@@ -32,6 +32,13 @@ public final class ModEntities {
     /** Entites disposant d'un oeuf d'apparition (monstres et boss). */
     public static final Map<String, DeferredHolder<EntityType<?>, ? extends EntityType<?>>> SPAWNABLE = new LinkedHashMap<>();
 
+    public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.mob.CryptZombieEntity>> CRYPT_ZOMBIE = mob("zombie_des_cryptes",
+            ENTITIES.registerEntityType("zombie_des_cryptes", com.mmorpg.entity.mob.CryptZombieEntity::new, MobCategory.MONSTER, b -> b.sized(0.6F, 1.95F).clientTrackingRange(8)));
+    public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.mob.VenomSpiderEntity>> VENOM_SPIDER = mob("araignee_venimeuse",
+            ENTITIES.registerEntityType("araignee_venimeuse", com.mmorpg.entity.mob.VenomSpiderEntity::new, MobCategory.MONSTER, b -> b.sized(0.7F, 0.5F).clientTrackingRange(8)));
+    public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.mob.BanditEntity>> BANDIT = mob("bandit_arbaletrier",
+            ENTITIES.registerEntityType("bandit_arbaletrier", com.mmorpg.entity.mob.BanditEntity::new, MobCategory.MONSTER, b -> b.sized(0.6F, 1.95F).clientTrackingRange(8)));
+
     public static final DeferredHolder<EntityType<?>, EntityType<GoblinEntity>> GOBLIN = mob("gobelin",
             ENTITIES.registerEntityType("gobelin", GoblinEntity::new, MobCategory.MONSTER, b -> b.sized(0.55F, 1.6F).clientTrackingRange(8)));
     public static final DeferredHolder<EntityType<?>, EntityType<DarkWolfEntity>> DARK_WOLF = mob("loup_sombre",
@@ -85,6 +92,9 @@ public final class ModEntities {
     }
 
     public static void registerAttributes(EntityAttributeCreationEvent event) {
+        event.put(CRYPT_ZOMBIE.get(), net.minecraft.world.entity.monster.zombie.Zombie.createAttributes().build());
+        event.put(VENOM_SPIDER.get(), net.minecraft.world.entity.monster.spider.CaveSpider.createCaveSpider().build());
+        event.put(BANDIT.get(), net.minecraft.world.entity.monster.illager.Pillager.createAttributes().build());
         event.put(GOBLIN.get(), RpgMonster.createAttributes().build());
         event.put(DARK_WOLF.get(), RpgMonster.createAttributes().build());
         event.put(CURSED_SKELETON.get(), CursedSkeletonEntity.createAttributes().build());

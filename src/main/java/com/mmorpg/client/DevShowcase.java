@@ -76,6 +76,33 @@ public final class DevShowcase {
             structuresPhase(mc, me);
             return;
         }
+        if (MODE.equals("reprise_mobs")) {
+            if (tick == 5) {
+                cmd(mc, "gamemode creative " + me);
+                cmd(mc, "tp " + me + " 0 220 0 0 10");
+                cmd(mc, "time set midnight");
+            }
+            if (tick == 15) cmd(mc, "fill -12 219 -12 12 219 12 minecraft:sea_lantern");
+            if (tick == 20) {
+                cmd(mc, "execute positioned -3 220 5 run mmorpg mob zombie_des_cryptes 15");
+                cmd(mc, "execute positioned 0 220 5 run mmorpg mob araignee_venimeuse 25");
+                cmd(mc, "execute positioned 3 220 5 run mmorpg mob bandit_arbaletrier 40");
+            }
+            if (tick == 100) {
+                java.util.Set<String> found = new java.util.HashSet<>();
+                for (var entity : mc.level.entitiesForRendering()) {
+                    if (entity instanceof com.mmorpg.entity.RpgMob mob) found.add(mob.mobKey());
+                }
+                if (!found.containsAll(java.util.List.of("zombie_des_cryptes", "araignee_venimeuse", "bandit_arbaletrier")))
+                    throw new IllegalStateException("Missing monster: " + found);
+                MMORPG.LOGGER.info("[CODEX CHECKS] MOBS PASS: three new entities loaded");
+                shot(mc, "codex_nouveaux_monstres");
+            }
+            if (tick == 110) MenuScreen.open(MenuScreen.Tab.BESTIAIRE);
+            if (tick == 120) shot(mc, "codex_bestiaire_etendu");
+            if (tick == 130) stop(mc);
+            return;
+        }
         if (MODE.equals("reprise")) {
             if (tick == 5) {
                 for (PlayerClass cls : PlayerClass.values()) {

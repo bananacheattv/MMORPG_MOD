@@ -37,6 +37,9 @@ public final class ClientRenderers {
 
     @SubscribeEvent
     public static void register(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(ModEntities.CRYPT_ZOMBIE.get(), net.minecraft.client.renderer.entity.ZombieRenderer::new);
+        event.registerEntityRenderer(ModEntities.VENOM_SPIDER.get(), net.minecraft.client.renderer.entity.CaveSpiderRenderer::new);
+        event.registerEntityRenderer(ModEntities.BANDIT.get(), net.minecraft.client.renderer.entity.PillagerRenderer::new);
         event.registerEntityRenderer(ModEntities.GOBLIN.get(), c -> humanoid(c, "gobelin"));
         event.registerEntityRenderer(ModEntities.DARK_WOLF.get(), c -> new TexturedMobRenderer<>(c,
                 new AdultWolfModel(c.bakeLayer(ModelLayers.WOLF)), WolfRenderState::new, "loup_sombre", 0.4F)

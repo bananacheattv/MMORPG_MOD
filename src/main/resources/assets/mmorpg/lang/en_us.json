@@ -217,5 +217,11 @@
   "mmorpg.configuration.title": "Configuration MMORPG",
   "item.mmorpg.nourriture_familier": "Nourriture pour familier",
   "item.mmorpg.charme_experience": "Charme d'expérience",
-  "item.mmorpg.charme_chance": "Charme de chance"
+  "item.mmorpg.charme_chance": "Charme de chance",
+  "entity.mmorpg.zombie_des_cryptes": "Zombie des Cryptes",
+  "entity.mmorpg.araignee_venimeuse": "Araignée Venimeuse",
+  "entity.mmorpg.bandit_arbaletrier": "Bandit Arbalétrier",
+  "item.mmorpg.zombie_des_cryptes_spawn_egg": "Œuf d'apparition : Zombie des Cryptes",
+  "item.mmorpg.araignee_venimeuse_spawn_egg": "Œuf d'apparition : Araignée Venimeuse",
+  "item.mmorpg.bandit_arbaletrier_spawn_egg": "Œuf d'apparition : Bandit Arbalétrier"
 }
