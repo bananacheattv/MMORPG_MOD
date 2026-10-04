@@ -785,6 +785,50 @@ def icon(glyph, main, accent, cls, size=32, gold=False):
 def gui_icons():
     for sid, cls, glyph, main, acc in SKILLS:
         img = icon(glyph, main, acc, cls, gold=sid in ('fureur_divine', 'meteore_celeste', 'tempete_divine', 'rempart_du_titan'))
+        # Contraste et reperes coherents : couleur de classe, or pour les ultimes,
+        # losange bleu pour les passifs ; les variantes ont un symbole d'effet.
+        from PIL import ImageDraw
+        d = ImageDraw.Draw(img)
+        passive = sid in ('maitrise_armes', 'flux_arcanique', 'oeil_de_lynx', 'peau_de_fer')
+        ultimate = sid in ('fureur_divine', 'meteore_celeste', 'tempete_divine', 'rempart_du_titan')
+        edge = '#ffe080' if ultimate else CLASS_COLORS[cls][0]
+        d.line([(1, 5), (1, 1), (5, 1)], fill=edge, width=1)
+        d.line([(26, 30), (30, 30), (30, 26)], fill=edge, width=1)
+        if passive:
+            d.polygon([(25, 21), (30, 26), (25, 31), (20, 26)], fill='#101828', outline='#90d8ff')
+            d.polygon([(25, 24), (27, 26), (25, 28), (23, 26)], fill='#90d8ff')
+        effect = {
+            'frappe_fragilisante': 'break', 'execution': 'strike', 'impact_vampirique': 'heal',
+            'second_souffle': 'heal', 'lance_de_givre': 'slow', 'souffle_draconique': 'fire',
+            'implosion': 'pull', 'meditation': 'mana', 'tir_entravant': 'slow',
+            'tir_venimeux': 'poison', 'tir_de_recul': 'push', 'pas_leger': 'speed',
+            'crochet_du_gardien': 'pull', 'jugement': 'strike', 'garde_partagee': 'guard',
+            'souffle_du_gardien': 'heal',
+        }.get(sid)
+        colors = {'heal': '#75ef88', 'slow': '#80e4ff', 'poison': '#a0e83c', 'fire': '#ff953f',
+                  'mana': '#75aaff', 'pull': '#ce91ff', 'guard': '#82c7ff', 'break': '#ffc070',
+                  'strike': '#ff6772', 'push': '#ffcf83', 'speed': '#96f2c3'}
+        if effect:
+            color = colors[effect]
+            d.rectangle((20, 20, 31, 31), fill='#0b101b', outline=color)
+            if effect in ('heal', 'mana'):
+                d.line((23, 26, 28, 26), fill=color, width=2)
+                d.line((26, 23, 26, 28), fill=color, width=2)
+            elif effect in ('pull', 'push', 'speed'):
+                pts = [(23, 23), (27, 26), (23, 29)]
+                if effect == 'pull': pts = [(28, 23), (24, 26), (28, 29)]
+                d.line(pts, fill=color, width=2)
+            elif effect == 'slow':
+                d.line((23, 23, 28, 28), fill=color)
+                d.line((23, 28, 28, 23), fill=color)
+                d.line((22, 26, 29, 26), fill=color)
+            elif effect == 'guard':
+                d.polygon([(23, 23), (28, 23), (28, 27), (26, 29), (23, 27)], outline=color)
+            elif effect in ('poison', 'fire'):
+                d.polygon([(26, 22), (29, 27), (27, 29), (24, 28), (23, 26)], fill=color)
+            else:
+                d.line((28, 23, 24, 29), fill=color, width=2)
+                d.line((23, 23, 25, 25), fill=color)
         img.save(path(ASSETS, 'textures', 'gui', 'skills', sid + '.png'))
     emblems = {'guerrier': ('crossed', '#f0f0f0', '#e0b030'), 'mage': ('staff', '#e0c8ff', '#80e0ff'),
                'archer': ('bow', '#e0c890', '#ffffff'), 'tank': ('shield', '#d0d8e8', '#ffd040')}

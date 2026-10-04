@@ -12,7 +12,8 @@ Branche : codex/eldoria-reprise. Sauvegarder chaque fonctionnalite dans un commi
 - Bestiaire : filtres Monstres/Boss puis familles, compteurs et tri par niveau ; famille configurable dans mobs.json, compatible avec les anciens fichiers. Compilation reussie ; essai visuel en jeu restant.
 - Inventaire : artisanat 2x2 et seconde main bloques en survie (menus, serveur, raccourci F), objets existants restitues ; mode creatif conserve. Tests executes dans une copie du monde : recette impossible, restitution sans perte, slots bloques, raccourcis refuses et retour creatif reussis. Capture visuelle verifiee.
 - Competences : 16 nouvelles actives (44 competences au total), paliers 10/40/65/90 en plus des paliers existants, six emplacements conserves, liste avec defilement et pagination. Compilation et test automatique des debloquages 1-100 reussis ; ecrans verifies en jeu. Equilibrage et chaque effet de combat a tester en multijoueur.
-- Les 9 autres demandes restent a implementer/verifier.
+- Icones : 44 visuels uniques, cadres par classe, marqueur passif et symboles secondaires (soin, poison, ralentissement, traction, protection...). Verification des fichiers 32x32 et planche visuelle effectuees.
+- Les 8 autres demandes restent a implementer/verifier.
 - Aucun code des agents cloud de Claude n'a ete recupere. Base initiale : f8c07de.
 
 ## Demandes utilisateur
