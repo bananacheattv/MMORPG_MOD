@@ -12,6 +12,8 @@ import java.util.Map;
 public class MobConfig {
     /** Nom affiche (vide = nom traduit par defaut). */
     public String displayName = "";
+    /** Sous-categorie du bestiaire ; vide = classement automatique. */
+    public String family = "";
     public int minLevel = 1;
     public int maxLevel = 10;
     public double baseHealth = 100;

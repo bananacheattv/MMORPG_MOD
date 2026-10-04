@@ -18,6 +18,8 @@ import java.util.List;
 public class BestiaryScreen extends MenuScreen {
     private static String selected;
     private int scroll;
+    private int category; // tous, monstres, boss
+    private String family = "Toutes";
 
     public BestiaryScreen() {
         super(Tab.BESTIAIRE);
@@ -37,23 +39,39 @@ public class BestiaryScreen extends MenuScreen {
 
     @Override
     protected void renderTab(GuiGraphicsExtractor g, int mx, int my, float a) {
-        List<String> keys = new ArrayList<>(ClientData.mobInfo.keySet());
+        List<String> all = new ArrayList<>(ClientData.mobInfo.keySet());
+        all.sort(java.util.Comparator.<String>comparingInt(k -> ClientData.mobInfo.getCompoundOrEmpty(k).getIntOr("min", 1))
+                .thenComparing(BestiaryScreen::displayName));
+        List<String> categoryKeys = all.stream().filter(k -> category == 0 ||
+                ClientData.mobInfo.getCompoundOrEmpty(k).getBooleanOr("boss", false) == (category == 2)).toList();
+        List<String> families = new ArrayList<>(List.of("Toutes"));
+        categoryKeys.stream().map(k -> ClientData.mobInfo.getCompoundOrEmpty(k).getStringOr("family", "Autres"))
+                .distinct().sorted().forEach(families::add);
+        if (!families.contains(family)) family = "Toutes";
+        List<String> keys = categoryKeys.stream().filter(k -> family.equals("Toutes") ||
+                family.equals(ClientData.mobInfo.getCompoundOrEmpty(k).getStringOr("family", "Autres"))).toList();
         int x0 = left + 8;
         int y0 = contentTop;
         int lw = 150;
-        Ui.header(g, x0, y0, lw, "BESTIAIRE");
+        Ui.header(g, x0, y0, lw, "BESTIAIRE (" + keys.size() + ")");
+        Ui.frame(g, x0, y0 + 14, lw, 16, Ui.GOLD, hovered(x0, y0 + 14, lw, 16));
+        g.text(font, "Type : " + new String[]{"Tous", "Monstres", "Boss"}[category] + "  >", x0 + 4, y0 + 18, Ui.TEXT, false);
+        click(x0, y0 + 14, lw, 16, () -> { category = (category + 1) % 3; family = "Toutes"; scroll = 0; });
+        Ui.frame(g, x0, y0 + 32, lw, 16, Ui.GOLD, hovered(x0, y0 + 32, lw, 16));
+        g.text(font, font.plainSubstrByWidth("Famille : " + family + "  >", lw - 8), x0 + 4, y0 + 36, Ui.TEXT, false);
+        click(x0, y0 + 32, lw, 16, () -> { family = families.get((families.indexOf(family) + 1) % families.size()); scroll = 0; });
         if (keys.isEmpty()) {
-            g.text(font, "Aucune donnée.", x0, y0 + 16, Ui.MUTED, false);
+            g.text(font, "Aucune donnée.", x0, y0 + 54, Ui.MUTED, false);
             return;
         }
         if (selected == null || !keys.contains(selected)) selected = keys.get(0);
         int rowH = 16;
-        int visible = (ph - 30 - 24) / rowH;
+        int visible = Math.max(1, (ph - 30 - 60) / rowH);
         scroll = Math.min(scroll, Math.max(0, keys.size() - visible));
         for (int i = 0; i < Math.min(visible, keys.size() - scroll); i++) {
             String k = keys.get(i + scroll);
             CompoundTag t = ClientData.mobInfo.getCompoundOrEmpty(k);
-            int ry = y0 + 14 + i * rowH;
+            int ry = y0 + 52 + i * rowH;
             boolean boss = t.getBooleanOr("boss", false);
             boolean sel = k.equals(selected);
             Ui.frame(g, x0, ry, lw, rowH - 2, boss ? 0xFFFF5050 : 0xFFC0A060, sel || hovered(x0, ry, lw, rowH - 2));
