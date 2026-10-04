@@ -4,8 +4,9 @@ Branche : codex/eldoria-reprise. Sauvegarder chaque fonctionnalite dans un commi
 
 ## Etat
 
-- Potions : correctif implemente (PV 150/600/1500 ; mana 100/350/900), plafonne aux maxima existants, aucun objet consomme si la jauge est pleine. Verification statique effectuee. Compilation NON VALIDEE : Gradle echoue avant compilation avec Unable to establish loopback connection / UnixDomainSockets Invalid argument: connect, sous Java 21 et Java 25. Java 25 installe dans C:/Program Files/Java/jdk-25.0.4. Aucun test en jeu effectue.
-- Les 16 autres demandes restent a implementer/verifier.
+- Potions : correctif implemente (PV 150/600/1500 ; mana 100/350/900), plafonne aux maxima existants, aucun objet consomme si la jauge est pleine. Verification statique effectuee. Compilation Gradle reussie sous Java 25 : utiliser JAVA_TOOL_OPTIONS=-Djdk.net.unixdomain.tmpdir=C:/Users/Utilisateur/Documents/GitHub/MMORPG_MOD/build dans cet environnement Windows. Java 25 installe dans C:/Program Files/Java/jdk-25.0.4. Aucun test en jeu effectue.
+- Familiers adaptes a la classe : bonus offensifs et attributs adaptes au proprietaire, avec les memes valeurs dans le calcul serveur et dans le menu. Compilation reussie ; verification en jeu restante.
+- Les 15 autres demandes restent a implementer/verifier.
 - Aucun code des agents cloud de Claude n'a ete recupere. Base initiale : f8c07de.
 
 ## Demandes utilisateur

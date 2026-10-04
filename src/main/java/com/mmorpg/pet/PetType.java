@@ -85,6 +85,25 @@ public enum PetType {
         return 1.0 + 0.15 * (Math.max(1, level) - 1);
     }
 
+    /** All companions adapt their offensive and primary bonuses to their owner's class. */
+    public StatBlock bonusAt(int level, com.mmorpg.rpg.PlayerClass cls) {
+        StatBlock out = bonusAt(level);
+        if (!cls.isPlayable()) return out;
+        double offense = out.get(Stat.ATK) + out.get(Stat.MAG);
+        out.set(Stat.ATK, 0);
+        out.set(Stat.MAG, 0);
+        out.set(cls == com.mmorpg.rpg.PlayerClass.MAGE ? Stat.MAG : Stat.ATK, offense);
+        double primary = 0;
+        for (Stat stat : Stat.PRIMARIES) {
+            primary += out.get(stat);
+            out.set(stat, 0);
+        }
+        Stat[] main = cls.mainAttributes();
+        out.set(main[0], primary * 0.6);
+        out.set(main[1], primary * 0.4);
+        return out;
+    }
+
     public StatBlock bonusAt(int level) {
         return bonus.scaled(levelMult(level));
     }

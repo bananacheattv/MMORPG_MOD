@@ -86,10 +86,10 @@ public class PetsScreen extends MenuScreen {
             Ui.bar(g, dx + 8, ty, dw - 16, 8, frac, 0xFFC080FF, 0xFF603090, level >= PetType.MAX_LEVEL ? "MAX" : (xp - cur) + " / " + (next - cur));
             ty += 14;
         }
-        g.text(font, "Bonus" + (has ? "" : " (niveau 1)") + " :", dx + 8, ty, Ui.GOLD, false);
+        g.text(font, "Bonus adaptés : " + d.playerClass.label, dx + 8, ty, Ui.GOLD, false);
         ty += 11;
         List<Component> lines = new ArrayList<>();
-        ItemTooltips.statLines(p.bonusAt(level), 1.0, lines::add);
+        ItemTooltips.statLines(p.bonusAt(level, d.playerClass), 1.0, lines::add);
         for (Component c : lines) {
             g.text(font, c, dx + 8, ty, 0xFFFFFFFF, false);
             ty += 10;

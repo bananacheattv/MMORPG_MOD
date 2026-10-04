@@ -64,7 +64,7 @@ public final class StatCalculator {
         // --- familier
         PetType pet = PetType.byId(data.activePet);
         if (pet != null && data.petXp.containsKey(pet.id)) {
-            flat.addAll(pet.bonusAt(data.petLevel(pet.id)));
+            flat.addAll(pet.bonusAt(data.petLevel(pet.id), cls));
         }
 
         // --- passifs de classe
