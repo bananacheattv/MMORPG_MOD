@@ -76,6 +76,38 @@ public final class DevShowcase {
             structuresPhase(mc, me);
             return;
         }
+        if (MODE.equals("reprise")) {
+            if (tick == 5) {
+                for (PlayerClass cls : PlayerClass.values()) {
+                    if (!cls.isPlayable()) continue;
+                    var test = new com.mmorpg.rpg.PlayerData();
+                    test.playerClass = cls;
+                    for (int lv = 1; lv <= 100; lv++) {
+                        test.level = lv;
+                        test.unlockSkills();
+                        for (var skill : com.mmorpg.skill.Skills.forClass(cls)) {
+                            if (test.isSkillUnlocked(skill) != (lv >= skill.unlockLevel)) throw new IllegalStateException("Skill unlock " + skill.id + " level " + lv);
+                        }
+                        if (test.skillBar.length != 6) throw new IllegalStateException("Skill bar size");
+                    }
+                    if (test.skillRanks.size() != 11) throw new IllegalStateException("Skill count " + cls);
+                }
+                MMORPG.LOGGER.info("[CODEX CHECKS] SKILLS PASS: 44 skills, levels 1-100, six slots");
+                mc.getWindow().setWindowed(1280, 720);
+                cmd(mc, "mmorpg classe " + me + " guerrier");
+                cmd(mc, "mmorpg niveau " + me + " 100");
+            }
+            if (tick == 30) MenuScreen.open(MenuScreen.Tab.COMPETENCES);
+            if (tick == 40) shot(mc, "codex_competences");
+            if (tick == 45 && mc.gui.screen() != null) mc.gui.screen().mouseScrolled(100, 100, 0, -10);
+            if (tick == 55) shot(mc, "codex_competences_suite");
+            if (tick == 60) MenuScreen.open(MenuScreen.Tab.BESTIAIRE);
+            if (tick == 70) shot(mc, "codex_bestiaire");
+            if (tick == 80) MenuScreen.open(MenuScreen.Tab.FAMILIERS);
+            if (tick == 90) shot(mc, "codex_familiers");
+            if (tick == 100) stop(mc);
+            return;
+        }
         if (MODE.equals("ecrans")) {          // inventaire du mod et ecran Personnage (8 attributs)
             if (tick == 5) mc.getWindow().setWindowed(1280, 720);
             if (tick == 20) cmd(mc, "gamemode survival " + me);

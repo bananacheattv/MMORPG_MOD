@@ -444,7 +444,7 @@ public final class SkillExecutor {
                 sound(p, SoundEvents.TOTEM_USE, 0.8f, 0.8f);
             }
             default -> {
-                return false;
+                return ExtendedSkills.execute(p, s, rank);
             }
         }
         return true;

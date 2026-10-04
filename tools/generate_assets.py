@@ -683,6 +683,22 @@ CLASS_COLORS = {
 }
 
 SKILLS = [
+    ('frappe_fragilisante', 'guerrier', 'sword', '#ffffff', '#ffe080'),
+    ('execution', 'guerrier', 'crossed', '#ffffff', '#ffe080'),
+    ('impact_vampirique', 'guerrier', 'drop', '#ffffff', '#ffe080'),
+    ('second_souffle', 'guerrier', 'heal', '#ffffff', '#ffe080'),
+    ('lance_de_givre', 'mage', 'snow', '#ffffff', '#ffe080'),
+    ('souffle_draconique', 'mage', 'flame', '#ffffff', '#ffe080'),
+    ('implosion', 'mage', 'spiral', '#ffffff', '#ffe080'),
+    ('meditation', 'mage', 'star', '#ffffff', '#ffe080'),
+    ('tir_entravant', 'archer', 'pierce', '#ffffff', '#ffe080'),
+    ('tir_venimeux', 'archer', 'arrow', '#ffffff', '#ffe080'),
+    ('tir_de_recul', 'archer', 'back', '#ffffff', '#ffe080'),
+    ('pas_leger', 'archer', 'dash', '#ffffff', '#ffe080'),
+    ('crochet_du_gardien', 'tank', 'taunt', '#ffffff', '#ffe080'),
+    ('jugement', 'tank', 'fist', '#ffffff', '#ffe080'),
+    ('garde_partagee', 'tank', 'shield', '#ffffff', '#ffe080'),
+    ('souffle_du_gardien', 'tank', 'heal', '#ffffff', '#ffe080'),
     # (id, classe, glyphe, couleur principale, accent)
     ('frappe_puissante', 'guerrier', 'sword', '#f0f0f0', '#e0b030'),
     ('cri_de_guerre', 'guerrier', 'shout', '#ffe0a0', '#ff6030'),

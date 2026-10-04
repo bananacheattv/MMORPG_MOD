@@ -12,7 +12,7 @@ import java.util.Map;
 import static com.mmorpg.skill.Skill.pct;
 import static com.mmorpg.skill.Skill.sec;
 
-/** Registre des 28 competences (7 par classe : 6 actives dont 1 ultime, et 1 passive). */
+/** 44 competences : 10 actives et 1 passive par classe, avec 6 emplacements actifs. */
 public final class Skills {
     private static final Map<String, Skill> BY_ID = new LinkedHashMap<>();
     private static final Map<PlayerClass, List<Skill>> BY_CLASS = new EnumMap<>(PlayerClass.class);
@@ -137,6 +137,55 @@ public final class Skills {
             .desc((s, r) -> "ULTIME — Pendant " + sec(s.duration) + " : dégâts subis réduits de " + pct(s.power) + ", renvoie " + pct(s.power2) + " des dégâts reçus et provoque tous les ennemis à " + (int) s.radius + " blocs.")
             .build());
 
+    public static final Skill FRAPPE_FRAGILISANTE = reg(Skill.builder("frappe_fragilisante", "Frappe Fragilisante", PlayerClass.GUERRIER, 10)
+            .cost(15, 9).power(1.4).radius(4).duration(5)
+            .desc((s, r) -> "Inflige " + pct(s.scaled(r)) + " de l’Attaque et affaiblit la cible pendant 5 s.").build());
+    public static final Skill EXECUTION = reg(Skill.builder("execution", "Exécution", PlayerClass.GUERRIER, 40)
+            .cost(25, 15).power(2.2).radius(4).duration(0)
+            .desc((s, r) -> "Inflige " + pct(s.scaled(r)) + " de l’Attaque ; dégâts doublés si la cible est sous 30 % de vie.").build());
+    public static final Skill IMPACT_VAMPIRIQUE = reg(Skill.builder("impact_vampirique", "Impact Vampirique", PlayerClass.GUERRIER, 65)
+            .cost(30, 18).power(1.6).radius(5).duration(0)
+            .desc((s, r) -> "Frappe les ennemis proches pour " + pct(s.scaled(r)) + " de l’Attaque ; soigne 3 % des PV max par cible touchée (maximum 15 %).").build());
+    public static final Skill SECOND_SOUFFLE = reg(Skill.builder("second_souffle", "Second Souffle", PlayerClass.GUERRIER, 90)
+            .cost(25, 45).power(0.2).radius(0).duration(0)
+            .desc((s, r) -> "Récupère " + pct(s.scaled(r)) + " de vos PV max.").build());
+    public static final Skill LANCE_DE_GIVRE = reg(Skill.builder("lance_de_givre", "Lance de Givre", PlayerClass.MAGE, 10)
+            .cost(18, 6).power(1.5).radius(22).duration(4)
+            .desc((s, r) -> "Inflige " + pct(s.scaled(r)) + " de la Magie à la cible visée et la ralentit pendant 4 s.").build());
+    public static final Skill SOUFFLE_DRACONIQUE = reg(Skill.builder("souffle_draconique", "Souffle Draconique", PlayerClass.MAGE, 40)
+            .cost(28, 12).power(1.8).radius(7).duration(5)
+            .desc((s, r) -> "Inflige " + pct(s.scaled(r)) + " de la Magie dans un cône et enflamme les ennemis pendant 5 s.").build());
+    public static final Skill IMPLOSION = reg(Skill.builder("implosion", "Implosion", PlayerClass.MAGE, 65)
+            .cost(40, 18).power(2).radius(5).duration(0)
+            .desc((s, r) -> "Attire les ennemis vers le point visé (20 blocs), puis inflige " + pct(s.scaled(r)) + " de la Magie dans un rayon de 5 blocs.").build());
+    public static final Skill MEDITATION = reg(Skill.builder("meditation", "Méditation", PlayerClass.MAGE, 90)
+            .cost(0, 45).power(0.3).radius(0).duration(0)
+            .desc((s, r) -> "Récupère " + pct(s.scaled(r)) + " de votre mana maximal.").build());
+    public static final Skill TIR_ENTRAVANT = reg(Skill.builder("tir_entravant", "Tir Entravant", PlayerClass.ARCHER, 10)
+            .cost(12, 8).power(1.3).radius(28).duration(4)
+            .desc((s, r) -> "Inflige " + pct(s.scaled(r)) + " de l’Attaque à la cible visée et la ralentit fortement pendant 4 s.").build());
+    public static final Skill TIR_VENIMEUX = reg(Skill.builder("tir_venimeux", "Tir Venimeux", PlayerClass.ARCHER, 40)
+            .cost(22, 14).power(0.5).radius(26).duration(6)
+            .desc((s, r) -> "Inflige " + pct(s.scaled(r)) + " de l’Attaque à l’impact puis le même montant chaque seconde pendant 6 s.").build());
+    public static final Skill TIR_DE_RECUL = reg(Skill.builder("tir_de_recul", "Tir de Recul", PlayerClass.ARCHER, 65)
+            .cost(22, 10).power(1.8).radius(20).duration(0)
+            .desc((s, r) -> "Inflige " + pct(s.scaled(r)) + " de l’Attaque à la cible visée et la repousse.").build());
+    public static final Skill PAS_LEGER = reg(Skill.builder("pas_leger", "Pas Léger", PlayerClass.ARCHER, 90)
+            .cost(25, 30).power(0.35).radius(0).duration(8)
+            .desc((s, r) -> "Augmente votre vitesse de " + pct(s.scaled(r)) + " pendant 8 s.").build());
+    public static final Skill CROCHET_DU_GARDIEN = reg(Skill.builder("crochet_du_gardien", "Crochet du Gardien", PlayerClass.TANK, 10)
+            .cost(15, 10).power(0.9).radius(12).duration(3)
+            .desc((s, r) -> "Inflige " + pct(s.scaled(r)) + " de l’Attaque, attire la cible et la provoque pendant 3 s.").build());
+    public static final Skill JUGEMENT = reg(Skill.builder("jugement", "Jugement", PlayerClass.TANK, 40)
+            .cost(25, 12).power(2).radius(5).duration(0)
+            .desc((s, r) -> "Inflige " + pct(s.scaled(r)) + " de votre Défense aux ennemis proches.").build());
+    public static final Skill GARDE_PARTAGEE = reg(Skill.builder("garde_partagee", "Garde Partagée", PlayerClass.TANK, 65)
+            .cost(35, 35).power(0.3).radius(8).duration(6)
+            .desc((s, r) -> "Réduit les dégâts subis de 30 % pendant 6 s pour vous et votre groupe à 8 blocs.").build());
+    public static final Skill SOUFFLE_DU_GARDIEN = reg(Skill.builder("souffle_du_gardien", "Souffle du Gardien", PlayerClass.TANK, 90)
+            .cost(40, 45).power(0.15).radius(8).duration(0)
+            .desc((s, r) -> "Soigne " + pct(s.scaled(r)) + " des PV max des membres de votre groupe à 8 blocs et de vous-même.").build());
+
     private Skills() {
     }
 
@@ -151,7 +200,7 @@ public final class Skills {
     }
 
     public static List<Skill> forClass(PlayerClass cls) {
-        return Collections.unmodifiableList(BY_CLASS.getOrDefault(cls, List.of()));
+        return BY_CLASS.getOrDefault(cls, List.of()).stream().sorted(java.util.Comparator.comparingInt(s -> s.unlockLevel)).toList();
     }
 
     public static Iterable<Skill> all() {

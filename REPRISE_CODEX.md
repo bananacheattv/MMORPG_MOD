@@ -11,7 +11,8 @@ Branche : codex/eldoria-reprise. Sauvegarder chaque fonctionnalite dans un commi
 - Menace / aggro : degats cumules par joueur, multiplicateur x2 pour le tank, seuil de changement de cible de 10 %, provocation prioritaire pendant sa duree, nettoyage hors portee/deconnexion/mort et respect de la base des boss. Compilation reussie ; validation multijoueur en jeu restante.
 - Bestiaire : filtres Monstres/Boss puis familles, compteurs et tri par niveau ; famille configurable dans mobs.json, compatible avec les anciens fichiers. Compilation reussie ; essai visuel en jeu restant.
 - Inventaire : artisanat 2x2 et seconde main bloques en survie (menus, serveur, raccourci F), objets existants restitues ; mode creatif conserve. Tests executes dans une copie du monde : recette impossible, restitution sans perte, slots bloques, raccourcis refuses et retour creatif reussis. Capture visuelle verifiee.
-- Les 10 autres demandes restent a implementer/verifier.
+- Competences : 16 nouvelles actives (44 competences au total), paliers 10/40/65/90 en plus des paliers existants, six emplacements conserves, liste avec defilement et pagination. Compilation et test automatique des debloquages 1-100 reussis ; ecrans verifies en jeu. Equilibrage et chaque effet de combat a tester en multijoueur.
+- Les 9 autres demandes restent a implementer/verifier.
 - Aucun code des agents cloud de Claude n'a ete recupere. Base initiale : f8c07de.
 
 ## Demandes utilisateur
