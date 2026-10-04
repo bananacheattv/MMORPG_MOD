@@ -93,12 +93,12 @@ public final class ModItems {
     public static final DeferredItem<SummonKeyItem> OEIL_NEANT = summon("oeil_neant", Rarity.MYTHIQUE, "avatar_neant", "Avatar du Néant", 100);
 
     // ------------------------------------------------------------------ consommables
-    public static final DeferredItem<RpgConsumableItem> POTION_SOIN_MINEURE = potion("potion_soin_mineure", Rarity.COMMUN, RpgConsumableItem.Kind.HEAL, 0.15, "Rend 15 % des PV maximum.");
-    public static final DeferredItem<RpgConsumableItem> POTION_SOIN = potion("potion_soin", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.HEAL, 0.30, "Rend 30 % des PV maximum.");
-    public static final DeferredItem<RpgConsumableItem> POTION_SOIN_MAJEURE = potion("potion_soin_majeure", Rarity.RARE, RpgConsumableItem.Kind.HEAL, 0.50, "Rend 50 % des PV maximum.");
-    public static final DeferredItem<RpgConsumableItem> POTION_MANA_MINEURE = potion("potion_mana_mineure", Rarity.COMMUN, RpgConsumableItem.Kind.MANA, 0.20, "Rend 20 % du mana maximum.");
-    public static final DeferredItem<RpgConsumableItem> POTION_MANA = potion("potion_mana", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.MANA, 0.40, "Rend 40 % du mana maximum.");
-    public static final DeferredItem<RpgConsumableItem> POTION_MANA_MAJEURE = potion("potion_mana_majeure", Rarity.RARE, RpgConsumableItem.Kind.MANA, 0.70, "Rend 70 % du mana maximum.");
+    public static final DeferredItem<RpgConsumableItem> POTION_SOIN_MINEURE = potion("potion_soin_mineure", Rarity.COMMUN, RpgConsumableItem.Kind.HEAL, 150, "Rend 150 PV.");
+    public static final DeferredItem<RpgConsumableItem> POTION_SOIN = potion("potion_soin", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.HEAL, 600, "Rend 600 PV.");
+    public static final DeferredItem<RpgConsumableItem> POTION_SOIN_MAJEURE = potion("potion_soin_majeure", Rarity.RARE, RpgConsumableItem.Kind.HEAL, 1500, "Rend 1500 PV.");
+    public static final DeferredItem<RpgConsumableItem> POTION_MANA_MINEURE = potion("potion_mana_mineure", Rarity.COMMUN, RpgConsumableItem.Kind.MANA, 100, "Rend 100 points de mana.");
+    public static final DeferredItem<RpgConsumableItem> POTION_MANA = potion("potion_mana", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.MANA, 350, "Rend 350 points de mana.");
+    public static final DeferredItem<RpgConsumableItem> POTION_MANA_MAJEURE = potion("potion_mana_majeure", Rarity.RARE, RpgConsumableItem.Kind.MANA, 900, "Rend 900 points de mana.");
     public static final DeferredItem<RpgConsumableItem> ELIXIR_EXPERIENCE = consumable("elixir_experience", Rarity.EPIQUE, RpgConsumableItem.Kind.ELIXIR, 0.25, "Octroie 25 % de l'expérience du niveau en cours.");
     public static final DeferredItem<RpgConsumableItem> PARCHEMIN_TELEPORTATION = consumable("parchemin_teleportation", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.TELEPORT_SCROLL, 0, "Ouvre le réseau de téléportation depuis n'importe où.\nConsommé lors du voyage.");
     public static final DeferredItem<RpgConsumableItem> PARCHEMIN_OUBLI = consumable("parchemin_oubli", Rarity.RARE, RpgConsumableItem.Kind.FORGET_SCROLL, 0, "Réinitialise vos points d'attribut.");

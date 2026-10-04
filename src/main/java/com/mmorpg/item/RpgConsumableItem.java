@@ -48,14 +48,16 @@ public class RpgConsumableItem extends RpgMaterialItem {
         switch (kind) {
             case HEAL -> {
                 if (sp.getCooldowns().isOnCooldown(stack)) return InteractionResult.FAIL;
-                RpgPlayers.healPercent(sp, amount);
+                if (data.hp >= data.stats.get(com.mmorpg.rpg.Stat.MAX_HP)) return InteractionResult.FAIL;
+                RpgPlayers.heal(sp, amount, true);
                 sp.getCooldowns().addCooldown(POTION_GROUP, 160);
                 sl.playSound(null, sp.blockPosition(), SoundEvents.GENERIC_DRINK.value(), SoundSource.PLAYERS, 1, 1);
                 sl.sendParticles(ParticleTypes.HEART, sp.getX(), sp.getY() + 1.2, sp.getZ(), 6, 0.4, 0.4, 0.4, 0.02);
             }
             case MANA -> {
                 if (sp.getCooldowns().isOnCooldown(stack)) return InteractionResult.FAIL;
-                RpgPlayers.restoreManaPercent(sp, amount);
+                if (data.mana >= data.stats.get(com.mmorpg.rpg.Stat.MAX_MANA)) return InteractionResult.FAIL;
+                RpgPlayers.restoreMana(sp, amount);
                 sp.getCooldowns().addCooldown(POTION_GROUP, 160);
                 sl.playSound(null, sp.blockPosition(), SoundEvents.GENERIC_DRINK.value(), SoundSource.PLAYERS, 1, 1.2f);
                 sl.sendParticles(ParticleTypes.ENCHANT, sp.getX(), sp.getY() + 1.2, sp.getZ(), 20, 0.4, 0.5, 0.4, 0.5);
