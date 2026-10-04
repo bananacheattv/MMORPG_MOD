@@ -6,11 +6,9 @@ import com.mmorpg.client.ui.Ui;
 import com.mmorpg.item.ItemTooltips;
 import com.mmorpg.network.Payloads;
 import com.mmorpg.pet.PetType;
-import com.mmorpg.registry.ModItems;
 import com.mmorpg.rpg.PlayerData;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +16,26 @@ import java.util.List;
 /** Collection de familiers : invocation, niveau, experience et bonus. */
 public class PetsScreen extends MenuScreen {
     private static PetType selected = PetType.FEU_FOLLET;
+
+    private final java.util.Map<PetType, com.mmorpg.entity.PetEntity> previews = new java.util.EnumMap<>(PetType.class);
+
+    private void preview(GuiGraphicsExtractor g, PetType type, int x, int y, int size) {
+        if (minecraft.level == null) return;
+        var entity = previews.computeIfAbsent(type, t -> {
+            var pet = new com.mmorpg.entity.PetEntity(com.mmorpg.registry.ModEntities.PET.get(), minecraft.level);
+            pet.displayOnly(t, 155);
+            return pet;
+        });
+        entity.tickCount = (int) (minecraft.level.getGameTime() % 100000);
+        var renderer = minecraft.getEntityRenderDispatcher().getRenderer(entity);
+        var state = renderer.createRenderState(entity, 1f);
+        state.shadowPieces.clear();
+        state.outlineColor = 0;
+        float scale = size * (type == PetType.PHENIX ? .55f : type == PetType.DRAGONNET ? .60f : type == PetType.FEE || type == PetType.LOUP_SPECTRAL ? .65f : .85f);
+        float center = type == PetType.DRAGONNET ? .65f : .48f;
+        g.entity(state, scale, new org.joml.Vector3f(0, center, 0),
+                new org.joml.Quaternionf().rotateZ((float) Math.PI), null, x, y, x + size, y + size);
+    }
 
     public PetsScreen() {
         super(Tab.FAMILIERS);
@@ -41,11 +59,8 @@ public class PetsScreen extends MenuScreen {
             boolean active = p.id.equals(d.activePet);
             Ui.frame(g, cx, cy, cell, cell + 14, p.rarity.color, p == selected || hovered(cx, cy, cell, cell + 14));
             if (active) Ui.border(g, cx + 1, cy + 1, cell - 2, cell + 12, 0xFF60FF60);
-            g.pose().pushMatrix();
-            g.pose().translate(cx + cell / 2f - 16, cy + 4);
-            g.pose().scale(2f, 2f);
-            g.item(new ItemStack(ModItems.PET_SPRITES.get(p).get()), 0, 0);
-            g.pose().popMatrix();
+            preview(g, p, cx + 3, cy + 2, cell - 6);
+            if (hovered(cx, cy, cell, cell + 14)) tooltip(g, List.of(Component.literal(p.label).withColor(p.rarity.color)));
             if (!has) {
                 g.fill(cx + 1, cy + 1, cx + cell - 1, cy + cell + 13, 0xC0000000);
                 g.centeredText(font, Component.literal("?"), cx + cell / 2, cy + 16, Ui.MUTED);
@@ -66,11 +81,7 @@ public class PetsScreen extends MenuScreen {
         Ui.inset(g, dx, y0, dw, dh);
         PetType p = selected;
         boolean has = d.petXp.containsKey(p.id);
-        g.pose().pushMatrix();
-        g.pose().translate(dx + 8, y0 + 8);
-        g.pose().scale(3f, 3f);
-        g.item(new ItemStack(ModItems.PET_SPRITES.get(p).get()), 0, 0);
-        g.pose().popMatrix();
+        preview(g, p, dx + 6, y0 + 4, 50);
         g.text(font, p.label, dx + 62, y0 + 10, p.rarity.color, true);
         g.text(font, p.rarity.label, dx + 62, y0 + 21, Ui.MUTED, false);
         int ty = y0 + 60;
