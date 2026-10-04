@@ -105,6 +105,9 @@ public final class ModItems {
     public static final DeferredItem<RpgConsumableItem> ORBE_RENAISSANCE = consumable("orbe_renaissance", Rarity.LEGENDAIRE, RpgConsumableItem.Kind.REBIRTH_ORB, 0, "Permet de choisir une nouvelle classe.\nVotre niveau est conservé.");
     public static final DeferredItem<RpgConsumableItem> COFFRE_COSMETIQUE = consumable("coffre_cosmetique", Rarity.EPIQUE, RpgConsumableItem.Kind.COSMETIC_CHEST, 0, "Débloque un cosmétique animé aléatoire.");
 
+    public static final DeferredItem<RpgConsumableItem> NOURRITURE_FAMILIER = consumable("nourriture_familier", Rarity.PEU_COMMUN,
+            RpgConsumableItem.Kind.PET_FOOD, 25, "Restaure 25 points de bonheur au familier invoqué.\nLes bonus varient de 50 % à 100 % selon son bonheur.");
+
     // ------------------------------------------------------------------ blocs
     public static final DeferredItem<BlockItem> FORGE_ARCANIQUE = ITEMS.registerSimpleBlockItem("forge_arcanique", ModBlocks.FORGE_ARCANIQUE);
     public static final DeferredItem<com.mmorpg.item.AdminBlockItem> TELEPORTEUR = ITEMS.registerItem("teleporteur",

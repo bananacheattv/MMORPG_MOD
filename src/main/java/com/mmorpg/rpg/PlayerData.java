@@ -42,6 +42,15 @@ public class PlayerData implements ValueIOSerializable {
     public float mana = -1;
     public final Map<String, Integer> petXp = new LinkedHashMap<>();
     public String activePet = "";
+    public final Map<String, Integer> petHappiness = new LinkedHashMap<>();
+
+    public int happiness(String id) {
+        return Math.clamp(petHappiness.getOrDefault(id, 100), 0, 100);
+    }
+
+    public double petBonusMultiplier(String id) {
+        return 0.5 + happiness(id) / 200.0;
+    }
     public final Set<String> cosmetics = new HashSet<>();
     public final Map<Cosmetic.Category, String> equippedCosmetics = new EnumMap<>(Cosmetic.Category.class);
     public final Set<UUID> waypoints = new HashSet<>();
@@ -146,6 +155,7 @@ public class PlayerData implements ValueIOSerializable {
         t.putFloat("mana", mana);
         t.store("pets", STR_INT_MAP, petXp);
         t.putString("activePet", activePet);
+        t.store("petHappiness", STR_INT_MAP, petHappiness);
         t.store("cosmetics", Codec.STRING.listOf(), new ArrayList<>(cosmetics));
         Map<String, String> eq = new HashMap<>();
         equippedCosmetics.forEach((k, v) -> eq.put(k.name(), v));
@@ -185,6 +195,10 @@ public class PlayerData implements ValueIOSerializable {
         petXp.clear();
         petXp.putAll(t.read("pets", STR_INT_MAP).orElse(Map.of()));
         activePet = t.getStringOr("activePet", "");
+        petHappiness.clear();
+        t.read("petHappiness", STR_INT_MAP).orElse(Map.of()).forEach((id, n) -> {
+            if (petXp.containsKey(id)) petHappiness.put(id, Math.clamp(n, 0, 100));
+        });
         cosmetics.clear();
         cosmetics.addAll(t.read("cosmetics", Codec.STRING.listOf()).orElse(List.of()));
         equippedCosmetics.clear();

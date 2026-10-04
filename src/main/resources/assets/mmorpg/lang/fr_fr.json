@@ -214,5 +214,6 @@
   "mmorpg.configuration.showDamageNumbers": "Afficher les dégâts flottants",
   "mmorpg.configuration.showNameplates": "Afficher les barres de vie des monstres",
   "mmorpg.configuration.showOwnCosmetics": "Afficher ses propres cosmétiques",
-  "mmorpg.configuration.title": "Configuration MMORPG"
+  "mmorpg.configuration.title": "Configuration MMORPG",
+  "item.mmorpg.nourriture_familier": "Nourriture pour familier"
 }

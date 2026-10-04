@@ -85,6 +85,7 @@ public final class ForgeRecipes {
 
     static {
         PlayerClass N = PlayerClass.NONE;
+        add(Category.FAMILIERS, "nourriture_familier", 4, 5, 1, N, "minecraft:wheat", 4, "minecraft:carrot", 2);
         // ---------------------------------------------------------------- materiaux intermediaires
         add(Category.MATERIAUX, "lingot_mithril", 1, 5, 20, N, "minecraft:iron_ingot", 2, "acier_orc", 2, "poussiere_ame", 1);
         add(Category.MATERIAUX, "lingot_adamantite", 1, 20, 55, N, "lingot_mithril", 1, "noyau_flamme", 2, "eclat_givre", 1, "minecraft:diamond", 1);

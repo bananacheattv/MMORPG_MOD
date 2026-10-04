@@ -836,6 +836,8 @@ def main():
     with open(os.path.join(os.path.dirname(__file__), 'manifest.txt'), 'w', encoding='utf-8') as f:
         for kind, iid in MANIFEST:
             f.write(f'{kind} {iid}\n')
+    import generate_extensions
+    generate_extensions.generate()
     print(f'{len(MANIFEST)} objets/blocs generes, {len(LANG)} traductions')
 
 

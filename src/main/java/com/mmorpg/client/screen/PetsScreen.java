@@ -89,10 +89,17 @@ public class PetsScreen extends MenuScreen {
         g.text(font, "Bonus adaptés : " + d.playerClass.label, dx + 8, ty, Ui.GOLD, false);
         ty += 11;
         List<Component> lines = new ArrayList<>();
-        ItemTooltips.statLines(p.bonusAt(level, d.playerClass), 1.0, lines::add);
+        ItemTooltips.statLines(p.bonusAt(level, d.playerClass), d.petBonusMultiplier(p.id), lines::add);
+        if (hovered(dx + 4, ty - 12, dw - 8, Math.max(12, y0 + dh - 60 - ty))) tooltip(g, lines);
         for (Component c : lines) {
+            if (ty > y0 + dh - 60) break;
             g.text(font, c, dx + 8, ty, 0xFFFFFFFF, false);
             ty += 10;
+        }
+        if (has) {
+            Ui.bar(g, dx + 8, y0 + dh - 48, dw - 16, 8, d.happiness(p.id) / 100f,
+                    0xFF70CC60, 0xFF306030, "Bonheur : " + d.happiness(p.id) + " / 100");
+            g.text(font, "Nourriture : clic droit en main", dx + 8, y0 + dh - 37, Ui.MUTED, false);
         }
         int by = y0 + dh - 22;
         if (has) {
