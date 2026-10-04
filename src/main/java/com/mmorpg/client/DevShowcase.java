@@ -105,7 +105,21 @@ public final class DevShowcase {
             if (tick == 70) shot(mc, "codex_bestiaire");
             if (tick == 80) MenuScreen.open(MenuScreen.Tab.FAMILIERS);
             if (tick == 90) shot(mc, "codex_familiers");
-            if (tick == 100) stop(mc);
+            if (tick == 95) {
+                ClientNet.send(new Payloads.CosmeticAction(Cosmetic.Category.AURA.ordinal(), "aura_flammes"));
+                ClientNet.send(new Payloads.CosmeticAction(Cosmetic.Category.AILES.ordinal(), "ailes_angeliques"));
+            }
+            if (tick == 105) {
+                if (!"aura_flammes".equals(ClientData.DATA.equippedCosmetics.get(Cosmetic.Category.AURA))
+                        || !"ailes_angeliques".equals(ClientData.DATA.equippedCosmetics.get(Cosmetic.Category.AILES)))
+                    throw new IllegalStateException("Cosmetic equipment sync failed");
+                MMORPG.LOGGER.info("[CODEX CHECKS] COSMETICS PASS: equipped and synchronized");
+                MenuScreen.open(MenuScreen.Tab.COSMETIQUES);
+            }
+            if (tick == 115) shot(mc, "codex_cosmetiques");
+            if (tick == 120) { mc.gui.setScreen(null); mc.options.setCameraType(CameraType.THIRD_PERSON_BACK); }
+            if (tick == 160) shot(mc, "codex_cosmetiques_jeu");
+            if (tick == 170) { mc.options.setCameraType(CameraType.FIRST_PERSON); stop(mc); }
             return;
         }
         if (MODE.equals("ecrans")) {          // inventaire du mod et ecran Personnage (8 attributs)

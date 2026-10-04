@@ -509,6 +509,13 @@ public final class RpgPlayers {
     public static void onLogin(ServerPlayer player) {
         PlayerData d = get(player);
         d.unlockSkills();
+        for (Cosmetic c : Cosmetic.values()) {
+            if (c.unlockLevel > 0 && c.unlockLevel <= d.level) d.cosmetics.add(c.id);
+        }
+        d.equippedCosmetics.entrySet().removeIf(e -> {
+            Cosmetic c = Cosmetic.byId(e.getValue());
+            return c == null || c.category != e.getKey() || !d.cosmetics.contains(c.id);
+        });
         recompute(player);
         if (d.hp <= 0) d.hp = (float) d.stats.get(Stat.MAX_HP);
         sync(player);

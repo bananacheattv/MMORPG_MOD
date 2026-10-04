@@ -42,6 +42,17 @@ public class CosmeticsScreen extends MenuScreen {
         for (Cosmetic c : Cosmetic.values()) if (d.cosmetics.contains(c.id)) owned++;
         g.text(font, owned + "/" + Cosmetic.values().length, x0 + 4, y0 + 96, Ui.MUTED, false);
         g.text(font, "débloqués", x0 + 4, y0 + 106, Ui.MUTED, false);
+        boolean showOwn = com.mmorpg.client.ClientConfig.SHOW_OWN_COSMETICS.get();
+        button(g, x0, y0 + 125, 80, 18, "Vue 1re : " + (showOwn ? "oui" : "non"), true, Ui.GOLD, () -> {
+            com.mmorpg.client.ClientConfig.SHOW_OWN_COSMETICS.set(!showOwn);
+            com.mmorpg.client.ClientConfig.SHOW_OWN_COSMETICS.save();
+        });
+        if (hovered(x0, y0 + 125, 80, 18)) tooltip(g, List.of(Component.literal("Afficher vos effets en première personne"),
+                Component.literal("Utilisez F5 pour voir les ailes et halos de dos.")));
+        button(g, x0, y0 + 147, 80, 18, "Voir en jeu", true, Ui.GOLD, () -> {
+            minecraft.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+            onClose();
+        });
 
         // liste
         int lx = x0 + 88;
@@ -73,7 +84,7 @@ public class CosmeticsScreen extends MenuScreen {
             Cosmetic c = selected;
             g.centeredText(font, Component.literal(c.label), px + pwid / 2, y0 + 5, c.color);
             int boxY = y0 + 18;
-            int boxH = 96;
+            int boxH = Math.max(48, Math.min(96, phei - 95));
             Minecraft mc = Minecraft.getInstance();
             if (mc.player != null) {
                 InventoryScreen.extractEntityInInventoryFollowsMouse(g, px + pwid / 2 - 30, boxY, px + pwid / 2 + 30, boxY + boxH, 36, 0.0625F, mx, my, mc.player);
