@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "mmorpg:berserker"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "mmorpg:berserker"
+      }
+    ]
+  }
+}

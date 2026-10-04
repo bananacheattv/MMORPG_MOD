@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "mmorpg:block/forge_arcanique"
+    },
+    "facing=east": {
+      "model": "mmorpg:block/forge_arcanique",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "mmorpg:block/forge_arcanique",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "mmorpg:block/forge_arcanique",
+      "y": 270
+    }
+  }
+}

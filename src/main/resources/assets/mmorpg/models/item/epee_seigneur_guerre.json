@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "mmorpg:item/epee_seigneur_guerre"
+  }
+}

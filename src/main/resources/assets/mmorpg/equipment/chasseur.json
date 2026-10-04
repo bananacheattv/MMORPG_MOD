@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "mmorpg:chasseur"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "mmorpg:chasseur"
+      }
+    ]
+  }
+}

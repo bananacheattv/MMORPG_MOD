@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "mmorpg:rodeur"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "mmorpg:rodeur"
+      }
+    ]
+  }
+}

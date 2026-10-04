@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/bow",
+  "textures": {
+    "layer0": "mmorpg:item/arc_chasseur_pulling_1"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "mmorpg:avatar_arcanique"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "mmorpg:avatar_arcanique"
+      }
+    ]
+  }
+}

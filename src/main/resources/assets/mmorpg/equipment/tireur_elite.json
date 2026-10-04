@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "mmorpg:tireur_elite"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "mmorpg:tireur_elite"
+      }
+    ]
+  }
+}

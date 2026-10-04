@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "mmorpg:item/spectre_givre_spawn_egg"
+  }
+}

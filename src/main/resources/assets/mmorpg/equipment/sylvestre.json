@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "mmorpg:sylvestre"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "mmorpg:sylvestre"
+      }
+    ]
+  }
+}

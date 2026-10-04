@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "mmorpg:item/golem_cristal_spawn_egg"
+  }
+}

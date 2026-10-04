@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "mmorpg:neant_primordial"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "mmorpg:neant_primordial"
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " D ",
+    "GOG",
+    "SSS"
+  ],
+  "key": {
+    "D": "minecraft:diamond",
+    "G": "minecraft:gold_ingot",
+    "O": "minecraft:obsidian",
+    "S": "minecraft:stone_bricks"
+  },
+  "result": {
+    "id": "mmorpg:autel_invocation"
+  }
+}

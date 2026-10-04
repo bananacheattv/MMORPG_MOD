@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "mmorpg:item/liche_ancienne_spawn_egg"
+  }
+}
