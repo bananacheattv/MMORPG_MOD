@@ -24,7 +24,7 @@ public class RpgConsumableItem extends RpgMaterialItem {
     public static final Identifier POTION_GROUP = MMORPG.id("potions");
 
     public enum Kind {
-        HEAL, MANA, PET_FOOD, ELIXIR, TELEPORT_SCROLL, FORGET_SCROLL, REBIRTH_ORB, COSMETIC_CHEST
+        HEAL, MANA, PET_FOOD, XP_CHARM, LUCK_CHARM, ELIXIR, TELEPORT_SCROLL, FORGET_SCROLL, REBIRTH_ORB, COSMETIC_CHEST
     }
 
     private final Kind kind;
@@ -61,6 +61,17 @@ public class RpgConsumableItem extends RpgMaterialItem {
                 sp.getCooldowns().addCooldown(POTION_GROUP, 160);
                 sl.playSound(null, sp.blockPosition(), SoundEvents.GENERIC_DRINK.value(), SoundSource.PLAYERS, 1, 1.2f);
                 sl.sendParticles(ParticleTypes.ENCHANT, sp.getX(), sp.getY() + 1.2, sp.getZ(), 20, 0.4, 0.5, 0.4, 0.5);
+            }
+            case XP_CHARM, LUCK_CHARM -> {
+                boolean xp = kind == Kind.XP_CHARM;
+                if ((xp ? data.xpCharmSeconds : data.luckCharmSeconds) > 0) {
+                    sp.sendOverlayMessage(Component.literal("Ce charme est déjà actif."));
+                    return InteractionResult.FAIL;
+                }
+                if (xp) data.xpCharmSeconds = 1800;
+                else data.luckCharmSeconds = 1800;
+                RpgPlayers.sync(sp);
+                sp.sendSystemMessage(Component.literal((xp ? "Expérience" : "Chances de butin") + " +25 % pendant 30 minutes de jeu."));
             }
             case PET_FOOD -> {
                 if (!com.mmorpg.server.PetManager.feed(sp, (int) amount)) return InteractionResult.FAIL;

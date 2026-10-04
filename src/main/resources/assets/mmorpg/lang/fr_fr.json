@@ -215,5 +215,7 @@
   "mmorpg.configuration.showNameplates": "Afficher les barres de vie des monstres",
   "mmorpg.configuration.showOwnCosmetics": "Afficher ses propres cosmétiques",
   "mmorpg.configuration.title": "Configuration MMORPG",
-  "item.mmorpg.nourriture_familier": "Nourriture pour familier"
+  "item.mmorpg.nourriture_familier": "Nourriture pour familier",
+  "item.mmorpg.charme_experience": "Charme d'expérience",
+  "item.mmorpg.charme_chance": "Charme de chance"
 }

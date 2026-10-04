@@ -169,6 +169,11 @@ public final class RpgPlayers {
         if (d.stats.get(Stat.MAX_HP) <= 0 || d.hp < 0) {
             recompute(player);
         }
+        if (now % 20 == 0 && (d.xpCharmSeconds > 0 || d.luckCharmSeconds > 0)) {
+            d.xpCharmSeconds = Math.max(0, d.xpCharmSeconds - 1);
+            d.luckCharmSeconds = Math.max(0, d.luckCharmSeconds - 1);
+            d.dirty = true;
+        }
         // effets expires
         boolean buffsChanged = false;
         Iterator<Buff> it = d.buffs.values().iterator();
@@ -274,7 +279,7 @@ public final class RpgPlayers {
     public static void giveXp(ServerPlayer player, long amount, boolean fromKill) {
         PlayerData d = get(player);
         if (!d.playerClass.isPlayable() || d.level >= LevelSystem.MAX_LEVEL || amount <= 0) return;
-        amount = Math.max(1, Math.round(amount * ConfigManager.general().xpMultiplier));
+        amount = Math.max(1, Math.round(amount * ConfigManager.general().xpMultiplier * (d.xpCharmSeconds > 0 ? 1.25 : 1.0)));
         d.xp += amount;
         CombatTexts.send(player, player.getX(), player.getY() + player.getBbHeight() + 0.6, player.getZ(), amount, Payloads.CombatText.XP);
         boolean leveled = false;

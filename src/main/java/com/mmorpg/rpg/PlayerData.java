@@ -58,6 +58,8 @@ public class PlayerData implements ValueIOSerializable {
     public boolean classChosenOnce = false;
     /** Porte-monnaie (pieces d'or). */
     public long gold = 0;
+    public int xpCharmSeconds;
+    public int luckCharmSeconds;
     /** Quetes en cours : progression de chaque objectif. */
     public final Map<String, int[]> activeQuests = new LinkedHashMap<>();
     public final Set<String> completedQuests = new HashSet<>();
@@ -164,6 +166,8 @@ public class PlayerData implements ValueIOSerializable {
         t.store("kills", STR_INT_MAP, kills);
         t.putBoolean("chosen", classChosenOnce);
         t.putLong("gold", gold);
+        t.putInt("xpCharmSeconds", xpCharmSeconds);
+        t.putInt("luckCharmSeconds", luckCharmSeconds);
         Map<String, List<Integer>> aq = new LinkedHashMap<>();
         activeQuests.forEach((k, v) -> {
             List<Integer> l = new ArrayList<>();
@@ -214,6 +218,8 @@ public class PlayerData implements ValueIOSerializable {
         kills.putAll(t.read("kills", STR_INT_MAP).orElse(Map.of()));
         classChosenOnce = t.getBooleanOr("chosen", playerClass != PlayerClass.NONE);
         gold = t.getLongOr("gold", 0);
+        xpCharmSeconds = Math.clamp(t.getIntOr("xpCharmSeconds", 0), 0, 1800);
+        luckCharmSeconds = Math.clamp(t.getIntOr("luckCharmSeconds", 0), 0, 1800);
         activeQuests.clear();
         t.read("activeQuests", Codec.unboundedMap(Codec.STRING, Codec.INT.listOf())).orElse(Map.of()).forEach((k, v) -> {
             int[] arr = new int[v.size()];

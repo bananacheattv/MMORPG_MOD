@@ -85,6 +85,8 @@ public final class ForgeRecipes {
 
     static {
         PlayerClass N = PlayerClass.NONE;
+        add(Category.CONSOMMABLES, "charme_experience", 1, 100, 10, N, "poussiere_ame", 8, "minecraft:lapis_lazuli", 4);
+        add(Category.CONSOMMABLES, "charme_chance", 1, 100, 10, N, "trefle_chance", 1, "minecraft:gold_ingot", 2);
         add(Category.FAMILIERS, "nourriture_familier", 4, 5, 1, N, "minecraft:wheat", 4, "minecraft:carrot", 2);
         // ---------------------------------------------------------------- materiaux intermediaires
         add(Category.MATERIAUX, "lingot_mithril", 1, 5, 20, N, "minecraft:iron_ingot", 2, "acier_orc", 2, "poussiere_ame", 1);

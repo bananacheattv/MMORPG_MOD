@@ -3,6 +3,8 @@ from pathlib import Path
 import json
 ROOT = Path(__file__).resolve().parents[1] / 'src/main/resources/assets/mmorpg'
 ITEMS = {
+    'charme_experience': ("Charme d'expérience", 'experience_bottle'),
+    'charme_chance': ('Charme de chance', 'emerald'),
     'nourriture_familier': ('Nourriture pour familier', 'golden_carrot'),
 }
 def generate():
