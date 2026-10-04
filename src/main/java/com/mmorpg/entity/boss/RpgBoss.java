@@ -241,7 +241,7 @@ public abstract class RpgBoss extends RpgMonster {
         }
         LivingEntity target = this.getTarget();
         if (target != null && target.distanceToSqr(home.getX() + 0.5, home.getY(), home.getZ() + 0.5) > (r + 14.0) * (r + 14.0)) {
-            this.setTarget(null);
+            com.mmorpg.combat.ThreatGoal.clear(this);
         }
     }
 

@@ -8,7 +8,8 @@ Branche : codex/eldoria-reprise. Sauvegarder chaque fonctionnalite dans un commi
 - Familiers adaptes a la classe : bonus offensifs et attributs adaptes au proprietaire, avec les memes valeurs dans le calcul serveur et dans le menu. Compilation reussie ; verification en jeu restante.
 - Nourriture et bonheur : bonheur persistant par familier, baisse de 1/minute invoque, nourriture fabricable (+25), bonus de 50 a 100 %, jauge dans le menu. Compilation reussie ; essai en jeu restant.
 - Charmes : XP et probabilites de butin +25 %, 30 minutes de jeu, timers sauvegardes, non cumulables, recettes de Forge.
-- Les 13 autres demandes restent a implementer/verifier.
+- Menace / aggro : degats cumules par joueur, multiplicateur x2 pour le tank, seuil de changement de cible de 10 %, provocation prioritaire pendant sa duree, nettoyage hors portee/deconnexion/mort et respect de la base des boss. Compilation reussie ; validation multijoueur en jeu restante.
+- Les 12 autres demandes restent a implementer/verifier.
 - Aucun code des agents cloud de Claude n'a ete recupere. Base initiale : f8c07de.
 
 ## Demandes utilisateur

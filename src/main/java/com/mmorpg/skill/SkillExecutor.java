@@ -386,7 +386,7 @@ public final class SkillExecutor {
                 Fx.cast(p, CastAnim.LEAP, 12);
                 Fx.spawn(level, FxKind.SHOCKWAVE, pos, r, 0xFF3020, 16);
                 for (Mob m : level.getEntitiesOfClass(Mob.class, p.getBoundingBox().inflate(r), m -> RpgCombat.isEnemy(p, m))) {
-                    m.setTarget(p);
+                    com.mmorpg.combat.ThreatGoal.taunt(m, p, s.duration);
                     Fx.attach(level, FxKind.MARK, m, 1, 0xFF3020, Math.min(s.duration, 100));
                 }
                 RpgPlayers.addBuff(p, BuffType.TAUNT, s.duration, s.power, 0);
@@ -438,7 +438,7 @@ public final class SkillExecutor {
                 Fx.spawn(level, FxKind.PILLAR, pos, 1.6, 0xFFD040, 24);
                 Fx.spawn(level, FxKind.SHOCKWAVE, pos, s.radius, 0xFFC040, 18);
                 for (Mob m : level.getEntitiesOfClass(Mob.class, p.getBoundingBox().inflate(s.radius), m -> RpgCombat.isEnemy(p, m))) {
-                    m.setTarget(p);
+                    com.mmorpg.combat.ThreatGoal.taunt(m, p, s.duration);
                     Fx.attach(level, FxKind.MARK, m, 1, 0xFFB020, 80);
                 }
                 sound(p, SoundEvents.TOTEM_USE, 0.8f, 0.8f);

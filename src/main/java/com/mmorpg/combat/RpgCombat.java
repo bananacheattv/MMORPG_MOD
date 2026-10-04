@@ -313,6 +313,10 @@ public final class RpgCombat {
         }
         damage = Math.max(0, damage);
 
+        if (target instanceof Mob mob && playerAttacker != null) {
+            ThreatGoal.damage(mob, playerAttacker, Math.min(damage, h.hp()));
+        }
+
         // vol de vie
         if (playerAttacker != null && damage > 0) {
             double ls = RpgPlayers.get(playerAttacker).stats.get(Stat.LIFESTEAL);
