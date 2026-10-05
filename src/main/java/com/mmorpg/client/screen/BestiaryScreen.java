@@ -20,6 +20,9 @@ public class BestiaryScreen extends MenuScreen {
     private int scroll;
     private int category; // tous, monstres, boss
     private String family = "Toutes";
+    private int dropdown;
+    private int dropdownScroll;
+    private List<String> familyOptions = List.of("Toutes");
 
     public BestiaryScreen() {
         super(Tab.BESTIAIRE);
@@ -33,6 +36,10 @@ public class BestiaryScreen extends MenuScreen {
 
     @Override
     public boolean mouseScrolled(double x, double y, double sx, double sy) {
+        if (dropdown != 0) {
+            dropdownScroll = Math.max(0, dropdownScroll - (int) Math.signum(sy));
+            return true;
+        }
         scroll = Math.max(0, scroll - (int) Math.signum(sy));
         return true;
     }
@@ -48,6 +55,7 @@ public class BestiaryScreen extends MenuScreen {
         categoryKeys.stream().map(k -> ClientData.mobInfo.getCompoundOrEmpty(k).getStringOr("family", "Autres"))
                 .distinct().sorted().forEach(families::add);
         if (!families.contains(family)) family = "Toutes";
+        familyOptions = families;
         List<String> keys = categoryKeys.stream().filter(k -> family.equals("Toutes") ||
                 family.equals(ClientData.mobInfo.getCompoundOrEmpty(k).getStringOr("family", "Autres"))).toList();
         int x0 = left + 8;
@@ -55,11 +63,11 @@ public class BestiaryScreen extends MenuScreen {
         int lw = 150;
         Ui.header(g, x0, y0, lw, "BESTIAIRE (" + keys.size() + ")");
         Ui.frame(g, x0, y0 + 14, lw, 16, Ui.GOLD, hovered(x0, y0 + 14, lw, 16));
-        g.text(font, "Type : " + new String[]{"Tous", "Monstres", "Boss"}[category] + "  >", x0 + 4, y0 + 18, Ui.TEXT, false);
-        click(x0, y0 + 14, lw, 16, () -> { category = (category + 1) % 3; family = "Toutes"; scroll = 0; });
+        g.text(font, "Type : " + new String[]{"Tous", "Monstres", "Boss"}[category] + "  ▼", x0 + 4, y0 + 18, Ui.TEXT, false);
+        click(x0, y0 + 14, lw, 16, () -> { dropdown = 1; dropdownScroll = 0; });
         Ui.frame(g, x0, y0 + 32, lw, 16, Ui.GOLD, hovered(x0, y0 + 32, lw, 16));
-        g.text(font, font.plainSubstrByWidth("Famille : " + family + "  >", lw - 8), x0 + 4, y0 + 36, Ui.TEXT, false);
-        click(x0, y0 + 32, lw, 16, () -> { family = families.get((families.indexOf(family) + 1) % families.size()); scroll = 0; });
+        g.text(font, font.plainSubstrByWidth("Famille : " + family + "  ▼", lw - 8), x0 + 4, y0 + 36, Ui.TEXT, false);
+        click(x0, y0 + 32, lw, 16, () -> { dropdown = 2; dropdownScroll = 0; });
         if (keys.isEmpty()) {
             g.text(font, "Aucune donnée.", x0, y0 + 54, Ui.MUTED, false);
             return;
@@ -127,6 +135,29 @@ public class BestiaryScreen extends MenuScreen {
                 ty += 20;
             }
             if (ty > y0 + dh - 20) break;
+        }
+    }
+
+    @Override protected void renderOverlay(GuiGraphicsExtractor g, int mx, int my, float a) {
+        if (dropdown == 0) return;
+        List<String> options = dropdown == 1 ? List.of("Tous", "Monstres", "Boss") : familyOptions;
+        int x = left + 8, y = contentTop + (dropdown == 1 ? 14 : 32), w = 150;
+        int rows = Math.min(options.size(), Math.max(1, (top + ph - y - 12) / 18));
+        dropdownScroll = Math.min(dropdownScroll, Math.max(0, options.size() - rows));
+        hits.clear();
+        click(0, 0, width, height, () -> dropdown = 0);
+        g.fill(x - 1, y - 1, x + w + 1, y + rows * 18 + 1, 0xFF15111E);
+        Ui.frame(g, x - 1, y - 1, w + 2, rows * 18 + 2, Ui.GOLD, false);
+        for (int i = 0; i < rows; i++) {
+            final int index = dropdownScroll + i;
+            String option = options.get(index);
+            boolean chosen = dropdown == 1 ? category == index : family.equals(option);
+            button(g, x, y + i * 18, w, 18, (chosen ? "✓ " : "") + option, true,
+                    chosen ? 0xFF665020 : 0xFF282230, () -> {
+                        if (dropdown == 1) { category = index; family = "Toutes"; }
+                        else family = option;
+                        dropdown = 0; scroll = 0;
+                    });
         }
     }
 }

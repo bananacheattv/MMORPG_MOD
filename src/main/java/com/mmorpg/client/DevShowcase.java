@@ -48,6 +48,21 @@ public final class DevShowcase {
         mc.options.pauseOnLostFocus = false;
         if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.PauseScreen) mc.gui.setScreen(null);
         String me = mc.player.getName().getString();
+        if (MODE.equals("bestiaire_dropdown")) {
+            if (tick == 5) { mc.getWindow().setWindowed(1280, 720); MenuScreen.open(MenuScreen.Tab.BESTIAIRE); }
+            if (tick == 15 || tick == 35) {
+                var screen = mc.gui.screen();
+                int x = (screen.width - Math.min(screen.width - 12, 440)) / 2 + 30;
+                int y = (screen.height - Math.min(screen.height - 12, 272)) / 2 + (tick == 15 ? 48 : 66);
+                screen.mouseClicked(new net.minecraft.client.input.MouseButtonEvent(x, y,
+                        new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0)), false);
+            }
+            if (tick == 25) shot(mc, "bestiaire_types_deroulants");
+            if (tick == 30) MenuScreen.open(MenuScreen.Tab.BESTIAIRE);
+            if (tick == 45) shot(mc, "bestiaire_familles_deroulantes");
+            if (tick == 55) stop(mc);
+            return;
+        }
         if (QUEST_ONLY) {
             questPhase(mc, me);
             return;
