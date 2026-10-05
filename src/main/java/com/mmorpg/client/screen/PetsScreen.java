@@ -44,6 +44,7 @@ public class PetsScreen extends MenuScreen {
     @Override
     protected void renderTab(GuiGraphicsExtractor g, int mx, int my, float a) {
         PlayerData d = ClientData.DATA;
+        button(g, left + 8, top + ph - 25, 196, 17, "Collection de montures >", true, 0xFF4A3820, () -> minecraft.gui.setScreen(new MountsScreen()));
         int x0 = left + 8;
         int y0 = contentTop;
         int owned = 0;

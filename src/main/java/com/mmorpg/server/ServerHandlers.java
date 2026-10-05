@@ -34,6 +34,16 @@ public final class ServerHandlers {
         }
     }
 
+    public static void mountAction(Payloads.MountAction packet, IPayloadContext ctx) {
+        if (!(ctx.player() instanceof ServerPlayer sp)) return;
+        switch (packet.action()) {
+            case Payloads.MountAction.UNLOCK -> MountManager.unlock(sp, packet.mount());
+            case Payloads.MountAction.SUMMON -> MountManager.summon(sp, packet.mount());
+            case Payloads.MountAction.DISMISS -> MountManager.despawn(sp);
+            default -> { }
+        }
+    }
+
     public static void petAction(Payloads.PetAction p, IPayloadContext ctx) {
         if (ctx.player() instanceof ServerPlayer sp) {
             PetManager.setActive(sp, p.pet());

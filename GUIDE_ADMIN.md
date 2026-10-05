@@ -26,3 +26,17 @@ Butin des deux : potions 45 %, pierres d’amelioration 25 %, or 20 %, charme XP
 ## Affichage
 
 Maintenir TAB pour la liste Eldoria (classe, niveau, latence ; jusqu’a 80 joueurs affiches comme la liste native). Le tableau Eldoria en haut a droite affiche l’or et les quetes. Il se deplace, se redimensionne et se masque dans l’editeur du HUD existant. Les niveaux et classes sont calcules par le serveur.
+
+## Montures
+
+Dans le menu **Familiers**, ouvrir **Collection de montures**. Selectionner un cheval, puis confirmer son achat avec l'or du jeu :
+
+| Monture | Niveau requis | Prix unique | Vitesse par rapport au cheval standard |
+| --- | ---: | ---: | ---: |
+| Destrier du Voyageur | 10 | 250 or | 107 % |
+| Courser de l'Aube | 40 | 1 500 or | 129 % |
+| Etalon de l'Ombre | 75 | 6 000 or | 151 % |
+
+La collection reste acquise apres mort et deconnexion. Invoquer sur la terre ferme, avec de la place autour du joueur. Clic droit pour monter, controles habituels du cheval pour avancer/sauter, Maj pour descendre. La selle est fournie et ne se retire pas. Le bouton **Renvoyer** retire la monture ; attendre cinq secondes entre deux invocations.
+
+Seul le proprietaire peut monter. La monture invoquee disparait si son proprietaire meurt, se deconnecte, change de dimension ou s'eloigne de plus de 64 blocs. Il suffit de la reinvoquer depuis la collection. Les montures utilisent les modeles de chevaux du jeu, avec trois robes et vitesses distinctes.

@@ -79,6 +79,9 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.NpcEntity>> NPC =
             ENTITIES.registerEntityType("pnj", com.mmorpg.entity.NpcEntity::new, MobCategory.MISC,
                     b -> b.sized(0.6F, 1.95F).clientTrackingRange(10));
+    public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.MountEntity>> MOUNT =
+            ENTITIES.registerEntityType("monture", com.mmorpg.entity.MountEntity::new, MobCategory.CREATURE,
+                    b -> b.sized(1.3965F, 1.6F).clientTrackingRange(10));
     public static final DeferredHolder<EntityType<?>, EntityType<PetEntity>> PET =
             ENTITIES.registerEntityType("familier", PetEntity::new, MobCategory.MISC,
                     b -> b.sized(0.5F, 0.5F).clientTrackingRange(8).updateInterval(1));
@@ -108,6 +111,8 @@ public final class ModEntities {
         event.put(IGNIS.get(), RpgBoss.createBossAttributes().build());
         event.put(FROST_TITAN.get(), RpgBoss.createBossAttributes().build());
         event.put(VOID_AVATAR.get(), RpgBoss.createBossAttributes().build());
+        event.put(MOUNT.get(), net.minecraft.world.entity.animal.equine.AbstractHorse.createBaseHorseAttributes()
+                .add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH, 20).build());
         event.put(NPC.get(), com.mmorpg.entity.NpcEntity.createAttributes().build());
     }
 }

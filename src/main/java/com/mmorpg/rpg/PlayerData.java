@@ -67,10 +67,15 @@ public class PlayerData implements ValueIOSerializable {
     /** Quetes journalieres : jour (numero de jour du monde) de la derniere realisation. */
     public final Map<String, Long> dailyQuests = new HashMap<>();
 
+    public final Set<String> mounts = new HashSet<>();
+
     // --- transient (non sauvegarde)
     public StatBlock stats = new StatBlock();
     public final Map<String, Long> cooldowns = new HashMap<>();
     public final Map<BuffType, Buff> buffs = new EnumMap<>(BuffType.class);
+    public UUID mountEntity;
+    public String activeMount = "";
+    public long nextMountTick;
     public UUID petEntity;
     public boolean dirty = true;
     public float regenAccumulatorHp;
@@ -158,6 +163,7 @@ public class PlayerData implements ValueIOSerializable {
         t.putFloat("mana", mana);
         t.store("pets", STR_INT_MAP, petXp);
         t.putString("activePet", activePet);
+        t.store("mounts", Codec.STRING.listOf(), new ArrayList<>(mounts));
         t.store("petHappiness", STR_INT_MAP, petHappiness);
         t.store("cosmetics", Codec.STRING.listOf(), new ArrayList<>(cosmetics));
         Map<String, String> eq = new HashMap<>();
@@ -223,6 +229,9 @@ public class PlayerData implements ValueIOSerializable {
         xpCharmSeconds = Math.clamp(t.getIntOr("xpCharmSeconds", 0), 0, 1800);
         luckCharmSeconds = Math.clamp(t.getIntOr("luckCharmSeconds", 0), 0, 1800);
         trackedQuest = t.getStringOr("trackedQuest", "");
+        mounts.clear();
+        mounts.addAll(t.read("mounts", Codec.STRING.listOf()).orElse(List.of()));
+        activeMount = t.getStringOr("activeMount", "");
         activeQuests.clear();
         t.read("activeQuests", Codec.unboundedMap(Codec.STRING, Codec.INT.listOf())).orElse(Map.of()).forEach((k, v) -> {
             int[] arr = new int[v.size()];

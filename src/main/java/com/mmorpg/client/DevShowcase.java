@@ -28,6 +28,7 @@ public final class DevShowcase {
     private static final boolean ENABLED = !MODE.isEmpty() && !MODE.equals("false");
     private static final boolean QUEST_ONLY = MODE.equals("quetes");
     private static int tick = -1;
+    private static net.minecraft.world.phys.Vec3 mountStart;
 
     private DevShowcase() {
     }
@@ -74,6 +75,40 @@ public final class DevShowcase {
         }
         if (MODE.equals("structures")) {
             structuresPhase(mc, me);
+            return;
+        }
+        if (MODE.equals("reprise_montures")) {
+            if (tick == 5) {
+                mc.getWindow().setWindowed(1280, 720); mc.gui.setScreen(null);
+                cmd(mc, "gamemode creative " + me);
+                cmd(mc, "tp " + me + " 30 220 0 0 10");
+                cmd(mc, "forceload add 25 -5 35 5");
+
+                cmd(mc, "time set day");
+            }
+            if (tick == 25) { cmd(mc, "fill 25 219 -5 35 219 5 minecraft:sea_lantern"); cmd(mc, "fill 25 220 -5 35 224 5 minecraft:air"); cmd(mc, "gamemode survival " + me); cmd(mc, "tp " + me + " 30 220 0 0 10"); }
+            if (tick == 110) { DevContentChecks.verify(); mc.gui.setScreen(new com.mmorpg.client.screen.MountsScreen()); }
+            if (tick == 125) shot(mc, "codex_collection_montures");
+            if (tick == 130) ClientNet.send(new Payloads.MountAction(Payloads.MountAction.UNLOCK, "voyageur"));
+            if (tick == 140) { mc.gui.setScreen(null); ClientNet.send(new Payloads.MountAction(Payloads.MountAction.SUMMON, "voyageur")); }
+            if (tick == 170) {
+                var mount = java.util.stream.StreamSupport.stream(mc.level.entitiesForRendering().spliterator(), false).filter(e -> e instanceof com.mmorpg.entity.MountEntity).findFirst().orElseThrow();
+                mc.gameMode.interact(mc.player, mount, new net.minecraft.world.phys.EntityHitResult(mount), net.minecraft.world.InteractionHand.MAIN_HAND);
+                mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
+            }
+            if (tick == 175) { mountStart = mc.player.position(); mc.options.keyUp.setDown(true); }
+            if (tick == 185) {
+                mc.options.keyUp.setDown(false);
+                mc.gui.hud.getChat().clearMessages(false);
+                mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
+                if (mountStart.distanceTo(mc.player.position()) < .2) throw new IllegalStateException("Mount movement missing");
+                MMORPG.LOGGER.info("[CODEX CHECKS] MOUNT MOVEMENT PASS");
+            }
+            if (tick == 190) {
+                if (!(mc.player.getVehicle() instanceof com.mmorpg.entity.MountEntity)) throw new IllegalStateException("Client mount riding missing");
+                shot(mc, "codex_monture_en_jeu");
+            }
+            if (tick == 200) { cmd(mc, "forceload remove 25 -5 35 5"); ClientNet.send(new Payloads.MountAction(Payloads.MountAction.DISMISS, "")); mc.options.setCameraType(CameraType.FIRST_PERSON); stop(mc); }
             return;
         }
         if (MODE.equals("reprise_tab")) {

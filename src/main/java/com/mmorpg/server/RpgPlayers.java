@@ -120,6 +120,7 @@ public final class RpgPlayers {
             buffs.put(b.type.name(), bt);
         }
         t.put("buffs", buffs);
+        t.putString("activeMount", d.activeMount);
         t.put("quests", QuestManager.activeTag(player, d));
         Net.toPlayer(player, new Payloads.SyncPlayer(t));
         d.dirty = false;

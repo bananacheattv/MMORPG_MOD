@@ -20,7 +20,8 @@ Branche : codex/eldoria-reprise. Sauvegarder chaque fonctionnalite dans un commi
 - Quetes : filtres et pagination du journal, suivi prioritaire persistant, trois nouvelles quetes en chaine, PNJ par groupe. Tests en jeu : prerequis, suivi sauvegarde, quantites cumulees, bon PNJ et recompense unique ; capture du journal verifiee.
 - Caisses et lucky blocks : caisse consommee avec une cle, recettes de Forge, cinq categories de butin avec probabilites affichees, bloc a casser en survie. Tests en jeu reussis : refus sans cle, consommation unitaire, probabilites et destruction sans duplication.
 - TAB et tableau : liste Eldoria avec classe/niveau synchronises hors portee, noms colores et latence ; tableau personnel deplacable/masquable, or, quetes et joueurs connectes. Captures en jeu verifiees et test de synchronisation reussi.
-- Montures : derniere demande a implementer/verifier.
+- Montures : trois chevaux deblocables definitivement (niveaux 10/40/75, prix 250/1500/6000 or), collection avec apercus, selle incluse, invocation et renvoi. Tests en jeu : niveau/or requis, achat unique, sauvegarde, refus d'une monture non possedee, proprietaire autorise a monter, deplacement reel, delai d'invocation et nettoyage. Entites temporaires non sauvegardees, collection conservee apres deconnexion.
+- Les 17 demandes ont une implementation. Les essais multijoueurs de combat et l'equilibrage restent a effectuer ; les limites de validation sont indiquees ci-dessus.
 - Aucun code des agents cloud de Claude n'a ete recupere. Base initiale : f8c07de.
 
 ## Demandes utilisateur
