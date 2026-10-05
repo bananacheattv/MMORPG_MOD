@@ -64,6 +64,7 @@ public final class ServerHandlers {
             case Payloads.QuestAction.ACCEPT -> QuestManager.accept(sp, p.quest(), p.npc());
             case Payloads.QuestAction.COMPLETE -> QuestManager.complete(sp, p.quest(), p.npc());
             case Payloads.QuestAction.ABANDON -> QuestManager.abandon(sp, p.quest());
+            case Payloads.QuestAction.TRACK -> QuestManager.track(sp, p.quest());
             default -> {
             }
         }

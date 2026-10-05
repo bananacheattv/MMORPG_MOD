@@ -76,6 +76,13 @@ public final class DevShowcase {
             structuresPhase(mc, me);
             return;
         }
+        if (MODE.equals("reprise_quetes")) {
+            if (tick == 5) { mc.getWindow().setWindowed(1280, 720); mc.gui.setScreen(null); cmd(mc, "mmorpg pnj quetes_groupe cryptes 2 Gardien des Cryptes"); }
+            if (tick == 15) MenuScreen.open(MenuScreen.Tab.QUETES);
+            if (tick == 30) shot(mc, "codex_journal_quetes");
+            if (tick == 40) stop(mc);
+            return;
+        }
         if (MODE.equals("reprise_equipement")) {
             if (tick == 5) { DevContentChecks.verify(); mc.getWindow().setWindowed(1280, 720); }
             String[] sets = {"valkyrie", "eternel_arcanes", "sentinelle_astrale", "egide_divine"};

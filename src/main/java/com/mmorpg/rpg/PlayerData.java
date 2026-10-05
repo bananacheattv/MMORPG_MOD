@@ -61,6 +61,7 @@ public class PlayerData implements ValueIOSerializable {
     public int xpCharmSeconds;
     public int luckCharmSeconds;
     /** Quetes en cours : progression de chaque objectif. */
+    public String trackedQuest = "";
     public final Map<String, int[]> activeQuests = new LinkedHashMap<>();
     public final Set<String> completedQuests = new HashSet<>();
     /** Quetes journalieres : jour (numero de jour du monde) de la derniere realisation. */
@@ -174,6 +175,7 @@ public class PlayerData implements ValueIOSerializable {
             for (int x : v) l.add(x);
             aq.put(k, l);
         });
+        t.putString("trackedQuest", trackedQuest);
         t.store("activeQuests", Codec.unboundedMap(Codec.STRING, Codec.INT.listOf()), aq);
         t.store("completedQuests", Codec.STRING.listOf(), new ArrayList<>(completedQuests));
         t.store("dailyQuests", Codec.unboundedMap(Codec.STRING, Codec.LONG), dailyQuests);
@@ -220,6 +222,7 @@ public class PlayerData implements ValueIOSerializable {
         gold = t.getLongOr("gold", 0);
         xpCharmSeconds = Math.clamp(t.getIntOr("xpCharmSeconds", 0), 0, 1800);
         luckCharmSeconds = Math.clamp(t.getIntOr("luckCharmSeconds", 0), 0, 1800);
+        trackedQuest = t.getStringOr("trackedQuest", "");
         activeQuests.clear();
         t.read("activeQuests", Codec.unboundedMap(Codec.STRING, Codec.INT.listOf())).orElse(Map.of()).forEach((k, v) -> {
             int[] arr = new int[v.size()];

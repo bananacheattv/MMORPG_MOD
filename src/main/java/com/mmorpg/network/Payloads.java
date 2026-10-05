@@ -202,7 +202,7 @@ public final class Payloads {
 
     /** Action de quete : 0 = accepter, 1 = rendre, 2 = abandonner. */
     public record QuestAction(int action, String quest, int npc) implements CustomPacketPayload {
-        public static final int ACCEPT = 0, COMPLETE = 1, ABANDON = 2;
+        public static final int ACCEPT = 0, COMPLETE = 1, ABANDON = 2, TRACK = 3;
         public static final Type<QuestAction> TYPE = new Type<>(MMORPG.id("quest_action"));
         public static final StreamCodec<ByteBuf, QuestAction> CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, QuestAction::action, ByteBufCodecs.STRING_UTF8, QuestAction::quest,

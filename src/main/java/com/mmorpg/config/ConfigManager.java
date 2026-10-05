@@ -131,6 +131,7 @@ public final class ConfigManager {
             } else {
                 qres.putAll(com.mmorpg.quest.DefaultQuests.create());
             }
+            com.mmorpg.quest.DefaultQuests.create().forEach(qres::putIfAbsent);
             for (com.mmorpg.quest.QuestDef d : qres.values()) {
                 if (d.objectives == null) d.objectives = new java.util.ArrayList<>();
                 if (d.requires == null) d.requires = new java.util.ArrayList<>();
