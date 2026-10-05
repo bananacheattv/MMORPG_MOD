@@ -89,12 +89,23 @@ public final class ModEntities {
     private ModEntities() {
     }
 
+    public static final Map<String, DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.mob.ImportedMobEntity>>> IMPORTED = new LinkedHashMap<>();
+    static {
+        for (var entry : com.mmorpg.entity.mob.ImportedMobs.ALL) {
+            var type = ENTITIES.registerEntityType(entry.key(), com.mmorpg.entity.mob.ImportedMobEntity::new, MobCategory.MONSTER,
+                    b -> b.sized(entry.width(), entry.height()).clientTrackingRange(10));
+            IMPORTED.put(entry.key(), type);
+            mob(entry.key(), type);
+        }
+    }
+
     private static <T extends EntityType<?>> DeferredHolder<EntityType<?>, T> mob(String key, DeferredHolder<EntityType<?>, T> holder) {
         SPAWNABLE.put(key, holder);
         return holder;
     }
 
     public static void registerAttributes(EntityAttributeCreationEvent event) {
+        IMPORTED.values().forEach(type -> event.put(type.get(), RpgMonster.createAttributes().build()));
         event.put(CRYPT_ZOMBIE.get(), net.minecraft.world.entity.monster.zombie.Zombie.createAttributes().build());
         event.put(VENOM_SPIDER.get(), net.minecraft.world.entity.monster.spider.CaveSpider.createCaveSpider().build());
         event.put(BANDIT.get(), net.minecraft.world.entity.monster.illager.Pillager.createAttributes().build());

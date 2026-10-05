@@ -48,6 +48,25 @@ public final class DevShowcase {
         mc.options.pauseOnLostFocus = false;
         if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.PauseScreen) mc.gui.setScreen(null);
         String me = mc.player.getName().getString();
+        if (MODE.equals("cosmetiques_importes")) {
+            if(tick==5) mc.getWindow().setWindowed(1600,900);
+            var list=java.util.Arrays.stream(Cosmetic.values()).filter(Cosmetic::hasModel).toList();
+            for(int i=0;i<list.size();i++) {
+                if(tick==15+i*20) mc.gui.setScreen(new com.mmorpg.client.screen.CosmeticsScreen(list.get(i)));
+                if(tick==25+i*20) shot(mc,"cosmetique_3d_"+list.get(i).id);
+            }
+            if(tick==225) stop(mc);
+            return;
+        }
+        if (MODE.equals("modeles_importes")) {
+            if(tick==5) mc.getWindow().setWindowed(1600,900);
+            for(int zone=0;zone<6;zone++) {
+                if(tick==15+zone*25) mc.gui.setScreen(new com.mmorpg.client.screen.ImportedGalleryScreen(zone));
+                if(tick==30+zone*25) shot(mc,"modeles_zone_"+zone);
+            }
+            if(tick==175) stop(mc);
+            return;
+        }
         if (MODE.equals("lucky_interface")) {
             var pos = mc.player.blockPosition().offset(2, 0, 0);
             if (tick == 5) {

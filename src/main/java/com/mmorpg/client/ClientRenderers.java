@@ -37,6 +37,7 @@ public final class ClientRenderers {
 
     @SubscribeEvent
     public static void register(EntityRenderersEvent.RegisterRenderers event) {
+        ModEntities.IMPORTED.forEach((key, type) -> event.registerEntityRenderer(type.get(), c -> new com.mmorpg.client.model.imported.ImportedMobRenderer(c, key)));
         event.registerEntityRenderer(ModEntities.CRYPT_ZOMBIE.get(), net.minecraft.client.renderer.entity.ZombieRenderer::new);
         event.registerEntityRenderer(ModEntities.VENOM_SPIDER.get(), net.minecraft.client.renderer.entity.CaveSpiderRenderer::new);
         event.registerEntityRenderer(ModEntities.BANDIT.get(), net.minecraft.client.renderer.entity.PillagerRenderer::new);
