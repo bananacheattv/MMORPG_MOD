@@ -76,6 +76,27 @@ public final class DevShowcase {
             structuresPhase(mc, me);
             return;
         }
+        if (MODE.equals("reprise_equipement")) {
+            if (tick == 5) { DevContentChecks.verify(); mc.getWindow().setWindowed(1280, 720); }
+            String[] sets = {"valkyrie", "eternel_arcanes", "sentinelle_astrale", "egide_divine"};
+            String[] classes = {"guerrier", "mage", "archer", "tank"};
+            int index = (tick - 10) / 40, stage = (tick - 10) % 40;
+            if (tick >= 10 && index < 4) {
+                if (stage == 0) {
+                    mc.gui.setScreen(null);
+                    cmd(mc, "gamemode survival " + me);
+                    cmd(mc, "mmorpg classe " + me + " " + classes[index]);
+                    cmd(mc, "mmorpg niveau " + me + " 100");
+                    String[] slots = {"head", "chest", "legs", "feet"};
+                    String[] pieces = {"casque", "plastron", "jambieres", "bottes"};
+                    for (int i = 0; i < 4; i++) cmd(mc, "item replace entity " + me + " armor." + slots[i] + " with mmorpg:" + sets[index] + "_" + pieces[i]);
+                }
+                if (stage == 15) MenuScreen.open(MenuScreen.Tab.PERSONNAGE);
+                if (stage == 25) shot(mc, "codex_armure_" + sets[index]);
+            }
+            if (tick == 175) stop(mc);
+            return;
+        }
         if (MODE.equals("reprise_mobs")) {
             if (tick == 5) {
                 cmd(mc, "gamemode creative " + me);

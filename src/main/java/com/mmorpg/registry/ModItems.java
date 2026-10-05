@@ -78,6 +78,7 @@ public final class ModItems {
             "Garantit la réussite d'une amélioration de +13 à +16 à la Forge Arcanique (consommé).");
     public static final DeferredItem<RpgMaterialItem> TREFLE_DIVIN = material("trefle_divin", Rarity.MYTHIQUE,
             "Garantit la réussite d'une amélioration de +17 à +20 à la Forge Arcanique (consommé).");
+    public static final DeferredItem<RpgMaterialItem> ALLIAGE_CELESTE = material("alliage_celeste", Rarity.MYTHIQUE, "Alliage de fin de progression pour les panoplies mythiques de classe.");
     public static final DeferredItem<RpgMaterialItem> LINGOT_MITHRIL = material("lingot_mithril", Rarity.RARE, "Métal léger et résistant, façonné à la Forge Arcanique.");
     public static final DeferredItem<RpgMaterialItem> LINGOT_ADAMANTITE = material("lingot_adamantite", Rarity.EPIQUE, "Le métal le plus dur du monde connu.");
     public static final DeferredItem<RpgMaterialItem> TISSU_ENCHANTE = material("tissu_enchante", Rarity.RARE, "Étoffe tissée de poussière d'âme.");

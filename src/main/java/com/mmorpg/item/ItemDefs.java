@@ -54,6 +54,7 @@ public final class ItemDefs {
         w("epee_seigneur_guerre", G, WeaponKind.SWORD, 45, E, null, "Forgée pour ceux qui commandent les armées.", ATK, 110, MAX_HP, 150, LIFESTEAL, 3, FORCE, 10);
         w("lame_demoniaque", G, WeaponKind.SWORD, 70, L, null, "Elle a soif du sang de ses ennemis.", ATK, 190, CRIT, 6, LIFESTEAL, 6, FORCE, 16);
         w("excalibur_celeste", G, WeaponKind.SWORD, 95, Y, null, "L'épée légendaire des dieux de la guerre.", ATK, 320, CRIT, 10, CRIT_DMG, 40, MAX_HP, 400, FORCE, 25);
+        w("epee_berserker", G, WeaponKind.SWORD, 25, R, null, "La lame du berserker, alternative à sa hache.", ATK, 52, CRIT, 4, MAX_HP, 50, FORCE, 6);
         // ---------------- Mage
         w("baton_apprenti", M, WeaponKind.STAFF, 1, C, Element.ARCANE, "Le premier bâton de tout apprenti.", MAG, 10, MAX_MANA, 20);
         w("sceptre_givre", M, WeaponKind.STAFF, 10, U, Element.GIVRE, "Un froid mordant émane du cristal.", MAG, 26, MAX_MANA, 50, INTELLIGENCE, 3);
@@ -112,6 +113,19 @@ public final class ItemDefs {
                 StatBlock.of(DEF, 50), StatBlock.of(DEF, 0.16, MAX_HP, 0.08, HP_REGEN, 0.20), "+16 % de Défense, +8 % de PV, +20 % de régénération");
         set("titan", "Titan Immortel", T, 85, L, "plate", StatBlock.of(MAX_HP, 2200, DEF, 320, ATK, 40, HP_REGEN, 8, VITALITE, 35),
                 StatBlock.of(DEF, 90), StatBlock.of(DEF, 0.20, MAX_HP, 0.12), "+20 % de Défense, +12 % de PV");
+
+        set("valkyrie", "Valkyrie Céleste", G, 100, Y, "plate",
+                StatBlock.of(MAX_HP, 2100, DEF, 250, ATK, 150, CRIT, 8, FORCE, 45),
+                StatBlock.of(ATK, 70), StatBlock.of(ATK, .18, CRIT_DMG, .25, MAX_HP, .10), "+18 % d'Attaque, +25 % de dégâts critiques, +10 % de PV");
+        set("eternel_arcanes", "Éternel des Arcanes", M, 100, Y, "robe",
+                StatBlock.of(MAX_HP, 1300, MAX_MANA, 1300, MAG, 210, DEF, 110, MANA_REGEN, 7, CDR, 12, INTELLIGENCE, 45),
+                StatBlock.of(MAG, 85), StatBlock.of(MAG, .20, MAX_MANA, .20, MAX_HP, .10), "+20 % de Magie et mana, +10 % de PV");
+        set("sentinelle_astrale", "Sentinelle Astrale", A, 100, Y, "leather",
+                StatBlock.of(MAX_HP, 1600, DEF, 170, ATK, 140, CRIT, 14, ESQ, 10, SPEED, 12, AGILITE, 45),
+                StatBlock.of(CRIT, 7), StatBlock.of(ATK, .18, CRIT_DMG, .30, SPEED, .12), "+18 % d'Attaque, +30 % de dégâts critiques, +12 % de vitesse");
+        set("egide_divine", "Égide Divine", T, 100, Y, "plate",
+                StatBlock.of(MAX_HP, 3100, DEF, 460, ATK, 60, HP_REGEN, 12, VITALITE, 45),
+                StatBlock.of(DEF, 125), StatBlock.of(DEF, .25, MAX_HP, .15), "+25 % de Défense, +15 % de PV");
 
         set("neant_primordial", "Néant Primordial", PlayerClass.NONE, 100, Y, "plate",
                 StatBlock.of(MAX_HP, 2000, DEF, 220, ATK, 120, MAG, 120, CRIT, 8, ESQ, 5,

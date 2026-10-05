@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "mmorpg:egide_divine"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "mmorpg:egide_divine"
+      }
+    ]
+  }
+}

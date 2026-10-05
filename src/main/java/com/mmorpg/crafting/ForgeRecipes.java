@@ -102,9 +102,11 @@ public final class ForgeRecipes {
         add(Category.MATERIAUX, "trefle_celeste", 1, 1500, 70, N, "trefle_dore", 2, "essence_neant", 1, "minecraft:diamond", 2);
         add(Category.MATERIAUX, "trefle_divin", 1, 4000, 90, N, "trefle_celeste", 2, "essence_neant", 2, "minecraft:netherite_ingot", 1);
 
+        add(Category.MATERIAUX, "alliage_celeste", 2, 200, 90, N, "lingot_adamantite", 3, "cristal_arcanique", 2, "fragment_divin", 1);
         // ---------------------------------------------------------------- armes : Guerrier
         weapon("epee_recrue", 3, "minecraft:iron_ingot", 3, "minecraft:stick", 1);
         weapon("lame_runique", 20, "ferraille_gobeline", 4, "oreille_gobelin", 3, "minecraft:iron_ingot", 2, "minecraft:lapis_lazuli", 4);
+        weapon("epee_berserker", 60, "acier_orc", 4, "defense_orc", 3, "couronne_roi_gobelin", 1);
         weapon("hache_berserker", 60, "acier_orc", 4, "defense_orc", 3, "couronne_roi_gobelin", 1);
         weapon("epee_seigneur_guerre", 150, "lingot_mithril", 4, "os_maudit", 4, "phylactere_liche", 1);
         weapon("lame_demoniaque", 400, "lingot_adamantite", 4, "noyau_flamme", 3, "coeur_infernal", 1);
@@ -148,6 +150,10 @@ public final class ForgeRecipes {
         armorSet("gardien", 40, "acier_orc", 3, "minecraft:iron_block", 1, "couronne_roi_gobelin");
         armorSet("paladin", 100, "lingot_mithril", 3, "minecraft:gold_ingot", 2, "phylactere_liche");
         armorSet("titan", 300, "lingot_adamantite", 3, "noyau_flamme", 1, "coeur_infernal");
+        armorSet("valkyrie", 1000, "alliage_celeste", 3, "lingot_adamantite", 3, "fragment_divin");
+        armorSet("eternel_arcanes", 1000, "alliage_celeste", 3, "tissu_enchante", 5, "fragment_divin");
+        armorSet("sentinelle_astrale", 1000, "alliage_celeste", 3, "cuir_renforce", 5, "fragment_divin");
+        armorSet("egide_divine", 1000, "alliage_celeste", 3, "lingot_adamantite", 5, "fragment_divin");
         armorSet("neant_primordial", 800, "fragment_divin", 1, "essence_neant", 2, "coeur_glace_eternelle");
 
         // ---------------------------------------------------------------- consommables

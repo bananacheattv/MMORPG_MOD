@@ -16,7 +16,8 @@ Branche : codex/eldoria-reprise. Sauvegarder chaque fonctionnalite dans un commi
 - Images des familiers : modeles 3D reels du jeu dans la collection et la fiche, apercus animes et noms au survol. Demarrage du jeu et capture des huit familiers verifies.
 - Cosmetiques : rendu local raccorde aux donnees privees synchronisees, reprise des debloquages au login, bouton de vue en jeu et option premiere personne dans la garde-robe. Test equipement/synchronisation reussi ; auras/ailes visibles en jeu sous forme de particules, comme dans le systeme initial.
 - Monstres : Zombie des Cryptes (8-22), Araignee Venimeuse (18-35), Bandit Arbaletrier (30-50), IA native melee/poison/tir, apparitions et butins configures, oeufs et bestiaire raccordes. Compilation et apparition/rendu des trois types verifies en jeu. Sauvegarde : 9abd4d3.
-- Les 5 autres demandes restent a implementer/verifier.
+- Equipement : cinq sets par classe dont quatre nouveaux mythiques de niveau 100 (Valkyrie, Eternel des Arcanes, Sentinelle Astrale, Egide Divine), 16 pieces avec textures portees, alliage celeste et recettes. Epee du Berserker ajoutee au niveau 25 ; les six armes existantes par classe sont conservees. 149 recettes resolues verifiees en jeu et apercus des quatre sets captures.
+- Les 4 autres demandes restent a implementer/verifier.
 - Aucun code des agents cloud de Claude n'a ete recupere. Base initiale : f8c07de.
 
 ## Demandes utilisateur
