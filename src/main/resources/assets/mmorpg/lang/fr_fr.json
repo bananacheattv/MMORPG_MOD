@@ -241,5 +241,8 @@
   "item.mmorpg.egide_divine_jambieres": "Jambières de l’Égide Divine",
   "item.mmorpg.egide_divine_bottes": "Bottes de l’Égide Divine",
   "item.mmorpg.epee_berserker": "Épée du Berserker",
-  "item.mmorpg.alliage_celeste": "Alliage Céleste"
+  "item.mmorpg.alliage_celeste": "Alliage Céleste",
+  "block.mmorpg.lucky_block": "Lucky Block",
+  "item.mmorpg.cle_aventure": "Clé d’aventure",
+  "item.mmorpg.caisse_aventure": "Caisse d’aventure"
 }

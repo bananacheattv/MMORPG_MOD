@@ -114,6 +114,10 @@ public final class ModItems {
     public static final DeferredItem<RpgConsumableItem> CHARME_CHANCE = consumable("charme_chance", Rarity.RARE,
             RpgConsumableItem.Kind.LUCK_CHARM, 0, "+25 % de chances de butin pendant 30 minutes de jeu. Non cumulable.");
 
+    public static final DeferredItem<RpgMaterialItem> CLE_AVENTURE = material("cle_aventure", Rarity.RARE, "Ouvre une caisse d’aventure. Une clé par caisse.");
+    public static final DeferredItem<RpgConsumableItem> CAISSE_AVENTURE = consumable("caisse_aventure", Rarity.RARE, RpgConsumableItem.Kind.ADVENTURE_CRATE, 0, "Nécessite une clé d’aventure. Butin : potions 45 %, matériaux 25 %, or 20 %, charme 8 %, cosmétique 2 %.");
+    public static final DeferredItem<BlockItem> LUCKY_BLOCK = ITEMS.registerSimpleBlockItem("lucky_block", ModBlocks.LUCKY_BLOCK);
+
     // ------------------------------------------------------------------ blocs
     public static final DeferredItem<BlockItem> FORGE_ARCANIQUE = ITEMS.registerSimpleBlockItem("forge_arcanique", ModBlocks.FORGE_ARCANIQUE);
     public static final DeferredItem<com.mmorpg.item.AdminBlockItem> TELEPORTEUR = ITEMS.registerItem("teleporteur",

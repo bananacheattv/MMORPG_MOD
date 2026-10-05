@@ -24,7 +24,7 @@ public class RpgConsumableItem extends RpgMaterialItem {
     public static final Identifier POTION_GROUP = MMORPG.id("potions");
 
     public enum Kind {
-        HEAL, MANA, PET_FOOD, XP_CHARM, LUCK_CHARM, ELIXIR, TELEPORT_SCROLL, FORGET_SCROLL, REBIRTH_ORB, COSMETIC_CHEST
+        ADVENTURE_CRATE, HEAL, MANA, PET_FOOD, XP_CHARM, LUCK_CHARM, ELIXIR, TELEPORT_SCROLL, FORGET_SCROLL, REBIRTH_ORB, COSMETIC_CHEST
     }
 
     private final Kind kind;
@@ -46,6 +46,9 @@ public class RpgConsumableItem extends RpgMaterialItem {
         ServerLevel sl = sp.level();
         boolean consumed = true;
         switch (kind) {
+            case ADVENTURE_CRATE -> {
+                return com.mmorpg.server.AdventureLoot.openCrate(sp, stack) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+            }
             case HEAL -> {
                 if (sp.getCooldowns().isOnCooldown(stack)) return InteractionResult.FAIL;
                 if (data.hp >= data.stats.get(com.mmorpg.rpg.Stat.MAX_HP)) return InteractionResult.FAIL;

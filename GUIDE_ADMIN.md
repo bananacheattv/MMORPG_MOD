@@ -16,3 +16,9 @@ Chaque quete possede un identifiant unique, `name`, `description`, `minLevel`, `
 Utiliser `/mmorpg reload` apres modification. Les nouvelles quetes par defaut sont ajoutees sans ecraser les definitions personnalisees existantes. Les journalieres redeviennent disponibles a minuit selon la date du serveur.
 
 Le journal du joueur propose Toutes / Campagne / Journalieres / A rendre. « Suivre en priorite » place la quete en tete du suivi a l'ecran. Dix quetes peuvent etre actives simultanement.
+
+## Caisses et Lucky Blocks
+
+Fabriquer caisse et cle a la Forge (niveau 5), puis utiliser la caisse avec une cle dans l’inventaire. Le Lucky Block se fabrique au niveau 10 : le poser puis le casser en survie pour recevoir un butin. En creatif, casser le bloc ne donne rien. Explosions et pistons ne permettent pas de recuperer le bloc.
+
+Butin des deux : potions 45 %, pierres d’amelioration 25 %, or 20 %, charme XP/chance 8 %, coffre cosmetique 2 %. Potions et pierres sont adaptees au niveau du joueur.
