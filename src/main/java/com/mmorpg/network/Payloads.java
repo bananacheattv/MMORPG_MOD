@@ -135,6 +135,12 @@ public final class Payloads {
         @Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
 
+    public record LuckyRoll(BlockPos pos) implements CustomPacketPayload {
+        public static final Type<LuckyRoll> TYPE = new Type<>(MMORPG.id("lucky_roll"));
+        public static final StreamCodec<ByteBuf, LuckyRoll> CODEC = StreamCodec.composite(BlockPos.STREAM_CODEC, LuckyRoll::pos, LuckyRoll::new);
+        @Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
     /** Invoquer (id) ou renvoyer (chaine vide) un familier. */
     public record PetAction(String pet) implements CustomPacketPayload {
         public static final Type<PetAction> TYPE = new Type<>(MMORPG.id("pet_action"));

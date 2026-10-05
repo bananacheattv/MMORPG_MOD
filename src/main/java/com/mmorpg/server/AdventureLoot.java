@@ -27,22 +27,36 @@ public final class AdventureLoot {
         return roll < 45 ? "potions" : roll < 70 ? "materiaux" : roll < 90 ? "or" : roll < 98 ? "charme" : "cosmetique";
     }
     public static void reward(ServerPlayer p) {
+        grant(p, roll(p));
+    }
+    public record Loot(String item, int count, long gold, String category) {
+        public net.minecraft.nbt.CompoundTag tag() {
+            var t = new net.minecraft.nbt.CompoundTag();
+            t.putString("item", item); t.putInt("count", count); t.putLong("gold", gold); t.putString("category", category);
+            return t;
+        }
+    }
+    public static Loot roll(ServerPlayer p) {
         var random = p.getRandom();
         String category = category(random.nextInt(100));
         int level = RpgPlayers.get(p).level;
-        switch (category) {
+        return switch (category) {
             case "potions" -> {
                 boolean heal = random.nextBoolean();
                 var item = heal ? (level >= 50 ? ModItems.POTION_SOIN_MAJEURE : level >= 20 ? ModItems.POTION_SOIN : ModItems.POTION_SOIN_MINEURE)
                     : (level >= 50 ? ModItems.POTION_MANA_MAJEURE : level >= 20 ? ModItems.POTION_MANA : ModItems.POTION_MANA_MINEURE);
-                RpgPlayers.give(p, item.get(), 3);
+                yield new Loot(net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(item.get()).toString(), 3, 0, category);
             }
-            case "materiaux" -> RpgPlayers.give(p, level >= 50 ? ModItems.PIERRE_AMELIORATION_SUP.get() : ModItems.PIERRE_AMELIORATION.get(), 2);
-            case "or" -> RpgPlayers.addGold(p, 40 + Math.max(1, level) * 3L, true);
-            case "charme" -> RpgPlayers.give(p, random.nextBoolean() ? ModItems.CHARME_CHANCE.get() : ModItems.CHARME_EXPERIENCE.get(), 1);
-            case "cosmetique" -> RpgPlayers.give(p, ModItems.COFFRE_COSMETIQUE.get(), 1);
-        }
-        p.sendSystemMessage(Component.literal("✦ Butin d’aventure : " + category).withColor(0xFFD040));
+            case "materiaux" -> new Loot(level >= 50 ? "mmorpg:pierre_amelioration_sup" : "mmorpg:pierre_amelioration", 2, 0, category);
+            case "or" -> new Loot("mmorpg:piece_or", 0, 40 + Math.max(1, level) * 3L, category);
+            case "charme" -> new Loot(random.nextBoolean() ? "mmorpg:charme_chance" : "mmorpg:charme_experience", 1, 0, category);
+            default -> new Loot("mmorpg:coffre_cosmetique", 1, 0, category);
+        };
+    }
+    public static void grant(ServerPlayer p, Loot loot) {
+        if (loot.gold > 0) RpgPlayers.addGold(p, loot.gold, true);
+        if (loot.count > 0) RpgPlayers.give(p, com.mmorpg.crafting.ForgeRecipes.resolveItem(loot.item), loot.count);
+        p.sendSystemMessage(Component.literal("✦ Butin d’aventure : " + loot.category).withColor(0xFFD040));
         p.level().playSound(null, p.blockPosition(), SoundEvents.CHEST_OPEN, SoundSource.PLAYERS, 1, 1.2f);
         p.level().sendParticles(ParticleTypes.FIREWORK, p.getX(), p.getY() + 1, p.getZ(), 25, .5, .5, .5, .1);
     }

@@ -48,6 +48,23 @@ public final class DevShowcase {
         mc.options.pauseOnLostFocus = false;
         if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.PauseScreen) mc.gui.setScreen(null);
         String me = mc.player.getName().getString();
+        if (MODE.equals("lucky_interface")) {
+            var pos = mc.player.blockPosition().offset(2, 0, 0);
+            if (tick == 5) {
+                mc.getWindow().setWindowed(1280, 720);
+                cmd(mc, "setblock " + pos.getX() + " " + pos.getY() + " " + pos.getZ() + " mmorpg:lucky_block");
+            }
+            if (tick == 15) {
+                var data = new CompoundTag(); data.putLong("pos", pos.asLong());
+                mc.gui.setScreen(new com.mmorpg.client.screen.LuckyBlockScreen(data));
+            }
+            if (tick == 25) shot(mc, "lucky_interface_avant");
+            if (tick == 30 && mc.gui.screen() instanceof com.mmorpg.client.screen.LuckyBlockScreen s) s.start();
+            if (tick == 55) shot(mc, "lucky_interface_animation");
+            if (tick == 130) shot(mc, "lucky_interface_resultat");
+            if (tick == 140) stop(mc);
+            return;
+        }
         if (MODE.equals("bestiaire_dropdown")) {
             if (tick == 5) { mc.getWindow().setWindowed(1280, 720); MenuScreen.open(MenuScreen.Tab.BESTIAIRE); }
             if (tick == 15 || tick == 35) {

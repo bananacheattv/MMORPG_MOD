@@ -34,8 +34,13 @@ public final class DevLootChecks {
             p.level().setBlockAndUpdate(pos, ModBlocks.LUCKY_BLOCK.get().defaultBlockState());
             check(p.gameMode.destroyBlock(pos), "lucky block break");
             check(p.level().getBlockState(pos).isAir(), "lucky block removed");
-            check(inv.countItem(ModItems.LUCKY_BLOCK.get()) == 0, "no duplicate block drop");
-            MMORPG.LOGGER.info("[CODEX CHECKS] LOOT PASS: missing key, consumption, weights, survival block break");
+            check(inv.countItem(ModItems.LUCKY_BLOCK.get()) == 1, "unopened block recovered once");
+            p.level().setBlockAndUpdate(pos, ModBlocks.LUCKY_BLOCK.get().defaultBlockState());
+            check(LuckyBlockManager.roll(p, pos), "opening placed block");
+            check(p.level().getBlockState(pos).isAir(), "opened block consumed");
+            check(!LuckyBlockManager.roll(p, pos), "second opening denied");
+            check(!LuckyBlockManager.roll(p, pos.offset(100, 0, 0)), "distant opening denied");
+            MMORPG.LOGGER.info("[CODEX CHECKS] LOOT PASS: keys, weights, recovery, opening and duplicate denial");
         } finally {
             p.level().setBlockAndUpdate(pos, block);
             for (int i = 0; i < saved.length; i++) inv.setItem(i, saved[i]);
