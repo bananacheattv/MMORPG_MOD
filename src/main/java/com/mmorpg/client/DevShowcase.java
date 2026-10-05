@@ -76,6 +76,19 @@ public final class DevShowcase {
             structuresPhase(mc, me);
             return;
         }
+        if (MODE.equals("reprise_tab")) {
+            if (tick == 5) { mc.getWindow().setWindowed(1280, 720); mc.gui.setScreen(null); }
+            if (tick == 110) shot(mc, "codex_tableau_eldoria");
+            if (tick == 115) mc.options.keyPlayerList.setDown(true);
+            if (tick == 130) {
+                var info = mc.getConnection().getPlayerInfo(mc.player.getUUID());
+                if (info == null || info.getTabListDisplayName() == null || !info.getTabListDisplayName().getString().contains(ClientData.DATA.playerClass.label)) throw new IllegalStateException("Missing RPG tab name");
+                MMORPG.LOGGER.info("[CODEX CHECKS] TAB PASS: synchronized class and level name");
+                shot(mc, "codex_tab_eldoria");
+            }
+            if (tick == 140) { mc.options.keyPlayerList.setDown(false); stop(mc); }
+            return;
+        }
         if (MODE.equals("reprise_quetes")) {
             if (tick == 5) { mc.getWindow().setWindowed(1280, 720); mc.gui.setScreen(null); cmd(mc, "mmorpg pnj quetes_groupe cryptes 2 Gardien des Cryptes"); }
             if (tick == 15) MenuScreen.open(MenuScreen.Tab.QUETES);

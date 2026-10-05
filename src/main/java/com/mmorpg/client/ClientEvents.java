@@ -33,6 +33,7 @@ public final class ClientEvents {
         });
         event.replaceLayer(VanillaGuiLayers.ARMOR_LEVEL, (g, delta) -> {
         });
+        event.replaceLayer(VanillaGuiLayers.TAB_LIST, com.mmorpg.client.hud.PlayerListHud::render);
         event.registerAbove(VanillaGuiLayers.HOTBAR, MMORPG.id("hud"), MmoHud::render);
     }
 

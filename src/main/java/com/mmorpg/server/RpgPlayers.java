@@ -99,6 +99,7 @@ public final class RpgPlayers {
     // ================================================================== synchronisation
 
     public static void sync(ServerPlayer player) {
+        player.refreshTabListName();
         PlayerData d = get(player);
         CompoundTag t = d.save();
         t.store("stats", com.mojang.serialization.Codec.DOUBLE.listOf(), toList(d.stats.raw()));

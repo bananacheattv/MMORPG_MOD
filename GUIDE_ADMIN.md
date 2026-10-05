@@ -22,3 +22,7 @@ Le journal du joueur propose Toutes / Campagne / Journalieres / A rendre. « Sui
 Fabriquer caisse et cle a la Forge (niveau 5), puis utiliser la caisse avec une cle dans l’inventaire. Le Lucky Block se fabrique au niveau 10 : le poser puis le casser en survie pour recevoir un butin. En creatif, casser le bloc ne donne rien. Explosions et pistons ne permettent pas de recuperer le bloc.
 
 Butin des deux : potions 45 %, pierres d’amelioration 25 %, or 20 %, charme XP/chance 8 %, coffre cosmetique 2 %. Potions et pierres sont adaptees au niveau du joueur.
+
+## Affichage
+
+Maintenir TAB pour la liste Eldoria (classe, niveau, latence ; jusqu’a 80 joueurs affiches comme la liste native). Le tableau Eldoria en haut a droite affiche l’or et les quetes. Il se deplace, se redimensionne et se masque dans l’editeur du HUD existant. Les niveaux et classes sont calcules par le serveur.

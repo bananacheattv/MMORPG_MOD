@@ -19,7 +19,8 @@ Branche : codex/eldoria-reprise. Sauvegarder chaque fonctionnalite dans un commi
 - Equipement : cinq sets par classe dont quatre nouveaux mythiques de niveau 100 (Valkyrie, Eternel des Arcanes, Sentinelle Astrale, Egide Divine), 16 pieces avec textures portees, alliage celeste et recettes. Epee du Berserker ajoutee au niveau 25 ; les six armes existantes par classe sont conservees. 149 recettes resolues verifiees en jeu et apercus des quatre sets captures.
 - Quetes : filtres et pagination du journal, suivi prioritaire persistant, trois nouvelles quetes en chaine, PNJ par groupe. Tests en jeu : prerequis, suivi sauvegarde, quantites cumulees, bon PNJ et recompense unique ; capture du journal verifiee.
 - Caisses et lucky blocks : caisse consommee avec une cle, recettes de Forge, cinq categories de butin avec probabilites affichees, bloc a casser en survie. Tests en jeu reussis : refus sans cle, consommation unitaire, probabilites et destruction sans duplication.
-- Les 2 autres demandes restent a implementer/verifier.
+- TAB et tableau : liste Eldoria avec classe/niveau synchronises hors portee, noms colores et latence ; tableau personnel deplacable/masquable, or, quetes et joueurs connectes. Captures en jeu verifiees et test de synchronisation reussi.
+- Montures : derniere demande a implementer/verifier.
 - Aucun code des agents cloud de Claude n'a ete recupere. Base initiale : f8c07de.
 
 ## Demandes utilisateur
