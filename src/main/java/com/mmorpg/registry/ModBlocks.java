@@ -52,6 +52,11 @@ public final class ModBlocks {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<StructureBlockEntity>> STRUCTURE = BLOCK_ENTITIES.register("structure",
             () -> new BlockEntityType<>(StructureBlockEntity::new, FORGE_ARCANIQUE.get(), TELEPORTEUR.get(), AUTEL_INVOCATION.get()));
 
+    /** Caisses : roue d'ouverture animee (etat synchronise). */
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.mmorpg.block.crate.CrateBlockEntity>> CRATE = BLOCK_ENTITIES.register("caisse",
+            () -> new BlockEntityType<>(com.mmorpg.block.crate.CrateBlockEntity::new,
+                    CRATES.values().stream().map(DeferredBlock::get).toArray(net.minecraft.world.level.block.Block[]::new)));
+
     private ModBlocks() {
     }
 

@@ -152,6 +152,13 @@ public final class Payloads {
         @Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
     }
 
+    /** Ouvrir la caisse (bloc) a cette position avec une cle. */
+    public record CrateOpen(BlockPos pos) implements CustomPacketPayload {
+        public static final Type<CrateOpen> TYPE = new Type<>(MMORPG.id("crate_open"));
+        public static final StreamCodec<ByteBuf, CrateOpen> CODEC = StreamCodec.composite(BlockPos.STREAM_CODEC, CrateOpen::pos, CrateOpen::new);
+        @Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
     /** Invoquer (id) ou renvoyer (chaine vide) un familier. */
     public record PetAction(String pet) implements CustomPacketPayload {
         public static final Type<PetAction> TYPE = new Type<>(MMORPG.id("pet_action"));

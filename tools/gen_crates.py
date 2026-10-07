@@ -125,15 +125,27 @@ def model(tier, open_):
         box([11, 9, 0.6], [13, 13.4, 15.4], METAL, faces=('north', 'south', 'up'), rot=lid),
         box([6.5, 7, 0.2], [9.5, 11, 1], METAL, north=LOCK, faces=('north', 'east', 'west', 'up', 'down'), rot=lid),
     ]
-    if tier in ('epique', 'legendaire', 'mythique'):
-        els.append(box([7, 13, 7], [9, 14.5, 9], GEM, rot=lid))
+    # coins renforces, poignees laterales, plaque a gemme sur le couvercle
+    for x0, z0 in ((0.4, 0.4), (14.1, 0.4), (0.4, 14.1), (14.1, 14.1)):
+        els.append(box([x0, 0, z0], [x0 + 1.5, 9, z0 + 1.5], METAL))
+    els.append(box([-0.4, 4, 6], [0.6, 6, 10], METAL, faces=('north', 'south', 'west', 'up', 'down')))
+    els.append(box([15.4, 4, 6], [16.4, 6, 10], METAL, faces=('north', 'south', 'east', 'up', 'down')))
+    els.append(box([6, 13, 6], [10, 13.6, 10], METAL, rot=lid))
+    els.append(box([7, 13.6, 7], [9, 15 if tier in ('epique', 'legendaire', 'mythique') else 14.4, 9], GEM, rot=lid))
+    # caisse 2x plus grande qu'un bloc, centree sur lui
+    for e in els:
+        e['from'] = [e['from'][0] * 2 - 8, e['from'][1] * 2, e['from'][2] * 2 - 8]
+        e['to'] = [e['to'][0] * 2 - 8, e['to'][1] * 2, e['to'][2] * 2 - 8]
+        if 'rotation' in e:
+            o = e['rotation']['origin']
+            e['rotation']['origin'] = [o[0] * 2 - 8, o[1] * 2, o[2] * 2 - 8]
     t = f'mmorpg:block/caisse_{tier}'
     return {'parent': 'minecraft:block/block', 'textures': {'particle': t, 't': t}, 'elements': els,
-            'display': {'gui': {'rotation': [30, 225, 0], 'translation': [0, 1, 0], 'scale': [0.7, 0.7, 0.7]},
-                        'ground': {'rotation': [0, 0, 0], 'translation': [0, 3, 0], 'scale': [0.3, 0.3, 0.3]},
-                        'fixed': {'rotation': [0, 0, 0], 'translation': [0, 0, 0], 'scale': [0.5, 0.5, 0.5]},
-                        'thirdperson_righthand': {'rotation': [75, 45, 0], 'translation': [0, 2.5, 0], 'scale': [0.375, 0.375, 0.375]},
-                        'firstperson_righthand': {'rotation': [0, 45, 0], 'translation': [0, 0, 0], 'scale': [0.4, 0.4, 0.4]}}}
+            'display': {'gui': {'rotation': [30, 225, 0], 'translation': [0, -1, 0], 'scale': [0.36, 0.36, 0.36]},
+                        'ground': {'rotation': [0, 0, 0], 'translation': [0, 3, 0], 'scale': [0.15, 0.15, 0.15]},
+                        'fixed': {'rotation': [0, 0, 0], 'translation': [0, 0, 0], 'scale': [0.25, 0.25, 0.25]},
+                        'thirdperson_righthand': {'rotation': [75, 45, 0], 'translation': [0, 2.5, 0], 'scale': [0.19, 0.19, 0.19]},
+                        'firstperson_righthand': {'rotation': [0, 45, 0], 'translation': [0, 0, 0], 'scale': [0.2, 0.2, 0.2]}}}
 
 
 def generate(g):
