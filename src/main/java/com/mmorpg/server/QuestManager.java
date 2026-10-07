@@ -54,6 +54,11 @@ public final class QuestManager {
         return !d.completedQuests.contains(id);
     }
 
+    public static boolean matchesNpc(QuestDef q, NpcEntity npc) {
+        return (q.npc == null || q.npc.isEmpty() || q.npc.equals(npc.getUUID().toString()))
+                && (q.giver.isEmpty() || q.giver.equalsIgnoreCase(npc.group()));
+    }
+
     private static int count(Inventory inv, Item item) {
         int n = 0;
         for (ItemStack s : inv) {
@@ -105,6 +110,10 @@ public final class QuestManager {
         t.putString("name", q.name);
         t.putString("desc", q.description);
         t.putString("giver", q.giver);
+        if (q.npc != null && !q.npc.isEmpty()) {
+            var npc = com.mmorpg.world.NpcDirectory.get(p.level().getServer()).entry(q.npc);
+            if (npc != null) t.putString("giver", npc.getStringOr("name", "Maître des Quêtes") + " — " + npc.getStringOr("zone", "Sans zone"));
+        }
         t.putBoolean("tracked", id.equals(d.trackedQuest));
         t.putInt("minLevel", q.minLevel);
         t.putBoolean("daily", q.daily);
@@ -177,8 +186,8 @@ public final class QuestManager {
         for (Map.Entry<String, QuestDef> e : ConfigManager.quests().entrySet()) {
             QuestDef q = e.getValue();
             if (d.activeQuests.containsKey(e.getKey())) {
-                if (q.giver.isEmpty() || q.giver.equalsIgnoreCase(npc.group())) active.add(questTag(p, d, e.getKey(), q));
-            } else if (isAvailable(d, e.getKey(), q, npc.group())) {
+                if (matchesNpc(q, npc)) active.add(questTag(p, d, e.getKey(), q));
+            } else if (matchesNpc(q, npc) && isAvailable(d, e.getKey(), q, npc.group())) {
                 available.add(questTag(p, d, e.getKey(), q));
             }
         }
@@ -205,7 +214,7 @@ public final class QuestManager {
         NpcEntity npc = nearGiver(p, npcId);
         PlayerData d = RpgPlayers.get(p);
         QuestDef q = def(id);
-        if (npc == null || !isAvailable(d, id, q, npc.group())) return;
+        if (npc == null || q == null || !matchesNpc(q, npc) || !isAvailable(d, id, q, npc.group())) return;
         if (d.activeQuests.size() >= MAX_ACTIVE) {
             p.sendOverlayMessage(Component.literal("Journal de quêtes plein (" + MAX_ACTIVE + " quêtes maximum).").withColor(0xFF5050));
             return;
@@ -238,7 +247,7 @@ public final class QuestManager {
         NpcEntity npc = nearGiver(p, npcId);
         PlayerData d = RpgPlayers.get(p);
         QuestDef q = def(id);
-        if (npc == null || q == null || (!q.giver.isEmpty() && !q.giver.equalsIgnoreCase(npc.group())) || !completable(p, d, id)) return;
+        if (npc == null || q == null || !matchesNpc(q, npc) || !completable(p, d, id)) return;
         // objets a rapporter
         for (QuestDef.Objective o : q.objectives) {
             if (!"collect".equals(o.type)) continue;

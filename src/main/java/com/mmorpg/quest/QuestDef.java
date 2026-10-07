@@ -24,6 +24,8 @@ public class QuestDef {
     public boolean daily = false;
     /** Groupe de PNJ qui proposent la quete (vide = tous les maitres des quetes). */
     public String giver = "";
+    /** Optional exact NPC UUID; empty retains the historical group-based behaviour. */
+    public String npc = "";
     public List<Objective> objectives = new ArrayList<>();
     public Rewards rewards = new Rewards();
 

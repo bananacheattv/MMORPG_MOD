@@ -48,6 +48,56 @@ public final class DevShowcase {
         mc.options.pauseOnLostFocus = false;
         if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.PauseScreen) mc.gui.setScreen(null);
         String me = mc.player.getName().getString();
+        if (MODE.equals("editeur_workflow")) {
+            if(tick==0) mc.getSingleplayerServer().execute(()->com.mmorpg.server.DevQuestEditorChecks.beginWorkflow(mc.getSingleplayerServer()));
+            if(tick==5) {mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(3);mc.resizeDisplay();cmd(mc,"mmorpg editeurquetes");}
+            var screen=mc.gui.screen();
+            if(screen!=null) {
+                int pw=screen.width-12,ph=screen.height-12,lw=Math.min(180,Math.max(120,pw/3)),rx=6+lw+20,rw=pw-lw-30,fy=66;
+                if(tick==15) editorClick(screen,25,36);
+                if(tick==20) editorClick(screen,40,6+ph-27);
+                if(tick==25) {editorText(screen,"Nom du PNJ","Maëlys (validation)");editorText(screen,"Zone","Forêt ancienne");}
+                if(tick==30) editorClick(screen,rx+30,6+ph-16);
+                if(tick==40) shot(mc,"editeur_pnj_cree");
+                if(tick==45) editorClick(screen,14+2*((lw-4)/3)+12,36);
+                if(tick==50) editorClick(screen,40,111);
+                if(tick==55) {
+                    editorText(screen,"Titre de la quête","La mémoire des racines");
+                    for(var child:screen.children()) if(child instanceof net.minecraft.client.gui.components.MultiLineEditBox box)
+                        box.setValue("Les anciens arbres murmurent un nom oublié.\nMaëlys attend votre aide au cœur de la forêt.\nRapportez les ressources demandées pour retrouver la mémoire des racines.");
+                }
+                if(tick==60) shot(mc,"editeur_lore_redige");
+                if(tick==65) editorClick(screen,rx+3*(rw/4)+15,38);
+                if(tick==70) editorClick(screen,rx+30,fy+10);
+                if(tick==75) editorText(screen,"Rechercher","Maëlys");
+                if(tick==80) editorClick(screen,40,68);
+                if(tick==85) editorClick(screen,rx+2*(rw/4)+15,38);
+                if(tick==90) editorClick(screen,rx+3*(rw/4)+15,fy);
+                if(tick==95) editorClick(screen,rx+30,fy+45);
+                if(tick==100) editorText(screen,"Rechercher","Ailes Célestes");
+                if(tick==105) shot(mc,"editeur_choix_cosmetique");
+                if(tick==110) editorClick(screen,40,68);
+                if(tick==115) editorClick(screen,rx+30,6+ph-16);
+                if(tick==125) shot(mc,"editeur_quete_enregistree");
+                if(tick==130) mc.getSingleplayerServer().execute(()->com.mmorpg.server.DevQuestEditorChecks.endWorkflow(mc.getSingleplayerServer()));
+                if(tick==140) stop(mc);
+            }
+            return;
+        }
+        if (MODE.equals("editeur_quetes")) {
+            if(tick==5) {mc.getWindow().setWindowed(1600,900);cmd(mc,"mmorpg editeurquetes");}
+            if(tick==20) shot(mc,"editeur_quetes_lore");
+            if(tick==25 && mc.gui.screen() instanceof com.mmorpg.client.screen.QuestEditorScreen s) s.showPage(1);
+            if(tick==35) shot(mc,"editeur_quetes_objectifs");
+            if(tick==40 && mc.gui.screen() instanceof com.mmorpg.client.screen.QuestEditorScreen s) s.showPage(2);
+            if(tick==50) shot(mc,"editeur_quetes_recompenses");
+            if(tick==55 && mc.gui.screen() instanceof com.mmorpg.client.screen.QuestEditorScreen s) s.showPage(3);
+            if(tick==65) shot(mc,"editeur_quetes_conditions");
+            if(tick==70) mc.getWindow().setWindowed(1280,720);
+            if(tick==80) shot(mc,"editeur_quetes_petit_ecran");
+            if(tick==90) stop(mc);
+            return;
+        }
         if (MODE.equals("cosmetiques_importes")) {
             if(tick==5) mc.getWindow().setWindowed(1600,900);
             var list=java.util.Arrays.stream(Cosmetic.values()).filter(Cosmetic::hasModel).toList();
@@ -1734,6 +1784,13 @@ public final class DevShowcase {
 
     private static void cmd(Minecraft mc, String command) {
         mc.player.connection.sendCommand(command);
+    }
+
+    private static void editorClick(net.minecraft.client.gui.screens.Screen screen,int x,int y) {
+        screen.mouseClicked(new net.minecraft.client.input.MouseButtonEvent(x,y,new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT,0)),false);
+    }
+    private static void editorText(net.minecraft.client.gui.screens.Screen screen,String label,String value) {
+        for(var child:screen.children()) if(child instanceof net.minecraft.client.gui.components.EditBox box&&box.getMessage().getString().equals(label)) box.setValue(value);
     }
 
     private static void shot(Minecraft mc, String name) {

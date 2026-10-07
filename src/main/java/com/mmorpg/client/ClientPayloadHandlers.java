@@ -48,6 +48,10 @@ public final class ClientPayloadHandlers {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
         switch (payload.screen()) {
+            case S2COpenScreen.QUEST_EDITOR -> {
+                if (mc.gui.screen() instanceof com.mmorpg.client.screen.QuestEditorScreen screen) screen.receive(payload.extra());
+                else if (!payload.extra().contains("status")) mc.gui.setScreen(new com.mmorpg.client.screen.QuestEditorScreen(payload.extra()));
+            }
             case S2COpenScreen.CLASS_SELECT -> mc.gui.setScreen(new ClassSelectScreen());
             case S2COpenScreen.TELEPORTER -> mc.gui.setScreen(new TeleporterScreen(payload.extra()));
             case S2COpenScreen.TELEPORTER_SETUP -> mc.gui.setScreen(new TeleporterSetupScreen(payload.extra()));

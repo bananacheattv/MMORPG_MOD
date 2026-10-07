@@ -10,6 +10,11 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 /** Tous les paquets reseau du mod (hors ouverture d'ecran). */
 public final class Payloads {
+    public record QuestEdit(CompoundTag data) implements CustomPacketPayload {
+        public static final Type<QuestEdit> TYPE=new Type<>(MMORPG.id("quest_edit"));
+        public static final StreamCodec<ByteBuf,QuestEdit> CODEC=StreamCodec.composite(ByteBufCodecs.COMPOUND_TAG,QuestEdit::data,QuestEdit::new);
+        @Override public Type<? extends CustomPacketPayload> type() {return TYPE;}
+    }
     private Payloads() {
     }
 

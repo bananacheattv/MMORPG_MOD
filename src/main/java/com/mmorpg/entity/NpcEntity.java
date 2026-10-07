@@ -44,6 +44,16 @@ public class NpcEntity extends PathfinderMob {
     private static final EntityDataAccessor<Integer> ROLE = SynchedEntityData.defineId(NpcEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> SKIN = SynchedEntityData.defineId(NpcEntity.class, EntityDataSerializers.INT);
     private String group = "";
+    private String zone = "Sans zone";
+
+    public String zone() { return zone; }
+    public void setZone(String zone) { this.zone = zone; }
+
+    @Override public void tick() {
+        super.tick();
+        if (tickCount % 40 == 0 && level() instanceof ServerLevel sl)
+            com.mmorpg.world.NpcDirectory.get(sl.getServer()).record(this);
+    }
 
     public NpcEntity(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
@@ -125,6 +135,7 @@ public class NpcEntity extends PathfinderMob {
         output.putInt("NpcRole", this.entityData.get(ROLE));
         output.putInt("NpcSkin", this.entityData.get(SKIN));
         output.putString("NpcGroup", group);
+        output.putString("NpcZone", zone);
     }
 
     @Override
@@ -133,5 +144,6 @@ public class NpcEntity extends PathfinderMob {
         this.entityData.set(ROLE, input.getIntOr("NpcRole", 0));
         this.entityData.set(SKIN, input.getIntOr("NpcSkin", 0));
         this.group = input.getStringOr("NpcGroup", "");
+        this.zone = input.getStringOr("NpcZone", "Sans zone");
     }
 }
