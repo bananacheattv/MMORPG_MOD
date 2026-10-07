@@ -50,7 +50,7 @@ public final class DevShowcase {
         String me = mc.player.getName().getString();
         if (MODE.equals("editeur_workflow")) {
             if(tick==0) mc.getSingleplayerServer().execute(()->com.mmorpg.server.DevQuestEditorChecks.beginWorkflow(mc.getSingleplayerServer()));
-            if(tick==5) {mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(3);mc.resizeDisplay();cmd(mc,"mmorpg editeurquetes");}
+            if(tick==5) {mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(3);mc.resizeGui();cmd(mc,"mmorpg editeurquetes");}
             var screen=mc.gui.screen();
             if(screen!=null) {
                 int pw=screen.width-12,ph=screen.height-12,lw=Math.min(180,Math.max(120,pw/3)),rx=6+lw+20,rw=pw-lw-30,fy=66;
