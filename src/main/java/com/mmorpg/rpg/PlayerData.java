@@ -245,7 +245,7 @@ public class PlayerData implements ValueIOSerializable {
         luckCharmSeconds = Math.clamp(t.getIntOr("luckCharmSeconds", 0), 0, 1800);
         trackedQuest = t.getStringOr("trackedQuest", "");
         mounts.clear();
-        mounts.addAll(t.read("mounts", Codec.STRING.listOf()).orElse(List.of()));
+        for (String m : t.read("mounts", Codec.STRING.listOf()).orElse(List.of())) mounts.add(com.mmorpg.mount.MountType.migrate(m));
         activeMount = t.getStringOr("activeMount", "");
         activeQuests.clear();
         t.read("activeQuests", Codec.unboundedMap(Codec.STRING, Codec.INT.listOf())).orElse(Map.of()).forEach((k, v) -> {

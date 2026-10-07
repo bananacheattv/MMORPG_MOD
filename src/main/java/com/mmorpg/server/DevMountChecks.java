@@ -27,8 +27,8 @@ public final class DevMountChecks {
             d.playerClass = PlayerClass.GUERRIER; d.level = 1; d.gold = 10000;
             check(!MountManager.unlock(p, "voyageur") && d.gold == 10000, "no gold purchase");
             d.level = 100;
-            check(MountManager.grant(p, com.mmorpg.mount.MountType.VOYAGEUR), "seal grant");
-            check(!MountManager.grant(p, com.mmorpg.mount.MountType.VOYAGEUR) && d.gold == 10000, "no double grant");
+            check(MountManager.grant(p, com.mmorpg.mount.MountType.SANGLIER), "seal grant");
+            check(!MountManager.grant(p, com.mmorpg.mount.MountType.SANGLIER) && d.gold == 10000, "no double grant");
             var saved = new PlayerData(); saved.load(d.save());
             check(saved.mounts.contains("voyageur"), "persistence");
             check(!MountManager.summon(p, "ombre"), "unowned summon denied");

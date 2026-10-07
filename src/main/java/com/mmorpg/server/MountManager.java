@@ -28,7 +28,7 @@ public final class MountManager {
         long now = p.level().getServer().getTickCount();
         if (now < d.nextMountTick) { message(p, "Patientez quelques secondes avant de réinvoquer."); return false; }
         if (p.isPassenger() || !p.onGround() || p.isInWater()) { message(p, "Descendez et placez-vous sur la terre ferme."); return false; }
-        var mount = new MountEntity(ModEntities.MOUNT.get(), p.level());
+        var mount = new MountEntity(ModEntities.MOUNTS.get(type).get(), p.level());
         mount.setup(p, type);
         boolean room = false;
         for (int[] offset : new int[][]{{2,0},{-2,0},{0,2},{0,-2}}) {
