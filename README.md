@@ -232,11 +232,16 @@ Dans Mods > Eldoria MMORPG > Configurer, on peut activer ou désactiver :
 À chaque push sur `main`, le workflow `Release launcher` compile le mod et met à jour la release GitHub
 [`latest`](https://github.com/bananacheattv/MMORPG_MOD/releases/tag/latest).
 
-Joueurs : télécharger `EldoriaLauncher-Windows.zip` (Java inclus), dézipper, lancer `EldoriaLauncher.exe`
-(ou `EldoriaLauncher.jar` avec Java 21+). Le launcher :
+Joueurs : télécharger `EldoriaLauncher-Windows.zip`, dézipper, lancer `EldoriaLauncher.exe`
+(ou `EldoriaLauncher.jar` avec Java 21+). Le launcher, sans passer par le launcher officiel :
 - se met à jour tout seul (son cœur `launcher-core.jar` est retéléchargé quand il change) ;
-- synchronise les mods dans `%APPDATA%\.eldoria\mods` (les mods ajoutés à la main sont gardés) ;
-- installe NeoForge si besoin et crée le profil « Eldoria MMORPG » dans le launcher Minecraft officiel ;
-- ouvre le launcher Minecraft (connexion Microsoft gérée par Mojang).
+- télécharge Java, Minecraft, NeoForge et les ressources dans `%APPDATA%\.eldoria\minecraft` ;
+- synchronise les mods dans `%APPDATA%\.eldoria\instance\mods` (Eldoria + WorldEdit pour la bonne version,
+  résolu sur Modrinth ; liste dans `launcher/extra_mods.json`, les mods ajoutés à la main sont gardés) ;
+- lance le jeu avec un compte Microsoft, ou un pseudo hors ligne (solo / serveur `online-mode=false`).
 
-Code : `launcher/` (amorce `bootstrap/`, cœur `core/`, scripts de build `scripts/`).
+Connexion Microsoft : créer une application Azure (« Comptes Microsoft personnels », client public, flux
+« appareil » activé), faire valider son ID pour Minecraft (https://aka.ms/mce-reviewappid), puis mettre l'ID
+dans la variable de dépôt `MSA_CLIENT_ID` (Settings → Secrets and variables → Actions → Variables).
+
+Code : `launcher/` (amorce `bootstrap/`, cœur `core/`, scripts `scripts/`).

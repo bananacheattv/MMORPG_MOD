@@ -2,25 +2,20 @@ package eldoria.launcher;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.security.MessageDigest;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -28,6 +23,8 @@ import java.util.Map;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -35,45 +32,53 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 /**
- * Coeur du launcher Eldoria (mis a jour automatiquement a chaque push) :
- * synchronise les mods de l'instance, installe NeoForge, cree le profil dans le launcher Minecraft officiel
- * puis l'ouvre (la connexion Microsoft reste geree par Mojang).
+ * Coeur du launcher Eldoria (mis a jour automatiquement a chaque push) : synchronise les mods,
+ * installe Minecraft + NeoForge, connecte le compte (Microsoft ou hors ligne) et lance le jeu directement.
  */
 public final class Launcher {
-    private static final String PROFILE_ID = "eldoria-mmorpg";
-
     private final Path home;
+    private final Path gameDir;
     private final Path mods;
     private final Path state;
-    private final Path mcDir;
     private final int bootVersion;
-    private final HttpClient http = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS)
-            .connectTimeout(Duration.ofSeconds(15)).build();
 
     private JFrame frame;
     private JLabel status;
+    private JLabel accountLabel;
+    private JButton loginBtn;
+    private JTextField pseudo;
+    private JComboBox<String> ram;
     private JProgressBar bar;
     private JTextArea log;
     private JButton play;
+
     private Map<String, Object> manifest;
+    private Map<String, Object> settings = new LinkedHashMap<>();
+    private Game game;
+    private MsAuth auth;
+    private volatile MsAuth.Account msAccount;
+    private volatile boolean ready;
 
     private Launcher(Path home, int bootVersion) {
         this.home = home;
-        this.mods = home.resolve("mods");
+        this.gameDir = home.resolve("instance");
+        this.mods = gameDir.resolve("mods");
         this.state = home.resolve("launcher");
-        this.mcDir = minecraftDir();
         this.bootVersion = bootVersion;
     }
 
     /** Appele par l'amorce. {@code manifestJson} vaut null hors ligne. */
     public static void start(String manifestJson, Path home, int bootVersion) {
         Launcher l = new Launcher(home, bootVersion);
-        if (java.awt.GraphicsEnvironment.isHeadless()) { // mode console (serveur, tests)
+        l.loadSettings();
+        if (java.awt.GraphicsEnvironment.isHeadless()) { // mode console (tests) : prepare puis lance hors ligne
             l.update(manifestJson);
+            if (l.ready && Boolean.getBoolean("eldoria.launch")) l.play();
             return;
         }
         SwingUtilities.invokeLater(() -> {
@@ -84,16 +89,7 @@ public final class Launcher {
         });
     }
 
-    static Path minecraftDir() {
-        String os = System.getProperty("os.name", "").toLowerCase();
-        String user = System.getProperty("user.home");
-        if (os.contains("win")) {
-            String appdata = System.getenv("APPDATA");
-            return Path.of(appdata != null ? appdata : user, ".minecraft");
-        }
-        if (os.contains("mac")) return Path.of(user, "Library", "Application Support", "minecraft");
-        return Path.of(user, ".minecraft");
-    }
+    // ---------------------------------------------------------------- UI
 
     private void buildUi() {
         frame = new JFrame("Eldoria MMORPG - Launcher");
@@ -102,10 +98,31 @@ public final class Launcher {
         root.setBorder(BorderFactory.createEmptyBorder(14, 14, 14, 14));
         root.setBackground(new Color(0x1b1622));
 
+        JPanel north = new JPanel(new BorderLayout(8, 8));
+        north.setOpaque(false);
         JLabel title = new JLabel("ELDORIA MMORPG");
         title.setFont(new Font(Font.SERIF, Font.BOLD, 30));
         title.setForeground(new Color(0xf0c860));
-        root.add(title, BorderLayout.NORTH);
+        north.add(title, BorderLayout.NORTH);
+
+        JPanel acc = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        acc.setOpaque(false);
+        accountLabel = label("Compte : hors ligne");
+        loginBtn = new JButton("Connexion Microsoft");
+        loginBtn.setEnabled(false);
+        loginBtn.addActionListener(e -> toggleLogin());
+        pseudo = new JTextField(Json.str(settings.get("pseudo"), ""), 12);
+        pseudo.setToolTipText("Pseudo utilise sans compte Microsoft (solo / serveur hors ligne)");
+        ram = new JComboBox<>(new String[]{"2", "3", "4", "6", "8", "12", "16"});
+        ram.setSelectedItem(Json.str(settings.get("ramGo"), "4"));
+        acc.add(accountLabel);
+        acc.add(loginBtn);
+        acc.add(label("  Pseudo hors ligne :"));
+        acc.add(pseudo);
+        acc.add(label("  RAM (Go) :"));
+        acc.add(ram);
+        north.add(acc, BorderLayout.SOUTH);
+        root.add(north, BorderLayout.NORTH);
 
         log = new JTextArea();
         log.setEditable(false);
@@ -114,25 +131,21 @@ public final class Launcher {
         log.setBackground(new Color(0x120e18));
         log.setForeground(new Color(0xd8d0e0));
         JScrollPane sp = new JScrollPane(log);
-        sp.setPreferredSize(new Dimension(620, 300));
+        sp.setPreferredSize(new Dimension(760, 320));
         root.add(sp, BorderLayout.CENTER);
 
         JPanel south = new JPanel(new BorderLayout(8, 8));
         south.setOpaque(false);
-        status = new JLabel("Recherche de mises a jour...");
-        status.setForeground(Color.WHITE);
+        status = label("Recherche de mises a jour...");
         bar = new JProgressBar(0, 1000);
         bar.setIndeterminate(true);
         play = new JButton("JOUER");
         play.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
         play.setEnabled(false);
-        play.addActionListener(e -> launch());
-        JPanel btns = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-        btns.setOpaque(false);
-        btns.add(play);
+        play.addActionListener(e -> new Thread(this::play, "eldoria-play").start());
         south.add(status, BorderLayout.NORTH);
         south.add(bar, BorderLayout.CENTER);
-        south.add(btns, BorderLayout.EAST);
+        south.add(play, BorderLayout.EAST);
         root.add(south, BorderLayout.SOUTH);
 
         frame.setContentPane(root);
@@ -141,11 +154,18 @@ public final class Launcher {
         frame.setVisible(true);
     }
 
+    private static JLabel label(String s) {
+        JLabel l = new JLabel(s);
+        l.setForeground(Color.WHITE);
+        return l;
+    }
+
     private void log(String s) {
         System.out.println(s);
         if (log == null) return;
         SwingUtilities.invokeLater(() -> {
             log.append(s + "\n");
+            if (log.getLineCount() > 3000) log.setText(log.getText().substring(log.getText().length() / 2));
             log.setCaretPosition(log.getDocument().getLength());
         });
     }
@@ -158,6 +178,33 @@ public final class Launcher {
             if (permille >= 0) bar.setValue(permille);
         });
     }
+
+    private void ui(Runnable r) { if (frame != null) SwingUtilities.invokeLater(r); }
+
+    private void error(String what, Exception e) {
+        e.printStackTrace();
+        log("ERREUR : " + e.getMessage());
+        status(what + " - voir le journal", 0);
+        ui(() -> JOptionPane.showMessageDialog(frame, what + " :\n" + e.getMessage(), "Eldoria", JOptionPane.ERROR_MESSAGE));
+    }
+
+    // ---------------------------------------------------------------- reglages
+
+    private void loadSettings() {
+        try {
+            Path f = state.resolve("settings.json");
+            if (Files.exists(f)) settings = Json.obj(Json.parse(Files.readString(f)));
+        } catch (Exception ignored) {}
+    }
+
+    private void saveSettings() {
+        try {
+            Files.createDirectories(state);
+            Files.writeString(state.resolve("settings.json"), Json.write(settings));
+        } catch (Exception ignored) {}
+    }
+
+    // ---------------------------------------------------------------- mise a jour
 
     private void update(String manifestJson) {
         try {
@@ -172,27 +219,22 @@ public final class Launcher {
             manifest = Json.obj(Json.parse(manifestJson));
             log("Version du modpack : " + Json.str(manifest.get("version"), "?") + "  (" + Json.str(manifest.get("date"), "") + ")");
             for (Object n : Json.arr(manifest.get("notes"))) log("  - " + n);
-
             int minBoot = (int) Double.parseDouble(Json.str(manifest.get("bootstrapVersion"), "1"));
             if (minBoot > bootVersion)
-                log("! Une nouvelle version du launcher est disponible : " + Json.str(manifest.get("releaseUrl"), ""));
+                log("! Nouvelle version du launcher disponible : " + Json.str(manifest.get("releaseUrl"), ""));
 
+            setupAuth();
             syncMods();
-            ensureNeoForge();
-            writeProfiles();
+            game = new Game(home.resolve("minecraft"), gameDir, this::log, this::status);
+            game.prepare(Json.str(manifest.get("minecraft"), "26.3"), Json.str(manifest.get("neoforge"), ""));
+            ready = true;
             status("Pret ! Clique sur JOUER.", 1000);
-            log("Pret. Le profil \"Eldoria MMORPG\" est installe dans le launcher Minecraft.");
-            if (play != null) SwingUtilities.invokeLater(() -> play.setEnabled(true));
+            log("Pret.");
+            ui(() -> play.setEnabled(true));
         } catch (Exception e) {
-            e.printStackTrace();
-            log("ERREUR : " + e);
-            status("Erreur - voir le journal", 0);
-            if (frame != null) SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(frame, "Erreur pendant la mise a jour :\n" + e,
-                    "Eldoria", JOptionPane.ERROR_MESSAGE));
+            error("Erreur pendant la mise a jour", e);
         }
     }
-
-    // ---------------------------------------------------------------- mods
 
     private void syncMods() throws Exception {
         List<Object> list = Json.arr(manifest.get("mods"));
@@ -202,168 +244,125 @@ public final class Launcher {
             Map<String, Object> mod = Json.obj(o);
             String file = Json.str(mod.get("file"), null);
             String url = Json.str(mod.get("url"), null);
-            String sha = Json.str(mod.get("sha256"), "");
             if (file == null || url == null || file.contains("/") || file.contains("\\")) continue;
+            String algo = mod.containsKey("sha512") ? "SHA-512" : mod.containsKey("sha1") ? "SHA-1" : "SHA-256";
+            String sha = Json.str(mod.containsKey("sha512") ? mod.get("sha512") : mod.containsKey("sha1") ? mod.get("sha1") : mod.get("sha256"), "");
             wanted.add(file);
             Path target = mods.resolve(file);
-            status("Verification de " + file, k * 1000 / Math.max(1, list.size()));
-            if (Files.exists(target) && sha.equalsIgnoreCase(sha256(target))) {
+            status("Verification de " + file, k++ * 1000 / Math.max(1, list.size()));
+            if (Net.valid(target, algo, sha, 0)) {
                 log("A jour : " + file);
             } else {
                 log("Telechargement : " + file);
-                download(url, target, sha);
+                Net.download(url, target, algo, sha, done -> status("Telechargement de " + file + " (" + done / 1024 + " Ko)", -1));
             }
-            k++;
         }
         // supprime les anciens fichiers geres par le launcher (les mods ajoutes a la main sont conserves)
         Path managed = state.resolve("managed-mods.txt");
         if (Files.exists(managed)) {
             for (String old : Files.readAllLines(managed)) {
-                if (!old.isBlank() && !wanted.contains(old) && !old.contains("/") && !old.contains("\\")) {
-                    if (Files.deleteIfExists(mods.resolve(old))) log("Supprime (obsolete) : " + old);
-                }
+                if (!old.isBlank() && !wanted.contains(old) && !old.contains("/") && !old.contains("\\")
+                        && Files.deleteIfExists(mods.resolve(old))) log("Supprime (obsolete) : " + old);
             }
         }
         Files.write(managed, wanted);
     }
 
-    private void download(String url, Path target, String sha) throws Exception {
-        Path tmp = target.resolveSibling(target.getFileName() + ".part");
-        HttpResponse<InputStream> r = http.send(HttpRequest.newBuilder(URI.create(url)).build(), HttpResponse.BodyHandlers.ofInputStream());
-        if (r.statusCode() != 200) throw new IllegalStateException("HTTP " + r.statusCode() + " pour " + url);
-        long total = r.headers().firstValueAsLong("content-length").orElse(-1);
-        try (InputStream in = r.body(); var out = Files.newOutputStream(tmp)) {
-            byte[] buf = new byte[1 << 16];
-            long done = 0;
-            for (int n; (n = in.read(buf)) > 0; ) {
-                out.write(buf, 0, n);
-                done += n;
-                if (total > 0) status("Telechargement de " + target.getFileName() + " (" + done / 1024 + " Ko)", (int) (done * 1000 / total));
-            }
-        }
-        if (!sha.isEmpty() && !sha.equalsIgnoreCase(sha256(tmp))) {
-            Files.deleteIfExists(tmp);
-            throw new IllegalStateException("Fichier corrompu (somme de controle) : " + target.getFileName());
-        }
-        Files.move(tmp, target, StandardCopyOption.REPLACE_EXISTING);
-    }
+    // ---------------------------------------------------------------- compte
 
-    static String sha256(Path p) throws Exception {
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        try (InputStream in = Files.newInputStream(p)) {
-            byte[] buf = new byte[1 << 16];
-            for (int n; (n = in.read(buf)) > 0; ) md.update(buf, 0, n);
-        }
-        return HexFormat.of().formatHex(md.digest());
-    }
-
-    // ---------------------------------------------------------------- NeoForge
-
-    private String versionId() {
-        return "neoforge-" + Json.str(manifest.get("neoforge"), "");
-    }
-
-    private void ensureNeoForge() throws Exception {
-        String neo = Json.str(manifest.get("neoforge"), null);
-        if (neo == null) throw new IllegalStateException("Version NeoForge absente du manifeste");
-        Path vjson = mcDir.resolve("versions").resolve(versionId()).resolve(versionId() + ".json");
-        if (Files.exists(vjson)) {
-            log("NeoForge " + neo + " deja installe.");
+    private void setupAuth() {
+        String clientId = Json.str(manifest.get("msaClientId"), "");
+        if (clientId.isBlank()) {
+            log("Connexion Microsoft non configuree : mode hors ligne (pseudo).");
             return;
         }
-        Files.createDirectories(mcDir);
-        Path profiles = mcDir.resolve("launcher_profiles.json");
-        if (!Files.exists(profiles)) Files.writeString(profiles, "{\n  \"profiles\" : {}\n}");
-
-        String url = Json.str(manifest.get("neoforgeInstaller"),
-                "https://maven.neoforged.net/releases/net/neoforged/neoforge/" + neo + "/neoforge-" + neo + "-installer.jar");
-        Path inst = state.resolve("neoforge-" + neo + "-installer.jar");
-        log("Telechargement de l'installeur NeoForge " + neo + "...");
-        download(url, inst, "");
-        status("Installation de NeoForge (peut prendre quelques minutes)...", -1);
-        String java = Path.of(System.getProperty("java.home"), "bin",
-                System.getProperty("os.name", "").toLowerCase().contains("win") ? "java.exe" : "java").toString();
-        Process p = new ProcessBuilder(java, "-jar", inst.toString(), "--install-client", mcDir.toString())
-                .directory(state.toFile()).redirectErrorStream(true).start();
-        try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8))) {
-            for (String line; (line = r.readLine()) != null; ) log("  [neoforge] " + line);
-        }
-        int code = p.waitFor();
-        if (code != 0 || !Files.exists(vjson)) throw new IllegalStateException("Echec de l'installation de NeoForge (code " + code + ")");
-        log("NeoForge installe.");
+        auth = new MsAuth(clientId, state.resolve("account.json"));
+        ui(() -> loginBtn.setEnabled(true));
+        msAccount = auth.refresh();
+        refreshAccountUi();
+        if (msAccount != null) log("Connecte en tant que " + msAccount.name());
     }
 
-    // ---------------------------------------------------------------- profil du launcher officiel
+    private void refreshAccountUi() {
+        ui(() -> {
+            accountLabel.setText(msAccount != null ? "Compte : " + msAccount.name() + " (Microsoft)" : "Compte : hors ligne");
+            loginBtn.setText(msAccount != null ? "Deconnexion" : "Connexion Microsoft");
+        });
+    }
 
-    private void writeProfiles() throws Exception {
-        for (String name : new String[]{"launcher_profiles.json", "launcher_profiles_microsoft_store.json"}) {
-            Path f = mcDir.resolve(name);
-            if (!Files.exists(f)) continue;
-            Map<String, Object> root;
+    private void toggleLogin() {
+        if (auth == null) return;
+        if (msAccount != null) {
+            try { auth.logout(); } catch (Exception ignored) {}
+            msAccount = null;
+            refreshAccountUi();
+            return;
+        }
+        loginBtn.setEnabled(false);
+        JDialog[] dlg = new JDialog[1];
+        new Thread(() -> {
             try {
-                root = Json.obj(Json.parse(Files.readString(f)));
+                msAccount = auth.login((url, code) -> ui(() -> {
+                    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(code), null);
+                    try { Desktop.getDesktop().browse(URI.create(url)); } catch (Exception ignored) {}
+                    JOptionPane pane = new JOptionPane("Va sur " + url + "\net entre le code (copie dans le presse-papier) :\n\n" + code,
+                            JOptionPane.INFORMATION_MESSAGE);
+                    dlg[0] = pane.createDialog(frame, "Connexion Microsoft");
+                    dlg[0].setModal(false);
+                    dlg[0].setVisible(true);
+                }), this::log);
+                log("Connecte en tant que " + msAccount.name());
             } catch (Exception e) {
-                log("Fichier " + name + " illisible, ignore : " + e.getMessage());
-                continue;
+                error("Connexion impossible", e);
+            } finally {
+                ui(() -> {
+                    if (dlg[0] != null) dlg[0].dispose();
+                    loginBtn.setEnabled(true);
+                });
+                refreshAccountUi();
             }
-            Map<String, Object> profiles = Json.obj(root.get("profiles"));
-            root.put("profiles", profiles);
-            Map<String, Object> p = Json.obj(profiles.get(PROFILE_ID));
-            if (p.isEmpty()) p = new LinkedHashMap<>();
-            String now = Instant.now().toString();
-            p.put("name", "Eldoria MMORPG");
-            p.put("type", "custom");
-            p.put("lastVersionId", versionId());
-            p.put("gameDir", home.toAbsolutePath().toString());
-            p.put("icon", "Enchanting_Table");
-            p.putIfAbsent("created", now);
-            p.put("lastUsed", now);
-            p.putIfAbsent("javaArgs", Json.str(manifest.get("javaArgs"), "-Xmx4G -XX:+UseG1GC"));
-            profiles.put(PROFILE_ID, p);
-            Files.writeString(f, Json.write(root));
-            log("Profil ajoute dans " + name);
-        }
+        }, "eldoria-login").start();
     }
 
-    // ---------------------------------------------------------------- lancement
+    // ---------------------------------------------------------------- jeu
 
-    private void launch() {
-        play.setEnabled(false);
-        List<List<String>> cmds = new ArrayList<>();
-        String os = System.getProperty("os.name", "").toLowerCase();
-        if (os.contains("win")) {
-            for (String env : new String[]{"ProgramFiles(x86)", "ProgramFiles", "LOCALAPPDATA"}) {
-                String base = System.getenv(env);
-                if (base == null) continue;
-                Path exe = Path.of(base, "Minecraft Launcher", "MinecraftLauncher.exe");
-                if (Files.exists(exe)) cmds.add(List.of(exe.toString()));
-                Path exe2 = Path.of(base, "Programs", "Minecraft Launcher", "MinecraftLauncher.exe");
-                if (Files.exists(exe2)) cmds.add(List.of(exe2.toString()));
-            }
-            Path xbox = Path.of("C:\\XboxGames\\Minecraft Launcher\\Content\\Minecraft.exe");
-            if (Files.exists(xbox)) cmds.add(List.of(xbox.toString()));
-            cmds.add(List.of("explorer.exe", "shell:AppsFolder\\Microsoft.4297127D64EC6_8wekyb3d8bbwe!Minecraft"));
-        } else if (os.contains("mac")) {
-            cmds.add(List.of("open", "-a", "Minecraft"));
-        } else {
-            cmds.add(List.of("minecraft-launcher"));
-        }
-        for (List<String> c : cmds) {
-            try {
-                new ProcessBuilder(c).start();
-                log("Ouverture du launcher Minecraft : selectionne le profil \"Eldoria MMORPG\" puis Jouer.");
-                status("Launcher Minecraft ouvert.", 1000);
-                new Thread(() -> {
-                    try { Thread.sleep(4000); } catch (InterruptedException ignored) {}
-                    System.exit(0);
-                }).start();
+    private void play() {
+        if (!ready) return;
+        MsAuth.Account acc = msAccount;
+        if (acc == null) {
+            String name = pseudo != null ? pseudo.getText().trim() : System.getProperty("eldoria.pseudo", "Joueur");
+            if (!name.matches("[A-Za-z0-9_]{3,16}")) {
+                ui(() -> JOptionPane.showMessageDialog(frame, "Connecte-toi avec Microsoft ou entre un pseudo (3-16 lettres, chiffres ou _).",
+                        "Eldoria", JOptionPane.WARNING_MESSAGE));
                 return;
-            } catch (Exception e) {
-                log("Echec : " + c.get(0) + " (" + e.getMessage() + ")");
             }
+            acc = MsAuth.Account.offline(name);
+            settings.put("pseudo", name);
         }
-        JOptionPane.showMessageDialog(frame, "Launcher Minecraft introuvable.\nOuvre-le manuellement et choisis le profil \"Eldoria MMORPG\".",
-                "Eldoria", JOptionPane.INFORMATION_MESSAGE);
-        play.setEnabled(true);
+        String go = ram != null ? (String) ram.getSelectedItem() : "4";
+        settings.put("ramGo", go);
+        saveSettings();
+        ui(() -> play.setEnabled(false));
+        try {
+            List<String> jvm = new ArrayList<>(List.of("-Xmx" + go + "G"));
+            Process p = game.launch(acc, jvm);
+            status("Minecraft est lance.", 1000);
+            ui(() -> frame.setState(JFrame.ICONIFIED));
+            try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8));
+                 PrintWriter out = new PrintWriter(Files.newBufferedWriter(state.resolve("latest.log")))) {
+                for (String line; (line = r.readLine()) != null; ) {
+                    out.println(line);
+                    log(line);
+                }
+            }
+            int code = p.waitFor();
+            log("Minecraft ferme (code " + code + ").");
+            status(code == 0 ? "Pret ! Clique sur JOUER." : "Minecraft s'est arrete avec une erreur (code " + code + ")", 1000);
+            ui(() -> frame.setState(JFrame.NORMAL));
+        } catch (Exception e) {
+            error("Lancement impossible", e);
+        } finally {
+            ui(() -> play.setEnabled(true));
+        }
     }
 }
