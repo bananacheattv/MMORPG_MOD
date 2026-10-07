@@ -158,7 +158,7 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
             String lvl = "Niv. " + d.level;
             boolean roomy = bottom - under >= 38;           // classe sur sa propre ligne si la place le permet
             String name = this.minecraft.player.getName().getString();
-            String evo = cls.evolutions[PlayerClass.tier(d.level)];
+            String evo = d.title();
             g.text(this.font, lvl, x + 176 - this.font.width(lvl), under, Ui.TEXT, true);
             if (roomy) {
                 g.text(this.font, this.font.plainSubstrByWidth(name, 176 - 6 - this.font.width(lvl)), x, under, Ui.GOLD_LIGHT, true);
@@ -248,7 +248,7 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
             int ty = py + ph - 24;
             int tx0 = rx + 8, tx1 = px + pw - 16;
             g.fill(tx0, ty + 4, tx1, ty + 6, 0xFF3A2E22);
-            int tier = PlayerClass.tier(d.level);
+            int tier = d.evolutionTier();
             int reachedX = tx0 + (int) ((tx1 - tx0) * Math.min(1f, (d.level - 1) / 99f));
             g.fillGradient(tx0, ty + 4, reachedX, ty + 6, Ui.GOLD_LIGHT, Ui.GOLD_DARK);
             for (int i = 0; i < 5; i++) {

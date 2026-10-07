@@ -143,7 +143,7 @@ public final class QuestManager {
         }
         rw.put("items", items);
         rw.putString("pet", q.rewards.pet == null ? "" : q.rewards.pet);
-        rw.putString("cosmetic", q.rewards.cosmetic == null ? "" : q.rewards.cosmetic);
+        rw.putInt("evolution", q.rewards.evolution);
         t.put("rewards", rw);
         return t;
     }
@@ -275,6 +275,7 @@ public final class QuestManager {
             if (item != null && item != Items.AIR && !CrateOnly.is(item)) RpgPlayers.give(p, item, ir.count);
         }
         // familiers et cosmetiques : uniquement dans les caisses et les Lucky Blocks (q.rewards.pet / cosmetic ignores)
+        if (q.rewards.evolution > 0) RpgPlayers.unlockEvolution(p, q.rewards.evolution);
         Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "QUÊTE TERMINÉE", q.name, 0x60FF80));
         p.level().playSound(null, p.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 0.8f, 1.2f);
         if (xp > 0) RpgPlayers.giveXp(p, xp, false);

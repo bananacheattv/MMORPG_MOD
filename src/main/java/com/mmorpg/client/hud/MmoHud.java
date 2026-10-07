@@ -252,7 +252,7 @@ public final class MmoHud {
         g.fill(x + 4, y + 22, x + 6 + f.width(lvl) + 2, y + 31, 0xE0101010);
         g.text(f, lvl, x + 6, y + 23, Ui.GOLD_LIGHT, true);
         g.text(f, f.plainSubstrByWidth(mc.player.getName().getString(), 70), x + 32, y + 5, 0xFFFFFFFF, true);
-        String title = cls.title(d.level);
+        String title = d.title();
         g.text(f, f.plainSubstrByWidth(title, 62), x + w - 6 - Math.min(62, f.width(title)), y + 5, cls.color, true);
         Ui.bar(g, x + 32, y + 16, w - 38, 9, ClientData.hp / Math.max(1, ClientData.maxHp), 0xFFF05050, 0xFF8A1818,
                 Ui.fmt(ClientData.hp) + " / " + Ui.fmt(ClientData.maxHp));
@@ -323,7 +323,7 @@ public final class MmoHud {
             hpText = Math.round(frac * 100) + " %";
             if (pub != null) {
                 PlayerClass c = PlayerClass.byId(pub.playerClass);
-                name += " — " + c.title(pub.level);
+                name += " — " + c.evolutions[Math.min(PlayerClass.tier(pub.level), pub.evolution)];
             }
         } else {
             name = t.getName().getString();

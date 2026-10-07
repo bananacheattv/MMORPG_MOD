@@ -56,6 +56,17 @@ public class PlayerData implements ValueIOSerializable {
     public final Set<UUID> waypoints = new HashSet<>();
     public final Map<String, Integer> kills = new HashMap<>();
     public boolean classChosenOnce = false;
+    /** Palier d'evolution debloque aupres du Maitre des classes (quetes) ; -1 = ancien joueur pas encore migre. */
+    public int evolution = 0;
+
+    /** Palier d'evolution effectif : celui permis par le niveau, plafonne par les quetes d'evolution terminees. */
+    public int evolutionTier() {
+        return Math.min(PlayerClass.tier(level), Math.max(0, evolution));
+    }
+
+    public String title() {
+        return playerClass.evolutions[evolutionTier()];
+    }
     /** Porte-monnaie (pieces d'or). */
     public long gold = 0;
     public int xpCharmSeconds;
@@ -172,6 +183,7 @@ public class PlayerData implements ValueIOSerializable {
         t.store("waypoints", UUIDUtil.CODEC.listOf(), new ArrayList<>(waypoints));
         t.store("kills", STR_INT_MAP, kills);
         t.putBoolean("chosen", classChosenOnce);
+        t.putInt("evolution", evolution);
         t.putLong("gold", gold);
         t.putInt("xpCharmSeconds", xpCharmSeconds);
         t.putInt("luckCharmSeconds", luckCharmSeconds);
@@ -225,6 +237,9 @@ public class PlayerData implements ValueIOSerializable {
         kills.clear();
         kills.putAll(t.read("kills", STR_INT_MAP).orElse(Map.of()));
         classChosenOnce = t.getBooleanOr("chosen", playerClass != PlayerClass.NONE);
+        // joueurs d'avant les quetes d'evolution : ils gardent le palier deja atteint
+        evolution = t.getIntOr("evolution", -1);
+        if (evolution < 0) evolution = PlayerClass.tier(level);
         gold = t.getLongOr("gold", 0);
         xpCharmSeconds = Math.clamp(t.getIntOr("xpCharmSeconds", 0), 0, 1800);
         luckCharmSeconds = Math.clamp(t.getIntOr("luckCharmSeconds", 0), 0, 1800);

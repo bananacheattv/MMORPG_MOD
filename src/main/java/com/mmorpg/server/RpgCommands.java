@@ -122,7 +122,7 @@ public final class RpgCommands {
                     ServerPlayer p = EntityArgument.getPlayer(c, "joueur");
                     PlayerData data = RpgPlayers.get(p);
                     StringBuilder sb = new StringBuilder();
-                    sb.append(p.getName().getString()).append(" — ").append(data.playerClass.title(data.level)).append(" niv. ").append(data.level)
+                    sb.append(p.getName().getString()).append(" — ").append(data.title()).append(" niv. ").append(data.level)
                             .append(" (").append(data.xp).append("/").append(LevelSystem.xpToNext(data.level)).append(" XP)\n");
                     for (Stat s : Stat.values()) {
                         sb.append(s.shortName).append(' ').append(s.format(data.stats.get(s), false)).append("  ");
@@ -216,6 +216,15 @@ public final class RpgCommands {
                                 c.getSource().sendSuccess(() -> ok("PNJ « " + name + " » créé, groupe : " + group), true);
                                 return 1;
                             })))))
+                        .then(Commands.literal("maitre_classes").executes(c -> {
+                            // PNJ du groupe « maitre_classes » : propose les quetes d'evolution (modifiables dans /mmorpg quetes editeur)
+                            String name = "Maître des classes";
+                            var npc = DungeonBuilder.spawnNpc(c.getSource().getLevel(), BlockPos.containing(c.getSource().getPosition()), com.mmorpg.entity.NpcEntity.Role.QUETES, name, 2, c.getSource().getRotation().y + 180);
+                            if (npc == null) return 0;
+                            npc.setup(com.mmorpg.entity.NpcEntity.Role.QUETES, name, 2, "maitre_classes");
+                            c.getSource().sendSuccess(() -> ok("Maître des classes créé (quêtes d'évolution)."), true);
+                            return 1;
+                        }))
                         .then(Commands.literal("quetes").then(Commands.argument("nom", StringArgumentType.greedyString()).executes(c -> spawnNpc(c, com.mmorpg.entity.NpcEntity.Role.QUETES))))
                         .then(Commands.literal("marchand").then(Commands.argument("nom", StringArgumentType.greedyString()).executes(c -> spawnNpc(c, com.mmorpg.entity.NpcEntity.Role.MARCHAND))))
                         .then(Commands.literal("supprimer").executes(c -> {

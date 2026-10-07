@@ -40,3 +40,20 @@ Dans le menu **Familiers**, ouvrir **Collection de montures**. Selectionner un c
 La collection reste acquise apres mort et deconnexion. Invoquer sur la terre ferme, avec de la place autour du joueur. Clic droit pour monter, controles habituels du cheval pour avancer/sauter, Maj pour descendre. La selle est fournie et ne se retire pas. Le bouton **Renvoyer** retire la monture ; attendre cinq secondes entre deux invocations.
 
 Seul le proprietaire peut monter. La monture invoquee disparait si son proprietaire meurt, se deconnecte, change de dimension ou s'eloigne de plus de 64 blocs. Il suffit de la reinvoquer depuis la collection. Les montures utilisent les modeles de chevaux du jeu, avec trois robes et vitesses distinctes.
+
+## Caisses (blocs 3D)
+
+- 7 caisses dans l'onglet créatif « Objets » : vote, quête, commune, rare, épique, légendaire, mythique.
+- Posez-les en créatif : incassables en survie, réutilisables à l'infini.
+- Clic droit avec la clé correspondante (`mmorpg:cle_vote`, `cle_quete`, `cle_commune`, `cle_rare`, `cle_epique`, `cle_legendaire`, `cle_mythique`) : le couvercle s'ouvre et le butin est tiré au sort.
+- Accroupi + clic droit : aperçu du contenu et des chances.
+- Butins modifiables en jeu : `/mmorpg butins` (un onglet par caisse + Lucky Block).
+- Cosmétiques (coffre cosmétique) et familiers (œufs) ne s'obtiennent **que** dans les caisses et les Lucky Blocks.
+- Clé de vote : à donner par votre plugin de vote, par ex. `/give <joueur> mmorpg:cle_vote 1`.
+
+## Évolutions de classe
+
+- Les évolutions (niv. 25, 50, 75, 100) se débloquent auprès du **Maître des classes** via des quêtes.
+- Créer le PNJ : `/mmorpg pnj maitre_classes` (groupe `maitre_classes`).
+- Quêtes par défaut : `evolution_1` à `evolution_4`, modifiables dans l'éditeur de quêtes (onglet récompenses → « Évolution de classe »).
+- Les joueurs déjà évolués gardent leur palier.

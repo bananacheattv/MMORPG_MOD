@@ -117,6 +117,27 @@ public final class DefaultQuests {
         m.put("nettoyer_cryptes", reward(obj(q("Les cryptes oubliées", 8, "La garde recherche des volontaires pour éliminer les zombies des cryptes."), "kill", "zombie_des_cryptes", 8), 1800, 60, "potion_soin", 2));
         m.put("toiles_venimeuses", req(reward(obj(q("Toiles venimeuses", 18, "Après les cryptes, débarrassez les galeries des araignées venimeuses."), "kill", "araignee_venimeuse", 10), 6500, 110, "potion_mana", 3), "nettoyer_cryptes"));
         m.put("routes_sures", req(reward(obj(q("Des routes plus sûres", 30, "Les arbalétriers pillent les caravanes. Rendez les routes aux voyageurs."), "kill", "bandit_arbaletrier", 12), 22000, 180, "cle_quete", 1), "toiles_venimeuses"));
+        // ------------------------------------------------ evolutions de classe (PNJ du groupe « maitre_classes »)
+        m.put("evolution_1", evolution(obj(obj(q("Épreuve de l'Initié", 25,
+                "Le Maître des classes jauge votre potentiel. Prouvez votre force sur le terrain et il éveillera votre première évolution."),
+                "level", "niveau", 25), "kill", "*", 60), 1, 8000, 300));
+        m.put("evolution_2", req(evolution(obj(obj(obj(q("Épreuve de l'Adepte", 50,
+                "Seuls ceux qui ont affronté un seigneur de guerre méritent la deuxième évolution. Terrassez un boss."),
+                "level", "niveau", 50), "kill", "*", 150), "kill", "boss", 1), 2, 60000, 1200), "evolution_1"));
+        m.put("evolution_3", req(evolution(obj(obj(obj(q("Épreuve du Maître", 75,
+                "La troisième évolution exige une maîtrise totale : triomphez de plusieurs boss du royaume."),
+                "level", "niveau", 75), "kill", "*", 300), "kill", "boss", 3), 3, 300000, 4000), "evolution_2"));
+        m.put("evolution_4", req(evolution(obj(obj(q("Épreuve de la Légende", 100,
+                "L'ultime évolution n'appartient qu'aux légendes. Abattez l'Avatar du Néant et revenez auprès du Maître."),
+                "level", "niveau", 100), "kill", "avatar_neant", 1), 4, 1500000, 10000), "evolution_3"));
         return m;
+    }
+
+    /** Quete d'evolution : proposee par le Maitre des classes, recompense = palier d'evolution + cle de quete. */
+    private static QuestDef evolution(QuestDef d, int tier, long xp, long gold) {
+        reward(d, xp, gold, "cle_quete", 1);
+        d.rewards.evolution = tier;
+        d.giver = "maitre_classes";
+        return d;
     }
 }

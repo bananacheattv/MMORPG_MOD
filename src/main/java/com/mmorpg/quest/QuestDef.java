@@ -52,6 +52,8 @@ public class QuestDef {
         public List<ItemReward> items = new ArrayList<>();
         public String pet = "";
         public String cosmetic = "";
+        /** Palier d'evolution de classe debloque (0 = aucun, 1 a 4). Quetes du Maitre des classes. */
+        public int evolution = 0;
     }
 
     public static class ItemReward {

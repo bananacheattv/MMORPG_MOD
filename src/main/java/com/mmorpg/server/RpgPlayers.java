@@ -151,6 +151,7 @@ public final class RpgPlayers {
         PublicPlayerData pub = new PublicPlayerData();
         pub.playerClass = d.playerClass.ordinal();
         pub.level = d.level;
+        pub.evolution = d.evolutionTier();
         for (Cosmetic.Category c : Cosmetic.Category.values()) {
             String id = d.equippedCosmetics.get(c);
             if (id != null && !id.isEmpty()) pub.cosmetics.add(id);
@@ -307,19 +308,14 @@ public final class RpgPlayers {
         level.playSound(null, player.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1f, 1f);
         int oldTier = PlayerClass.tier(oldLevel);
         int newTier = PlayerClass.tier(newLevel);
-        if (newTier > oldTier) {
-            String title = d.playerClass.title(newLevel);
-            Net.toPlayer(player, new Payloads.Notify(Payloads.Notify.EVOLUTION, "ÉVOLUTION !", "Vous devenez " + title, d.playerClass.color));
-            level.playSound(null, player.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1f, 1f);
-            level.sendParticles(ParticleTypes.END_ROD, player.getX(), player.getY() + 1, player.getZ(), 80, 0.6, 1.2, 0.6, 0.25);
-            if (ConfigManager.general().announceEvolutions) {
-                player.level().getServer().getPlayerList().broadcastSystemMessage(
-                        Component.literal("✦ ").withColor(0xFFD040)
-                                .append(player.getDisplayName())
-                                .append(Component.literal(" a évolué en ").withColor(0xE0D8C0))
-                                .append(Component.literal(title).withColor(d.playerClass.color & 0xFFFFFF))
-                                .append(Component.literal(" (niveau " + newLevel + ") !").withColor(0xE0D8C0)), false);
-            }
+        if (newTier > oldTier && d.evolution < newTier) {
+            // l'evolution se debloque aupres du Maitre des classes
+            Net.toPlayer(player, new Payloads.Notify(Payloads.Notify.EVOLUTION, "ÉVOLUTION DISPONIBLE",
+                    "Rendez-vous auprès du Maître des classes", d.playerClass.color));
+            player.sendSystemMessage(Component.literal("✦ Vous pouvez évoluer en " + d.playerClass.evolutions[newTier]
+                    + " : accomplissez l'épreuve du Maître des classes.").withColor(0xE8C060));
+        } else if (newTier > oldTier) {
+            announceEvolution(player, d);
         } else {
             Net.toPlayer(player, new Payloads.Notify(Payloads.Notify.LEVEL_UP, "NIVEAU " + newLevel,
                     "+" + (newLevel - oldLevel) * LevelSystem.ATTRIBUTE_POINTS_PER_LEVEL + " points d'attribut", 0xFFD040));
@@ -334,6 +330,33 @@ public final class RpgPlayers {
                         .append(Component.literal(c.label).withColor(c.color & 0xFFFFFF)));
             }
         }
+    }
+
+    /** Effets et annonce d'une nouvelle evolution (palier effectif du joueur). */
+    public static void announceEvolution(ServerPlayer player, PlayerData d) {
+        String title = d.title();
+        ServerLevel level = player.level();
+        Net.toPlayer(player, new Payloads.Notify(Payloads.Notify.EVOLUTION, "ÉVOLUTION !", "Vous devenez " + title, d.playerClass.color));
+        level.playSound(null, player.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1f, 1f);
+        level.sendParticles(ParticleTypes.END_ROD, player.getX(), player.getY() + 1, player.getZ(), 80, 0.6, 1.2, 0.6, 0.25);
+        if (ConfigManager.general().announceEvolutions) {
+            player.level().getServer().getPlayerList().broadcastSystemMessage(
+                    Component.literal("✦ ").withColor(0xFFD040)
+                            .append(player.getDisplayName())
+                            .append(Component.literal(" a évolué en ").withColor(0xE0D8C0))
+                            .append(Component.literal(title).withColor(d.playerClass.color & 0xFFFFFF))
+                            .append(Component.literal(" (niveau " + d.level + ") !").withColor(0xE0D8C0)), false);
+        }
+    }
+
+    /** Recompense d'une quete d'evolution : debloque le palier (applique tout de suite si le niveau le permet). */
+    public static void unlockEvolution(ServerPlayer player, int tier) {
+        PlayerData d = get(player);
+        int before = d.evolutionTier();
+        d.evolution = Math.max(d.evolution, Math.min(4, tier));
+        recompute(player);
+        if (d.evolutionTier() > before) announceEvolution(player, d);
+        sync(player);
     }
 
     public static void setLevel(ServerPlayer player, int level) {
