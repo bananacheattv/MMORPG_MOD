@@ -85,6 +85,12 @@ public final class ForgeRecipes {
 
     static {
         PlayerClass N = PlayerClass.NONE;
+        add(Category.CONSOMMABLES, "charme_experience", 1, 100, 10, N, "poussiere_ame", 8, "minecraft:lapis_lazuli", 4);
+        add(Category.CONSOMMABLES, "cle_aventure", 1, 80, 5, N, "minecraft:iron_ingot", 4, "poussiere_ame", 2);
+        add(Category.CONSOMMABLES, "caisse_aventure", 1, 40, 5, N, "minecraft:oak_planks", 8, "ferraille_gobeline", 4);
+        add(Category.CONSOMMABLES, "lucky_block", 1, 120, 10, N, "minecraft:gold_ingot", 4, "trefle_chance", 1);
+        add(Category.CONSOMMABLES, "charme_chance", 1, 100, 10, N, "trefle_chance", 1, "minecraft:gold_ingot", 2);
+        add(Category.FAMILIERS, "nourriture_familier", 4, 5, 1, N, "minecraft:wheat", 4, "minecraft:carrot", 2);
         // ---------------------------------------------------------------- materiaux intermediaires
         add(Category.MATERIAUX, "lingot_mithril", 1, 5, 20, N, "minecraft:iron_ingot", 2, "acier_orc", 2, "poussiere_ame", 1);
         add(Category.MATERIAUX, "lingot_adamantite", 1, 20, 55, N, "lingot_mithril", 1, "noyau_flamme", 2, "eclat_givre", 1, "minecraft:diamond", 1);
@@ -99,9 +105,11 @@ public final class ForgeRecipes {
         add(Category.MATERIAUX, "trefle_celeste", 1, 1500, 70, N, "trefle_dore", 2, "essence_neant", 1, "minecraft:diamond", 2);
         add(Category.MATERIAUX, "trefle_divin", 1, 4000, 90, N, "trefle_celeste", 2, "essence_neant", 2, "minecraft:netherite_ingot", 1);
 
+        add(Category.MATERIAUX, "alliage_celeste", 2, 200, 90, N, "lingot_adamantite", 3, "cristal_arcanique", 2, "fragment_divin", 1);
         // ---------------------------------------------------------------- armes : Guerrier
         weapon("epee_recrue", 3, "minecraft:iron_ingot", 3, "minecraft:stick", 1);
         weapon("lame_runique", 20, "ferraille_gobeline", 4, "oreille_gobelin", 3, "minecraft:iron_ingot", 2, "minecraft:lapis_lazuli", 4);
+        weapon("epee_berserker", 60, "acier_orc", 4, "defense_orc", 3, "couronne_roi_gobelin", 1);
         weapon("hache_berserker", 60, "acier_orc", 4, "defense_orc", 3, "couronne_roi_gobelin", 1);
         weapon("epee_seigneur_guerre", 150, "lingot_mithril", 4, "os_maudit", 4, "phylactere_liche", 1);
         weapon("lame_demoniaque", 400, "lingot_adamantite", 4, "noyau_flamme", 3, "coeur_infernal", 1);
@@ -145,6 +153,10 @@ public final class ForgeRecipes {
         armorSet("gardien", 40, "acier_orc", 3, "minecraft:iron_block", 1, "couronne_roi_gobelin");
         armorSet("paladin", 100, "lingot_mithril", 3, "minecraft:gold_ingot", 2, "phylactere_liche");
         armorSet("titan", 300, "lingot_adamantite", 3, "noyau_flamme", 1, "coeur_infernal");
+        armorSet("valkyrie", 1000, "alliage_celeste", 3, "lingot_adamantite", 3, "fragment_divin");
+        armorSet("eternel_arcanes", 1000, "alliage_celeste", 3, "tissu_enchante", 5, "fragment_divin");
+        armorSet("sentinelle_astrale", 1000, "alliage_celeste", 3, "cuir_renforce", 5, "fragment_divin");
+        armorSet("egide_divine", 1000, "alliage_celeste", 3, "lingot_adamantite", 5, "fragment_divin");
         armorSet("neant_primordial", 800, "fragment_divin", 1, "essence_neant", 2, "coeur_glace_eternelle");
 
         // ---------------------------------------------------------------- consommables

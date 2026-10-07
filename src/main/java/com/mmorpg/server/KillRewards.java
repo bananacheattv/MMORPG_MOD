@@ -108,14 +108,16 @@ public final class KillRewards {
         if (!(dead.level() instanceof ServerLevel level) || dead instanceof Player) return;
         MobData md = dead.getExistingDataOrNull(ModAttachments.MOB);
         if (md == null || !md.initialized()) return;
-        if (killer(dead, event.getSource().getEntity()) == null) return;
+        ServerPlayer lootOwner = killer(dead, event.getSource().getEntity());
+        if (lootOwner == null) return;
         GeneralConfig g = ConfigManager.general();
+        double dropMultiplier = g.dropMultiplier * (RpgPlayers.get(lootOwner).luckCharmSeconds > 0 ? 1.25 : 1.0);
         var random = dead.getRandom();
         List<ItemStack> loot = new ArrayList<>();
         MobConfig cfg = ConfigManager.mobs().get(md.key);
         if (cfg != null) {
             for (MobConfig.Drop d : cfg.drops) {
-                double chance = Math.min(1.0, d.chance * g.dropMultiplier);
+                double chance = Math.min(1.0, d.chance * dropMultiplier);
                 if (random.nextDouble() < chance) {
                     Item item = ForgeRecipes.resolveItem(d.item);
                     if (item != null && item != net.minecraft.world.item.Items.AIR) {
@@ -130,16 +132,16 @@ public final class KillRewards {
                 loot.add(new ItemStack(ModItems.PIECE_OR.get(), 1 + random.nextInt(1 + md.level / 8)));
             }
             // trefles d'amelioration : rares, plus puissants sur les monstres de haut niveau
-            if (md.level >= 10 && random.nextDouble() < g.cloverDropChance * g.dropMultiplier) {
+            if (md.level >= 10 && random.nextDouble() < g.cloverDropChance * dropMultiplier) {
                 // palier selon le niveau du monstre (le Trefle Divin ne vient que de l'Avatar du Neant et de la Forge)
                 int top = md.level >= 70 ? 3 : md.level >= 50 ? 2 : md.level >= 30 ? 1 : 0;
                 int t = Math.max(0, top - random.nextInt(2));
                 loot.add(new ItemStack(ModItems.get(com.mmorpg.crafting.ForgeRecipes.CLOVERS[t])));
             }
-            if (random.nextDouble() < g.upgradeStoneDropChance * g.dropMultiplier) {
+            if (random.nextDouble() < g.upgradeStoneDropChance * dropMultiplier) {
                 loot.add(new ItemStack(md.level >= 60 && random.nextInt(4) == 0 ? ModItems.PIERRE_AMELIORATION_SUP.get() : ModItems.PIERRE_AMELIORATION.get()));
             }
-            if (random.nextDouble() < g.potionDropChance * g.dropMultiplier) {
+            if (random.nextDouble() < g.potionDropChance * dropMultiplier) {
                 Item potion = switch (random.nextInt(4)) {
                     case 0 -> md.level >= 50 ? ModItems.POTION_SOIN_MAJEURE.get() : md.level >= 20 ? ModItems.POTION_SOIN.get() : ModItems.POTION_SOIN_MINEURE.get();
                     case 1 -> md.level >= 50 ? ModItems.POTION_MANA_MAJEURE.get() : md.level >= 20 ? ModItems.POTION_MANA.get() : ModItems.POTION_MANA_MINEURE.get();

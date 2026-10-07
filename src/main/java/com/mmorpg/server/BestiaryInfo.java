@@ -21,6 +21,7 @@ public final class BestiaryInfo {
             MobConfig c = e.getValue();
             CompoundTag t = new CompoundTag();
             t.putString("name", c.displayName);
+            t.putString("family", family(e.getKey(), c));
             t.putInt("min", c.minLevel);
             t.putInt("max", c.maxLevel);
             t.putFloat("hp", (float) c.healthAt(c.minLevel));
@@ -42,6 +43,15 @@ public final class BestiaryInfo {
             root.put(e.getKey(), t);
         }
         return root;
+    }
+
+    private static String family(String key, MobConfig cfg) {
+        if (cfg.family != null && !cfg.family.isBlank()) return cfg.family;
+        if (key.contains("gobelin") || key.contains("orc") || key.contains("bandit")) return "Humanoïdes";
+        if (key.contains("loup") || key.contains("araignee")) return "Bêtes";
+        if (key.contains("squelette") || key.contains("liche") || key.contains("spectre")) return "Morts-vivants";
+        if (key.contains("neant")) return "Néant";
+        return "Élémentaires";
     }
 
     public static void sendTo(ServerPlayer player) {

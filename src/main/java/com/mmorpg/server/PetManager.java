@@ -60,11 +60,28 @@ public final class PetManager {
         if (d.activePet.isEmpty() || !player.isAlive() || player.isSpectator()) return;
         PetType type = PetType.byId(d.activePet);
         if (type == null) return;
+        if (player.level().getGameTime() % 1200 == 0 && d.happiness(type.id) > 0) {
+            d.petHappiness.put(type.id, d.happiness(type.id) - 1);
+            RpgPlayers.recomputeAndSync(player);
+        }
         Entity existing = d.petEntity == null ? null : player.level().getEntity(d.petEntity);
         if (existing == null || !existing.isAlive()) {
             despawn(player);
             spawn(player, type);
         }
+    }
+
+    /** Food is consumed only when an owned, summoned companion needs it. */
+    public static boolean feed(ServerPlayer player, int amount) {
+        PlayerData d = RpgPlayers.get(player);
+        if (d.activePet.isEmpty() || !d.petXp.containsKey(d.activePet) || d.happiness(d.activePet) >= 100) {
+            player.sendOverlayMessage(Component.literal("Invoquez un familier qui a faim."));
+            return false;
+        }
+        d.petHappiness.put(d.activePet, Math.min(100, d.happiness(d.activePet) + amount));
+        RpgPlayers.recomputeAndSync(player);
+        player.level().sendParticles(ParticleTypes.HEART, player.getX(), player.getY() + 1, player.getZ(), 5, 0.5, 0.5, 0.5, 0);
+        return true;
     }
 
     public static void addPetXp(ServerPlayer player, String id, int xp) {

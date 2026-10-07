@@ -46,6 +46,20 @@ public final class ConfigManager {
         return quests;
     }
 
+    /** Write the entire replacement first; preserve the current file and map if writing fails. */
+    public static synchronized void saveQuest(String id, com.mmorpg.quest.QuestDef quest) throws java.io.IOException {
+        var updated = new LinkedHashMap<>(quests);
+        updated.put(id, quest);
+        Files.createDirectories(dir());
+        Path temp = Files.createTempFile(dir(), "quests-", ".tmp");
+        try {
+            Files.writeString(temp, GSON.toJson(updated), StandardCharsets.UTF_8);
+            try { Files.move(temp, dir().resolve("quests.json"), java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE); }
+            catch (java.nio.file.AtomicMoveNotSupportedException e) { Files.move(temp, dir().resolve("quests.json"), java.nio.file.StandardCopyOption.REPLACE_EXISTING); }
+            quests = updated;
+        } finally { Files.deleteIfExists(temp); }
+    }
+
     public static ShopConfig shop() {
         return shop;
     }
@@ -131,12 +145,14 @@ public final class ConfigManager {
             } else {
                 qres.putAll(com.mmorpg.quest.DefaultQuests.create());
             }
+            com.mmorpg.quest.DefaultQuests.create().forEach(qres::putIfAbsent);
             for (com.mmorpg.quest.QuestDef d : qres.values()) {
                 if (d.objectives == null) d.objectives = new java.util.ArrayList<>();
                 if (d.requires == null) d.requires = new java.util.ArrayList<>();
                 if (d.rewards == null) d.rewards = new com.mmorpg.quest.QuestDef.Rewards();
                 if (d.rewards.items == null) d.rewards.items = new java.util.ArrayList<>();
                 if (d.giver == null) d.giver = "";
+                if (d.npc == null) d.npc = "";
             }
             quests = qres;
             write(q, quests);

@@ -34,10 +34,21 @@ public enum Cosmetic {
     TRAINEE_NOTES("trainee_notes", "Traînée Mélodique", Category.TRAINEE, -1, 0xFF60FF90,
             "Des notes de musique jaillissent sur votre passage."),
     SILLAGE_ARDENT("sillage_ardent", "Sillage Ardent", Category.TRAINEE, -1, 0xFFFF6010,
-            "Vos pas laissent une traînée de braises.");
+            "Vos pas laissent une traînée de braises."),
+    COURONNE_DU_NEANT("couronne_du_neant", "Couronne du Néant", Category.COIFFE, -1, 0xFFB080FF, "Couronne 3D aux cristaux flottants."),
+    AILES_CELESTES("ailes_celestes", "Ailes Célestes", Category.DOS, -1, 0xFFB0E8FF, "Ailes 3D animées, attachées à votre dos."),
+    CHAPEAU_ARCHIMAGE("chapeau_archimage", "Chapeau d’Archimage", Category.COIFFE, -1, 0xFF9070E0, "Un chapeau enchanté en trois dimensions."),
+    MASQUE_KITSUNE("masque_kitsune", "Masque Kitsune", Category.VISAGE, -1, 0xFFFFD8C0, "Masque de renard animé."),
+    SAC_ALCHIMISTE("sac_alchimiste", "Sac d’Alchimiste", Category.DOS, -1, 0xFF80B060, "Sac à fioles animé, porté dans le dos."),
+    DRAGON_EPAULE("dragon_epaule", "Dragon d’Épaule", Category.EPAULES, -1, 0xFF90C090, "Un petit dragon animé perché sur votre épaule."),
+    CORNES_INFERNALES("cornes_infernales", "Cornes Infernales", Category.COIFFE, -1, 0xFFFF7050, "Cornes 3D aux braises animées."),
+    CAPE_ROYALE("cape_royale", "Cape Royale", Category.DOS, -1, 0xFFFFC050, "Une cape royale animée."),
+    CARQUOIS_SYLVESTRE("carquois_sylvestre", "Carquois Sylvestre", Category.DOS, -1, 0xFF90C060, "Un carquois sylvestre en trois dimensions."),
+    EPAULIERES_GIVRE("epaulieres_givre", "Épaulières de Givre", Category.EPAULES, -1, 0xFF90D8FF, "Deux épaulières aux cristaux animés.");
 
     public enum Category {
-        AURA("Auras"), AILES("Ailes"), HALO("Halos"), TRAINEE("Traînées");
+        AURA("Auras"), AILES("Ailes"), HALO("Halos"), TRAINEE("Traînées"),
+        COIFFE("Coiffes 3D"), DOS("Dos 3D"), VISAGE("Visage 3D"), EPAULES("Épaules 3D");
 
         public final String label;
 
@@ -81,4 +92,6 @@ public enum Cosmetic {
     public String unlockText() {
         return unlockLevel > 0 ? "Débloqué au niveau " + unlockLevel : "Obtenu dans un Coffre Cosmétique";
     }
+
+    public boolean hasModel() { return category.ordinal() >= Category.COIFFE.ordinal(); }
 }

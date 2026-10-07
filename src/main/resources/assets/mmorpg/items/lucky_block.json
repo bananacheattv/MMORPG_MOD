@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "mmorpg:block/lucky_block"
+  }
+}

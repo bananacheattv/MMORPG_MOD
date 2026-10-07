@@ -17,6 +17,12 @@ import java.util.List;
 /** Arbre de competences : details, amelioration des rangs et assignation a la barre de raccourcis. */
 public class SkillsScreen extends MenuScreen {
     private static String selected;
+    private int scroll;
+
+    @Override public boolean mouseScrolled(double x, double y, double sx, double sy) {
+        scroll = Math.max(0, scroll - (int) Math.signum(sy));
+        return true;
+    }
 
     public SkillsScreen() {
         super(Tab.COMPETENCES);
@@ -33,10 +39,12 @@ public class SkillsScreen extends MenuScreen {
         int y0 = contentTop;
         int listW = 170;
         Ui.header(g, x0, y0, listW, "COMPÉTENCES — " + d.playerClass.label.toUpperCase(java.util.Locale.ROOT));
-        int rowH = Math.max(14, Math.min(26, (ph - 30 - 70 - 16) / Math.max(1, skills.size())));
+        int rowH = 24;
+        int visible = Math.max(1, (ph - 30 - 70 - 16) / rowH);
+        scroll = Math.min(scroll, Math.max(0, skills.size() - visible));
         boolean compact = rowH < 22;
-        for (int i = 0; i < skills.size(); i++) {
-            Skill s = skills.get(i);
+        for (int i = 0; i < Math.min(visible, skills.size() - scroll); i++) {
+            Skill s = skills.get(i + scroll);
             int ry = y0 + 14 + i * rowH;
             boolean unlocked = d.level >= s.unlockLevel;
             int rank = d.skillRank(s.id);
@@ -59,7 +67,7 @@ public class SkillsScreen extends MenuScreen {
                     g.text(font, right, x0 + listW - 5 - rightW, ty, Ui.RED, false);
                 }
             } else {
-                g.text(font, s.name, nameX, ry + 3, unlocked ? Ui.TEXT : Ui.MUTED, false);
+                g.text(font, font.plainSubstrByWidth(s.name, listW - iconSize - 10), nameX, ry + 3, unlocked ? Ui.TEXT : Ui.MUTED, false);
                 if (unlocked) {
                     for (int p = 0; p < Skill.MAX_RANK; p++) {
                         Ui.diamond(g, nameX + p * 7 + 2, ry + rowH - 9, 2, p < rank ? Ui.GOLD : 0xFF3A3030);
@@ -73,6 +81,11 @@ public class SkillsScreen extends MenuScreen {
             click(x0, ry, listW, rowH - 2, () -> selected = id);
         }
 
+        int pageY = top + ph - 60;
+        button(g, x0, pageY, 35, 16, "<", scroll > 0, Ui.GOLD, () -> scroll = Math.max(0, scroll - visible));
+        button(g, x0 + listW - 35, pageY, 35, 16, ">", scroll + visible < skills.size(), Ui.GOLD, () -> scroll += visible);
+        g.text(font, (scroll + 1) + "-" + Math.min(skills.size(), scroll + visible) + " / " + skills.size(), x0 + 46, pageY + 4, Ui.MUTED, false);
+
         // ------------------------------------------------ details
         int dx = x0 + listW + 10;
         int dw = left + pw - 8 - dx;
@@ -84,7 +97,7 @@ public class SkillsScreen extends MenuScreen {
             boolean unlocked = d.isSkillUnlocked(s);
             Ui.icon(g, Ui.skillIcon(s.id), dx + 6, y0 + 6, 32, 32, unlocked ? 0xFFFFFFFF : 0xFF606060);
             Ui.border(g, dx + 5, y0 + 5, 34, 34, Ui.GOLD_DARK);
-            g.text(font, s.name, dx + 44, y0 + 7, d.playerClass.color, true);
+            g.text(font, font.plainSubstrByWidth(s.name, dw - 48), dx + 44, y0 + 7, d.playerClass.color, true);
             g.text(font, s.typeLabel() + " — Niveau " + s.unlockLevel, dx + 44, y0 + 18, Ui.MUTED, false);
             if (!s.passive) {
                 String info = "Mana " + s.manaCost + "   Recharge " + Skill.sec(Math.round(s.cooldown * (1 - ClientData.stats.get(Stat.CDR) / 100f)));

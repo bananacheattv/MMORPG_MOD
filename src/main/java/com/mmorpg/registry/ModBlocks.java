@@ -27,6 +27,9 @@ public final class ModBlocks {
             p -> p.mapColor(MapColor.COLOR_PURPLE).strength(3f, 1200f).sound(SoundType.STONE).lightLevel(s -> s.getValue(AltarBlock.ACTIVE) ? 13 : 8).noOcclusion()
                     .pushReaction(PushReaction.IMMOVEABLE));
 
+    public static final DeferredBlock<com.mmorpg.block.LuckyBlock> LUCKY_BLOCK = BLOCKS.registerBlock("lucky_block", com.mmorpg.block.LuckyBlock::new,
+            p -> p.mapColor(MapColor.GOLD).strength(0.8f, 1200f).sound(SoundType.METAL).lightLevel(s -> 5).noLootTable().pushReaction(PushReaction.IMMOVEABLE));
+
     /** Partie invisible des structures multiblocs (collision et renvoi des clics vers le bloc fonctionnel). */
     public static final DeferredBlock<StructurePartBlock> STRUCTURE_PART = BLOCKS.registerBlock("structure_part", StructurePartBlock::new,
             p -> p.mapColor(MapColor.COLOR_BLACK).strength(5f, 1200f).sound(SoundType.STONE).noOcclusion().noLootTable()

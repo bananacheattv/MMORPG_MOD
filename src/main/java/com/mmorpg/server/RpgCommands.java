@@ -53,6 +53,7 @@ public final class RpgCommands {
 
         d.register(Commands.literal("mmorpg")
                 .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .then(Commands.literal("editeurquetes").executes(c -> {QuestEditor.open(c.getSource().getPlayerOrException());return 1;}))
                 .then(Commands.literal("niveau").then(Commands.argument("joueur", EntityArgument.player())
                         .then(Commands.argument("niveau", IntegerArgumentType.integer(1, LevelSystem.MAX_LEVEL)).executes(c -> {
                             ServerPlayer p = EntityArgument.getPlayer(c, "joueur");
@@ -201,6 +202,19 @@ public final class RpgCommands {
                                     return 1;
                                 }))))
                 .then(Commands.literal("pnj")
+                        .then(Commands.literal("quetes_groupe")
+                            .then(Commands.argument("groupe", StringArgumentType.word())
+                            .then(Commands.argument("apparence", IntegerArgumentType.integer(0, 3))
+                            .then(Commands.argument("nom", StringArgumentType.greedyString()).executes(c -> {
+                                String name = StringArgumentType.getString(c, "nom");
+                                int skin = IntegerArgumentType.getInteger(c, "apparence");
+                                String group = StringArgumentType.getString(c, "groupe");
+                                var npc = DungeonBuilder.spawnNpc(c.getSource().getLevel(), BlockPos.containing(c.getSource().getPosition()), com.mmorpg.entity.NpcEntity.Role.QUETES, name, skin, c.getSource().getRotation().y + 180);
+                                if (npc == null) return 0;
+                                npc.setup(com.mmorpg.entity.NpcEntity.Role.QUETES, name, skin, group);
+                                c.getSource().sendSuccess(() -> ok("PNJ « " + name + " » créé, groupe : " + group), true);
+                                return 1;
+                            })))))
                         .then(Commands.literal("quetes").then(Commands.argument("nom", StringArgumentType.greedyString()).executes(c -> spawnNpc(c, com.mmorpg.entity.NpcEntity.Role.QUETES))))
                         .then(Commands.literal("marchand").then(Commands.argument("nom", StringArgumentType.greedyString()).executes(c -> spawnNpc(c, com.mmorpg.entity.NpcEntity.Role.MARCHAND))))
                         .then(Commands.literal("supprimer").executes(c -> {
@@ -223,6 +237,7 @@ public final class RpgCommands {
                             ServerPlayer p = EntityArgument.getPlayer(c, "joueur");
                             PlayerData data = RpgPlayers.get(p);
                             data.activeQuests.clear();
+                            data.trackedQuest = "";
                             data.completedQuests.clear();
                             data.dailyQuests.clear();
                             RpgPlayers.sync(p);

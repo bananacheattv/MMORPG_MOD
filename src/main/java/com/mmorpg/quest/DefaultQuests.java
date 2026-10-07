@@ -114,6 +114,9 @@ public final class DefaultQuests {
         hunt.rewards.xpPercentOfLevel = 30;
         hunt.rewards.items.add(new QuestDef.ItemReward("mmorpg:pierre_amelioration", 2));
         m.put("tueur_geants", hunt);
+        m.put("nettoyer_cryptes", reward(obj(q("Les cryptes oubliées", 8, "La garde recherche des volontaires pour éliminer les zombies des cryptes."), "kill", "zombie_des_cryptes", 8), 1800, 60, "potion_soin", 2));
+        m.put("toiles_venimeuses", req(reward(obj(q("Toiles venimeuses", 18, "Après les cryptes, débarrassez les galeries des araignées venimeuses."), "kill", "araignee_venimeuse", 10), 6500, 110, "potion_mana", 3), "nettoyer_cryptes"));
+        m.put("routes_sures", req(reward(obj(q("Des routes plus sûres", 30, "Les arbalétriers pillent les caravanes. Rendez les routes aux voyageurs."), "kill", "bandit_arbaletrier", 12), 22000, 180, "coffre_cosmetique", 1), "toiles_venimeuses"));
         return m;
     }
 }

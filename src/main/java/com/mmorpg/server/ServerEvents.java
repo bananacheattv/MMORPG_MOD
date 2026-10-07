@@ -56,6 +56,7 @@ public final class ServerEvents {
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
             RpgPlayers.tick(sp);
+            if (sp.tickCount % 20 == 0) MountManager.maintain(sp);
         }
     }
 
@@ -69,6 +70,7 @@ public final class ServerEvents {
     @SubscribeEvent
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
+            MountManager.despawn(sp);
             RpgPlayers.onLogout(sp);
         }
     }
@@ -83,6 +85,7 @@ public final class ServerEvents {
     @SubscribeEvent
     public static void onChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
+            MountManager.despawn(sp);
             PetManager.despawn(sp);
             RpgPlayers.recomputeAndSync(sp);
         }

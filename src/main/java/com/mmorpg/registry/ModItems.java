@@ -78,6 +78,7 @@ public final class ModItems {
             "Garantit la réussite d'une amélioration de +13 à +16 à la Forge Arcanique (consommé).");
     public static final DeferredItem<RpgMaterialItem> TREFLE_DIVIN = material("trefle_divin", Rarity.MYTHIQUE,
             "Garantit la réussite d'une amélioration de +17 à +20 à la Forge Arcanique (consommé).");
+    public static final DeferredItem<RpgMaterialItem> ALLIAGE_CELESTE = material("alliage_celeste", Rarity.MYTHIQUE, "Alliage de fin de progression pour les panoplies mythiques de classe.");
     public static final DeferredItem<RpgMaterialItem> LINGOT_MITHRIL = material("lingot_mithril", Rarity.RARE, "Métal léger et résistant, façonné à la Forge Arcanique.");
     public static final DeferredItem<RpgMaterialItem> LINGOT_ADAMANTITE = material("lingot_adamantite", Rarity.EPIQUE, "Le métal le plus dur du monde connu.");
     public static final DeferredItem<RpgMaterialItem> TISSU_ENCHANTE = material("tissu_enchante", Rarity.RARE, "Étoffe tissée de poussière d'âme.");
@@ -93,17 +94,29 @@ public final class ModItems {
     public static final DeferredItem<SummonKeyItem> OEIL_NEANT = summon("oeil_neant", Rarity.MYTHIQUE, "avatar_neant", "Avatar du Néant", 100);
 
     // ------------------------------------------------------------------ consommables
-    public static final DeferredItem<RpgConsumableItem> POTION_SOIN_MINEURE = potion("potion_soin_mineure", Rarity.COMMUN, RpgConsumableItem.Kind.HEAL, 0.15, "Rend 15 % des PV maximum.");
-    public static final DeferredItem<RpgConsumableItem> POTION_SOIN = potion("potion_soin", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.HEAL, 0.30, "Rend 30 % des PV maximum.");
-    public static final DeferredItem<RpgConsumableItem> POTION_SOIN_MAJEURE = potion("potion_soin_majeure", Rarity.RARE, RpgConsumableItem.Kind.HEAL, 0.50, "Rend 50 % des PV maximum.");
-    public static final DeferredItem<RpgConsumableItem> POTION_MANA_MINEURE = potion("potion_mana_mineure", Rarity.COMMUN, RpgConsumableItem.Kind.MANA, 0.20, "Rend 20 % du mana maximum.");
-    public static final DeferredItem<RpgConsumableItem> POTION_MANA = potion("potion_mana", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.MANA, 0.40, "Rend 40 % du mana maximum.");
-    public static final DeferredItem<RpgConsumableItem> POTION_MANA_MAJEURE = potion("potion_mana_majeure", Rarity.RARE, RpgConsumableItem.Kind.MANA, 0.70, "Rend 70 % du mana maximum.");
+    public static final DeferredItem<RpgConsumableItem> POTION_SOIN_MINEURE = potion("potion_soin_mineure", Rarity.COMMUN, RpgConsumableItem.Kind.HEAL, 150, "Rend 150 PV.");
+    public static final DeferredItem<RpgConsumableItem> POTION_SOIN = potion("potion_soin", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.HEAL, 600, "Rend 600 PV.");
+    public static final DeferredItem<RpgConsumableItem> POTION_SOIN_MAJEURE = potion("potion_soin_majeure", Rarity.RARE, RpgConsumableItem.Kind.HEAL, 1500, "Rend 1500 PV.");
+    public static final DeferredItem<RpgConsumableItem> POTION_MANA_MINEURE = potion("potion_mana_mineure", Rarity.COMMUN, RpgConsumableItem.Kind.MANA, 100, "Rend 100 points de mana.");
+    public static final DeferredItem<RpgConsumableItem> POTION_MANA = potion("potion_mana", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.MANA, 350, "Rend 350 points de mana.");
+    public static final DeferredItem<RpgConsumableItem> POTION_MANA_MAJEURE = potion("potion_mana_majeure", Rarity.RARE, RpgConsumableItem.Kind.MANA, 900, "Rend 900 points de mana.");
     public static final DeferredItem<RpgConsumableItem> ELIXIR_EXPERIENCE = consumable("elixir_experience", Rarity.EPIQUE, RpgConsumableItem.Kind.ELIXIR, 0.25, "Octroie 25 % de l'expérience du niveau en cours.");
     public static final DeferredItem<RpgConsumableItem> PARCHEMIN_TELEPORTATION = consumable("parchemin_teleportation", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.TELEPORT_SCROLL, 0, "Ouvre le réseau de téléportation depuis n'importe où.\nConsommé lors du voyage.");
     public static final DeferredItem<RpgConsumableItem> PARCHEMIN_OUBLI = consumable("parchemin_oubli", Rarity.RARE, RpgConsumableItem.Kind.FORGET_SCROLL, 0, "Réinitialise vos points d'attribut.");
     public static final DeferredItem<RpgConsumableItem> ORBE_RENAISSANCE = consumable("orbe_renaissance", Rarity.LEGENDAIRE, RpgConsumableItem.Kind.REBIRTH_ORB, 0, "Permet de choisir une nouvelle classe.\nVotre niveau est conservé.");
     public static final DeferredItem<RpgConsumableItem> COFFRE_COSMETIQUE = consumable("coffre_cosmetique", Rarity.EPIQUE, RpgConsumableItem.Kind.COSMETIC_CHEST, 0, "Débloque un cosmétique animé aléatoire.");
+
+    public static final DeferredItem<RpgConsumableItem> NOURRITURE_FAMILIER = consumable("nourriture_familier", Rarity.PEU_COMMUN,
+            RpgConsumableItem.Kind.PET_FOOD, 25, "Restaure 25 points de bonheur au familier invoqué.\nLes bonus varient de 50 % à 100 % selon son bonheur.");
+
+    public static final DeferredItem<RpgConsumableItem> CHARME_EXPERIENCE = consumable("charme_experience", Rarity.RARE,
+            RpgConsumableItem.Kind.XP_CHARM, 0, "+25 % d'expérience pendant 30 minutes de jeu. Non cumulable.");
+    public static final DeferredItem<RpgConsumableItem> CHARME_CHANCE = consumable("charme_chance", Rarity.RARE,
+            RpgConsumableItem.Kind.LUCK_CHARM, 0, "+25 % de chances de butin pendant 30 minutes de jeu. Non cumulable.");
+
+    public static final DeferredItem<RpgMaterialItem> CLE_AVENTURE = material("cle_aventure", Rarity.RARE, "Ouvre une caisse d’aventure. Une clé par caisse.");
+    public static final DeferredItem<RpgConsumableItem> CAISSE_AVENTURE = consumable("caisse_aventure", Rarity.RARE, RpgConsumableItem.Kind.ADVENTURE_CRATE, 0, "Nécessite une clé d’aventure. Butin : potions 45 %, matériaux 25 %, or 20 %, charme 8 %, cosmétique 2 %.");
+    public static final DeferredItem<BlockItem> LUCKY_BLOCK = ITEMS.registerSimpleBlockItem("lucky_block", ModBlocks.LUCKY_BLOCK);
 
     // ------------------------------------------------------------------ blocs
     public static final DeferredItem<BlockItem> FORGE_ARCANIQUE = ITEMS.registerSimpleBlockItem("forge_arcanique", ModBlocks.FORGE_ARCANIQUE);

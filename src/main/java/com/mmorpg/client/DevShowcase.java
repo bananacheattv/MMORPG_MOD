@@ -28,6 +28,7 @@ public final class DevShowcase {
     private static final boolean ENABLED = !MODE.isEmpty() && !MODE.equals("false");
     private static final boolean QUEST_ONLY = MODE.equals("quetes");
     private static int tick = -1;
+    private static net.minecraft.world.phys.Vec3 mountStart;
 
     private DevShowcase() {
     }
@@ -47,6 +48,107 @@ public final class DevShowcase {
         mc.options.pauseOnLostFocus = false;
         if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.PauseScreen) mc.gui.setScreen(null);
         String me = mc.player.getName().getString();
+        if (MODE.equals("editeur_workflow")) {
+            if(tick==0) mc.getSingleplayerServer().execute(()->com.mmorpg.server.DevQuestEditorChecks.beginWorkflow(mc.getSingleplayerServer()));
+            if(tick==5) {mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(3);mc.resizeGui();cmd(mc,"mmorpg editeurquetes");}
+            var screen=mc.gui.screen();
+            if(screen!=null) {
+                int pw=screen.width-12,ph=screen.height-12,lw=Math.min(180,Math.max(120,pw/3)),rx=6+lw+20,rw=pw-lw-30,fy=66;
+                if(tick==15) editorClick(screen,25,36);
+                if(tick==20) editorClick(screen,40,6+ph-27);
+                if(tick==25) {editorText(screen,"Nom du PNJ","Maëlys (validation)");editorText(screen,"Zone","Forêt ancienne");}
+                if(tick==30) editorClick(screen,rx+30,6+ph-16);
+                if(tick==40) shot(mc,"editeur_pnj_cree");
+                if(tick==45) editorClick(screen,14+2*((lw-4)/3)+12,36);
+                if(tick==50) editorClick(screen,40,111);
+                if(tick==55) {
+                    editorText(screen,"Titre de la quête","La mémoire des racines");
+                    for(var child:screen.children()) if(child instanceof net.minecraft.client.gui.components.MultiLineEditBox box)
+                        box.setValue("Les anciens arbres murmurent un nom oublié.\nMaëlys attend votre aide au cœur de la forêt.\nRapportez les ressources demandées pour retrouver la mémoire des racines.");
+                }
+                if(tick==60) shot(mc,"editeur_lore_redige");
+                if(tick==65) editorClick(screen,rx+3*(rw/4)+15,38);
+                if(tick==70) editorClick(screen,rx+30,fy+10);
+                if(tick==75) editorText(screen,"Rechercher","Maëlys");
+                if(tick==80) editorClick(screen,40,68);
+                if(tick==85) editorClick(screen,rx+2*(rw/4)+15,38);
+                if(tick==90) editorClick(screen,rx+3*(rw/4)+15,fy);
+                if(tick==95) editorClick(screen,rx+30,fy+45);
+                if(tick==100) editorText(screen,"Rechercher","Ailes Célestes");
+                if(tick==105) shot(mc,"editeur_choix_cosmetique");
+                if(tick==110) editorClick(screen,40,68);
+                if(tick==115) editorClick(screen,rx+30,6+ph-16);
+                if(tick==125) shot(mc,"editeur_quete_enregistree");
+                if(tick==130) mc.getSingleplayerServer().execute(()->com.mmorpg.server.DevQuestEditorChecks.endWorkflow(mc.getSingleplayerServer()));
+                if(tick==140) stop(mc);
+            }
+            return;
+        }
+        if (MODE.equals("editeur_quetes")) {
+            if(tick==5) {mc.getWindow().setWindowed(1600,900);cmd(mc,"mmorpg editeurquetes");}
+            if(tick==20) shot(mc,"editeur_quetes_lore");
+            if(tick==25 && mc.gui.screen() instanceof com.mmorpg.client.screen.QuestEditorScreen s) s.showPage(1);
+            if(tick==35) shot(mc,"editeur_quetes_objectifs");
+            if(tick==40 && mc.gui.screen() instanceof com.mmorpg.client.screen.QuestEditorScreen s) s.showPage(2);
+            if(tick==50) shot(mc,"editeur_quetes_recompenses");
+            if(tick==55 && mc.gui.screen() instanceof com.mmorpg.client.screen.QuestEditorScreen s) s.showPage(3);
+            if(tick==65) shot(mc,"editeur_quetes_conditions");
+            if(tick==70) mc.getWindow().setWindowed(1280,720);
+            if(tick==80) shot(mc,"editeur_quetes_petit_ecran");
+            if(tick==90) stop(mc);
+            return;
+        }
+        if (MODE.equals("cosmetiques_importes")) {
+            if(tick==5) mc.getWindow().setWindowed(1600,900);
+            var list=java.util.Arrays.stream(Cosmetic.values()).filter(Cosmetic::hasModel).toList();
+            for(int i=0;i<list.size();i++) {
+                if(tick==15+i*20) mc.gui.setScreen(new com.mmorpg.client.screen.CosmeticsScreen(list.get(i)));
+                if(tick==25+i*20) shot(mc,"cosmetique_3d_"+list.get(i).id);
+            }
+            if(tick==225) stop(mc);
+            return;
+        }
+        if (MODE.equals("modeles_importes")) {
+            if(tick==5) mc.getWindow().setWindowed(1600,900);
+            for(int zone=0;zone<6;zone++) {
+                if(tick==15+zone*25) mc.gui.setScreen(new com.mmorpg.client.screen.ImportedGalleryScreen(zone));
+                if(tick==30+zone*25) shot(mc,"modeles_zone_"+zone);
+            }
+            if(tick==175) stop(mc);
+            return;
+        }
+        if (MODE.equals("lucky_interface")) {
+            var pos = mc.player.blockPosition().offset(2, 0, 0);
+            if (tick == 5) {
+                mc.getWindow().setWindowed(1280, 720);
+                cmd(mc, "setblock " + pos.getX() + " " + pos.getY() + " " + pos.getZ() + " mmorpg:lucky_block");
+            }
+            if (tick == 15) {
+                var data = new CompoundTag(); data.putLong("pos", pos.asLong());
+                mc.gui.setScreen(new com.mmorpg.client.screen.LuckyBlockScreen(data));
+            }
+            if (tick == 25) shot(mc, "lucky_interface_avant");
+            if (tick == 30 && mc.gui.screen() instanceof com.mmorpg.client.screen.LuckyBlockScreen s) s.start();
+            if (tick == 55) shot(mc, "lucky_interface_animation");
+            if (tick == 130) shot(mc, "lucky_interface_resultat");
+            if (tick == 140) stop(mc);
+            return;
+        }
+        if (MODE.equals("bestiaire_dropdown")) {
+            if (tick == 5) { mc.getWindow().setWindowed(1280, 720); MenuScreen.open(MenuScreen.Tab.BESTIAIRE); }
+            if (tick == 15 || tick == 35) {
+                var screen = mc.gui.screen();
+                int x = (screen.width - Math.min(screen.width - 12, 440)) / 2 + 30;
+                int y = (screen.height - Math.min(screen.height - 12, 272)) / 2 + (tick == 15 ? 48 : 66);
+                screen.mouseClicked(new net.minecraft.client.input.MouseButtonEvent(x, y,
+                        new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0)), false);
+            }
+            if (tick == 25) shot(mc, "bestiaire_types_deroulants");
+            if (tick == 30) MenuScreen.open(MenuScreen.Tab.BESTIAIRE);
+            if (tick == 45) shot(mc, "bestiaire_familles_deroulantes");
+            if (tick == 55) stop(mc);
+            return;
+        }
         if (QUEST_ONLY) {
             questPhase(mc, me);
             return;
@@ -74,6 +176,154 @@ public final class DevShowcase {
         }
         if (MODE.equals("structures")) {
             structuresPhase(mc, me);
+            return;
+        }
+        if (MODE.equals("reprise_montures")) {
+            if (tick == 5) {
+                mc.getWindow().setWindowed(1280, 720); mc.gui.setScreen(null);
+                cmd(mc, "gamemode creative " + me);
+                cmd(mc, "tp " + me + " 30 220 0 0 10");
+                cmd(mc, "forceload add 25 -5 35 5");
+
+                cmd(mc, "time set day");
+            }
+            if (tick == 25) { cmd(mc, "fill 25 219 -5 35 219 5 minecraft:sea_lantern"); cmd(mc, "fill 25 220 -5 35 224 5 minecraft:air"); cmd(mc, "gamemode survival " + me); cmd(mc, "tp " + me + " 30 220 0 0 10"); }
+            if (tick == 110) { DevContentChecks.verify(); mc.gui.setScreen(new com.mmorpg.client.screen.MountsScreen()); }
+            if (tick == 125) shot(mc, "codex_collection_montures");
+            if (tick == 130) ClientNet.send(new Payloads.MountAction(Payloads.MountAction.UNLOCK, "voyageur"));
+            if (tick == 140) { mc.gui.setScreen(null); ClientNet.send(new Payloads.MountAction(Payloads.MountAction.SUMMON, "voyageur")); }
+            if (tick == 170) {
+                var mount = java.util.stream.StreamSupport.stream(mc.level.entitiesForRendering().spliterator(), false).filter(e -> e instanceof com.mmorpg.entity.MountEntity).findFirst().orElseThrow();
+                mc.gameMode.interact(mc.player, mount, new net.minecraft.world.phys.EntityHitResult(mount), net.minecraft.world.InteractionHand.MAIN_HAND);
+                mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
+            }
+            if (tick == 175) { mountStart = mc.player.position(); mc.options.keyUp.setDown(true); }
+            if (tick == 185) {
+                mc.options.keyUp.setDown(false);
+                mc.gui.hud.getChat().clearMessages(false);
+                mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
+                if (mountStart.distanceTo(mc.player.position()) < .2) throw new IllegalStateException("Mount movement missing");
+                MMORPG.LOGGER.info("[CODEX CHECKS] MOUNT MOVEMENT PASS");
+            }
+            if (tick == 190) {
+                if (!(mc.player.getVehicle() instanceof com.mmorpg.entity.MountEntity)) throw new IllegalStateException("Client mount riding missing");
+                shot(mc, "codex_monture_en_jeu");
+            }
+            if (tick == 200) { cmd(mc, "forceload remove 25 -5 35 5"); ClientNet.send(new Payloads.MountAction(Payloads.MountAction.DISMISS, "")); mc.options.setCameraType(CameraType.FIRST_PERSON); stop(mc); }
+            return;
+        }
+        if (MODE.equals("reprise_tab")) {
+            if (tick == 5) { mc.getWindow().setWindowed(1280, 720); mc.gui.setScreen(null); }
+            if (tick == 110) shot(mc, "codex_tableau_eldoria");
+            if (tick == 115) mc.options.keyPlayerList.setDown(true);
+            if (tick == 130) {
+                var info = mc.getConnection().getPlayerInfo(mc.player.getUUID());
+                if (info == null || info.getTabListDisplayName() == null || !info.getTabListDisplayName().getString().contains(ClientData.DATA.playerClass.label)) throw new IllegalStateException("Missing RPG tab name");
+                MMORPG.LOGGER.info("[CODEX CHECKS] TAB PASS: synchronized class and level name");
+                shot(mc, "codex_tab_eldoria");
+            }
+            if (tick == 140) { mc.options.keyPlayerList.setDown(false); stop(mc); }
+            return;
+        }
+        if (MODE.equals("reprise_quetes")) {
+            if (tick == 5) { mc.getWindow().setWindowed(1280, 720); mc.gui.setScreen(null); cmd(mc, "mmorpg pnj quetes_groupe cryptes 2 Gardien des Cryptes"); }
+            if (tick == 15) MenuScreen.open(MenuScreen.Tab.QUETES);
+            if (tick == 30) shot(mc, "codex_journal_quetes");
+            if (tick == 40) stop(mc);
+            return;
+        }
+        if (MODE.equals("reprise_equipement")) {
+            if (tick == 5) { DevContentChecks.verify(); mc.getWindow().setWindowed(1280, 720); }
+            String[] sets = {"valkyrie", "eternel_arcanes", "sentinelle_astrale", "egide_divine"};
+            String[] classes = {"guerrier", "mage", "archer", "tank"};
+            int index = (tick - 10) / 40, stage = (tick - 10) % 40;
+            if (tick >= 10 && index < 4) {
+                if (stage == 0) {
+                    mc.gui.setScreen(null);
+                    cmd(mc, "gamemode survival " + me);
+                    cmd(mc, "mmorpg classe " + me + " " + classes[index]);
+                    cmd(mc, "mmorpg niveau " + me + " 100");
+                    String[] slots = {"head", "chest", "legs", "feet"};
+                    String[] pieces = {"casque", "plastron", "jambieres", "bottes"};
+                    for (int i = 0; i < 4; i++) cmd(mc, "item replace entity " + me + " armor." + slots[i] + " with mmorpg:" + sets[index] + "_" + pieces[i]);
+                }
+                if (stage == 15) MenuScreen.open(MenuScreen.Tab.PERSONNAGE);
+                if (stage == 25) shot(mc, "codex_armure_" + sets[index]);
+            }
+            if (tick == 175) stop(mc);
+            return;
+        }
+        if (MODE.equals("reprise_mobs")) {
+            if (tick == 5) {
+                cmd(mc, "gamemode creative " + me);
+                cmd(mc, "tp " + me + " 0 220 0 0 10");
+                cmd(mc, "time set midnight");
+            }
+            if (tick == 15) cmd(mc, "fill -12 219 -12 12 219 12 minecraft:sea_lantern");
+            if (tick == 20) {
+                cmd(mc, "execute positioned -3 220 5 run mmorpg mob zombie_des_cryptes 15");
+                cmd(mc, "execute positioned 0 220 5 run mmorpg mob araignee_venimeuse 25");
+                cmd(mc, "execute positioned 3 220 5 run mmorpg mob bandit_arbaletrier 40");
+            }
+            if (tick == 100) {
+                java.util.Set<String> found = new java.util.HashSet<>();
+                for (var entity : mc.level.entitiesForRendering()) {
+                    if (entity instanceof com.mmorpg.entity.RpgMob mob) found.add(mob.mobKey());
+                }
+                if (!found.containsAll(java.util.List.of("zombie_des_cryptes", "araignee_venimeuse", "bandit_arbaletrier")))
+                    throw new IllegalStateException("Missing monster: " + found);
+                MMORPG.LOGGER.info("[CODEX CHECKS] MOBS PASS: three new entities loaded");
+                shot(mc, "codex_nouveaux_monstres");
+            }
+            if (tick == 110) MenuScreen.open(MenuScreen.Tab.BESTIAIRE);
+            if (tick == 120) shot(mc, "codex_bestiaire_etendu");
+            if (tick == 130) stop(mc);
+            return;
+        }
+        if (MODE.equals("reprise")) {
+            if (tick == 5) {
+                for (PlayerClass cls : PlayerClass.values()) {
+                    if (!cls.isPlayable()) continue;
+                    var test = new com.mmorpg.rpg.PlayerData();
+                    test.playerClass = cls;
+                    for (int lv = 1; lv <= 100; lv++) {
+                        test.level = lv;
+                        test.unlockSkills();
+                        for (var skill : com.mmorpg.skill.Skills.forClass(cls)) {
+                            if (test.isSkillUnlocked(skill) != (lv >= skill.unlockLevel)) throw new IllegalStateException("Skill unlock " + skill.id + " level " + lv);
+                        }
+                        if (test.skillBar.length != 6) throw new IllegalStateException("Skill bar size");
+                    }
+                    if (test.skillRanks.size() != 11) throw new IllegalStateException("Skill count " + cls);
+                }
+                MMORPG.LOGGER.info("[CODEX CHECKS] SKILLS PASS: 44 skills, levels 1-100, six slots");
+                mc.getWindow().setWindowed(1280, 720);
+                cmd(mc, "mmorpg classe " + me + " guerrier");
+                cmd(mc, "mmorpg niveau " + me + " 100");
+            }
+            if (tick == 30) MenuScreen.open(MenuScreen.Tab.COMPETENCES);
+            if (tick == 40) shot(mc, "codex_competences");
+            if (tick == 45 && mc.gui.screen() != null) mc.gui.screen().mouseScrolled(100, 100, 0, -10);
+            if (tick == 55) shot(mc, "codex_competences_suite");
+            if (tick == 60) MenuScreen.open(MenuScreen.Tab.BESTIAIRE);
+            if (tick == 70) shot(mc, "codex_bestiaire");
+            if (tick == 80) MenuScreen.open(MenuScreen.Tab.FAMILIERS);
+            if (tick == 90) shot(mc, "codex_familiers");
+            if (tick == 95) {
+                ClientNet.send(new Payloads.CosmeticAction(Cosmetic.Category.AURA.ordinal(), "aura_flammes"));
+                ClientNet.send(new Payloads.CosmeticAction(Cosmetic.Category.AILES.ordinal(), "ailes_angeliques"));
+            }
+            if (tick == 105) {
+                if (!"aura_flammes".equals(ClientData.DATA.equippedCosmetics.get(Cosmetic.Category.AURA))
+                        || !"ailes_angeliques".equals(ClientData.DATA.equippedCosmetics.get(Cosmetic.Category.AILES)))
+                    throw new IllegalStateException("Cosmetic equipment sync failed");
+                MMORPG.LOGGER.info("[CODEX CHECKS] COSMETICS PASS: equipped and synchronized");
+                MenuScreen.open(MenuScreen.Tab.COSMETIQUES);
+            }
+            if (tick == 115) shot(mc, "codex_cosmetiques");
+            if (tick == 120) { mc.gui.setScreen(null); mc.options.setCameraType(CameraType.THIRD_PERSON_BACK); }
+            if (tick == 160) shot(mc, "codex_cosmetiques_jeu");
+            if (tick == 170) { mc.options.setCameraType(CameraType.FIRST_PERSON); stop(mc); }
             return;
         }
         if (MODE.equals("ecrans")) {          // inventaire du mod et ecran Personnage (8 attributs)
@@ -1534,6 +1784,13 @@ public final class DevShowcase {
 
     private static void cmd(Minecraft mc, String command) {
         mc.player.connection.sendCommand(command);
+    }
+
+    private static void editorClick(net.minecraft.client.gui.screens.Screen screen,int x,int y) {
+        screen.mouseClicked(new net.minecraft.client.input.MouseButtonEvent(x,y,new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT,0)),false);
+    }
+    private static void editorText(net.minecraft.client.gui.screens.Screen screen,String label,String value) {
+        for(var child:screen.children()) if(child instanceof net.minecraft.client.gui.components.EditBox box&&box.getMessage().getString().equals(label)) box.setValue(value);
     }
 
     private static void shot(Minecraft mc, String name) {

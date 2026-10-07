@@ -40,9 +40,14 @@ public final class CosmeticFx {
         for (Player p : level.players()) {
             if (p.isInvisible() || p.isSpectator() || p.distanceToSqr(mc.player) > 64 * 64) continue;
             PublicPlayerData pub = p.getExistingDataOrNull(ModAttachments.PUBLIC);
-            if (pub == null || pub.cosmetics.isEmpty()) continue;
+            // Le joueur local dispose deja de sa collection privee synchronisee.
+            // L'attachement public concerne surtout les autres joueurs suivis par le client.
+            java.util.Collection<String> equipped = p == mc.player
+                    ? com.mmorpg.client.ClientData.DATA.equippedCosmetics.values()
+                    : pub == null ? java.util.List.of() : pub.cosmetics;
+            if (equipped.isEmpty()) continue;
             boolean self = p == mc.player && mc.options.getCameraType().isFirstPerson();
-            for (String id : pub.cosmetics) {
+            for (String id : equipped) {
                 Cosmetic c = Cosmetic.byId(id);
                 if (c == null) continue;
                 if (self && c.category != Cosmetic.Category.TRAINEE && !ClientConfig.SHOW_OWN_COSMETICS.get()) continue;

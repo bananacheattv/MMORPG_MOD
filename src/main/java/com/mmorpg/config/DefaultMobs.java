@@ -184,6 +184,44 @@ public final class DefaultMobs {
         avatar.abilities.put("voidCooldown", 300.0);
         avatar.abilities.put("summonCount", 2.0);
         m.put("avatar_neant", avatar);
+        MobConfig zombie = mob(8, 22, 110, 26, 11, 2.7, 1.1, 0.25, 1);
+        zombie.displayName = "Zombie des Cryptes";
+        zombie.family = "Morts-vivants";
+        spawn(zombie, 14, 1, 3, true, ow, "*");
+        drop(zombie, "minecraft:rotten_flesh", .8, 1, 3);
+        drop(zombie, "os_maudit", .25, 1, 1);
+        m.put("zombie_des_cryptes", zombie);
+
+        MobConfig spider = mob(18, 35, 140, 24, 13, 3, .8, .32, 1.5);
+        spider.displayName = "Araignée Venimeuse";
+        spider.family = "Bêtes";
+        spawn(spider, 12, 1, 2, true, ow, "#minecraft:is_forest", "minecraft:swamp", "minecraft:lush_caves");
+        drop(spider, "minecraft:string", .8, 2, 5);
+        drop(spider, "minecraft:spider_eye", .45, 1, 2);
+        m.put("araignee_venimeuse", spider);
+
+        MobConfig bandit = mob(30, 50, 250, 35, 18, 4, 1.7, .30, 1);
+        bandit.displayName = "Bandit Arbalétrier";
+        bandit.family = "Humanoïdes";
+        spawn(bandit, 12, 1, 3, false, ow, "minecraft:plains", "#minecraft:is_forest", "minecraft:savanna");
+        drop(bandit, "minecraft:leather", .5, 1, 3);
+        drop(bandit, "minecraft:iron_ingot", .20, 1, 2);
+        drop(bandit, "piece_or", .8, 5, 15);
+        m.put("bandit_arbaletrier", bandit);
+        String[][] biomes = {{"#minecraft:is_forest"}, {"minecraft:swamp", "minecraft:mangrove_swamp"},
+                {"minecraft:dripstone_caves", "minecraft:deep_dark"}, {"minecraft:snowy_plains", "minecraft:ice_spikes", "minecraft:grove"},
+                {"minecraft:desert", "#minecraft:is_badlands"}, {"#minecraft:is_end"}};
+        String[] loot = {"minecraft:oak_log", "minecraft:slime_ball", "os_maudit", "eclat_givre", "noyau_flamme", "essence_neant"};
+        for (var entry : com.mmorpg.entity.mob.ImportedMobs.ALL) {
+            int z = entry.zone();
+            MobConfig c = mob(1 + z * 16, Math.min(100, 18 + z * 16), 70 + z * 70, 22 + z * 8, 8 + z * 5, 2.4 + z * .6, 1 + z * .4, .27, 1);
+            c.displayName = entry.name();
+            c.family = com.mmorpg.entity.mob.ImportedMobs.ZONES[z];
+            spawn(c, 4, 1, 2, z == 2, z == 5 ? List.of("minecraft:the_end") : ow, biomes[z]);
+            drop(c, loot[z], .5, 1, 2);
+            drop(c, "piece_or", .6, 2 + z * 3, 5 + z * 5);
+            m.put(entry.key(), c);
+        }
         return m;
     }
 }

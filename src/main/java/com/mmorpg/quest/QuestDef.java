@@ -20,10 +20,12 @@ public class QuestDef {
     public int minLevel = 1;
     /** Quetes a terminer avant de pouvoir accepter celle-ci. */
     public List<String> requires = new ArrayList<>();
-    /** Quete journaliere (recommencable chaque jour du monde). */
+    /** Quete journaliere (recommencable chaque jour civil du serveur). */
     public boolean daily = false;
     /** Groupe de PNJ qui proposent la quete (vide = tous les maitres des quetes). */
     public String giver = "";
+    /** Optional exact NPC UUID; empty retains the historical group-based behaviour. */
+    public String npc = "";
     public List<Objective> objectives = new ArrayList<>();
     public Rewards rewards = new Rewards();
 

@@ -179,6 +179,7 @@ public final class HudLayout {
     public static final Element BUFFS = mod("buffs", "Effets du personnage", (sw, sh) -> MmoHud.buffsSize(), (sw, sh, w, h) -> new int[]{5, 65});
     public static final Element CIBLE = mod("cible", "Cadre de la cible", (sw, sh) -> new int[]{168, 30}, (sw, sh, w, h) -> new int[]{4, MmoHud.defaultTargetY()});
     public static final Element GROUPE = mod("groupe", "Membres du groupe", (sw, sh) -> MmoHud.partySize(), (sw, sh, w, h) -> new int[]{4, MmoHud.defaultPartyY()});
+    public static final Element ELDORIA = mod("eldoria", "Tableau Eldoria", (sw, sh) -> new int[]{153, 44}, (sw, sh, w, h) -> new int[]{sw - w - 4, 4});
     public static final Element QUETES = mod("quetes", "Suivi des quêtes", (sw, sh) -> MmoHud.questSize(), (sw, sh, w, h) -> new int[]{sw - w - 4, 52});
     public static final Element BOSS = mod("boss", "Barre de boss", (sw, sh) -> new int[]{272, 34},
             (sw, sh, w, h) -> new int[]{sw >= 2 * 186 + w ? (sw - w) / 2 : 180, 4});

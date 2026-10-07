@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * Onglet Personnage du menu, qui remplace aussi l'inventaire de Minecraft (touche E) : un seul ecran avec
- * l'equipement, l'artisanat 2 x 2, le sac et la barre rapide (emplacements de Minecraft), le portrait, les attributs
+ * l'equipement, le sac et la barre rapide (emplacements de Minecraft), le portrait, les attributs
  * (repartition des points), les statistiques et le chemin d'evolution de la classe.
  */
 public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
@@ -72,6 +72,7 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
             openCreative();
             return;
         }
+        com.mmorpg.server.InventoryRules.apply(this.minecraft.player);
         super.init();
         // meme panneau que les autres onglets ; les emplacements de Minecraft sont places sous les onglets, a gauche
         this.pw = Math.min(this.width - 12, 440);
@@ -141,11 +142,13 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
         InventoryScreen.extractEntityInInventoryFollowsMouse(g, x + 26, y + 8, x + 75, y + 78, 30, 0.0625F, mouseX, mouseY, this.minecraft.player);
         Ui.icon(g, Ui.classIcon(cls.id(), false), x + 26, y + 8, 12, 32);
         for (Slot s : this.menu.slots) {
+            if (!s.isActive()) continue;
             boolean equipment = (s.index >= InventoryMenu.ARMOR_SLOT_START && s.index < InventoryMenu.ARMOR_SLOT_END) || s.index == InventoryMenu.SHIELD_SLOT;
             boolean result = s.index == InventoryMenu.RESULT_SLOT;
             slotBox(g, x + s.x - 1, y + s.y - 1, equipment ? Ui.GOLD_DARK : result ? Ui.GOLD : 0xFF3A2E22, result);
         }
-        g.text(this.font, "→", x + 138, y + 32, Ui.GOLD, true);
+        g.text(this.font, "Rendez-vous", x + 98, y + 20, Ui.MUTED, false);
+        g.text(this.font, "à la Forge", x + 98, y + 32, Ui.GOLD, false);
         g.fill(x + 8, y + 139, x + 168, y + 140, 0x60B08A40);
 
         // ------------------------------------------------ identite, barres et evolution (sous l'inventaire, selon la place)

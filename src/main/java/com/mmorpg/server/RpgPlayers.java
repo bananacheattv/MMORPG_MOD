@@ -99,6 +99,7 @@ public final class RpgPlayers {
     // ================================================================== synchronisation
 
     public static void sync(ServerPlayer player) {
+        player.refreshTabListName();
         PlayerData d = get(player);
         CompoundTag t = d.save();
         t.store("stats", com.mojang.serialization.Codec.DOUBLE.listOf(), toList(d.stats.raw()));
@@ -119,6 +120,7 @@ public final class RpgPlayers {
             buffs.put(b.type.name(), bt);
         }
         t.put("buffs", buffs);
+        t.putString("activeMount", d.activeMount);
         t.put("quests", QuestManager.activeTag(player, d));
         Net.toPlayer(player, new Payloads.SyncPlayer(t));
         d.dirty = false;
@@ -168,6 +170,11 @@ public final class RpgPlayers {
         long now = player.level().getGameTime();
         if (d.stats.get(Stat.MAX_HP) <= 0 || d.hp < 0) {
             recompute(player);
+        }
+        if (now % 20 == 0 && (d.xpCharmSeconds > 0 || d.luckCharmSeconds > 0)) {
+            d.xpCharmSeconds = Math.max(0, d.xpCharmSeconds - 1);
+            d.luckCharmSeconds = Math.max(0, d.luckCharmSeconds - 1);
+            d.dirty = true;
         }
         // effets expires
         boolean buffsChanged = false;
@@ -274,7 +281,7 @@ public final class RpgPlayers {
     public static void giveXp(ServerPlayer player, long amount, boolean fromKill) {
         PlayerData d = get(player);
         if (!d.playerClass.isPlayable() || d.level >= LevelSystem.MAX_LEVEL || amount <= 0) return;
-        amount = Math.max(1, Math.round(amount * ConfigManager.general().xpMultiplier));
+        amount = Math.max(1, Math.round(amount * ConfigManager.general().xpMultiplier * (d.xpCharmSeconds > 0 ? 1.25 : 1.0)));
         d.xp += amount;
         CombatTexts.send(player, player.getX(), player.getY() + player.getBbHeight() + 0.6, player.getZ(), amount, Payloads.CombatText.XP);
         boolean leveled = false;
@@ -504,6 +511,13 @@ public final class RpgPlayers {
     public static void onLogin(ServerPlayer player) {
         PlayerData d = get(player);
         d.unlockSkills();
+        for (Cosmetic c : Cosmetic.values()) {
+            if (c.unlockLevel > 0 && c.unlockLevel <= d.level) d.cosmetics.add(c.id);
+        }
+        d.equippedCosmetics.entrySet().removeIf(e -> {
+            Cosmetic c = Cosmetic.byId(e.getValue());
+            return c == null || c.category != e.getKey() || !d.cosmetics.contains(c.id);
+        });
         recompute(player);
         if (d.hp <= 0) d.hp = (float) d.stats.get(Stat.MAX_HP);
         sync(player);
