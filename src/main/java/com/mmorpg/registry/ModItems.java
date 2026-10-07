@@ -117,6 +117,38 @@ public final class ModItems {
     public static final DeferredItem<RpgMaterialItem> TISSU_SPECTRAL = material("tissu_spectral", Rarity.RARE, "Étoffe tissée de soie et de voile spectral.");
     public static final DeferredItem<RpgMaterialItem> CUIR_POLAIRE = material("cuir_polaire", Rarity.RARE, "Cuir renforcé doublé de fourrure polaire.");
     public static final DeferredItem<RpgMaterialItem> ACIER_STELLAIRE = material("acier_stellaire", Rarity.EPIQUE, "Adamantite forgée avec de la poussière d'étoile.");
+    // ---- materiaux propres a chaque monstre (zones importees, araignee venimeuse)
+    public static final DeferredItem<RpgMaterialItem> MOUSSE_VIVANTE = material("mousse_vivante", Rarity.COMMUN, "Mousse qui pousse encore sur le dos des Mousseux.");
+    public static final DeferredItem<RpgMaterialItem> DEFENSE_RONCE = material("defense_ronce", Rarity.PEU_COMMUN, "Défense couverte d'épines d'un Sanglier ronce.");
+    public static final DeferredItem<RpgMaterialItem> PLUME_SYLVESTRE = material("plume_sylvestre", Rarity.PEU_COMMUN, "Plume d'empennage des Archers sylvestres.");
+    public static final DeferredItem<RpgMaterialItem> CHAPEAU_LUISANT = material("chapeau_luisant", Rarity.PEU_COMMUN, "Chapeau phosphorescent d'un Veilleur champignon.");
+    public static final DeferredItem<RpgMaterialItem> NOEUD_RACINE = material("noeud_racine", Rarity.RARE, "Bois noueux arraché au Colosse racine.");
+    public static final DeferredItem<RpgMaterialItem> PEAU_CRAPAUD = material("peau_crapaud", Rarity.COMMUN, "Peau visqueuse et résistante des Crapauds venimeux.");
+    public static final DeferredItem<RpgMaterialItem> PERLE_ACIDE = material("perle_acide", Rarity.PEU_COMMUN, "Perle corrosive formée dans les Limaces acides.");
+    public static final DeferredItem<RpgMaterialItem> LANTERNE_LUCIOLE = material("lanterne_luciole", Rarity.PEU_COMMUN, "Abdomen lumineux d'une Luciole géante.");
+    public static final DeferredItem<RpgMaterialItem> ROSEAU_ENCHANTE = material("roseau_enchante", Rarity.PEU_COMMUN, "Roseau ensorcelé par les Sorciers des roseaux.");
+    public static final DeferredItem<RpgMaterialItem> CROC_HYDRE = material("croc_hydre", Rarity.RARE, "Croc venimeux de l'Hydre des marais.");
+    public static final DeferredItem<RpgMaterialItem> PHALANGE_OSSELET = material("phalange_osselet", Rarity.COMMUN, "Petits os des Osselets des cryptes.");
+    public static final DeferredItem<RpgMaterialItem> PATTE_ARAIGNEE = material("patte_araignee", Rarity.PEU_COMMUN, "Patte osseuse et acérée.");
+    public static final DeferredItem<RpgMaterialItem> ECUSSON_FUNERAIRE = material("ecusson_funeraire", Rarity.PEU_COMMUN, "Écusson des Gardes funéraires.");
+    public static final DeferredItem<RpgMaterialItem> MAILLON_SPECTRAL = material("maillon_spectral", Rarity.RARE, "Maillon des chaînes du Spectre enchaîné.");
+    public static final DeferredItem<RpgMaterialItem> JOYAU_CRYPTES = material("joyau_cryptes", Rarity.EPIQUE, "Le joyau qui ornait le sceptre du Roi des cryptes.");
+    public static final DeferredItem<RpgMaterialItem> QUEUE_RENARD = material("queue_renard", Rarity.PEU_COMMUN, "Queue soyeuse d'un Renard de givre.");
+    public static final DeferredItem<RpgMaterialItem> ELYTRE_POLAIRE = material("elytre_polaire", Rarity.PEU_COMMUN, "Aile dure d'un Scarabée polaire.");
+    public static final DeferredItem<RpgMaterialItem> PLUME_HARPIE = material("plume_harpie", Rarity.PEU_COMMUN, "Plume glacée d'une Harpie des neiges.");
+    public static final DeferredItem<RpgMaterialItem> NOYAU_GLACE = material("noyau_glace", Rarity.RARE, "Le cœur gelé d'un Golem d'iceberg.");
+    public static final DeferredItem<RpgMaterialItem> ECAILLE_BOREALE = material("ecaille_boreale", Rarity.EPIQUE, "Écaille irisée du Wyrm boréal.");
+    public static final DeferredItem<RpgMaterialItem> DARD_SCORPION = material("dard_scorpion", Rarity.PEU_COMMUN, "Dard empoisonné d'un Scorpion de cuivre.");
+    public static final DeferredItem<RpgMaterialItem> SCARABEE_OR = material("scarabee_or", Rarity.RARE, "Amulette sacrée trouvée sur les Momies des dunes.");
+    public static final DeferredItem<RpgMaterialItem> CRIN_CENDRE = material("crin_cendre", Rarity.COMMUN, "Crin gris des Hyènes cendrées.");
+    public static final DeferredItem<RpgMaterialItem> FUMEE_DJINN = material("fumee_djinn", Rarity.RARE, "Fumée ardente capturée dans une fiole.");
+    public static final DeferredItem<RpgMaterialItem> CARAPACE_VOLCANIQUE = material("carapace_volcanique", Rarity.RARE, "Écaille de lave refroidie d'une Tortue volcanique.");
+    public static final DeferredItem<RpgMaterialItem> POUDRE_ASTRALE = material("poudre_astrale", Rarity.PEU_COMMUN, "Écailles chatoyantes des Mites astrales.");
+    public static final DeferredItem<RpgMaterialItem> GRIFFE_VIDE = material("griffe_vide", Rarity.RARE, "Griffe d'ombre d'un Rôdeur du vide.");
+    public static final DeferredItem<RpgMaterialItem> PUPILLE_CHAOS = material("pupille_chaos", Rarity.EPIQUE, "L'œil arraché à un Œil du chaos.");
+    public static final DeferredItem<RpgMaterialItem> PLAQUE_FRACTUREE = material("plaque_fracturee", Rarity.EPIQUE, "Fragment d'armure d'un Chevalier fracturé.");
+    public static final DeferredItem<RpgMaterialItem> COEUR_ETOILE = material("coeur_etoile", Rarity.LEGENDAIRE, "Le cœur incandescent d'un Dévoreur d'étoiles.");
+    public static final DeferredItem<RpgMaterialItem> GLANDE_VENIN = material("glande_venin", Rarity.PEU_COMMUN, "Glande gorgée de venin des Araignées venimeuses.");
     public static final DeferredItem<RpgMaterialItem> PIECE_OR = ITEMS.registerItem("piece_or",
             p -> new RpgMaterialItem(p, Rarity.COMMUN, "Monnaie", "La monnaie du royaume. Utilisée à la Forge Arcanique."), p -> p.stacksTo(99));
 

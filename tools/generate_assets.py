@@ -861,6 +861,8 @@ def main():
     import sys
     import gen_equipment
     gen_equipment.generate(sys.modules[__name__])
+    import gen_hd_textures
+    gen_hd_textures.generate(sys.modules[__name__])
     lang = dict(sorted(LANG.items()))
     write_json(os.path.join(ASSETS, 'lang', 'fr_fr.json'), lang)
     write_json(os.path.join(ASSETS, 'lang', 'en_us.json'), lang)
@@ -869,6 +871,7 @@ def main():
             f.write(f'{kind} {iid}\n')
     import generate_extensions
     generate_extensions.generate()
+    gen_hd_textures.generate(sys.modules[__name__])     # remplace les textures provisoires des extensions
     print(f'{len(MANIFEST)} objets/blocs generes, {len(LANG)} traductions')
     # modeles Blockbench importes (30 monstres, 10 cosmetiques) : textures, oeufs et traductions
     import import_bbmodels

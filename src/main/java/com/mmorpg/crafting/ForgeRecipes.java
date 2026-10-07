@@ -111,6 +111,22 @@ public final class ForgeRecipes {
         add(Category.MATERIAUX, "tissu_spectral", 2, 25, 35, N, "soie_araignee", 3, "voile_spectral", 1, "tissu_enchante", 1);
         add(Category.MATERIAUX, "cuir_polaire", 2, 30, 45, N, "fourrure_polaire", 3, "cuir_renforce", 1, "carapace_givree", 1);
         add(Category.MATERIAUX, "acier_stellaire", 1, 120, 75, N, "lingot_adamantite", 1, "poussiere_etoile", 2, "plaque_neant", 1);
+        // recettes alternatives avec les materiaux propres aux monstres
+        add(Category.MATERIAUX, "bois_enchante", 2, 4, 10, N, "noeud_racine", 1, "roseau_enchante", 2, "mousse_vivante", 2);
+        add(Category.MATERIAUX, "cuir_renforce", 2, 2, 5, N, "peau_crapaud", 3, "crin_cendre", 1);
+        add(Category.MATERIAUX, "cuir_polaire", 2, 30, 45, N, "queue_renard", 2, "crin_cendre", 2, "cuir_renforce", 1);
+        add(Category.MATERIAUX, "tissu_spectral", 2, 25, 35, N, "maillon_spectral", 1, "soie_araignee", 2, "plume_harpie", 1);
+        add(Category.MATERIAUX, "bronze_runique", 2, 20, 30, N, "dard_scorpion", 2, "carapace_cuivre", 2, "minecraft:copper_ingot", 1);
+        add(Category.MATERIAUX, "acier_stellaire", 1, 120, 75, N, "coeur_etoile", 1, "lingot_adamantite", 1, "poudre_astrale", 2);
+        add(Category.MATERIAUX, "pierre_amelioration", 1, 10, 1, N, "phalange_osselet", 4, "ecusson_funeraire", 1, "minecraft:lapis_lazuli", 1);
+        add(Category.MATERIAUX, "pierre_amelioration_sup", 1, 60, 40, N, "pierre_amelioration", 2, "joyau_cryptes", 1, "noyau_glace", 1);
+        add(Category.MATERIAUX, "trefle_quatre_feuilles", 1, 150, 30, N, "trefle_chance", 2, "chapeau_luisant", 2, "perle_acide", 1);
+        add(Category.MATERIAUX, "alliage_celeste", 2, 200, 90, N, "lingot_adamantite", 3, "ecaille_boreale", 1, "pupille_chaos", 1, "plaque_fracturee", 2);
+        add(Category.CONSOMMABLES, "potion_soin", 2, 10, 20, N, "minecraft:glass_bottle", 2, "lanterne_luciole", 1, "croc_hydre", 1);
+        add(Category.CONSOMMABLES, "potion_mana", 2, 10, 20, N, "minecraft:glass_bottle", 2, "fumee_djinn", 1, "elytre_polaire", 1);
+        add(Category.CONSOMMABLES, "elixir_experience", 1, 50, 10, N, "minecraft:glass_bottle", 1, "griffe_vide", 1, "glande_venin", 2, "scarabee_or", 1);
+        add(Category.FAMILIERS, "nourriture_familier", 4, 5, 1, N, "defense_ronce", 1, "plume_sylvestre", 1, "minecraft:wheat", 2);
+        add(Category.MATERIAUX, "lingot_mithril", 1, 5, 20, N, "minecraft:iron_ingot", 2, "carapace_volcanique", 1, "patte_araignee", 1);
         // ---------------------------------------------------------------- armes : Guerrier
         weapon("epee_recrue", 3, "minecraft:iron_ingot", 3, "minecraft:stick", 1);
         weapon("lame_runique", 20, "ferraille_gobeline", 4, "oreille_gobelin", 3, "minecraft:iron_ingot", 2, "minecraft:lapis_lazuli", 4);

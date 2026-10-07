@@ -8,7 +8,42 @@ import java.util.Map;
 /** Valeurs par defaut des monstres et boss (ecrites dans mobs.json au premier lancement). */
 public final class DefaultMobs {
     /** A augmenter quand de nouveaux objets sont ajoutes au butin par defaut : ils sont fusionnes dans les mobs.json existants. */
-    public static final int DROPS_VERSION = 2;
+    public static final int DROPS_VERSION = 3;
+    /** Materiau propre a chaque monstre importe. */
+    private static final Map<String, String> MOB_MATERIAL = new java.util.HashMap<>();
+
+    static {
+        MOB_MATERIAL.put("mousseux", "mousse_vivante");
+        MOB_MATERIAL.put("sanglier_ronce", "defense_ronce");
+        MOB_MATERIAL.put("archer_sylvestre", "plume_sylvestre");
+        MOB_MATERIAL.put("veilleur_champignon", "chapeau_luisant");
+        MOB_MATERIAL.put("colosse_racine", "noeud_racine");
+        MOB_MATERIAL.put("crapaud_venimeux", "peau_crapaud");
+        MOB_MATERIAL.put("limace_acide", "perle_acide");
+        MOB_MATERIAL.put("luciole_geante", "lanterne_luciole");
+        MOB_MATERIAL.put("sorcier_roseaux", "roseau_enchante");
+        MOB_MATERIAL.put("hydre_marais", "croc_hydre");
+        MOB_MATERIAL.put("osselet", "phalange_osselet");
+        MOB_MATERIAL.put("araignee_os", "patte_araignee");
+        MOB_MATERIAL.put("garde_funeraire", "ecusson_funeraire");
+        MOB_MATERIAL.put("spectre_enchaine", "maillon_spectral");
+        MOB_MATERIAL.put("roi_cryptes", "joyau_cryptes");
+        MOB_MATERIAL.put("renard_givre", "queue_renard");
+        MOB_MATERIAL.put("scarabee_polaire", "elytre_polaire");
+        MOB_MATERIAL.put("harpie_neiges", "plume_harpie");
+        MOB_MATERIAL.put("golem_iceberg", "noyau_glace");
+        MOB_MATERIAL.put("wyrm_boreal", "ecaille_boreale");
+        MOB_MATERIAL.put("scorpion_cuivre", "dard_scorpion");
+        MOB_MATERIAL.put("momie_dunes", "scarabee_or");
+        MOB_MATERIAL.put("hyene_cendree", "crin_cendre");
+        MOB_MATERIAL.put("djinn_braises", "fumee_djinn");
+        MOB_MATERIAL.put("tortue_volcanique", "carapace_volcanique");
+        MOB_MATERIAL.put("mite_astrale", "poudre_astrale");
+        MOB_MATERIAL.put("rodeur_vide", "griffe_vide");
+        MOB_MATERIAL.put("oeil_chaos", "pupille_chaos");
+        MOB_MATERIAL.put("chevalier_fracture", "plaque_fracturee");
+        MOB_MATERIAL.put("devoreur_etoiles", "coeur_etoile");
+    }
 
     private DefaultMobs() {
     }
@@ -213,6 +248,7 @@ public final class DefaultMobs {
         drop(spider, "minecraft:string", .8, 2, 5);
         drop(spider, "minecraft:spider_eye", .45, 1, 2);
         drop(spider, "soie_araignee", .6, 1, 3);
+        drop(spider, "glande_venin", .35, 1, 1);
         m.put("araignee_venimeuse", spider);
 
         MobConfig bandit = mob(30, 50, 250, 35, 18, 4, 1.7, .30, 1);
@@ -244,6 +280,8 @@ public final class DefaultMobs {
             drop(c, zoneLoot[z][1], .25, 1, 1);
             if (elites.contains(entry.key())) drop(c, zoneLoot[z][2], .35, 1, 1);
             if (entry.key().equals("araignee_os")) drop(c, "soie_araignee", .5, 1, 2);
+            String own = MOB_MATERIAL.get(entry.key());
+            if (own != null) drop(c, own, elites.contains(entry.key()) ? .4 : .3, 1, 1);
             drop(c, "piece_or", .6, 2 + z * 3, 5 + z * 5);
             m.put(entry.key(), c);
         }
