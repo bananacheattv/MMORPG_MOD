@@ -93,7 +93,7 @@ public final class ModEntities {
     static {
         for (var entry : com.mmorpg.entity.mob.ImportedMobs.ALL) {
             var type = ENTITIES.registerEntityType(entry.key(), com.mmorpg.entity.mob.ImportedMobEntity::new, MobCategory.MONSTER,
-                    b -> b.sized(entry.width(), entry.height()).clientTrackingRange(10));
+                    b -> b.sized(entry.scaledWidth(), entry.scaledHeight()).clientTrackingRange(10));
             IMPORTED.put(entry.key(), type);
             mob(entry.key(), type);
         }
@@ -105,7 +105,8 @@ public final class ModEntities {
     }
 
     public static void registerAttributes(EntityAttributeCreationEvent event) {
-        IMPORTED.values().forEach(type -> event.put(type.get(), RpgMonster.createAttributes().build()));
+        IMPORTED.values().forEach(type -> event.put(type.get(), RpgMonster.createAttributes()
+                .add(net.minecraft.world.entity.ai.attributes.Attributes.FLYING_SPEED, 0.45).build()));
         event.put(CRYPT_ZOMBIE.get(), net.minecraft.world.entity.monster.zombie.Zombie.createAttributes().build());
         event.put(VENOM_SPIDER.get(), net.minecraft.world.entity.monster.spider.CaveSpider.createCaveSpider().build());
         event.put(BANDIT.get(), net.minecraft.world.entity.monster.illager.Pillager.createAttributes().build());
