@@ -201,6 +201,14 @@ public final class ModItems {
             BY_ID.put("sceau_" + m.id, seal);
         }
     }
+    public static final DeferredItem<com.mmorpg.item.MysteryItem> OEUF_MYSTERE = mystery("oeuf_mystere", com.mmorpg.item.MysteryItem.Kind.PET);
+    public static final DeferredItem<com.mmorpg.item.MysteryItem> SCEAU_MYSTERE = mystery("sceau_mystere", com.mmorpg.item.MysteryItem.Kind.MOUNT);
+
+    private static DeferredItem<com.mmorpg.item.MysteryItem> mystery(String id, com.mmorpg.item.MysteryItem.Kind kind) {
+        DeferredItem<com.mmorpg.item.MysteryItem> item = ITEMS.registerItem(id, p -> new com.mmorpg.item.MysteryItem(p, kind));
+        BY_ID.put(id, item);
+        return item;
+    }
     /** Blocs des caisses (onglet creatif, reserves aux admins). */
     public static final java.util.List<DeferredItem<BlockItem>> CRATE_BLOCKS = new java.util.ArrayList<>();
 

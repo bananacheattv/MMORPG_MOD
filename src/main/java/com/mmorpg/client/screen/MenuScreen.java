@@ -10,7 +10,7 @@ import net.minecraft.client.input.KeyEvent;
 /** Menu principal a onglets du mod. */
 public abstract class MenuScreen extends MmoScreen {
     public enum Tab {
-        PERSONNAGE("Personnage"), COMPETENCES("Compétences"), QUETES("Quêtes"), GROUPE("Groupe"), FAMILIERS("Familiers"), COSMETIQUES("Cosmétiques"), BESTIAIRE("Bestiaire");
+        PERSONNAGE("Personnage"), COMPETENCES("Compétences"), QUETES("Quêtes"), GROUPE("Groupe"), FAMILIERS("Familiers"), MONTURES("Montures"), COSMETIQUES("Cosmétiques"), BESTIAIRE("Bestiaire");
 
         public final String label;
 
@@ -45,6 +45,7 @@ public abstract class MenuScreen extends MmoScreen {
             case QUETES -> new QuestLogScreen();
             case GROUPE -> new PartyScreen();
             case FAMILIERS -> new PetsScreen();
+            case MONTURES -> new MountsScreen();
             case COSMETIQUES -> new CosmeticsScreen();
             case BESTIAIRE -> new BestiaryScreen();
         });

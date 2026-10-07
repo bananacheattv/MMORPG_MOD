@@ -14,13 +14,13 @@ public class MountsScreen extends MenuScreen {
     private int scroll;
     private boolean confirm;
     private final java.util.Map<MountType, MountEntity> previews = new java.util.EnumMap<>(MountType.class);
-    public MountsScreen() { super(Tab.FAMILIERS); }
+    public MountsScreen() { super(Tab.MONTURES); }
     @Override protected void renderTab(GuiGraphicsExtractor g, int mx, int my, float a) {
         var d = ClientData.DATA;
         int x = left + 8, y = contentTop, lw = 165;
         MountType[] all = MountType.values();
         Ui.header(g, x, y, lw, "MONTURES (" + d.mounts.size() + "/" + all.length + ")");
-        int rowH = 18, rows = Math.max(1, (top + ph - 30 - (y + 18)) / rowH);
+        int rowH = 18, rows = Math.max(1, (top + ph - 10 - (y + 18)) / rowH);
         scroll = Math.max(0, Math.min(scroll, all.length - rows));
         for (int i = 0; i < Math.min(rows, all.length - scroll); i++) {
             var type = all[i + scroll];
@@ -31,7 +31,6 @@ public class MountsScreen extends MenuScreen {
             g.text(font, owned ? "✔" : "✖", x + lw - 12, ry + 4, owned ? 0xFF60E070 : Ui.MUTED, false);
             click(x, ry, lw, rowH - 2, () -> { selected = type; confirm = false; });
         }
-        button(g, x, top + ph - 25, lw, 17, "< Familiers", true, 0xFF2A2420, () -> minecraft.gui.setScreen(new PetsScreen()));
         int dx = x + lw + 8, dw = left + pw - 8 - dx, bottom = top + ph - 8;
         Ui.inset(g, dx, y, dw, bottom - y);
         g.text(font, selected.label, dx + 7, y + 6, Ui.GOLD, false);

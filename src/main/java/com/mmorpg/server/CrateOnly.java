@@ -10,6 +10,6 @@ public final class CrateOnly {
     }
 
     public static boolean is(Item item) {
-        return item instanceof PetEggItem || item instanceof com.mmorpg.item.MountSealItem || item == ModItems.COFFRE_COSMETIQUE.get();
+        return item instanceof PetEggItem || item instanceof com.mmorpg.item.MysteryItem || item instanceof com.mmorpg.item.MountSealItem || item == ModItems.COFFRE_COSMETIQUE.get();
     }
 }

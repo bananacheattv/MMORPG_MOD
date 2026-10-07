@@ -18,6 +18,7 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 public final class Keys {
     public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(MMORPG.id("mmorpg"));
     public static final KeyMapping MENU = new KeyMapping("key.mmorpg.menu", InputConstants.KEY_M, CATEGORY);
+    public static final KeyMapping MOUNT = new KeyMapping("key.mmorpg.mount", InputConstants.KEY_N, CATEGORY);
     public static final KeyMapping HUD_EDIT = new KeyMapping("key.mmorpg.hud_edit", InputConstants.KEY_U, CATEGORY);
     public static final KeyMapping[] SKILLS = createSkills();
 
@@ -40,6 +41,7 @@ public final class Keys {
         event.registerCategory(CATEGORY);
         event.register(MENU);
         event.register(HUD_EDIT);
+        event.register(MOUNT);
         for (KeyMapping skill : SKILLS) event.register(skill);
     }
 
@@ -49,6 +51,11 @@ public final class Keys {
         while (MENU.consumeClick()) {
             if (mc.player != null && mc.level != null && mc.gui.screen() == null) {
                 MenuScreen.open(MenuScreen.lastTab);
+            }
+        }
+        while (MOUNT.consumeClick()) {
+            if (mc.player != null && mc.level != null && mc.gui.screen() == null) {
+                ClientNet.send(new Payloads.MountAction(Payloads.MountAction.TOGGLE, ""));
             }
         }
         while (HUD_EDIT.consumeClick()) {

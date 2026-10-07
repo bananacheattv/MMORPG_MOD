@@ -193,6 +193,8 @@ MOUNT_SEALS = {
     'sceau_felin_vide': ('seal', '#24163a', '#b060ff', '#e0b0ff', '#a040ff'),
     'sceau_araignee_cavernes': ('seal', '#3a3a44', '#ff3030', '#ff9090', '#c02020'),
     'sceau_hippogriffe': ('seal', '#f0ece4', '#e8b830', '#fff0a0', '#ffd040'),
+    'oeuf_mystere': ('egg', '#7a4ad8', '#ffd040', '#ffffff', '#c080ff'),
+    'sceau_mystere': ('seal', '#2a2040', '#ffd040', '#ffffff', '#ffb040'),
 }
 
 

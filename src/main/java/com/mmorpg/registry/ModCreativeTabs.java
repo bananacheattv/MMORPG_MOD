@@ -38,6 +38,8 @@ public final class ModCreativeTabs {
                 ModItems.SUMMONS.forEach(i -> out.accept(i.get()));
                 ModItems.PET_EGGS.values().forEach(i -> out.accept(i.get()));
                 ModItems.MOUNT_SEALS.values().forEach(i -> out.accept(i.get()));
+                out.accept(ModItems.OEUF_MYSTERE.get());
+                out.accept(ModItems.SCEAU_MYSTERE.get());
                 ModItems.SPAWN_EGGS.forEach(i -> out.accept(i.get()));
             })
             .build());

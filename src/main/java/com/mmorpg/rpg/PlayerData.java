@@ -86,6 +86,10 @@ public class PlayerData implements ValueIOSerializable {
     public final Map<BuffType, Buff> buffs = new EnumMap<>(BuffType.class);
     public UUID mountEntity;
     public String activeMount = "";
+    /** Derniere monture utilisee (touche Monture). */
+    public String lastMount = "";
+    /** Combat PvP : montures interdites jusqu'a ce tick serveur (non sauvegarde). */
+    public long pvpUntilTick;
     public long nextMountTick;
     public UUID petEntity;
     public boolean dirty = true;
@@ -175,6 +179,7 @@ public class PlayerData implements ValueIOSerializable {
         t.store("pets", STR_INT_MAP, petXp);
         t.putString("activePet", activePet);
         t.store("mounts", Codec.STRING.listOf(), new ArrayList<>(mounts));
+        t.putString("lastMount", lastMount);
         t.store("petHappiness", STR_INT_MAP, petHappiness);
         t.store("cosmetics", Codec.STRING.listOf(), new ArrayList<>(cosmetics));
         Map<String, String> eq = new HashMap<>();
@@ -246,6 +251,7 @@ public class PlayerData implements ValueIOSerializable {
         trackedQuest = t.getStringOr("trackedQuest", "");
         mounts.clear();
         for (String m : t.read("mounts", Codec.STRING.listOf()).orElse(List.of())) mounts.add(com.mmorpg.mount.MountType.migrate(m));
+        lastMount = t.getStringOr("lastMount", "");
         activeMount = t.getStringOr("activeMount", "");
         activeQuests.clear();
         t.read("activeQuests", Codec.unboundedMap(Codec.STRING, Codec.INT.listOf())).orElse(Map.of()).forEach((k, v) -> {

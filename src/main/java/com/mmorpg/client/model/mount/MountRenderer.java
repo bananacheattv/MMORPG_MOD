@@ -15,7 +15,13 @@ public class MountRenderer extends MobRenderer<MountEntity, MountRenderer.State,
     }
 
     public MountRenderer(EntityRendererProvider.Context ctx, MountType type) {
-        super(ctx, new ImportedModel("mounts", type.id), type.width * .55f);
+        super(ctx, new ImportedModel("mounts", type.id), type.width * .55f * com.mmorpg.registry.ModEntities.MOUNT_SCALE);
+    }
+
+    @Override
+    protected void scale(State state, com.mojang.blaze3d.vertex.PoseStack pose) {
+        float s = com.mmorpg.registry.ModEntities.MOUNT_SCALE;
+        pose.scale(s, s, s);
     }
 
     @Override

@@ -170,3 +170,5 @@ def generate(g):
     for mid, name in MOUNTS.items():
         g.LANG[f'item.mmorpg.sceau_{mid}'] = 'Sceau de monture : ' + name
         g.LANG[f'entity.mmorpg.monture_{mid}'] = name
+    g.LANG['item.mmorpg.oeuf_mystere'] = 'Œuf mystère'
+    g.LANG['item.mmorpg.sceau_mystere'] = 'Sceau mystère'

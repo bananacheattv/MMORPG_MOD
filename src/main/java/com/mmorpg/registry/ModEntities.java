@@ -79,13 +79,16 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.NpcEntity>> NPC =
             ENTITIES.registerEntityType("pnj", com.mmorpg.entity.NpcEntity::new, MobCategory.MISC,
                     b -> b.sized(0.6F, 1.95F).clientTrackingRange(10));
+    /** Les montures sont affichees 2x plus grandes que leur modele. */
+    public static final float MOUNT_SCALE = 2f;
     /** Une entite par monture 3D (taille et hauteur de selle propres). */
     public static final Map<com.mmorpg.mount.MountType, DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.MountEntity>>> MOUNTS =
             new java.util.EnumMap<>(com.mmorpg.mount.MountType.class);
     static {
         for (var m : com.mmorpg.mount.MountType.values()) {
             MOUNTS.put(m, ENTITIES.registerEntityType("monture_" + m.id, com.mmorpg.entity.MountEntity::new, MobCategory.CREATURE,
-                    b -> b.sized(m.width, m.height).eyeHeight(m.height * .9f).passengerAttachments(m.seat + .1f).clientTrackingRange(10)));
+                    b -> b.sized(m.width * MOUNT_SCALE, m.height * MOUNT_SCALE).eyeHeight(m.height * MOUNT_SCALE * .9f)
+                            .passengerAttachments(m.seat * MOUNT_SCALE + .1f).clientTrackingRange(10)));
         }
     }
     public static final DeferredHolder<EntityType<?>, EntityType<PetEntity>> PET =
