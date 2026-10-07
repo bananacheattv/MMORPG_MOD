@@ -167,6 +167,18 @@ def armor_icons(ga):
             armor_icon(piece, style, base, trim, gem, seed=i * 5, halo=halo).save(ga.path(tex, f'{sid}_{piece}.png'))
 
 
+# cles des caisses : rendues a part (graine fixe) pour ne pas decaler les graines des autres objets
+CRATE_KEYS = {
+    'cle_vote': ('key', '#c8d0c8', '#50ff80', None, None),
+    'cle_quete': ('key', '#c09050', '#ffd040', None, None),
+    'cle_commune': ('key', '#a0a0a8', '#e0e0e0', None, None),
+    'cle_rare': ('key', '#c8d4e4', '#3a8cff', '#a0c8ff', None),
+    'cle_epique': ('key', '#9a70e0', '#d040ff', '#e0a0ff', '#b060ff'),
+    'cle_legendaire': ('key', '#f0c040', '#ff8020', '#fff0a0', '#ffb040'),
+    'cle_mythique': ('key', '#ff5070', '#ff2040', '#ffc0d0', '#ff3050'),
+}
+
+
 def generate(ga):
     armor_icons(ga)
     tex = os.path.join(ga.ASSETS, 'textures', 'item')
@@ -177,7 +189,9 @@ def generate(ga):
         ga.LANG[f'item.{ga.MODID}.{iid}'] = row[0]
     for pid, (base, spots, glow) in EGGS.items():
         entries['oeuf_' + pid] = ('egg', base, spots, glow, glow)
-    for i, (iid, (kind, base, acc, glow, halo)) in enumerate(sorted(entries.items())):
+    rows = list(enumerate(sorted(entries.items())))
+    rows += [(1000 + i, kv) for i, kv in enumerate(CRATE_KEYS.items())]
+    for i, (iid, (kind, base, acc, glow, halo)) in rows:
         img = render_item(kind, base, acc, glow, seed=i * 7 + 3, halo=halo)
         img.save(ga.path(tex, iid + '.png'))
         # modele simple pointant sur la texture du mod (remplace les textures vanilla provisoires)

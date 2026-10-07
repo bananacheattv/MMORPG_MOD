@@ -48,9 +48,6 @@ public class ShopConfig {
         c.buy.add(new Offer("parchemin_oubli", 1, 300, 10));
         c.buy.add(new Offer("elixir_experience", 1, 400, 20));
         c.buy.add(new Offer("orbe_renaissance", 1, 2000, 10));
-        c.buy.add(new Offer("coffre_cosmetique", 1, 1500, 30));
-        c.buy.add(new Offer("oeuf_feu_follet", 1, 250, 5));
-        c.buy.add(new Offer("oeuf_slime", 1, 250, 5));
         c.buy.add(new Offer("minecraft:bread", 4, 3, 1));
         c.buy.add(new Offer("minecraft:cooked_beef", 4, 6, 1));
         c.buy.add(new Offer("minecraft:torch", 16, 4, 1));

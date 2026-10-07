@@ -59,6 +59,8 @@ def generate():
     key.save(ROOT / 'textures/item/cle_aventure.png')
     g.write_json(str(ROOT / 'models/item/cle_aventure.json'), {'parent': 'minecraft:item/generated', 'textures': {'layer0': 'mmorpg:item/cle_aventure'}})
     g.write_json(str(ROOT / 'models/item/caisse_aventure.json'), {'parent': 'minecraft:block/barrel'})
+    import gen_crates
+    gen_crates.generate(g)
     for locale in ['fr_fr', 'en_us']:
         p = ROOT / 'lang' / (locale + '.json')
         data = json.loads(p.read_text(encoding='utf-8'))

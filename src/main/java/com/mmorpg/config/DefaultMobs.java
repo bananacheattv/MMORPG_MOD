@@ -157,8 +157,6 @@ public final class DefaultMobs {
         drop(king, "baton_flammes", 0.12, 1, 1);
         drop(king, "arc_tempete", 0.12, 1, 1);
         drop(king, "marteau_colosse", 0.12, 1, 1);
-        drop(king, "oeuf_slime", 0.25, 1, 1);
-        drop(king, "coffre_cosmetique", 0.15, 1, 1);
         king.abilities.put("slamCooldown", 160.0);
         king.abilities.put("slamDamage", 1.5);
         king.abilities.put("summonCooldown", 400.0);
@@ -175,8 +173,6 @@ public final class DefaultMobs {
         drop(lich, "baton_arcanique", 0.10, 1, 1);
         drop(lich, "arc_faucon", 0.10, 1, 1);
         drop(lich, "masse_gardien", 0.10, 1, 1);
-        drop(lich, "oeuf_chouette", 0.25, 1, 1);
-        drop(lich, "coffre_cosmetique", 0.25, 1, 1);
         lich.abilities.put("boltCooldown", 40.0);
         lich.abilities.put("boltDamage", 0.9);
         lich.abilities.put("summonCooldown", 500.0);
@@ -194,8 +190,6 @@ public final class DefaultMobs {
         drop(ignis, "sceptre_neant", 0.10, 1, 1);
         drop(ignis, "arc_spectral", 0.10, 1, 1);
         drop(ignis, "marteau_titan", 0.10, 1, 1);
-        drop(ignis, "oeuf_phenix", 0.20, 1, 1);
-        drop(ignis, "coffre_cosmetique", 0.30, 1, 1);
         ignis.abilities.put("fireballCooldown", 120.0);
         ignis.abilities.put("fireballCount", 5.0);
         ignis.abilities.put("ringCooldown", 240.0);
@@ -207,8 +201,6 @@ public final class DefaultMobs {
         drop(titan, "trefle_celeste", 0.4, 1, 1);
         drop(titan, "piece_or", 1.0, 150, 250);
         drop(titan, "pierre_amelioration_sup", 1.0, 2, 3);
-        drop(titan, "oeuf_loup_spectral", 0.30, 1, 1);
-        drop(titan, "coffre_cosmetique", 0.35, 1, 1);
         titan.abilities.put("slamCooldown", 140.0);
         titan.abilities.put("slamDamage", 1.6);
         titan.abilities.put("shardCooldown", 200.0);
@@ -225,8 +217,6 @@ public final class DefaultMobs {
         drop(avatar, "baton_archimage", 0.08, 1, 1);
         drop(avatar, "arc_aube_divine", 0.08, 1, 1);
         drop(avatar, "marteau_egide", 0.08, 1, 1);
-        drop(avatar, "oeuf_dragonnet", 0.20, 1, 1);
-        drop(avatar, "coffre_cosmetique", 0.50, 1, 2);
         avatar.abilities.put("orbCooldown", 100.0);
         avatar.abilities.put("blinkCooldown", 180.0);
         avatar.abilities.put("voidCooldown", 300.0);

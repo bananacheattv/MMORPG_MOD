@@ -84,6 +84,7 @@ public final class QuestEditor {
         require(q.name!=null&&!q.name.isBlank()&&q.name.length()<=100,"Nom : 1 à 100 caractères.");
         require(q.description!=null&&q.description.length()<=4000,"Lore : 4 000 caractères maximum.");
         require(q.minLevel>=1&&q.minLevel<=100,"Niveau : 1 à 100.");
+        require(q.rewards!=null&&q.rewards.evolution>=0&&q.rewards.evolution<=4,"Évolution : 0 à 4.");
         require(q.giver!=null&&q.giver.length()<=80&&q.npc!=null&&q.npc.length()<=80,"PNJ invalide.");
         if(!q.npc.isEmpty()) {
             var npc=directory.entry(q.npc);require(npc!=null&&npc.getIntOr("role",-1)==0,"Sélectionnez un PNJ de quêtes.");

@@ -225,7 +225,6 @@ public final class ForgeRecipes {
         add(Category.CONSOMMABLES, "parchemin_teleportation", 2, 5, 1, N, "minecraft:paper", 2, "minecraft:ender_pearl", 1);
         add(Category.CONSOMMABLES, "parchemin_oubli", 1, 50, 10, N, "minecraft:paper", 1, "poussiere_ame", 2, "minecraft:amethyst_shard", 2);
         add(Category.CONSOMMABLES, "orbe_renaissance", 1, 150, 10, N, "minecraft:ender_eye", 1, "poussiere_ame", 4, "minecraft:diamond", 2);
-        add(Category.CONSOMMABLES, "coffre_cosmetique", 1, 100, 30, N, "cristal_arcanique", 1, "minecraft:gold_ingot", 2, "minecraft:chest", 1);
 
         // ---------------------------------------------------------------- invocations
         add(Category.INVOCATIONS, "sceau_roi_gobelin", 1, 20, 15, N, "oreille_gobelin", 8, "ferraille_gobeline", 6, "minecraft:gold_ingot", 2);
@@ -235,14 +234,6 @@ public final class ForgeRecipes {
         add(Category.INVOCATIONS, "oeil_neant", 1, 400, 90, N, "essence_neant", 6, "coeur_glace_eternelle", 1, "minecraft:ender_eye", 2, "cristal_arcanique", 4);
 
         // ---------------------------------------------------------------- familiers
-        add(Category.FAMILIERS, "oeuf_feu_follet", 1, 20, 5, N, "poussiere_ame", 4, "minecraft:egg", 1, "minecraft:glowstone_dust", 2);
-        add(Category.FAMILIERS, "oeuf_slime", 1, 20, 5, N, "minecraft:slime_ball", 8, "minecraft:egg", 1, "oreille_gobelin", 2);
-        add(Category.FAMILIERS, "oeuf_chouette", 1, 60, 25, N, "minecraft:feather", 6, "minecraft:egg", 1, "poussiere_ame", 2, "minecraft:book", 1);
-        add(Category.FAMILIERS, "oeuf_loup_spectral", 1, 80, 30, N, "croc_loup", 6, "fourrure_sombre", 4, "minecraft:egg", 1, "eclat_givre", 1);
-        add(Category.FAMILIERS, "oeuf_golem", 1, 80, 30, N, "acier_orc", 4, "cristal_arcanique", 1, "minecraft:egg", 1);
-        add(Category.FAMILIERS, "oeuf_fee", 1, 200, 50, N, "cristal_arcanique", 4, "poussiere_ame", 4, "minecraft:egg", 1, "minecraft:pink_petals", 4);
-        add(Category.FAMILIERS, "oeuf_phenix", 1, 500, 70, N, "noyau_flamme", 6, "coeur_infernal", 1, "minecraft:egg", 1, "minecraft:gold_block", 2);
-        add(Category.FAMILIERS, "oeuf_dragonnet", 1, 1500, 95, N, "fragment_divin", 3, "essence_neant", 4, "minecraft:egg", 1);
     }
 
     private ForgeRecipes() {

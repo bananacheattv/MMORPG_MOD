@@ -11,12 +11,14 @@ import java.util.List;
 public class PublicPlayerData {
     public int playerClass = 0;
     public int level = 1;
+    public int evolution = 0;
     public List<String> cosmetics = new ArrayList<>();
     public float hpFraction = 1;
 
     public static final StreamCodec<ByteBuf, PublicPlayerData> STREAM_CODEC = StreamCodec.of((buf, d) -> {
         ByteBufCodecs.VAR_INT.encode(buf, d.playerClass);
         ByteBufCodecs.VAR_INT.encode(buf, d.level);
+        ByteBufCodecs.VAR_INT.encode(buf, d.evolution);
         ByteBufCodecs.VAR_INT.encode(buf, d.cosmetics.size());
         for (String c : d.cosmetics) ByteBufCodecs.STRING_UTF8.encode(buf, c);
         buf.writeFloat(d.hpFraction);
@@ -24,6 +26,7 @@ public class PublicPlayerData {
         PublicPlayerData d = new PublicPlayerData();
         d.playerClass = ByteBufCodecs.VAR_INT.decode(buf);
         d.level = ByteBufCodecs.VAR_INT.decode(buf);
+        d.evolution = ByteBufCodecs.VAR_INT.decode(buf);
         int n = ByteBufCodecs.VAR_INT.decode(buf);
         for (int i = 0; i < n; i++) d.cosmetics.add(ByteBufCodecs.STRING_UTF8.decode(buf));
         d.hpFraction = buf.readFloat();
@@ -31,7 +34,7 @@ public class PublicPlayerData {
     });
 
     public boolean sameAs(PublicPlayerData o) {
-        return o != null && o.playerClass == playerClass && o.level == level && o.cosmetics.equals(cosmetics)
+        return o != null && o.playerClass == playerClass && o.level == level && o.evolution == evolution && o.cosmetics.equals(cosmetics)
                 && Math.abs(o.hpFraction - hpFraction) < 0.02f;
     }
 }

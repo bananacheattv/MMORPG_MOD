@@ -210,8 +210,8 @@ public final class QuestEditorScreen extends MmoScreen {
         button(g,rx+rw/2+3,fy+106,rw/2-3,18,"Retirer",!draft.objectives.isEmpty(),Ui.RED,()->{draft.objectives.remove(objective);objective=Math.max(0,objective-1);rebuild();});
     }
     private void renderRewards(GuiGraphicsExtractor g) {
-        String[] tabs={"Or / XP","Objets","Familier","Cosmétique"};int tw=rw/4;
-        for(int i=0;i<4;i++) {int p=i;button(g,rx+i*tw,fy-8,tw-2,17,tabs[i],true,rewardPage==i?Ui.GOLD:Ui.MUTED,()->{rewardPage=p;rebuild();});}
+        String[] tabs={"Or / XP","Objets","Évolution de classe"};int tw=rw/3;
+        for(int i=0;i<3;i++) {int p=i;button(g,rx+i*tw,fy-8,tw-2,17,tabs[i],true,rewardPage==i?Ui.GOLD:Ui.MUTED,()->{rewardPage=p;rebuild();});}
         if(rewardPage==1) {
             if(!draft.rewards.items.isEmpty()) {var r=draft.rewards.items.get(item);
                 button(g,rx,fy+32,rw,24,font.plainSubstrByWidth(itemName(r.item),rw-10),true,Ui.GOLD,()->choose("Récompense : objet",itemChoices(),v->r.item=v));
@@ -222,10 +222,11 @@ public final class QuestEditorScreen extends MmoScreen {
             button(g,rx,fy+112,rw/2-3,18,"+ Objet",draft.rewards.items.size()<16,Ui.GREEN,()->{draft.rewards.items.add(new QuestDef.ItemReward("minecraft:diamond",1));item=draft.rewards.items.size()-1;rebuild();});
             button(g,rx+rw/2+3,fy+112,rw/2-3,18,"Retirer",!draft.rewards.items.isEmpty(),Ui.RED,()->{draft.rewards.items.remove(item);item=Math.max(0,item-1);rebuild();});
         } else if(rewardPage==2) {
-            String name=Arrays.stream(PetType.values()).filter(p->p.id.equals(draft.rewards.pet)).map(p->p.label).findFirst().orElse("Aucun familier");
-            button(g,rx,fy+35,rw,25,name+" ▾",true,Ui.GOLD,()->{var choices=new ArrayList<Choice>();choices.add(new Choice("","Aucun familier"));for(var p:PetType.values()) choices.add(new Choice(p.id,p.label));choose("Récompense : familier",choices,v->draft.rewards.pet=v);});
-        } else if(rewardPage==3) {
-            var c=Cosmetic.byId(draft.rewards.cosmetic);button(g,rx,fy+35,rw,25,c==null?"Aucun cosmétique ▾":font.plainSubstrByWidth(c.label+" ▾",rw-10),true,Ui.GOLD,()->{var choices=new ArrayList<Choice>();choices.add(new Choice("","Aucun cosmétique"));for(var cosmetic:Cosmetic.values()) choices.add(new Choice(cosmetic.id,cosmetic.label));choose("Récompense : cosmétique",choices,v->draft.rewards.cosmetic=v);});
+            // familiers et cosmetiques ne s'obtiennent que dans les caisses : seule l'evolution de classe est proposee ici
+            String[] evo={"Aucune","1re évolution (niv. 25)","2e évolution (niv. 50)","3e évolution (niv. 75)","4e évolution (niv. 100)"};
+            int cur=Math.max(0,Math.min(4,draft.rewards.evolution));
+            button(g,rx,fy+35,rw,25,evo[cur]+" ▾",true,Ui.GOLD,()->{var choices=new ArrayList<Choice>();for(int i=0;i<evo.length;i++) choices.add(new Choice(Integer.toString(i),evo[i]));choose("Récompense : évolution de classe",choices,v->draft.rewards.evolution=Integer.parseInt(v));});
+            g.text(font,"Quêtes du Maître des classes : débloque le palier.",rx,fy+68,Ui.MUTED,false);
         }
     }
     private void renderConditions(GuiGraphicsExtractor g) {

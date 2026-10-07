@@ -79,10 +79,14 @@ public final class AdventureLoot {
     }
 
     public static void grant(ServerPlayer p, Loot loot) {
+        grant(p, loot, "Butin d’aventure", 0xFFD040);
+    }
+
+    public static void grant(ServerPlayer p, Loot loot, String source, int color) {
         if (loot.gold > 0) RpgPlayers.addGold(p, loot.gold, true);
         if (loot.count > 0) RpgPlayers.give(p, ForgeRecipes.resolveItem(loot.item), loot.count);
         String what = loot.gold > 0 ? loot.gold + " pièces d’or" : loot.count + " × " + loot.category;
-        p.sendSystemMessage(Component.literal("✦ Butin d’aventure : " + what).withColor(0xFFD040));
+        p.sendSystemMessage(Component.literal("✦ " + source + " : " + what).withColor(color));
         p.level().playSound(null, p.blockPosition(), SoundEvents.CHEST_OPEN, SoundSource.PLAYERS, 1, 1.2f);
         p.level().sendParticles(ParticleTypes.FIREWORK, p.getX(), p.getY() + 1, p.getZ(), 25, .5, .5, .5, .1);
     }

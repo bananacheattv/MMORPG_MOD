@@ -120,7 +120,7 @@ public final class KillRewards {
                 double chance = Math.min(1.0, d.chance * dropMultiplier);
                 if (random.nextDouble() < chance) {
                     Item item = ForgeRecipes.resolveItem(d.item);
-                    if (item != null && item != net.minecraft.world.item.Items.AIR) {
+                    if (item != null && item != net.minecraft.world.item.Items.AIR && !CrateOnly.is(item)) {
                         int n = d.min >= d.max ? d.min : d.min + random.nextInt(d.max - d.min + 1);
                         loot.add(new ItemStack(item, Math.max(1, n)));
                     }
