@@ -25,12 +25,10 @@ public final class DevMountChecks {
             MountManager.despawn(p); d.mounts.clear(); d.nextMountTick = 0;
             for (int i = 0; i < items.length; i++) inventory.setItem(i, net.minecraft.world.item.ItemStack.EMPTY);
             d.playerClass = PlayerClass.GUERRIER; d.level = 1; d.gold = 10000;
-            check(!MountManager.unlock(p, "voyageur") && d.gold == 10000, "level required");
-            d.level = 100; d.gold = 0;
-            check(!MountManager.unlock(p, "voyageur"), "gold required");
-            d.gold = 10000;
-            check(MountManager.unlock(p, "voyageur") && d.gold == 9750, "purchase");
-            check(!MountManager.unlock(p, "voyageur") && d.gold == 9750, "no double charge");
+            check(!MountManager.unlock(p, "voyageur") && d.gold == 10000, "no gold purchase");
+            d.level = 100;
+            check(MountManager.grant(p, com.mmorpg.mount.MountType.VOYAGEUR), "seal grant");
+            check(!MountManager.grant(p, com.mmorpg.mount.MountType.VOYAGEUR) && d.gold == 10000, "no double grant");
             var saved = new PlayerData(); saved.load(d.save());
             check(saved.mounts.contains("voyageur"), "persistence");
             check(!MountManager.summon(p, "ombre"), "unowned summon denied");

@@ -17,6 +17,7 @@ TIERS = {
     'mythique': ('Caisse mythique', '#2a0f1c', '#ff5070', '#ff2040'),
 }
 KEYS = {t: 'Clé ' + n.split(' ', 1)[1].replace('de ', '') for t, (n, *_) in TIERS.items()}
+MOUNTS = {'voyageur': 'Destrier du Voyageur', 'aube': 'Courser de l’Aube', 'ombre': 'Étalon de l’Ombre'}
 KEYS.update({'vote': 'Clé de vote', 'quete': 'Clé de quête'})
 
 
@@ -151,3 +152,5 @@ def generate(g):
         g.LANG[f'block.mmorpg.{bid}'] = name
     for tier, name in KEYS.items():
         g.LANG[f'item.mmorpg.cle_{tier}'] = name
+    for mid, name in MOUNTS.items():
+        g.LANG[f'item.mmorpg.monture_{mid}'] = 'Sceau de monture : ' + name

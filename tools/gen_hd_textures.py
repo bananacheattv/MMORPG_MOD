@@ -179,6 +179,14 @@ CRATE_KEYS = {
 }
 
 
+# sceaux de monture (caisses) : graines fixes eux aussi
+MOUNT_SEALS = {
+    'monture_voyageur': ('seal', '#8a5a30', '#e0c080', None, '#c09060'),
+    'monture_aube': ('seal', '#f0f0e8', '#ffd040', '#fff0b0', '#ffe080'),
+    'monture_ombre': ('seal', '#2a2030', '#b060ff', '#d0a0ff', '#8040e0'),
+}
+
+
 def generate(ga):
     armor_icons(ga)
     tex = os.path.join(ga.ASSETS, 'textures', 'item')
@@ -191,6 +199,7 @@ def generate(ga):
         entries['oeuf_' + pid] = ('egg', base, spots, glow, glow)
     rows = list(enumerate(sorted(entries.items())))
     rows += [(1000 + i, kv) for i, kv in enumerate(CRATE_KEYS.items())]
+    rows += [(1100 + i, kv) for i, kv in enumerate(MOUNT_SEALS.items())]
     for i, (iid, (kind, base, acc, glow, halo)) in rows:
         img = render_item(kind, base, acc, glow, seed=i * 7 + 3, halo=halo)
         img.save(ga.path(tex, iid + '.png'))
