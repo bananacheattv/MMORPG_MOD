@@ -21,7 +21,7 @@ Le journal du joueur propose Toutes / Campagne / Journalieres / A rendre. « Sui
 
 Fabriquer caisse et cle a la Forge (niveau 5), puis utiliser la caisse avec une cle dans l’inventaire. Le Lucky Block se fabrique au niveau 10 : le poser, faire un clic droit puis choisir « Ouvrir ». Trois rouleaux affichent le tirage ; « Passer l’animation » affiche directement le resultat. Le serveur donne la recompense des l’ouverture, meme si la fenetre est fermee. Casser un bloc non ouvert en survie le rend sans tirer de butin. En creatif, casser le bloc ne donne rien. Les pistons ne peuvent pas le deplacer.
 
-Butin des deux : potions 45 %, pierres d’amelioration 25 %, or 20 %, charme XP/chance 8 %, coffre cosmetique 2 %. Potions et pierres sont adaptees au niveau du joueur.
+Chacun a sa propre table de butin, modifiable en jeu par un operateur avec `/mmorpg butins` : onglet **Caisse d'aventure** ou **Lucky Block**, ajout d'un objet (recherche, objet tenu en main ou pieces d'or), quantites min/max, poids (la chance affichee = poids / somme des poids ; Maj + clic : pas de 10), suppression, puis **Enregistrer**. Les tables sont stockees dans `config/mmorpg/butins.json` (aussi modifiable a la main, puis `/mmorpg reload`). L'ecran du Lucky Block affiche les butins possibles et leurs chances.
 
 ## Affichage
 

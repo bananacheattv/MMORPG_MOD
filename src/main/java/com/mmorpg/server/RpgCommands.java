@@ -54,6 +54,7 @@ public final class RpgCommands {
         d.register(Commands.literal("mmorpg")
                 .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("editeurquetes").executes(c -> {QuestEditor.open(c.getSource().getPlayerOrException());return 1;}))
+                .then(Commands.literal("butins").executes(c -> {com.mmorpg.server.LootEditor.open(c.getSource().getPlayerOrException());return 1;}))
                 .then(Commands.literal("niveau").then(Commands.argument("joueur", EntityArgument.player())
                         .then(Commands.argument("niveau", IntegerArgumentType.integer(1, LevelSystem.MAX_LEVEL)).executes(c -> {
                             ServerPlayer p = EntityArgument.getPlayer(c, "joueur");

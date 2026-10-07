@@ -15,6 +15,7 @@ public final class LuckyBlockManager {
     public static void open(ServerPlayer p, BlockPos pos) {
         if (!valid(p, pos)) return;
         var data = new CompoundTag(); data.putLong("pos", pos.asLong());
+        data.put("table", AdventureLoot.preview(com.mmorpg.config.LootTables.LUCKY));
         Net.toPlayer(p, new S2COpenScreen(S2COpenScreen.LUCKY_BLOCK, data));
     }
     public static boolean roll(ServerPlayer p, BlockPos pos) {
@@ -25,7 +26,7 @@ public final class LuckyBlockManager {
             return false;
         }
         // Paid immediately after consuming the block: closing or disconnecting cannot lose or reroll the reward.
-        var loot = AdventureLoot.roll(p);
+        var loot = AdventureLoot.roll(p, com.mmorpg.config.LootTables.LUCKY);
         AdventureLoot.grant(p, loot);
         data.put("loot", loot.tag());
         Net.toPlayer(p, new S2COpenScreen(S2COpenScreen.LUCKY_RESULT, data));

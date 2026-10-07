@@ -28,9 +28,9 @@ public final class DevLootChecks {
             check(AdventureLoot.openCrate(p, crate), "opening");
             check(crate.getCount() == 1 && inv.countItem(ModItems.CLE_AVENTURE.get()) == 0, "one key and one crate");
             check(!AdventureLoot.openCrate(p, crate) && crate.getCount() == 1, "repeat without key");
-            var counts = new java.util.HashMap<String, Integer>();
-            for (int i = 0; i < 100; i++) counts.merge(AdventureLoot.category(i), 1, Integer::sum);
-            check(counts.equals(java.util.Map.of("potions",45,"materiaux",25,"or",20,"charme",8,"cosmetique",2)), "reward weights");
+            int permille = 0;
+            for (var t : AdventureLoot.preview(com.mmorpg.config.LootTables.CRATE)) permille += ((net.minecraft.nbt.CompoundTag) t).getIntOr("permille", 0);
+            check(Math.abs(permille - 1000) <= 12, "reward weights");
             p.level().setBlockAndUpdate(pos, ModBlocks.LUCKY_BLOCK.get().defaultBlockState());
             check(p.gameMode.destroyBlock(pos), "lucky block break");
             check(p.level().getBlockState(pos).isAir(), "lucky block removed");
