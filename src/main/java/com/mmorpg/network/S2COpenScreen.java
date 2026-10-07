@@ -20,6 +20,7 @@ public record S2COpenScreen(int screen, CompoundTag extra) implements CustomPack
     public static final int LUCKY_BLOCK = 7;
     public static final int LUCKY_RESULT = 8;
     public static final int LOOT_EDITOR = 9;
+    public static final int CRATE = 10;
 
     public static final Type<S2COpenScreen> TYPE = new Type<>(MMORPG.id("open_screen"));
     public static final StreamCodec<ByteBuf, S2COpenScreen> CODEC = StreamCodec.composite(

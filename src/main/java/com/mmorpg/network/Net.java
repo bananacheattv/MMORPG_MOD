@@ -37,6 +37,9 @@ public final class Net {
         r.playToServer(Payloads.LuckyRoll.TYPE, Payloads.LuckyRoll.CODEC, (packet, ctx) -> {
             if (ctx.player() instanceof ServerPlayer p) com.mmorpg.server.LuckyBlockManager.roll(p, packet.pos());
         });
+        r.playToServer(Payloads.CrateOpen.TYPE, Payloads.CrateOpen.CODEC, (packet, ctx) -> {
+            if (ctx.player() instanceof ServerPlayer p) com.mmorpg.server.CrateManager.open(p, packet.pos());
+        });
         r.playToServer(Payloads.PetAction.TYPE, Payloads.PetAction.CODEC, ServerHandlers::petAction);
         r.playToServer(Payloads.CosmeticAction.TYPE, Payloads.CosmeticAction.CODEC, ServerHandlers::cosmeticAction);
         r.playToServer(Payloads.Teleport.TYPE, Payloads.Teleport.CODEC, ServerHandlers::teleport);

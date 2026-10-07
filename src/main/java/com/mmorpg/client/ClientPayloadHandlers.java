@@ -62,6 +62,7 @@ public final class ClientPayloadHandlers {
             case S2COpenScreen.FORGE -> mc.gui.setScreen(new ForgeScreen(BlockPos.of(payload.extra().getLongOr("pos", 0))));
             case S2COpenScreen.QUEST_GIVER -> mc.gui.setScreen(new com.mmorpg.client.screen.QuestGiverScreen(payload.extra()));
             case S2COpenScreen.SHOP -> mc.gui.setScreen(new com.mmorpg.client.screen.ShopScreen(payload.extra()));
+            case S2COpenScreen.CRATE -> mc.gui.setScreen(new com.mmorpg.client.screen.CrateScreen(payload.extra()));
             case S2COpenScreen.LUCKY_BLOCK -> mc.gui.setScreen(new com.mmorpg.client.screen.LuckyBlockScreen(payload.extra()));
             case S2COpenScreen.LUCKY_RESULT -> {
                 if (mc.gui.screen() instanceof com.mmorpg.client.screen.LuckyBlockScreen screen) screen.result(payload.extra());

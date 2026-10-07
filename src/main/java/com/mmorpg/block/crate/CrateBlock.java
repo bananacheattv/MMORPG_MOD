@@ -27,10 +27,11 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * Caisse en bloc 3D posee par un admin (incassable en survie, reutilisable) : clic droit avec la bonne cle = ouverture
  * (le couvercle s'ouvre, butin tire au sort cote serveur) ; accroupi + clic droit = apercu du contenu.
  */
-public class CrateBlock extends Block {
+public class CrateBlock extends Block implements net.minecraft.world.level.block.EntityBlock {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
-    private static final VoxelShape SHAPE = Block.box(0.5, 0, 0.5, 15.5, 14, 15.5);
+    /** Modele 2x plus grand que un bloc (deborde de 7 px de chaque cote). */
+    private static final VoxelShape SHAPE = Block.box(-7, 0, -7, 23, 27, 23);
 
     public final CrateTier tier;
 
@@ -67,13 +68,18 @@ public class CrateBlock extends Block {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (player instanceof ServerPlayer sp) CrateManager.use(sp, pos, state, tier);
+        if (player instanceof ServerPlayer sp) CrateManager.showScreen(sp, pos, tier);
         return InteractionResult.SUCCESS;
     }
 
-    /** Referme le couvercle apres l'animation d'ouverture. */
+    @Override
+    public net.minecraft.world.level.block.entity.BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new CrateBlockEntity(pos, state);
+    }
+
+    /** Fin de la roue (annonce du gain) puis fermeture du couvercle. */
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        if (state.getValue(OPEN)) level.setBlockAndUpdate(pos, state.setValue(OPEN, false));
+        CrateManager.tick(level, pos, state, tier);
     }
 }
