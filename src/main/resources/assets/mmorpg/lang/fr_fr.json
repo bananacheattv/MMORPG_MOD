@@ -485,5 +485,8 @@
   "entity.mmorpg.chevalier_fracture": "Chevalier fracturé",
   "item.mmorpg.chevalier_fracture_spawn_egg": "Œuf d’apparition : Chevalier fracturé",
   "entity.mmorpg.devoreur_etoiles": "Dévoreur d’étoiles",
-  "item.mmorpg.devoreur_etoiles_spawn_egg": "Œuf d’apparition : Dévoreur d’étoiles"
+  "item.mmorpg.devoreur_etoiles_spawn_egg": "Œuf d’apparition : Dévoreur d’étoiles",
+  "key.mmorpg.mount": "Monture (invoquer / descendre)",
+  "item.mmorpg.oeuf_mystere": "Œuf mystère",
+  "item.mmorpg.sceau_mystere": "Sceau mystère"
 }

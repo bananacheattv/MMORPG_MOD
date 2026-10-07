@@ -140,7 +140,7 @@ public final class Payloads {
     }
 
     public record MountAction(int action, String mount) implements CustomPacketPayload {
-        public static final int UNLOCK = 0, SUMMON = 1, DISMISS = 2;
+        public static final int UNLOCK = 0, SUMMON = 1, DISMISS = 2, TOGGLE = 3;
         public static final Type<MountAction> TYPE = new Type<>(MMORPG.id("mount_action"));
         public static final StreamCodec<ByteBuf, MountAction> CODEC = StreamCodec.composite(ByteBufCodecs.VAR_INT, MountAction::action, ByteBufCodecs.STRING_UTF8, MountAction::mount, MountAction::new);
         @Override public Type<? extends CustomPacketPayload> type() { return TYPE; }

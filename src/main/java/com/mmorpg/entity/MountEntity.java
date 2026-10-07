@@ -45,7 +45,19 @@ public class MountEntity extends Horse {
     // The type must be serializable for Minecraft to allow riding. Suppress instance saves instead.
     @Override public boolean shouldBeSaved() { return false; }
     @Override public boolean saveAsPassenger(net.minecraft.world.level.storage.ValueOutput output) { return false; }
-    @Override public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) { return false; }
+    /** La monture est invulnerable : les coups (fleches, monstres) touchent le cavalier a sa place. */
+    @Override public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        if (getFirstPassenger() instanceof net.minecraft.world.entity.LivingEntity rider && source.getEntity() != rider) rider.hurtServer(level, source, amount);
+        return false;
+    }
+    /** Descendre de la monture la renvoie. */
+    @Override protected void removePassenger(Entity passenger) {
+        super.removePassenger(passenger);
+        if (!level().isClientSide() && passenger instanceof ServerPlayer sp && getUUID().equals(RpgPlayers.get(sp).mountEntity)) {
+            com.mmorpg.server.MountManager.despawn(sp);
+            RpgPlayers.sync(sp);
+        }
+    }
     @Override protected void dropEquipment(net.minecraft.server.level.ServerLevel level) { }
     @Override public boolean canMate(net.minecraft.world.entity.animal.Animal other) { return false; }
     @Override protected void registerGoals() { }

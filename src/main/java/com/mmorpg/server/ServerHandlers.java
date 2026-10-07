@@ -39,7 +39,8 @@ public final class ServerHandlers {
         switch (packet.action()) {
             case Payloads.MountAction.UNLOCK -> MountManager.unlock(sp, packet.mount());
             case Payloads.MountAction.SUMMON -> MountManager.summon(sp, packet.mount());
-            case Payloads.MountAction.DISMISS -> MountManager.despawn(sp);
+            case Payloads.MountAction.DISMISS -> { MountManager.despawn(sp); RpgPlayers.sync(sp); }
+            case Payloads.MountAction.TOGGLE -> MountManager.toggle(sp);
             default -> { }
         }
     }

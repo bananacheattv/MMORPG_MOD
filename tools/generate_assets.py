@@ -827,7 +827,7 @@ def misc_data():
     LANG[f'key.category.{MODID}.{MODID}'] = "MMORPG"
     keys = {
         'menu': "Ouvrir le menu MMORPG", 'skills': "Ouvrir les compétences", 'pets': "Ouvrir les familiers",
-        'cosmetics': "Ouvrir les cosmétiques", 'hud_edit': "Modifier l'interface (HUD)",
+        'cosmetics': "Ouvrir les cosmétiques", 'hud_edit': "Modifier l'interface (HUD)", 'mount': "Monture (invoquer / descendre)",
         'skill1': "Compétence 1", 'skill2': "Compétence 2", 'skill3': "Compétence 3",
         'skill4': "Compétence 4", 'skill5': "Compétence 5", 'skill6': "Compétence 6",
     }
