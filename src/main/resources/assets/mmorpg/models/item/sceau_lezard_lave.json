@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "mmorpg:item/monture_ombre"
+    "layer0": "mmorpg:item/sceau_lezard_lave"
   }
 }

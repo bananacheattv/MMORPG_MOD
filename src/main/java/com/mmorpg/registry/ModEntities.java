@@ -79,9 +79,15 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.NpcEntity>> NPC =
             ENTITIES.registerEntityType("pnj", com.mmorpg.entity.NpcEntity::new, MobCategory.MISC,
                     b -> b.sized(0.6F, 1.95F).clientTrackingRange(10));
-    public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.MountEntity>> MOUNT =
-            ENTITIES.registerEntityType("monture", com.mmorpg.entity.MountEntity::new, MobCategory.CREATURE,
-                    b -> b.sized(1.3965F, 1.6F).clientTrackingRange(10));
+    /** Une entite par monture 3D (taille et hauteur de selle propres). */
+    public static final Map<com.mmorpg.mount.MountType, DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.MountEntity>>> MOUNTS =
+            new java.util.EnumMap<>(com.mmorpg.mount.MountType.class);
+    static {
+        for (var m : com.mmorpg.mount.MountType.values()) {
+            MOUNTS.put(m, ENTITIES.registerEntityType("monture_" + m.id, com.mmorpg.entity.MountEntity::new, MobCategory.CREATURE,
+                    b -> b.sized(m.width, m.height).eyeHeight(m.height * .9f).passengerAttachments(m.seat + .1f).clientTrackingRange(10)));
+        }
+    }
     public static final DeferredHolder<EntityType<?>, EntityType<PetEntity>> PET =
             ENTITIES.registerEntityType("familier", PetEntity::new, MobCategory.MISC,
                     b -> b.sized(0.5F, 0.5F).clientTrackingRange(8).updateInterval(1));
@@ -123,7 +129,7 @@ public final class ModEntities {
         event.put(IGNIS.get(), RpgBoss.createBossAttributes().build());
         event.put(FROST_TITAN.get(), RpgBoss.createBossAttributes().build());
         event.put(VOID_AVATAR.get(), RpgBoss.createBossAttributes().build());
-        event.put(MOUNT.get(), net.minecraft.world.entity.animal.equine.AbstractHorse.createBaseHorseAttributes()
+        for (var mount : MOUNTS.values()) event.put(mount.get(), net.minecraft.world.entity.animal.equine.AbstractHorse.createBaseHorseAttributes()
                 .add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH, 20).build());
         event.put(NPC.get(), com.mmorpg.entity.NpcEntity.createAttributes().build());
     }

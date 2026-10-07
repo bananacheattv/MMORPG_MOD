@@ -181,9 +181,18 @@ CRATE_KEYS = {
 
 # sceaux de monture (caisses) : graines fixes eux aussi
 MOUNT_SEALS = {
-    'monture_voyageur': ('seal', '#8a5a30', '#e0c080', None, '#c09060'),
-    'monture_aube': ('seal', '#f0f0e8', '#ffd040', '#fff0b0', '#ffe080'),
-    'monture_ombre': ('seal', '#2a2030', '#b060ff', '#d0a0ff', '#8040e0'),
+    'sceau_sanglier': ('seal', '#6b4a2e', '#c03020', None, None),
+    'sceau_loup_givre': ('seal', '#e6ecf2', '#40b0ff', '#c0e8ff', '#80d0ff'),
+    'sceau_cerf_sylvestre': ('seal', '#7a5634', '#60c040', '#c0ffa0', None),
+    'sceau_tortue_cristal': ('seal', '#25b890', '#40f0d0', '#c0fff0', None),
+    'sceau_chevre_celeste': ('seal', '#eef0f4', '#d9a830', '#80c0ff', None),
+    'sceau_lezard_lave': ('seal', '#2e2222', '#ff7a1a', '#ffc060', '#ff8a20'),
+    'sceau_raptor_sables': ('seal', '#d8c08a', '#2aa8a0', '#80e0d8', None),
+    'sceau_ours_runique': ('seal', '#5a3a22', '#40e0d8', '#a0fff0', '#40e0d8'),
+    'sceau_scorpion_dunes': ('seal', '#d8b884', '#b84a20', '#ffb060', None),
+    'sceau_felin_vide': ('seal', '#24163a', '#b060ff', '#e0b0ff', '#a040ff'),
+    'sceau_araignee_cavernes': ('seal', '#3a3a44', '#ff3030', '#ff9090', '#c02020'),
+    'sceau_hippogriffe': ('seal', '#f0ece4', '#e8b830', '#fff0a0', '#ffd040'),
 }
 
 

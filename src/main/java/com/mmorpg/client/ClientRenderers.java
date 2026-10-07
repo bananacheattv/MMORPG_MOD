@@ -67,7 +67,8 @@ public final class ClientRenderers {
         event.registerEntityRenderer(ModEntities.SPELL_PROJECTILE.get(), com.mmorpg.client.fx.SpellProjectileRenderer::new);
         event.registerEntityRenderer(ModEntities.SKILL_FX.get(), com.mmorpg.client.fx.SkillFxRenderer::new);
         event.registerEntityRenderer(ModEntities.PET.get(), com.mmorpg.client.model.pet.PetRenderer::new);     // familiers 3D animes
-        event.registerEntityRenderer(ModEntities.MOUNT.get(), net.minecraft.client.renderer.entity.HorseRenderer::new);
+        ModEntities.MOUNTS.forEach((type, entity) -> event.registerEntityRenderer(entity.get(),
+                c -> new com.mmorpg.client.model.mount.MountRenderer(c, type)));     // montures 3D animees
         event.registerEntityRenderer(ModEntities.NPC.get(), NpcRenderer::new);
     }
 

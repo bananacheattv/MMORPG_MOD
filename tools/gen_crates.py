@@ -17,7 +17,10 @@ TIERS = {
     'mythique': ('Caisse mythique', '#2a0f1c', '#ff5070', '#ff2040'),
 }
 KEYS = {t: 'Clé ' + n.split(' ', 1)[1].replace('de ', '') for t, (n, *_) in TIERS.items()}
-MOUNTS = {'voyageur': 'Destrier du Voyageur', 'aube': 'Courser de l’Aube', 'ombre': 'Étalon de l’Ombre'}
+MOUNTS = {'sanglier': 'Sanglier de guerre', 'loup_givre': 'Loup de givre', 'cerf_sylvestre': 'Cerf sylvestre',
+          'tortue_cristal': 'Tortue de cristal', 'chevre_celeste': 'Chèvre céleste', 'lezard_lave': 'Lézard de lave',
+          'raptor_sables': 'Raptor des sables', 'ours_runique': 'Ours runique', 'scorpion_dunes': 'Scorpion des dunes',
+          'felin_vide': 'Félin du vide', 'araignee_cavernes': 'Araignée des cavernes', 'hippogriffe': 'Hippogriffe'}
 KEYS.update({'vote': 'Clé de vote', 'quete': 'Clé de quête'})
 
 
@@ -153,4 +156,5 @@ def generate(g):
     for tier, name in KEYS.items():
         g.LANG[f'item.mmorpg.cle_{tier}'] = name
     for mid, name in MOUNTS.items():
-        g.LANG[f'item.mmorpg.monture_{mid}'] = 'Sceau de monture : ' + name
+        g.LANG[f'item.mmorpg.sceau_{mid}'] = 'Sceau de monture : ' + name
+        g.LANG[f'entity.mmorpg.monture_{mid}'] = name

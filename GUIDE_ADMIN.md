@@ -57,3 +57,10 @@ Seul le proprietaire peut monter. La monture invoquee disparait si son proprieta
 - Créer le PNJ : `/mmorpg pnj maitre_classes` (groupe `maitre_classes`).
 - Quêtes par défaut : `evolution_1` à `evolution_4`, modifiables dans l'éditeur de quêtes (onglet récompenses → « Évolution de classe »).
 - Les joueurs déjà évolués gardent leur palier.
+
+## Montures 3D
+
+- 12 montures (Sanglier, Loup de givre, Cerf sylvestre, Tortue de cristal, Chèvre céleste, Lézard de lave, Raptor des sables, Ours runique, Scorpion des dunes, Félin du vide, Araignée des cavernes, Hippogriffe).
+- Obtenues uniquement via les sceaux `mmorpg:sceau_<monture>` (caisses / Lucky Blocks), sans niveau minimum.
+- L'Hippogriffe vole : avancer en regardant vers le haut = monter, vers le bas = descendre, saut = battement d'ailes.
+- Modèles régénérables : `python3 tools/gen_mounts.py`.

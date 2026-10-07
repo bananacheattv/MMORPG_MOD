@@ -196,10 +196,9 @@ public final class ModItems {
 
     static {
         for (var m : com.mmorpg.mount.MountType.values()) {
-            Rarity r = switch (m) { case VOYAGEUR -> Rarity.RARE; case AUBE -> Rarity.EPIQUE; default -> Rarity.LEGENDAIRE; };
-            DeferredItem<com.mmorpg.item.MountSealItem> seal = ITEMS.registerItem("monture_" + m.id, p -> new com.mmorpg.item.MountSealItem(p, m, r));
+            DeferredItem<com.mmorpg.item.MountSealItem> seal = ITEMS.registerItem("sceau_" + m.id, p -> new com.mmorpg.item.MountSealItem(p, m, m.rarity));
             MOUNT_SEALS.put(m, seal);
-            BY_ID.put("monture_" + m.id, seal);
+            BY_ID.put("sceau_" + m.id, seal);
         }
     }
     /** Blocs des caisses (onglet creatif, reserves aux admins). */

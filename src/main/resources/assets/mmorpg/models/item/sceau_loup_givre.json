@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "mmorpg:item/monture_voyageur"
+    "layer0": "mmorpg:item/sceau_loup_givre"
   }
 }

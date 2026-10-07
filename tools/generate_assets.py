@@ -877,6 +877,9 @@ def main():
     import import_bbmodels
     sys.argv = sys.argv[:1]
     import_bbmodels.main()
+    # montures 3D (modeles voxel + textures + animations)
+    import gen_mounts
+    gen_mounts.main()
 
 
 if __name__ == '__main__':

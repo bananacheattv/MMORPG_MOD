@@ -20,7 +20,7 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
     public final Identifier texture;
     public ImportedModel(String kind, String key) { this(kind, key, read(kind, key)); }
     private ImportedModel(String kind, String key, JsonObject data) {
-        super(root(data, kind.equals("mobs") ? 24 : 0), RenderTypes::entityTranslucent);
+        super(root(data, kind.equals("cosmetics") ? 0 : 24), RenderTypes::entityTranslucent);
         texture = MMORPG.id("textures/imported/" + kind + "/" + key + ".png");
         for (var value : data.getAsJsonArray("animations")) {
             var a = value.getAsJsonObject();
@@ -111,7 +111,11 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
     }
     @Override public void setupAnim(LivingEntityRenderState state) {
         super.setupAnim(state);
-        float moving = state instanceof ImportedMobRenderer.State s ? Math.min(1,s.walkAnimationSpeed*3) : 0;
+        if(state instanceof com.mmorpg.client.model.mount.MountRenderer.State m && m.flying && animations.containsKey("fly")) {
+            animate("fly",state.ageInTicks,1);
+            return;
+        }
+        float moving = Math.min(1,state.walkAnimationSpeed*3);
         animate("idle",state.ageInTicks,1-moving);
         String move=animations.containsKey("walk")?"walk":animations.containsKey("fly")?"fly":"slither";
         animate(move,state.ageInTicks,moving);
