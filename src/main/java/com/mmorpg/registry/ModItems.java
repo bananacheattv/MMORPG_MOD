@@ -190,6 +190,18 @@ public final class ModItems {
     public static final DeferredItem<RpgMaterialItem> CLE_EPIQUE = material("cle_epique", Rarity.EPIQUE, "Ouvre une caisse épique.");
     public static final DeferredItem<RpgMaterialItem> CLE_LEGENDAIRE = material("cle_legendaire", Rarity.LEGENDAIRE, "Ouvre une caisse légendaire.");
     public static final DeferredItem<RpgMaterialItem> CLE_MYTHIQUE = material("cle_mythique", Rarity.MYTHIQUE, "Ouvre une caisse mythique.");
+    /** Sceaux de monture (uniquement dans les caisses et Lucky Blocks). */
+    public static final java.util.Map<com.mmorpg.mount.MountType, DeferredItem<com.mmorpg.item.MountSealItem>> MOUNT_SEALS =
+            new java.util.EnumMap<>(com.mmorpg.mount.MountType.class);
+
+    static {
+        for (var m : com.mmorpg.mount.MountType.values()) {
+            Rarity r = switch (m) { case VOYAGEUR -> Rarity.RARE; case AUBE -> Rarity.EPIQUE; default -> Rarity.LEGENDAIRE; };
+            DeferredItem<com.mmorpg.item.MountSealItem> seal = ITEMS.registerItem("monture_" + m.id, p -> new com.mmorpg.item.MountSealItem(p, m, r));
+            MOUNT_SEALS.put(m, seal);
+            BY_ID.put("monture_" + m.id, seal);
+        }
+    }
     /** Blocs des caisses (onglet creatif, reserves aux admins). */
     public static final java.util.List<DeferredItem<BlockItem>> CRATE_BLOCKS = new java.util.ArrayList<>();
 

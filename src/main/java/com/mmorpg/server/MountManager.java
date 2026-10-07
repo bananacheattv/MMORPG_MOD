@@ -8,13 +8,17 @@ import net.minecraft.network.chat.Component;
 
 public final class MountManager {
     private static boolean playable(ServerPlayer p) { return p.isAlive() && !p.isSpectator() && RpgPlayers.get(p).playerClass.isPlayable(); }
+    /** Les montures ne s'achetent plus : elles s'obtiennent dans les caisses et les Lucky Blocks (sceaux de monture). */
     public static boolean unlock(ServerPlayer p, String id) {
-        var type = MountType.byId(id); var d = RpgPlayers.get(p);
-        if (!playable(p) || type == null || d.mounts.contains(id)) return false;
-        if (d.level < type.level) { message(p, "Niveau " + type.level + " requis."); return false; }
-        RpgPlayers.depositCoins(p);
-        if (!RpgPlayers.takeGold(p, type.price)) { message(p, "Il vous faut " + type.price + " pièces d’or."); return false; }
-        d.mounts.add(id); RpgPlayers.sync(p);
+        message(p, "Les montures s’obtiennent dans les caisses et les Lucky Blocks.");
+        return false;
+    }
+    /** Ajoute une monture a la collection (sceau de monture) ; faux si elle est deja possedee. */
+    public static boolean grant(ServerPlayer p, MountType type) {
+        var d = RpgPlayers.get(p);
+        if (!p.isAlive() || p.isSpectator()) return false;
+        if (d.mounts.contains(type.id)) { message(p, "Vous possédez déjà " + type.label + "."); return false; }
+        d.mounts.add(type.id); RpgPlayers.sync(p);
         message(p, type.label + " débloqué définitivement !");
         return true;
     }

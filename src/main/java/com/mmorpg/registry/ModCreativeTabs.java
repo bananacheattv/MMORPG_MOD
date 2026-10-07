@@ -37,6 +37,7 @@ public final class ModCreativeTabs {
                 ModItems.CONSUMABLES.forEach(i -> out.accept(i.get()));
                 ModItems.SUMMONS.forEach(i -> out.accept(i.get()));
                 ModItems.PET_EGGS.values().forEach(i -> out.accept(i.get()));
+                ModItems.MOUNT_SEALS.values().forEach(i -> out.accept(i.get()));
                 ModItems.SPAWN_EGGS.forEach(i -> out.accept(i.get()));
             })
             .build());

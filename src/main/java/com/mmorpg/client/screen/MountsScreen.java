@@ -25,7 +25,7 @@ public class MountsScreen extends MenuScreen {
             boolean owned = d.mounts.contains(type.id);
             Ui.frame(g, x, ry, lw, 36, owned ? Ui.GOLD : Ui.MUTED, type == selected);
             g.text(font, type.label, x + 5, ry + 5, owned ? Ui.GOLD : Ui.TEXT, false);
-            g.text(font, "Niv. " + type.level + " • " + (owned ? "Débloquée" : type.price + " or"), x + 5, ry + 20, Ui.MUTED, false);
+            g.text(font, "Niv. " + type.level + " • " + (owned ? "Débloquée" : "Caisses"), x + 5, ry + 20, Ui.MUTED, false);
             click(x, ry, lw, 36, () -> { selected = type; confirm = false; });
         }
         button(g, x, top + ph - 25, lw, 17, "< Familiers", true, 0xFF2A2420, () -> minecraft.gui.setScreen(new PetsScreen()));
@@ -56,13 +56,7 @@ public class MountsScreen extends MenuScreen {
                 minecraft.gui.setScreen(null);
             });
         } else {
-            String label = confirm ? "Confirmer : " + selected.price + " or" : "Débloquer : " + selected.price + " or";
-            button(g, dx + 7, by, dw - 14, 17, label, d.level >= selected.level && d.gold >= selected.price, 0xFF665022, () -> {
-                if (confirm) { ClientNet.send(new Payloads.MountAction(Payloads.MountAction.UNLOCK, selected.id)); confirm = false; }
-                else confirm = true;
-            });
-            if (d.level < selected.level) g.text(font, "Niveau " + selected.level + " requis", dx + 7, by - 12, Ui.RED, false);
-            else if (d.gold < selected.price) g.text(font, "Or insuffisant", dx + 7, by - 12, Ui.RED, false);
+            Ui.wrap(g, "S'obtient uniquement dans les caisses et les Lucky Blocks (Sceau de monture).", dx + 7, by - 10, dw - 14, Ui.GOLD);
         }
     }
 }
