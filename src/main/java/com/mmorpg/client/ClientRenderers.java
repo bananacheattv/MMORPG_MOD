@@ -37,6 +37,10 @@ public final class ClientRenderers {
 
     @SubscribeEvent
     public static void register(EntityRenderersEvent.RegisterRenderers event) {
+        ModEntities.IMPORTED.forEach((key, type) -> event.registerEntityRenderer(type.get(), c -> new com.mmorpg.client.model.imported.ImportedMobRenderer(c, key)));
+        event.registerEntityRenderer(ModEntities.CRYPT_ZOMBIE.get(), net.minecraft.client.renderer.entity.ZombieRenderer::new);
+        event.registerEntityRenderer(ModEntities.VENOM_SPIDER.get(), net.minecraft.client.renderer.entity.CaveSpiderRenderer::new);
+        event.registerEntityRenderer(ModEntities.BANDIT.get(), net.minecraft.client.renderer.entity.PillagerRenderer::new);
         event.registerEntityRenderer(ModEntities.GOBLIN.get(), c -> humanoid(c, "gobelin"));
         event.registerEntityRenderer(ModEntities.DARK_WOLF.get(), c -> new TexturedMobRenderer<>(c,
                 new AdultWolfModel(c.bakeLayer(ModelLayers.WOLF)), WolfRenderState::new, "loup_sombre", 0.4F)
@@ -63,6 +67,7 @@ public final class ClientRenderers {
         event.registerEntityRenderer(ModEntities.SPELL_PROJECTILE.get(), com.mmorpg.client.fx.SpellProjectileRenderer::new);
         event.registerEntityRenderer(ModEntities.SKILL_FX.get(), com.mmorpg.client.fx.SkillFxRenderer::new);
         event.registerEntityRenderer(ModEntities.PET.get(), com.mmorpg.client.model.pet.PetRenderer::new);     // familiers 3D animes
+        event.registerEntityRenderer(ModEntities.MOUNT.get(), net.minecraft.client.renderer.entity.HorseRenderer::new);
         event.registerEntityRenderer(ModEntities.NPC.get(), NpcRenderer::new);
     }
 

@@ -1,0 +1,7 @@
+{
+  "parent": "mmorpg:item/epee_niv_01",
+  "textures": {
+    "0": "mmorpg:item/epee_milicien",
+    "particle": "mmorpg:item/epee_milicien"
+  }
+}

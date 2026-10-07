@@ -16,6 +16,10 @@ public record S2COpenScreen(int screen, CompoundTag extra) implements CustomPack
     public static final int TELEPORTER_SETUP = 3;
     public static final int QUEST_GIVER = 4;
     public static final int SHOP = 5;
+    public static final int QUEST_EDITOR = 6;
+    public static final int LUCKY_BLOCK = 7;
+    public static final int LUCKY_RESULT = 8;
+    public static final int LOOT_EDITOR = 9;
 
     public static final Type<S2COpenScreen> TYPE = new Type<>(MMORPG.id("open_screen"));
     public static final StreamCodec<ByteBuf, S2COpenScreen> CODEC = StreamCodec.composite(

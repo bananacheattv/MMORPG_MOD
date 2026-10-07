@@ -64,7 +64,7 @@ public final class StatCalculator {
         // --- familier
         PetType pet = PetType.byId(data.activePet);
         if (pet != null && data.petXp.containsKey(pet.id)) {
-            flat.addAll(pet.bonusAt(data.petLevel(pet.id)));
+            flat.addScaled(pet.bonusAt(data.petLevel(pet.id), cls), data.petBonusMultiplier(pet.id));
         }
 
         // --- passifs de classe
@@ -117,7 +117,7 @@ public final class StatCalculator {
         StatBlock out = new StatBlock();
         for (int i = 0; i < np; i++) out.set(Stat.PRIMARIES[i], prim[i]);
 
-        double evo = 1.0 + 0.05 * PlayerClass.tier(level);
+        double evo = 1.0 + 0.05 * data.evolutionTier();
         double atkFromAgi = cls == PlayerClass.ARCHER ? 1.3 : 0.6;
         double atkFromFor = cls == PlayerClass.ARCHER ? 0.6 : 1.4;
 

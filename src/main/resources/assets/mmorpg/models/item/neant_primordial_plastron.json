@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "mmorpg:item/neant_primordial_plastron"
-  }
-}

@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "mmorpg:bastion_eternel"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "mmorpg:bastion_eternel"
+      }
+    ]
+  }
+}

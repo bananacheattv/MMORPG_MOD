@@ -10,6 +10,17 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 /** Tous les paquets reseau du mod (hors ouverture d'ecran). */
 public final class Payloads {
+    public record QuestEdit(CompoundTag data) implements CustomPacketPayload {
+        public static final Type<QuestEdit> TYPE=new Type<>(MMORPG.id("quest_edit"));
+        public static final StreamCodec<ByteBuf,QuestEdit> CODEC=StreamCodec.composite(ByteBufCodecs.COMPOUND_TAG,QuestEdit::data,QuestEdit::new);
+        @Override public Type<? extends CustomPacketPayload> type() {return TYPE;}
+    }
+    /** Edition des butins (caisses, Lucky Blocks) par un operateur. */
+    public record LootEdit(CompoundTag data) implements CustomPacketPayload {
+        public static final Type<LootEdit> TYPE=new Type<>(MMORPG.id("loot_edit"));
+        public static final StreamCodec<ByteBuf,LootEdit> CODEC=StreamCodec.composite(ByteBufCodecs.COMPOUND_TAG,LootEdit::data,LootEdit::new);
+        @Override public Type<? extends CustomPacketPayload> type() {return TYPE;}
+    }
     private Payloads() {
     }
 
@@ -128,6 +139,19 @@ public final class Payloads {
         }
     }
 
+    public record MountAction(int action, String mount) implements CustomPacketPayload {
+        public static final int UNLOCK = 0, SUMMON = 1, DISMISS = 2;
+        public static final Type<MountAction> TYPE = new Type<>(MMORPG.id("mount_action"));
+        public static final StreamCodec<ByteBuf, MountAction> CODEC = StreamCodec.composite(ByteBufCodecs.VAR_INT, MountAction::action, ByteBufCodecs.STRING_UTF8, MountAction::mount, MountAction::new);
+        @Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
+    public record LuckyRoll(BlockPos pos) implements CustomPacketPayload {
+        public static final Type<LuckyRoll> TYPE = new Type<>(MMORPG.id("lucky_roll"));
+        public static final StreamCodec<ByteBuf, LuckyRoll> CODEC = StreamCodec.composite(BlockPos.STREAM_CODEC, LuckyRoll::pos, LuckyRoll::new);
+        @Override public Type<? extends CustomPacketPayload> type() { return TYPE; }
+    }
+
     /** Invoquer (id) ou renvoyer (chaine vide) un familier. */
     public record PetAction(String pet) implements CustomPacketPayload {
         public static final Type<PetAction> TYPE = new Type<>(MMORPG.id("pet_action"));
@@ -202,7 +226,7 @@ public final class Payloads {
 
     /** Action de quete : 0 = accepter, 1 = rendre, 2 = abandonner. */
     public record QuestAction(int action, String quest, int npc) implements CustomPacketPayload {
-        public static final int ACCEPT = 0, COMPLETE = 1, ABANDON = 2;
+        public static final int ACCEPT = 0, COMPLETE = 1, ABANDON = 2, TRACK = 3;
         public static final Type<QuestAction> TYPE = new Type<>(MMORPG.id("quest_action"));
         public static final StreamCodec<ByteBuf, QuestAction> CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, QuestAction::action, ByteBufCodecs.STRING_UTF8, QuestAction::quest,

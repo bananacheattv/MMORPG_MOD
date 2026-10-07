@@ -105,6 +105,10 @@ public final class MmoHud {
             partyFrames(g, mc);
             HudLayout.end(g);
         }
+        if (HudLayout.begin(g, HudLayout.ELDORIA)) {
+            eldoriaBoard(g, mc);
+            HudLayout.end(g);
+        }
         if (HudLayout.begin(g, HudLayout.QUETES)) {
             questTracker(g, mc);
             HudLayout.end(g);
@@ -248,7 +252,7 @@ public final class MmoHud {
         g.fill(x + 4, y + 22, x + 6 + f.width(lvl) + 2, y + 31, 0xE0101010);
         g.text(f, lvl, x + 6, y + 23, Ui.GOLD_LIGHT, true);
         g.text(f, f.plainSubstrByWidth(mc.player.getName().getString(), 70), x + 32, y + 5, 0xFFFFFFFF, true);
-        String title = cls.title(d.level);
+        String title = d.title();
         g.text(f, f.plainSubstrByWidth(title, 62), x + w - 6 - Math.min(62, f.width(title)), y + 5, cls.color, true);
         Ui.bar(g, x + 32, y + 16, w - 38, 9, ClientData.hp / Math.max(1, ClientData.maxHp), 0xFFF05050, 0xFF8A1818,
                 Ui.fmt(ClientData.hp) + " / " + Ui.fmt(ClientData.maxHp));
@@ -319,7 +323,7 @@ public final class MmoHud {
             hpText = Math.round(frac * 100) + " %";
             if (pub != null) {
                 PlayerClass c = PlayerClass.byId(pub.playerClass);
-                name += " — " + c.title(pub.level);
+                name += " — " + c.evolutions[Math.min(PlayerClass.tier(pub.level), pub.evolution)];
             }
         } else {
             name = t.getName().getString();
@@ -339,6 +343,19 @@ public final class MmoHud {
         g.text(f, f.plainSubstrByWidth(name, w - 16 - f.width(lv)), x + 6, y + 5, bossFlag ? 0xFFFF7070 : 0xFFFFFFFF, true);
         g.text(f, lv, x + w - 6 - f.width(lv), y + 5, lvlColor, true);
         Ui.bar(g, x + 6, y + 17, w - 12, 8, frac, 0xFFE84040, 0xFF7A1010, hpText);
+    }
+
+    private static void eldoriaBoard(GuiGraphicsExtractor g, Minecraft mc) {
+        var d = ClientData.DATA;
+        Ui.frame(g, 0, 0, 153, 44, Ui.GOLD, false);
+        g.text(mc.font, "✦ ELDORIA", 5, 4, Ui.GOLD, false);
+        int online = mc.getConnection() == null ? 0 : mc.getConnection().getOnlinePlayers().size();
+        String count = online + " en ligne";
+        g.text(mc.font, count, 148 - mc.font.width(count), 4, Ui.MUTED, false);
+        g.text(mc.font, "Niv. " + d.level + " • " + d.playerClass.label, 5, 14, d.playerClass.color, false);
+        g.text(mc.font, "Or : " + (d.gold >= 1000000 ? (d.gold / 1000000) + "M" : d.gold >= 10000 ? (d.gold / 1000) + "k" : Long.toString(d.gold)), 5, 24, Ui.GOLD, false);
+        long ready = java.util.stream.IntStream.range(0, ClientData.quests.size()).filter(i -> ClientData.quests.getCompoundOrEmpty(i).getBooleanOr("completable", false)).count();
+        g.text(mc.font, "Quêtes : " + d.activeQuests.size() + " • " + ready + " à rendre", 5, 34, ready > 0 ? Ui.GREEN : Ui.TEXT, false);
     }
 
     private static void partyFrames(GuiGraphicsExtractor g, Minecraft mc) {

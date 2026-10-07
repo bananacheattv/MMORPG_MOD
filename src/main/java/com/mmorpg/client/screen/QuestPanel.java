@@ -80,9 +80,11 @@ public final class QuestPanel {
             if (Ui.in(mx, my, rx, ty, 16, 16)) g.setTooltipForNextFrame(font, stack, mx, my);
             rx += 19;
         }
-        String pet = rw.getStringOr("pet", "");
-        if (!pet.isEmpty() && PetType.byId(pet) != null) {
-            g.item(new ItemStack(ModItems.PET_EGGS.get(PetType.byId(pet)).get()), rx, ty);
+        int evo = rw.getIntOr("evolution", 0);
+        if (evo > 0) {
+            var cls = com.mmorpg.client.ClientData.DATA.playerClass;
+            String label = "✦ Évolution : " + (cls.isPlayable() ? cls.evolutions[Math.min(4, evo)] : "palier " + evo);
+            g.text(font, font.plainSubstrByWidth(label, x + w - rx - 4), rx + 2, ty + 4, Ui.GOLD, true);
         }
         return ty + 18;
     }

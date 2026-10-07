@@ -27,6 +27,21 @@ public final class ModBlocks {
             p -> p.mapColor(MapColor.COLOR_PURPLE).strength(3f, 1200f).sound(SoundType.STONE).lightLevel(s -> s.getValue(AltarBlock.ACTIVE) ? 13 : 8).noOcclusion()
                     .pushReaction(PushReaction.IMMOVEABLE));
 
+    public static final DeferredBlock<com.mmorpg.block.LuckyBlock> LUCKY_BLOCK = BLOCKS.registerBlock("lucky_block", com.mmorpg.block.LuckyBlock::new,
+            p -> p.mapColor(MapColor.GOLD).strength(0.8f, 1200f).sound(SoundType.METAL).lightLevel(s -> 5).noLootTable().pushReaction(PushReaction.IMMOVEABLE));
+
+    /** Caisses en bloc 3D (une par type), posees par les admins et ouvertes avec la cle correspondante. */
+    public static final java.util.Map<com.mmorpg.block.crate.CrateTier, DeferredBlock<com.mmorpg.block.crate.CrateBlock>> CRATES =
+            new java.util.EnumMap<>(com.mmorpg.block.crate.CrateTier.class);
+
+    static {
+        for (var tier : com.mmorpg.block.crate.CrateTier.values()) {
+            CRATES.put(tier, BLOCKS.registerBlock(tier.blockId(), p -> new com.mmorpg.block.crate.CrateBlock(p, tier),
+                    p -> p.mapColor(MapColor.WOOD).strength(-1.0f, 3600000f).sound(SoundType.WOOD).lightLevel(s -> 4).noOcclusion()
+                            .noLootTable().pushReaction(PushReaction.IMMOVEABLE)));
+        }
+    }
+
     /** Partie invisible des structures multiblocs (collision et renvoi des clics vers le bloc fonctionnel). */
     public static final DeferredBlock<StructurePartBlock> STRUCTURE_PART = BLOCKS.registerBlock("structure_part", StructurePartBlock::new,
             p -> p.mapColor(MapColor.COLOR_BLACK).strength(5f, 1200f).sound(SoundType.STONE).noOcclusion().noLootTable()

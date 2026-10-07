@@ -1,0 +1,107 @@
+name: Release launcher
+
+# A chaque push sur main : compile le mod + le launcher et met a jour la release "latest"
+# que le launcher lit pour se mettre a jour tout seul.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: release-latest
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build du mod
+        run: bash ./gradlew build
+
+      - name: Build du launcher
+        run: bash launcher/scripts/build_jars.sh "$GITHUB_WORKSPACE/launcher/build"
+
+      - name: Manifeste
+        env:
+          MSA_CLIENT_ID: ${{ vars.MSA_CLIENT_ID }}
+        run: |
+          mkdir dist
+          cp $(ls build/libs/*.jar | grep -v -- '-sources\|-javadoc') dist/
+          cp launcher/build/launcher-core.jar launcher/build/EldoriaLauncher.jar dist/
+          NEO=$(grep '^neo_version=' gradle.properties | cut -d= -f2)
+          MC=$(grep '^minecraft_version=' gradle.properties | cut -d= -f2)
+          mapfile -t NOTES < <(git log -5 --no-merges --format='%s')
+          python3 launcher/scripts/make_manifest.py dist \
+            "https://github.com/${{ github.repository }}/releases/download/latest" \
+            "${{ github.run_number }}-${GITHUB_SHA::7}" "$MC" "$NEO" "${NOTES[@]}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  windows:
+    needs: build
+    runs-on: windows-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+
+      - name: jpackage (launcher Windows autonome, Java inclus)
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory in | Out-Null
+          Copy-Item dist/EldoriaLauncher.jar in/
+          jpackage --type app-image --name EldoriaLauncher --input in --main-jar EldoriaLauncher.jar `
+            --main-class eldoria.boot.Bootstrap --app-version 1.0.0 --vendor Eldoria `
+            --add-modules java.se,jdk.zipfs,jdk.charsets,jdk.unsupported,jdk.localedata --dest out
+          Compress-Archive -Path out/EldoriaLauncher -DestinationPath EldoriaLauncher-Windows.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: EldoriaLauncher-Windows.zip
+
+  publish:
+    needs: [build, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: art
+
+      - name: Release "latest"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          cat > notes.md <<'NOTES'
+          Build automatique du dernier push sur main.
+
+          **Joueurs** : telechargez `EldoriaLauncher-Windows.zip`, dezippez puis lancez `EldoriaLauncher.exe`
+          (ou `EldoriaLauncher.jar` si Java est installe). Le launcher se met a jour tout seul a chaque push.
+          NOTES
+          gh release delete latest --cleanup-tag -y || true
+          gh release create latest art/dist/* art/windows/EldoriaLauncher-Windows.zip \
+            --target "$GITHUB_SHA" --title "Eldoria MMORPG - build ${{ github.run_number }}" --notes-file notes.md --latest

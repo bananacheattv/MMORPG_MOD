@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "mmorpg:eternel_arcanes"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "mmorpg:eternel_arcanes"
+      }
+    ]
+  }
+}

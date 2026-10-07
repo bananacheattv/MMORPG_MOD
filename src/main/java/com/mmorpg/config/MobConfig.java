@@ -12,6 +12,8 @@ import java.util.Map;
 public class MobConfig {
     /** Nom affiche (vide = nom traduit par defaut). */
     public String displayName = "";
+    /** Sous-categorie du bestiaire ; vide = classement automatique. */
+    public String family = "";
     public int minLevel = 1;
     public int maxLevel = 10;
     public double baseHealth = 100;
@@ -24,6 +26,8 @@ public class MobConfig {
     public double xpMultiplier = 1.0;
     /** Taille du modele (1.0 = normale). */
     public double scale = 1.0;
+    /** Version du butin par defaut deja fusionnee dans ce fichier (voir DefaultMobs.DROPS_VERSION). */
+    public int dropsVersion = 0;
     public boolean boss = false;
     public Spawn spawn = new Spawn();
     public List<Drop> drops = new ArrayList<>();

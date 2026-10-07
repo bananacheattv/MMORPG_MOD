@@ -25,8 +25,18 @@ public final class Net {
         r.playToClient(Payloads.PartySync.TYPE, Payloads.PartySync.CODEC);
 
         r.playToServer(Payloads.SelectClass.TYPE, Payloads.SelectClass.CODEC, ServerHandlers::selectClass);
+        r.playToServer(Payloads.QuestEdit.TYPE, Payloads.QuestEdit.CODEC, (packet, ctx) -> {
+            if (ctx.player() instanceof ServerPlayer p) com.mmorpg.server.QuestEditor.action(p, packet.data());
+        });
+        r.playToServer(Payloads.LootEdit.TYPE, Payloads.LootEdit.CODEC, (packet, ctx) -> {
+            if (ctx.player() instanceof ServerPlayer p) com.mmorpg.server.LootEditor.action(p, packet.data());
+        });
         r.playToServer(Payloads.Allocate.TYPE, Payloads.Allocate.CODEC, ServerHandlers::allocate);
         r.playToServer(Payloads.SkillAction.TYPE, Payloads.SkillAction.CODEC, ServerHandlers::skillAction);
+        r.playToServer(Payloads.MountAction.TYPE, Payloads.MountAction.CODEC, ServerHandlers::mountAction);
+        r.playToServer(Payloads.LuckyRoll.TYPE, Payloads.LuckyRoll.CODEC, (packet, ctx) -> {
+            if (ctx.player() instanceof ServerPlayer p) com.mmorpg.server.LuckyBlockManager.roll(p, packet.pos());
+        });
         r.playToServer(Payloads.PetAction.TYPE, Payloads.PetAction.CODEC, ServerHandlers::petAction);
         r.playToServer(Payloads.CosmeticAction.TYPE, Payloads.CosmeticAction.CODEC, ServerHandlers::cosmeticAction);
         r.playToServer(Payloads.Teleport.TYPE, Payloads.Teleport.CODEC, ServerHandlers::teleport);

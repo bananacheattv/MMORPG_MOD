@@ -78,10 +78,77 @@ public final class ModItems {
             "Garantit la réussite d'une amélioration de +13 à +16 à la Forge Arcanique (consommé).");
     public static final DeferredItem<RpgMaterialItem> TREFLE_DIVIN = material("trefle_divin", Rarity.MYTHIQUE,
             "Garantit la réussite d'une amélioration de +17 à +20 à la Forge Arcanique (consommé).");
+    public static final DeferredItem<RpgMaterialItem> ALLIAGE_CELESTE = material("alliage_celeste", Rarity.MYTHIQUE, "Alliage de fin de progression pour les panoplies mythiques de classe.");
     public static final DeferredItem<RpgMaterialItem> LINGOT_MITHRIL = material("lingot_mithril", Rarity.RARE, "Métal léger et résistant, façonné à la Forge Arcanique.");
     public static final DeferredItem<RpgMaterialItem> LINGOT_ADAMANTITE = material("lingot_adamantite", Rarity.EPIQUE, "Le métal le plus dur du monde connu.");
     public static final DeferredItem<RpgMaterialItem> TISSU_ENCHANTE = material("tissu_enchante", Rarity.RARE, "Étoffe tissée de poussière d'âme.");
     public static final DeferredItem<RpgMaterialItem> CUIR_RENFORCE = material("cuir_renforce", Rarity.PEU_COMMUN, "Cuir renforcé de fourrure sombre.");
+    // ---- materiaux de butin supplementaires (monstres, zones des monstres importes) et intermediaires de la Forge
+    public static final DeferredItem<RpgMaterialItem> SOIE_ARAIGNEE = material("soie_araignee", Rarity.COMMUN, "Soie résistante filée par les araignées.");
+    public static final DeferredItem<RpgMaterialItem> GRIFFE_LOUP = material("griffe_loup", Rarity.COMMUN, "Griffe acérée des Loups Sombres.");
+    public static final DeferredItem<RpgMaterialItem> INSIGNE_BANDIT = material("insigne_bandit", Rarity.PEU_COMMUN, "Insigne arraché aux bandits arbalétriers.");
+    public static final DeferredItem<RpgMaterialItem> ICHOR_CRYPTES = material("ichor_cryptes", Rarity.PEU_COMMUN, "Fluide verdâtre des morts-vivants des cryptes.");
+    public static final DeferredItem<RpgMaterialItem> SANG_ORC = material("sang_orc", Rarity.PEU_COMMUN, "Sang épais et bouillonnant des Orcs Guerriers.");
+    public static final DeferredItem<RpgMaterialItem> CENDRE_ARDENTE = material("cendre_ardente", Rarity.PEU_COMMUN, "Cendre encore brûlante des Élémentaires de Feu.");
+    public static final DeferredItem<RpgMaterialItem> CRANE_MAUDIT = material("crane_maudit", Rarity.RARE, "Un crâne qui murmure encore des malédictions.");
+    public static final DeferredItem<RpgMaterialItem> VOILE_SPECTRAL = material("voile_spectral", Rarity.RARE, "Lambeau translucide arraché aux Spectres de Givre.");
+    public static final DeferredItem<RpgMaterialItem> GEMME_BRUTE = material("gemme_brute", Rarity.RARE, "Gemme non taillée extraite des Golems de Cristal.");
+    public static final DeferredItem<RpgMaterialItem> PLAQUE_NEANT = material("plaque_neant", Rarity.EPIQUE, "Fragment d'armure des Chevaliers du Néant.");
+    public static final DeferredItem<RpgMaterialItem> ECORCE_ANCIENNE = material("ecorce_ancienne", Rarity.COMMUN, "Écorce dure des créatures de la Forêt ancienne.");
+    public static final DeferredItem<RpgMaterialItem> SEVE_LUMINEUSE = material("seve_lumineuse", Rarity.PEU_COMMUN, "Sève dorée qui brille dans l'obscurité.");
+    public static final DeferredItem<RpgMaterialItem> COEUR_RACINE = material("coeur_racine", Rarity.RARE, "Le cœur vivant du Colosse racine.");
+    public static final DeferredItem<RpgMaterialItem> MUCUS_ACIDE = material("mucus_acide", Rarity.COMMUN, "Substance corrosive des créatures du Marais.");
+    public static final DeferredItem<RpgMaterialItem> VENIN_MARAIS = material("venin_marais", Rarity.PEU_COMMUN, "Venin violacé des crapauds et sorciers des marais.");
+    public static final DeferredItem<RpgMaterialItem> ECAILLE_HYDRE = material("ecaille_hydre", Rarity.RARE, "Écaille brillante de l'Hydre des marais.");
+    public static final DeferredItem<RpgMaterialItem> FRAGMENT_OSSUAIRE = material("fragment_ossuaire", Rarity.COMMUN, "Débris d'os des Cryptes.");
+    public static final DeferredItem<RpgMaterialItem> RELIQUE_FUNERAIRE = material("relique_funeraire", Rarity.PEU_COMMUN, "Anneau rituel des gardes funéraires.");
+    public static final DeferredItem<RpgMaterialItem> COURONNE_CRYPTES = material("couronne_cryptes", Rarity.RARE, "La couronne rouillée du Roi des cryptes.");
+    public static final DeferredItem<RpgMaterialItem> FOURRURE_POLAIRE = material("fourrure_polaire", Rarity.COMMUN, "Fourrure épaisse des bêtes des Terres gelées.");
+    public static final DeferredItem<RpgMaterialItem> CARAPACE_GIVREE = material("carapace_givree", Rarity.PEU_COMMUN, "Carapace gelée des scarabées polaires.");
+    public static final DeferredItem<RpgMaterialItem> CROC_WYRM = material("croc_wyrm", Rarity.RARE, "Croc glacé du Wyrm boréal.");
+    public static final DeferredItem<RpgMaterialItem> CARAPACE_CUIVRE = material("carapace_cuivre", Rarity.COMMUN, "Plaques métalliques des scorpions de cuivre.");
+    public static final DeferredItem<RpgMaterialItem> BANDELETTE_ANCIENNE = material("bandelette_ancienne", Rarity.PEU_COMMUN, "Bandelette imprégnée de magie des momies.");
+    public static final DeferredItem<RpgMaterialItem> BRAISE_DJINN = material("braise_djinn", Rarity.RARE, "Braise éternelle d'un Djinn des braises.");
+    public static final DeferredItem<RpgMaterialItem> ECLAT_ASTRAL = material("eclat_astral", Rarity.PEU_COMMUN, "Éclat cristallin tombé du Néant astral.");
+    public static final DeferredItem<RpgMaterialItem> POUSSIERE_ETOILE = material("poussiere_etoile", Rarity.RARE, "Poussière scintillante des créatures astrales.");
+    public static final DeferredItem<RpgMaterialItem> ECLAT_FRACTURE = material("eclat_fracture", Rarity.EPIQUE, "Morceau de réalité brisée laissé par les êtres du vide.");
+    public static final DeferredItem<RpgMaterialItem> BOIS_ENCHANTE = material("bois_enchante", Rarity.PEU_COMMUN, "Bois ancien imprégné de sève lumineuse.");
+    public static final DeferredItem<RpgMaterialItem> BRONZE_RUNIQUE = material("bronze_runique", Rarity.RARE, "Alliage de cuivre gravé de runes.");
+    public static final DeferredItem<RpgMaterialItem> TISSU_SPECTRAL = material("tissu_spectral", Rarity.RARE, "Étoffe tissée de soie et de voile spectral.");
+    public static final DeferredItem<RpgMaterialItem> CUIR_POLAIRE = material("cuir_polaire", Rarity.RARE, "Cuir renforcé doublé de fourrure polaire.");
+    public static final DeferredItem<RpgMaterialItem> ACIER_STELLAIRE = material("acier_stellaire", Rarity.EPIQUE, "Adamantite forgée avec de la poussière d'étoile.");
+    // ---- materiaux propres a chaque monstre (zones importees, araignee venimeuse)
+    public static final DeferredItem<RpgMaterialItem> MOUSSE_VIVANTE = material("mousse_vivante", Rarity.COMMUN, "Mousse qui pousse encore sur le dos des Mousseux.");
+    public static final DeferredItem<RpgMaterialItem> DEFENSE_RONCE = material("defense_ronce", Rarity.PEU_COMMUN, "Défense couverte d'épines d'un Sanglier ronce.");
+    public static final DeferredItem<RpgMaterialItem> PLUME_SYLVESTRE = material("plume_sylvestre", Rarity.PEU_COMMUN, "Plume d'empennage des Archers sylvestres.");
+    public static final DeferredItem<RpgMaterialItem> CHAPEAU_LUISANT = material("chapeau_luisant", Rarity.PEU_COMMUN, "Chapeau phosphorescent d'un Veilleur champignon.");
+    public static final DeferredItem<RpgMaterialItem> NOEUD_RACINE = material("noeud_racine", Rarity.RARE, "Bois noueux arraché au Colosse racine.");
+    public static final DeferredItem<RpgMaterialItem> PEAU_CRAPAUD = material("peau_crapaud", Rarity.COMMUN, "Peau visqueuse et résistante des Crapauds venimeux.");
+    public static final DeferredItem<RpgMaterialItem> PERLE_ACIDE = material("perle_acide", Rarity.PEU_COMMUN, "Perle corrosive formée dans les Limaces acides.");
+    public static final DeferredItem<RpgMaterialItem> LANTERNE_LUCIOLE = material("lanterne_luciole", Rarity.PEU_COMMUN, "Abdomen lumineux d'une Luciole géante.");
+    public static final DeferredItem<RpgMaterialItem> ROSEAU_ENCHANTE = material("roseau_enchante", Rarity.PEU_COMMUN, "Roseau ensorcelé par les Sorciers des roseaux.");
+    public static final DeferredItem<RpgMaterialItem> CROC_HYDRE = material("croc_hydre", Rarity.RARE, "Croc venimeux de l'Hydre des marais.");
+    public static final DeferredItem<RpgMaterialItem> PHALANGE_OSSELET = material("phalange_osselet", Rarity.COMMUN, "Petits os des Osselets des cryptes.");
+    public static final DeferredItem<RpgMaterialItem> PATTE_ARAIGNEE = material("patte_araignee", Rarity.PEU_COMMUN, "Patte osseuse et acérée.");
+    public static final DeferredItem<RpgMaterialItem> ECUSSON_FUNERAIRE = material("ecusson_funeraire", Rarity.PEU_COMMUN, "Écusson des Gardes funéraires.");
+    public static final DeferredItem<RpgMaterialItem> MAILLON_SPECTRAL = material("maillon_spectral", Rarity.RARE, "Maillon des chaînes du Spectre enchaîné.");
+    public static final DeferredItem<RpgMaterialItem> JOYAU_CRYPTES = material("joyau_cryptes", Rarity.EPIQUE, "Le joyau qui ornait le sceptre du Roi des cryptes.");
+    public static final DeferredItem<RpgMaterialItem> QUEUE_RENARD = material("queue_renard", Rarity.PEU_COMMUN, "Queue soyeuse d'un Renard de givre.");
+    public static final DeferredItem<RpgMaterialItem> ELYTRE_POLAIRE = material("elytre_polaire", Rarity.PEU_COMMUN, "Aile dure d'un Scarabée polaire.");
+    public static final DeferredItem<RpgMaterialItem> PLUME_HARPIE = material("plume_harpie", Rarity.PEU_COMMUN, "Plume glacée d'une Harpie des neiges.");
+    public static final DeferredItem<RpgMaterialItem> NOYAU_GLACE = material("noyau_glace", Rarity.RARE, "Le cœur gelé d'un Golem d'iceberg.");
+    public static final DeferredItem<RpgMaterialItem> ECAILLE_BOREALE = material("ecaille_boreale", Rarity.EPIQUE, "Écaille irisée du Wyrm boréal.");
+    public static final DeferredItem<RpgMaterialItem> DARD_SCORPION = material("dard_scorpion", Rarity.PEU_COMMUN, "Dard empoisonné d'un Scorpion de cuivre.");
+    public static final DeferredItem<RpgMaterialItem> SCARABEE_OR = material("scarabee_or", Rarity.RARE, "Amulette sacrée trouvée sur les Momies des dunes.");
+    public static final DeferredItem<RpgMaterialItem> CRIN_CENDRE = material("crin_cendre", Rarity.COMMUN, "Crin gris des Hyènes cendrées.");
+    public static final DeferredItem<RpgMaterialItem> FUMEE_DJINN = material("fumee_djinn", Rarity.RARE, "Fumée ardente capturée dans une fiole.");
+    public static final DeferredItem<RpgMaterialItem> CARAPACE_VOLCANIQUE = material("carapace_volcanique", Rarity.RARE, "Écaille de lave refroidie d'une Tortue volcanique.");
+    public static final DeferredItem<RpgMaterialItem> POUDRE_ASTRALE = material("poudre_astrale", Rarity.PEU_COMMUN, "Écailles chatoyantes des Mites astrales.");
+    public static final DeferredItem<RpgMaterialItem> GRIFFE_VIDE = material("griffe_vide", Rarity.RARE, "Griffe d'ombre d'un Rôdeur du vide.");
+    public static final DeferredItem<RpgMaterialItem> PUPILLE_CHAOS = material("pupille_chaos", Rarity.EPIQUE, "L'œil arraché à un Œil du chaos.");
+    public static final DeferredItem<RpgMaterialItem> PLAQUE_FRACTUREE = material("plaque_fracturee", Rarity.EPIQUE, "Fragment d'armure d'un Chevalier fracturé.");
+    public static final DeferredItem<RpgMaterialItem> COEUR_ETOILE = material("coeur_etoile", Rarity.LEGENDAIRE, "Le cœur incandescent d'un Dévoreur d'étoiles.");
+    public static final DeferredItem<RpgMaterialItem> GLANDE_VENIN = material("glande_venin", Rarity.PEU_COMMUN, "Glande gorgée de venin des Araignées venimeuses.");
     public static final DeferredItem<RpgMaterialItem> PIECE_OR = ITEMS.registerItem("piece_or",
             p -> new RpgMaterialItem(p, Rarity.COMMUN, "Monnaie", "La monnaie du royaume. Utilisée à la Forge Arcanique."), p -> p.stacksTo(99));
 
@@ -93,17 +160,55 @@ public final class ModItems {
     public static final DeferredItem<SummonKeyItem> OEIL_NEANT = summon("oeil_neant", Rarity.MYTHIQUE, "avatar_neant", "Avatar du Néant", 100);
 
     // ------------------------------------------------------------------ consommables
-    public static final DeferredItem<RpgConsumableItem> POTION_SOIN_MINEURE = potion("potion_soin_mineure", Rarity.COMMUN, RpgConsumableItem.Kind.HEAL, 0.15, "Rend 15 % des PV maximum.");
-    public static final DeferredItem<RpgConsumableItem> POTION_SOIN = potion("potion_soin", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.HEAL, 0.30, "Rend 30 % des PV maximum.");
-    public static final DeferredItem<RpgConsumableItem> POTION_SOIN_MAJEURE = potion("potion_soin_majeure", Rarity.RARE, RpgConsumableItem.Kind.HEAL, 0.50, "Rend 50 % des PV maximum.");
-    public static final DeferredItem<RpgConsumableItem> POTION_MANA_MINEURE = potion("potion_mana_mineure", Rarity.COMMUN, RpgConsumableItem.Kind.MANA, 0.20, "Rend 20 % du mana maximum.");
-    public static final DeferredItem<RpgConsumableItem> POTION_MANA = potion("potion_mana", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.MANA, 0.40, "Rend 40 % du mana maximum.");
-    public static final DeferredItem<RpgConsumableItem> POTION_MANA_MAJEURE = potion("potion_mana_majeure", Rarity.RARE, RpgConsumableItem.Kind.MANA, 0.70, "Rend 70 % du mana maximum.");
+    public static final DeferredItem<RpgConsumableItem> POTION_SOIN_MINEURE = potion("potion_soin_mineure", Rarity.COMMUN, RpgConsumableItem.Kind.HEAL, 150, "Rend 150 PV.");
+    public static final DeferredItem<RpgConsumableItem> POTION_SOIN = potion("potion_soin", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.HEAL, 600, "Rend 600 PV.");
+    public static final DeferredItem<RpgConsumableItem> POTION_SOIN_MAJEURE = potion("potion_soin_majeure", Rarity.RARE, RpgConsumableItem.Kind.HEAL, 1500, "Rend 1500 PV.");
+    public static final DeferredItem<RpgConsumableItem> POTION_MANA_MINEURE = potion("potion_mana_mineure", Rarity.COMMUN, RpgConsumableItem.Kind.MANA, 100, "Rend 100 points de mana.");
+    public static final DeferredItem<RpgConsumableItem> POTION_MANA = potion("potion_mana", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.MANA, 350, "Rend 350 points de mana.");
+    public static final DeferredItem<RpgConsumableItem> POTION_MANA_MAJEURE = potion("potion_mana_majeure", Rarity.RARE, RpgConsumableItem.Kind.MANA, 900, "Rend 900 points de mana.");
     public static final DeferredItem<RpgConsumableItem> ELIXIR_EXPERIENCE = consumable("elixir_experience", Rarity.EPIQUE, RpgConsumableItem.Kind.ELIXIR, 0.25, "Octroie 25 % de l'expérience du niveau en cours.");
     public static final DeferredItem<RpgConsumableItem> PARCHEMIN_TELEPORTATION = consumable("parchemin_teleportation", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.TELEPORT_SCROLL, 0, "Ouvre le réseau de téléportation depuis n'importe où.\nConsommé lors du voyage.");
     public static final DeferredItem<RpgConsumableItem> PARCHEMIN_OUBLI = consumable("parchemin_oubli", Rarity.RARE, RpgConsumableItem.Kind.FORGET_SCROLL, 0, "Réinitialise vos points d'attribut.");
     public static final DeferredItem<RpgConsumableItem> ORBE_RENAISSANCE = consumable("orbe_renaissance", Rarity.LEGENDAIRE, RpgConsumableItem.Kind.REBIRTH_ORB, 0, "Permet de choisir une nouvelle classe.\nVotre niveau est conservé.");
     public static final DeferredItem<RpgConsumableItem> COFFRE_COSMETIQUE = consumable("coffre_cosmetique", Rarity.EPIQUE, RpgConsumableItem.Kind.COSMETIC_CHEST, 0, "Débloque un cosmétique animé aléatoire.");
+
+    public static final DeferredItem<RpgConsumableItem> NOURRITURE_FAMILIER = consumable("nourriture_familier", Rarity.PEU_COMMUN,
+            RpgConsumableItem.Kind.PET_FOOD, 25, "Restaure 25 points de bonheur au familier invoqué.\nLes bonus varient de 50 % à 100 % selon son bonheur.");
+
+    public static final DeferredItem<RpgConsumableItem> CHARME_EXPERIENCE = consumable("charme_experience", Rarity.RARE,
+            RpgConsumableItem.Kind.XP_CHARM, 0, "+25 % d'expérience pendant 30 minutes de jeu. Non cumulable.");
+    public static final DeferredItem<RpgConsumableItem> CHARME_CHANCE = consumable("charme_chance", Rarity.RARE,
+            RpgConsumableItem.Kind.LUCK_CHARM, 0, "+25 % de chances de butin pendant 30 minutes de jeu. Non cumulable.");
+
+    public static final DeferredItem<RpgMaterialItem> CLE_AVENTURE = material("cle_aventure", Rarity.RARE, "Ouvre une caisse d’aventure. Une clé par caisse.");
+    public static final DeferredItem<RpgConsumableItem> CAISSE_AVENTURE = consumable("caisse_aventure", Rarity.RARE, RpgConsumableItem.Kind.ADVENTURE_CRATE, 0, "Nécessite une clé d’aventure. Contient un butin aléatoire (potions, pierres, or, charmes...).");
+    public static final DeferredItem<BlockItem> LUCKY_BLOCK = ITEMS.registerSimpleBlockItem("lucky_block", ModBlocks.LUCKY_BLOCK);
+    public static final DeferredItem<RpgMaterialItem> CLE_VOTE = material("cle_vote", Rarity.PEU_COMMUN, "Ouvre une caisse de vote. Obtenue en votant pour le serveur.");
+    public static final DeferredItem<RpgMaterialItem> CLE_QUETE = material("cle_quete", Rarity.RARE, "Ouvre une caisse de quête. Récompense de quêtes.");
+    public static final DeferredItem<RpgMaterialItem> CLE_COMMUNE = material("cle_commune", Rarity.COMMUN, "Ouvre une caisse commune.");
+    public static final DeferredItem<RpgMaterialItem> CLE_RARE = material("cle_rare", Rarity.RARE, "Ouvre une caisse rare.");
+    public static final DeferredItem<RpgMaterialItem> CLE_EPIQUE = material("cle_epique", Rarity.EPIQUE, "Ouvre une caisse épique.");
+    public static final DeferredItem<RpgMaterialItem> CLE_LEGENDAIRE = material("cle_legendaire", Rarity.LEGENDAIRE, "Ouvre une caisse légendaire.");
+    public static final DeferredItem<RpgMaterialItem> CLE_MYTHIQUE = material("cle_mythique", Rarity.MYTHIQUE, "Ouvre une caisse mythique.");
+    /** Sceaux de monture (uniquement dans les caisses et Lucky Blocks). */
+    public static final java.util.Map<com.mmorpg.mount.MountType, DeferredItem<com.mmorpg.item.MountSealItem>> MOUNT_SEALS =
+            new java.util.EnumMap<>(com.mmorpg.mount.MountType.class);
+
+    static {
+        for (var m : com.mmorpg.mount.MountType.values()) {
+            Rarity r = switch (m) { case VOYAGEUR -> Rarity.RARE; case AUBE -> Rarity.EPIQUE; default -> Rarity.LEGENDAIRE; };
+            DeferredItem<com.mmorpg.item.MountSealItem> seal = ITEMS.registerItem("monture_" + m.id, p -> new com.mmorpg.item.MountSealItem(p, m, r));
+            MOUNT_SEALS.put(m, seal);
+            BY_ID.put("monture_" + m.id, seal);
+        }
+    }
+    /** Blocs des caisses (onglet creatif, reserves aux admins). */
+    public static final java.util.List<DeferredItem<BlockItem>> CRATE_BLOCKS = new java.util.ArrayList<>();
+
+    static {
+        for (var tier : com.mmorpg.block.crate.CrateTier.values())
+            CRATE_BLOCKS.add(ITEMS.registerSimpleBlockItem(tier.blockId(), ModBlocks.CRATES.get(tier)));
+    }
 
     // ------------------------------------------------------------------ blocs
     public static final DeferredItem<BlockItem> FORGE_ARCANIQUE = ITEMS.registerSimpleBlockItem("forge_arcanique", ModBlocks.FORGE_ARCANIQUE);

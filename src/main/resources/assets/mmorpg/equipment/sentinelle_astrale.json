@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "mmorpg:sentinelle_astrale"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "mmorpg:sentinelle_astrale"
+      }
+    ]
+  }
+}

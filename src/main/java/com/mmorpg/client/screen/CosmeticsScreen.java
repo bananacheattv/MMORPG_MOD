@@ -23,6 +23,8 @@ public class CosmeticsScreen extends MenuScreen {
         super(Tab.COSMETIQUES);
     }
 
+    public CosmeticsScreen(Cosmetic cosmetic) { this(); category=cosmetic.category;selected=cosmetic; }
+
     @Override
     protected void renderTab(GuiGraphicsExtractor g, int mx, int my, float a) {
         PlayerData d = ClientData.DATA;
@@ -32,16 +34,26 @@ public class CosmeticsScreen extends MenuScreen {
         Cosmetic.Category[] cats = Cosmetic.Category.values();
         for (int i = 0; i < cats.length; i++) {
             Cosmetic.Category c = cats[i];
-            int cy = y0 + i * 22;
-            button(g, x0, cy, 80, 18, c.label, true, c == category ? 0xFF6A4A1A : 0xFF2A2420, () -> {
+            int cy = y0 + i * 16;
+            button(g, x0, cy, 80, 15, c.label, true, c == category ? 0xFF6A4A1A : 0xFF2A2420, () -> {
                 category = c;
                 selected = null;
             });
         }
         int owned = 0;
         for (Cosmetic c : Cosmetic.values()) if (d.cosmetics.contains(c.id)) owned++;
-        g.text(font, owned + "/" + Cosmetic.values().length, x0 + 4, y0 + 96, Ui.MUTED, false);
-        g.text(font, "débloqués", x0 + 4, y0 + 106, Ui.MUTED, false);
+        g.text(font, owned + "/" + Cosmetic.values().length + " débloqués", x0 + 4, y0 + 132, Ui.MUTED, false);
+        boolean showOwn = com.mmorpg.client.ClientConfig.SHOW_OWN_COSMETICS.get();
+        button(g, x0, y0 + 145, 80, 18, "Vue 1re : " + (showOwn ? "oui" : "non"), true, Ui.GOLD, () -> {
+            com.mmorpg.client.ClientConfig.SHOW_OWN_COSMETICS.set(!showOwn);
+            com.mmorpg.client.ClientConfig.SHOW_OWN_COSMETICS.save();
+        });
+        if (hovered(x0, y0 + 145, 80, 18)) tooltip(g, List.of(Component.literal("Afficher vos effets en première personne"),
+                Component.literal("Utilisez F5 pour voir les ailes et halos de dos.")));
+        button(g, x0, y0 + 167, 80, 18, "Voir en jeu", true, Ui.GOLD, () -> {
+            minecraft.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+            onClose();
+        });
 
         // liste
         int lx = x0 + 88;
@@ -58,7 +70,7 @@ public class CosmeticsScreen extends MenuScreen {
             g.fill(lx + 4, ry + 4, lx + 23, ry + 23, Ui.withAlpha(c.color, has ? 0xFF : 0x50));
             Ui.border(g, lx + 4, ry + 4, 19, 19, Ui.darker(c.color | 0xFF000000, 0.5f));
             g.text(font, c.label, lx + 28, ry + 4, has ? Ui.TEXT : Ui.MUTED, false);
-            String status = eq ? "Équipé" : has ? "Débloqué" : (c.unlockLevel > 0 ? "Niveau " + c.unlockLevel : "Coffre");
+            String status = eq ? "Équipé" : has ? "Débloqué" : (c.unlockLevel > 0 ? "Niveau " + c.unlockLevel : "Caisses / Lucky Block");
             g.text(font, status, lx + 28, ry + 15, eq ? Ui.GREEN : has ? Ui.GOLD : Ui.RED, false);
             final Cosmetic cc = c;
             click(lx, ry, lw, 27, () -> selected = cc);
@@ -73,15 +85,21 @@ public class CosmeticsScreen extends MenuScreen {
             Cosmetic c = selected;
             g.centeredText(font, Component.literal(c.label), px + pwid / 2, y0 + 5, c.color);
             int boxY = y0 + 18;
-            int boxH = 96;
+            int boxH = Math.max(48, Math.min(96, phei - 95));
             Minecraft mc = Minecraft.getInstance();
             if (mc.player != null) {
-                InventoryScreen.extractEntityInInventoryFollowsMouse(g, px + pwid / 2 - 30, boxY, px + pwid / 2 + 30, boxY + boxH, 36, 0.0625F, mx, my, mc.player);
+                com.mmorpg.client.model.imported.ImportedCosmetics.preview = c;
+                try {
+                    if(c.category==Cosmetic.Category.DOS) {
+                        InventoryScreen.renderEntityInInventoryFollowsAngle(g,px+2,boxY,px+pwid-2,boxY+boxH,36,.0625f,9,.2f,mc.player);
+                    } else if(c.hasModel()) InventoryScreen.renderEntityInInventoryFollowsAngle(g,px+2,boxY,px+pwid-2,boxY+boxH,36,.0625f,-.5f,.2f,mc.player);
+                    else InventoryScreen.extractEntityInInventoryFollowsMouse(g, px + 2, boxY, px + pwid - 2, boxY + boxH, 36, 0.0625F, mx, my, mc.player);
+                } finally { com.mmorpg.client.model.imported.ImportedCosmetics.preview = null; }
             }
-            drawPreview(g, c, px + pwid / 2, boxY + boxH / 2 + 6);
+            if (!c.hasModel()) drawPreview(g, c, px + pwid / 2, boxY + boxH / 2 + 6);
             int ty = boxY + boxH + 6;
             ty += Ui.wrap(g, c.description, px + 6, ty, pwid - 12, Ui.TEXT) + 2;
-            g.text(font, c.unlockText(), px + 6, ty, Ui.MUTED, false);
+            Ui.wrap(g, c.unlockText(), px + 6, ty, pwid - 12, Ui.MUTED);
             boolean has = d.cosmetics.contains(c.id);
             boolean eq = c.id.equals(equipped);
             int by = y0 + phei - 22;

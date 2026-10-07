@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "mmorpg:oracle_astral"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "mmorpg:oracle_astral"
+      }
+    ]
+  }
+}

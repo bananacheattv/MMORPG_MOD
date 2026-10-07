@@ -103,7 +103,7 @@ def bow_item(item_id, name, **kw):
 # Armes en 3D (modeles Blockbench, format Java Block/Item) generees dans art/ :
 #   art/batons_blockbench/generer_batons.py, art/epees_blockbench/generer_epees.py,
 #   art/marteaux_blockbench/generer_marteaux.py, art/arcs_blockbench/generer_arcs.py
-# Le sprite 2D genere plus bas reste disponible (et sert pour les armes sans modele 3D, ex. la hache du berserker),
+# Le sprite 2D genere plus bas reste disponible (et sert pour les armes sans modele 3D),
 # mais ces objets utilisent le modele 3D en main et dans l'inventaire.
 WEAPONS_3D = {
     'batons_blockbench': {
@@ -203,7 +203,6 @@ def weapons():
     # Guerrier
     simple_item('epee_recrue', "Épée de la Recrue", gi.sword('#c8ccd4', '#8a6a3a', '#5a3a20'), H)
     simple_item('lame_runique', "Lame Runique", gi.sword('#9fb4d8', '#7a8090', '#3a3040', rune='#60f0ff'), H)
-    simple_item('hache_berserker', "Hache du Berserker", gi.axe('#a8a8b0', '#6a3a20', edge='#e0e4ea', double=True), H)
     simple_item('epee_seigneur_guerre', "Épée du Seigneur de Guerre",
                 gi.sword('#d8dce8', '#e0b030', '#802020', gem='#e02030', width=3, guard_len=4), H)
     simple_item('lame_demoniaque', "Lame Démoniaque",
@@ -255,7 +254,6 @@ ARMOR_SETS = [
     ('gardien', "du Gardien", 'plate', '#6a7080', '#c09030', '#40a0ff'),
     ('paladin', "du Paladin", 'plate', '#f0f0f8', '#ffd040', '#40c0ff'),
     ('titan', "du Titan Immortel", 'plate', '#5a4a3a', '#ff8020', '#ff4020'),
-    ('neant_primordial', "du Néant Primordial", 'plate', '#2a1240', '#a040ff', '#ff60ff'),
 ]
 PIECE_NAMES = {
     'plate': {'casque': 'Casque', 'plastron': 'Plastron', 'jambieres': 'Jambières', 'bottes': 'Bottes'},
@@ -683,6 +681,22 @@ CLASS_COLORS = {
 }
 
 SKILLS = [
+    ('frappe_fragilisante', 'guerrier', 'sword', '#ffffff', '#ffe080'),
+    ('execution', 'guerrier', 'crossed', '#ffffff', '#ffe080'),
+    ('impact_vampirique', 'guerrier', 'drop', '#ffffff', '#ffe080'),
+    ('second_souffle', 'guerrier', 'heal', '#ffffff', '#ffe080'),
+    ('lance_de_givre', 'mage', 'snow', '#ffffff', '#ffe080'),
+    ('souffle_draconique', 'mage', 'flame', '#ffffff', '#ffe080'),
+    ('implosion', 'mage', 'spiral', '#ffffff', '#ffe080'),
+    ('meditation', 'mage', 'star', '#ffffff', '#ffe080'),
+    ('tir_entravant', 'archer', 'pierce', '#ffffff', '#ffe080'),
+    ('tir_venimeux', 'archer', 'arrow', '#ffffff', '#ffe080'),
+    ('tir_de_recul', 'archer', 'back', '#ffffff', '#ffe080'),
+    ('pas_leger', 'archer', 'dash', '#ffffff', '#ffe080'),
+    ('crochet_du_gardien', 'tank', 'taunt', '#ffffff', '#ffe080'),
+    ('jugement', 'tank', 'fist', '#ffffff', '#ffe080'),
+    ('garde_partagee', 'tank', 'shield', '#ffffff', '#ffe080'),
+    ('souffle_du_gardien', 'tank', 'heal', '#ffffff', '#ffe080'),
     # (id, classe, glyphe, couleur principale, accent)
     ('frappe_puissante', 'guerrier', 'sword', '#f0f0f0', '#e0b030'),
     ('cri_de_guerre', 'guerrier', 'shout', '#ffe0a0', '#ff6030'),
@@ -767,16 +781,30 @@ def icon(glyph, main, accent, cls, size=32, gold=False):
 
 
 def gui_icons():
+    """Icones de competences et emblemes de classe (tools/gen_skill_icons.py)."""
+    import gen_skill_icons as gsi
+    passives = ('maitrise_armes', 'flux_arcanique', 'oeil_de_lynx', 'peau_de_fer')
+    ultimates = ('fureur_divine', 'meteore_celeste', 'tempete_divine', 'rempart_du_titan')
+    effects = {
+        'frappe_fragilisante': 'break', 'execution': 'strike', 'impact_vampirique': 'heal',
+        'second_souffle': 'heal', 'lance_de_givre': 'slow', 'souffle_draconique': 'fire',
+        'implosion': 'pull', 'meditation': 'mana', 'tir_entravant': 'slow',
+        'tir_venimeux': 'poison', 'tir_de_recul': 'push', 'pas_leger': 'speed',
+        'crochet_du_gardien': 'pull', 'jugement': 'strike', 'garde_partagee': 'guard',
+        'souffle_du_gardien': 'heal',
+    }
+    preview = []
     for sid, cls, glyph, main, acc in SKILLS:
-        img = icon(glyph, main, acc, cls, gold=sid in ('fureur_divine', 'meteore_celeste', 'tempete_divine', 'rempart_du_titan'))
+        img = gsi.render(glyph, main, acc, CLASS_COLORS[cls], ultimate=sid in ultimates, passive=sid in passives,
+                         effect=effects.get(sid))
         img.save(path(ASSETS, 'textures', 'gui', 'skills', sid + '.png'))
+        preview.append(img)
     emblems = {'guerrier': ('crossed', '#f0f0f0', '#e0b030'), 'mage': ('staff', '#e0c8ff', '#80e0ff'),
                'archer': ('bow', '#e0c890', '#ffffff'), 'tank': ('shield', '#d0d8e8', '#ffd040')}
     for cls, (glyph, m, a) in emblems.items():
-        img = icon(glyph, m, a, cls, size=32, gold=True)
-        img.save(path(ASSETS, 'textures', 'gui', 'classes', cls + '.png'))
-        big = icon(glyph, m, a, cls, size=64, gold=True)
-        big.save(path(ASSETS, 'textures', 'gui', 'classes', cls + '_big.png'))
+        gsi.render(glyph, m, a, CLASS_COLORS[cls], size=32, ultimate=True).save(path(ASSETS, 'textures', 'gui', 'classes', cls + '.png'))
+        gsi.render(glyph, m, a, CLASS_COLORS[cls], size=64, ultimate=True).save(path(ASSETS, 'textures', 'gui', 'classes', cls + '_big.png'))
+    gsi.preview(preview, os.path.join(os.path.dirname(__file__), '..', 'art', 'apercu_icones_competences.png'))
 
 
 # ---------------------------------------------------------------------------
@@ -830,13 +858,25 @@ def main():
     gui_icons()
     gen_fx.generate()
     misc_data()
+    import sys
+    import gen_equipment
+    gen_equipment.generate(sys.modules[__name__])
+    import gen_hd_textures
+    gen_hd_textures.generate(sys.modules[__name__])
     lang = dict(sorted(LANG.items()))
     write_json(os.path.join(ASSETS, 'lang', 'fr_fr.json'), lang)
     write_json(os.path.join(ASSETS, 'lang', 'en_us.json'), lang)
     with open(os.path.join(os.path.dirname(__file__), 'manifest.txt'), 'w', encoding='utf-8') as f:
         for kind, iid in MANIFEST:
             f.write(f'{kind} {iid}\n')
+    import generate_extensions
+    generate_extensions.generate()
+    gen_hd_textures.generate(sys.modules[__name__])     # remplace les textures provisoires des extensions
     print(f'{len(MANIFEST)} objets/blocs generes, {len(LANG)} traductions')
+    # modeles Blockbench importes (30 monstres, 10 cosmetiques) : textures, oeufs et traductions
+    import import_bbmodels
+    sys.argv = sys.argv[:1]
+    import_bbmodels.main()
 
 
 if __name__ == '__main__':

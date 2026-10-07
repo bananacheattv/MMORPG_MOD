@@ -1,0 +1,782 @@
+[
+  {
+    "slug": "01_mousseux",
+    "title": "Mousseux",
+    "biome": "01_Foret_ancienne",
+    "cubes": 264,
+    "bones": 7,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Petit esprit de bois : marche à racines et attaque des deux poings.",
+    "path": "01_Foret_ancienne/modeles/01_mousseux.bbmodel"
+  },
+  {
+    "slug": "02_sanglier_ronce",
+    "title": "Sanglier ronce",
+    "biome": "01_Foret_ancienne",
+    "cubes": 383,
+    "bones": 13,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Charge tête baissée, démarche quadrupède et queue mobile.",
+    "path": "01_Foret_ancienne/modeles/02_sanglier_ronce.bbmodel"
+  },
+  {
+    "slug": "03_archer_sylvestre",
+    "title": "Archer sylvestre",
+    "biome": "01_Foret_ancienne",
+    "cubes": 259,
+    "bones": 13,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Archer à capuche végétale : marche et geste de tir à l’arc.",
+    "path": "01_Foret_ancienne/modeles/03_archer_sylvestre.bbmodel"
+  },
+  {
+    "slug": "04_veilleur_champignon",
+    "title": "Veilleur champignon",
+    "biome": "01_Foret_ancienne",
+    "cubes": 150,
+    "bones": 11,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Gardien fongique au grand chapeau : respiration et coups de bras.",
+    "path": "01_Foret_ancienne/modeles/04_veilleur_champignon.bbmodel"
+  },
+  {
+    "slug": "05_colosse_racine",
+    "title": "Colosse racine",
+    "biome": "01_Foret_ancienne",
+    "cubes": 674,
+    "bones": 13,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Colosse massif à longues ramures, épaules moussues, mains de racines recourbées et cœur ambré.",
+    "path": "01_Foret_ancienne/modeles/05_colosse_racine.bbmodel"
+  },
+  {
+    "slug": "06_crapaud_venimeux",
+    "title": "Crapaud venimeux",
+    "biome": "02_Marais_toxique",
+    "cubes": 285,
+    "bones": 9,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Crapaud accroupi : respiration, bond et projection de la langue.",
+    "path": "02_Marais_toxique/modeles/06_crapaud_venimeux.bbmodel"
+  },
+  {
+    "slug": "07_limace_acide",
+    "title": "Limace acide",
+    "biome": "02_Marais_toxique",
+    "cubes": 114,
+    "bones": 10,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "slither",
+        "length": 1.5,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Limace sans pattes : ondulation segmentée, antennes mobiles et contraction acide.",
+    "path": "02_Marais_toxique/modeles/07_limace_acide.bbmodel"
+  },
+  {
+    "slug": "08_luciole_geante",
+    "title": "Luciole géante",
+    "biome": "02_Marais_toxique",
+    "cubes": 149,
+    "bones": 14,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "fly",
+        "length": 1.5,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Insecte volant à six pattes et quatre ailes ; piqué d’attaque.",
+    "path": "02_Marais_toxique/modeles/08_luciole_geante.bbmodel"
+  },
+  {
+    "slug": "09_sorcier_roseaux",
+    "title": "Sorcier des roseaux",
+    "biome": "02_Marais_toxique",
+    "cubes": 274,
+    "bones": 23,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Sorcier aux roseaux : marche traînante et geste d’incantation.",
+    "path": "02_Marais_toxique/modeles/09_sorcier_roseaux.bbmodel"
+  },
+  {
+    "slug": "10_hydre_marais",
+    "title": "Hydre des marais",
+    "biome": "02_Marais_toxique",
+    "cubes": 689,
+    "bones": 29,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Hydre à trois longs cous segmentés, mâchoires dentées, écaille de gorge et queue enroulée.",
+    "path": "02_Marais_toxique/modeles/10_hydre_marais.bbmodel"
+  },
+  {
+    "slug": "11_osselet",
+    "title": "Osselet",
+    "biome": "03_Cryptes_oubliees",
+    "cubes": 105,
+    "bones": 13,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Petit squelette encapuchonné : marche vive et coup de dague.",
+    "path": "03_Cryptes_oubliees/modeles/11_osselet.bbmodel"
+  },
+  {
+    "slug": "12_araignee_os",
+    "title": "Araignée d’os",
+    "biome": "03_Cryptes_oubliees",
+    "cubes": 82,
+    "bones": 13,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Araignée à huit pattes, abdomen en crâne et crochets articulés.",
+    "path": "03_Cryptes_oubliees/modeles/12_araignee_os.bbmodel"
+  },
+  {
+    "slug": "13_garde_funeraire",
+    "title": "Garde funéraire",
+    "biome": "03_Cryptes_oubliees",
+    "cubes": 185,
+    "bones": 11,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Sentinelle en bronze : marche défensive et estoc de lance.",
+    "path": "03_Cryptes_oubliees/modeles/13_garde_funeraire.bbmodel"
+  },
+  {
+    "slug": "14_spectre_enchaine",
+    "title": "Spectre enchaîné",
+    "biome": "03_Cryptes_oubliees",
+    "cubes": 224,
+    "bones": 30,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "fly",
+        "length": 1.5,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Spectre flottant : tissus ondulants et fouet de chaînes articulées.",
+    "path": "03_Cryptes_oubliees/modeles/14_spectre_enchaine.bbmodel"
+  },
+  {
+    "slug": "15_roi_cryptes",
+    "title": "Roi des cryptes",
+    "biome": "03_Cryptes_oubliees",
+    "cubes": 335,
+    "bones": 21,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Boss nécromant couronné : cape mobile et grand coup d’épée.",
+    "path": "03_Cryptes_oubliees/modeles/15_roi_cryptes.bbmodel"
+  },
+  {
+    "slug": "16_renard_givre",
+    "title": "Renard de givre",
+    "biome": "04_Pics_de_givre",
+    "cubes": 335,
+    "bones": 16,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Renard de givre à grande queue relevée et touffue, oreilles cristallines, poitrail et pattes articulées.",
+    "path": "04_Pics_de_givre/modeles/16_renard_givre.bbmodel"
+  },
+  {
+    "slug": "17_scarabee_polaire",
+    "title": "Scarabée polaire",
+    "biome": "04_Pics_de_givre",
+    "cubes": 131,
+    "bones": 11,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Scarabée à six pattes, carapace de glace et pinces de morsure.",
+    "path": "04_Pics_de_givre/modeles/17_scarabee_polaire.bbmodel"
+  },
+  {
+    "slug": "18_harpie_neiges",
+    "title": "Harpie des neiges",
+    "biome": "04_Pics_de_givre",
+    "cubes": 259,
+    "bones": 8,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "fly",
+        "length": 1.5,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Harpie entièrement plumée : battement d’ailes et attaque aux serres.",
+    "path": "04_Pics_de_givre/modeles/18_harpie_neiges.bbmodel"
+  },
+  {
+    "slug": "19_golem_iceberg",
+    "title": "Golem d’iceberg",
+    "biome": "04_Pics_de_givre",
+    "cubes": 300,
+    "bones": 11,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Colosse de glace : marche lourde et frappe des deux poings.",
+    "path": "04_Pics_de_givre/modeles/19_golem_iceberg.bbmodel"
+  },
+  {
+    "slug": "20_wyrm_boreal",
+    "title": "Wyrm boréal",
+    "biome": "04_Pics_de_givre",
+    "cubes": 371,
+    "bones": 18,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "slither",
+        "length": 1.5,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Wyrm boréal en S vertical, quatorze vertèbres articulées, écailles, nageoires et grandes cornes glacées.",
+    "path": "04_Pics_de_givre/modeles/20_wyrm_boreal.bbmodel"
+  },
+  {
+    "slug": "21_scorpion_cuivre",
+    "title": "Scorpion de cuivre",
+    "biome": "05_Desert_ardent",
+    "cubes": 203,
+    "bones": 23,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Scorpion à huit pattes : pinces indépendantes et frappe du dard.",
+    "path": "05_Desert_ardent/modeles/21_scorpion_cuivre.bbmodel"
+  },
+  {
+    "slug": "22_momie_dunes",
+    "title": "Momie des dunes",
+    "biome": "05_Desert_ardent",
+    "cubes": 111,
+    "bones": 15,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Momie aux bandages mobiles : marche raide et saisie des deux bras.",
+    "path": "05_Desert_ardent/modeles/22_momie_dunes.bbmodel"
+  },
+  {
+    "slug": "23_hyene_cendree",
+    "title": "Hyène cendrée",
+    "biome": "05_Desert_ardent",
+    "cubes": 254,
+    "bones": 14,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Prédateur au dos voûté, rayures incandescentes et morsure articulée.",
+    "path": "05_Desert_ardent/modeles/23_hyene_cendree.bbmodel"
+  },
+  {
+    "slug": "24_djinn_braises",
+    "title": "Djinn des braises",
+    "biome": "05_Desert_ardent",
+    "cubes": 201,
+    "bones": 14,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "fly",
+        "length": 1.5,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Djinn sans jambes : vol, tourbillon de braises et projection des paumes.",
+    "path": "05_Desert_ardent/modeles/24_djinn_braises.bbmodel"
+  },
+  {
+    "slug": "25_tortue_volcanique",
+    "title": "Tortue volcanique",
+    "biome": "05_Desert_ardent",
+    "cubes": 370,
+    "bones": 8,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Boss quadrupède à carapace volcanique, cratère de lave et morsure.",
+    "path": "05_Desert_ardent/modeles/25_tortue_volcanique.bbmodel"
+  },
+  {
+    "slug": "26_mite_astrale",
+    "title": "Mite astrale",
+    "biome": "06_Faille_du_neant",
+    "cubes": 326,
+    "bones": 7,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "fly",
+        "length": 1.5,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Mite astrale aux quatre ailes diagonales festonnées, nervures, motifs et antennes ciliées.",
+    "path": "06_Faille_du_neant/modeles/26_mite_astrale.bbmodel"
+  },
+  {
+    "slug": "27_rodeur_vide",
+    "title": "Rôdeur du vide",
+    "biome": "06_Faille_du_neant",
+    "cubes": 334,
+    "bones": 15,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "walk",
+        "length": 1.2,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Prédateur du vide à longues pattes : démarche rampante et morsure.",
+    "path": "06_Faille_du_neant/modeles/27_rodeur_vide.bbmodel"
+  },
+  {
+    "slug": "28_oeil_chaos",
+    "title": "Œil du chaos",
+    "biome": "06_Faille_du_neant",
+    "cubes": 163,
+    "bones": 38,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "fly",
+        "length": 1.5,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Œil du chaos à orbite arrondie et irrégulière, iris magenta, pupille fendue et sept tentacules recourbés.",
+    "path": "06_Faille_du_neant/modeles/28_oeil_chaos.bbmodel"
+  },
+  {
+    "slug": "29_chevalier_fracture",
+    "title": "Chevalier fracturé",
+    "biome": "06_Faille_du_neant",
+    "cubes": 229,
+    "bones": 11,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "fly",
+        "length": 1.5,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Armure flottante aux jointures fracturées et attaque de grande lame.",
+    "path": "06_Faille_du_neant/modeles/29_chevalier_fracture.bbmodel"
+  },
+  {
+    "slug": "30_devoreur_etoiles",
+    "title": "Dévoreur d’étoiles",
+    "biome": "06_Faille_du_neant",
+    "cubes": 543,
+    "bones": 18,
+    "animations": [
+      {
+        "name": "idle",
+        "length": 3,
+        "loop": "loop"
+      },
+      {
+        "name": "fly",
+        "length": 1.5,
+        "loop": "loop"
+      },
+      {
+        "name": "attack",
+        "length": 1.2,
+        "loop": "once"
+      }
+    ],
+    "notes": "Dévoreur d’étoiles enroulé, quatorze vertèbres articulées, bouche ouverte, dents et nageoires astrales.",
+    "path": "06_Faille_du_neant/modeles/30_devoreur_etoiles.bbmodel"
+  }
+]

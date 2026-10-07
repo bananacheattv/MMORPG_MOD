@@ -226,3 +226,22 @@ Dans Mods > Eldoria MMORPG > Configurer, on peut activer ou désactiver :
 - `./gradlew runClient -PquickWorld=<monde>` ouvre directement une sauvegarde de `run/saves`.
 - `./gradlew runClient -PquickWorld=<monde> -Pshowcase` lance la vitrine automatique : elle ouvre chaque interface et enregistre des captures dans `run/screenshots`. Variantes : `-Pshowcase=quetes` (quêtes et marchand), `-Pshowcase=clic` (menus au clic gauche). Réservée au développement, elle est sans effet en jeu normal.
 - Test à deux joueurs : `./gradlew runServer`, puis `./gradlew runClient -PmpServer=localhost -Pusername=Alice -Pshowcase=mpA` et la même commande avec `-Pusername=Bob -Pshowcase=mpB`.
+
+## Launcher auto-mis à jour
+
+À chaque push sur `main`, le workflow `Release launcher` compile le mod et met à jour la release GitHub
+[`latest`](https://github.com/bananacheattv/MMORPG_MOD/releases/tag/latest).
+
+Joueurs : télécharger `EldoriaLauncher-Windows.zip`, dézipper, lancer `EldoriaLauncher.exe`
+(ou `EldoriaLauncher.jar` avec Java 21+). Le launcher, sans passer par le launcher officiel :
+- se met à jour tout seul (son cœur `launcher-core.jar` est retéléchargé quand il change) ;
+- télécharge Java, Minecraft, NeoForge et les ressources dans `%APPDATA%\.eldoria\minecraft` ;
+- synchronise les mods dans `%APPDATA%\.eldoria\instance\mods` (Eldoria + WorldEdit pour la bonne version,
+  résolu sur Modrinth ; liste dans `launcher/extra_mods.json`, les mods ajoutés à la main sont gardés) ;
+- lance le jeu avec un compte Microsoft, ou un pseudo hors ligne (solo / serveur `online-mode=false`).
+
+Connexion Microsoft : créer une application Azure (« Comptes Microsoft personnels », client public, flux
+« appareil » activé), faire valider son ID pour Minecraft (https://aka.ms/mce-reviewappid), puis mettre l'ID
+dans la variable de dépôt `MSA_CLIENT_ID` (Settings → Secrets and variables → Actions → Variables).
+
+Code : `launcher/` (amorce `bootstrap/`, cœur `core/`, scripts `scripts/`).
