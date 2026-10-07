@@ -24,7 +24,7 @@ public final class MountManager {
     }
     public static boolean summon(ServerPlayer p, String id) {
         var type = MountType.byId(id); var d = RpgPlayers.get(p);
-        if (!playable(p) || type == null || !d.mounts.contains(id) || d.level < type.level) return false;
+        if (!playable(p) || type == null || !d.mounts.contains(id)) return false;
         long now = p.level().getServer().getTickCount();
         if (now < d.nextMountTick) { message(p, "Patientez quelques secondes avant de réinvoquer."); return false; }
         if (p.isPassenger() || !p.onGround() || p.isInWater()) { message(p, "Descendez et placez-vous sur la terre ferme."); return false; }
