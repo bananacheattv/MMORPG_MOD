@@ -272,15 +272,9 @@ public final class QuestManager {
         if (q.rewards.gold > 0) RpgPlayers.addGold(p, q.rewards.gold, true);
         for (QuestDef.ItemReward ir : q.rewards.items) {
             Item item = ForgeRecipes.resolveItem(ir.item);
-            if (item != null && item != Items.AIR) RpgPlayers.give(p, item, ir.count);
+            if (item != null && item != Items.AIR && !CrateOnly.is(item)) RpgPlayers.give(p, item, ir.count);
         }
-        if (q.rewards.pet != null && !q.rewards.pet.isEmpty()) {
-            PetType pet = PetType.byId(q.rewards.pet);
-            if (pet != null) RpgPlayers.unlockPet(p, pet);
-        }
-        if (q.rewards.cosmetic != null && !q.rewards.cosmetic.isEmpty() && Cosmetic.byId(q.rewards.cosmetic) != null) {
-            d.cosmetics.add(q.rewards.cosmetic);
-        }
+        // familiers et cosmetiques : uniquement dans les caisses et les Lucky Blocks (q.rewards.pet / cosmetic ignores)
         Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "QUÊTE TERMINÉE", q.name, 0x60FF80));
         p.level().playSound(null, p.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 0.8f, 1.2f);
         if (xp > 0) RpgPlayers.giveXp(p, xp, false);

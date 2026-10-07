@@ -183,6 +183,20 @@ public final class ModItems {
     public static final DeferredItem<RpgMaterialItem> CLE_AVENTURE = material("cle_aventure", Rarity.RARE, "Ouvre une caisse d’aventure. Une clé par caisse.");
     public static final DeferredItem<RpgConsumableItem> CAISSE_AVENTURE = consumable("caisse_aventure", Rarity.RARE, RpgConsumableItem.Kind.ADVENTURE_CRATE, 0, "Nécessite une clé d’aventure. Contient un butin aléatoire (potions, pierres, or, charmes...).");
     public static final DeferredItem<BlockItem> LUCKY_BLOCK = ITEMS.registerSimpleBlockItem("lucky_block", ModBlocks.LUCKY_BLOCK);
+    public static final DeferredItem<RpgMaterialItem> CLE_VOTE = material("cle_vote", Rarity.PEU_COMMUN, "Ouvre une caisse de vote. Obtenue en votant pour le serveur.");
+    public static final DeferredItem<RpgMaterialItem> CLE_QUETE = material("cle_quete", Rarity.RARE, "Ouvre une caisse de quête. Récompense de quêtes.");
+    public static final DeferredItem<RpgMaterialItem> CLE_COMMUNE = material("cle_commune", Rarity.COMMUN, "Ouvre une caisse commune.");
+    public static final DeferredItem<RpgMaterialItem> CLE_RARE = material("cle_rare", Rarity.RARE, "Ouvre une caisse rare.");
+    public static final DeferredItem<RpgMaterialItem> CLE_EPIQUE = material("cle_epique", Rarity.EPIQUE, "Ouvre une caisse épique.");
+    public static final DeferredItem<RpgMaterialItem> CLE_LEGENDAIRE = material("cle_legendaire", Rarity.LEGENDAIRE, "Ouvre une caisse légendaire.");
+    public static final DeferredItem<RpgMaterialItem> CLE_MYTHIQUE = material("cle_mythique", Rarity.MYTHIQUE, "Ouvre une caisse mythique.");
+    /** Blocs des caisses (onglet creatif, reserves aux admins). */
+    public static final java.util.List<DeferredItem<BlockItem>> CRATE_BLOCKS = new java.util.ArrayList<>();
+
+    static {
+        for (var tier : com.mmorpg.block.crate.CrateTier.values())
+            CRATE_BLOCKS.add(ITEMS.registerSimpleBlockItem(tier.blockId(), ModBlocks.CRATES.get(tier)));
+    }
 
     // ------------------------------------------------------------------ blocs
     public static final DeferredItem<BlockItem> FORGE_ARCANIQUE = ITEMS.registerSimpleBlockItem("forge_arcanique", ModBlocks.FORGE_ARCANIQUE);

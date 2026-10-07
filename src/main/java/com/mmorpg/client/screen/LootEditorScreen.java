@@ -29,7 +29,7 @@ public final class LootEditorScreen extends MmoScreen {
     private static final Gson JSON = new Gson();
     private static final java.lang.reflect.Type LIST = new TypeToken<List<LootTables.Entry>>() {
     }.getType();
-    private static final String[] TABLES = {LootTables.CRATE, LootTables.LUCKY};
+    private static final String[] TABLES = LootTables.ALL.toArray(new String[0]);
 
     private final Map<String, List<LootTables.Entry>> tables = new LinkedHashMap<>();
     private final Map<String, Boolean> modified = new LinkedHashMap<>();

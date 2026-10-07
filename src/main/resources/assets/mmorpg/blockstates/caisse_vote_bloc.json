@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,open=false": {
+      "model": "mmorpg:block/caisse_vote_bloc"
+    },
+    "facing=north,open=true": {
+      "model": "mmorpg:block/caisse_vote_bloc_ouverte"
+    },
+    "facing=east,open=false": {
+      "model": "mmorpg:block/caisse_vote_bloc",
+      "y": 90
+    },
+    "facing=east,open=true": {
+      "model": "mmorpg:block/caisse_vote_bloc_ouverte",
+      "y": 90
+    },
+    "facing=south,open=false": {
+      "model": "mmorpg:block/caisse_vote_bloc",
+      "y": 180
+    },
+    "facing=south,open=true": {
+      "model": "mmorpg:block/caisse_vote_bloc_ouverte",
+      "y": 180
+    },
+    "facing=west,open=false": {
+      "model": "mmorpg:block/caisse_vote_bloc",
+      "y": 270
+    },
+    "facing=west,open=true": {
+      "model": "mmorpg:block/caisse_vote_bloc_ouverte",
+      "y": 270
+    }
+  }
+}

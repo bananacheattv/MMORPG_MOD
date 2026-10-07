@@ -24,7 +24,7 @@ public final class LootEditor {
     public static CompoundTag snapshot() {
         CompoundTag t = new CompoundTag();
         CompoundTag tables = new CompoundTag();
-        for (String id : List.of(LootTables.CRATE, LootTables.LUCKY)) {
+        for (String id : LootTables.ALL) {
             tables.putString(id, QuestEditor.JSON.toJson(ConfigManager.loot().table(id)));
         }
         t.put("tables", tables);
@@ -41,7 +41,7 @@ public final class LootEditor {
         boolean ok = false;
         try {
             String table = data.getStringOr("table", "");
-            if (!table.equals(LootTables.CRATE) && !table.equals(LootTables.LUCKY)) throw new IllegalArgumentException("Table inconnue.");
+            if (!LootTables.ALL.contains(table)) throw new IllegalArgumentException("Table inconnue.");
             String json = data.getStringOr("json", "");
             if (json.length() > 20000) throw new IllegalArgumentException("Table trop grande.");
             List<LootTables.Entry> entries = QuestEditor.JSON.fromJson(json, LIST);

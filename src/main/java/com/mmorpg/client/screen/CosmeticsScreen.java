@@ -70,7 +70,7 @@ public class CosmeticsScreen extends MenuScreen {
             g.fill(lx + 4, ry + 4, lx + 23, ry + 23, Ui.withAlpha(c.color, has ? 0xFF : 0x50));
             Ui.border(g, lx + 4, ry + 4, 19, 19, Ui.darker(c.color | 0xFF000000, 0.5f));
             g.text(font, c.label, lx + 28, ry + 4, has ? Ui.TEXT : Ui.MUTED, false);
-            String status = eq ? "Équipé" : has ? "Débloqué" : (c.unlockLevel > 0 ? "Niveau " + c.unlockLevel : "Coffre");
+            String status = eq ? "Équipé" : has ? "Débloqué" : (c.unlockLevel > 0 ? "Niveau " + c.unlockLevel : "Caisses / Lucky Block");
             g.text(font, status, lx + 28, ry + 15, eq ? Ui.GREEN : has ? Ui.GOLD : Ui.RED, false);
             final Cosmetic cc = c;
             click(lx, ry, lw, 27, () -> selected = cc);

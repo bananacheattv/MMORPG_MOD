@@ -49,7 +49,7 @@ public final class ShopManager {
             return;
         }
         Item item = ForgeRecipes.resolveItem(offer.item);
-        if (item == null || item == Items.AIR) return;
+        if (item == null || item == Items.AIR || CrateOnly.is(item)) return;
         times = Math.max(1, Math.min(64, times));
         long cost = (long) offer.price * times;
         if (!RpgPlayers.takeGold(p, cost)) {
