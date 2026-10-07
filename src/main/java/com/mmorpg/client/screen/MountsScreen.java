@@ -25,7 +25,7 @@ public class MountsScreen extends MenuScreen {
             boolean owned = d.mounts.contains(type.id);
             Ui.frame(g, x, ry, lw, 36, owned ? Ui.GOLD : Ui.MUTED, type == selected);
             g.text(font, type.label, x + 5, ry + 5, owned ? Ui.GOLD : Ui.TEXT, false);
-            g.text(font, "Niv. " + type.level + " • " + (owned ? "Débloquée" : "Caisses"), x + 5, ry + 20, Ui.MUTED, false);
+            g.text(font, owned ? "Débloquée" : "Caisses / Lucky Blocks", x + 5, ry + 20, Ui.MUTED, false);
             click(x, ry, lw, 36, () -> { selected = type; confirm = false; });
         }
         button(g, x, top + ph - 25, lw, 17, "< Familiers", true, 0xFF2A2420, () -> minecraft.gui.setScreen(new PetsScreen()));
@@ -51,7 +51,7 @@ public class MountsScreen extends MenuScreen {
         boolean owned = d.mounts.contains(selected.id), active = selected.id.equals(d.activeMount);
         int by = bottom - 23;
         if (owned) {
-            button(g, dx + 7, by, dw - 14, 17, active ? "Renvoyer" : "Invoquer", d.level >= selected.level, 0xFF2A5630, () -> {
+            button(g, dx + 7, by, dw - 14, 17, active ? "Renvoyer" : "Invoquer", true, 0xFF2A5630, () -> {
                 ClientNet.send(new Payloads.MountAction(active ? Payloads.MountAction.DISMISS : Payloads.MountAction.SUMMON, selected.id));
                 minecraft.gui.setScreen(null);
             });

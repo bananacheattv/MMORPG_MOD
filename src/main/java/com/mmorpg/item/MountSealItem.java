@@ -35,7 +35,6 @@ public class MountSealItem extends RpgMaterialItem {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> out, TooltipFlag flag) {
         super.appendHoverText(stack, context, display, out, flag);
-        out.accept(Component.literal("Niveau " + mount.level + " requis pour la monter").withColor(0xE8C060));
         out.accept(Component.literal("Clic droit pour l'ajouter à vos montures").withColor(0x80C0FF));
     }
 }
