@@ -23,3 +23,6 @@ jobs:
 
       - name: Build with Gradle
         run: bash ./gradlew build
+
+      - name: Build du launcher
+        run: bash launcher/scripts/build_jars.sh

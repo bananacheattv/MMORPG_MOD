@@ -226,3 +226,17 @@ Dans Mods > Eldoria MMORPG > Configurer, on peut activer ou désactiver :
 - `./gradlew runClient -PquickWorld=<monde>` ouvre directement une sauvegarde de `run/saves`.
 - `./gradlew runClient -PquickWorld=<monde> -Pshowcase` lance la vitrine automatique : elle ouvre chaque interface et enregistre des captures dans `run/screenshots`. Variantes : `-Pshowcase=quetes` (quêtes et marchand), `-Pshowcase=clic` (menus au clic gauche). Réservée au développement, elle est sans effet en jeu normal.
 - Test à deux joueurs : `./gradlew runServer`, puis `./gradlew runClient -PmpServer=localhost -Pusername=Alice -Pshowcase=mpA` et la même commande avec `-Pusername=Bob -Pshowcase=mpB`.
+
+## Launcher auto-mis à jour
+
+À chaque push sur `main`, le workflow `Release launcher` compile le mod et met à jour la release GitHub
+[`latest`](https://github.com/bananacheattv/MMORPG_MOD/releases/tag/latest).
+
+Joueurs : télécharger `EldoriaLauncher-Windows.zip` (Java inclus), dézipper, lancer `EldoriaLauncher.exe`
+(ou `EldoriaLauncher.jar` avec Java 21+). Le launcher :
+- se met à jour tout seul (son cœur `launcher-core.jar` est retéléchargé quand il change) ;
+- synchronise les mods dans `%APPDATA%\.eldoria\mods` (les mods ajoutés à la main sont gardés) ;
+- installe NeoForge si besoin et crée le profil « Eldoria MMORPG » dans le launcher Minecraft officiel ;
+- ouvre le launcher Minecraft (connexion Microsoft gérée par Mojang).
+
+Code : `launcher/` (amorce `bootstrap/`, cœur `core/`, scripts de build `scripts/`).
