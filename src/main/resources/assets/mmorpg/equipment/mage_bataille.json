@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "mmorpg:mage_bataille"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "mmorpg:mage_bataille"
+      }
+    ]
+  }
+}

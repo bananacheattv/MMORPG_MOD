@@ -30,8 +30,20 @@ public final class ConfigManager {
     private static Map<String, MobConfig> mobs = DefaultMobs.create();
     private static Map<String, com.mmorpg.quest.QuestDef> quests = com.mmorpg.quest.DefaultQuests.create();
     private static ShopConfig shop = ShopConfig.defaults();
+    private static LootTables loot = LootTables.defaults();
 
     private ConfigManager() {
+    }
+
+    /** Ajoute au butin d'un monstre deja configure les nouveaux objets du butin par defaut (sans toucher aux reglages existants). */
+    private static void mergeDrops(MobConfig cfg, MobConfig defaults) {
+        for (MobConfig.Drop d : cfg.drops) {
+            if (d.item.equals("mmorpg:hache_berserker")) d.item = "mmorpg:epee_berserker";     // la hache est devenue une epee
+        }
+        for (MobConfig.Drop d : defaults.drops) {
+            if (cfg.drops.stream().noneMatch(x -> x.item.equals(d.item))) cfg.drops.add(new MobConfig.Drop(d.item, d.chance, d.min, d.max));
+        }
+        cfg.dropsVersion = DefaultMobs.DROPS_VERSION;
     }
 
     public static GeneralConfig general() {
@@ -57,6 +69,26 @@ public final class ConfigManager {
             try { Files.move(temp, dir().resolve("quests.json"), java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE); }
             catch (java.nio.file.AtomicMoveNotSupportedException e) { Files.move(temp, dir().resolve("quests.json"), java.nio.file.StandardCopyOption.REPLACE_EXISTING); }
             quests = updated;
+        } finally { Files.deleteIfExists(temp); }
+    }
+
+    public static LootTables loot() {
+        return loot;
+    }
+
+    /** Enregistre une table de butin modifiee en jeu (ecriture atomique de butins.json). */
+    public static synchronized void saveLootTable(String id, java.util.List<LootTables.Entry> entries) throws java.io.IOException {
+        LootTables updated = new LootTables();
+        updated.tables.putAll(loot.tables);
+        updated.tables.put(id, new java.util.ArrayList<>(entries));
+        updated.sanitize();
+        Files.createDirectories(dir());
+        Path temp = Files.createTempFile(dir(), "butins-", ".tmp");
+        try {
+            Files.writeString(temp, GSON.toJson(updated), StandardCharsets.UTF_8);
+            try { Files.move(temp, dir().resolve("butins.json"), java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE); }
+            catch (java.nio.file.AtomicMoveNotSupportedException e) { Files.move(temp, dir().resolve("butins.json"), java.nio.file.StandardCopyOption.REPLACE_EXISTING); }
+            loot = updated;
         } finally { Files.deleteIfExists(temp); }
     }
 
@@ -125,7 +157,8 @@ public final class ConfigManager {
                 }
             }
             for (Map.Entry<String, MobConfig> e : defaults.entrySet()) {
-                result.putIfAbsent(e.getKey(), e.getValue());
+                MobConfig existing = result.putIfAbsent(e.getKey(), e.getValue());
+                if (existing != null && existing.dropsVersion < DefaultMobs.DROPS_VERSION) mergeDrops(existing, e.getValue());
             }
             for (MobConfig cfg : result.values()) {
                 sanitize(cfg);
@@ -166,6 +199,16 @@ public final class ConfigManager {
             }
             shop = shopCfg == null ? ShopConfig.defaults() : shopCfg;
             write(sh, shop);
+
+            Path lt = dir().resolve("butins.json");
+            LootTables lootCfg = null;
+            if (Files.exists(lt)) {
+                try (Reader r = Files.newBufferedReader(lt, StandardCharsets.UTF_8)) {
+                    lootCfg = GSON.fromJson(r, LootTables.class);
+                }
+            }
+            loot = (lootCfg == null ? LootTables.defaults() : lootCfg).sanitize();
+            write(lt, loot);
             MMORPG.LOGGER.info("[MMORPG] Configuration chargée : {} monstres/boss, {} quêtes, {} articles en boutique", mobs.size(), quests.size(), shop.buy.size());
         } catch (Exception e) {
             MMORPG.LOGGER.error("[MMORPG] Impossible de lire la configuration, valeurs par défaut utilisées", e);
@@ -173,6 +216,7 @@ public final class ConfigManager {
             mobs = DefaultMobs.create();
             quests = com.mmorpg.quest.DefaultQuests.create();
             shop = ShopConfig.defaults();
+            loot = LootTables.defaults();
         }
     }
 

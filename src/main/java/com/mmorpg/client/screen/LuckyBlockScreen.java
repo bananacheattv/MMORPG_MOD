@@ -17,7 +17,17 @@ public class LuckyBlockScreen extends MmoScreen {
     private boolean requested;
     private int elapsed;
     private String error = "";
-    public LuckyBlockScreen(CompoundTag data) { super("Lucky Block"); pos = BlockPos.of(data.getLongOr("pos", 0)); }
+    /** Butins possibles envoyes par le serveur (config/mmorpg/butins.json, modifiable avec /mmorpg butins). */
+    private final net.minecraft.nbt.ListTag table;
+    private final String[] icons;
+    public LuckyBlockScreen(CompoundTag data) {
+        super("Lucky Block");
+        pos = BlockPos.of(data.getLongOr("pos", 0));
+        table = data.getListOrEmpty("table");
+        java.util.List<String> ids = new java.util.ArrayList<>();
+        for (int i = 0; i < table.size(); i++) ids.add(table.getCompoundOrEmpty(i).getStringOr("item", "mmorpg:piece_or"));
+        icons = ids.isEmpty() ? new String[]{"potion_soin", "pierre_amelioration", "piece_or", "charme_chance", "coffre_cosmetique"} : ids.toArray(new String[0]);
+    }
     @Override protected int panelWidth() { return Math.min(width - 12, 540); }
     @Override protected int panelHeight() { return Math.min(height - 12, 290); }
     public void result(CompoundTag data) {
@@ -38,7 +48,6 @@ public class LuckyBlockScreen extends MmoScreen {
         int right = x + rw + 14, infoW = left + pw - right - 12;
         boolean spinning = loot != null && elapsed < 80;
         boolean finished = loot != null && !spinning;
-        String[] icons = {"potion_soin", "pierre_amelioration", "piece_or", "charme_chance", "coffre_cosmetique"};
         int cw = (rw - 8) / 3, rh = Math.max(64, Math.min(104, ph - 130));
         for (int col = 0; col < 3; col++) {
             int cx = x + col * (cw + 4);
@@ -59,14 +68,20 @@ public class LuckyBlockScreen extends MmoScreen {
             g.fill(cx + 1, y + rh / 2 + 17, cx + cw - 1, y + rh / 2 + 18, Ui.GOLD);
         }
         Ui.header(g, right, y, infoW, "BUTINS POSSIBLES");
-        String[] names = {"Potions", "Amélioration", "Pièces d’or", "Charmes", "Cosmétique"};
-        int[] odds = {45,25,20,8,2};
-        for (int i = 0; i < icons.length; i++) {
-            int iy = y + 17 + i * 23;
-            g.item(new ItemStack(ForgeRecipes.resolveItem(icons[i])), right, iy);
-            g.text(font, font.plainSubstrByWidth(names[i], infoW - 21), right + 20, iy, Ui.TEXT, false);
-            g.text(font, odds[i] + " %", right + 20, iy + 10, Ui.GOLD, false);
+        int maxRows = Math.max(1, (rh + 20) / 21);
+        for (int i = 0; i < Math.min(table.size(), maxRows); i++) {
+            CompoundTag e = table.getCompoundOrEmpty(i);
+            int iy = y + 15 + i * 21;
+            ItemStack stack = new ItemStack(ForgeRecipes.resolveItem(e.getStringOr("item", "mmorpg:piece_or")));
+            g.item(stack, right, iy);
+            int min = e.getIntOr("min", 1), max = e.getIntOr("max", 1);
+            String qty = (min == max ? String.valueOf(min) : min + "-" + max) + (e.getBooleanOr("gold", false) ? " or" : " ×");
+            String name = e.getBooleanOr("gold", false) ? "Pièces d’or" : stack.getHoverName().getString();
+            g.text(font, font.plainSubstrByWidth(name, infoW - 21), right + 20, iy, Ui.TEXT, false);
+            int pm = e.getIntOr("permille", 0);
+            g.text(font, qty + "   " + (pm / 10) + "," + (pm % 10) + " %", right + 20, iy + 9, Ui.GOLD, false);
         }
+        if (table.size() > maxRows) g.text(font, "+" + (table.size() - maxRows) + " autres…", right, y + 15 + maxRows * 21, Ui.MUTED, false);
         String label = !requested ? "Ouvrir" : spinning ? "Passer l’animation" : finished ? "Fermer" : "Ouverture…";
         button(g, x, y + rh + 10, rw, 20, label, !requested || loot != null, 0xFF665020, () -> {
             if (!requested) start(); else if (spinning) elapsed = 80; else onClose();

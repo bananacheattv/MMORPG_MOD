@@ -1,0 +1,7 @@
+{
+  "parent": "mmorpg:item/baton_niv060",
+  "textures": {
+    "0": "mmorpg:item/sceptre_ombre",
+    "particle": "mmorpg:item/sceptre_ombre"
+  }
+}

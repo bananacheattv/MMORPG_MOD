@@ -28,6 +28,9 @@ public final class Net {
         r.playToServer(Payloads.QuestEdit.TYPE, Payloads.QuestEdit.CODEC, (packet, ctx) -> {
             if (ctx.player() instanceof ServerPlayer p) com.mmorpg.server.QuestEditor.action(p, packet.data());
         });
+        r.playToServer(Payloads.LootEdit.TYPE, Payloads.LootEdit.CODEC, (packet, ctx) -> {
+            if (ctx.player() instanceof ServerPlayer p) com.mmorpg.server.LootEditor.action(p, packet.data());
+        });
         r.playToServer(Payloads.Allocate.TYPE, Payloads.Allocate.CODEC, ServerHandlers::allocate);
         r.playToServer(Payloads.SkillAction.TYPE, Payloads.SkillAction.CODEC, ServerHandlers::skillAction);
         r.playToServer(Payloads.MountAction.TYPE, Payloads.MountAction.CODEC, ServerHandlers::mountAction);

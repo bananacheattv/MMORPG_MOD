@@ -15,6 +15,12 @@ public final class Payloads {
         public static final StreamCodec<ByteBuf,QuestEdit> CODEC=StreamCodec.composite(ByteBufCodecs.COMPOUND_TAG,QuestEdit::data,QuestEdit::new);
         @Override public Type<? extends CustomPacketPayload> type() {return TYPE;}
     }
+    /** Edition des butins (caisses, Lucky Blocks) par un operateur. */
+    public record LootEdit(CompoundTag data) implements CustomPacketPayload {
+        public static final Type<LootEdit> TYPE=new Type<>(MMORPG.id("loot_edit"));
+        public static final StreamCodec<ByteBuf,LootEdit> CODEC=StreamCodec.composite(ByteBufCodecs.COMPOUND_TAG,LootEdit::data,LootEdit::new);
+        @Override public Type<? extends CustomPacketPayload> type() {return TYPE;}
+    }
     private Payloads() {
     }
 

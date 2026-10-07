@@ -31,8 +31,7 @@ public final class ArmorLayers {
             Map.entry("garde", "panoplie_04_niv_015"),
             Map.entry("gardien", "panoplie_07_niv_030"),
             Map.entry("paladin", "panoplie_13_niv_060"),
-            Map.entry("titan", "panoplie_18_niv_085"),
-            Map.entry("neant_primordial", "panoplie_20_niv_100"));
+            Map.entry("titan", "panoplie_18_niv_085"));
     public static final List<String> PANOPLIES = List.of("panoplie_01_niv_001", "panoplie_02_niv_005", "panoplie_03_niv_010", "panoplie_04_niv_015", "panoplie_05_niv_020", "panoplie_06_niv_025", "panoplie_07_niv_030", "panoplie_08_niv_035", "panoplie_09_niv_040", "panoplie_10_niv_045", "panoplie_11_niv_050", "panoplie_12_niv_055", "panoplie_13_niv_060", "panoplie_14_niv_065", "panoplie_15_niv_070", "panoplie_16_niv_075", "panoplie_17_niv_080", "panoplie_18_niv_085", "panoplie_19_niv_090", "panoplie_20_niv_100");
 
     private ArmorLayers() {

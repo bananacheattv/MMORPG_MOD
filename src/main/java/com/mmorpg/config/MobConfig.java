@@ -26,6 +26,8 @@ public class MobConfig {
     public double xpMultiplier = 1.0;
     /** Taille du modele (1.0 = normale). */
     public double scale = 1.0;
+    /** Version du butin par defaut deja fusionnee dans ce fichier (voir DefaultMobs.DROPS_VERSION). */
+    public int dropsVersion = 0;
     public boolean boss = false;
     public Spawn spawn = new Spawn();
     public List<Drop> drops = new ArrayList<>();
