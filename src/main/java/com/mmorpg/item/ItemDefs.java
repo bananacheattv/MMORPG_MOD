@@ -49,32 +49,51 @@ public final class ItemDefs {
 
         // ---------------- Guerrier
         w("epee_recrue", G, WeaponKind.SWORD, 1, C, null, "Une lame simple mais fiable.", ATK, 8);
+        w("epee_milicien", G, WeaponKind.SWORD, 5, C, null, "Une épée de milice, robuste et bien équilibrée.", ATK, 14, FORCE, 1);
         w("lame_runique", G, WeaponKind.SWORD, 10, U, null, "Des runes anciennes luisent le long de la lame.", ATK, 22, CRIT, 2, FORCE, 3);
-        w("hache_berserker", G, WeaponKind.AXE, 25, R, null, "Arrachée au trésor du Roi Gobelin.", ATK, 55, CRIT_DMG, 15, MAX_HP, 50, FORCE, 6);
+        w("lame_acier_trempe", G, WeaponKind.SWORD, 18, U, null, "Acier trempé dans la sève des forêts anciennes.", ATK, 36, CRIT, 3, FORCE, 4);
+        w("epee_berserker", G, WeaponKind.SWORD, 25, R, null, "Arrachée au trésor du Roi Gobelin, elle a soif de batailles.", ATK, 55, CRIT_DMG, 15, MAX_HP, 50, FORCE, 6);
+        w("epee_croise", G, WeaponKind.SWORD, 35, R, null, "Bénie par les croisés qui gardaient les cryptes.", ATK, 80, MAX_HP, 100, LIFESTEAL, 2, FORCE, 8);
         w("epee_seigneur_guerre", G, WeaponKind.SWORD, 45, E, null, "Forgée pour ceux qui commandent les armées.", ATK, 110, MAX_HP, 150, LIFESTEAL, 3, FORCE, 10);
+        w("lame_tempetes", G, WeaponKind.SWORD, 58, E, null, "La foudre gronde à chaque coup porté.", ATK, 150, CRIT, 5, CRIT_DMG, 20, FORCE, 13);
         w("lame_demoniaque", G, WeaponKind.SWORD, 70, L, null, "Elle a soif du sang de ses ennemis.", ATK, 190, CRIT, 6, LIFESTEAL, 6, FORCE, 16);
+        w("epee_roi_dragon", G, WeaponKind.SWORD, 82, L, null, "Forgée dans les écailles d'un wyrm boréal.", ATK, 250, CRIT, 8, LIFESTEAL, 5, MAX_HP, 250, FORCE, 20);
         w("excalibur_celeste", G, WeaponKind.SWORD, 95, Y, null, "L'épée légendaire des dieux de la guerre.", ATK, 320, CRIT, 10, CRIT_DMG, 40, MAX_HP, 400, FORCE, 25);
-        w("epee_berserker", G, WeaponKind.SWORD, 25, R, null, "La lame du berserker, alternative à sa hache.", ATK, 52, CRIT, 4, MAX_HP, 50, FORCE, 6);
         // ---------------- Mage
         w("baton_apprenti", M, WeaponKind.STAFF, 1, C, Element.ARCANE, "Le premier bâton de tout apprenti.", MAG, 10, MAX_MANA, 20);
+        w("baton_saule", M, WeaponKind.STAFF, 5, C, Element.ARCANE, "Taillé dans un saule qui murmure des sorts.", MAG, 16, MAX_MANA, 35);
         w("sceptre_givre", M, WeaponKind.STAFF, 10, U, Element.GIVRE, "Un froid mordant émane du cristal.", MAG, 26, MAX_MANA, 50, INTELLIGENCE, 3);
+        w("sceptre_marees", M, WeaponKind.STAFF, 18, U, Element.GIVRE, "Il suit le rythme des marées des marais.", MAG, 42, MAX_MANA, 80, MANA_REGEN, 1, INTELLIGENCE, 4);
         w("baton_flammes", M, WeaponKind.STAFF, 25, R, Element.FEU, "Les flammes de l'enfer dansent à son sommet.", MAG, 65, CRIT, 3, MAX_MANA, 100, INTELLIGENCE, 6);
+        w("baton_foudre", M, WeaponKind.STAFF, 35, R, Element.ECLAIR, "Des arcs électriques courent le long du bois.", MAG, 95, MAX_MANA, 150, CRIT, 4, INTELLIGENCE, 8);
         w("baton_arcanique", M, WeaponKind.STAFF, 45, E, Element.ARCANE, "Canalise les énergies arcaniques pures.", MAG, 130, MAX_MANA, 200, MANA_REGEN, 2, CDR, 5, INTELLIGENCE, 10);
+        w("sceptre_ombre", M, WeaponKind.STAFF, 58, E, Element.OMBRE, "L'ombre s'y enroule comme un serpent.", MAG, 175, MAX_MANA, 250, CDR, 7, INTELLIGENCE, 13);
         w("sceptre_neant", M, WeaponKind.STAFF, 70, L, Element.NEANT, "Il murmure des secrets venus d'ailleurs.", MAG, 220, CRIT, 5, MAX_MANA, 300, INTELLIGENCE, 16);
+        w("baton_phenix", M, WeaponKind.STAFF, 82, L, Element.FEU, "Une plume de phénix brûle éternellement à son sommet.", MAG, 290, MAX_MANA, 400, CRIT, 7, MANA_REGEN, 4, INTELLIGENCE, 20);
         w("baton_archimage", M, WeaponKind.STAFF, 95, Y, Element.ECLAIR, "Le bâton des Archimages éternels.", MAG, 360, MAX_MANA, 500, CDR, 10, MANA_REGEN, 5, INTELLIGENCE, 25);
         // ---------------- Archer
         w("arc_chasseur", A, WeaponKind.BOW, 1, C, null, "Un arc de chasse en bois souple.", ATK, 7, CRIT, 2);
+        w("arc_court", A, WeaponKind.BOW, 5, C, null, "Court et maniable, idéal pour débuter.", ATK, 12, CRIT, 3);
         w("arc_elfique", A, WeaponKind.BOW, 10, U, null, "Léger et précis, façonné par les elfes.", ATK, 20, CRIT, 4, SPEED, 3, AGILITE, 3);
+        w("arc_composite", A, WeaponKind.BOW, 18, U, null, "Bois, corne et tendon : une puissance surprenante.", ATK, 34, CRIT, 5, SPEED, 3, AGILITE, 4);
         w("arc_tempete", A, WeaponKind.BOW, 25, R, null, "Ses flèches sifflent comme le vent d'orage.", ATK, 50, CRIT, 6, ESQ, 2, AGILITE, 6);
+        w("arc_sylvain", A, WeaponKind.BOW, 35, R, null, "Les esprits de la forêt guident ses flèches.", ATK, 75, CRIT, 7, ESQ, 3, AGILITE, 8);
         w("arc_faucon", A, WeaponKind.BOW, 45, E, null, "L'œil du faucon ne manque jamais sa proie.", ATK, 100, CRIT, 8, CRIT_DMG, 20, AGILITE, 10);
+        w("arc_lune_argent", A, WeaponKind.BOW, 58, E, null, "Il brille d'une lueur argentée sous la lune.", ATK, 140, CRIT, 9, CRIT_DMG, 25, AGILITE, 13);
         w("arc_spectral", A, WeaponKind.BOW, 70, L, null, "Tendu avec une corde d'âme glacée.", ATK, 175, CRIT, 10, ESQ, 4, AGILITE, 16);
+        w("arc_dragon", A, WeaponKind.BOW, 82, L, null, "Tendu avec un nerf de dragon, il ne rate jamais.", ATK, 235, CRIT, 12, CRIT_DMG, 35, ESQ, 5, AGILITE, 20);
         w("arc_aube_divine", A, WeaponKind.BOW, 95, Y, null, "Chaque flèche porte la lumière de l'aube.", ATK, 300, CRIT, 14, CRIT_DMG, 50, AGILITE, 25);
         // ---------------- Tank
         w("masse_garde", T, WeaponKind.HAMMER, 1, C, null, "L'arme réglementaire de la garde.", ATK, 6, DEF, 6, MAX_HP, 30);
+        w("masse_cloutee", T, WeaponKind.HAMMER, 5, C, null, "Des clous de fer hérissent sa tête.", ATK, 10, DEF, 10, MAX_HP, 55);
         w("marteau_bastion", T, WeaponKind.HAMMER, 10, U, null, "Lourd comme un mur de forteresse.", ATK, 16, DEF, 15, MAX_HP, 80, VITALITE, 3);
+        w("marteau_forgeron", T, WeaponKind.HAMMER, 18, U, null, "Le marteau d'un maître forgeron, lourd et fidèle.", ATK, 28, DEF, 25, MAX_HP, 140, VITALITE, 4);
         w("marteau_colosse", T, WeaponKind.HAMMER, 25, R, null, "Seul un colosse peut le soulever.", ATK, 40, DEF, 35, MAX_HP, 200, VITALITE, 6);
+        w("masse_templier", T, WeaponKind.HAMMER, 35, R, null, "L'arme sacrée des templiers des cryptes.", ATK, 60, DEF, 52, MAX_HP, 300, HP_REGEN, 1, VITALITE, 8);
         w("masse_gardien", T, WeaponKind.HAMMER, 45, E, null, "Bénie par les gardiens sacrés.", ATK, 80, DEF, 70, MAX_HP, 400, HP_REGEN, 2, VITALITE, 10);
+        w("marteau_runique", T, WeaponKind.HAMMER, 58, E, null, "Des runes de protection couvrent sa masse.", ATK, 110, DEF, 95, MAX_HP, 550, HP_REGEN, 3, VITALITE, 13);
         w("marteau_titan", T, WeaponKind.HAMMER, 70, L, null, "Forgé dans le cœur d'un volcan.", ATK, 140, DEF, 120, MAX_HP, 700, VITALITE, 16);
+        w("marteau_rois_anciens", T, WeaponKind.HAMMER, 82, L, null, "Transmis de roi en roi depuis l'aube des temps.", ATK, 190, DEF, 160, MAX_HP, 950, VITALITE, 20);
         w("marteau_egide", T, WeaponKind.HAMMER, 95, Y, null, "Aucune force ne peut briser l'Égide.", ATK, 240, DEF, 200, MAX_HP, 1200, VITALITE, 25);
 
         // ---------------- Sets d'armure (totaux pour les 4 pieces)
@@ -114,6 +133,24 @@ public final class ItemDefs {
         set("titan", "Titan Immortel", T, 85, L, "plate", StatBlock.of(MAX_HP, 2200, DEF, 320, ATK, 40, HP_REGEN, 8, VITALITE, 35),
                 StatBlock.of(DEF, 90), StatBlock.of(DEF, 0.20, MAX_HP, 0.12), "+20 % de Défense, +12 % de PV");
 
+        // panoplies intermediaires : statistiques interpolees entre les deux panoplies voisines de la classe
+        between("veteran", "Vétéran", G, 15, U, "plate", "acier_soldat", "berserker");
+        between("croise", "Croisé", G, 35, R, "plate", "berserker", "seigneur_guerre");
+        between("conquerant", "Conquérant", G, 65, E, "plate", "seigneur_guerre", "dieu_guerre");
+        between("seigneur_dragon", "Seigneur Dragon", G, 75, L, "plate", "seigneur_guerre", "dieu_guerre");
+        between("acolyte", "Acolyte", M, 15, U, "robe", "apprenti", "sorcier");
+        between("enchanteur", "Enchanteur", M, 35, R, "robe", "sorcier", "archimage");
+        between("mage_bataille", "Mage de Bataille", M, 65, E, "robe", "archimage", "avatar_arcanique");
+        between("oracle_astral", "Oracle Astral", M, 75, L, "robe", "archimage", "avatar_arcanique");
+        between("eclaireur", "Éclaireur", A, 15, U, "leather", "chasseur", "rodeur");
+        between("traqueur", "Traqueur", A, 35, R, "leather", "rodeur", "tireur_elite");
+        between("lame_ombre", "Lame d'Ombre", A, 65, E, "leather", "tireur_elite", "sylvestre");
+        between("chasseur_lunaire", "Chasseur Lunaire", A, 75, L, "leather", "tireur_elite", "sylvestre");
+        between("sentinelle_fer", "Sentinelle de Fer", T, 15, U, "plate", "garde", "gardien");
+        between("rempart", "Rempart", T, 35, R, "plate", "gardien", "paladin");
+        between("croise_sacre", "Croisé Sacré", T, 65, E, "plate", "paladin", "titan");
+        between("bastion_eternel", "Bastion Éternel", T, 75, L, "plate", "paladin", "titan");
+
         set("valkyrie", "Valkyrie Céleste", G, 100, Y, "plate",
                 StatBlock.of(MAX_HP, 2100, DEF, 250, ATK, 150, CRIT, 8, FORCE, 45),
                 StatBlock.of(ATK, 70), StatBlock.of(ATK, .18, CRIT_DMG, .25, MAX_HP, .10), "+18 % d'Attaque, +25 % de dégâts critiques, +10 % de PV");
@@ -127,10 +164,51 @@ public final class ItemDefs {
                 StatBlock.of(MAX_HP, 3100, DEF, 460, ATK, 60, HP_REGEN, 12, VITALITE, 45),
                 StatBlock.of(DEF, 125), StatBlock.of(DEF, .25, MAX_HP, .15), "+25 % de Défense, +15 % de PV");
 
-        set("neant_primordial", "Néant Primordial", PlayerClass.NONE, 100, Y, "plate",
-                StatBlock.of(MAX_HP, 2000, DEF, 220, ATK, 120, MAG, 120, CRIT, 8, ESQ, 5,
-                        FORCE, 15, AGILITE, 15, INTELLIGENCE, 15, VITALITE, 15, ESPRIT, 15),
-                StatBlock.of(ATK, 40, MAG, 40), StatBlock.of(ATK, 0.15, MAG, 0.15, MAX_HP, 0.10), "+15 % d'Attaque et de Puissance magique, +10 % de PV");
+    }
+
+    /** Panoplie intermediaire : totaux et bonus interpoles (selon le niveau) entre deux panoplies existantes. */
+    private static void between(String id, String name, PlayerClass cls, int level, Rarity r, String style, String from, String to) {
+        ArmorSet a = SETS.get(from), b = SETS.get(to);
+        double t = (level - a.level()) / (double) (b.level() - a.level());
+        StatBlock bonus4 = lerp(a.bonus4Pct(), b.bonus4Pct(), t, 100);
+        set(id, name, cls, level, r, style, lerp(a.totals(), b.totals(), t, 0), lerp(a.bonus2(), b.bonus2(), t, 0), bonus4, bonusText(bonus4));
+    }
+
+    /** Interpolation lineaire de deux blocs de statistiques ; scale = precision d'arrondi (0 = selon le type de statistique). */
+    private static StatBlock lerp(StatBlock a, StatBlock b, double t, int scale) {
+        StatBlock out = new StatBlock();
+        for (Stat s : Stat.values()) {
+            double v = a.get(s) + (b.get(s) - a.get(s)) * t;
+            if (v == 0) continue;
+            int precision = scale > 0 ? scale : (s.kind == Stat.Kind.FLAT || s.kind == Stat.Kind.PRIMARY ? 1 : 10);
+            out.set(s, Math.round(v * precision) / (double) precision);
+        }
+        return out;
+    }
+
+    private static String bonusText(StatBlock pct) {
+        StringBuilder sb = new StringBuilder();
+        for (Stat s : Stat.values()) {
+            double v = pct.get(s);
+            if (v <= 0) continue;
+            String what = switch (s) {
+                case ATK -> "d'Attaque";
+                case MAG -> "de Puissance magique";
+                case MAX_HP -> "de PV";
+                case MAX_MANA -> "de mana";
+                case DEF -> "de Défense";
+                case CRIT -> "de chances de critique";
+                case CRIT_DMG -> "de dégâts critiques";
+                case ESQ -> "d'esquive";
+                case SPEED -> "de vitesse";
+                case HP_REGEN -> "de régénération";
+                case MANA_REGEN -> "de régénération de mana";
+                default -> "de " + s.label.toLowerCase(java.util.Locale.ROOT);
+            };
+            if (sb.length() > 0) sb.append(", ");
+            sb.append("+").append(Math.round(v * 100)).append(" % ").append(what);
+        }
+        return sb.toString();
     }
 
     static {

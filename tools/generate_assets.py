@@ -103,7 +103,7 @@ def bow_item(item_id, name, **kw):
 # Armes en 3D (modeles Blockbench, format Java Block/Item) generees dans art/ :
 #   art/batons_blockbench/generer_batons.py, art/epees_blockbench/generer_epees.py,
 #   art/marteaux_blockbench/generer_marteaux.py, art/arcs_blockbench/generer_arcs.py
-# Le sprite 2D genere plus bas reste disponible (et sert pour les armes sans modele 3D, ex. la hache du berserker),
+# Le sprite 2D genere plus bas reste disponible (et sert pour les armes sans modele 3D),
 # mais ces objets utilisent le modele 3D en main et dans l'inventaire.
 WEAPONS_3D = {
     'batons_blockbench': {
@@ -203,7 +203,6 @@ def weapons():
     # Guerrier
     simple_item('epee_recrue', "Épée de la Recrue", gi.sword('#c8ccd4', '#8a6a3a', '#5a3a20'), H)
     simple_item('lame_runique', "Lame Runique", gi.sword('#9fb4d8', '#7a8090', '#3a3040', rune='#60f0ff'), H)
-    simple_item('hache_berserker', "Hache du Berserker", gi.axe('#a8a8b0', '#6a3a20', edge='#e0e4ea', double=True), H)
     simple_item('epee_seigneur_guerre', "Épée du Seigneur de Guerre",
                 gi.sword('#d8dce8', '#e0b030', '#802020', gem='#e02030', width=3, guard_len=4), H)
     simple_item('lame_demoniaque', "Lame Démoniaque",
@@ -255,7 +254,6 @@ ARMOR_SETS = [
     ('gardien', "du Gardien", 'plate', '#6a7080', '#c09030', '#40a0ff'),
     ('paladin', "du Paladin", 'plate', '#f0f0f8', '#ffd040', '#40c0ff'),
     ('titan', "du Titan Immortel", 'plate', '#5a4a3a', '#ff8020', '#ff4020'),
-    ('neant_primordial', "du Néant Primordial", 'plate', '#2a1240', '#a040ff', '#ff60ff'),
 ]
 PIECE_NAMES = {
     'plate': {'casque': 'Casque', 'plastron': 'Plastron', 'jambieres': 'Jambières', 'bottes': 'Bottes'},
@@ -890,6 +888,9 @@ def main():
     gui_icons()
     gen_fx.generate()
     misc_data()
+    import sys
+    import gen_equipment
+    gen_equipment.generate(sys.modules[__name__])
     lang = dict(sorted(LANG.items()))
     write_json(os.path.join(ASSETS, 'lang', 'fr_fr.json'), lang)
     write_json(os.path.join(ASSETS, 'lang', 'en_us.json'), lang)
@@ -899,6 +900,10 @@ def main():
     import generate_extensions
     generate_extensions.generate()
     print(f'{len(MANIFEST)} objets/blocs generes, {len(LANG)} traductions')
+    # modeles Blockbench importes (30 monstres, 10 cosmetiques) : textures, oeufs et traductions
+    import import_bbmodels
+    sys.argv = sys.argv[:1]
+    import_bbmodels.main()
 
 
 if __name__ == '__main__':

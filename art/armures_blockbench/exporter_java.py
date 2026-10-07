@@ -44,8 +44,6 @@ SET_PANOPLY = {
     'gardien': 'panoplie_07_niv_030',           # Acier poli
     'paladin': 'panoplie_13_niv_060',           # Chevalier cristallin
     'titan': 'panoplie_18_niv_085',             # Armure ancienne massive
-    # Mythique
-    'neant_primordial': 'panoplie_20_niv_100',  # Armure mythique
 }
 
 SLOTS = {'casque': 'head', 'plastron': 'chest', 'jambieres': 'legs', 'bottes': 'feet'}

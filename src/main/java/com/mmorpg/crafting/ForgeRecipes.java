@@ -105,35 +105,59 @@ public final class ForgeRecipes {
         add(Category.MATERIAUX, "trefle_celeste", 1, 1500, 70, N, "trefle_dore", 2, "essence_neant", 1, "minecraft:diamond", 2);
         add(Category.MATERIAUX, "trefle_divin", 1, 4000, 90, N, "trefle_celeste", 2, "essence_neant", 2, "minecraft:netherite_ingot", 1);
 
-        add(Category.MATERIAUX, "alliage_celeste", 2, 200, 90, N, "lingot_adamantite", 3, "cristal_arcanique", 2, "fragment_divin", 1);
+        add(Category.MATERIAUX, "alliage_celeste", 2, 200, 90, N, "lingot_adamantite", 3, "cristal_arcanique", 2, "fragment_divin", 1, "eclat_fracture", 1);
+        add(Category.MATERIAUX, "bois_enchante", 2, 4, 10, N, "ecorce_ancienne", 3, "seve_lumineuse", 1);
+        add(Category.MATERIAUX, "bronze_runique", 2, 20, 30, N, "carapace_cuivre", 3, "minecraft:copper_ingot", 2, "minecraft:lapis_lazuli", 2);
+        add(Category.MATERIAUX, "tissu_spectral", 2, 25, 35, N, "soie_araignee", 3, "voile_spectral", 1, "tissu_enchante", 1);
+        add(Category.MATERIAUX, "cuir_polaire", 2, 30, 45, N, "fourrure_polaire", 3, "cuir_renforce", 1, "carapace_givree", 1);
+        add(Category.MATERIAUX, "acier_stellaire", 1, 120, 75, N, "lingot_adamantite", 1, "poussiere_etoile", 2, "plaque_neant", 1);
         // ---------------------------------------------------------------- armes : Guerrier
         weapon("epee_recrue", 3, "minecraft:iron_ingot", 3, "minecraft:stick", 1);
         weapon("lame_runique", 20, "ferraille_gobeline", 4, "oreille_gobelin", 3, "minecraft:iron_ingot", 2, "minecraft:lapis_lazuli", 4);
         weapon("epee_berserker", 60, "acier_orc", 4, "defense_orc", 3, "couronne_roi_gobelin", 1);
-        weapon("hache_berserker", 60, "acier_orc", 4, "defense_orc", 3, "couronne_roi_gobelin", 1);
+        weapon("epee_milicien", 8, "minecraft:iron_ingot", 4, "griffe_loup", 2, "minecraft:leather", 1);
+        weapon("lame_acier_trempe", 35, "minecraft:iron_ingot", 4, "bois_enchante", 2, "ferraille_gobeline", 4, "insigne_bandit", 1);
+        weapon("epee_croise", 110, "lingot_mithril", 3, "relique_funeraire", 3, "fragment_ossuaire", 4, "couronne_roi_gobelin", 1);
         weapon("epee_seigneur_guerre", 150, "lingot_mithril", 4, "os_maudit", 4, "phylactere_liche", 1);
+        weapon("lame_tempetes", 280, "bronze_runique", 4, "cendre_ardente", 4, "braise_djinn", 1, "phylactere_liche", 1);
         weapon("lame_demoniaque", 400, "lingot_adamantite", 4, "noyau_flamme", 3, "coeur_infernal", 1);
+        weapon("epee_roi_dragon", 650, "acier_stellaire", 3, "croc_wyrm", 2, "ecaille_hydre", 2, "coeur_infernal", 1);
         weapon("excalibur_celeste", 1000, "fragment_divin", 3, "lingot_adamantite", 4, "essence_neant", 2, "coeur_glace_eternelle", 1);
         // Mage
         weapon("baton_apprenti", 3, "minecraft:stick", 3, "minecraft:lapis_lazuli", 2, "minecraft:glowstone_dust", 1);
+        weapon("baton_saule", 8, "minecraft:stick", 3, "ecorce_ancienne", 3, "minecraft:lapis_lazuli", 2);
         weapon("sceptre_givre", 20, "oreille_gobelin", 3, "croc_loup", 2, "minecraft:lapis_lazuli", 3, "minecraft:quartz", 2);
+        weapon("sceptre_marees", 35, "bois_enchante", 2, "mucus_acide", 4, "venin_marais", 2, "minecraft:prismarine_shard", 3);
         weapon("baton_flammes", 60, "poussiere_ame", 3, "os_maudit", 2, "couronne_roi_gobelin", 1, "minecraft:blaze_rod", 2);
+        weapon("baton_foudre", 110, "bois_enchante", 3, "tissu_spectral", 2, "ichor_cryptes", 3, "couronne_roi_gobelin", 1);
         weapon("baton_arcanique", 150, "lingot_mithril", 2, "poussiere_ame", 4, "phylactere_liche", 1, "minecraft:amethyst_shard", 4);
+        weapon("sceptre_ombre", 280, "crane_maudit", 2, "gemme_brute", 2, "bandelette_ancienne", 3, "phylactere_liche", 1);
         weapon("sceptre_neant", 400, "cristal_arcanique", 3, "eclat_givre", 2, "coeur_infernal", 1);
+        weapon("baton_phenix", 650, "braise_djinn", 3, "poussiere_etoile", 3, "seve_lumineuse", 4, "coeur_infernal", 1);
         weapon("baton_archimage", 1000, "fragment_divin", 3, "essence_neant", 3, "cristal_arcanique", 2, "coeur_glace_eternelle", 1);
         // Archer
         weapon("arc_chasseur", 3, "minecraft:stick", 3, "minecraft:string", 3, "minecraft:leather", 1);
+        weapon("arc_court", 8, "minecraft:stick", 3, "soie_araignee", 2, "griffe_loup", 1);
         weapon("arc_elfique", 20, "cuir_renforce", 2, "croc_loup", 3, "minecraft:string", 3);
+        weapon("arc_composite", 35, "bois_enchante", 2, "soie_araignee", 3, "fourrure_sombre", 2, "insigne_bandit", 1);
         weapon("arc_tempete", 60, "os_maudit", 3, "acier_orc", 2, "couronne_roi_gobelin", 1, "cuir_renforce", 2);
+        weapon("arc_sylvain", 110, "bois_enchante", 4, "seve_lumineuse", 2, "relique_funeraire", 2, "couronne_roi_gobelin", 1);
         weapon("arc_faucon", 150, "lingot_mithril", 2, "fourrure_sombre", 3, "phylactere_liche", 1, "minecraft:feather", 4);
+        weapon("arc_lune_argent", 280, "cuir_polaire", 3, "voile_spectral", 2, "carapace_givree", 3, "phylactere_liche", 1);
         weapon("arc_spectral", 400, "eclat_givre", 3, "cristal_arcanique", 2, "coeur_infernal", 1);
+        weapon("arc_dragon", 650, "acier_stellaire", 2, "croc_wyrm", 3, "ecaille_hydre", 2, "coeur_infernal", 1);
         weapon("arc_aube_divine", 1000, "fragment_divin", 3, "lingot_adamantite", 2, "essence_neant", 2, "coeur_glace_eternelle", 1);
         // Tank
         weapon("masse_garde", 3, "minecraft:iron_ingot", 3, "minecraft:stick", 2, "minecraft:cobblestone", 2);
+        weapon("masse_cloutee", 8, "minecraft:iron_ingot", 4, "ferraille_gobeline", 2, "minecraft:stick", 1);
         weapon("marteau_bastion", 20, "ferraille_gobeline", 4, "minecraft:iron_ingot", 3, "croc_loup", 2);
+        weapon("marteau_forgeron", 35, "minecraft:iron_ingot", 5, "bois_enchante", 2, "sang_orc", 1, "insigne_bandit", 1);
         weapon("marteau_colosse", 60, "acier_orc", 5, "defense_orc", 2, "couronne_roi_gobelin", 1);
+        weapon("masse_templier", 110, "lingot_mithril", 3, "relique_funeraire", 3, "fragment_ossuaire", 4, "couronne_roi_gobelin", 1);
         weapon("masse_gardien", 150, "lingot_mithril", 4, "minecraft:gold_block", 2, "phylactere_liche", 1);
+        weapon("marteau_runique", 280, "bronze_runique", 5, "gemme_brute", 2, "carapace_givree", 3, "phylactere_liche", 1);
         weapon("marteau_titan", 400, "lingot_adamantite", 4, "noyau_flamme", 2, "coeur_infernal", 1);
+        weapon("marteau_rois_anciens", 650, "acier_stellaire", 3, "couronne_cryptes", 1, "coeur_racine", 2, "coeur_infernal", 1);
         weapon("marteau_egide", 1000, "fragment_divin", 3, "lingot_adamantite", 4, "coeur_glace_eternelle", 1, "essence_neant", 2);
 
         // ---------------------------------------------------------------- armures
@@ -153,11 +177,26 @@ public final class ForgeRecipes {
         armorSet("gardien", 40, "acier_orc", 3, "minecraft:iron_block", 1, "couronne_roi_gobelin");
         armorSet("paladin", 100, "lingot_mithril", 3, "minecraft:gold_ingot", 2, "phylactere_liche");
         armorSet("titan", 300, "lingot_adamantite", 3, "noyau_flamme", 1, "coeur_infernal");
+        armorSet("veteran", 25, "minecraft:iron_ingot", 3, "griffe_loup", 2, "insigne_bandit");
+        armorSet("croise", 70, "lingot_mithril", 2, "relique_funeraire", 2, "couronne_roi_gobelin");
+        armorSet("conquerant", 180, "bronze_runique", 3, "sang_orc", 2, "braise_djinn");
+        armorSet("seigneur_dragon", 240, "acier_stellaire", 2, "ecaille_hydre", 1, "croc_wyrm");
+        armorSet("acolyte", 25, "soie_araignee", 3, "seve_lumineuse", 1, "insigne_bandit");
+        armorSet("enchanteur", 70, "tissu_spectral", 2, "ichor_cryptes", 2, "couronne_roi_gobelin");
+        armorSet("mage_bataille", 180, "tissu_spectral", 3, "bandelette_ancienne", 2, "braise_djinn");
+        armorSet("oracle_astral", 240, "tissu_spectral", 3, "poussiere_etoile", 2, "eclat_fracture");
+        armorSet("eclaireur", 25, "cuir_renforce", 2, "soie_araignee", 2, "insigne_bandit");
+        armorSet("traqueur", 70, "cuir_renforce", 3, "venin_marais", 2, "couronne_roi_gobelin");
+        armorSet("lame_ombre", 180, "cuir_polaire", 3, "voile_spectral", 1, "braise_djinn");
+        armorSet("chasseur_lunaire", 240, "cuir_polaire", 3, "eclat_astral", 2, "croc_wyrm");
+        armorSet("sentinelle_fer", 25, "minecraft:iron_ingot", 4, "ecorce_ancienne", 2, "insigne_bandit");
+        armorSet("rempart", 70, "lingot_mithril", 3, "fragment_ossuaire", 3, "couronne_roi_gobelin");
+        armorSet("croise_sacre", 180, "bronze_runique", 3, "gemme_brute", 1, "coeur_racine");
+        armorSet("bastion_eternel", 240, "acier_stellaire", 2, "carapace_givree", 2, "couronne_cryptes");
         armorSet("valkyrie", 1000, "alliage_celeste", 3, "lingot_adamantite", 3, "fragment_divin");
         armorSet("eternel_arcanes", 1000, "alliage_celeste", 3, "tissu_enchante", 5, "fragment_divin");
         armorSet("sentinelle_astrale", 1000, "alliage_celeste", 3, "cuir_renforce", 5, "fragment_divin");
         armorSet("egide_divine", 1000, "alliage_celeste", 3, "lingot_adamantite", 5, "fragment_divin");
-        armorSet("neant_primordial", 800, "fragment_divin", 1, "essence_neant", 2, "coeur_glace_eternelle");
 
         // ---------------------------------------------------------------- consommables
         add(Category.CONSOMMABLES, "potion_soin_mineure", 2, 2, 1, N, "minecraft:glass_bottle", 2, "minecraft:apple", 1, "oreille_gobelin", 1);

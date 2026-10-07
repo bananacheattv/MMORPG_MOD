@@ -27,8 +27,6 @@ def generate():
         ('egide_divine', 'de l’Égide Divine', 'plate', '#213451', '#f0c75b', '#9bcaff'),
     ]
     g.armors()
-    g.simple_item('epee_berserker', 'Épée du Berserker', g.gi.sword('#d3d9df', '#a04430', '#443033', gem='#ff6030'), 'minecraft:item/handheld')
-    g.write_json(str(ROOT / 'items/epee_berserker.json'), {'model': {'type': 'minecraft:model', 'model': 'mmorpg:item/epee_niv_40'}})
     from PIL import Image, ImageDraw
     texture = Image.new('RGBA', (16, 16), '#bd790e')
     draw = ImageDraw.Draw(texture)

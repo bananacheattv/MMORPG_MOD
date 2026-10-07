@@ -34,6 +34,17 @@ public final class ConfigManager {
     private ConfigManager() {
     }
 
+    /** Ajoute au butin d'un monstre deja configure les nouveaux objets du butin par defaut (sans toucher aux reglages existants). */
+    private static void mergeDrops(MobConfig cfg, MobConfig defaults) {
+        for (MobConfig.Drop d : cfg.drops) {
+            if (d.item.equals("mmorpg:hache_berserker")) d.item = "mmorpg:epee_berserker";     // la hache est devenue une epee
+        }
+        for (MobConfig.Drop d : defaults.drops) {
+            if (cfg.drops.stream().noneMatch(x -> x.item.equals(d.item))) cfg.drops.add(new MobConfig.Drop(d.item, d.chance, d.min, d.max));
+        }
+        cfg.dropsVersion = DefaultMobs.DROPS_VERSION;
+    }
+
     public static GeneralConfig general() {
         return general;
     }
@@ -125,7 +136,8 @@ public final class ConfigManager {
                 }
             }
             for (Map.Entry<String, MobConfig> e : defaults.entrySet()) {
-                result.putIfAbsent(e.getKey(), e.getValue());
+                MobConfig existing = result.putIfAbsent(e.getKey(), e.getValue());
+                if (existing != null && existing.dropsVersion < DefaultMobs.DROPS_VERSION) mergeDrops(existing, e.getValue());
             }
             for (MobConfig cfg : result.values()) {
                 sanitize(cfg);

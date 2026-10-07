@@ -1,0 +1,7 @@
+{
+  "parent": "mmorpg:item/arc_niv_20_pulling_2",
+  "textures": {
+    "0": "mmorpg:item/arc_composite",
+    "particle": "mmorpg:item/arc_composite"
+  }
+}

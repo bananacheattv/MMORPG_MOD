@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "mmorpg:rempart"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "mmorpg:rempart"
+      }
+    ]
+  }
+}

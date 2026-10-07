@@ -1,0 +1,7 @@
+{
+  "parent": "mmorpg:item/epee_niv_60",
+  "textures": {
+    "0": "mmorpg:item/lame_tempetes",
+    "particle": "mmorpg:item/lame_tempetes"
+  }
+}

@@ -83,6 +83,40 @@ public final class ModItems {
     public static final DeferredItem<RpgMaterialItem> LINGOT_ADAMANTITE = material("lingot_adamantite", Rarity.EPIQUE, "Le métal le plus dur du monde connu.");
     public static final DeferredItem<RpgMaterialItem> TISSU_ENCHANTE = material("tissu_enchante", Rarity.RARE, "Étoffe tissée de poussière d'âme.");
     public static final DeferredItem<RpgMaterialItem> CUIR_RENFORCE = material("cuir_renforce", Rarity.PEU_COMMUN, "Cuir renforcé de fourrure sombre.");
+    // ---- materiaux de butin supplementaires (monstres, zones des monstres importes) et intermediaires de la Forge
+    public static final DeferredItem<RpgMaterialItem> SOIE_ARAIGNEE = material("soie_araignee", Rarity.COMMUN, "Soie résistante filée par les araignées.");
+    public static final DeferredItem<RpgMaterialItem> GRIFFE_LOUP = material("griffe_loup", Rarity.COMMUN, "Griffe acérée des Loups Sombres.");
+    public static final DeferredItem<RpgMaterialItem> INSIGNE_BANDIT = material("insigne_bandit", Rarity.PEU_COMMUN, "Insigne arraché aux bandits arbalétriers.");
+    public static final DeferredItem<RpgMaterialItem> ICHOR_CRYPTES = material("ichor_cryptes", Rarity.PEU_COMMUN, "Fluide verdâtre des morts-vivants des cryptes.");
+    public static final DeferredItem<RpgMaterialItem> SANG_ORC = material("sang_orc", Rarity.PEU_COMMUN, "Sang épais et bouillonnant des Orcs Guerriers.");
+    public static final DeferredItem<RpgMaterialItem> CENDRE_ARDENTE = material("cendre_ardente", Rarity.PEU_COMMUN, "Cendre encore brûlante des Élémentaires de Feu.");
+    public static final DeferredItem<RpgMaterialItem> CRANE_MAUDIT = material("crane_maudit", Rarity.RARE, "Un crâne qui murmure encore des malédictions.");
+    public static final DeferredItem<RpgMaterialItem> VOILE_SPECTRAL = material("voile_spectral", Rarity.RARE, "Lambeau translucide arraché aux Spectres de Givre.");
+    public static final DeferredItem<RpgMaterialItem> GEMME_BRUTE = material("gemme_brute", Rarity.RARE, "Gemme non taillée extraite des Golems de Cristal.");
+    public static final DeferredItem<RpgMaterialItem> PLAQUE_NEANT = material("plaque_neant", Rarity.EPIQUE, "Fragment d'armure des Chevaliers du Néant.");
+    public static final DeferredItem<RpgMaterialItem> ECORCE_ANCIENNE = material("ecorce_ancienne", Rarity.COMMUN, "Écorce dure des créatures de la Forêt ancienne.");
+    public static final DeferredItem<RpgMaterialItem> SEVE_LUMINEUSE = material("seve_lumineuse", Rarity.PEU_COMMUN, "Sève dorée qui brille dans l'obscurité.");
+    public static final DeferredItem<RpgMaterialItem> COEUR_RACINE = material("coeur_racine", Rarity.RARE, "Le cœur vivant du Colosse racine.");
+    public static final DeferredItem<RpgMaterialItem> MUCUS_ACIDE = material("mucus_acide", Rarity.COMMUN, "Substance corrosive des créatures du Marais.");
+    public static final DeferredItem<RpgMaterialItem> VENIN_MARAIS = material("venin_marais", Rarity.PEU_COMMUN, "Venin violacé des crapauds et sorciers des marais.");
+    public static final DeferredItem<RpgMaterialItem> ECAILLE_HYDRE = material("ecaille_hydre", Rarity.RARE, "Écaille brillante de l'Hydre des marais.");
+    public static final DeferredItem<RpgMaterialItem> FRAGMENT_OSSUAIRE = material("fragment_ossuaire", Rarity.COMMUN, "Débris d'os des Cryptes.");
+    public static final DeferredItem<RpgMaterialItem> RELIQUE_FUNERAIRE = material("relique_funeraire", Rarity.PEU_COMMUN, "Anneau rituel des gardes funéraires.");
+    public static final DeferredItem<RpgMaterialItem> COURONNE_CRYPTES = material("couronne_cryptes", Rarity.RARE, "La couronne rouillée du Roi des cryptes.");
+    public static final DeferredItem<RpgMaterialItem> FOURRURE_POLAIRE = material("fourrure_polaire", Rarity.COMMUN, "Fourrure épaisse des bêtes des Terres gelées.");
+    public static final DeferredItem<RpgMaterialItem> CARAPACE_GIVREE = material("carapace_givree", Rarity.PEU_COMMUN, "Carapace gelée des scarabées polaires.");
+    public static final DeferredItem<RpgMaterialItem> CROC_WYRM = material("croc_wyrm", Rarity.RARE, "Croc glacé du Wyrm boréal.");
+    public static final DeferredItem<RpgMaterialItem> CARAPACE_CUIVRE = material("carapace_cuivre", Rarity.COMMUN, "Plaques métalliques des scorpions de cuivre.");
+    public static final DeferredItem<RpgMaterialItem> BANDELETTE_ANCIENNE = material("bandelette_ancienne", Rarity.PEU_COMMUN, "Bandelette imprégnée de magie des momies.");
+    public static final DeferredItem<RpgMaterialItem> BRAISE_DJINN = material("braise_djinn", Rarity.RARE, "Braise éternelle d'un Djinn des braises.");
+    public static final DeferredItem<RpgMaterialItem> ECLAT_ASTRAL = material("eclat_astral", Rarity.PEU_COMMUN, "Éclat cristallin tombé du Néant astral.");
+    public static final DeferredItem<RpgMaterialItem> POUSSIERE_ETOILE = material("poussiere_etoile", Rarity.RARE, "Poussière scintillante des créatures astrales.");
+    public static final DeferredItem<RpgMaterialItem> ECLAT_FRACTURE = material("eclat_fracture", Rarity.EPIQUE, "Morceau de réalité brisée laissé par les êtres du vide.");
+    public static final DeferredItem<RpgMaterialItem> BOIS_ENCHANTE = material("bois_enchante", Rarity.PEU_COMMUN, "Bois ancien imprégné de sève lumineuse.");
+    public static final DeferredItem<RpgMaterialItem> BRONZE_RUNIQUE = material("bronze_runique", Rarity.RARE, "Alliage de cuivre gravé de runes.");
+    public static final DeferredItem<RpgMaterialItem> TISSU_SPECTRAL = material("tissu_spectral", Rarity.RARE, "Étoffe tissée de soie et de voile spectral.");
+    public static final DeferredItem<RpgMaterialItem> CUIR_POLAIRE = material("cuir_polaire", Rarity.RARE, "Cuir renforcé doublé de fourrure polaire.");
+    public static final DeferredItem<RpgMaterialItem> ACIER_STELLAIRE = material("acier_stellaire", Rarity.EPIQUE, "Adamantite forgée avec de la poussière d'étoile.");
     public static final DeferredItem<RpgMaterialItem> PIECE_OR = ITEMS.registerItem("piece_or",
             p -> new RpgMaterialItem(p, Rarity.COMMUN, "Monnaie", "La monnaie du royaume. Utilisée à la Forge Arcanique."), p -> p.stacksTo(99));
 

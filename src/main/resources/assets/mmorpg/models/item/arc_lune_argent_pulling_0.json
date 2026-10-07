@@ -1,0 +1,7 @@
+{
+  "parent": "mmorpg:item/arc_niv_60_pulling_0",
+  "textures": {
+    "0": "mmorpg:item/arc_lune_argent",
+    "particle": "mmorpg:item/arc_lune_argent"
+  }
+}

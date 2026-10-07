@@ -657,7 +657,7 @@ public final class DevShowcase {
     private static void weaponPhase(Minecraft mc, String me) {
         String[] hot = {"arc_chasseur", "arc_aube_divine", "masse_garde", "marteau_egide", "epee_recrue", "excalibur_celeste"};
         String[] inv = {"arc_elfique", "arc_tempete", "arc_faucon", "arc_spectral", "marteau_bastion", "marteau_colosse", "masse_gardien",
-                "marteau_titan", "lame_runique", "hache_berserker", "epee_seigneur_guerre", "lame_demoniaque"};
+                "marteau_titan", "lame_runique", "epee_berserker", "epee_seigneur_guerre", "lame_demoniaque"};
         if (tick == 20) {
             cmd(mc, "time set day");
             cmd(mc, "weather clear");
@@ -718,7 +718,7 @@ public final class DevShowcase {
      */
     private static void integrationPhase(Minecraft mc, String me) {
         String[][] sets = {{"acier_soldat", "epee_recrue"}, {"sorcier", "baton_flammes"}, {"tireur_elite", "arc_faucon"},
-                {"paladin", "masse_gardien"}, {"dieu_guerre", "excalibur_celeste"}, {"neant_primordial", "marteau_egide"}};
+                {"paladin", "masse_gardien"}, {"dieu_guerre", "excalibur_celeste"}, {"egide_divine", "marteau_egide"}};
         String[] bosses = {"roi_gobelin", "liche_ancienne", "seigneur_ignis", "titan_glace", "avatar_neant"};
         int[] dist = {9, 9, 11, 15, 11};
         int[] pitch = {-8, -8, -12, -16, -12};

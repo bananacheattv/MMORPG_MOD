@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "mmorpg:lame_ombre"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "mmorpg:lame_ombre"
+      }
+    ]
+  }
+}
