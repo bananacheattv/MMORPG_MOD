@@ -15,9 +15,9 @@ STOPPED, STARTING, CASTING, SETTLING, WAITING, APPROACH, REELING, PAUSED, CALIBR
     "CALIBRAGE")
 
 
-def minecraft_focused():
+def foreground_title():
     if sys.platform != "win32":
-        return True
+        return None
     try:
         import ctypes
         user32 = ctypes.windll.user32
@@ -25,9 +25,17 @@ def minecraft_focused():
         n = user32.GetWindowTextLengthW(hwnd)
         buf = ctypes.create_unicode_buffer(n + 1)
         user32.GetWindowTextW(hwnd, buf, n + 1)
-        return "minecraft" in buf.value.lower()
+        return buf.value
     except Exception:
+        return None
+
+
+def game_focused(cfg):
+    title = foreground_title()
+    if title is None:
         return True
+    t = title.lower()
+    return any(k.strip() and k.strip().lower() in t for k in cfg.focus_titles.split(","))
 
 
 class FishingBot(threading.Thread):
@@ -195,11 +203,12 @@ class FishingBot(threading.Thread):
                     self.detector.reset(now)
             return
 
-        if c.require_focus and not minecraft_focused():
+        if c.require_focus and not game_focused(c):
             if self.state != PAUSED:
                 self._prev_state = self.state
                 self._set(PAUSED)
-                self.log("Minecraft n'est pas au premier plan : pause.")
+                self.log("Fenetre du jeu pas au premier plan (fenetre active : \"%s\") : pause. "
+                         "Ajoutez ce nom dans Bot > Fenetres du jeu, ou decochez la pause." % foreground_title())
             time.sleep(0.2)
             return
         if self.state == PAUSED:

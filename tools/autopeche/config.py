@@ -67,7 +67,8 @@ class Config:
     no_bobber_timeout: float = 6.0  # relance si bouchon introuvable X s
     start_delay: float = 3.0        # compte a rebours au demarrage
     cast_on_start: bool = True
-    require_focus: bool = True      # (Windows) pause si Minecraft n'est pas au premier plan
+    require_focus: bool = True      # (Windows) pause si le jeu n'est pas au premier plan
+    focus_titles: str = "minecraft,erazion,lunar,badlion,feather,optifine,forge,fabric"
     stop_after_catches: int = 0     # 0 = illimite
     stop_after_minutes: float = 0.0 # 0 = illimite
     hotkey_toggle: str = "f8"
