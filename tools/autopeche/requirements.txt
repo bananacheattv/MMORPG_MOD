@@ -1,0 +1,5 @@
+mss>=9.0
+numpy>=1.24
+pillow>=10.0
+pynput>=1.7
+opencv-python>=4.8  # optionnel (detection plus robuste)
