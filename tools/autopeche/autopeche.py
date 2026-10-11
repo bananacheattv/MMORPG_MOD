@@ -39,7 +39,8 @@ class App(tk.Tk):
         self.cfg = Config.load()
         self.events = queue.Queue()
         self.bot = FishingBot(self.cfg, self.events)
-        self.history = deque(maxlen=300)
+        self.history = self.bot.history
+        self._shown = None
         self.last_frame = None
         self.preview_img = None
         self.vars = {}
@@ -105,7 +106,7 @@ class App(tk.Tk):
         self.gauge = tk.Canvas(left, width=210, height=18, bg="#0e1014", highlightthickness=0)
         self.gauge.pack(anchor="w")
 
-        nb = ttk.Notebook(self)
+        nb = self.nb = ttk.Notebook(self)
         nb.pack(side="left", fill="both", expand=True, padx=8, pady=8)
         self._tab_preview(nb)
         self._tab_graph(nb)
@@ -407,7 +408,7 @@ class App(tk.Tk):
 
     # --- boucle UI ------------------------------------------------------
     def _poll(self):
-        last_frame, last_sig = None, None
+        last_frame = None
         try:
             while True:
                 kind, data = self.events.get_nowait()
@@ -419,20 +420,17 @@ class App(tk.Tk):
                     self._show_state(data)
                 elif kind == "frame":
                     last_frame = data
-                elif kind == "signal":
-                    last_sig = data
-                    self.history.append((data.score, data.signals.get("dip", 0) * self.cfg.w_dip,
-                                         data.signals.get("bubble", 0) * self.cfg.w_bubble,
-                                         data.signals.get("lost", 0) * self.cfg.w_lost))
-                    self._frames = getattr(self, "_frames", 0) + 1
         except queue.Empty:
             pass
-        if last_frame is not None:
+        if last_frame is not None and self.nb.index("current") == 0:
             self._show_frame(*last_frame)
-        if last_sig is not None:
-            self._show_signal(last_sig)
-            self._draw_graph()
-        self.after(40, self._poll)
+        r = self.bot.latest
+        if r is not None and r is not self._shown:
+            self._shown = r
+            self._show_signal(r)
+            if self.nb.index("current") == 1:
+                self._draw_graph()
+        self.after(60, self._poll)
 
     def _show_state(self, st):
         self.state_lbl.configure(text=st, foreground=STATE_COLORS.get(st, FG))
@@ -454,7 +452,7 @@ class App(tk.Tk):
         cw, ch = max(self.canvas.winfo_width(), 50), max(self.canvas.winfo_height(), 50)
         k = min(cw / pil.width, ch / pil.height)
         if abs(k - 1) > 0.02:
-            pil = pil.resize((max(1, int(pil.width * k)), max(1, int(pil.height * k))))
+            pil = pil.resize((max(1, int(pil.width * k)), max(1, int(pil.height * k))), 0)
         self.preview_img = ImageTk.PhotoImage(pil)
         self.canvas.delete("all")
         self.canvas.create_image(cw // 2, ch // 2, image=self.preview_img)
@@ -474,7 +472,8 @@ class App(tk.Tk):
     def _draw_graph(self):
         g = self.graph
         w, h = g.winfo_width(), g.winfo_height()
-        if w < 20 or not self.history:
+        hist = list(self.history)  # copie : le bot ecrit en parallele
+        if w < 20 or not hist:
             return
         g.delete("all")
         top = max(self.cfg.trigger_score * 2.0, 0.5)
@@ -484,10 +483,10 @@ class App(tk.Tk):
         g.create_line(0, y(self.cfg.trigger_score), w, y(self.cfg.trigger_score), fill="#ef5350", dash=(6, 4))
         n = self.history.maxlen
         dx = w / (n - 1)
-        x0 = w - dx * (len(self.history) - 1)
+        x0 = w - dx * (len(hist) - 1)
         for idx, (_, col) in reversed(list(enumerate(SERIES))):
             pts = []
-            for j, row in enumerate(self.history):
+            for j, row in enumerate(hist):
                 pts += [x0 + j * dx, y(row[idx])]
             if len(pts) >= 4:
                 g.create_line(*pts, fill=col, width=2 if idx == 0 else 1)
@@ -501,8 +500,8 @@ class App(tk.Tk):
         self.stat_lbls["taux"].configure(text="%.0f" % (s["prises"] * 3600 / el) if el > 30 else "-")
         self.stat_lbls["attente"].configure(text="%.1f s" % s["attente_moy"] if s["prises"] else "-")
         self.stat_lbls["duree"].configure(text=time.strftime("%H:%M:%S", time.gmtime(el)))
-        self.stat_lbls["fps"].configure(text=str(getattr(self, "_frames", 0)))
-        self._frames = 0
+        self.stat_lbls["fps"].configure(text=str(self.bot.frames))
+        self.bot.frames = 0
         self.after(1000, self._tick_stats)
 
     def _close(self):

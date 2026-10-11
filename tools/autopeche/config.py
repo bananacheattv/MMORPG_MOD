@@ -58,9 +58,9 @@ class Config:
     settle_time: float = 2.2        # ignore l'eclaboussure du lancer (s)
 
     # Bot
-    fps: int = 30
-    react_min: float = 0.08         # delai de reaction humain (s)
-    react_max: float = 0.25
+    fps: int = 60
+    react_min: float = 0.03         # delai de reaction humain (s)
+    react_max: float = 0.12
     recast_min: float = 0.6         # delai avant de relancer (s)
     recast_max: float = 1.3
     max_wait: float = 45.0          # relance si rien apres X s

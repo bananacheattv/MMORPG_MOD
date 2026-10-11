@@ -38,6 +38,31 @@ def hue_mask(h, s, v, hue, tol, smin, vmin):
     return (dh <= tol) & (s >= smin) & (v >= vmin)
 
 
+_LUT_CACHE = {}
+
+
+def color_lut(hue, tol, smin, vmin):
+    """Table 32x32x32 -> bool : masque de couleur en une seule indexation (tres rapide)."""
+    key = (round(hue, 1), round(tol, 1), round(smin, 3), round(vmin, 3))
+    lut = _LUT_CACHE.get(key)
+    if lut is None:
+        q = (np.arange(32, dtype=np.uint8) * 8 + 4)
+        rgb = np.stack(np.meshgrid(q, q, q, indexing="ij"), axis=-1).reshape(1, -1, 3)
+        h, s, v = rgb_to_hsv(rgb)
+        lut = hue_mask(h, s, v, hue, tol, smin, vmin).reshape(-1)
+        if len(_LUT_CACHE) > 16:
+            _LUT_CACHE.clear()
+        _LUT_CACHE[key] = lut
+    return lut
+
+
+def lut_index(rgb):
+    r = (rgb[..., 0] >> 3).astype(np.uint16)
+    g = (rgb[..., 1] >> 3).astype(np.uint16)
+    b = (rgb[..., 2] >> 3).astype(np.uint16)
+    return (r << 10) | (g << 5) | b
+
+
 @dataclass
 class Blob:
     cx: float
@@ -92,6 +117,44 @@ def largest_blob(mask, min_area):
                 int(x1 - x0 + 1), int(y1 - y0 + 1), int(len(a)))
 
 
+def find_bobber(mask, min_area, size_hint=8.0, expect=None):
+    """Recherche rapide (numpy pur) : cellule la plus dense (proche de la position
+    attendue) puis mean-shift."""
+    ys, xs = np.nonzero(mask)
+    if len(xs) < min_area:
+        return None
+    if len(xs) > 40:
+        cell = 6
+        hgt, wid = mask.shape
+        nx = wid // cell + 1
+        idx = (ys // cell) * nx + xs // cell
+        counts = np.bincount(idx).astype(np.float32)
+        if expect is not None:
+            cells = np.arange(len(counts))
+            d = np.hypot((cells % nx + 0.5) * cell - expect[0], (cells // nx + 0.5) * cell - expect[1])
+            counts /= 1.0 + d / max(hgt, wid) * 4.0
+        best = int(counts.argmax())
+        cx, cy = (best % nx + 0.5) * cell, (best // nx + 0.5) * cell
+    else:
+        cx, cy = float(np.median(xs)), float(np.median(ys))
+    rad = max(6.0, size_hint * 1.3)
+    for _ in range(4):
+        sel = (np.abs(xs - cx) <= rad) & (np.abs(ys - cy) <= rad)
+        if sel.sum() < min_area:
+            return None
+        sx, sy = xs[sel], ys[sel]
+        ncx, ncy = float(sx.mean()), float(sy.mean())
+        x0, x1, y0, y1 = sx.min(), sx.max(), sy.min(), sy.max()
+        touching = (x1 - x0) >= 2 * rad - 2 or (y1 - y0) >= 2 * rad - 2
+        moved = abs(ncx - cx) + abs(ncy - cy) > 1
+        cx, cy = ncx, ncy
+        if touching:
+            rad *= 1.5
+        elif not moved:
+            break
+    return Blob(cx, cy, int(x0), int(y0), int(x1 - x0 + 1), int(y1 - y0 + 1), int(sel.sum()))
+
+
 @dataclass
 class Result:
     t: float
@@ -106,8 +169,9 @@ class Result:
     armed: bool = False
     score: float = 0.0
     bite: bool = False
-    bobber_mask: np.ndarray = None
+    bobber_mask: np.ndarray = None   # masques de la fenetre de travail
     bubble_mask: np.ndarray = None
+    offset: tuple = (0, 0)
     signals: dict = field(default_factory=dict)
 
 
@@ -126,28 +190,45 @@ class Detector:
         self.lost_count = 0
         self.confirm = 0
         self.last_center = None
+        self.last_pos = None
         self.last_size = 8.0
         self.dist_hist = deque(maxlen=12)
         self.last_seen = t
 
     def process(self, frame, t):
         c = self.cfg
-        h, s, v = rgb_to_hsv(frame)
-        bmask = hue_mask(h, s, v, c.bobber_hue, c.bobber_hue_tol, c.bobber_smin, c.bobber_vmin)
-        umask = hue_mask(h, s, v, c.bubble_hue, c.bubble_hue_tol, c.bubble_smin, c.bubble_vmin)
-        blob = largest_blob(bmask, c.bobber_min_area)
+        H, W = frame.shape[:2]
+        # Fenetre de travail : seulement autour du bouchon une fois trouve (bien plus rapide)
+        ox, oy, x1, y1 = 0, 0, W, H
+        if self.last_pos is not None and t - self.last_seen < 1.0:
+            half = int(c.radius_factor * self.last_size + c.radius_px + 3 * self.last_size + 12)
+            px, py = self.last_pos
+            ox, oy = max(0, int(px - half)), max(0, int(py - half))
+            x1, y1 = min(W, int(px + half)), min(H, int(py + half))
+        sub = frame[oy:y1, ox:x1]
+        idx = lut_index(sub)
+        bmask = color_lut(c.bobber_hue, c.bobber_hue_tol, c.bobber_smin, c.bobber_vmin)[idx]
+        umask = color_lut(c.bubble_hue, c.bubble_hue_tol, c.bubble_smin, c.bubble_vmin)[idx]
+        if self.last_pos is not None:
+            expect = (self.last_pos[0] - ox, self.last_pos[1] - oy)
+        else:
+            expect = (sub.shape[1] / 2, sub.shape[0] / 2)  # le calibrage centre la zone sur le bouchon
+        blob = find_bobber(bmask, c.bobber_min_area, self.last_size, expect)
         # Bulles par mouvement (fonctionne meme sans le pack de textures)
-        gray = frame.astype(np.float32).mean(axis=-1)
-        if self.bg is None or self.bg.shape != gray.shape:
-            self.bg = gray.copy()
         if c.bubble_motion:
-            umask = umask | (np.abs(gray - self.bg) > c.motion_threshold)
-        self.bg += (gray - self.bg) * 0.15
+            if self.bg is None or self.bg.shape != (H, W):
+                self.bg = frame.mean(axis=-1, dtype=np.float32)
+            gray = sub.mean(axis=-1, dtype=np.float32)  # (fenetre seulement)
+            bg = self.bg[oy:y1, ox:x1]
+            umask |= np.abs(gray - bg) > c.motion_threshold
+            bg += (gray - bg) * 0.15
         umask &= ~bmask
         if blob is not None:  # le bouchon qui bouge n'est pas une bulle
             m = int(max(blob.w, blob.h) * 0.7) + 2
             umask[max(0, blob.y - m):blob.y + blob.h + m, max(0, blob.x - m):blob.x + blob.w + m] = False
-        r = Result(t=t, bobber=blob, bobber_mask=bmask, bubble_mask=umask)
+            blob = Blob(blob.cx + ox, blob.cy + oy, blob.x + ox, blob.y + oy, blob.w, blob.h, blob.area)
+            self.last_pos = (blob.cx, blob.cy)
+        r = Result(t=t, bobber=blob, bobber_mask=bmask, bubble_mask=umask, offset=(ox, oy))
 
         if blob is not None:
             self.last_seen = t
@@ -179,6 +260,7 @@ class Detector:
             r.center = (cx, cy)
             r.radius = c.radius_factor * self.last_size + c.radius_px
             ys, xs = np.nonzero(umask)
+            xs, ys = xs + ox, ys + oy
             if len(xs):
                 d = np.hypot(xs - cx, ys - cy)
                 near = d <= r.radius
@@ -221,10 +303,12 @@ def annotate(frame, r, max_w=520):
     """Image PIL de previsualisation avec masques et reperes."""
     from PIL import Image, ImageDraw
     img = frame.copy()
+    ox, oy = r.offset
     if r.bobber_mask is not None:
-        img[r.bobber_mask] = (255, 0, 255)
-    if r.bubble_mask is not None:
-        img[r.bubble_mask] = (255, 255, 0)
+        hh, ww = r.bobber_mask.shape
+        win = img[oy:oy + hh, ox:ox + ww]
+        win[r.bobber_mask] = (255, 0, 255)
+        win[r.bubble_mask] = (255, 255, 0)
     pil = Image.fromarray(img)
     d = ImageDraw.Draw(pil)
     if r.center is not None:

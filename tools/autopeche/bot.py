@@ -41,6 +41,11 @@ class FishingBot(threading.Thread):
         self.quit = threading.Event()
         self.preview = True
         self.want_calib = False
+        self.frames = 0
+        self.last_preview = 0.0
+        self.latest = None
+        from collections import deque
+        self.history = deque(maxlen=300)
         self.reset_stats()
         from pynput.mouse import Button, Controller
         self._mouse, self._btn = Controller(), Button.right
@@ -120,8 +125,9 @@ class FishingBot(threading.Thread):
                 except Exception as e:  # ne jamais tuer le thread
                     self.log("Erreur : %r" % e)
                     time.sleep(0.5)
-                dt = time.time() - t0
-                time.sleep(max(0.0, 1.0 / max(self.cfg.fps, 1) - dt))
+                rest = 1.0 / max(self.cfg.fps, 1) - (time.time() - t0)
+                if rest > 0.002:
+                    time.sleep(rest)
 
     def _grab(self, sct, mon):
         x, y, w, h = self.cfg.roi(mon["width"], mon["height"])
@@ -130,10 +136,19 @@ class FishingBot(threading.Thread):
 
     def _frame(self, sct, mon, live=True):
         frame = self._grab(sct, mon)
-        r = self.detector.process(frame, time.time())
-        if self.preview:
+        now = time.time()
+        r = self.detector.process(frame, now)
+        self.frames += 1
+        # Le rendu de l'apercu est limite a ~8 i/s pour ne pas ralentir la detection
+        if self.preview and now - self.last_preview > 0.12 and self.events.qsize() < 20:
+            self.last_preview = now
+            r.bobber_mask, r.bubble_mask = r.bobber_mask.copy(), r.bubble_mask.copy()
             self.events.put(("frame", (annotate(frame, r), frame, r)))
-        self.events.put(("signal", r))
+        self.latest = r
+        sg = r.signals
+        c = self.cfg
+        self.history.append((r.score, sg.get("dip", 0) * c.w_dip, sg.get("bubble", 0) * c.w_bubble,
+                             sg.get("lost", 0) * c.w_lost))
         return r
 
     def _calibrate(self, sct, mon):
