@@ -11,7 +11,7 @@ import time
 
 import numpy as np
 
-from detector import largest_blob, rgb_to_hsv
+from detector import find_bobber, hue_mask, largest_blob, rgb_to_hsv
 
 
 def _erode(m):
@@ -113,20 +113,38 @@ def run(bot, sct, mon):
         out, inn = f3, f2
     else:
         out, inn = f2, f1
-    # Ignore la canne tenue en main (coin bas-droit de l'ecran), qui change aussi au lancer
-    blob = find_object(inn, out, ~keep)
+    # Ignore la canne tenue en main (coin bas-droit de l'ecran) et les particules (couleur des bulles)
+    hb, sb, vb = rgb_to_hsv(out)
+    parts = _dilate(hue_mask(hb, sb, vb, c.bubble_hue, c.bubble_hue_tol + 10, 0.35, 0.3), 2)
+    blob = find_object(inn, out, ~keep | parts)
     if blob is None:
         bot.log("Calibrage : bouchon introuvable.")
         return False
-    col = learn_color(out, blob, _change(inn, out))
+    col = learn_color(out, blob, _change(inn, out) & ~parts)
+    if col is not None and min(abs(col[0] - c.bubble_hue), 360 - abs(col[0] - c.bubble_hue)) < 25:
+        col = None  # meme couleur que les bulles : ce n'est pas le bouchon
+    if col is not None:
+        # Rejette la couleur de l'eau (eau animee sans le pack de textures)
+        sat = sb > 0.3
+        if sat.sum():
+            water = float(np.median(hb[sat]))
+            if min(abs(col[0] - water), 360 - abs(col[0] - water)) < 30:
+                bot.log("Calibrage : seule l'eau bouge, bouchon invisible -> activez le pack AutoPeche_Detection.")
+                return False
     if col is None:
         bot.log("Calibrage : couleur du bouchon trop terne (activez le pack de textures).")
         return False
     c.bobber_hue, c.bobber_hue_tol, c.bobber_smin, c.bobber_vmin = col
+    # Taille reelle du bouchon : par sa couleur (le masque de changement inclut le fil)
+    m = hue_mask(hb, sb, vb, *col)
+    fine = find_bobber(m, 3, 8.0, (blob.cx, blob.cy))
+    if fine is not None and abs(fine.cx - blob.cx) + abs(fine.cy - blob.cy) < 60:
+        blob = fine
     c.bobber_min_area = int(max(3, min(40, blob.area * 0.25)))
     sx, sy = zx + blob.cx, zy + blob.cy
-    rw = max(c.calib_roi_w, int(max(blob.w, blob.h) * 18))
-    rh = max(c.calib_roi_h, int(max(blob.w, blob.h) * 14))
+    size = min(max(blob.w, blob.h), 60)
+    rw = max(c.calib_roi_w, size * 14)
+    rh = max(c.calib_roi_h, size * 10)
     c.roi_w, c.roi_h = min(rw, W), min(rh, H)
     c.roi_x = int(np.clip(sx - c.roi_w / 2, 0, W - c.roi_w))
     c.roi_y = int(np.clip(sy - c.roi_h / 2, 0, H - c.roi_h))

@@ -44,13 +44,15 @@ def build(eau_sombre=True):
     hook = png(solid(8, MAGENTA, (200, 0, 200, 255)))
     for path in ("entity/fishing_hook.png", "entity/fishing/fishing_hook.png", "entity/fishing_bobber.png"):
         files[tex + path] = hook
-    # Particules : jaune pur, entierement opaque (surface detectable maximale)
+    # Particules : petit point jaune central (une texture pleine donne d'enormes carres)
+    dot = Image.new("RGBA", (8, 8), (0, 0, 0, 0))
+    ImageDraw.Draw(dot).rectangle((2, 2, 5, 5), fill=JAUNE)
     for name in PARTICULES:
-        files[tex + "particle/" + name] = png(solid(8, JAUNE))
+        files[tex + "particle/" + name] = png(dot)
     if eau_sombre:
         # Texture en niveaux de gris teintee par le biome -> bleu tres sombre, sans animation
-        files[tex + "block/water_still.png"] = png(solid(16, (70, 70, 70, 235)))
-        files[tex + "block/water_flow.png"] = png(solid(32, (70, 70, 70, 235)))
+        files[tex + "block/water_still.png"] = png(solid(16, (70, 70, 70, 150)))
+        files[tex + "block/water_flow.png"] = png(solid(32, (70, 70, 70, 150)))
 
     icon = Image.new("RGBA", (64, 64), (16, 30, 60, 255))
     d = ImageDraw.Draw(icon)

@@ -220,7 +220,9 @@ class Detector:
                 self.bg = frame.mean(axis=-1, dtype=np.float32)
             gray = sub.mean(axis=-1, dtype=np.float32)  # (fenetre seulement)
             bg = self.bg[oy:y1, ox:x1]
-            umask |= np.abs(gray - bg) > c.motion_threshold
+            # Mouvement clair uniquement (bulles/eclaboussures), pas le fil noir ni l'eau decouverte
+            level = float(np.median(gray[::4, ::4])) if gray.size else 0.0
+            umask |= ((gray - bg) > c.motion_threshold) & (gray > level + c.motion_threshold)
             bg += (gray - bg) * 0.15
         umask &= ~bmask
         if blob is not None:  # le bouchon qui bouge n'est pas une bulle

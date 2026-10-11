@@ -202,7 +202,7 @@ class App(tk.Tk):
         self._slider(g, "calib_wait", "Attente apres lancer (calibrage, s)", 1, 6, 0.1)
         g = ttk.LabelFrame(f, text=" Bouchon ", padding=8)
         g.pack(fill="x", pady=4)
-        self._slider(g, "dip_threshold", "Enfoncement (tailles de bouchon)", 0.1, 2.0, 0.05,
+        self._slider(g, "dip_threshold", "Enfoncement (tailles de bouchon)", 0.1, 4.0, 0.05,
                      "Distance verticale, relative a la taille du bouchon, qui donne un signal 'dip' plein.")
         self._slider(g, "lost_ratio", "Disparu si aire <", 0.05, 0.9, 0.05)
         self._slider(g, "lost_frames", "Images 'disparu' consecutives", 1, 10, 1)

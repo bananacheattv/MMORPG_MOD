@@ -1,7 +1,7 @@
 # Auto-Peche Minecraft
 
 1. `lancer.bat` (Windows) — ou `pip install -r requirements.txt` puis `python autopeche.py`.
-2. `python gen_texture_pack.py` → copier `AutoPeche_Detection.zip` dans `.minecraft/resourcepacks`, l'activer en haut de la liste.
+2. `python gen_texture_pack.py` → copier `AutoPeche_Detection.zip` dans `.minecraft/resourcepacks`, l'activer en haut de la liste (**obligatoire** : le bouchon d'origine est presque invisible sous l'eau).
    Bouchon **magenta**, bulles/éclaboussures **jaunes**, eau sombre (`--eau-claire` pour garder l'eau d'origine).
 3. Dans Minecraft : canne en main, visez l'eau. Au démarrage le bot se **calibre seul** (lance/ramène la ligne, trouve le bouchon et sa couleur) — ne bougez pas la caméra.
 4. **F8** = démarrer / arrêter.

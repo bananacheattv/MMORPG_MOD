@@ -42,15 +42,15 @@ class Config:
     calib_roi_h: int = 280
 
     # Detection
-    radius_factor: float = 6.0      # rayon de recherche des bulles = facteur * taille bouchon
-    radius_px: int = 25             # + marge fixe en pixels
-    dip_threshold: float = 0.45     # enfoncement (en tailles de bouchon) pour un signal plein
+    radius_factor: float = 4.0      # rayon de recherche des bulles = facteur * taille bouchon
+    radius_px: int = 15             # + marge fixe en pixels
+    dip_threshold: float = 1.0      # enfoncement (en tailles de bouchon) pour un signal plein (touche reelle : 2 a 3.5)
     bubble_threshold: int = 12      # pixels de bulles proches pour un signal plein
     approach_min: int = 4           # pixels de bulles pour considerer une approche
     lost_ratio: float = 0.35        # bouchon "disparu" si aire < ratio * aire de reference
     lost_frames: int = 2
     w_dip: float = 0.70
-    w_bubble: float = 0.50
+    w_bubble: float = 0.35
     w_lost: float = 0.80
     trigger_score: float = 1.0
     confirm_frames: int = 2
