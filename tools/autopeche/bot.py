@@ -7,10 +7,12 @@ import time
 
 import numpy as np
 
+import calibrate
 from detector import Detector, annotate
 
-STOPPED, STARTING, CASTING, SETTLING, WAITING, APPROACH, REELING, PAUSED = (
-    "ARRETE", "DEMARRAGE", "LANCER", "STABILISATION", "ATTENTE", "APPROCHE", "FERRAGE", "PAUSE")
+STOPPED, STARTING, CASTING, SETTLING, WAITING, APPROACH, REELING, PAUSED, CALIBRATING = (
+    "ARRETE", "DEMARRAGE", "LANCER", "STABILISATION", "ATTENTE", "APPROCHE", "FERRAGE", "PAUSE",
+    "CALIBRAGE")
 
 
 def minecraft_focused():
@@ -38,6 +40,7 @@ class FishingBot(threading.Thread):
         self.active = threading.Event()
         self.quit = threading.Event()
         self.preview = True
+        self.want_calib = False
         self.reset_stats()
         from pynput.mouse import Button, Controller
         self._mouse, self._btn = Controller(), Button.right
@@ -54,6 +57,11 @@ class FishingBot(threading.Thread):
             self.t_state = time.time()
             self.active.set()
             self.log("Demarrage dans %.0f s : placez-vous dans Minecraft, canne en main." % self.cfg.start_delay)
+
+    def request_calibration(self):
+        self.want_calib = True
+        if not self.active.is_set():
+            self.start_fishing()
 
     def stop_fishing(self):
         if self.active.is_set():
@@ -82,6 +90,9 @@ class FishingBot(threading.Thread):
 
     def _cast(self):
         self._click()
+        self._line_out()
+
+    def _line_out(self):
         self.stats["lancers"] += 1
         self._set(SETTLING)
         self.t_cast = time.time()
@@ -125,6 +136,24 @@ class FishingBot(threading.Thread):
         self.events.put(("signal", r))
         return r
 
+    def _calibrate(self, sct, mon):
+        self._set(CALIBRATING)
+        for essai in range(1, 4):
+            try:
+                ok = calibrate.run(self, sct, mon)
+            except InterruptedError:
+                return
+            if ok:
+                self.detector.bg = None
+                self._line_out()
+                return
+            self.log("Nouvel essai de calibrage (%d/3)..." % essai)
+            self._sleep(1.0, 1.5)
+            if not self.active.is_set():
+                return
+        self.log("Calibrage impossible : visez l'eau, canne en main, et activez le pack de textures.")
+        self.stop_fishing()
+
     def _step(self, sct, mon):
         c, now = self.cfg, time.time()
         s = self.stats
@@ -139,7 +168,10 @@ class FishingBot(threading.Thread):
         if self.state == STARTING:
             self._frame(sct, mon)
             if now - self.t_state >= c.start_delay:
-                if c.cast_on_start:
+                if c.auto_calibrate or self.want_calib:
+                    self.want_calib = False
+                    self._calibrate(sct, mon)
+                elif c.cast_on_start:
                     self.log("Lancer.")
                     self._cast()
                 else:
@@ -159,6 +191,10 @@ class FishingBot(threading.Thread):
             self.log("Reprise.")
             self._set(self._prev_state)
             self.detector.reset(time.time())
+
+        if self.want_calib:
+            self.want_calib = False
+            return self._calibrate(sct, mon)
 
         r = self._frame(sct, mon)
         waited = now - self.t_cast
@@ -193,8 +229,10 @@ class FishingBot(threading.Thread):
             why = "delai depasse" if waited > c.max_wait else "bouchon introuvable"
             self.log("Relance (%s)." % why)
             s["timeouts"] += 1
+            self.events.put(("stats", dict(s)))
+            if c.auto_calibrate and why == "bouchon introuvable":
+                return self._calibrate(sct, mon)
             if self.detector.base_y is not None:  # canne lancee : on la ramene d'abord
                 self._click()
                 self._sleep(c.recast_min, c.recast_max)
             self._cast()
-            self.events.put(("stats", dict(s)))

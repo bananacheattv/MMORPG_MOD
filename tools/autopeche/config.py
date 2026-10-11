@@ -29,11 +29,23 @@ class Config:
     bubble_smin: float = 0.55
     bubble_vmin: float = 0.30
 
+    # Bulles detectees aussi par mouvement (marche sans le pack de textures)
+    bubble_motion: bool = True
+    motion_threshold: float = 28.0
+
+    # Calibrage automatique (localise le bouchon + apprend sa couleur)
+    auto_calibrate: bool = True
+    calib_wait: float = 2.6          # attente apres un lancer avant mesure (s)
+    calib_zone_w: float = 0.60       # zone de recherche (fraction de l'ecran)
+    calib_zone_h: float = 0.55
+    calib_roi_w: int = 380           # zone de suivi apres calibrage
+    calib_roi_h: int = 280
+
     # Detection
     radius_factor: float = 6.0      # rayon de recherche des bulles = facteur * taille bouchon
     radius_px: int = 25             # + marge fixe en pixels
     dip_threshold: float = 0.45     # enfoncement (en tailles de bouchon) pour un signal plein
-    bubble_threshold: int = 18      # pixels de bulles proches pour un signal plein
+    bubble_threshold: int = 12      # pixels de bulles proches pour un signal plein
     approach_min: int = 4           # pixels de bulles pour considerer une approche
     lost_ratio: float = 0.35        # bouchon "disparu" si aire < ratio * aire de reference
     lost_frames: int = 2

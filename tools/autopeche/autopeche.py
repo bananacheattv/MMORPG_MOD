@@ -18,13 +18,14 @@ if sys.platform == "win32":  # coordonnees ecran exactes avec la mise a l'echell
 
 from PIL import ImageTk
 
-from bot import APPROACH, PAUSED, REELING, SETTLING, STARTING, STOPPED, WAITING, FishingBot
+from bot import (APPROACH, CALIBRATING, PAUSED, REELING, SETTLING, STARTING, STOPPED, WAITING,
+                 FishingBot)
 from config import CONFIG_PATH, Config
 from detector import rgb_to_hsv
 
 BG, PANEL, FG, ACC, MUTED = "#15181e", "#1f242c", "#e6e6e6", "#4fc3f7", "#8a93a0"
 STATE_COLORS = {STOPPED: "#8a93a0", STARTING: "#ffd54f", "LANCER": "#ffd54f", SETTLING: "#90caf9",
-                WAITING: "#4fc3f7", APPROACH: "#ffa726", REELING: "#ef5350", PAUSED: "#ba68c8"}
+                WAITING: "#4fc3f7", CALIBRATING: "#ffd54f", APPROACH: "#ffa726", REELING: "#ef5350", PAUSED: "#ba68c8"}
 SERIES = [("score", "#ffffff"), ("dip", "#66bb6a"), ("bubble", "#ffee58"), ("lost", "#ef5350")]
 
 
@@ -85,6 +86,7 @@ class App(tk.Tk):
         self.state_lbl.pack(anchor="w", pady=(2, 10))
         self.go_btn = ttk.Button(left, text="DEMARRER  (F8)", style="Go.TButton", command=self.bot.toggle)
         self.go_btn.pack(fill="x")
+        ttk.Button(left, text="Calibrer maintenant", command=self.bot.request_calibration).pack(fill="x", pady=(6, 0))
         self.hint = ttk.Label(left, text="", style="Muted.TLabel", wraplength=210)
         self.hint.pack(anchor="w", pady=(6, 12))
 
@@ -191,6 +193,12 @@ class App(tk.Tk):
 
     def _tab_detection(self, nb):
         f = self._scroll_frame(nb, "Detection")
+        g = ttk.LabelFrame(f, text=" Automatique ", padding=8)
+        g.pack(fill="x", pady=4)
+        self._check(g, "auto_calibrate", "Calibrage automatique au demarrage (trouve le bouchon + sa couleur)")
+        self._check(g, "bubble_motion", "Detecter les bulles aussi par mouvement (sans pack de textures)")
+        self._slider(g, "motion_threshold", "Seuil de mouvement", 5, 100, 1)
+        self._slider(g, "calib_wait", "Attente apres lancer (calibrage, s)", 1, 6, 0.1)
         g = ttk.LabelFrame(f, text=" Bouchon ", padding=8)
         g.pack(fill="x", pady=4)
         self._slider(g, "dip_threshold", "Enfoncement (tailles de bouchon)", 0.1, 2.0, 0.05,
@@ -384,6 +392,12 @@ class App(tk.Tk):
                 self.vars[k].set(v)
         self._update_roi_lbl()
 
+    def _sync_vars(self):
+        for k, var in self.vars.items():
+            var.set(getattr(self.cfg, k))
+        self._update_roi_lbl()
+        self.cfg.save()
+
     def _log(self, msg):
         tag = "bite" if "TOUCHE" in msg else "warn" if ("Relance" in msg or "Erreur" in msg) else ""
         self.log.configure(state="normal")
@@ -399,6 +413,8 @@ class App(tk.Tk):
                 kind, data = self.events.get_nowait()
                 if kind == "log":
                     self._log(data)
+                elif kind == "calibrated":
+                    self._sync_vars()
                 elif kind == "state":
                     self._show_state(data)
                 elif kind == "frame":
@@ -425,6 +441,7 @@ class App(tk.Tk):
                               style="Stop.TButton" if running else "Go.TButton")
         self.hint.configure(text={
             STARTING: "Basculez sur Minecraft, canne a peche en main, visez l'eau.",
+            CALIBRATING: "Calibrage : ne bougez pas, le bot lance et ramene la ligne.",
             SETTLING: "Le bouchon se stabilise...",
             WAITING: "En attente d'une touche.",
             APPROACH: "Un poisson arrive !",

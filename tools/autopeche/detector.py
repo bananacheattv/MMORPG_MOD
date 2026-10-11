@@ -64,17 +64,32 @@ def largest_blob(mask, min_area):
     ys, xs = np.nonzero(mask)
     if len(xs) < min_area:
         return None
-    # Sans OpenCV : on garde les pixels proches de la mediane (rejette le bruit isole)
-    mx, my = np.median(xs), np.median(ys)
-    spread = max(6.0, 3.0 * np.median(np.hypot(xs - mx, ys - my)))
-    keep = np.hypot(xs - mx, ys - my) <= spread
-    xs, ys = xs[keep], ys[keep]
-    if len(xs) < min_area:
+    if len(xs) > 30000:  # trop de pixels : approximation par la mediane
+        return Blob(float(np.median(xs)), float(np.median(ys)), int(xs.min()), int(ys.min()),
+                    int(np.ptp(xs) + 1), int(np.ptp(ys) + 1), int(len(xs)))
+    best = None
+    todo = set(zip(ys.tolist(), xs.tolist()))
+    while todo:
+        seed = todo.pop()
+        comp, stack = [seed], [seed]
+        while stack:
+            y, x = stack.pop()
+            for dy in (-1, 0, 1):
+                for dx in (-1, 0, 1):
+                    q = (y + dy, x + dx)
+                    if q in todo:
+                        todo.remove(q)
+                        comp.append(q)
+                        stack.append(q)
+        if best is None or len(comp) > len(best):
+            best = comp
+    if len(best) < min_area:
         return None
-    x0, x1 = np.percentile(xs, [3, 97]).astype(int)
-    y0, y1 = np.percentile(ys, [3, 97]).astype(int)
-    return Blob(float(xs.mean()), float(ys.mean()), int(x0), int(y0),
-                int(x1 - x0 + 1), int(y1 - y0 + 1), int(len(xs)))
+    a = np.asarray(best)
+    y0, x0 = a.min(0)
+    y1, x1 = a.max(0)
+    return Blob(float(a[:, 1].mean()), float(a[:, 0].mean()), int(x0), int(y0),
+                int(x1 - x0 + 1), int(y1 - y0 + 1), int(len(a)))
 
 
 @dataclass
@@ -99,6 +114,8 @@ class Result:
 class Detector:
     def __init__(self, cfg):
         self.cfg = cfg
+        self.bg = None
+        self.noise_mu, self.noise_var = 0.0, 4.0
         self.reset(0.0)
 
     def reset(self, t):
@@ -117,8 +134,19 @@ class Detector:
         c = self.cfg
         h, s, v = rgb_to_hsv(frame)
         bmask = hue_mask(h, s, v, c.bobber_hue, c.bobber_hue_tol, c.bobber_smin, c.bobber_vmin)
-        umask = hue_mask(h, s, v, c.bubble_hue, c.bubble_hue_tol, c.bubble_smin, c.bubble_vmin) & ~bmask
+        umask = hue_mask(h, s, v, c.bubble_hue, c.bubble_hue_tol, c.bubble_smin, c.bubble_vmin)
         blob = largest_blob(bmask, c.bobber_min_area)
+        # Bulles par mouvement (fonctionne meme sans le pack de textures)
+        gray = frame.astype(np.float32).mean(axis=-1)
+        if self.bg is None or self.bg.shape != gray.shape:
+            self.bg = gray.copy()
+        if c.bubble_motion:
+            umask = umask | (np.abs(gray - self.bg) > c.motion_threshold)
+        self.bg += (gray - self.bg) * 0.15
+        umask &= ~bmask
+        if blob is not None:  # le bouchon qui bouge n'est pas une bulle
+            m = int(max(blob.w, blob.h) * 0.7) + 2
+            umask[max(0, blob.y - m):blob.y + blob.h + m, max(0, blob.x - m):blob.x + blob.w + m] = False
         r = Result(t=t, bobber=blob, bobber_mask=bmask, bubble_mask=umask)
 
         if blob is not None:
@@ -154,7 +182,13 @@ class Detector:
             if len(xs):
                 d = np.hypot(xs - cx, ys - cy)
                 near = d <= r.radius
-                r.bubbles = int(near.sum())
+                raw = int(near.sum())
+                # Seuil de bruit appris en continu (eau animee, houle...)
+                floor = self.noise_mu + 2.5 * self.noise_var ** 0.5
+                if r.armed and r.dip < c.dip_threshold * 0.3:
+                    self.noise_mu += (raw - self.noise_mu) * 0.03
+                    self.noise_var += ((raw - self.noise_mu) ** 2 - self.noise_var) * 0.03
+                r.bubbles = max(0, int(raw - floor))
                 if r.bubbles:
                     r.bubble_dist = float(d[near].mean())
         if r.bubbles >= c.approach_min:

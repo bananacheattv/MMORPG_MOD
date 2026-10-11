@@ -41,7 +41,9 @@ def build(eau_sombre=True):
     files = {}
     tex = "assets/minecraft/textures/"
     # Bouchon : magenta pur (bord legerement plus sombre pour garder la forme lisible)
-    files[tex + "entity/fishing_hook.png"] = png(solid(8, MAGENTA, (200, 0, 200, 255)))
+    hook = png(solid(8, MAGENTA, (200, 0, 200, 255)))
+    for path in ("entity/fishing_hook.png", "entity/fishing/fishing_hook.png", "entity/fishing_bobber.png"):
+        files[tex + path] = hook
     # Particules : jaune pur, entierement opaque (surface detectable maximale)
     for name in PARTICULES:
         files[tex + "particle/" + name] = png(solid(8, JAUNE))
