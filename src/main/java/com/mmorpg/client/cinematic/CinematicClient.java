@@ -68,6 +68,10 @@ public final class CinematicClient {
     private record Title(String text, String sub, int color, float from, float to) {
     }
 
+    /** Image cle du parcours global : position, cible et champ de vision a l'instant t (secondes). */
+    private record Keyframe(float t, Vec3 pos, Vec3 target, float fov) {
+    }
+
     private record Shot(String name, float start, float duration, Ease ease, boolean fade, boolean last, List<Object> cam, List<Object> target,
                         List<Key> fov, List<Key> roll, Title title, List<Sound> sounds, List<Particle> particles, int classKind) {
     }
@@ -95,6 +99,18 @@ public final class CinematicClient {
     private static final float SPAWN_YAW = 180F;
     private static final float SPAWN_PITCH = 6F;
     private static List<Vec3> preload = new ArrayList<>();
+    private static final List<Keyframe> PARCOURS = new ArrayList<>();
+    private static List<Keyframe> warm = new ArrayList<>();
+    private static boolean warming;
+    private static int warmIndex;
+    private static long warmStart;
+    private static boolean smoothInit;
+    private static float smoothYaw;
+    private static float smoothPitch;
+    private static long lastAimNanos;
+    private static int statFrames;
+    private static int statHitches;
+    private static float statMax;
 
     private CinematicClient() {
     }
@@ -122,7 +138,11 @@ public final class CinematicClient {
         camera = new ArmorStand(mc.level, 0, 0, 0);
         camera.setInvisible(true);
         camera.setNoGravity(true);
-        Vec3 first = SHOTS.get(0).cam.get(0) instanceof Vec3 v ? v : Vec3.atCenterOf(origin);
+        smoothInit = false;
+        lastAimNanos = 0;
+        warming = false;
+        warmIndex = 0;
+        Vec3 first = !PARCOURS.isEmpty() ? PARCOURS.get(0).pos : SHOTS.get(0).cam.get(0) instanceof Vec3 v ? v : Vec3.atCenterOf(origin);
         setCamera(first, SPAWN_YAW, SPAWN_PITCH);
         mc.setCameraEntity(camera);
         phase = Phase.LOADING;
@@ -155,19 +175,38 @@ public final class CinematicClient {
         return out;
     }
 
+    private static Vec3 point(JsonElement e) {
+        if (e.isJsonPrimitive()) {
+            Vec3 eye = HubLayout.center(origin, HubLayout.SPAWN).add(SPAWN_EYE_OFFSET);
+            return "@joueur".equals(e.getAsString()) ? eye : eye.add(Vec3.directionFromRotation(SPAWN_PITCH, SPAWN_YAW).scale(8));
+        }
+        return rel(e.getAsJsonArray());
+    }
+
     private static void parse(String json) {
         SHOTS.clear();
+        PARCOURS.clear();
         preload = new ArrayList<>();
         JsonObject root = JsonParser.parseString(json).getAsJsonObject();
         fadeIn = root.has("fondEntree") ? root.get("fondEntree").getAsFloat() : 1.5F;
         outroSeconds = root.has("fondSortie") ? root.get("fondSortie").getAsFloat() : 1.2F;
+        if (root.has("parcours")) {
+            for (JsonElement e : root.getAsJsonArray("parcours")) {
+                JsonObject o = e.getAsJsonObject();
+                PARCOURS.add(new Keyframe(o.get("t").getAsFloat(), point(o.get("camera")), point(o.get("cible")), o.has("fov") ? o.get("fov").getAsFloat() : -1F));
+            }
+            for (Keyframe k : PARCOURS) {
+                preload.add(k.pos);
+                preload.add(k.target);
+            }
+        }
         float t = 0F;
         JsonArray plans = root.getAsJsonArray("plans");
         for (int i = 0; i < plans.size(); i++) {
             JsonObject p = plans.get(i).getAsJsonObject();
             float dur = p.get("duree").getAsFloat();
-            List<Object> cam = path(p.getAsJsonArray("camera"));
-            List<Object> tgt = path(p.getAsJsonArray("cible"));
+            List<Object> cam = p.has("camera") ? path(p.getAsJsonArray("camera")) : new ArrayList<>();
+            List<Object> tgt = p.has("cible") ? path(p.getAsJsonArray("cible")) : new ArrayList<>();
             Title title = null;
             if (p.has("titre")) {
                 JsonObject o = p.getAsJsonObject("titre");
@@ -201,14 +240,24 @@ public final class CinematicClient {
                 for (int k = 0; k < ClassMasterEntity.IDS.length; k++) if (ClassMasterEntity.IDS[k].equals(c)) kind = k;
             }
             boolean last = i == plans.size() - 1;
-            boolean fade = !last && !"coupe".equals(p.has("transition") ? p.get("transition").getAsString() : "fondu");
+            boolean fade = PARCOURS.isEmpty() && !last && !"coupe".equals(p.has("transition") ? p.get("transition").getAsString() : "fondu");
             SHOTS.add(new Shot(p.has("nom") ? p.get("nom").getAsString() : "plan" + i, t, dur, Ease.byName(p.has("rythme") ? p.get("rythme").getAsString() : null),
                     fade, last, cam, tgt, keys(p, "fov"), keys(p, "roulis"), title, sounds, parts, kind));
             for (Object o : cam) if (o instanceof Vec3 v) preload.add(v);
             for (Object o : tgt) if (o instanceof Vec3 v) preload.add(v);
             t += dur;
         }
-        total = t;
+        total = PARCOURS.isEmpty() ? t : PARCOURS.get(PARCOURS.size() - 1).t;
+        buildWarm();
+    }
+
+    /** Points de pre-chauffage : le long du parcours, toutes les 2 s, puis retour au depart. */
+    private static void buildWarm() {
+        warm = new ArrayList<>();
+        if (PARCOURS.isEmpty()) return;
+        float end = PARCOURS.get(PARCOURS.size() - 1).t;
+        for (float s = 0F; s < end; s += 2F) warm.add(sampleParcours(s));
+        warm.add(PARCOURS.get(0));
     }
 
     // ================================================================== fin
@@ -277,11 +326,29 @@ public final class CinematicClient {
         switch (phase) {
             case LOADING -> {
                 float waited = (now - loadStart) / 1.0E9F;
-                if ((chunksReady(mc) && waited > 0.6F) || waited > 8F) {
+                if (!warming) {
+                    if ((chunksReady(mc) && waited > 0.6F) || waited > 8F) {
+                        warming = true;
+                        warmIndex = 0;
+                        warmStart = now;
+                    }
+                } else if (warmIndex >= warm.size() || waited > 40F) {
                     phase = Phase.PLAYING;
                     phaseStart = now;
                     shotIndex = 0;
                     shotOfCursors = -1;
+                    smoothInit = false;
+                    lastAimNanos = 0;
+                } else {
+                    // pre-chauffage : la camera survole le parcours sous l'ecran noir pour que le rendu des sections soit pret avant la lecture
+                    Keyframe k = warm.get(warmIndex);
+                    aim(k.pos, k.target, 0F, true);
+                    lastFov = k.fov < 0 ? mc.options.fov().get() : k.fov;
+                    float s = (now - warmStart) / 1.0E9F;
+                    if ((mc.levelRenderer.hasRenderedAllSections() && s > 0.1F) || s > 1.0F) {
+                        warmIndex++;
+                        warmStart = now;
+                    }
                 }
             }
             case PLAYING -> {
@@ -309,6 +376,10 @@ public final class CinematicClient {
     }
 
     private static void finishScene(Minecraft mc, long now) {
+        MMORPG.LOGGER.info("[MMORPG] Cinematique : {} images, image la plus lente {} ms, {} images au-dela de 50 ms", statFrames, Math.round(statMax * 1000), statHitches);
+        statFrames = 0;
+        statHitches = 0;
+        statMax = 0F;
         // la camera rend la main au joueur ; les barres se retractent pendant la fin
         mc.setCameraEntity(mc.player);
         camera = null;
@@ -327,15 +398,17 @@ public final class CinematicClient {
             }
         }
         float local = Mth.clamp((t - shot.start) / shot.duration, 0F, 1F);
-        float e = shot.ease.apply(local);
-        Vec3 pos = spline(shot.cam, e);
-        Vec3 target = spline(shot.target, e);
-        Vec3 d = target.subtract(pos);
-        float yaw = (float) Math.toDegrees(Math.atan2(-d.x, d.z));
-        float pitch = (float) -Math.toDegrees(Math.atan2(d.y, Math.hypot(d.x, d.z)));
-        setCamera(pos, yaw, pitch);
-        lastFov = shot.fov.isEmpty() ? mc.options.fov().get() : sample(shot.fov, e, mc.options.fov().get());
-        lastRoll = shot.roll.isEmpty() ? 0F : sample(shot.roll, e, 0F);
+        if (!PARCOURS.isEmpty()) {
+            Keyframe k = sampleParcours(t);
+            aim(k.pos, k.target, t, false);
+            lastFov = k.fov < 0 ? mc.options.fov().get() : k.fov;
+            lastRoll = 0F;
+        } else {
+            float e = shot.ease.apply(local);
+            aim(spline(shot.cam, e), spline(shot.target, e), t, false);
+            lastFov = shot.fov.isEmpty() ? mc.options.fov().get() : sample(shot.fov, e, mc.options.fov().get());
+            lastRoll = shot.roll.isEmpty() ? 0F : sample(shot.roll, e, 0F);
+        }
         // evenements du plan : sons, particules, mise en scene du maitre de classe
         if (shotOfCursors != shotIndex) {
             shotOfCursors = shotIndex;
@@ -346,6 +419,82 @@ public final class CinematicClient {
         while (soundCursor < shot.sounds.size() && shot.sounds.get(soundCursor).t <= local) fire(mc, shot.sounds.get(soundCursor++));
         while (particleCursor < shot.particles.size() && shot.particles.get(particleCursor).t <= local) burst(mc, shot.particles.get(particleCursor++));
         skipAlpha = Mth.clamp((t - 1.5F) / 0.8F, 0F, 1F);
+    }
+
+    /** Oriente la camera vers la cible avec un lissage exponentiel (supprime les a-coups) ; en fin de scene elle rejoint exactement le regard du joueur. */
+    private static void aim(Vec3 pos, Vec3 target, float t, boolean snap) {
+        Vec3 d = target.subtract(pos);
+        float yaw = (float) Math.toDegrees(Math.atan2(-d.x, d.z));
+        float pitch = (float) -Math.toDegrees(Math.atan2(d.y, Math.hypot(d.x, d.z)));
+        long now = System.nanoTime();
+        float dt = lastAimNanos == 0 ? 0.016F : Mth.clamp((now - lastAimNanos) / 1.0E9F, 0.001F, 0.1F);
+        lastAimNanos = now;
+        if (!snap && smoothInit) {
+            statFrames++;
+            if (dt > 0.05F) statHitches++;
+            statMax = Math.max(statMax, dt);
+        }
+        if (!smoothInit || snap) {
+            smoothYaw = yaw;
+            smoothPitch = pitch;
+            smoothInit = true;
+        } else {
+            float a = 1F - (float) Math.exp(-dt / 0.16F);
+            a = Math.max(a, Mth.clamp((t - (total - 0.8F)) / 0.8F, 0F, 1F));
+            smoothYaw += Mth.wrapDegrees(yaw - smoothYaw) * a;
+            smoothPitch += (pitch - smoothPitch) * a;
+        }
+        setCamera(pos, smoothYaw, smoothPitch);
+    }
+
+    /** Parcours global : interpolation d'Hermite C1 entre images cles (tangentes par differences finies, nulles aux extremites). */
+    private static Keyframe sampleParcours(float t) {
+        int n = PARCOURS.size();
+        if (t <= PARCOURS.get(0).t) return PARCOURS.get(0);
+        if (t >= PARCOURS.get(n - 1).t) return PARCOURS.get(n - 1);
+        int i = 0;
+        while (i < n - 2 && t > PARCOURS.get(i + 1).t) i++;
+        Keyframe a = PARCOURS.get(i);
+        Keyframe b = PARCOURS.get(i + 1);
+        float dt = b.t - a.t;
+        float u = (t - a.t) / dt;
+        Vec3 pos = hermite(a.pos, b.pos, tangent(i, false), tangent(i + 1, false), dt, u);
+        Vec3 tgt = hermite(a.target, b.target, tangent(i, true), tangent(i + 1, true), dt, u);
+        float k = u * u * (3F - 2F * u);
+        float fa = a.fov;
+        float fb = b.fov;
+        float fov = fa < 0 || fb < 0 ? (u < 0.5F ? fa : fb) : fa + (fb - fa) * k;
+        return new Keyframe(t, pos, tgt, fov);
+    }
+
+    /** Diagnostic (tests) : {position, cible} du parcours a l'instant t, ou null s'il n'y a pas de parcours global. */
+    public static Vec3[] debugSample(float t) {
+        if (PARCOURS.isEmpty()) return null;
+        Keyframe k = sampleParcours(t);
+        return new Vec3[]{k.pos, k.target};
+    }
+
+    public static float debugTotal() {
+        return total;
+    }
+
+    private static Vec3 tangent(int i, boolean target) {
+        int n = PARCOURS.size();
+        if (i <= 0 || i >= n - 1) return Vec3.ZERO;
+        Keyframe p = PARCOURS.get(i - 1);
+        Keyframe q = PARCOURS.get(i + 1);
+        Vec3 d = target ? q.target.subtract(p.target) : q.pos.subtract(p.pos);
+        return d.scale(1.0 / (q.t - p.t));
+    }
+
+    private static Vec3 hermite(Vec3 p0, Vec3 p1, Vec3 m0, Vec3 m1, float dt, float u) {
+        double u2 = u * u;
+        double u3 = u2 * u;
+        double h00 = 2 * u3 - 3 * u2 + 1;
+        double h10 = u3 - 2 * u2 + u;
+        double h01 = -2 * u3 + 3 * u2;
+        double h11 = u3 - u2;
+        return p0.scale(h00).add(m0.scale(h10 * dt)).add(p1.scale(h01)).add(m1.scale(h11 * dt));
     }
 
     private static void stageMaster(Minecraft mc, int kind, float seconds) {
@@ -485,8 +634,17 @@ public final class CinematicClient {
         switch (phase) {
             case LOADING -> {
                 black = 1F;
-                String msg = "ELDORIA";
-                g.centeredText(mc.font, Component.literal(msg), w / 2, h / 2 - 4, 0xFFFFD060);
+                g.fill(0, 0, w, h, 0xFF000000);
+                g.pose().pushMatrix();
+                g.pose().translate(w / 2F, h / 2F - 14);
+                g.pose().scale(3F, 3F);
+                g.centeredText(mc.font, com.mmorpg.client.EldoriaFont.of("ELDORIA"), 0, 0, 0xFFFFD060);
+                g.pose().popMatrix();
+                float progress = warming && !warm.isEmpty() ? Mth.clamp((float) warmIndex / warm.size(), 0F, 1F) : 0F;
+                int bw = Math.min(200, w / 3);
+                g.fill(w / 2 - bw / 2, h / 2 + 14, w / 2 + bw / 2, h / 2 + 16, 0x55FFFFFF);
+                g.fill(w / 2 - bw / 2, h / 2 + 14, w / 2 - bw / 2 + Math.round(bw * progress), h / 2 + 16, 0xFFFFD060);
+                g.centeredText(mc.font, Component.literal("Préparation de la citadelle…"), w / 2, h / 2 + 22, 0xFFC8C0B0);
                 return;
             }
             case PLAYING -> {

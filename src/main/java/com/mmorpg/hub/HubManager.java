@@ -110,6 +110,7 @@ public final class HubManager {
         p.stopRiding();
         Vec3 at = HubLayout.center(hub.origin(), HubLayout.SPAWN);
         p.teleportTo(level, at.x, at.y, at.z, Set.of(), 180F, 0F, true);
+        CinematicManager.arrivedAtHub(p);
         return true;
     }
 

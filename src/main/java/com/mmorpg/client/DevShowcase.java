@@ -371,7 +371,7 @@ public final class DevShowcase {
             hubPhase(mc, me);
             return;
         }
-        if (MODE.equals("cinematique")) {
+        if (MODE.equals("cinematique") || MODE.equals("cineverif")) {
             cinematicPhase(mc, me);
             return;
         }
@@ -1663,7 +1663,49 @@ public final class DevShowcase {
         }
     }
 
-    /** Cinematique d'arrivee : captures a intervalles reguliers. */
+    private static boolean cineSaw;
+    private static int cineEnd = -1;
+    private static int cineVerifTick = -1;
+
+    /** Echantillonne le parcours : camera dans un bloc, ou ligne de vue vers la cible bouchee (intervalles de temps). */
+    private static void verifyCinematicPath(Minecraft mc) {
+        float total = com.mmorpg.client.cinematic.CinematicClient.debugTotal();
+        StringBuilder inside = new StringBuilder();
+        StringBuilder blocked = new StringBuilder();
+        boolean in = false;
+        boolean bl = false;
+        float inStart = 0;
+        float blStart = 0;
+        String inWhat = "";
+        String blWhat = "";
+        for (float t = 0F; t <= total; t += 0.1F) {
+            var v = com.mmorpg.client.cinematic.CinematicClient.debugSample(t);
+            if (v == null) return;
+            boolean isInside = !mc.level.getBlockState(net.minecraft.core.BlockPos.containing(v[0])).isAir();
+            var hit = mc.level.clip(new net.minecraft.world.level.ClipContext(v[0], v[1], net.minecraft.world.level.ClipContext.Block.COLLIDER,
+                    net.minecraft.world.level.ClipContext.Fluid.NONE, mc.player));
+            double dist = v[0].distanceTo(v[1]);
+            boolean isBlocked = hit.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK && hit.getLocation().distanceTo(v[0]) < dist * 0.55 && dist > 3;
+            if (isInside && !in) {
+                inStart = t;
+                inWhat = mc.level.getBlockState(net.minecraft.core.BlockPos.containing(v[0])).getBlock().getDescriptionId() + String.format(java.util.Locale.ROOT, "@%.0f,%.0f,%.0f", v[0].x - HUB_ORIGIN[0], v[0].y - HUB_ORIGIN[1], v[0].z - HUB_ORIGIN[2]);
+            }
+            if (!isInside && in) inside.append(String.format(java.util.Locale.ROOT, " [%.1f-%.1f %s]", inStart, t, inWhat));
+            if (isBlocked && !bl) {
+                blStart = t;
+                var hp = hit.getLocation();
+                blWhat = mc.level.getBlockState(net.minecraft.core.BlockPos.containing(hp.add(v[1].subtract(v[0]).normalize().scale(0.1)))).getBlock().getDescriptionId()
+                        + String.format(java.util.Locale.ROOT, "@%.0f,%.0f,%.0f cam@%.0f,%.0f,%.0f", hp.x - HUB_ORIGIN[0], hp.y - HUB_ORIGIN[1], hp.z - HUB_ORIGIN[2], v[0].x - HUB_ORIGIN[0], v[0].y - HUB_ORIGIN[1], v[0].z - HUB_ORIGIN[2]);
+            }
+            if (!isBlocked && bl) blocked.append(String.format(java.util.Locale.ROOT, " [%.1f-%.1f %s]", blStart, t, blWhat));
+            in = isInside;
+            bl = isBlocked;
+        }
+        MMORPG.LOGGER.info("[MMORPG] PARCOURS camera dans un bloc :{}", inside.length() == 0 ? " aucun" : inside);
+        MMORPG.LOGGER.info("[MMORPG] PARCOURS ligne de vue bouchee :{}", blocked.length() == 0 ? " aucune" : blocked);
+    }
+
+    /** Cinematique d'arrivee : declenchee par l'arrivee au hub (/hub reset), captures reguliers, puis controle du regard vers le sol et le plafond. */
     private static void cinematicPhase(Minecraft mc, String me) {
         if (tick == 5) mc.getWindow().setWindowed(1280, 720);
         if (tick == 10) {
@@ -1673,26 +1715,48 @@ public final class DevShowcase {
             cmd(mc, String.format("tp %s %d %d %d", me, HUB_ORIGIN[0], HUB_ORIGIN[1], HUB_ORIGIN[2]));
         }
         if (tick == 30) cmd(mc, "mmorpg hub");
-        if (tick == 100) cmd(mc, "mmorpg cinematique " + me);
-        int[] shots = {110, 160, 220, 300, 400, 520, 660, 760, 900, 1000, 1100, 1240, 1380, 1520, 1640, 1700};
-        for (int i = 0; i < shots.length; i++) {
-            if (tick == 100 + shots[i]) {
-                MMORPG.LOGGER.info("[MMORPG] CINEMATIQUE +{} ticks : camera = {} ecran={} actif={}", shots[i], mc.getCameraEntity() == mc.player ? "joueur" : "libre",
-                        screenName(mc), com.mmorpg.client.cinematic.CinematicClient.active());
-                shot(mc, String.format("14%02d_cine_%d", i, shots[i]));
-            }
+        if (tick == 60) cmd(mc, "hub reset " + me);              // arrivee au hub : la cinematique demarre d'elle-meme
+        boolean active = com.mmorpg.client.cinematic.CinematicClient.active();
+        if (active) cineSaw = true;
+        if (MODE.equals("cineverif") && active && cineVerifTick < 0) cineVerifTick = tick;
+        if (MODE.equals("cineverif") && cineVerifTick > 0 && tick == cineVerifTick + 10) {
+            verifyCinematicPath(mc);
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (cineverif)");
+            stop(mc);
         }
-        // relecture puis saut : doit rendre la main au joueur sans attendre la fin du film
-        if (tick == 1850) cmd(mc, "mmorpg cinematique " + me);
-        if (tick == 1930) com.mmorpg.client.cinematic.CinematicClient.skip();
-        if (tick == 1990) MMORPG.LOGGER.info("[MMORPG] CINEMATIQUE apres saut : actif={} camera={} verrou serveur={}", com.mmorpg.client.cinematic.CinematicClient.active(),
-                mc.getCameraEntity() == mc.player ? "joueur" : "libre", com.mmorpg.hub.CinematicManager.isLocked(sp(mc, me)));
-        if (tick == 2100) {
-            MMORPG.LOGGER.info("[MMORPG] CINEMATIQUE terminee : actif={} camera={} verrou serveur={}", com.mmorpg.client.cinematic.CinematicClient.active(),
+        if (cineSaw && !active && cineEnd < 0) {
+            cineEnd = tick;
+            MMORPG.LOGGER.info("[MMORPG] CINEMATIQUE terminee au tick {} : camera={} verrou serveur={}", tick,
                     mc.getCameraEntity() == mc.player ? "joueur" : "libre", com.mmorpg.hub.CinematicManager.isLocked(sp(mc, me)));
-            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (cinematique)");
         }
-        if (tick == 2120) stop(mc);
+        if (cineSaw && cineEnd < 0 && tick % 120 == 0) {
+            MMORPG.LOGGER.info("[MMORPG] CINEMATIQUE tick {} : camera = {}", tick, mc.getCameraEntity() == mc.player ? "joueur" : "libre");
+            shot(mc, String.format("14%02d_cine_%d", tick / 120, tick));
+        }
+        if (cineEnd > 0) {
+            int d = tick - cineEnd;
+            if (d == 5) verifyCinematicPath(mc);
+            if (d == 30) cmd(mc, "tp " + me + " ~ ~ ~ 0 90");
+            if (d == 50) {
+                MMORPG.LOGGER.info("[MMORPG] REGARD BAS : joueur xRot={} cameraEntite={} fov={}", mc.player.getXRot(), mc.getCameraEntity() == mc.player, mc.options.fov().get());
+                shot(mc, "1490_post_bas");
+            }
+            if (d == 60) cmd(mc, "tp " + me + " ~ ~ ~ 0 -90");
+            if (d == 80) {
+                MMORPG.LOGGER.info("[MMORPG] REGARD HAUT : joueur xRot={} cameraEntite={}", mc.player.getXRot(), mc.getCameraEntity() == mc.player);
+                shot(mc, "1491_post_haut");
+            }
+            if (d == 90) cmd(mc, "tp " + me + " ~ ~ ~ 90 0");
+            if (d == 110) shot(mc, "1492_post_horizon");
+            if (d == 120) {
+                MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (cinematique)");
+            }
+            if (d == 130) stop(mc);
+        }
+        if (tick > 4000 && cineEnd < 0) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (cinematique) : la cinematique ne s'est pas terminee");
+            stop(mc);
+        }
     }
 
     private static void petsPhase(Minecraft mc, String me) {

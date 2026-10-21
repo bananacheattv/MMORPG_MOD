@@ -76,9 +76,30 @@ public final class CinematicManager {
         }
     }
 
+    /** Joueurs qui viennent d'arriver dans le hub : la cinematique demarre au prochain controle si elle n'a jamais ete vue. */
+    private static final Set<UUID> ARRIVED = new java.util.HashSet<>();
+
+    public static void arrivedAtHub(ServerPlayer p) {
+        ARRIVED.add(p.getUUID());
+    }
+
+    @SubscribeEvent
+    public static void onDimensionChange(PlayerEvent.PlayerChangedDimensionEvent event) {
+        if (event.getEntity() instanceof ServerPlayer p && event.getTo().equals(HubManager.HUB_DIM)) arrivedAtHub(p);
+    }
+
+    @SubscribeEvent
+    public static void onLoginInHub(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer p && p.level().dimension().equals(HubManager.HUB_DIM)) arrivedAtHub(p);
+    }
+
     @SubscribeEvent
     public static void onTick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer p) || p.tickCount % 5 != 0) return;
+        if (!ARRIVED.isEmpty() && ARRIVED.remove(p.getUUID())) {
+            HubPlayerData hd = ClassTrial.data(p);
+            if (!hd.cinematicSeen && !hd.inTrial && !LOCKED.containsKey(p.getUUID()) && com.mmorpg.config.ConfigManager.general().hubCinematic) start(p, true);
+        }
         Lock lock = LOCKED.get(p.getUUID());
         if (lock == null) return;
         if (p.level().getGameTime() > lock.until) {

@@ -29,7 +29,9 @@ final class HubFlora {
                 boolean parvis = Math.hypot(x, z - 46) > 6 && Math.hypot(x, z - 46) < 12 && Math.abs(x) > 4 && z > 38;
                 boolean rim = !c.in(c.foot, x, z) && c.in(c.isle, x, z) && c.edge[x - HubCtx.X0][z - HubCtx.Z0] > 2.5F;
                 if (!(plazaLawn || parvis || rim)) continue;
-                if (nearPavilion(x, z, 13.5) || c.rnd(x, 2, z, 303) > 0.62F) continue;
+                boolean onDiagonal = r < 34 && Math.abs(Math.abs(x) - Math.abs(z)) / 1.414 < 9.0;      // couloir de vue vers les pavillons
+                boolean onAxis = r < 70 && (Math.abs(x) < 9 || Math.abs(z) < 9);                       // couloirs de la cinematique le long des axes
+                if (nearPavilion(x, z, 13.5) || onDiagonal || onAxis || c.rnd(x, 2, z, 303) > 0.62F) continue;
                 if (c.get(x, -1, z).getBlock() != Blocks.GRASS_BLOCK && !(rim && c.get(x, 0, z).isAir())) continue;
                 int type = (int) (c.rnd(x, 4, z, 304) * 4);
                 int h = 5 + (int) (c.rnd(x, 5, z, 305) * 4);

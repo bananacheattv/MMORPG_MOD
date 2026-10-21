@@ -130,7 +130,7 @@ Un opérateur construit le hub avec `/hub set` (ou `/mmorpg hub`) dans sa **dime
 
 Le hub est **protégé** (réglage `hubProtection`) : on n'y casse ni ne pose de blocs, il n'y a ni PvP ni monstres hostiles (les opérateurs en créatif gardent la main pour l'aménager).
 
-À sa première connexion, un joueur sans classe voit une **cinématique** (caméra fluide, barres cinéma, titres, sons et particules ; Espace ou Échap pour passer) qui survole le hub et présente les quatre classes. Il parle ensuite aux **Maîtres de classe**, des PNJ au modèle animé propre à chaque classe : il peut **essayer** n'importe quelle classe à un niveau choisi (1, 25, 50, 75 ou 100) dans la salle d'épreuve, avec son équipement et ses compétences, sans rien gagner ni perdre (son personnage est entièrement restauré à la sortie), puis **choisir** définitivement celle qu'il a essayée. Le Téléporteur du hub reste fermé tant qu'aucune classe n'est choisie.
+À sa première arrivée dans le hub, un joueur voit une **cinématique** d'environ une minute (un seul mouvement de caméra continu et pré-chauffé pour rester fluide, barres cinéma, titres, sons et particules ; Espace ou Échap pour passer) qui survole le hub et présente les quatre classes. Il parle ensuite aux **Maîtres de classe**, des PNJ au modèle animé propre à chaque classe : il peut **essayer** n'importe quelle classe à un niveau choisi (1, 25, 50, 75 ou 100) dans la salle d'épreuve, avec son équipement et ses compétences, sans rien gagner ni perdre (son personnage est entièrement restauré à la sortie), puis **choisir** définitivement celle qu'il a essayée. Le Téléporteur du hub reste fermé tant qu'aucune classe n'est choisie.
 
 ## Blocs de bâtisseur et police Eldoria
 
