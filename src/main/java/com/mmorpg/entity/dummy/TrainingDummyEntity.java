@@ -278,7 +278,8 @@ public class TrainingDummyEntity extends PathfinderMob {
     @Override
     public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         // un joueur creatif accroupi retire le mannequin d'un coup
-        if (source.getEntity() instanceof Player p && p.getAbilities().instabuild && p.isShiftKeyDown()) {
+        if (source.is(net.minecraft.world.damagesource.DamageTypes.PLAYER_ATTACK) && source.getEntity() instanceof Player p
+                && p.getAbilities().instabuild && p.isShiftKeyDown()) {
             this.discard();
             return true;
         }
