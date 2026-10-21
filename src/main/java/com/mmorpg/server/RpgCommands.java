@@ -202,6 +202,34 @@ public final class RpgCommands {
                                     c.getSource().sendSuccess(() -> ok("Cosmétique(s) débloqué(s)"), true);
                                     return 1;
                                 }))))
+                .then(Commands.literal("mannequin")
+                        .then(Commands.literal("supprimer").executes(c -> {
+                            var list = c.getSource().getLevel().getEntitiesOfClass(com.mmorpg.entity.dummy.TrainingDummyEntity.class,
+                                    new net.minecraft.world.phys.AABB(BlockPos.containing(c.getSource().getPosition())).inflate(10));
+                            list.forEach(n -> n.discard());
+                            c.getSource().sendSuccess(() -> ok(list.size() + " mannequin(s) supprimé(s)"), true);
+                            return list.size();
+                        }))
+                        .then(Commands.argument("variante", StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(com.mmorpg.entity.dummy.TrainingDummyEntity.VARIANTS, b))
+                                .executes(c -> {
+                                    String id = StringArgumentType.getString(c, "variante");
+                                    int v = java.util.Arrays.asList(com.mmorpg.entity.dummy.TrainingDummyEntity.VARIANTS).indexOf(id);
+                                    if (v < 0) {
+                                        c.getSource().sendFailure(Component.literal("Variante inconnue : standard, blinde ou magique."));
+                                        return 0;
+                                    }
+                                    var level = c.getSource().getLevel();
+                                    var dummy = com.mmorpg.registry.ModEntities.TRAINING_DUMMY.get().create(level, null, BlockPos.containing(c.getSource().getPosition()),
+                                            net.minecraft.world.entity.EntitySpawnReason.COMMAND, true, false);
+                                    if (dummy == null) return 0;
+                                    var pos = c.getSource().getPosition();
+                                    dummy.snapTo(pos.x, pos.y, pos.z, c.getSource().getRotation().y + 180, 0);
+                                    dummy.setup(v);
+                                    level.addFreshEntity(dummy);
+                                    c.getSource().sendSuccess(() -> ok("Mannequin « " + dummy.config().name + " » posé."), true);
+                                    return 1;
+                                })))
                 .then(Commands.literal("pnj")
                         .then(Commands.literal("quetes_groupe")
                             .then(Commands.argument("groupe", StringArgumentType.word())

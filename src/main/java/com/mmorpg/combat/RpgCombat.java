@@ -252,6 +252,7 @@ public final class RpgCombat {
         if (h == null) return;
 
         Hit hit = OVERRIDE.get();
+        boolean magicHit = hit != null && hit.magic();
         Entity attacker = source.getEntity();
         Entity direct = source.getDirectEntity();
         float raw = event.getContainer().getOriginalDamage();
@@ -304,7 +305,7 @@ public final class RpgCombat {
         }
 
         if (!environmental) {
-            double def = h.def();
+            double def = target instanceof com.mmorpg.entity.dummy.TrainingDummyEntity dummy ? dummy.defenseFor(magicHit) : h.def();
             double reduction = Math.min(0.8, def / (def + 200.0 + 10.0 * attackerLevel));
             damage *= 1.0 - reduction;
         }
@@ -323,6 +324,13 @@ public final class RpgCombat {
             if (ls > 0) RpgPlayers.heal(playerAttacker, damage * ls / 100.0, false);
         }
 
+        // mannequin d'entrainement : jamais de perte de vie, le coup alimente ses statistiques
+        if (target instanceof com.mmorpg.entity.dummy.TrainingDummyEntity dummy) {
+            if (!environmental) dummy.recordHit(damage, crit, attacker);       // chute, feu, vide... ne comptent pas
+            event.setNewDamage(0F);
+            if (damage > 0 && attacker instanceof Player) CombatTexts.above(target, (float) damage, crit ? Payloads.CombatText.CRIT : Payloads.CombatText.DAMAGE);
+            return;
+        }
         double newHp = h.hp() - damage;
         if (newHp <= 0.01) {
             h.setHp(0);

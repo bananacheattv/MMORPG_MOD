@@ -43,3 +43,10 @@ Branche : codex/eldoria-reprise. Sauvegarder chaque fonctionnalite dans un commi
 15. Caisses + cles, lucky blocks.
 16. TAB et scoreboard custom.
 17. Montures deblocables.
+
+## Hub d'entrée (branche feature/hub-entree)
+
+Étapes : 1. mannequin d'entraînement, 2. PNJ de classe + choix après essai (pas d'écran dédié), 3. zone de test, 4. hub `/mmorpg hub`, 5. cinématique.
+
+- Étape 1 faite : `entity/dummy/TrainingDummyEntity`, rendu `client/model/dummy` (ressort amorti réel, direction/force du coup), panneau dans `MmoHud.dummyPanels`, config `mannequin.json`, objets/recettes/commande. Test : `-Pshowcase=mannequin` et `-Pshowcase=mannequin2`.
+

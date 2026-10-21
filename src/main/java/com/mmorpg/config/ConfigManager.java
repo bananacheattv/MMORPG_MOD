@@ -31,6 +31,7 @@ public final class ConfigManager {
     private static Map<String, com.mmorpg.quest.QuestDef> quests = com.mmorpg.quest.DefaultQuests.create();
     private static ShopConfig shop = ShopConfig.defaults();
     private static LootTables loot = LootTables.defaults();
+    private static DummyConfig dummy = DummyConfig.defaults();
 
     private ConfigManager() {
     }
@@ -70,6 +71,10 @@ public final class ConfigManager {
             catch (java.nio.file.AtomicMoveNotSupportedException e) { Files.move(temp, dir().resolve("quests.json"), java.nio.file.StandardCopyOption.REPLACE_EXISTING); }
             quests = updated;
         } finally { Files.deleteIfExists(temp); }
+    }
+
+    public static DummyConfig dummy() {
+        return dummy;
     }
 
     public static LootTables loot() {
@@ -209,6 +214,15 @@ public final class ConfigManager {
             }
             loot = (lootCfg == null ? LootTables.defaults() : lootCfg).sanitize();
             write(lt, loot);
+            Path dm = dir().resolve("mannequin.json");
+            DummyConfig dummyCfg = null;
+            if (Files.exists(dm)) {
+                try (Reader r = Files.newBufferedReader(dm, StandardCharsets.UTF_8)) {
+                    dummyCfg = GSON.fromJson(r, DummyConfig.class);
+                }
+            }
+            dummy = (dummyCfg == null ? DummyConfig.defaults() : dummyCfg).sanitize();
+            write(dm, dummy);
             MMORPG.LOGGER.info("[MMORPG] Configuration chargée : {} monstres/boss, {} quêtes, {} articles en boutique", mobs.size(), quests.size(), shop.buy.size());
         } catch (Exception e) {
             MMORPG.LOGGER.error("[MMORPG] Impossible de lire la configuration, valeurs par défaut utilisées", e);
@@ -217,6 +231,7 @@ public final class ConfigManager {
             quests = com.mmorpg.quest.DefaultQuests.create();
             shop = ShopConfig.defaults();
             loot = LootTables.defaults();
+            dummy = DummyConfig.defaults();
         }
     }
 

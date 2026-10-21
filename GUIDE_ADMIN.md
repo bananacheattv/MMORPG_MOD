@@ -64,3 +64,14 @@ Seul le proprietaire peut monter. La monture invoquee disparait si son proprieta
 - Obtenues uniquement via les sceaux `mmorpg:sceau_<monture>` (caisses / Lucky Blocks), sans niveau minimum.
 - L'Hippogriffe vole : avancer en regardant vers le haut = monter, vers le bas = descendre, saut = battement d'ailes.
 - Modèles régénérables : `python3 tools/gen_mounts.py`.
+
+## Mannequins d'entraînement
+
+- 3 variantes : **standard** (paille, aucune défense), **blindé** (forte défense physique), **magique** (forte résistance magique).
+- Objets : `mmorpg:mannequin_entrainement`, `mannequin_blinde`, `mannequin_magique` (onglet créatif « Objets » ; recettes à la Forge Arcanique, catégorie Consommables). Clic droit sur un bloc pour le poser.
+- Commandes : `/mmorpg mannequin <standard|blinde|magique>` pose un mannequin à ta position ; `/mmorpg mannequin supprimer` retire ceux dans un rayon de 10 blocs. Un joueur créatif accroupi qui le frappe le retire aussi.
+- Il est immortel, immobile, non poussable et ne riposte jamais. Il subit les dégâts du mod comme un monstre (défense, critiques, menace du Tank, dégâts flottants) sans perdre de vie. Les dégâts d'environnement (chute, feu, vide) ne comptent pas.
+- Panneau au-dessus de lui : DPS (fenêtre glissante), total, plus gros coup, critiques. **Accroupi + clic droit** : remise à zéro.
+- Réglages : `config/mmorpg/mannequin.json` (niveau affiché, fenêtre du DPS, portée du panneau, défense physique / magique de chaque variante). `/mmorpg reload` les recharge.
+- Modèles et animations (Blockbench) : `art/mannequin_blockbench/` (`python generer_mannequin.py`).
+

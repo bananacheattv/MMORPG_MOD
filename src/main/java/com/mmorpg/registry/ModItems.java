@@ -43,6 +43,18 @@ public final class ModItems {
     public static final List<DeferredItem<? extends Item>> SPAWN_EGGS = new ArrayList<>();
     public static final Map<String, DeferredItem<? extends Item>> BY_ID = new LinkedHashMap<>();
     public static final Map<PetType, DeferredItem<PetEggItem>> PET_EGGS = new EnumMap<>(PetType.class);
+    /** Mannequins d'entrainement (objets de placement), par variante. */
+    public static final Map<String, DeferredItem<com.mmorpg.item.TrainingDummyItem>> DUMMY_ITEMS = new java.util.LinkedHashMap<>();
+    static {
+        String[] ids = {"mannequin_entrainement", "mannequin_blinde", "mannequin_magique"};
+        Rarity[] rar = {Rarity.PEU_COMMUN, Rarity.RARE, Rarity.RARE};
+        String[] lore = {"Paille et bois : il encaisse tout sans broncher.", "Plastron d'acier : forte défense physique.", "Runes et cristal : forte résistance magique."};
+        for (int i = 0; i < ids.length; i++) {
+            int v = i;
+            DUMMY_ITEMS.put(com.mmorpg.entity.dummy.TrainingDummyEntity.VARIANTS[i], ITEMS.registerItem(ids[i],
+                    p -> new com.mmorpg.item.TrainingDummyItem(p, rar[v], v, lore[v])));
+        }
+    }
     public static final Map<PetType, DeferredItem<Item>> PET_SPRITES = new EnumMap<>(PetType.class);
     public static final Map<ItemDefs.Element, DeferredItem<Item>> PROJECTILE_SPRITES = new EnumMap<>(ItemDefs.Element.class);
 

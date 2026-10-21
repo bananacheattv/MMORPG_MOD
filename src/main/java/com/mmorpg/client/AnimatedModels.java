@@ -51,6 +51,10 @@ public final class AnimatedModels {
         event.registerLayerDefinition(AutelInvocationModel.LAYER, AutelInvocationModel::createBodyLayer);
         event.registerLayerDefinition(TeleporteurModel.LAYER, TeleporteurModel::createBodyLayer);
         event.registerLayerDefinition(ForgeArcaniqueModel.LAYER, ForgeArcaniqueModel::createBodyLayer);
+        // mannequins d'entrainement (art/mannequin_blockbench)
+        event.registerLayerDefinition(com.mmorpg.client.model.dummy.MannequinStandardModel.LAYER, com.mmorpg.client.model.dummy.MannequinStandardModel::createBodyLayer);
+        event.registerLayerDefinition(com.mmorpg.client.model.dummy.MannequinBlindeModel.LAYER, com.mmorpg.client.model.dummy.MannequinBlindeModel::createBodyLayer);
+        event.registerLayerDefinition(com.mmorpg.client.model.dummy.MannequinMagiqueModel.LAYER, com.mmorpg.client.model.dummy.MannequinMagiqueModel::createBodyLayer);
         // familiers (art/familiers_blockbench)
         event.registerLayerDefinition(com.mmorpg.client.model.pet.FeuFolletModel.LAYER, com.mmorpg.client.model.pet.FeuFolletModel::createBodyLayer);
         event.registerLayerDefinition(com.mmorpg.client.model.pet.BebeSlimeModel.LAYER, com.mmorpg.client.model.pet.BebeSlimeModel::createBodyLayer);

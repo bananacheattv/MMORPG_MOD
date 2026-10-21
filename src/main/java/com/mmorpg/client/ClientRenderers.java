@@ -70,6 +70,7 @@ public final class ClientRenderers {
         ModEntities.MOUNTS.forEach((type, entity) -> event.registerEntityRenderer(entity.get(),
                 c -> new com.mmorpg.client.model.mount.MountRenderer(c, type)));     // montures 3D animees
         event.registerEntityRenderer(ModEntities.NPC.get(), NpcRenderer::new);
+        event.registerEntityRenderer(ModEntities.TRAINING_DUMMY.get(), com.mmorpg.client.model.dummy.DummyRenderer::new);
     }
 
     private static <T extends Mob> HumanoidRenderer<T, HumanoidRenderState> humanoid(EntityRendererProvider.Context c, String texture) {

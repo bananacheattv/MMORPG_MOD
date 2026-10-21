@@ -367,6 +367,14 @@ public final class DevShowcase {
             breakPhase(mc, me);
             return;
         }
+        if (MODE.equals("mannequin2")) {
+            dummyTiltPhase(mc, me);
+            return;
+        }
+        if (MODE.equals("mannequin")) {
+            dummyPhase(mc, me);
+            return;
+        }
         if (MODE.equals("familiers")) {
             petsPhase(mc, me);
             return;
@@ -1201,6 +1209,168 @@ public final class DevShowcase {
                     test[0], partGone, masterGone, drops, screenName(mc));
             mc.gui.setScreen(null);
         }
+    }
+
+    // ------------------------------------------------------------------ mannequins d'entrainement (-Pshowcase=mannequin)
+
+    private static com.mmorpg.entity.dummy.TrainingDummyEntity dummyAt(Minecraft mc, int variant) {
+        for (var e : mc.level.getEntitiesOfClass(com.mmorpg.entity.dummy.TrainingDummyEntity.class, mc.player.getBoundingBox().inflate(30))) {
+            if (e.variant() == variant) return e;
+        }
+        return null;
+    }
+
+    private static com.mmorpg.entity.dummy.TrainingDummyEntity serverDummy(Minecraft mc, int variant) {
+        var server = mc.getSingleplayerServer();
+        var level = server.getLevel(mc.player.level().dimension());
+        for (var e : level.getEntitiesOfClass(com.mmorpg.entity.dummy.TrainingDummyEntity.class, mc.player.getBoundingBox().inflate(30))) {
+            if (e.variant() == variant) return e;
+        }
+        return null;
+    }
+
+    private static String dummyStats(Minecraft mc, int variant) {
+        var d = serverDummy(mc, variant);
+        return d == null ? "absent" : String.format(java.util.Locale.ROOT, "%s : DPS=%d total=%d meilleur=%d coups=%d critiques=%d (client : DPS=%d total=%d)",
+                d.variantId(), d.dps(), d.total(), d.best(), d.hits(), d.crits(), dummyAt(mc, variant).dps(), dummyAt(mc, variant).total());
+    }
+
+    /** Se place a 3 blocs devant un mannequin (par le sud) en le regardant. */
+    private static void faceDummy(Minecraft mc, String me, int variant, double fromSide) {
+        var d = dummyAt(mc, variant);
+        if (d == null) return;
+        cmd(mc, String.format(java.util.Locale.ROOT, "tp %s %.2f %.2f %.2f %.1f %.1f", me, d.getX() + fromSide, d.getY(), d.getZ() + 3.0, 180F - (float) Math.toDegrees(Math.atan2(fromSide, 3.0)), 8F));
+    }
+
+    private static void hitDummy(Minecraft mc, int variant) {
+        var d = dummyAt(mc, variant);
+        if (d == null) return;
+        mc.gameMode.attack(mc.player, d);
+    }
+
+    private static void dummyPhase(Minecraft mc, String me) {
+        if (tick == 5) mc.getWindow().setWindowed(1280, 720);
+        if (tick == 15) {
+            cmd(mc, "time set day");
+            cmd(mc, "weather clear");
+            cmd(mc, "gamemode survival " + me);
+            cmd(mc, "mmorpg classe " + me + " guerrier");
+            cmd(mc, "mmorpg niveau " + me + " 100");
+            cmd(mc, "give " + me + " mmorpg:epee_seigneur_guerre");
+            cmd(mc, "kill @e[type=mmorpg:mannequin_entrainement]");
+            cmd(mc, "kill @e[type=mmorpg:roi_gobelin]");
+        }
+        if (tick == 30) {
+            String[] v = {"standard", "blinde", "magique"};
+            for (int i = 0; i < 3; i++) {
+                cmd(mc, String.format(java.util.Locale.ROOT, "execute positioned %d 181 %d rotated 180 0 run mmorpg mannequin %s", 100 + i * 7, -690, v[i]));
+            }
+            mc.player.getInventory().setSelectedSlot(0);
+        }
+        if (tick == 36) {
+            for (int i = 0; i < 3; i++) MMORPG.LOGGER.info("[MMORPG] MANNEQUIN pose : {} present={}", i, dummyAt(mc, i) != null);
+            faceDummy(mc, me, 0, 0);
+        }
+        // 1) mannequin standard : 6 coups a l'epee (melee), cadence du cooldown
+        for (int k = 0; k < 6; k++) if (tick == 50 + k * 12) hitDummy(mc, 0);
+        if (tick == 54) shot(mc, "100_mannequin_coup");
+        if (tick == 135) {
+            MMORPG.LOGGER.info("[MMORPG] MANNEQUIN standard apres 6 coups : {}", dummyStats(mc, 0));
+            shot(mc, "101_mannequin_panneau");
+        }
+        // 2) blinde : memes coups => moins de degats (defense physique)
+        if (tick == 140) faceDummy(mc, me, 1, 0);
+        for (int k = 0; k < 6; k++) if (tick == 150 + k * 12) hitDummy(mc, 1);
+        if (tick == 235) MMORPG.LOGGER.info("[MMORPG] MANNEQUIN blinde apres 6 coups : {}", dummyStats(mc, 1));
+        // 3) magique (melee) : moins de resistance physique que le blinde
+        if (tick == 240) faceDummy(mc, me, 2, 0);
+        for (int k = 0; k < 6; k++) if (tick == 250 + k * 12) hitDummy(mc, 2);
+        if (tick == 335) {
+            MMORPG.LOGGER.info("[MMORPG] MANNEQUIN magique (melee) apres 6 coups : {}", dummyStats(mc, 2));
+            shot(mc, "102_mannequin_magique");
+        }
+        // 4) mage : sorts (degats magiques) sur le blindé puis sur le magique
+        if (tick == 340) {
+            cmd(mc, "mmorpg classe " + me + " mage");
+            cmd(mc, "mmorpg niveau " + me + " 100");
+            var sd = serverDummy(mc, 1);
+            if (sd != null) sd.resetStats();
+            sd = serverDummy(mc, 2);
+            if (sd != null) sd.resetStats();
+        }
+        if (tick == 360) faceDummy(mc, me, 1, 0);
+        for (int k = 0; k < 4; k++) if (tick == 375 + k * 30) ClientNet.send(new Payloads.SkillAction(Payloads.SkillAction.CAST, 0, ""));
+        if (tick == 520) MMORPG.LOGGER.info("[MMORPG] MANNEQUIN blinde (sorts) : {}", dummyStats(mc, 1));
+        if (tick == 525) faceDummy(mc, me, 2, 0);
+        for (int k = 0; k < 4; k++) if (tick == 540 + k * 30) ClientNet.send(new Payloads.SkillAction(Payloads.SkillAction.CAST, 0, ""));
+        if (tick == 685) {
+            MMORPG.LOGGER.info("[MMORPG] MANNEQUIN magique (sorts) : {}", dummyStats(mc, 2));
+            shot(mc, "103_mannequin_sorts");
+        }
+        // 5) remise a zero : accroupi + clic droit
+        if (tick == 690) {
+            var d = serverDummy(mc, 2);
+            var server = mc.getSingleplayerServer();
+            var sp = server.getPlayerList().getPlayerByName(me);
+            sp.setShiftKeyDown(true);
+            sp.interactOn(d, net.minecraft.world.InteractionHand.MAIN_HAND, d.position());
+            sp.setShiftKeyDown(false);
+        }
+        if (tick == 700) MMORPG.LOGGER.info("[MMORPG] MANNEQUIN magique apres remise a zero : {}", dummyStats(mc, 2));
+        if (tick == 706) shot(mc, "104_mannequin_reset");
+        if (tick == 740) {
+            // immortalite : degats enormes
+            var sd = serverDummy(mc, 2);
+            sd.hurtServer((net.minecraft.server.level.ServerLevel) sd.level(), sd.damageSources().generic(), 1.0E9F);
+            MMORPG.LOGGER.info("[MMORPG] MANNEQUIN apres 1e9 degats vanilla : vivant={} {}", sd.isAlive(), dummyStats(mc, 2));
+            cmd(mc, "mmorpg mannequin supprimer");
+        }
+        if (tick == 760) {
+            MMORPG.LOGGER.info("[MMORPG] MANNEQUIN apres suppression : {} restants", mc.level.getEntitiesOfClass(com.mmorpg.entity.dummy.TrainingDummyEntity.class, mc.player.getBoundingBox().inflate(40)).size());
+            cmd(mc, "gamemode creative " + me);
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (mannequin)");
+        }
+        if (tick == 770) stop(mc);
+    }
+
+    /** Direction de l'inclinaison : coup venu du sud, camera a l'est (le mannequin doit pencher vers le nord, donc vers la droite de l'image). */
+    private static void dummyTiltPhase(Minecraft mc, String me) {
+        if (tick == 5) mc.getWindow().setWindowed(1280, 720);
+        if (tick == 15) {
+            cmd(mc, "time set day");
+            cmd(mc, "gamemode creative " + me);
+            cmd(mc, "mmorpg classe " + me + " guerrier");
+            cmd(mc, "mmorpg niveau " + me + " 100");
+            cmd(mc, "kill @e[type=mmorpg:mannequin_entrainement]");
+            cmd(mc, "kill @e[type=mmorpg:roi_gobelin]");
+            cmd(mc, "execute positioned 107.5 181 -690.5 rotated 180 0 run mmorpg mannequin standard");
+            cmd(mc, "tp " + me + " 112.5 181 -690.5 90 10");
+        }
+        int[] t = {60, 140, 220};          // 1) coup du sud  2) coup de l'est (camera)  3) coup de l'ouest
+        double[][] from = {{107.5, -687.5}, {110.5, -690.5}, {104.5, -690.5}};
+        for (int k = 0; k < 3; k++) {
+            if (tick == t[k] - 2) {
+                var d = serverDummy(mc, 0);
+                var sp = mc.getSingleplayerServer().getPlayerList().getPlayerByName(me);
+                if (d != null && sp != null) {
+                    sp.snapTo(from[k][0], 181, from[k][1]);                 // l'attaquant se place la ou le coup arrive
+                    com.mmorpg.combat.RpgCombat.dealDamage(sp, d, 800, false, false);
+                    sp.snapTo(112.5, 181, -690.5, 90, 10);
+                }
+            }
+            for (int dt : new int[]{3, 6, 10, 16}) {
+                if (tick == t[k] + dt) {
+                    var d = dummyAt(mc, 0);
+                    MMORPG.LOGGER.info("[MMORPG] INCLINAISON coup {} +{} ticks : tiltX={} tiltZ={}", k + 1, dt, d.tiltX, d.tiltZ);
+                    shot(mc, "110_incl_" + (k + 1) + "_" + dt);
+                }
+            }
+        }
+        if (tick == 300) {
+            cmd(mc, "mmorpg mannequin supprimer");
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (mannequin2)");
+        }
+        if (tick == 310) stop(mc);
     }
 
     private static void petsPhase(Minecraft mc, String me) {

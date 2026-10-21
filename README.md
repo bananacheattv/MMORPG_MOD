@@ -124,6 +124,10 @@ Les familiers sont des **modèles 3D animés** (Blockbench, `art/familiers_block
 
 Immobiles un moment, ils se reposent : le loup s'assoit puis s'endort, le golem et la chouette s'endorment, le slime s'aplatit, le feu follet entre en canalisation. À l'invocation, ils jouent une animation de joie.
 
+## Mannequins d'entraînement
+
+Trois mannequins (standard, blindé, magique) pour mesurer ses dégâts : on les fabrique à la Forge Arcanique et on les pose avec un clic droit. Ils sont immortels, immobiles et ne ripostent pas ; un panneau au-dessus d'eux affiche le DPS sur 10 s, le total, le plus gros coup et les critiques (accroupi + clic droit pour remettre à zéro). Le blindé résiste aux coups physiques, le magique aux sorts. Réglages dans `config/mmorpg/mannequin.json`.
+
 ## Téléporteurs, villes et donjons
 
 Les téléporteurs sont un **outil d'administration** pour installer les villes et les donjons. Ils n'ont pas de recette : on les prend dans l'onglet créatif du mod ou avec `/give`.

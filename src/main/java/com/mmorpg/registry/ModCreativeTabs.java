@@ -36,6 +36,7 @@ public final class ModCreativeTabs {
                 out.accept(ModItems.PIECE_OR.get());
                 ModItems.CONSUMABLES.forEach(i -> out.accept(i.get()));
                 ModItems.SUMMONS.forEach(i -> out.accept(i.get()));
+                ModItems.DUMMY_ITEMS.values().forEach(i -> out.accept(i.get()));
                 ModItems.PET_EGGS.values().forEach(i -> out.accept(i.get()));
                 ModItems.MOUNT_SEALS.values().forEach(i -> out.accept(i.get()));
                 out.accept(ModItems.OEUF_MYSTERE.get());

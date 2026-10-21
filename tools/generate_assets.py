@@ -30,6 +30,7 @@ ASSETS = os.path.join(ROOT, 'assets', MODID)
 DATA = os.path.join(ROOT, 'data')
 
 LANG = {}
+LANG_EN = {}          # traductions anglaises (les autres cles restent en francais dans en_us.json)
 MANIFEST = []
 
 
@@ -863,9 +864,11 @@ def main():
     gen_equipment.generate(sys.modules[__name__])
     import gen_hd_textures
     gen_hd_textures.generate(sys.modules[__name__])
+    import gen_hub
+    gen_hub.generate(sys.modules[__name__])
     lang = dict(sorted(LANG.items()))
     write_json(os.path.join(ASSETS, 'lang', 'fr_fr.json'), lang)
-    write_json(os.path.join(ASSETS, 'lang', 'en_us.json'), lang)
+    write_json(os.path.join(ASSETS, 'lang', 'en_us.json'), dict(sorted({**lang, **LANG_EN}.items())))
     with open(os.path.join(os.path.dirname(__file__), 'manifest.txt'), 'w', encoding='utf-8') as f:
         for kind, iid in MANIFEST:
             f.write(f'{kind} {iid}\n')

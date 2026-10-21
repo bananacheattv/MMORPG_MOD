@@ -91,6 +91,9 @@ public final class ModEntities {
                             .passengerAttachments(m.seat * MOUNT_SCALE + .1f).clientTrackingRange(10)));
         }
     }
+    public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.dummy.TrainingDummyEntity>> TRAINING_DUMMY =
+            ENTITIES.registerEntityType("mannequin_entrainement", com.mmorpg.entity.dummy.TrainingDummyEntity::new, MobCategory.MISC,
+                    b -> b.sized(1.0F, 2.0F).fireImmune().clientTrackingRange(10).noSummon());
     public static final DeferredHolder<EntityType<?>, EntityType<PetEntity>> PET =
             ENTITIES.registerEntityType("familier", PetEntity::new, MobCategory.MISC,
                     b -> b.sized(0.5F, 0.5F).clientTrackingRange(8).updateInterval(1));
@@ -135,5 +138,6 @@ public final class ModEntities {
         for (var mount : MOUNTS.values()) event.put(mount.get(), net.minecraft.world.entity.animal.equine.AbstractHorse.createBaseHorseAttributes()
                 .add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH, 20).build());
         event.put(NPC.get(), com.mmorpg.entity.NpcEntity.createAttributes().build());
+        event.put(TRAINING_DUMMY.get(), com.mmorpg.entity.dummy.TrainingDummyEntity.createAttributes().build());
     }
 }
