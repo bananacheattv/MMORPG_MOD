@@ -367,6 +367,14 @@ public final class DevShowcase {
             breakPhase(mc, me);
             return;
         }
+        if (MODE.equals("hub")) {
+            hubPhase(mc, me);
+            return;
+        }
+        if (MODE.equals("cinematique")) {
+            cinematicPhase(mc, me);
+            return;
+        }
         if (MODE.equals("mannequin2")) {
             dummyTiltPhase(mc, me);
             return;
@@ -1371,6 +1379,238 @@ public final class DevShowcase {
             MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (mannequin2)");
         }
         if (tick == 310) stop(mc);
+    }
+
+    // ------------------------------------------------------------------ hub, essais de classe, choix (-Pshowcase=hub / cinematique)
+
+    private static net.minecraft.server.level.ServerPlayer sp(Minecraft mc, String me) {
+        return mc.getSingleplayerServer().getPlayerList().getPlayerByName(me);
+    }
+
+    private static com.mmorpg.entity.hub.ClassMasterEntity master(Minecraft mc, int kind) {
+        var server = mc.getSingleplayerServer();
+        var level = server.getLevel(mc.player.level().dimension());
+        for (var e : level.getEntitiesOfClass(com.mmorpg.entity.hub.ClassMasterEntity.class, mc.player.getBoundingBox().inflate(120))) {
+            if (e.kind() == kind) return e;
+        }
+        return null;
+    }
+
+    private static String hubState(Minecraft mc, String me) {
+        var p = sp(mc, me);
+        var d = com.mmorpg.server.RpgPlayers.get(p);
+        var hd = com.mmorpg.hub.ClassTrial.data(p);
+        int items = 0;
+        for (int i = 0; i < p.getInventory().getContainerSize(); i++) if (!p.getInventory().getItem(i).isEmpty()) items++;
+        return String.format(java.util.Locale.ROOT, "classe=%s niveau=%d xp=%d or=%d essai=%s objets=%d main=%s tete=%s off=%s barre=%s pos=(%.0f,%.0f,%.0f)",
+                d.playerClass, d.level, d.xp, d.gold, hd.inTrial, items, p.getMainHandItem().getHoverName().getString(),
+                p.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).getHoverName().getString(), p.getOffhandItem().getHoverName().getString(), String.join(",", d.skillBar), p.getX(), p.getY(), p.getZ());
+    }
+
+    private static final int[] HUB_ORIGIN = {400, 181, 400};
+
+    private static void hubView(Minecraft mc, String me, double dx, double dy, double dz, double tx, double ty, double tz) {
+        double yaw = Math.toDegrees(Math.atan2(-(tx - dx), tz - dz));
+        double pitch = -Math.toDegrees(Math.atan2(ty - dy, Math.hypot(tx - dx, tz - dz)));
+        cmd(mc, String.format(java.util.Locale.ROOT, "tp %s %.2f %.2f %.2f %.1f %.1f", me, HUB_ORIGIN[0] + 0.5 + dx, HUB_ORIGIN[1] + dy - 1.62, HUB_ORIGIN[2] + 0.5 + dz, yaw, pitch));
+    }
+
+    private static int diamonds(Minecraft mc, String me) {
+        var p = sp(mc, me);
+        int n = 0;
+        for (int i = 0; i < p.getInventory().getContainerSize(); i++) {
+            var st = p.getInventory().getItem(i);
+            if (st.is(net.minecraft.world.item.Items.DIAMOND)) n += st.getCount();
+        }
+        return n;
+    }
+
+    private static void hubPhase(Minecraft mc, String me) {
+        if (tick == 5) mc.getWindow().setWindowed(1280, 720);
+        if (tick == 10) {
+            cmd(mc, "time set day");
+            cmd(mc, "weather clear");
+            cmd(mc, "gamemode creative " + me);
+            cmd(mc, "mmorpg classe " + me + " mage");
+            cmd(mc, "mmorpg niveau " + me + " 20");
+            cmd(mc, "give " + me + " minecraft:diamond 12");
+            cmd(mc, "mmorpg or " + me + " 30");
+            cmd(mc, String.format("tp %s %d %d %d", me, HUB_ORIGIN[0], HUB_ORIGIN[1], HUB_ORIGIN[2]));
+        }
+        if (tick == 30) cmd(mc, "mmorpg hub");
+        if (tick == 80) {
+            MMORPG.LOGGER.info("[MMORPG] HUB construit : {} maitres, {} mannequins",
+                    mc.level.getEntitiesOfClass(com.mmorpg.entity.hub.ClassMasterEntity.class, mc.player.getBoundingBox().inflate(120)).size(),
+                    mc.level.getEntitiesOfClass(com.mmorpg.entity.dummy.TrainingDummyEntity.class, mc.player.getBoundingBox().inflate(120)).size());
+            hubView(mc, me, -40, 36, 40, 0, 2, -4);
+        }
+        if (tick == 110) shot(mc, "120_hub_vue_generale");
+        if (tick == 112) hubView(mc, me, -14, 5, -2, -10, 2.5, -10);
+        if (tick == 135) shot(mc, "121_hub_zone_guerrier");
+        if (tick == 137) hubView(mc, me, 14, 5, -2, 10, 2.5, -10);
+        if (tick == 160) shot(mc, "122_hub_zone_mage");
+        if (tick == 162) hubView(mc, me, -4, 4, 16, -10, 2.5, 10);
+        if (tick == 185) shot(mc, "123_hub_zone_archer");
+        if (tick == 187) hubView(mc, me, 4, 4, 16, 10, 2.5, 10);
+        if (tick == 210) shot(mc, "124_hub_zone_tank");
+        if (tick == 212) hubView(mc, me, 0, 5, 24, 0, 2, 12);
+        if (tick == 235) shot(mc, "125_hub_porte_teleporteur");
+        if (tick == 237) hubView(mc, me, 0, 4, -24, 0, 2, -40);
+        if (tick == 270) shot(mc, "126_hub_salle_epreuve");
+        if (tick == 272) hubView(mc, me, 20, 4, -6, 30, 1.5, 0);
+        if (tick == 300) shot(mc, "127_hub_aire_entrainement");
+
+        // ---- essai d'une classe : Guerrier niveau 50 depuis un joueur Mage niveau 20 avec sac
+        if (tick == 303) {
+            cmd(mc, "gamemode survival " + me);
+            cmd(mc, "item replace entity " + me + " armor.head with minecraft:iron_helmet");
+            cmd(mc, "item replace entity " + me + " weapon.offhand with minecraft:shield");
+        }
+        if (tick == 305) {
+            hubView(mc, me, -6, 1.7, -6, -10, 2.4, -10);
+            MMORPG.LOGGER.info("[MMORPG] AVANT essai : {}", hubState(mc, me));
+        }
+        if (tick == 320) com.mmorpg.hub.HubManager.interact(sp(mc, me), master(mc, 0));
+        if (tick == 345) {
+            MMORPG.LOGGER.info("[MMORPG] DIALOGUE Maitre Guerrier ouvert : ecran = {}", screenName(mc));
+            shot(mc, "128_dialogue_guerrier");
+        }
+        if (tick == 347) ClientNet.send(new Payloads.HubAction(Payloads.HubAction.CHOOSE, PlayerClass.GUERRIER.ordinal(), 0));
+        if (tick == 352) MMORPG.LOGGER.info("[MMORPG] CHOISIR avec une classe deja choisie (refus attendu) : {}", hubState(mc, me));
+        if (tick == 355) {
+            mc.gui.setScreen(null);
+            ClientNet.send(new Payloads.HubAction(Payloads.HubAction.TRY, PlayerClass.GUERRIER.ordinal(), 50));
+        }
+        if (tick == 400) {
+            MMORPG.LOGGER.info("[MMORPG] PENDANT essai Guerrier 50 : {}", hubState(mc, me));
+            shot(mc, "129_essai_guerrier");
+        }
+        // coups sur un mannequin : XP et or ne doivent pas bouger
+        if (tick == 405) {
+            var d = mc.level.getEntitiesOfClass(com.mmorpg.entity.dummy.TrainingDummyEntity.class, mc.player.getBoundingBox().inflate(40));
+            if (!d.isEmpty()) {
+                var t = d.get(0);
+                cmd(mc, String.format(java.util.Locale.ROOT, "tp %s %.2f %.2f %.2f 0 8", me, t.getX(), t.getY(), t.getZ() + 3));
+            }
+        }
+        for (int k = 0; k < 5; k++) if (tick == 420 + k * 12) {
+            var d = mc.level.getEntitiesOfClass(com.mmorpg.entity.dummy.TrainingDummyEntity.class, mc.player.getBoundingBox().inflate(6));
+            if (!d.isEmpty()) mc.gameMode.attack(mc.player, d.get(0));
+        }
+        if (tick == 500) {
+            MMORPG.LOGGER.info("[MMORPG] APRES coups : {}", hubState(mc, me));
+            shot(mc, "130_essai_coups");
+        }
+        // coup mortel : le joueur doit etre relance, pas tue
+        if (tick == 510) {
+            var p = sp(mc, me);
+            p.hurtServer((net.minecraft.server.level.ServerLevel) p.level(), p.damageSources().generic(), 1.0E9F);
+            com.mmorpg.combat.RpgCombat.dealDamage(p, p, 1.0E9, false, false);
+        }
+        if (tick == 530) MMORPG.LOGGER.info("[MMORPG] APRES coup mortel (essai doit continuer) : vivant={} {}", sp(mc, me).isAlive(), hubState(mc, me));
+        // changement de classe pendant l'essai
+        if (tick == 535) ClientNet.send(new Payloads.HubAction(Payloads.HubAction.TRY, PlayerClass.TANK.ordinal(), 75));
+        if (tick == 560) MMORPG.LOGGER.info("[MMORPG] ESSAI change en Tank 75 : {}", hubState(mc, me));
+        if (tick == 565) {
+            mc.gui.setScreen(null);
+            var g = master(mc, 4);
+            if (g != null) com.mmorpg.hub.HubManager.interact(sp(mc, me), g);
+        }
+        if (tick == 590) {
+            MMORPG.LOGGER.info("[MMORPG] DIALOGUE Gardien : ecran = {}", screenName(mc));
+            shot(mc, "131_dialogue_gardien");
+        }
+        // sortie : restauration complete attendue (Mage 20, 12 diamants, 30 pieces d'or, position d'origine)
+        if (tick == 592) ClientNet.send(new Payloads.HubAction(Payloads.HubAction.QUIT, 0, 0));
+        if (tick == 625) {
+            mc.gui.setScreen(null);
+            MMORPG.LOGGER.info("[MMORPG] APRES sortie : {} diamants={}", hubState(mc, me), diamonds(mc, me));
+            shot(mc, "132_apres_restauration");
+        }
+        // reprise apres plantage : le joueur est sauvegarde en plein essai puis restaure a la connexion
+        if (tick == 630) ClientNet.send(new Payloads.HubAction(Payloads.HubAction.TRY, PlayerClass.ARCHER.ordinal(), 100));
+        if (tick == 660) {
+            var p = sp(mc, me);
+            var out = net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING, p.registryAccess());
+            p.saveWithoutId(out);
+            String saved = out.buildResult().toString();
+            MMORPG.LOGGER.info("[MMORPG] SAUVEGARDE JOUEUR pendant l'essai : contient l'etat d'essai = {} ({} octets)", saved.contains("inTrial"), saved.length());
+            com.mmorpg.hub.ClassTrial.onLogin(new net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent(p));
+        }
+        if (tick == 690) MMORPG.LOGGER.info("[MMORPG] APRES reconnexion simulee : {} diamants={}", hubState(mc, me), diamonds(mc, me));
+        // joueur sans classe : teleporteur ferme, choix interdit sans essai, puis essai + choix
+        if (tick == 700) {
+            cmd(mc, "mmorpg classe " + me + " aucune");
+            sp(mc, me).getData(com.mmorpg.registry.ModAttachments.HUB).triedMask = 0;
+            com.mmorpg.hub.HubManager.forceNonOperator = true; // joueur ordinaire : le choix exige un essai et le teleporteur exige une classe
+        }
+        if (tick == 715) {
+            mc.gui.setScreen(null);
+            MMORPG.LOGGER.info("[MMORPG] JOUEUR SANS CLASSE : {} operateur={}", hubState(mc, me), com.mmorpg.hub.HubManager.isOperator(sp(mc, me)));
+            hubView(mc, me, -6, 1.7, -6, -10, 2.4, -10);
+        }
+        if (tick == 720) ClientNet.send(new Payloads.HubAction(Payloads.HubAction.CHOOSE, PlayerClass.MAGE.ordinal(), 0));
+        if (tick == 730) MMORPG.LOGGER.info("[MMORPG] CHOISIR sans essai (refus attendu) : {}", hubState(mc, me));
+        if (tick == 735) {
+            var p = sp(mc, me);
+            var tp = com.mmorpg.hub.HubLayout.pos(new net.minecraft.core.BlockPos(HUB_ORIGIN[0], HUB_ORIGIN[1], HUB_ORIGIN[2]), com.mmorpg.hub.HubLayout.TELEPORTER);
+            com.mmorpg.server.TeleportManager.onUse((net.minecraft.server.level.ServerLevel) p.level(), tp, p);
+        }
+        if (tick == 750) MMORPG.LOGGER.info("[MMORPG] TELEPORTEUR sans classe : ecran = {} (attendu aucun)", screenName(mc));
+        if (tick == 755) ClientNet.send(new Payloads.HubAction(Payloads.HubAction.TRY, PlayerClass.MAGE.ordinal(), 25));
+        if (tick == 785) MMORPG.LOGGER.info("[MMORPG] ESSAI Mage 25 : {}", hubState(mc, me));
+        if (tick == 790) {
+            var g = master(mc, 4);
+            if (g != null) com.mmorpg.hub.HubManager.interact(sp(mc, me), g);
+        }
+        if (tick == 810) shot(mc, "133_choix_apres_essai");
+        if (tick == 812) ClientNet.send(new Payloads.HubAction(Payloads.HubAction.CHOOSE, PlayerClass.MAGE.ordinal(), 0));
+        if (tick == 840) {
+            mc.gui.setScreen(null);
+            MMORPG.LOGGER.info("[MMORPG] APRES choix du Mage : {}", hubState(mc, me));
+            var p = sp(mc, me);
+            var tp = com.mmorpg.hub.HubLayout.pos(new net.minecraft.core.BlockPos(HUB_ORIGIN[0], HUB_ORIGIN[1], HUB_ORIGIN[2]), com.mmorpg.hub.HubLayout.TELEPORTER);
+            com.mmorpg.server.TeleportManager.onUse((net.minecraft.server.level.ServerLevel) p.level(), tp, p);
+        }
+        if (tick == 860) {
+            com.mmorpg.hub.HubManager.forceNonOperator = false;
+            MMORPG.LOGGER.info("[MMORPG] TELEPORTEUR avec classe : ecran = {} (attendu TeleporterScreen)", screenName(mc));
+            mc.gui.setScreen(null);
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (hub)");
+        }
+        if (tick == 870) stop(mc);
+    }
+
+    /** Cinematique d'arrivee : captures a intervalles reguliers. */
+    private static void cinematicPhase(Minecraft mc, String me) {
+        if (tick == 5) mc.getWindow().setWindowed(1280, 720);
+        if (tick == 10) {
+            cmd(mc, "time set day");
+            cmd(mc, "weather clear");
+            cmd(mc, "gamemode survival " + me);
+            cmd(mc, String.format("tp %s %d %d %d", me, HUB_ORIGIN[0], HUB_ORIGIN[1], HUB_ORIGIN[2]));
+        }
+        if (tick == 30) cmd(mc, "mmorpg hub");
+        if (tick == 100) cmd(mc, "mmorpg cinematique " + me);
+        int[] shots = {110, 160, 220, 300, 400, 520, 660, 760, 900, 1000, 1100, 1240, 1380, 1520, 1640, 1700};
+        for (int i = 0; i < shots.length; i++) {
+            if (tick == 100 + shots[i]) {
+                MMORPG.LOGGER.info("[MMORPG] CINEMATIQUE +{} ticks : camera = {} ecran={} actif={}", shots[i], mc.getCameraEntity() == mc.player ? "joueur" : "libre",
+                        screenName(mc), com.mmorpg.client.cinematic.CinematicClient.active());
+                shot(mc, String.format("14%02d_cine_%d", i, shots[i]));
+            }
+        }
+        // relecture puis saut : doit rendre la main au joueur sans attendre la fin du film
+        if (tick == 1850) cmd(mc, "mmorpg cinematique " + me);
+        if (tick == 1930) com.mmorpg.client.cinematic.CinematicClient.skip();
+        if (tick == 1990) MMORPG.LOGGER.info("[MMORPG] CINEMATIQUE apres saut : actif={} camera={} verrou serveur={}", com.mmorpg.client.cinematic.CinematicClient.active(),
+                mc.getCameraEntity() == mc.player ? "joueur" : "libre", com.mmorpg.hub.CinematicManager.isLocked(sp(mc, me)));
+        if (tick == 2100) {
+            MMORPG.LOGGER.info("[MMORPG] CINEMATIQUE terminee : actif={} camera={} verrou serveur={}", com.mmorpg.client.cinematic.CinematicClient.active(),
+                    mc.getCameraEntity() == mc.player ? "joueur" : "libre", com.mmorpg.hub.CinematicManager.isLocked(sp(mc, me)));
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (cinematique)");
+        }
+        if (tick == 2120) stop(mc);
     }
 
     private static void petsPhase(Minecraft mc, String me) {
