@@ -1446,22 +1446,22 @@ public final class DevShowcase {
             MMORPG.LOGGER.info("[MMORPG] HUB construit : {} maitres, {} mannequins",
                     mc.level.getEntitiesOfClass(com.mmorpg.entity.hub.ClassMasterEntity.class, mc.player.getBoundingBox().inflate(120)).size(),
                     mc.level.getEntitiesOfClass(com.mmorpg.entity.dummy.TrainingDummyEntity.class, mc.player.getBoundingBox().inflate(120)).size());
-            hubView(mc, me, -40, 36, 40, 0, 2, -4);
+            hubView(mc, me, -105, 72, 110, 8, 0, -18);
         }
         if (tick == 110) shot(mc, "120_hub_vue_generale");
-        if (tick == 112) hubView(mc, me, -14, 5, -2, -10, 2.5, -10);
+        if (tick == 112) hubView(mc, me, -6, 5, -6, -22, 7, -22);
         if (tick == 135) shot(mc, "121_hub_zone_guerrier");
-        if (tick == 137) hubView(mc, me, 14, 5, -2, 10, 2.5, -10);
+        if (tick == 137) hubView(mc, me, 6, 5, -6, 22, 7, -22);
         if (tick == 160) shot(mc, "122_hub_zone_mage");
-        if (tick == 162) hubView(mc, me, -4, 4, 16, -10, 2.5, 10);
+        if (tick == 162) hubView(mc, me, -6, 5, 6, -22, 7, 22);
         if (tick == 185) shot(mc, "123_hub_zone_archer");
-        if (tick == 187) hubView(mc, me, 4, 4, 16, 10, 2.5, 10);
+        if (tick == 187) hubView(mc, me, 6, 5, 6, 22, 7, 22);
         if (tick == 210) shot(mc, "124_hub_zone_tank");
-        if (tick == 212) hubView(mc, me, 0, 5, 24, 0, 2, 12);
+        if (tick == 212) hubView(mc, me, 0, 7, 12, 0, 3, 24);
         if (tick == 235) shot(mc, "125_hub_porte_teleporteur");
-        if (tick == 237) hubView(mc, me, 0, 4, -24, 0, 2, -40);
+        if (tick == 237) hubView(mc, me, 0, 6, -44, 0, 6, -74);
         if (tick == 270) shot(mc, "126_hub_salle_epreuve");
-        if (tick == 272) hubView(mc, me, 20, 4, -6, 30, 1.5, 0);
+        if (tick == 272) hubView(mc, me, 34, 7, 0, 58, 3, 0);
         if (tick == 300) shot(mc, "127_hub_aire_entrainement");
 
         // ---- essai d'une classe : Guerrier niveau 50 depuis un joueur Mage niveau 20 avec sac
@@ -1471,7 +1471,7 @@ public final class DevShowcase {
             cmd(mc, "item replace entity " + me + " weapon.offhand with minecraft:shield");
         }
         if (tick == 305) {
-            hubView(mc, me, -6, 1.7, -6, -10, 2.4, -10);
+            hubView(mc, me, -14, 1.7, -14, -20, 2.4, -20);
             MMORPG.LOGGER.info("[MMORPG] AVANT essai : {}", hubState(mc, me));
         }
         if (tick == 320) com.mmorpg.hub.HubManager.interact(sp(mc, me), master(mc, 0));
@@ -1551,7 +1551,7 @@ public final class DevShowcase {
         if (tick == 715) {
             mc.gui.setScreen(null);
             MMORPG.LOGGER.info("[MMORPG] JOUEUR SANS CLASSE : {} operateur={}", hubState(mc, me), com.mmorpg.hub.HubManager.isOperator(sp(mc, me)));
-            hubView(mc, me, -6, 1.7, -6, -10, 2.4, -10);
+            hubView(mc, me, -14, 1.7, -14, -20, 2.4, -20);
         }
         if (tick == 720) ClientNet.send(new Payloads.HubAction(Payloads.HubAction.CHOOSE, PlayerClass.MAGE.ordinal(), 0));
         if (tick == 730) MMORPG.LOGGER.info("[MMORPG] CHOISIR sans essai (refus attendu) : {}", hubState(mc, me));
@@ -1580,26 +1580,50 @@ public final class DevShowcase {
             com.mmorpg.hub.HubManager.forceNonOperator = false;
             MMORPG.LOGGER.info("[MMORPG] TELEPORTEUR avec classe : ecran = {} (attendu TeleporterScreen)", screenName(mc));
             mc.gui.setScreen(null);
+        }
+        // protection du hub : un joueur ordinaire en survie ne peut pas casser les blocs du hub ; /hub ramene au point d'apparition
+        if (tick == 862) {
+            var pl = sp(mc, me);
+            var lvl = (net.minecraft.server.level.ServerLevel) pl.level();
+            var target = new net.minecraft.core.BlockPos(HUB_ORIGIN[0] + 5, HUB_ORIGIN[1] - 1, HUB_ORIGIN[2] + 14);
+            com.mmorpg.hub.HubManager.forceNonOperator = true;
+            pl.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+            boolean before = !lvl.getBlockState(target).isAir();
+            pl.gameMode.destroyBlock(target);
+            boolean kept = !lvl.getBlockState(target).isAir();
+            MMORPG.LOGGER.info("[MMORPG] PROTECTION : bloc present avant={} apres casse={} (attendu true/true) dansHub={}", before, kept,
+                    com.mmorpg.hub.HubProtection.inHub(lvl, target));
+            com.mmorpg.hub.HubManager.forceNonOperator = false;
+            cmd(mc, "tp " + me + " " + (HUB_ORIGIN[0] + 200) + " " + (HUB_ORIGIN[1] + 5) + " " + (HUB_ORIGIN[2] + 200));
+        }
+        if (tick == 866) cmd(mc, "hub");
+        if (tick == 880) {
+            var pl = sp(mc, me);
+            var sp0 = com.mmorpg.hub.HubLayout.center(new net.minecraft.core.BlockPos(HUB_ORIGIN[0], HUB_ORIGIN[1], HUB_ORIGIN[2]), com.mmorpg.hub.HubLayout.SPAWN);
+            MMORPG.LOGGER.info("[MMORPG] COMMANDE /hub : distance au point d'apparition = {} (attendu < 2)", String.format(java.util.Locale.ROOT, "%.1f", pl.position().distanceTo(sp0)));
             MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (hub)");
         }
-        if (tick == 870) stop(mc);
+        if (tick == 890) stop(mc);
     }
 
     /** Revue visuelle du hub : construction puis captures sous des angles fixes ({@code {x, y, z, cibleX, cibleY, cibleZ}} relatifs a l'origine). */
     private static final Object[][] DESIGN_VIEWS = {
-            {"aerienne", -52.0, 34.0, 58.0, 0.0, 2.0, 0.0},
-            {"dessous", -34.0, -14.0, 44.0, 0.0, -6.0, 0.0},
-            {"portail", 0.0, 3.5, 34.0, 0.0, 8.0, 19.0},
-            {"place", 0.0, 10.0, 16.0, 0.0, 1.0, 0.0},
-            {"centre", 5.0, 3.0, 10.0, 0.0, 3.0, 0.0},
-            {"guerrier", -2.0, 3.5, -2.0, -10.0, 3.5, -10.0},
-            {"mage", 2.0, 3.5, -2.0, 10.0, 3.5, -10.0},
-            {"archer", -2.0, 3.5, 2.0, -10.0, 3.5, 10.0},
-            {"tank", 2.0, 3.5, 2.0, 10.0, 3.5, 10.0},
-            {"teleporteur", 0.0, 3.0, 5.0, 0.0, 2.0, 13.0},
-            {"salle", 0.0, 3.5, -23.0, 0.0, 3.0, -48.0},
-            {"aire", 18.0, 4.0, 0.0, 34.0, 1.5, 0.0},
-            {"promenade", -16.0, 3.0, 12.0, -3.0, 2.0, -6.0},
+            {"aerienne", -105.0, 72.0, 110.0, 8.0, 0.0, -18.0},
+            {"dessous", -80.0, -34.0, 90.0, 0.0, -14.0, 0.0},
+            {"portail", 0.0, 6.0, 66.0, 0.0, 12.0, 35.0},
+            {"place", 0.0, 26.0, 44.0, 0.0, 2.0, 0.0},
+            {"rotonde", 16.0, 9.0, 18.0, 0.0, 8.0, 0.0},
+            {"interieur", 5.0, 2.5, 5.0, 0.0, 13.0, 0.0},
+            {"guerrier", -6.0, 5.0, -6.0, -22.0, 7.0, -22.0},
+            {"mage", 6.0, 5.0, -6.0, 22.0, 7.0, -22.0},
+            {"archer", -6.0, 5.0, 6.0, -22.0, 7.0, 22.0},
+            {"tank", 6.0, 5.0, 6.0, 22.0, 7.0, 22.0},
+            {"teleporteur", 0.0, 7.0, 12.0, 0.0, 3.0, 24.0},
+            {"voie", 0.0, 4.0, -26.0, 0.0, 4.0, -52.0},
+            {"arene", 0.0, 6.0, -44.0, 0.0, 6.0, -74.0},
+            {"arene_haut", 0.0, 14.0, -56.0, 0.0, 4.0, -84.0},
+            {"aire", 34.0, 7.0, 0.0, 58.0, 3.0, 0.0},
+            {"promenade", -32.0, 7.0, 18.0, -8.0, 3.0, -8.0},
     };
 
     private static void hubDesignPhase(Minecraft mc, String me) {
@@ -1612,24 +1636,24 @@ public final class DevShowcase {
         }
         if (tick == 30) cmd(mc, "mmorpg hub");
         if (tick == 31) cmd(mc, "gamemode creative " + me);
-        int first = 160;
+        int first = 420;
         for (int i = 0; i < DESIGN_VIEWS.length; i++) {
             Object[] v = DESIGN_VIEWS[i];
-            if (tick == first + i * 50) {
+            if (tick == first + i * 60) {
                 cmd(mc, "gamemode spectator " + me);
                 hubView(mc, me, (double) v[1], (double) v[2], (double) v[3], (double) v[4], (double) v[5], (double) v[6]);
             }
-            if (tick == first + i * 50 + 35) shot(mc, String.format("15%02d_hub_%s", i, v[0]));
+            if (tick == first + i * 60 + 45) shot(mc, String.format("15%02d_hub_%s", i, v[0]));
         }
-        int night = first + DESIGN_VIEWS.length * 50 + 10;
+        int night = first + DESIGN_VIEWS.length * 60 + 10;
         if (tick == night) {
             cmd(mc, "time set 18000");
-            hubView(mc, me, 0.0, 12.0, 24.0, 0.0, 2.0, 0.0);
+            hubView(mc, me, 0.0, 26.0, 44.0, 0.0, 2.0, 0.0);
         }
         if (tick == night + 40) shot(mc, "1590_hub_nuit_place");
-        if (tick == night + 45) hubView(mc, me, -2.0, 3.5, -2.0, -10.0, 3.5, -10.0);
+        if (tick == night + 45) hubView(mc, me, -6.0, 5.0, -6.0, -22.0, 7.0, -22.0);
         if (tick == night + 85) shot(mc, "1591_hub_nuit_guerrier");
-        if (tick == night + 90) hubView(mc, me, 2.0, 3.5, -2.0, 10.0, 3.5, -10.0);
+        if (tick == night + 90) hubView(mc, me, 6.0, 5.0, -6.0, 22.0, 7.0, -22.0);
         if (tick == night + 130) shot(mc, "1592_hub_nuit_mage");
         if (tick == night + 140) {
             MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (hubdesign)");

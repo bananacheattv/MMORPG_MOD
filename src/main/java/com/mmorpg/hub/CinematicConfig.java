@@ -38,9 +38,9 @@ public final class CinematicConfig {
               "fondSortie": 1.4,
               "plans": [
                 {
-                  "nom": "survol", "duree": 10.0, "rythme": "inOutCubic", "transition": "fondu",
-                  "camera": [[-34, 26, 40], [-33, 22, 14], [-27, 19, -8], [-14, 16, -24], [6, 14, -22], [20, 15, -8]],
-                  "cible": [[0, 3, 4], [0, 4, 0], [0, 5, -4], [0, 4, -2]],
+                  "nom": "survol", "duree": 14.0, "rythme": "inOutCubic", "transition": "fondu",
+                  "camera": [[-74, 44, 80], [-80, 38, 20], [-58, 32, -34], [-6, 38, -66], [56, 34, -40], [70, 30, 14], [30, 26, 62]],
+                  "cible": [[0, 8, 10], [0, 10, 0], [0, 10, -8], [0, 8, -4]],
                   "fov": [[0, 78], [0.5, 66], [1, 62]],
                   "titre": {"texte": "ELDORIA", "sous": "Le hub des héros", "couleur": "#FFD060", "debut": 0.12, "fin": 0.9},
                   "sons": [
@@ -54,8 +54,8 @@ public final class CinematicConfig {
                 },
                 {
                   "nom": "guerrier", "duree": 6.0, "rythme": "inOutCubic", "transition": "fondu", "classe": "GUERRIER",
-                  "camera": [[-10, 1.6, -1.5], [-10, 1.8, -4.8], [-10, 2.0, -7.2]],
-                  "cible": [[-10, 2.3, -10], [-10, 2.5, -10], [-10, 2.7, -10]],
+                  "camera": [[-8.5, 3.6, -8.5], [-11, 3.8, -11], [-14, 4.0, -14]],
+                  "cible": [[-20, 3.2, -20], [-21, 5.5, -21], [-22, 6.8, -22]],
                   "fov": [[0, 74], [1, 52]],
                   "titre": {"texte": "LE GUERRIER", "sous": "Force et Férocité — la lame avant tout", "couleur": "#FF6A50", "debut": 0.18, "fin": 0.92},
                   "sons": [
@@ -63,15 +63,15 @@ public final class CinematicConfig {
                     {"t": 0.35, "son": "minecraft:item.trident.thunder", "volume": 0.5, "hauteur": 0.8}
                   ],
                   "particules": [
-                    {"t": 0.0, "type": "flame", "pos": [-10, 1.2, -10], "nombre": 40, "dispersion": [1.1, 1.4, 1.1], "vitesse": 0.04},
-                    {"t": 0.4, "type": "lava", "pos": [-10, 2.2, -10], "nombre": 14, "dispersion": [1, 1, 1], "vitesse": 0.05},
-                    {"t": 0.5, "type": "crit", "pos": [-10, 2.8, -10], "nombre": 30, "dispersion": [1, 1, 1], "vitesse": 0.3}
+                    {"t": 0.0, "type": "flame", "pos": [-20, 1.4, -20], "nombre": 40, "dispersion": [1.1, 1.4, 1.1], "vitesse": 0.04},
+                    {"t": 0.4, "type": "lava", "pos": [-20, 3, -20], "nombre": 14, "dispersion": [1, 1, 1], "vitesse": 0.05},
+                    {"t": 0.5, "type": "crit", "pos": [-20, 4, -20], "nombre": 30, "dispersion": [1, 1, 1], "vitesse": 0.3}
                   ]
                 },
                 {
                   "nom": "mage", "duree": 6.0, "rythme": "inOutCubic", "transition": "fondu", "classe": "MAGE",
-                  "camera": [[6.5, 9.0, -3.0], [7.2, 5.0, -6.2], [7.8, 2.3, -7.6]],
-                  "cible": [[10, 3.4, -10], [10, 3.6, -10], [10, 3.8, -10]],
+                  "camera": [[8.5, 3.6, -8.5], [11, 3.8, -11], [14, 4.0, -14]],
+                  "cible": [[20, 3.2, -20], [21, 5.5, -21], [22, 6.8, -22]],
                   "fov": [[0, 82], [1, 55]],
                   "titre": {"texte": "LE MAGE", "sous": "Intelligence et Esprit — l'arcane obéit", "couleur": "#B07CFF", "debut": 0.18, "fin": 0.92},
                   "sons": [
@@ -79,15 +79,15 @@ public final class CinematicConfig {
                     {"t": 0.4, "son": "minecraft:entity.evoker.cast_spell", "volume": 0.5, "hauteur": 1.1}
                   ],
                   "particules": [
-                    {"t": 0.0, "type": "enchant", "pos": [10, 2.5, -10], "nombre": 80, "dispersion": [1.5, 1.5, 1.5], "vitesse": 0.5},
-                    {"t": 0.45, "type": "witch", "pos": [10, 3.0, -10], "nombre": 40, "dispersion": [1.2, 1.2, 1.2], "vitesse": 0.05},
-                    {"t": 0.55, "type": "end_rod", "pos": [10, 4.2, -10], "nombre": 30, "dispersion": [0.8, 0.8, 0.8], "vitesse": 0.08}
+                    {"t": 0.0, "type": "enchant", "pos": [20, 3, -20], "nombre": 80, "dispersion": [1.5, 1.5, 1.5], "vitesse": 0.5},
+                    {"t": 0.45, "type": "witch", "pos": [20, 4, -20], "nombre": 40, "dispersion": [1.2, 1.2, 1.2], "vitesse": 0.05},
+                    {"t": 0.55, "type": "end_rod", "pos": [20, 6, -20], "nombre": 30, "dispersion": [0.8, 0.8, 0.8], "vitesse": 0.08}
                   ]
                 },
                 {
                   "nom": "archer", "duree": 6.0, "rythme": "inOutCubic", "transition": "fondu", "classe": "ARCHER",
-                  "camera": [[-10, 1.6, 1.5], [-10, 1.8, 4.6], [-10, 2.0, 7.0]],
-                  "cible": [[-10, 2.3, 10], [-10, 2.7, 10], [-10, 3.0, 10]],
+                  "camera": [[-8.5, 3.6, 8.5], [-11, 3.8, 11], [-14, 4.0, 14]],
+                  "cible": [[-20, 3.2, 20], [-21, 5.5, 21], [-22, 6.8, 22]],
                   "fov": [[0, 60], [1, 68]],
                   "titre": {"texte": "L'ARCHER", "sous": "Agilité et Dextérité — jamais là où l'on frappe", "couleur": "#6CE06C", "debut": 0.18, "fin": 0.92},
                   "sons": [
@@ -95,15 +95,15 @@ public final class CinematicConfig {
                     {"t": 0.45, "son": "minecraft:block.grass.break", "volume": 0.6, "hauteur": 0.8}
                   ],
                   "particules": [
-                    {"t": 0.0, "type": "happy_villager", "pos": [-10, 1.5, 10], "nombre": 30, "dispersion": [1.6, 1.4, 1.6], "vitesse": 0.02},
-                    {"t": 0.4, "type": "cherry_leaves", "pos": [-10, 4.0, 10], "nombre": 40, "dispersion": [2.2, 0.5, 2.2], "vitesse": 0.02},
-                    {"t": 0.5, "type": "cloud", "pos": [-9, 1.4, 10], "nombre": 12, "dispersion": [0.6, 0.3, 0.6], "vitesse": 0.03}
+                    {"t": 0.0, "type": "happy_villager", "pos": [-20, 2, 20], "nombre": 30, "dispersion": [1.6, 1.4, 1.6], "vitesse": 0.02},
+                    {"t": 0.4, "type": "cherry_leaves", "pos": [-20, 6, 20], "nombre": 40, "dispersion": [2.2, 0.5, 2.2], "vitesse": 0.02},
+                    {"t": 0.5, "type": "cloud", "pos": [-19, 1.6, 20], "nombre": 12, "dispersion": [0.6, 0.3, 0.6], "vitesse": 0.03}
                   ]
                 },
                 {
                   "nom": "tank", "duree": 6.0, "rythme": "inOutCubic", "transition": "fondu", "classe": "TANK",
-                  "camera": [[10, 1.7, 1.5], [10, 1.9, 4.6], [10, 2.0, 7.0]],
-                  "cible": [[10, 2.3, 10], [10, 2.5, 10], [10, 2.7, 10]],
+                  "camera": [[8.5, 3.6, 8.5], [11, 3.8, 11], [14, 4.0, 14]],
+                  "cible": [[20, 3.2, 20], [21, 5.5, 21], [22, 6.8, 22]],
                   "fov": [[0, 66], [1, 54]],
                   "titre": {"texte": "LE TANK", "sous": "Vitalité et Endurance — le rempart du groupe", "couleur": "#58A8FF", "debut": 0.18, "fin": 0.92},
                   "sons": [
@@ -111,15 +111,15 @@ public final class CinematicConfig {
                     {"t": 0.4, "son": "minecraft:block.anvil.land", "volume": 0.4, "hauteur": 0.7}
                   ],
                   "particules": [
-                    {"t": 0.0, "type": "wax_on", "pos": [10, 1.8, 10], "nombre": 30, "dispersion": [1.4, 1.6, 1.4], "vitesse": 0.5},
-                    {"t": 0.4, "type": "electric_spark", "pos": [10, 2.2, 10], "nombre": 30, "dispersion": [1.3, 1.6, 1.3], "vitesse": 0.4},
-                    {"t": 0.55, "type": "snowflake", "pos": [10, 3.4, 10], "nombre": 30, "dispersion": [1.4, 1.2, 1.4], "vitesse": 0.02}
+                    {"t": 0.0, "type": "wax_on", "pos": [20, 2, 20], "nombre": 30, "dispersion": [1.4, 1.6, 1.4], "vitesse": 0.5},
+                    {"t": 0.4, "type": "electric_spark", "pos": [20, 3, 20], "nombre": 30, "dispersion": [1.3, 1.6, 1.3], "vitesse": 0.4},
+                    {"t": 0.55, "type": "snowflake", "pos": [20, 5, 20], "nombre": 30, "dispersion": [1.4, 1.2, 1.4], "vitesse": 0.02}
                   ]
                 },
                 {
                   "nom": "retour", "duree": 8.0, "rythme": "inOutQuint", "transition": "fin",
-                  "camera": [[0, 17, -4], [0, 10, 5], [0, 4.2, 14], "@joueur"],
-                  "cible": [[0, 2, 0], [0, 1.8, 8], "@regard"],
+                  "camera": [[0, 34, 68], [0, 16, 58], [0, 6, 51], "@joueur"],
+                  "cible": [[0, 12, 20], [0, 8, 30], "@regard"],
                   "fov": [[0, 72], [1, -1]],
                   "titre": {"texte": "À VOUS DE JOUER", "sous": "Parlez aux Maîtres de classe : essayez, puis choisissez votre voie", "couleur": "#FFE6A0", "debut": 0.25, "fin": 0.9},
                   "sons": [
@@ -127,7 +127,7 @@ public final class CinematicConfig {
                     {"t": 0.85, "son": "minecraft:entity.player.levelup", "volume": 0.5, "hauteur": 1.2}
                   ],
                   "particules": [
-                    {"t": 0.5, "type": "end_rod", "pos": [0, 2, 12], "nombre": 40, "dispersion": [3, 2, 3], "vitesse": 0.03}
+                    {"t": 0.5, "type": "end_rod", "pos": [0, 4, 40], "nombre": 40, "dispersion": [3, 2, 3], "vitesse": 0.03}
                   ]
                 }
               ]

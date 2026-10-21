@@ -7,37 +7,39 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * Plan du hub, en coordonnees relatives a son origine (centre de la place, au niveau ou l'on marche ; le sol est en y = -1).
- * x : est, z : sud. Le hub est toujours construit dans cette orientation : la place est un disque, l'entree au sud, la salle
- * d'epreuve au nord, l'aire d'entrainement a l'est.
+ * x : est, z : sud. Le hub est toujours construit dans cette orientation : la place est un disque de 31 blocs de rayon avec la
+ * rotonde au centre, l'entree au sud, l'arene d'epreuve au nord, l'aire d'entrainement a l'est et un pavillon par classe sur
+ * chaque diagonale.
  */
 public final class HubLayout {
     private HubLayout() {
     }
 
-    public static final int PLAZA_RADIUS = 17;
-    /** Place d'apparition des nouveaux joueurs (juste a l'interieur de la porte sud, face a la place). */
-    public static final int[] SPAWN = {0, 0, 21};
-    public static final int[] TELEPORTER = {0, 0, 13};
+    public static final int PLAZA_RADIUS = 31;
+    /** Place d'apparition des nouveaux joueurs : sur le parvis, face au portail. */
+    public static final int[] SPAWN = {0, 0, 46};
+    public static final int[] TELEPORTER = {0, 0, 24};
     public static final int[] CLASS_MASTER = {0, 0, 0};
-    /** Salle d'epreuve : demi-largeur 15, de z = -52 a -22 ; entree au milieu du mur sud. */
-    public static final int ROOM_HALF = 15;
-    public static final int ROOM_Z0 = -52;
-    public static final int ROOM_Z1 = -22;
-    public static final int ROOM_HEIGHT = 10;
-    public static final int[] TRIAL_SPAWN = {0, 0, -30};
-    public static final int[] TRIAL_MASTER = {-5, 0, -27};
-    /** Aire d'entrainement a l'est. */
-    public static final int YARD_X0 = 22;
-    public static final int YARD_X1 = 42;
-    public static final int YARD_HALF = 10;
+    /** Arene d'epreuve (disque de rayon 22) : de z = -96 a -52 ; entree au sud. */
+    public static final int ROOM_HALF = 22;
+    public static final int ROOM_Z0 = -96;
+    public static final int ROOM_Z1 = -52;
+    public static final int ROOM_HEIGHT = 40;
+    public static final int[] TRIAL_SPAWN = {0, 0, -58};
+    public static final int[] TRIAL_MASTER = {-8, 0, -58};
+    /** Aire d'entrainement a l'est (disque de rayon 15 centre en x = 58). */
+    public static final int YARD_X0 = 43;
+    public static final int YARD_X1 = 73;
+    public static final int YARD_HALF = 15;
+    public static final int YARD_CENTER_X = 58;
 
     /** Zones de classe : sur les diagonales de la place. */
     public static int[] classSpot(PlayerClass cls) {
         return switch (cls) {
-            case GUERRIER -> new int[]{-10, 0, -10};
-            case MAGE -> new int[]{10, 0, -10};
-            case ARCHER -> new int[]{-10, 0, 10};
-            default -> new int[]{10, 0, 10};
+            case GUERRIER -> new int[]{-20, 0, -20};
+            case MAGE -> new int[]{20, 0, -20};
+            case ARCHER -> new int[]{-20, 0, 20};
+            default -> new int[]{20, 0, 20};
         };
     }
 
@@ -52,8 +54,8 @@ public final class HubLayout {
     }
 
     /** Mannequins : {x, z, variante, yaw}. */
-    public static final int[][] DUMMIES_ROOM = {{-9, -46, 0, 0}, {0, -46, 1, 0}, {9, -46, 2, 0}, {-5, -39, 0, 0}, {5, -39, 0, 0}};
-    public static final int[][] DUMMIES_YARD = {{28, -6, 0, 90}, {28, 0, 1, 90}, {28, 6, 2, 90}, {36, -6, 2, 90}, {36, 0, 0, 90}, {36, 6, 1, 90}};
+    public static final int[][] DUMMIES_ROOM = {{-13, -86, 0, 0}, {0, -90, 1, 0}, {13, -86, 2, 0}, {-7, -78, 0, 0}, {7, -78, 0, 0}};
+    public static final int[][] DUMMIES_YARD = {{52, -8, 0, 90}, {52, 0, 1, 90}, {52, 8, 2, 90}, {60, -8, 2, 90}, {60, 0, 0, 90}, {60, 8, 1, 90}};
 
     public static BlockPos pos(BlockPos origin, int[] p) {
         return origin.offset(p[0], p[1], p[2]);
@@ -63,14 +65,14 @@ public final class HubLayout {
         return new Vec3(origin.getX() + p[0] + 0.5, origin.getY() + p[1], origin.getZ() + p[2] + 0.5);
     }
 
-    /** Volume de la salle d'epreuve : quitter ce volume met fin a l'essai. */
+    /** Volume de l'arene d'epreuve : quitter ce volume met fin a l'essai. */
     public static AABB roomBounds(BlockPos origin) {
-        return new AABB(origin.getX() - ROOM_HALF - 1, origin.getY() - 4, origin.getZ() + ROOM_Z0 - 1,
-                origin.getX() + ROOM_HALF + 2, origin.getY() + ROOM_HEIGHT + 4, origin.getZ() + ROOM_Z1 + 1);
+        return new AABB(origin.getX() - ROOM_HALF - 2, origin.getY() - 6, origin.getZ() + ROOM_Z0 - 2,
+                origin.getX() + ROOM_HALF + 3, origin.getY() + ROOM_HEIGHT + 4, origin.getZ() + ROOM_Z1 + 2);
     }
 
     /** Volume englobant tout le hub (cinematique, protection). */
     public static AABB hubBounds(BlockPos origin) {
-        return new AABB(origin.getX() - 24, origin.getY() - 6, origin.getZ() + ROOM_Z0 - 6, origin.getX() + YARD_X1 + 6, origin.getY() + 30, origin.getZ() + 30);
+        return new AABB(origin.getX() - 52, origin.getY() - 36, origin.getZ() + ROOM_Z0 - 10, origin.getX() + YARD_X1 + 12, origin.getY() + 48, origin.getZ() + 66);
     }
 }
