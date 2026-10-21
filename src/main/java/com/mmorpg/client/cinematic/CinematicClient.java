@@ -541,7 +541,7 @@ public final class CinematicClient {
         g.pose().pushMatrix();
         g.pose().translate(x, y);
         g.pose().scale(2.4F, 2.4F);
-        g.text(mc.font, t.text, 0, 0, (t.color & 0xFFFFFF) | alpha, true);
+        g.text(mc.font, com.mmorpg.client.EldoriaFont.of(t.text), 0, 0, (t.color & 0xFFFFFF) | alpha, true);
         g.pose().popMatrix();
         g.fill(x, y + 24, x + Math.round(60 * a), y + 25, (t.color & 0xFFFFFF) | alpha);
         g.pose().pushMatrix();

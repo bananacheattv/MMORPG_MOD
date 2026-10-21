@@ -375,6 +375,10 @@ public final class DevShowcase {
             cinematicPhase(mc, me);
             return;
         }
+        if (MODE.equals("hubdesign")) {
+            hubDesignPhase(mc, me);
+            return;
+        }
         if (MODE.equals("mannequin2")) {
             dummyTiltPhase(mc, me);
             return;
@@ -1579,6 +1583,58 @@ public final class DevShowcase {
             MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (hub)");
         }
         if (tick == 870) stop(mc);
+    }
+
+    /** Revue visuelle du hub : construction puis captures sous des angles fixes ({@code {x, y, z, cibleX, cibleY, cibleZ}} relatifs a l'origine). */
+    private static final Object[][] DESIGN_VIEWS = {
+            {"aerienne", -52.0, 34.0, 58.0, 0.0, 2.0, 0.0},
+            {"dessous", -34.0, -14.0, 44.0, 0.0, -6.0, 0.0},
+            {"portail", 0.0, 3.5, 34.0, 0.0, 8.0, 19.0},
+            {"place", 0.0, 10.0, 16.0, 0.0, 1.0, 0.0},
+            {"centre", 5.0, 3.0, 10.0, 0.0, 3.0, 0.0},
+            {"guerrier", -2.0, 3.5, -2.0, -10.0, 3.5, -10.0},
+            {"mage", 2.0, 3.5, -2.0, 10.0, 3.5, -10.0},
+            {"archer", -2.0, 3.5, 2.0, -10.0, 3.5, 10.0},
+            {"tank", 2.0, 3.5, 2.0, 10.0, 3.5, 10.0},
+            {"teleporteur", 0.0, 3.0, 5.0, 0.0, 2.0, 13.0},
+            {"salle", 0.0, 3.5, -23.0, 0.0, 3.0, -48.0},
+            {"aire", 18.0, 4.0, 0.0, 34.0, 1.5, 0.0},
+            {"promenade", -16.0, 3.0, 12.0, -3.0, 2.0, -6.0},
+    };
+
+    private static void hubDesignPhase(Minecraft mc, String me) {
+        if (tick == 5) mc.getWindow().setWindowed(1280, 720);
+        if (tick == 10) {
+            cmd(mc, "time set 6000");
+            cmd(mc, "weather clear");
+            cmd(mc, "gamemode creative " + me);
+            cmd(mc, String.format("tp %s %d %d %d", me, HUB_ORIGIN[0], HUB_ORIGIN[1], HUB_ORIGIN[2]));
+        }
+        if (tick == 30) cmd(mc, "mmorpg hub");
+        if (tick == 31) cmd(mc, "gamemode creative " + me);
+        int first = 160;
+        for (int i = 0; i < DESIGN_VIEWS.length; i++) {
+            Object[] v = DESIGN_VIEWS[i];
+            if (tick == first + i * 50) {
+                cmd(mc, "gamemode spectator " + me);
+                hubView(mc, me, (double) v[1], (double) v[2], (double) v[3], (double) v[4], (double) v[5], (double) v[6]);
+            }
+            if (tick == first + i * 50 + 35) shot(mc, String.format("15%02d_hub_%s", i, v[0]));
+        }
+        int night = first + DESIGN_VIEWS.length * 50 + 10;
+        if (tick == night) {
+            cmd(mc, "time set 18000");
+            hubView(mc, me, 0.0, 12.0, 24.0, 0.0, 2.0, 0.0);
+        }
+        if (tick == night + 40) shot(mc, "1590_hub_nuit_place");
+        if (tick == night + 45) hubView(mc, me, -2.0, 3.5, -2.0, -10.0, 3.5, -10.0);
+        if (tick == night + 85) shot(mc, "1591_hub_nuit_guerrier");
+        if (tick == night + 90) hubView(mc, me, 2.0, 3.5, -2.0, 10.0, 3.5, -10.0);
+        if (tick == night + 130) shot(mc, "1592_hub_nuit_mage");
+        if (tick == night + 140) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (hubdesign)");
+            stop(mc);
+        }
     }
 
     /** Cinematique d'arrivee : captures a intervalles reguliers. */

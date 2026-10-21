@@ -542,7 +542,7 @@ public final class MmoHud {
         smallPanel(g, 0, 0, w, h, cls.color);
         float pulse = 0.5f + 0.5f * (float) Math.sin(System.currentTimeMillis() / 260.0);
         Ui.diamond(g, 10, 15, 4, Ui.lighter(cls.color, 0.2f + 0.5f * pulse));
-        g.text(f, "ESSAI — " + cls.label + " niv. " + level, 20, 5, cls.color, true);
+        g.text(f, com.mmorpg.client.EldoriaFont.of("ESSAI — " + cls.label + " niv. " + level), 20, 5, cls.color, true);
         long secs = HudLayout.editing ? 83 : (System.nanoTime() - ClientData.trialSince) / 1_000_000_000L;
         String time = String.format(java.util.Locale.ROOT, "%d:%02d", secs / 60, secs % 60);
         g.text(f, time, w - 8 - f.width(time), 5, Ui.MUTED, false);
