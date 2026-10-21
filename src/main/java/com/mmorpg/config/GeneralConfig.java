@@ -31,6 +31,12 @@ public class GeneralConfig {
     public double potionDropChance = 0.04;
     public boolean announceBossKills = true;
     public boolean announceEvolutions = true;
+    /** Hub d'entree : cinematique a la premiere arrivee (rejouable avec /mmorpg cinematique ou aupres du Maitre des classes). */
+    public boolean hubCinematic = true;
+    /** Hub d'entree : zone d'essai des classes (sinon le choix de classe est direct, sans essai prealable). */
+    public boolean hubTrialZone = true;
+    /** Hub d'entree : pas de casse ni de pose de blocs, pas de PvP et pas de monstres hostiles dans son volume. */
+    public boolean hubProtection = true;
     /** Ouvre automatiquement l'ecran de choix de classe a la premiere connexion. */
     public boolean openClassSelectionOnJoin = true;
 }

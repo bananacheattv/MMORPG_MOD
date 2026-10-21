@@ -550,7 +550,15 @@ public final class RpgPlayers {
         if (!d.playerClass.isPlayable() && !com.mmorpg.hub.ClassTrial.active(player)) {
             // hub construit : cinematique a la premiere arrivee, puis choix aupres des Maitres de classe ; sinon ecran de choix classique
             if (com.mmorpg.hub.HubData.get(player.level().getServer()).exists()) {
-                if (!com.mmorpg.hub.ClassTrial.data(player).cinematicSeen) com.mmorpg.hub.CinematicManager.start(player, true);
+                var hubData = com.mmorpg.hub.ClassTrial.data(player);
+                if (!hubData.cinematicSeen) {
+                    if (ConfigManager.general().hubCinematic) {
+                        com.mmorpg.hub.CinematicManager.start(player, true);
+                    } else {
+                        hubData.cinematicSeen = true;
+                        player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Parlez aux Maîtres de classe : essayez, puis choisissez votre voie.").withColor(0xFFE6A0));
+                    }
+                }
             } else if (ConfigManager.general().openClassSelectionOnJoin) {
                 openClassSelection(player);
             }

@@ -202,13 +202,7 @@ public final class RpgCommands {
                                     c.getSource().sendSuccess(() -> ok("Cosmétique(s) débloqué(s)"), true);
                                     return 1;
                                 }))))
-                .then(Commands.literal("hub").executes(c -> {
-                    var level = c.getSource().getLevel();
-                    BlockPos feet = BlockPos.containing(c.getSource().getPosition());
-                    com.mmorpg.hub.HubBuilder.build(level, feet);
-                    c.getSource().sendSuccess(() -> ok("Hub d'Eldoria construit en " + feet.toShortString() + " : place centrale, 4 zones de classe, salle d'épreuve, aire d'entraînement, téléporteur. Point d'apparition du monde défini sur le hub."), true);
-                    return 1;
-                }))
+                .then(Commands.literal("hub").executes(RpgCommands::buildHub))
                 .then(Commands.literal("cinematique")
                         .executes(c -> playCinematic(c.getSource().getPlayerOrException(), c))
                         .then(Commands.argument("joueur", EntityArgument.player()).executes(c -> playCinematic(EntityArgument.getPlayer(c, "joueur"), c))))
@@ -303,7 +297,64 @@ public final class RpgCommands {
                 })));
     }
 
+    private static int buildHub(CommandContext<CommandSourceStack> c) {
+        var level = c.getSource().getLevel();
+        BlockPos feet = BlockPos.containing(c.getSource().getPosition());
+        c.getSource().sendSuccess(() -> ok("Construction de la Citadelle d'Eldoria en cours..."), false);
+        com.mmorpg.hub.HubBuilder.build(level, feet);
+        c.getSource().sendSuccess(() -> ok("Hub d'Eldoria construit en " + feet.toShortString() + " : rotonde, bassin, 4 pavillons de classe, portail, arène d'épreuve, aire d'entraînement, téléporteur. Point d'apparition du monde défini sur le hub."), true);
+        return 1;
+    }
+
+    private static int setClass(CommandContext<CommandSourceStack> c) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        ServerPlayer p = EntityArgument.getPlayer(c, "joueur");
+        PlayerClass cls = PlayerClass.byName(StringArgumentType.getString(c, "classe"));
+        PlayerData data = RpgPlayers.get(p);
+        data.resetClass();
+        if (cls.isPlayable()) {
+            data.classChosenOnce = true;
+            RpgPlayers.selectClass(p, cls);
+        } else {
+            RpgPlayers.recomputeAndSync(p);
+            RpgPlayers.openClassSelection(p);
+        }
+        c.getSource().sendSuccess(() -> ok("Classe de " + p.getName().getString() + " : " + cls.label), true);
+        return 1;
+    }
+
+    /** /hub (tous les joueurs), /hub set, /hub reset <joueur> et /class set <joueur> <classe> (operateurs). */
+    public static void registerHub(CommandDispatcher<CommandSourceStack> d) {
+        List<String> classes = Arrays.stream(PlayerClass.values()).map(PlayerClass::id).toList();
+        d.register(Commands.literal("hub")
+                .executes(c -> {
+                    ServerPlayer p = c.getSource().getPlayerOrException();
+                    if (!com.mmorpg.hub.HubManager.goToHub(p)) {
+                        c.getSource().sendFailure(Component.literal("Le hub n'est pas encore construit (un opérateur doit utiliser /hub set)."));
+                        return 0;
+                    }
+                    return 1;
+                })
+                .then(Commands.literal("set").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).executes(RpgCommands::buildHub))
+                .then(Commands.literal("reset").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .then(Commands.argument("joueur", EntityArgument.player()).executes(c -> {
+                            ServerPlayer p = EntityArgument.getPlayer(c, "joueur");
+                            com.mmorpg.hub.HubManager.reset(p);
+                            c.getSource().sendSuccess(() -> ok("Hub de " + p.getName().getString() + " réinitialisé (cinématique, essais et classe)."), true);
+                            return 1;
+                        }))));
+        d.register(Commands.literal("class")
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .then(Commands.literal("set").then(Commands.argument("joueur", EntityArgument.player())
+                        .then(Commands.argument("classe", StringArgumentType.word())
+                                .suggests((c, b) -> SharedSuggestionProvider.suggest(classes, b))
+                                .executes(RpgCommands::setClass)))));
+    }
+
     private static int playCinematic(ServerPlayer target, CommandContext<CommandSourceStack> c) {
+        if (!ConfigManager.general().hubCinematic) {
+            c.getSource().sendFailure(Component.literal("La cinématique est désactivée (hubCinematic dans general.json)."));
+            return 0;
+        }
         if (!com.mmorpg.hub.CinematicManager.start(target, false)) {
             c.getSource().sendFailure(Component.literal("Le hub n'est pas construit (/mmorpg hub)."));
             return 0;

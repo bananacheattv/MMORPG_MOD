@@ -43,6 +43,7 @@ public class ClassMasterScreen extends MmoScreen {
     private final boolean hasClass;
     private final int tried;
     private final boolean operator;
+    private final boolean trialEnabled;
     private int selectedClass;
     private int selectedLevel = 2;           // index dans LEVELS : niveau 50 par defaut
     private boolean confirming;
@@ -62,6 +63,7 @@ public class ClassMasterScreen extends MmoScreen {
         this.hasClass = t.getBooleanOr("hasClass", false);
         this.tried = t.getIntOr("tried", 0);
         this.operator = t.getBooleanOr("operator", false);
+        this.trialEnabled = t.getBooleanOr("trialEnabled", true);
         this.selectedClass = kind < 4 ? CLASSES[kind].ordinal() : (inTrial ? trialClass : PlayerClass.GUERRIER.ordinal());
         for (int i = 0; i < LEVELS.length; i++) if (LEVELS[i] == trialLevel && inTrial) selectedLevel = i;
     }
@@ -325,7 +327,7 @@ public class ClassMasterScreen extends MmoScreen {
         int bw = (w - 8) / 2;
         int level = LEVELS[selectedLevel];
         String tryLabel = inTrial ? "Essayer " + cls.label + " niv. " + level : "Essayer (niv. " + level + ")";
-        btn(g, "try", x, y, bw, 16, tryLabel, !hasClass || operator, 0xFF6A5A1A, () -> {
+        btn(g, "try", x, y, bw, 16, tryLabel, (!hasClass || operator) && trialEnabled, 0xFF6A5A1A, () -> {
             ClientNet.send(new Payloads.HubAction(Payloads.HubAction.TRY, selectedClass, level));
             onClose();
         });

@@ -74,6 +74,7 @@ public final class ClassTrial {
 
     /** Demarre (ou change) l'essai d'une classe. Renvoie un message d'erreur, ou null en cas de succes. */
     public static @Nullable String start(ServerPlayer p, PlayerClass cls, int level) {
+        if (!com.mmorpg.config.ConfigManager.general().hubTrialZone) return "La zone d'essai est désactivée sur ce serveur.";
         if (!cls.isPlayable()) return "Classe inconnue.";
         if (java.util.Arrays.stream(LEVELS).noneMatch(l -> l == level)) return "Niveau d'essai inconnu.";
         HubData hub = HubData.get(p.level().getServer());
