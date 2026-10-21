@@ -126,9 +126,17 @@ Immobiles un moment, ils se reposent : le loup s'assoit puis s'endort, le golem 
 
 ## Hub d'entrée
 
-Un opérateur construit le hub avec `/mmorpg hub` : place centrale, quatre zones de classe, salle d'épreuve, aire d'entraînement avec des mannequins, Téléporteur vers les villes et donjons. Le point d'apparition du monde y est placé.
+Un opérateur construit le hub avec `/hub set` (ou `/mmorpg hub`) : la **Citadelle d'Eldoria**, une grande île céleste (face inférieure rocheuse, cascades, lianes et cristaux lumineux, îlots flottants) avec une place de 31 blocs de rayon, sa **rotonde à dôme vitré** et son bassin annulaire à ponts, **quatre pavillons de classe** à colonnade ronde (chacun avec une grande sculpture : épée du Guerrier, obélisque du Mage, arc de l'Archer, bouclier du Tank), un **portail à tours rondes**, le Téléporteur vers les villes et donjons, une **arène d'épreuve** à dôme et une **aire d'entraînement** circulaire avec ses mannequins. Le point d'apparition du monde y est placé. Les joueurs reviennent au hub avec `/hub`.
+
+Le hub est **protégé** (réglage `hubProtection`) : on n'y casse ni ne pose de blocs, il n'y a ni PvP ni monstres hostiles (les opérateurs en créatif gardent la main pour l'aménager).
 
 À sa première connexion, un joueur sans classe voit une **cinématique** (caméra fluide, barres cinéma, titres, sons et particules ; Espace ou Échap pour passer) qui survole le hub et présente les quatre classes. Il parle ensuite aux **Maîtres de classe**, des PNJ au modèle animé propre à chaque classe : il peut **essayer** n'importe quelle classe à un niveau choisi (1, 25, 50, 75 ou 100) dans la salle d'épreuve, avec son équipement et ses compétences, sans rien gagner ni perdre (son personnage est entièrement restauré à la sortie), puis **choisir** définitivement celle qu'il a essayée. Le Téléporteur du hub reste fermé tant qu'aucune classe n'est choisie.
+
+## Blocs de bâtisseur et police Eldoria
+
+L'onglet créatif **« Eldoria : bâtisseur »** propose 19 matériaux décoratifs aux textures peintes pour le mod (marbre d'Eldoria, marbre poli et doré, colonne de marbre, pierre azur, pierre solaire, dalle runique, cristaux azur / arcanique / d'ambre lumineux, tuiles azur / pourpre / écarlate / sylvestre / de givre, bois ancien, or ouvragé, roche céleste, fer noirci), la plupart avec leurs **marches et dalles** pour arrondir les constructions. Ils servent au hub et sont utilisables par tous les bâtisseurs. Textures et modèles : `tools/gen_decor.py`.
+
+La **police pixel Eldoria** (capitales à empattements, accents français ; `tools/gen_font.py`) habille les titres de la cinématique, du dialogue des Maîtres de classe, de la bannière d'essai et les grands titres 3D du hub.
 
 ## Mannequins d'entraînement
 
