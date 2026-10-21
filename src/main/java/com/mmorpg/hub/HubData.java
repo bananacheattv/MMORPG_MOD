@@ -17,19 +17,27 @@ import org.jspecify.annotations.Nullable;
 public class HubData extends SavedData {
     private static final Codec<HubData> CODEC = RecordCodecBuilder.create(i -> i.group(
             BlockPos.CODEC.optionalFieldOf("origin").forGetter(d -> java.util.Optional.ofNullable(d.origin)),
-            ResourceKey.codec(Registries.DIMENSION).optionalFieldOf("dimension", Level.OVERWORLD).forGetter(d -> d.dimension)
-    ).apply(i, (o, dim) -> new HubData(o.orElse(null), dim)));
+            ResourceKey.codec(Registries.DIMENSION).optionalFieldOf("dimension", Level.OVERWORLD).forGetter(d -> d.dimension),
+            Codec.BOOL.optionalFieldOf("stable", false).forGetter(d -> d.stable)
+    ).apply(i, (o, dim, st) -> new HubData(o.orElse(null), dim, st)));
     public static final SavedDataType<HubData> TYPE = new SavedDataType<>(MMORPG.id("hub"), HubData::new, CODEC);
 
     private @Nullable BlockPos origin;
     private ResourceKey<Level> dimension = Level.OVERWORLD;
+    /** Vrai quand le hub a ete construit avec des identifiants d'entites stables (les anciens exemplaires peuvent alors etre retires). */
+    private boolean stable;
 
     public HubData() {
     }
 
-    private HubData(@Nullable BlockPos origin, ResourceKey<Level> dimension) {
+    private HubData(@Nullable BlockPos origin, ResourceKey<Level> dimension, boolean stable) {
         this.origin = origin;
         this.dimension = dimension;
+        this.stable = stable;
+    }
+
+    public boolean stableBuild() {
+        return stable;
     }
 
     public static HubData get(MinecraftServer server) {
@@ -55,6 +63,7 @@ public class HubData extends SavedData {
     public void set(ResourceKey<Level> dim, BlockPos origin) {
         this.dimension = dim;
         this.origin = origin.immutable();
+        this.stable = true;
         setDirty();
     }
 

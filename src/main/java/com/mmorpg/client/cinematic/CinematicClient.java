@@ -69,7 +69,7 @@ public final class CinematicClient {
     }
 
     /** Image cle du parcours global : position, cible et champ de vision a l'instant t (secondes). */
-    private record Keyframe(float t, Vec3 pos, Vec3 target, float fov) {
+    private record Keyframe(float t, Vec3 pos, Vec3 target, float fov, boolean cut) {
     }
 
     private record Shot(String name, float start, float duration, Ease ease, boolean fade, boolean last, List<Object> cam, List<Object> target,
@@ -108,6 +108,8 @@ public final class CinematicClient {
     private static float smoothYaw;
     private static float smoothPitch;
     private static long lastAimNanos;
+    private static float lastPlayT;
+    private static CinematicMusic music;
     private static int statFrames;
     private static int statHitches;
     private static float statMax;
@@ -140,6 +142,7 @@ public final class CinematicClient {
         camera.setNoGravity(true);
         smoothInit = false;
         lastAimNanos = 0;
+        lastPlayT = 0F;
         warming = false;
         warmIndex = 0;
         Vec3 first = !PARCOURS.isEmpty() ? PARCOURS.get(0).pos : SHOTS.get(0).cam.get(0) instanceof Vec3 v ? v : Vec3.atCenterOf(origin);
@@ -193,7 +196,7 @@ public final class CinematicClient {
         if (root.has("parcours")) {
             for (JsonElement e : root.getAsJsonArray("parcours")) {
                 JsonObject o = e.getAsJsonObject();
-                PARCOURS.add(new Keyframe(o.get("t").getAsFloat(), point(o.get("camera")), point(o.get("cible")), o.has("fov") ? o.get("fov").getAsFloat() : -1F));
+                PARCOURS.add(new Keyframe(o.get("t").getAsFloat(), point(o.get("camera")), point(o.get("cible")), o.has("fov") ? o.get("fov").getAsFloat() : -1F, o.has("coupe") && o.get("coupe").getAsBoolean()));
             }
             for (Keyframe k : PARCOURS) {
                 preload.add(k.pos);
@@ -271,10 +274,18 @@ public final class CinematicClient {
             mc.player.setXRot(SPAWN_PITCH);
         }
         if (was) MMORPG.LOGGER.info("[MMORPG] Cinematique : fin cote client (notif serveur = {})", notify);
+        stopMusic(10);
         phase = Phase.OFF;
         camera = null;
         SHOTS.clear();
         if (was && notify) ClientNet.send(new Payloads.HubAction(Payloads.HubAction.CINEMATIC_END, 0, 0));
+    }
+
+    private static void stopMusic(int fadeTicks) {
+        if (music != null) {
+            music.fadeOut(fadeTicks);
+            music = null;
+        }
     }
 
     public static void skip() {
@@ -282,6 +293,7 @@ public final class CinematicClient {
         if (phase == Phase.PLAYING || phase == Phase.LOADING) {
             phase = Phase.SKIPPING;
             phaseStart = System.nanoTime();
+            stopMusic(14);
         }
     }
 
@@ -339,6 +351,9 @@ public final class CinematicClient {
                     shotOfCursors = -1;
                     smoothInit = false;
                     lastAimNanos = 0;
+                    mc.getMusicManager().stopPlaying();
+                    music = new CinematicMusic();
+                    mc.getSoundManager().play(music);
                 } else {
                     // pre-chauffage : la camera survole le parcours sous l'ecran noir pour que le rendu des sections soit pret avant la lecture
                     Keyframe k = warm.get(warmIndex);
@@ -376,6 +391,7 @@ public final class CinematicClient {
     }
 
     private static void finishScene(Minecraft mc, long now) {
+        stopMusic(30);
         MMORPG.LOGGER.info("[MMORPG] Cinematique : {} images, image la plus lente {} ms, {} images au-dela de 50 ms", statFrames, Math.round(statMax * 1000), statHitches);
         statFrames = 0;
         statHitches = 0;
@@ -400,6 +416,9 @@ public final class CinematicClient {
         float local = Mth.clamp((t - shot.start) / shot.duration, 0F, 1F);
         if (!PARCOURS.isEmpty()) {
             Keyframe k = sampleParcours(t);
+            for (Keyframe c : PARCOURS) if (c.cut && lastPlayT < c.t && c.t <= t) smoothInit = false;      // apres une coupe, l'orientation repart de zero
+            if (music != null && lastPlayT < 10F && t >= 10F) MMORPG.LOGGER.info("[MMORPG] Cinematique : musique active = {}", mc.getSoundManager().isActive(music));
+            lastPlayT = t;
             aim(k.pos, k.target, t, false);
             lastFov = k.fov < 0 ? mc.options.fov().get() : k.fov;
             lastRoll = 0F;
@@ -456,6 +475,7 @@ public final class CinematicClient {
         while (i < n - 2 && t > PARCOURS.get(i + 1).t) i++;
         Keyframe a = PARCOURS.get(i);
         Keyframe b = PARCOURS.get(i + 1);
+        if (b.cut) return a;                                  // coupe : la camera reste en place jusqu'a l'image suivante (masquee par un fondu au noir)
         float dt = b.t - a.t;
         float u = (t - a.t) / dt;
         Vec3 pos = hermite(a.pos, b.pos, tangent(i, false), tangent(i + 1, false), dt, u);
@@ -464,7 +484,7 @@ public final class CinematicClient {
         float fa = a.fov;
         float fb = b.fov;
         float fov = fa < 0 || fb < 0 ? (u < 0.5F ? fa : fb) : fa + (fb - fa) * k;
-        return new Keyframe(t, pos, tgt, fov);
+        return new Keyframe(t, pos, tgt, fov, false);
     }
 
     /** Diagnostic (tests) : {position, cible} du parcours a l'instant t, ou null s'il n'y a pas de parcours global. */
@@ -480,7 +500,7 @@ public final class CinematicClient {
 
     private static Vec3 tangent(int i, boolean target) {
         int n = PARCOURS.size();
-        if (i <= 0 || i >= n - 1) return Vec3.ZERO;
+        if (i <= 0 || i >= n - 1 || PARCOURS.get(i).cut || PARCOURS.get(i + 1).cut) return Vec3.ZERO;
         Keyframe p = PARCOURS.get(i - 1);
         Keyframe q = PARCOURS.get(i + 1);
         Vec3 d = target ? q.target.subtract(p.target) : q.pos.subtract(p.pos);
@@ -614,8 +634,17 @@ public final class CinematicClient {
         }
     }
 
+    /** Pendant la scene, aucune autre musique que la sienne. */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onPlaySound(net.neoforged.neoforge.client.event.sound.PlaySoundEvent event) {
+        if (phase != Phase.OFF && event.getSound() != null && event.getSound().getSource() == net.minecraft.sounds.SoundSource.MUSIC && !(event.getSound() instanceof CinematicMusic)) {
+            event.setSound(null);
+        }
+    }
+
     @SubscribeEvent
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
+        stopMusic(1);
         phase = Phase.OFF;
         camera = null;
         SHOTS.clear();
@@ -650,6 +679,12 @@ public final class CinematicClient {
             case PLAYING -> {
                 float t = (now - phaseStart) / 1.0E9F;
                 black = Math.max(black, 1F - Ease.IN_OUT_CUBIC.apply(Mth.clamp(t / fadeIn, 0F, 1F)));
+                for (Keyframe c : PARCOURS) {
+                    if (!c.cut) continue;
+                    float d = t - c.t;                         // noir complet de -0,1 s a +0,25 s autour de la coupe
+                    float f = d < -0.1F ? Mth.clamp(1F + (d + 0.1F) / 0.5F, 0F, 1F) : d > 0.25F ? Mth.clamp(1F - (d - 0.25F) / 0.6F, 0F, 1F) : 1F;
+                    black = Math.max(black, f * f * (3F - 2F * f));
+                }
                 bars = Ease.IN_OUT_CUBIC.apply(Mth.clamp((t - 0.2F) / 1.2F, 0F, 1F));
                 Shot s = SHOTS.get(Math.min(shotIndex, SHOTS.size() - 1));
                 // fondu au noir entre deux plans : noir complet a la jonction

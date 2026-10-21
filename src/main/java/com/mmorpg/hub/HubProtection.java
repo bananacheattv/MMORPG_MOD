@@ -90,6 +90,7 @@ public final class HubProtection {
             event.setCanceled(true);
             return;
         }
+        if (!hub.stableBuild()) return;                       // hub construit avant les identifiants stables : on ne touche a rien tant qu'il n'est pas reconstruit
         boolean legacy = e instanceof com.mmorpg.entity.hub.ClassMasterEntity
                 || (e instanceof com.mmorpg.entity.NpcEntity n && "maitre_classes".equals(n.group()))
                 || (e instanceof net.minecraft.world.entity.Display.TextDisplay && e.entityTags().contains(HubBuilder.TAG))

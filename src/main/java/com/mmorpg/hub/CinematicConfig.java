@@ -49,26 +49,59 @@ public final class CinematicConfig {
                 {"t": 0, "camera": [0, 40, 108], "cible": [0, 18, 40], "fov": 76},
                 {"t": 6, "camera": [0, 35, 78], "cible": [0, 27, 36], "fov": 70},
                 {"t": 10, "camera": [-2, 46, 50], "cible": [0, 16, 14], "fov": 68},
-                {"t": 12.8, "camera": [-22, 46, 32], "cible": [0, 14, 6], "fov": 66},
-                {"t": 15, "camera": [-38, 36, 16], "cible": [0, 12, 0], "fov": 64},
-                {"t": 19, "camera": [-30, 16, -2], "cible": [-12, 8, -8], "fov": 62},
-                {"t": 22.5, "camera": [-7.8, 7, -7.8], "cible": [-20, 5.5, -20], "fov": 60},
-                {"t": 27.5, "camera": [-9.4, 7.8, -9.4], "cible": [-21, 5, -21], "fov": 56},
-                {"t": 30.2, "camera": [0, 12, -15], "cible": [0, 7, -26], "fov": 56},
-                {"t": 33, "camera": [7.8, 7, -7.8], "cible": [20, 5.5, -20], "fov": 60},
-                {"t": 36.3, "camera": [9.4, 7.8, -9.4], "cible": [21, 5, -21], "fov": 56},
-                {"t": 39.2, "camera": [15.5, 10, 0], "cible": [27, 6, 0], "fov": 56},
-                {"t": 42, "camera": [7.8, 7, 7.8], "cible": [20, 5.5, 20], "fov": 60},
-                {"t": 45.3, "camera": [9.4, 7.8, 9.4], "cible": [21, 5, 21], "fov": 56},
-                {"t": 48.2, "camera": [0, 13, 15], "cible": [0, 9, 26], "fov": 56},
-                {"t": 51, "camera": [-7.8, 7, 7.8], "cible": [-20, 5.5, 20], "fov": 60},
-                {"t": 54.3, "camera": [-9.4, 7.8, 9.4], "cible": [-21, 5, 21], "fov": 56},
-                {"t": 57.5, "camera": [-6, 20, 28], "cible": [0, 12, 6], "fov": 62},
-                {"t": 59.8, "camera": [0, 42, 42], "cible": [0, 14, 10], "fov": 60},
-                {"t": 62, "camera": [0, 34, 64], "cible": [0, 14, 14], "fov": 64},
-                {"t": 63.6, "camera": [0, 16, 66], "cible": [0, 9, 24], "fov": 66},
-                {"t": 64.9, "camera": [0, 7, 57], "cible": [0, 5, 36], "fov": 70},
-                {"t": 66, "camera": "@joueur", "cible": "@regard", "fov": -1}
+                {"t": 12.8, "camera": [-22, 46, 32], "cible": [-6, 12, 4], "fov": 66},
+                {"t": 15.5, "camera": [-38, 34, 14], "cible": [-14, 9, -6], "fov": 64},
+                {"t": 18.8, "camera": [-26, 20, -2], "cible": [-18, 8, -14], "fov": 62},
+                {"t": 22.5, "camera": [-7.78, 7.0, -7.78], "cible": [-20.01, 5.5, -20.01], "fov": 60},
+                {"t": 23.25, "camera": [-8.15, 7.12, -7.9], "cible": [-20.47, 5.42, -19.84], "fov": 59},
+                {"t": 24.0, "camera": [-8.52, 7.24, -8.0], "cible": [-20.94, 5.35, -19.66], "fov": 59},
+                {"t": 24.75, "camera": [-8.9, 7.36, -8.1], "cible": [-21.4, 5.28, -19.47], "fov": 58},
+                {"t": 25.5, "camera": [-9.29, 7.48, -8.19], "cible": [-21.86, 5.2, -19.27], "fov": 58},
+                {"t": 26.25, "camera": [-9.68, 7.6, -8.26], "cible": [-22.32, 5.12, -19.06], "fov": 57},
+                {"t": 27.0, "camera": [-10.07, 7.72, -8.33], "cible": [-22.78, 5.05, -18.84], "fov": 56},
+                {"t": 27.75, "camera": [-10.6, 8.39, -8.43], "cible": [-23.24, 5.86, -18.48], "fov": 56},
+                {"t": 28.5, "camera": [-11.98, 10.0, -7.39], "cible": [-25.17, 8.29, -15.53], "fov": 56},
+                {"t": 29.25, "camera": [-13.49, 11.14, -4.62], "cible": [-27.78, 10.17, -9.51], "fov": 57},
+                {"t": 30.0, "camera": [-14.07, 11.61, -0.67], "cible": [-29.06, 11.15, -1.38], "fov": 58},
+                {"t": 30.75, "camera": [-13.14, 11.32, 3.36], "cible": [-27.91, 11.07, 7.13], "fov": 59},
+                {"t": 31.5, "camera": [-11.11, 10.32, 6.33], "cible": [-24.81, 9.94, 14.13], "fov": 59},
+                {"t": 32.25, "camera": [-8.99, 8.79, 7.74], "cible": [-21.5, 7.97, 18.52], "fov": 60},
+                {"t": 33.0, "camera": [-7.78, 7.0, 7.78], "cible": [-20.01, 5.5, 20.01], "fov": 60},
+                {"t": 33.75, "camera": [-7.95, 7.18, 8.34], "cible": [-19.75, 5.39, 20.71], "fov": 59},
+                {"t": 34.5, "camera": [-8.1, 7.36, 8.91], "cible": [-19.46, 5.27, 21.41], "fov": 58},
+                {"t": 35.25, "camera": [-8.23, 7.55, 9.5], "cible": [-19.16, 5.16, 22.11], "fov": 57},
+                {"t": 36.0, "camera": [-8.33, 7.73, 10.09], "cible": [-18.83, 5.05, 22.8], "fov": 56},
+                {"t": 36.75, "camera": [-8.34, 8.82, 10.87], "cible": [-18.07, 6.48, 23.54], "fov": 56},
+                {"t": 37.5, "camera": [-6.94, 10.29, 12.32], "cible": [-14.5, 8.74, 25.74], "fov": 56},
+                {"t": 38.25, "camera": [-3.99, 11.28, 13.69], "cible": [-8.2, 10.41, 28.15], "fov": 57},
+                {"t": 39.0, "camera": [-0.08, 11.62, 14.03], "cible": [-0.16, 11.21, 29.05], "fov": 58},
+                {"t": 39.75, "camera": [3.73, 11.25, 12.97], "cible": [7.97, 11.0, 27.66], "fov": 59},
+                {"t": 40.5, "camera": [6.48, 10.23, 10.95], "cible": [14.53, 9.83, 24.56], "fov": 59},
+                {"t": 41.25, "camera": [7.77, 8.73, 8.93], "cible": [18.62, 7.89, 21.4], "fov": 60},
+                {"t": 42.0, "camera": [7.78, 7.0, 7.78], "cible": [20.01, 5.5, 20.01], "fov": 60},
+                {"t": 42.75, "camera": [8.34, 7.18, 7.95], "cible": [20.71, 5.39, 19.75], "fov": 59},
+                {"t": 43.5, "camera": [8.91, 7.36, 8.1], "cible": [21.41, 5.27, 19.46], "fov": 58},
+                {"t": 44.25, "camera": [9.5, 7.55, 8.23], "cible": [22.11, 5.16, 19.16], "fov": 57},
+                {"t": 45.0, "camera": [10.09, 7.73, 8.33], "cible": [22.8, 5.05, 18.83], "fov": 56},
+                {"t": 45.75, "camera": [10.87, 8.82, 8.34], "cible": [23.54, 6.48, 18.07], "fov": 56},
+                {"t": 46.5, "camera": [12.32, 10.29, 6.94], "cible": [25.74, 8.74, 14.5], "fov": 56},
+                {"t": 47.25, "camera": [13.69, 11.28, 3.99], "cible": [28.15, 10.41, 8.2], "fov": 57},
+                {"t": 48.0, "camera": [14.03, 11.62, 0.08], "cible": [29.05, 11.21, 0.16], "fov": 58},
+                {"t": 48.75, "camera": [12.97, 11.25, -3.73], "cible": [27.66, 11.0, -7.97], "fov": 59},
+                {"t": 49.5, "camera": [10.95, 10.23, -6.48], "cible": [24.56, 9.83, -14.53], "fov": 59},
+                {"t": 50.25, "camera": [8.93, 8.73, -7.77], "cible": [21.4, 7.89, -18.62], "fov": 60},
+                {"t": 51.0, "camera": [7.78, 7.0, -7.78], "cible": [20.01, 5.5, -20.01], "fov": 60},
+                {"t": 51.75, "camera": [7.88, 7.13, -8.21], "cible": [19.76, 5.42, -20.58], "fov": 59},
+                {"t": 52.5, "camera": [7.97, 7.27, -8.65], "cible": [19.5, 5.33, -21.15], "fov": 59},
+                {"t": 53.25, "camera": [8.05, 7.4, -9.1], "cible": [19.22, 5.25, -21.72], "fov": 58},
+                {"t": 54.0, "camera": [8.11, 7.53, -9.55], "cible": [18.92, 5.17, -22.28], "fov": 57},
+                {"t": 54.75, "camera": [8.16, 7.67, -10.01], "cible": [18.61, 5.08, -22.85], "fov": 57},
+                {"t": 55.5, "camera": [8.19, 7.8, -10.48], "cible": [18.29, 5.0, -23.4], "fov": 56},
+                {"t": 56.5, "camera": [8.19, 7.8, -10.48], "cible": [18.29, 5.0, -23.4], "fov": 56},
+                {"t": 57.0, "camera": [0, 40, 104], "cible": [0, 16, 30], "fov": 76, "coupe": true},
+                {"t": 61.0, "camera": [0, 26, 78], "cible": [0, 14, 30], "fov": 72},
+                {"t": 64.0, "camera": [0, 12, 62], "cible": [0, 8, 36], "fov": 70},
+                {"t": 66.0, "camera": "@joueur", "cible": "@regard", "fov": -1}
               ],
               "plans": [
                 {
@@ -104,20 +137,20 @@ public final class CinematicConfig {
                   ]
                 },
                 {
-                  "nom": "mage",
+                  "nom": "archer",
                   "duree": 9,
                   "rythme": "linear",
                   "transition": "coupe",
-                  "classe": "MAGE",
-                  "titre": {"texte": "LE MAGE", "sous": "Intelligence et Esprit — l'arcane obéit", "couleur": "#B07CFF", "debut": 0.28, "fin": 0.97},
+                  "classe": "ARCHER",
+                  "titre": {"texte": "L'ARCHER", "sous": "Agilité et Dextérité — jamais là où l'on frappe", "couleur": "#6CE06C", "debut": 0.28, "fin": 0.97},
                   "sons": [
-                    {"t": 0.0, "son": "minecraft:block.enchantment_table.use", "volume": 0.8, "hauteur": 0.9},
-                    {"t": 0.4, "son": "minecraft:entity.evoker.cast_spell", "volume": 0.5, "hauteur": 1.1}
+                    {"t": 0.0, "son": "minecraft:entity.arrow.shoot", "volume": 0.6, "hauteur": 1.1},
+                    {"t": 0.45, "son": "minecraft:block.grass.break", "volume": 0.6, "hauteur": 0.8}
                   ],
                   "particules": [
-                    {"t": 0.0, "type": "enchant", "pos": [20, 3, -20], "nombre": 80, "dispersion": [1.5, 1.5, 1.5], "vitesse": 0.5},
-                    {"t": 0.45, "type": "witch", "pos": [20, 4, -20], "nombre": 40, "dispersion": [1.2, 1.2, 1.2], "vitesse": 0.05},
-                    {"t": 0.55, "type": "end_rod", "pos": [20, 6, -20], "nombre": 30, "dispersion": [0.8, 0.8, 0.8], "vitesse": 0.08}
+                    {"t": 0.0, "type": "happy_villager", "pos": [-20, 2, 20], "nombre": 30, "dispersion": [1.6, 1.4, 1.6], "vitesse": 0.02},
+                    {"t": 0.4, "type": "cherry_leaves", "pos": [-20, 6, 20], "nombre": 40, "dispersion": [2.2, 0.5, 2.2], "vitesse": 0.02},
+                    {"t": 0.5, "type": "cloud", "pos": [-19, 1.6, 20], "nombre": 12, "dispersion": [0.6, 0.3, 0.6], "vitesse": 0.03}
                   ]
                 },
                 {
@@ -138,20 +171,20 @@ public final class CinematicConfig {
                   ]
                 },
                 {
-                  "nom": "archer",
+                  "nom": "mage",
                   "duree": 9,
                   "rythme": "linear",
                   "transition": "coupe",
-                  "classe": "ARCHER",
-                  "titre": {"texte": "L'ARCHER", "sous": "Agilité et Dextérité — jamais là où l'on frappe", "couleur": "#6CE06C", "debut": 0.28, "fin": 0.97},
+                  "classe": "MAGE",
+                  "titre": {"texte": "LE MAGE", "sous": "Intelligence et Esprit — l'arcane obéit", "couleur": "#B07CFF", "debut": 0.28, "fin": 0.97},
                   "sons": [
-                    {"t": 0.0, "son": "minecraft:entity.arrow.shoot", "volume": 0.6, "hauteur": 1.1},
-                    {"t": 0.45, "son": "minecraft:block.grass.break", "volume": 0.6, "hauteur": 0.8}
+                    {"t": 0.0, "son": "minecraft:block.enchantment_table.use", "volume": 0.8, "hauteur": 0.9},
+                    {"t": 0.4, "son": "minecraft:entity.evoker.cast_spell", "volume": 0.5, "hauteur": 1.1}
                   ],
                   "particules": [
-                    {"t": 0.0, "type": "happy_villager", "pos": [-20, 2, 20], "nombre": 30, "dispersion": [1.6, 1.4, 1.6], "vitesse": 0.02},
-                    {"t": 0.4, "type": "cherry_leaves", "pos": [-20, 6, 20], "nombre": 40, "dispersion": [2.2, 0.5, 2.2], "vitesse": 0.02},
-                    {"t": 0.5, "type": "cloud", "pos": [-19, 1.6, 20], "nombre": 12, "dispersion": [0.6, 0.3, 0.6], "vitesse": 0.03}
+                    {"t": 0.0, "type": "enchant", "pos": [20, 3, -20], "nombre": 80, "dispersion": [1.5, 1.5, 1.5], "vitesse": 0.5},
+                    {"t": 0.45, "type": "witch", "pos": [20, 4, -20], "nombre": 40, "dispersion": [1.2, 1.2, 1.2], "vitesse": 0.05},
+                    {"t": 0.55, "type": "end_rod", "pos": [20, 6, -20], "nombre": 30, "dispersion": [0.8, 0.8, 0.8], "vitesse": 0.08}
                   ]
                 },
                 {
