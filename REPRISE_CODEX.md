@@ -50,6 +50,7 @@ Branche : codex/eldoria-reprise. Sauvegarder chaque fonctionnalite dans un commi
 
 - Étape 1 faite : `entity/dummy/TrainingDummyEntity`, rendu `client/model/dummy` (ressort amorti réel, direction/force du coup), panneau dans `MmoHud.dummyPanels`, config `mannequin.json`, objets/recettes/commande. Test : `-Pshowcase=mannequin` et `-Pshowcase=mannequin2`.
 - Étapes 2 à 5 (maîtres de classe, essai, hub, cinématique) : code dans `hub/` (HubBuilder, HubLayout, HubData, ClassTrial, CinematicManager/Config), `entity/hub/ClassMasterEntity`, `client/cinematic/`, `client/screen/ClassMasterScreen`, modèles `art/classes_blockbench/`. Documentation : README (« Hub d'entrée »), GUIDE_ADMIN (« Hub d'entrée, cinématique et essai des classes »).
-- Restent à valider : multijoueur (deux joueurs en cinématique / en essai en même temps), provocation du Tank sur le mannequin.
+- Validé en jeu (`-Dmmorpg.checkDummy=true`, `server/DevDummyChecks`) : dégâts par variante, immortalité, provocation du Tank, immobilité, absence de riposte, dégâts d'environnement ignorés, retrait créatif, remise à zéro, DPS.
+- Restent à valider : multijoueur (deux joueurs en cinématique / en essai en même temps).
 - Environnement : pas d'identifiants GitHub dans les sessions Claude (push à faire depuis GitHub Desktop) ; deux sessions Claude partagent ce dossier : `git add` fichier par fichier.
 
