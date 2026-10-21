@@ -56,7 +56,8 @@ public final class KillRewards {
             RpgPlayers.onDeath(sp);
             return;
         }
-        if (dead instanceof com.mmorpg.entity.dummy.TrainingDummyEntity) return;      // le mannequin ne donne ni XP ni butin
+        if (dead instanceof com.mmorpg.entity.dummy.TrainingDummyEntity) return;
+        if (event.getSource().getEntity() instanceof ServerPlayer trial && com.mmorpg.hub.ClassTrial.active(trial)) return;   // essai : ni XP, ni or, ni butin      // le mannequin ne donne ni XP ni butin
         MobData md = dead.getExistingDataOrNull(ModAttachments.MOB);
         if (md == null || !md.initialized()) return;
         ServerPlayer killer = killer(dead, event.getSource().getEntity());

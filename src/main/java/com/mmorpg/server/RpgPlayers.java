@@ -280,6 +280,7 @@ public final class RpgPlayers {
     // ================================================================== experience
 
     public static void giveXp(ServerPlayer player, long amount, boolean fromKill) {
+        if (com.mmorpg.hub.ClassTrial.active(player)) return;          // essai de classe : aucune recompense
         PlayerData d = get(player);
         if (!d.playerClass.isPlayable() || d.level >= LevelSystem.MAX_LEVEL || amount <= 0) return;
         amount = Math.max(1, Math.round(amount * ConfigManager.general().xpMultiplier * (d.xpCharmSeconds > 0 ? 1.25 : 1.0)));
@@ -546,8 +547,13 @@ public final class RpgPlayers {
         sync(player);
         BestiaryInfo.sendTo(player);
         PartyManager.sync(player);
-        if (!d.playerClass.isPlayable() && ConfigManager.general().openClassSelectionOnJoin) {
-            openClassSelection(player);
+        if (!d.playerClass.isPlayable() && !com.mmorpg.hub.ClassTrial.active(player)) {
+            // hub construit : cinematique a la premiere arrivee, puis choix aupres des Maitres de classe ; sinon ecran de choix classique
+            if (com.mmorpg.hub.HubData.get(player.level().getServer()).exists()) {
+                if (!com.mmorpg.hub.ClassTrial.data(player).cinematicSeen) com.mmorpg.hub.CinematicManager.start(player, true);
+            } else if (ConfigManager.general().openClassSelectionOnJoin) {
+                openClassSelection(player);
+            }
         }
     }
 

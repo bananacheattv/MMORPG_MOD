@@ -202,6 +202,19 @@ public final class RpgCommands {
                                     c.getSource().sendSuccess(() -> ok("Cosmétique(s) débloqué(s)"), true);
                                     return 1;
                                 }))))
+                .then(Commands.literal("hub").executes(c -> {
+                    var level = c.getSource().getLevel();
+                    BlockPos feet = BlockPos.containing(c.getSource().getPosition());
+                    com.mmorpg.hub.HubBuilder.build(level, feet);
+                    c.getSource().sendSuccess(() -> ok("Hub d'Eldoria construit en " + feet.toShortString() + " : place centrale, 4 zones de classe, salle d'épreuve, aire d'entraînement, téléporteur. Point d'apparition du monde défini sur le hub."), true);
+                    return 1;
+                }))
+                .then(Commands.literal("cinematique")
+                        .executes(c -> playCinematic(c.getSource().getPlayerOrException(), c))
+                        .then(Commands.argument("joueur", EntityArgument.player()).executes(c -> playCinematic(EntityArgument.getPlayer(c, "joueur"), c))))
+                .then(Commands.literal("essai").then(Commands.literal("fin")
+                        .executes(c -> endTrial(c.getSource().getPlayerOrException(), c))
+                        .then(Commands.argument("joueur", EntityArgument.player()).executes(c -> endTrial(EntityArgument.getPlayer(c, "joueur"), c)))))
                 .then(Commands.literal("mannequin")
                         .then(Commands.literal("supprimer").executes(c -> {
                             var list = c.getSource().getLevel().getEntitiesOfClass(com.mmorpg.entity.dummy.TrainingDummyEntity.class,
@@ -288,6 +301,25 @@ public final class RpgCommands {
                     c.getSource().sendSuccess(() -> ok("Configuration rechargée (" + ConfigManager.mobs().size() + " monstres)"), true);
                     return 1;
                 })));
+    }
+
+    private static int playCinematic(ServerPlayer target, CommandContext<CommandSourceStack> c) {
+        if (!com.mmorpg.hub.CinematicManager.start(target, false)) {
+            c.getSource().sendFailure(Component.literal("Le hub n'est pas construit (/mmorpg hub)."));
+            return 0;
+        }
+        c.getSource().sendSuccess(() -> ok("Cinématique lancée pour " + target.getGameProfile().name()), true);
+        return 1;
+    }
+
+    private static int endTrial(ServerPlayer target, CommandContext<CommandSourceStack> c) {
+        if (!com.mmorpg.hub.ClassTrial.active(target)) {
+            c.getSource().sendFailure(Component.literal(target.getGameProfile().name() + " n'est pas en essai."));
+            return 0;
+        }
+        com.mmorpg.hub.ClassTrial.end(target, true, "Essai terminé : votre personnage a été restauré.");
+        c.getSource().sendSuccess(() -> ok("Essai terminé, personnage restauré."), true);
+        return 1;
     }
 
     private static int spawnNpc(CommandContext<CommandSourceStack> c, com.mmorpg.entity.NpcEntity.Role role) {

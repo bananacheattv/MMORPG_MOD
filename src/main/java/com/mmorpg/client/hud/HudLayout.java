@@ -185,6 +185,7 @@ public final class HudLayout {
             (sw, sh, w, h) -> new int[]{sw >= 2 * 186 + w ? (sw - w) / 2 : 180, 4});
     public static final Element SORTS = mod("sorts", "Barre de sorts", (sw, sh) -> new int[]{136, 26}, (sw, sh, w, h) ->
             sw / 2 + 96 + w <= sw - 2 ? new int[]{sw / 2 + 96, sh - 25} : new int[]{sw / 2 - w / 2, sh - 73});
+    public static final Element ESSAI = mod("essai", "Indicateur d'essai de classe", (sw, sh) -> new int[]{210, 30}, (sw, sh, w, h) -> new int[]{(sw - w) / 2, 6});
     public static final Element BANNIERE = mod("banniere", "Annonces", (sw, sh) -> MmoHud.bannerSize(), (sw, sh, w, h) -> new int[]{(sw - w) / 2, sh / 4 - 7});
 
     // ---------------------------------------------------------------- elements vanilla (deplaces par transformation)

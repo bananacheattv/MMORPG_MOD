@@ -31,6 +31,11 @@ public final class ClientData {
     /** Etat du groupe (membres, invitation en attente). */
     public static CompoundTag party = new CompoundTag();
     public static boolean received = false;
+    /** Essai de classe en cours (indicateur du HUD). */
+    public static boolean trialActive;
+    public static int trialClass;
+    public static int trialLevel;
+    public static long trialSince;
 
     private ClientData() {
     }
@@ -100,5 +105,6 @@ public final class ClientData {
         quests = new net.minecraft.nbt.ListTag();
         party = new CompoundTag();
         received = false;
+        trialActive = false;
     }
 }

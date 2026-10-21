@@ -214,6 +214,10 @@ public final class RpgCombat {
             event.setCanceled(true);
             return;
         }
+        if (target instanceof ServerPlayer lockedTarget && com.mmorpg.hub.CinematicManager.isLocked(lockedTarget)) {
+            event.setCanceled(true);          // cinematique en cours : le joueur est intouchable
+            return;
+        }
         if (target instanceof ServerPlayer tp && attacker instanceof ServerPlayer ap && tp != ap
                 && com.mmorpg.server.PartyManager.sameParty(tp, ap)) {
             event.setCanceled(true);
@@ -329,6 +333,11 @@ public final class RpgCombat {
             if (!environmental) dummy.recordHit(damage, crit, attacker);       // chute, feu, vide... ne comptent pas
             event.setNewDamage(0F);
             if (damage > 0 && attacker instanceof Player) CombatTexts.above(target, (float) damage, crit ? Payloads.CombatText.CRIT : Payloads.CombatText.DAMAGE);
+            return;
+        }
+        if (target instanceof ServerPlayer trialPlayer && com.mmorpg.hub.ClassTrial.active(trialPlayer) && h.hp() - damage <= 0.01) {
+            event.setNewDamage(0F);                   // essai de classe : un coup mortel relance l'essai sans aucune perte
+            com.mmorpg.hub.ClassTrial.revive(trialPlayer);
             return;
         }
         double newHp = h.hp() - damage;

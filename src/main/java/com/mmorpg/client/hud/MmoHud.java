@@ -76,7 +76,7 @@ public final class MmoHud {
                 continue;
             }
             if (e instanceof com.mmorpg.entity.dummy.TrainingDummyEntity dummy) {          // mannequin : panneau dedie, pas de barre de vie
-                if (dummy.distanceToSqr(mc.player) < (double) dummyRange * dummyRange) DUMMIES.add(dummy);
+                if (dummy.distanceToSqr(mc.player) < (double) dummyRange * dummyRange && mc.player.hasLineOfSight(dummy)) DUMMIES.add(dummy);
                 continue;
             }
             if (!(e instanceof LivingEntity le) || e == mc.player || !le.isAlive()) continue;
@@ -131,6 +131,10 @@ public final class MmoHud {
         }
         if (HudLayout.begin(g, HudLayout.SORTS)) {
             skillBar(g);
+            HudLayout.end(g);
+        }
+        if ((ClientData.trialActive || HudLayout.editing) && HudLayout.begin(g, HudLayout.ESSAI)) {
+            trialBanner(g);
             HudLayout.end(g);
         }
         if (HudLayout.begin(g, HudLayout.BANNIERE)) {
@@ -522,6 +526,32 @@ public final class MmoHud {
             g.text(f, key, 0, 0, 0xFFFFE6A0, true);
             g.pose().popMatrix();
         }
+    }
+
+    /** Indicateur d'essai de classe : glisse depuis le haut a l'apparition, losange qui pulse, duree ecoulee. */
+    private static void trialBanner(GuiGraphicsExtractor g) {
+        PlayerClass cls = ClientData.trialActive ? PlayerClass.byId(ClientData.trialClass) : PlayerClass.GUERRIER;
+        int level = ClientData.trialActive ? ClientData.trialLevel : 50;
+        float k = Math.min(1f, (System.nanoTime() - ClientData.trialSince) / 4.0E8f);
+        float slide = HudLayout.editing ? 0f : (1f - (1f - (float) Math.pow(1f - k, 3))) * -34f;
+        g.pose().pushMatrix();
+        g.pose().translate(0, slide);
+        Font f = font();
+        int w = 210;
+        int h = 30;
+        smallPanel(g, 0, 0, w, h, cls.color);
+        float pulse = 0.5f + 0.5f * (float) Math.sin(System.currentTimeMillis() / 260.0);
+        Ui.diamond(g, 10, 15, 4, Ui.lighter(cls.color, 0.2f + 0.5f * pulse));
+        g.text(f, "ESSAI — " + cls.label + " niv. " + level, 20, 5, cls.color, true);
+        long secs = HudLayout.editing ? 83 : (System.nanoTime() - ClientData.trialSince) / 1_000_000_000L;
+        String time = String.format(java.util.Locale.ROOT, "%d:%02d", secs / 60, secs % 60);
+        g.text(f, time, w - 8 - f.width(time), 5, Ui.MUTED, false);
+        g.pose().pushMatrix();
+        g.pose().translate(20, 18);
+        g.pose().scale(0.75f, 0.75f);
+        g.text(f, "Rien n'est conservé · parlez au Gardien pour quitter", 0, 0, Ui.TEXT, false);
+        g.pose().popMatrix();
+        g.pose().popMatrix();
     }
 
     private static void banner(GuiGraphicsExtractor g) {

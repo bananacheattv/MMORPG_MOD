@@ -21,6 +21,12 @@ public record S2COpenScreen(int screen, CompoundTag extra) implements CustomPack
     public static final int LUCKY_RESULT = 8;
     public static final int LOOT_EDITOR = 9;
     public static final int CRATE = 10;
+    /** Dialogue d'un Maitre de classe / de l'epreuve. */
+    public static final int CLASS_MASTER = 11;
+    /** Lancement de la cinematique d'arrivee (definition JSON et origine du hub). */
+    public static final int CINEMATIC = 12;
+    /** Etat de l'essai de classe (pas d'ecran) : actif, classe, niveau. */
+    public static final int TRIAL_STATE = 13;
 
     public static final Type<S2COpenScreen> TYPE = new Type<>(MMORPG.id("open_screen"));
     public static final StreamCodec<ByteBuf, S2COpenScreen> CODEC = StreamCodec.composite(

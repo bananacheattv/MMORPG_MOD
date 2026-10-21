@@ -62,6 +62,14 @@ public final class ClientPayloadHandlers {
             case S2COpenScreen.FORGE -> mc.gui.setScreen(new ForgeScreen(BlockPos.of(payload.extra().getLongOr("pos", 0))));
             case S2COpenScreen.QUEST_GIVER -> mc.gui.setScreen(new com.mmorpg.client.screen.QuestGiverScreen(payload.extra()));
             case S2COpenScreen.SHOP -> mc.gui.setScreen(new com.mmorpg.client.screen.ShopScreen(payload.extra()));
+            case S2COpenScreen.CLASS_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.ClassMasterScreen(payload.extra()));
+            case S2COpenScreen.TRIAL_STATE -> {
+                ClientData.trialActive = payload.extra().getBooleanOr("active", false);
+                ClientData.trialClass = payload.extra().getIntOr("class", 0);
+                ClientData.trialLevel = payload.extra().getIntOr("level", 1);
+                ClientData.trialSince = System.nanoTime();
+            }
+            case S2COpenScreen.CINEMATIC -> com.mmorpg.client.cinematic.CinematicClient.start(payload.extra());
             case S2COpenScreen.CRATE -> mc.gui.setScreen(new com.mmorpg.client.screen.CrateScreen(payload.extra()));
             case S2COpenScreen.LUCKY_BLOCK -> mc.gui.setScreen(new com.mmorpg.client.screen.LuckyBlockScreen(payload.extra()));
             case S2COpenScreen.LUCKY_RESULT -> {
