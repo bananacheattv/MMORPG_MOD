@@ -26,6 +26,8 @@ NOMS = {'maitre_guerrier': ('Maître Guerrier', 'Warrior Master'), 'maitre_mage'
 def generate(ga):
     import gen_font
     gen_font.generate(ga.ASSETS)
+    import gen_decor
+    gen_decor.generate(ga)
     classes = os.path.join(os.path.dirname(__file__), '..', 'art', 'classes_blockbench')
     for folder, key in MAITRES:
         for suffix in ('', '_emissive'):

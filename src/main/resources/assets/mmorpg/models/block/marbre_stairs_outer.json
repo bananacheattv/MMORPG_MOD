@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "mmorpg:block/marbre",
+    "top": "mmorpg:block/marbre",
+    "side": "mmorpg:block/marbre"
+  }
+}

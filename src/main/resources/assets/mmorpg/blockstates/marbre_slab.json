@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "mmorpg:block/marbre_slab"
+    },
+    "type=top": {
+      "model": "mmorpg:block/marbre_slab_top"
+    },
+    "type=double": {
+      "model": "mmorpg:block/marbre"
+    }
+  }
+}

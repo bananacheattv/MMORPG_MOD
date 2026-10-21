@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "mmorpg:block/bois_ancien_slab"
+    },
+    "type=top": {
+      "model": "mmorpg:block/bois_ancien_slab_top"
+    },
+    "type=double": {
+      "model": "mmorpg:block/bois_ancien"
+    }
+  }
+}

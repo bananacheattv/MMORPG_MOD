@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "mmorpg:block/tuile_ecarlate_slab"
+    },
+    "type=top": {
+      "model": "mmorpg:block/tuile_ecarlate_slab_top"
+    },
+    "type=double": {
+      "model": "mmorpg:block/tuile_ecarlate"
+    }
+  }
+}

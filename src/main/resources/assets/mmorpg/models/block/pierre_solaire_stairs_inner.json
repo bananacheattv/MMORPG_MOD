@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/inner_stairs",
+  "textures": {
+    "bottom": "mmorpg:block/pierre_solaire",
+    "top": "mmorpg:block/pierre_solaire",
+    "side": "mmorpg:block/pierre_solaire"
+  }
+}

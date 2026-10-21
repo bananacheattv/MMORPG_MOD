@@ -45,6 +45,13 @@ public final class ModCreativeTabs {
             })
             .build());
 
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> BUILDER = TABS.register("batisseur", () -> CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup.mmorpg.batisseur"))
+            .withTabsBefore(OBJECTS.getKey())
+            .icon(() -> new ItemStack(DecorBlocks.get("marbre_dore")))
+            .displayItems((params, out) -> DecorBlocks.ITEMS.forEach(i -> out.accept(i.get())))
+            .build());
+
     private ModCreativeTabs() {
     }
 }

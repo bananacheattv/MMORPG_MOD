@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "mmorpg:block/fer_noirci",
+    "top": "mmorpg:block/fer_noirci",
+    "side": "mmorpg:block/fer_noirci"
+  }
+}
