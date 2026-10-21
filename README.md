@@ -124,6 +124,12 @@ Les familiers sont des **modèles 3D animés** (Blockbench, `art/familiers_block
 
 Immobiles un moment, ils se reposent : le loup s'assoit puis s'endort, le golem et la chouette s'endorment, le slime s'aplatit, le feu follet entre en canalisation. À l'invocation, ils jouent une animation de joie.
 
+## Hub d'entrée
+
+Un opérateur construit le hub avec `/mmorpg hub` : place centrale, quatre zones de classe, salle d'épreuve, aire d'entraînement avec des mannequins, Téléporteur vers les villes et donjons. Le point d'apparition du monde y est placé.
+
+À sa première connexion, un joueur sans classe voit une **cinématique** (caméra fluide, barres cinéma, titres, sons et particules ; Espace ou Échap pour passer) qui survole le hub et présente les quatre classes. Il parle ensuite aux **Maîtres de classe**, des PNJ au modèle animé propre à chaque classe : il peut **essayer** n'importe quelle classe à un niveau choisi (1, 25, 50, 75 ou 100) dans la salle d'épreuve, avec son équipement et ses compétences, sans rien gagner ni perdre (son personnage est entièrement restauré à la sortie), puis **choisir** définitivement celle qu'il a essayée. Le Téléporteur du hub reste fermé tant qu'aucune classe n'est choisie.
+
 ## Mannequins d'entraînement
 
 Trois mannequins (standard, blindé, magique) pour mesurer ses dégâts : on les fabrique à la Forge Arcanique et on les pose avec un clic droit. Ils sont immortels, immobiles et ne ripostent pas ; un panneau au-dessus d'eux affiche le DPS sur 10 s, le total, le plus gros coup et les critiques (accroupi + clic droit pour remettre à zéro). Le blindé résiste aux coups physiques, le magique aux sorts. Réglages dans `config/mmorpg/mannequin.json`.

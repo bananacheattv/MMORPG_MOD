@@ -75,3 +75,13 @@ Seul le proprietaire peut monter. La monture invoquee disparait si son proprieta
 - Réglages : `config/mmorpg/mannequin.json` (niveau affiché, fenêtre du DPS, portée du panneau, défense physique / magique de chaque variante). `/mmorpg reload` les recharge.
 - Modèles et animations (Blockbench) : `art/mannequin_blockbench/` (`python generer_mannequin.py`).
 
+## Hub d'entrée, cinématique et essai des classes
+
+- `/mmorpg hub` construit le hub à ta position (place centrale, 4 zones de classe, salle d'épreuve, aire d'entraînement, Téléporteur vers les villes et donjons, Maître des classes) et **fixe le point d'apparition du monde dessus**. Tant qu'il n'existe pas, il n'y a pas de cinématique.
+- **Première connexion sans classe** : cinématique d'arrivée (survol du hub, présentation des 4 classes, retour au joueur), puis le joueur parle aux **Maîtres de classe**. Elle se saute avec Espace ou Échap.
+- `/mmorpg cinematique [joueur]` la rejoue (les Maîtres de classe proposent aussi de la revoir).
+- **Essai d'une classe** : un Maître de classe permet d'essayer sa classe au niveau 1, 25, 50, 75 ou 100 dans la salle d'épreuve, avec arme, panoplie et compétences correspondantes. Rien ne se gagne pendant l'essai (ni XP, ni or, ni butin, ni progression de quête). À la fin (sortie de la salle, PNJ, déconnexion, changement de dimension, plantage puis reconnexion), tout le personnage est restauré à l'identique (classe, niveau, XP, attributs, sac, équipement, barre de sorts, familier et monture actifs).
+- **Choix définitif** : seulement auprès d'un Maître de classe et seulement après avoir essayé la classe (les opérateurs peuvent choisir directement). Le Téléporteur du hub reste bloqué tant qu'aucune classe n'est choisie.
+- `/mmorpg essai fin [joueur]` met fin de force à un essai (restauration complète).
+- Réglages : `config/mmorpg/cinematique.json` (plans, trajectoires de caméra, rythme, fov, titres, sons, particules ; coordonnées relatives à la place centrale du hub ; `/mmorpg cinematique` relit le fichier à chaque lancement). Le hub contient aussi des mannequins d'entraînement (voir plus haut).
+
