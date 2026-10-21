@@ -16,7 +16,24 @@ DUMMIES = [
 ]
 
 
+MAITRES = [('guerrier', 'maitre_guerrier'), ('mage', 'maitre_mage'), ('archer', 'maitre_archer'), ('tank', 'maitre_tank'),
+           ('epreuve', 'gardien_epreuve')]
+NOMS = {'maitre_guerrier': ('Maître Guerrier', 'Warrior Master'), 'maitre_mage': ('Maître Mage', 'Mage Master'),
+        'maitre_archer': ('Maître Archer', 'Archer Master'), 'maitre_tank': ('Maître Tank', 'Tank Master'),
+        'gardien_epreuve': ("Gardien de l'épreuve", 'Trial Guardian')}
+
+
 def generate(ga):
+    classes = os.path.join(os.path.dirname(__file__), '..', 'art', 'classes_blockbench')
+    for folder, key in MAITRES:
+        for suffix in ('', '_emissive'):
+            src = os.path.join(classes, folder, f'{key}{suffix}.png')
+            if os.path.isfile(src):
+                shutil.copyfile(src, ga.path(ga.ASSETS, 'textures', 'entity', 'hub', f'{key}{suffix}.png'))
+            else:
+                print(f'ATTENTION : texture du maitre {key}{suffix} absente (lancer art/classes_blockbench/generer_classes.py)')
+        ga.LANG[f'entity.{ga.MODID}.maitre_classe'] = 'Maître de classe'
+        ga.LANG_EN[f'entity.{ga.MODID}.maitre_classe'] = 'Class Master'
     art = os.path.join(os.path.dirname(__file__), '..', 'art', 'mannequin_blockbench')
     for item_id, variant, key, fr, en in DUMMIES:
         for suffix in ('', '_emissive'):
