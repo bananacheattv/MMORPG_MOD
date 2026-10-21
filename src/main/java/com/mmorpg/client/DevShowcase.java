@@ -1645,6 +1645,14 @@ public final class DevShowcase {
                 cmd(mc, "gamemode spectator " + me);
                 hubView(mc, me, (double) v[1], (double) v[2], (double) v[3], (double) v[4], (double) v[5], (double) v[6]);
             }
+            if (tick == first + i * 60 + 40) {
+                MMORPG.LOGGER.info("[MMORPG] PERF vue {} : {} fps, entites {}, particules [{}]", v[0], mc.getFps(), mc.level.getEntityCount(), mc.particleEngine.countParticles());
+                java.util.Map<String, Integer> byType = new java.util.TreeMap<>();
+                for (var en : mc.level.entitiesForRendering()) byType.merge(net.minecraft.world.entity.EntityType.getKey(en.getType()).toString(), 1, Integer::sum);
+                StringBuilder sb = new StringBuilder();
+                byType.entrySet().stream().sorted((x, y) -> y.getValue() - x.getValue()).limit(6).forEach(en -> sb.append(en.getKey()).append('=').append(en.getValue()).append(' '));
+                MMORPG.LOGGER.info("[MMORPG] PERF types : {}", sb);
+            }
             if (tick == first + i * 60 + 45) shot(mc, String.format("15%02d_hub_%s", i, v[0]));
         }
         int night = first + DESIGN_VIEWS.length * 60 + 10;

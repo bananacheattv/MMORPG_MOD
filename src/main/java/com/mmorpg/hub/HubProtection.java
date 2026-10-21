@@ -16,6 +16,7 @@ import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
@@ -73,6 +74,27 @@ public final class HubProtection {
         if (event.getSpawnType() == EntitySpawnReason.COMMAND || event.getSpawnType() == EntitySpawnReason.SPAWN_ITEM_USE) return;
         if (!(mob instanceof Enemy) && !(mob instanceof com.mmorpg.entity.RpgMob)) return;
         if (inHub(mob.level(), mob.blockPosition())) event.setSpawnCancelled(true);
+    }
+
+    /** Nettoyage des anciens exemplaires du hub (identifiant non stable) qui s'etaient accumules a chaque reconstruction. */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onJoin(EntityJoinLevelEvent event) {
+        if (!(event.getLevel() instanceof ServerLevel sl) || !sl.dimension().equals(HubManager.HUB_DIM)) return;
+        Entity e = event.getEntity();
+        if (HubBuilder.isStable(e.getUUID())) return;
+        HubData hub = HubData.get(sl.getServer());
+        if (!hub.exists() || hub.origin() == null) return;
+        // objets au sol sans proprietaire : fleurs, herbes et lanternes qui se detachent pendant la construction (jamais ceux jetes par un joueur)
+        if (e instanceof net.minecraft.world.entity.item.ItemEntity item && item.getOwner() == null
+                && HubLayout.hubBounds(hub.origin()).contains(e.getX(), e.getY(), e.getZ())) {
+            event.setCanceled(true);
+            return;
+        }
+        boolean legacy = e instanceof com.mmorpg.entity.hub.ClassMasterEntity
+                || (e instanceof com.mmorpg.entity.NpcEntity n && "maitre_classes".equals(n.group()))
+                || (e instanceof net.minecraft.world.entity.Display.TextDisplay && e.entityTags().contains(HubBuilder.TAG))
+                || (e instanceof com.mmorpg.entity.dummy.TrainingDummyEntity && HubBuilder.isDummySlot(hub.origin(), e.getX(), e.getZ()));
+        if (legacy) event.setCanceled(true);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)

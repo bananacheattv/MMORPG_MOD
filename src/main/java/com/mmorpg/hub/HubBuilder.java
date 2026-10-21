@@ -21,7 +21,11 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.phys.AABB;
 
+import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Construction du hub d'entree (/mmorpg hub) : la « Citadelle d'Eldoria », une ile celeste a face inferieure rocheuse effilee
@@ -41,9 +45,33 @@ public final class HubBuilder {
     static final Block[] FLOWERS = {Blocks.DANDELION, Blocks.POPPY, Blocks.CORNFLOWER, Blocks.AZURE_BLUET, Blocks.ALLIUM,
             Blocks.OXEYE_DAISY, Blocks.PINK_TULIP, Blocks.LILY_OF_THE_VALLEY};
 
+    /** Identifiant stable d'une entite du hub : reconstruire le hub ne cree donc jamais de doublon, meme dans une zone non chargee. */
+    static UUID stable(String key) {
+        return UUID.nameUUIDFromBytes(("eldoria-hub:" + key).getBytes(StandardCharsets.UTF_8));
+    }
+
+    private static final Set<UUID> STABLE = new HashSet<>();
+
+    static {
+        for (int i = 0; i < 8; i++) STABLE.add(stable("master:" + i));
+        STABLE.add(stable("npc:maitre"));
+        for (int i = 0; i < 16; i++) {
+            STABLE.add(stable("dummy:room:" + i));
+            STABLE.add(stable("dummy:yard:" + i));
+        }
+        for (int i = 0; i < 40; i++) STABLE.add(stable("text:" + i));
+    }
+
+    public static boolean isStable(UUID id) {
+        return STABLE.contains(id);
+    }
+
+    private static int textIndex;
+
     /** Construit le hub avec sa place centrale au niveau {@code feet} (sol en dessous) et renvoie le centre. */
     public static BlockPos build(ServerLevel level, BlockPos feet) {
         HubCtx c = new HubCtx(level, feet.immutable());
+        textIndex = 0;
         removeOld(c);
         computeMasks(c);
         terrain(c);
@@ -352,9 +380,12 @@ public final class HubBuilder {
     // ================================================================== textes en police Eldoria
 
     static void text(HubCtx c, double x, double y, double z, String text, String color, float scale) {
+        UUID id = stable("text:" + textIndex++);
         String snbt = String.format(Locale.ROOT, "{text:{text:\"%s\",font:\"mmorpg:eldoria\",color:\"%s\"},billboard:\"center\",background:0,shadow:true,"
-                + "see_through:false,line_width:600,Tags:[\"%s\"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],"
-                + "translation:[0f,0f,0f],scale:[%.2ff,%.2ff,%.2ff]}}", text.replace("\"", "\\\""), color, TAG, scale, scale, scale);
+                + "see_through:false,line_width:600,Tags:[\"%s\"],UUID:[I;%d,%d,%d,%d],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],"
+                + "translation:[0f,0f,0f],scale:[%.2ff,%.2ff,%.2ff]}}", text.replace("\"", "\\\""), color, TAG,
+                (int) (id.getMostSignificantBits() >> 32), (int) id.getMostSignificantBits(), (int) (id.getLeastSignificantBits() >> 32),
+                (int) id.getLeastSignificantBits(), scale, scale, scale);
         CommandSourceStack src = c.L.getServer().createCommandSourceStack().withLevel(c.L).withSuppressedOutput();
         c.L.getServer().getCommands().performPrefixedCommand(src,
                 String.format(Locale.ROOT, "summon minecraft:text_display %.2f %.2f %.2f %s", c.O.getX() + x + 0.5, c.O.getY() + y, c.O.getZ() + z + 0.5, snbt));
@@ -392,17 +423,23 @@ public final class HubBuilder {
     }
 
     private static void entities(HubCtx c) {
-        var master = com.mmorpg.world.DungeonBuilder.spawnNpc(c.L, HubLayout.pos(c.O, HubLayout.CLASS_MASTER), com.mmorpg.entity.NpcEntity.Role.QUETES,
-                "Maître des classes", 2, 0F);
-        if (master != null) master.setup(com.mmorpg.entity.NpcEntity.Role.QUETES, "Maître des classes", 2, "maitre_classes");
+        var master = ModEntities.NPC.get().create(c.L, EntitySpawnReason.COMMAND);
+        if (master != null) {
+            BlockPos mp = HubLayout.pos(c.O, HubLayout.CLASS_MASTER);
+            master.snapTo(mp.getX() + 0.5, mp.getY(), mp.getZ() + 0.5, 0F, 0F);
+            master.setYHeadRot(0F);
+            master.setup(com.mmorpg.entity.NpcEntity.Role.QUETES, "Maître des classes", 2, "maitre_classes");
+            master.setUUID(stable("npc:maitre"));
+            c.L.addFreshEntity(master);
+        }
         for (int k = 0; k < 4; k++) {
             PlayerClass cls = CLASSES[k];
             int[] s = HubLayout.classSpot(cls);
             spawnMaster(c, k, s[0], 1, s[2], HubLayout.classYaw(cls));
         }
         spawnMaster(c, ClassMasterEntity.EPREUVE, HubLayout.TRIAL_MASTER[0], 0, HubLayout.TRIAL_MASTER[2], 90F);
-        for (int[] d : HubLayout.DUMMIES_ROOM) spawnDummy(c, d);
-        for (int[] d : HubLayout.DUMMIES_YARD) spawnDummy(c, d);
+        for (int i = 0; i < HubLayout.DUMMIES_ROOM.length; i++) spawnDummy(c, HubLayout.DUMMIES_ROOM[i], "room:" + i);
+        for (int i = 0; i < HubLayout.DUMMIES_YARD.length; i++) spawnDummy(c, HubLayout.DUMMIES_YARD[i], "yard:" + i);
     }
 
     private static void spawnMaster(HubCtx c, int kind, int x, int y, int z, float yaw) {
@@ -412,14 +449,26 @@ public final class HubBuilder {
         npc.setYHeadRot(yaw);
         npc.setYBodyRot(yaw);
         npc.setup(kind);
+        npc.setUUID(stable("master:" + kind));
         c.L.addFreshEntity(npc);
     }
 
-    private static void spawnDummy(HubCtx c, int[] d) {
+    /** Une case de mannequin du hub se trouve-t-elle a cet endroit (a 1,5 bloc pres) ? */
+    public static boolean isDummySlot(BlockPos origin, double x, double z) {
+        for (int[][] set : new int[][][]{HubLayout.DUMMIES_ROOM, HubLayout.DUMMIES_YARD}) {
+            for (int[] d : set) {
+                if (Math.abs(x - (origin.getX() + d[0] + 0.5)) < 1.5 && Math.abs(z - (origin.getZ() + d[1] + 0.5)) < 1.5) return true;
+            }
+        }
+        return false;
+    }
+
+    private static void spawnDummy(HubCtx c, int[] d, String key) {
         TrainingDummyEntity e = ModEntities.TRAINING_DUMMY.get().create(c.L, EntitySpawnReason.COMMAND);
         if (e == null) return;
         e.snapTo(c.O.getX() + d[0] + 0.5, c.O.getY(), c.O.getZ() + d[1] + 0.5, d[3], 0F);
         e.setup(d[2]);
+        e.setUUID(stable("dummy:" + key));
         c.L.addFreshEntity(e);
     }
 }
