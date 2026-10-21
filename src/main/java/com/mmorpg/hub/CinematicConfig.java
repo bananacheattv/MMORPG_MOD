@@ -105,7 +105,7 @@ public final class CinematicConfig {
                   "camera": [[8.5, 3.6, 8.5], [11, 3.8, 11], [14, 4.0, 14]],
                   "cible": [[20, 3.2, 20], [21, 5.5, 21], [22, 6.8, 22]],
                   "fov": [[0, 66], [1, 54]],
-                  "titre": {"texte": "LE TANK", "sous": "Vitalité et Endurance — le rempart du groupe", "couleur": "#58A8FF", "debut": 0.18, "fin": 0.92},
+                  "titre": {"texte": "LE PALADIN", "sous": "Vitalité et Endurance — le rempart du groupe", "couleur": "#58A8FF", "debut": 0.18, "fin": 0.92},
                   "sons": [
                     {"t": 0.0, "son": "minecraft:item.shield.block", "volume": 0.8, "hauteur": 0.8},
                     {"t": 0.4, "son": "minecraft:block.anvil.land", "volume": 0.4, "hauteur": 0.7}

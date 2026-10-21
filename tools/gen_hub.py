@@ -19,11 +19,45 @@ DUMMIES = [
 MAITRES = [('guerrier', 'maitre_guerrier'), ('mage', 'maitre_mage'), ('archer', 'maitre_archer'), ('tank', 'maitre_tank'),
            ('epreuve', 'gardien_epreuve')]
 NOMS = {'maitre_guerrier': ('Maître Guerrier', 'Warrior Master'), 'maitre_mage': ('Maître Mage', 'Mage Master'),
-        'maitre_archer': ('Maître Archer', 'Archer Master'), 'maitre_tank': ('Maître Tank', 'Tank Master'),
+        'maitre_archer': ('Maître Archer', 'Archer Master'), 'maitre_tank': ('Maître Paladin', 'Paladin Master'),
         'gardien_epreuve': ("Gardien de l'épreuve", 'Trial Guardian')}
 
 
+def hub_dimension(ga):
+    """Dimension dediee du hub (vide, hauteur 256, cycle jour/nuit du monde principal, aucune apparition de monstres)."""
+    ga.write_json(os.path.join(ga.DATA, ga.MODID, 'dimension_type', 'hub.json'), {
+        'ambient_light': 0.05,
+        'attributes': {
+            'minecraft:visual/cloud_color': '#ccffffff',
+            'minecraft:visual/cloud_height': 176.0,
+            'minecraft:gameplay/bed_rule': {'can_set_spawn': 'never', 'can_sleep': 'never', 'explodes': False},
+            'minecraft:gameplay/respawn_anchor_works': False,
+        },
+        'coordinate_scale': 1.0,
+        'has_ceiling': False,
+        'has_ender_dragon_fight': False,
+        'has_fixed_time': False,
+        'has_skylight': True,
+        'height': 256,
+        'infiniburn': '#minecraft:infiniburn_overworld',
+        'logical_height': 256,
+        'min_y': 0,
+        'monster_spawn_block_light_limit': 0,
+        'monster_spawn_light_level': 0,
+        'skybox': 'overworld',
+        'timelines': '#minecraft:in_overworld',
+        'default_clock': 'minecraft:overworld',
+    })
+    ga.write_json(os.path.join(ga.DATA, ga.MODID, 'dimension', 'hub.json'), {
+        'type': f'{ga.MODID}:hub',
+        'generator': {'type': 'minecraft:flat', 'settings': {
+            'biome': 'minecraft:the_void', 'features': False, 'lakes': False,
+            'layers': [{'block': 'minecraft:air', 'height': 1}], 'structure_overrides': []}},
+    })
+
+
 def generate(ga):
+    hub_dimension(ga)
     import gen_font
     gen_font.generate(ga.ASSETS)
     import gen_decor

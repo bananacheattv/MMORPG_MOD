@@ -42,7 +42,7 @@ public final class RpgCommands {
     }
 
     public static void register(CommandDispatcher<CommandSourceStack> d) {
-        List<String> classes = Arrays.stream(PlayerClass.values()).map(PlayerClass::id).toList();
+        List<String> classes = Arrays.stream(PlayerClass.values()).map(c -> c == PlayerClass.TANK ? "paladin" : c.id()).toList();
         List<String> bosses = List.of("roi_gobelin", "liche_ancienne", "seigneur_ignis", "titan_glace", "avatar_neant");
         List<String> mobs = new ArrayList<>(ModEntities.SPAWNABLE.keySet());
         List<String> dungeons = Arrays.stream(DungeonBuilder.DungeonType.values()).map(t -> t.id).toList();
@@ -298,11 +298,14 @@ public final class RpgCommands {
     }
 
     private static int buildHub(CommandContext<CommandSourceStack> c) {
-        var level = c.getSource().getLevel();
-        BlockPos feet = BlockPos.containing(c.getSource().getPosition());
+        var level = c.getSource().getServer().getLevel(com.mmorpg.hub.HubManager.HUB_DIM);
+        if (level == null) {
+            c.getSource().sendFailure(Component.literal("La dimension du hub (mmorpg:hub) est introuvable : le mod est-il à jour sur ce monde ?"));
+            return 0;
+        }
         c.getSource().sendSuccess(() -> ok("Construction de la Citadelle d'Eldoria en cours..."), false);
-        com.mmorpg.hub.HubBuilder.build(level, feet);
-        c.getSource().sendSuccess(() -> ok("Hub d'Eldoria construit en " + feet.toShortString() + " : rotonde, bassin, 4 pavillons de classe, portail, arène d'épreuve, aire d'entraînement, téléporteur. Point d'apparition du monde défini sur le hub."), true);
+        com.mmorpg.hub.HubBuilder.build(level, com.mmorpg.hub.HubManager.HUB_ORIGIN);
+        c.getSource().sendSuccess(() -> ok("Hub d'Eldoria construit dans la dimension mmorpg:hub : rotonde, bassin, 4 pavillons de classe, portail, arène d'épreuve, aire d'entraînement, téléporteur. Point d'apparition du monde défini sur le hub : utilisez /hub pour vous y rendre."), true);
         return 1;
     }
 
@@ -324,7 +327,7 @@ public final class RpgCommands {
 
     /** /hub (tous les joueurs), /hub set, /hub reset <joueur> et /class set <joueur> <classe> (operateurs). */
     public static void registerHub(CommandDispatcher<CommandSourceStack> d) {
-        List<String> classes = Arrays.stream(PlayerClass.values()).map(PlayerClass::id).toList();
+        List<String> classes = Arrays.stream(PlayerClass.values()).map(c -> c == PlayerClass.TANK ? "paladin" : c.id()).toList();
         d.register(Commands.literal("hub")
                 .executes(c -> {
                     ServerPlayer p = c.getSource().getPlayerOrException();

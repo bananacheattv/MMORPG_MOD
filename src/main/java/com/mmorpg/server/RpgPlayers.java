@@ -556,6 +556,7 @@ public final class RpgPlayers {
                         com.mmorpg.hub.CinematicManager.start(player, true);
                     } else {
                         hubData.cinematicSeen = true;
+                        com.mmorpg.hub.HubManager.goToHub(player);
                         player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Parlez aux Maîtres de classe : essayez, puis choisissez votre voie.").withColor(0xFFE6A0));
                     }
                 }

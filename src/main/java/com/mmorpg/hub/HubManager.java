@@ -16,6 +16,27 @@ import java.util.Set;
 
 /** Dialogues et actions des PNJ du hub : essayer une classe, la choisir, quitter l'essai, revoir la cinematique. */
 public final class HubManager {
+    /** Dimension dediee du hub (data/mmorpg/dimension/hub.json) et origine de sa construction. */
+    public static final net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> HUB_DIM =
+            net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION, com.mmorpg.MMORPG.id("hub"));
+    public static final net.minecraft.core.BlockPos HUB_ORIGIN = new net.minecraft.core.BlockPos(0, 96, 0);
+    public static final String EXIT_NAME = "Monde principal";
+
+    /** Destination « Monde principal » du Teleporteur du hub : l'ancien point d'apparition du monde (cree a la construction du hub). */
+    public static void registerExit(net.minecraft.server.MinecraftServer server, net.minecraft.core.BlockPos overworldSpawn) {
+        com.mmorpg.world.WaypointData data = com.mmorpg.world.WaypointData.get(server);
+        for (var w : data.all()) if (EXIT_NAME.equals(w.name)) return;
+        data.create(net.minecraft.world.level.Level.OVERWORLD, overworldSpawn, EXIT_NAME, com.mmorpg.world.WaypointData.CITY, 1, new java.util.UUID(0, 0));
+    }
+
+    /** Le Teleporteur du hub donne aussi la destination « Monde principal ». */
+    public static void grantExit(ServerPlayer p, com.mmorpg.world.WaypointData.Waypoint used) {
+        if (!used.dimension.equals(HUB_DIM)) return;
+        for (var w : com.mmorpg.world.WaypointData.get(p.level().getServer()).all()) {
+            if (EXIT_NAME.equals(w.name)) RpgPlayers.get(p).waypoints.add(w.id);
+        }
+    }
+
     /** Interrupteur reserve aux tests automatises (DevShowcase) : traite le joueur comme un non-operateur. */
     public static volatile boolean forceNonOperator = false;
 

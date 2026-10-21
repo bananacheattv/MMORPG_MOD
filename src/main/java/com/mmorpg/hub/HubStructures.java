@@ -59,7 +59,7 @@ final class HubStructures {
                         s = Blocks.AIR.defaultBlockState();
                         if (y < 6 && Math.abs(x) <= 6) s = Blocks.AIR.defaultBlockState();
                     } else if (d <= 7.6 && y >= 6) s = c.state(y == 13 && x == 0 ? "or_ouvrage" : "marbre_dore");
-                    else if (y >= 12 && y <= 13) s = c.state("or_ouvrage");
+                    else if (y >= 12 && y <= 13) s = c.state(y == 12 && Math.abs(x) % 2 == 0 ? "cristal_ambre" : "or_ouvrage");
                     else s = c.mix(x, y, z, 66, "pierre_solaire", 50, "marbre", 30, "marbre_poli", 20);
                     c.set(x, y, z, s);
                 }
@@ -78,7 +78,8 @@ final class HubStructures {
         for (int y = 0; y <= 22; y++) {
             final int yy = y;
             c.ring(tx, y, tz, 3.6, 5.2, (x, yq, z) -> {
-                if (yy == 0 || yy == 12 || yy == 22) return c.state("or_ouvrage");
+                if (yy == 12) return (x + z) % 2 == 0 ? c.state("cristal_ambre") : c.state("or_ouvrage");
+                if (yy == 0 || yy == 22) return c.state("or_ouvrage");
                 if (yy % 6 == 5) return c.state("marbre_dore");
                 return c.mix(x, yy, z, 67, "pierre_solaire", 50, "marbre", 30, "marbre_poli", 20);
             });
@@ -147,6 +148,7 @@ final class HubStructures {
                         : HubBuilder.FLOWERS[(int) (c.rnd(x, 2, z, 84) * HubBuilder.FLOWERS.length) % HubBuilder.FLOWERS.length].defaultBlockState());
             }
         }
+        for (int z = -31; z >= -49; z -= 6) for (int s : new int[]{-6, 6}) HubBuilder.lamp(c, s, z);
         for (int z = -34; z >= -50; z -= 6) {                    // arches en plein cintre
             for (int s : new int[]{-1, 1}) {
                 for (int y = 0; y <= 5; y++) c.set(s * 5, y, z, y == 0 ? c.state("marbre_dore") : c.state("colonne_marbre"));
@@ -157,7 +159,7 @@ final class HubStructures {
                     if (d > 4.2 && d <= 6.0) c.set(x, y, z, d > 5.2 && y > 9 ? c.state("or_ouvrage") : c.state("marbre"));
                 }
             }
-            c.set(0, 11, z, "or_ouvrage");
+            c.set(0, 11, z, "cristal_azur");
             c.set(0, 6, z, c.hanging(Blocks.LANTERN));
         }
     }
@@ -189,7 +191,7 @@ final class HubStructures {
             double m = a % 22.5;
             if (y == 7 || y == 14) return c.state("or_ouvrage");
             if (y >= 4 && y <= 11 && m > 6.5 && m < 16 && Math.hypot(x, z - zc) > R - 0.6) return glass();
-            if (m < 2.4 || m > 20.1) return c.state("marbre_dore");
+            if (m < 2.4 || m > 20.1) return y == 3 || y == 10 ? c.state("cristal_ambre") : c.state("marbre_dore");
             return c.mix(x, y, z, 92, "pierre_solaire", 45, "marbre", 30, "marbre_poli", 25);
         });
         for (int x = -7; x <= 7; x++) {                              // entree au sud : grande arche
@@ -257,6 +259,13 @@ final class HubStructures {
             if (Math.abs(z) <= 3 && x < cx) return null;
             return ((x + z) & 1) == 0 ? c.state(Blocks.SPRUCE_FENCE) : null;
         });
+        for (int k = 0; k < 24; k += 2) {                              // lanternes sur la palissade
+            double a = Math.toRadians(k * 15);
+            int lx = cx + (int) Math.round(Math.cos(a) * 15.1);
+            int lz = (int) Math.round(Math.sin(a) * 15.1);
+            if (c.get(lx, 4, lz).getBlock() == Blocks.SPRUCE_FENCE) c.set(lx, 5, lz, Blocks.LANTERN);
+            else if (Math.abs(lz) > 3 || lx > cx) c.set(lx, 4, lz, Blocks.LANTERN);
+        }
         for (int k = 0; k < 4; k++) {                                 // tours de guet rondes
             double a = Math.toRadians(k * 90 + 45);
             int tx = cx + (int) Math.round(Math.cos(a) * 15.6);

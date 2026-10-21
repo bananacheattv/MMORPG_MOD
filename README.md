@@ -29,7 +29,7 @@ Mod MMORPG complet : 4 classes qui évoluent (niveaux 1 à 100), 28 compétences
 | Guerrier | Guerrier | Berserker | Seigneur de Guerre | Champion Légendaire | Dieu de la Guerre |
 | Mage | Mage | Sorcier | Archimage | Arcaniste Suprême | Avatar des Arcanes |
 | Archer | Archer | Rôdeur | Tireur d'Élite | Sentinelle Sylvestre | Archer Divin |
-| Tank | Tank | Gardien | Paladin | Rempart Sacré | Titan Immortel |
+| Paladin | Paladin | Gardien | Templier | Rempart Sacré | Titan Immortel |
 
 ### Compétences (7 par classe, rangs 1 à 5)
 
@@ -38,7 +38,7 @@ Une compétence se débloque au rang 1 dès que son niveau est atteint. On gagne
 - **Guerrier** : Frappe Puissante, Cri de Guerre, Maîtrise des Armes (passif), Tourbillon d'Acier (25), Charge Brutale (50), Rage Sanguinaire (75), Fureur du Dieu de la Guerre (100, ultime).
 - **Mage** : Boule de Feu, Nova de Givre, Flux Arcanique (passif), Éclair en Chaîne (25), Transfert Arcanique (50), Bouclier de Mana (75), Météore Céleste (100, ultime).
 - **Archer** : Tir Perçant, Pluie de Flèches, Œil de Lynx (passif), Saut Acrobatique (25), Flèche Explosive (50), Volée de Flèches (75), Tempête Divine (100, ultime).
-- **Tank** : Coup de Bouclier, Provocation, Peau de Fer (passif), Forteresse (25), Onde de Choc (50), Aura Sacrée (75), Rempart du Titan (100, ultime).
+- **Paladin** : Coup de Bouclier, Provocation, Peau de Fer (passif), Forteresse (25), Onde de Choc (50), Aura Sacrée (75), Rempart du Titan (100, ultime).
 
 ## Statistiques
 
@@ -49,7 +49,7 @@ Une compétence se débloque au rang 1 dès que son niveau est atteint. On gagne
   | Guerrier | Force, **Férocité** | Attaque, PV ; dégâts critiques, vol de vie |
   | Archer | Agilité, **Dextérité** | Attaque, esquive, vitesse ; critique, vitesse d'attaque |
   | Mage | Intelligence, Esprit | Puissance magique, mana ; régénération, recharges |
-  | Tank | Vitalité, **Endurance** | PV, défense ; défense, régénération de vie |
+  | Paladin | Vitalité, **Endurance** | PV, défense ; défense, régénération de vie |
 - **14 statistiques dérivées** : PV, Mana, Attaque, Puissance magique, Défense, Critique, Dégâts critiques, Esquive, Vitesse, Vitesse d'attaque, Régénération de vie et de mana, Vol de vie, Réduction de recharge.
 - **Ordre de calcul** : attributs → formules → bonus d'équipement, de familier et de sets → multiplicateur d'évolution → bonus en % → plafonds (critique 75 %, esquive 45 %, recharge 40 %…).
 - **Réduction de dégâts** : `DEF / (DEF + 200 + 10 × niveau de l'attaquant)`, plafonnée à 80 %.
@@ -126,7 +126,7 @@ Immobiles un moment, ils se reposent : le loup s'assoit puis s'endort, le golem 
 
 ## Hub d'entrée
 
-Un opérateur construit le hub avec `/hub set` (ou `/mmorpg hub`) : la **Citadelle d'Eldoria**, une grande île céleste (face inférieure rocheuse, cascades, lianes et cristaux lumineux, îlots flottants) avec une place de 31 blocs de rayon, sa **rotonde à dôme vitré** et son bassin annulaire à ponts, **quatre pavillons de classe** à colonnade ronde (chacun avec une grande sculpture : épée du Guerrier, obélisque du Mage, arc de l'Archer, bouclier du Tank), un **portail à tours rondes**, le Téléporteur vers les villes et donjons, une **arène d'épreuve** à dôme et une **aire d'entraînement** circulaire avec ses mannequins. Le point d'apparition du monde y est placé. Les joueurs reviennent au hub avec `/hub`.
+Un opérateur construit le hub avec `/hub set` (ou `/mmorpg hub`) dans sa **dimension dédiée** `mmorpg:hub` (vide, cycle jour/nuit du monde principal, sans monstres) : la **Citadelle d'Eldoria**, une grande île céleste (face inférieure rocheuse, cascades, lianes et cristaux lumineux, îlots flottants) avec une place de 31 blocs de rayon, sa **rotonde à dôme vitré** et son bassin annulaire à ponts, **quatre pavillons de classe** à colonnade ronde (chacun avec une grande sculpture : épée du Guerrier, obélisque du Mage, arc de l'Archer, bouclier du Paladin), un **portail à tours rondes**, le Téléporteur vers les villes et donjons, une **arène d'épreuve** à dôme et une **aire d'entraînement** circulaire avec ses mannequins. Le point d'apparition du monde y est placé. Les joueurs reviennent au hub avec `/hub` ; le Téléporteur du hub propose aussi la destination **« Monde principal »** (l'ancien point d'apparition du monde). La nuit, la citadelle reste éclairée : lampadaires, lanternes, cristaux lumineux dans les nervures du dôme et les colonnades, rangées lumineuses au sol des pavillons, palissade éclairée.
 
 Le hub est **protégé** (réglage `hubProtection`) : on n'y casse ni ne pose de blocs, il n'y a ni PvP ni monstres hostiles (les opérateurs en créatif gardent la main pour l'aménager).
 

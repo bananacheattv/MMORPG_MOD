@@ -59,6 +59,11 @@ public final class HubBuilder {
         HubFlora.islets(c);
         texts(c);
         entities(c);
+        var server = level.getServer();
+        var old = server.getRespawnData();
+        if (old.globalPos().dimension().equals(net.minecraft.world.level.Level.OVERWORLD) && !level.dimension().equals(net.minecraft.world.level.Level.OVERWORLD)) {
+            HubManager.registerExit(server, old.globalPos().pos());
+        }
         BlockPos spawn = HubLayout.pos(c.O, HubLayout.SPAWN);
         level.setRespawnData(new LevelData.RespawnData(GlobalPos.of(level.dimension(), spawn), 180F, 0F));
         HubData.get(level.getServer()).set(level.dimension(), c.O);
@@ -259,6 +264,13 @@ public final class HubBuilder {
                 if ((r > 10.0 && r <= 10.6) || (r > 16.4 && r <= 17.0)) c.set(x, 0, z, c.slab("marbre_poli", false));
             }
         }
+        for (int a = 0; a < 360; a += 12) {                        // lanternes sur la levre externe du bassin
+            int x = (int) Math.round(Math.cos(Math.toRadians(a)) * 17.4);
+            int z = (int) Math.round(Math.sin(Math.toRadians(a)) * 17.4);
+            if (HubBuilder.avenue(x, z)) continue;
+            for (int y = 0; y <= 1; y++) c.set(x, y, z, Blocks.SANDSTONE_WALL);
+            c.set(x, 2, z, Blocks.LANTERN);
+        }
         for (int a = 0; a < 360; a++) {                            // balustrade du pourtour et pilastres de lanternes
             double rad = Math.toRadians(a);
             int x = (int) Math.round(Math.cos(rad) * 31);
@@ -279,7 +291,7 @@ public final class HubBuilder {
             }
         }
         for (int[] d : new int[][]{{0, 1}, {0, -1}, {1, 0}, {-1, 0}}) {   // lampadaires le long des quatre avenues
-            for (int k = 19; k <= 29; k += 5) {
+            for (int k = 12; k <= 29; k += 4) {
                 for (int s : new int[]{-3, 3}) {
                     int x = d[0] != 0 ? d[0] * k : s;
                     int z = d[1] != 0 ? d[1] * k : s;
@@ -309,13 +321,13 @@ public final class HubBuilder {
             c.set(x, 12, z, "or_ouvrage");
         }
         c.ring(0, 12, 0, 7.5, 9.8, (x, y, z) -> c.state("marbre"));       // architrave
-        c.ring(0, 13, 0, 8.0, 9.4, (x, y, z) -> c.state("or_ouvrage"));
+        c.ring(0, 13, 0, 8.0, 9.4, (x, y, z) -> (x + z) % 3 == 0 ? c.state("cristal_azur") : c.state("or_ouvrage"));
         c.dome(0, 13, 0, R + 0.8, 1.35, (x, y, z, el, az) -> {
             if (el > 76) return null;                                                         // oculus
             double m = az % 30;
             if (el < 9) return c.state("or_ouvrage");
             if (el > 68) return c.state("marbre_dore");
-            if (m < 2.6 || m > 27.4) return c.state("marbre_dore");                           // nervures
+            if (m < 2.6 || m > 27.4) return el > 24 && el < 36 ? c.state("cristal_azur") : c.state("marbre_dore");   // nervures, a cristaux lumineux
             if (el > 14 && m > 7 && m < 23) return Blocks.STAINED_GLASS.pick(DyeColor.LIGHT_BLUE).defaultBlockState();
             return c.state("tuile_azur");
         });
@@ -357,7 +369,7 @@ public final class HubBuilder {
                 case GUERRIER -> new String[]{"LE GUERRIER", "#FF6A50"};
                 case MAGE -> new String[]{"LE MAGE", "#B07CFF"};
                 case ARCHER -> new String[]{"L'ARCHER", "#6CE06C"};
-                default -> new String[]{"LE TANK", "#58A8FF"};
+                default -> new String[]{"LE PALADIN", "#58A8FF"};
             };
             text(c, s[0], 25, s[2], t[0], t[1], 6F);
         }

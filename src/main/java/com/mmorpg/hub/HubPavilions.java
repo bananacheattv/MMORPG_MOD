@@ -15,15 +15,15 @@ final class HubPavilions {
     private HubPavilions() {
     }
 
-    private record Theme(Object a, Object b, Object accent, Object column, Object cap, Object trim) {
+    private record Theme(Object a, Object b, Object accent, Object column, Object cap, Object trim, Object light) {
     }
 
     private static Theme theme(PlayerClass cls) {
         return switch (cls) {
-            case GUERRIER -> new Theme(Blocks.POLISHED_BLACKSTONE_BRICKS, "fer_noirci", Blocks.RED_NETHER_BRICKS, "fer_noirci", "or_ouvrage", "tuile_ecarlate");
-            case MAGE -> new Theme("marbre_poli", "marbre", "tuile_pourpre", "colonne_marbre", "cristal_arcane", "tuile_pourpre");
-            case ARCHER -> new Theme(Blocks.MOSS_BLOCK, "bois_ancien", Blocks.GRASS_BLOCK, Blocks.STRIPPED_DARK_OAK_LOG, "bois_ancien", "tuile_sylve");
-            default -> new Theme("pierre_azur", "marbre_poli", "tuile_givre", "colonne_marbre", "pierre_azur", "tuile_givre");
+            case GUERRIER -> new Theme(Blocks.POLISHED_BLACKSTONE_BRICKS, "fer_noirci", Blocks.RED_NETHER_BRICKS, "fer_noirci", "or_ouvrage", "tuile_ecarlate", "cristal_ambre");
+            case MAGE -> new Theme("marbre_poli", "marbre", "tuile_pourpre", "colonne_marbre", "cristal_arcane", "tuile_pourpre", "cristal_arcane");
+            case ARCHER -> new Theme(Blocks.MOSS_BLOCK, "bois_ancien", Blocks.GRASS_BLOCK, Blocks.STRIPPED_DARK_OAK_LOG, "bois_ancien", "tuile_sylve", Blocks.VERDANT_FROGLIGHT);
+            default -> new Theme("pierre_azur", "marbre_poli", "tuile_givre", "colonne_marbre", "pierre_azur", "tuile_givre", "cristal_azur");
         };
     }
 
@@ -52,7 +52,7 @@ final class HubPavilions {
             double dz = z - cz;
             double r = Math.hypot(dx, dz);
             if (r > 10.3) return c.state(t.accent());
-            if (r > 8.2) return c.mix(x, y, z, 41, t.b(), 55, t.a(), 45);
+            if (r > 8.2) return r <= 9.6 && ((x + z) & 3) == 0 ? c.state(t.light()) : c.mix(x, y, z, 41, t.b(), 55, t.a(), 45);
             if (r > 7.2) return c.state(t.trim());
             if (r > 3.4 && spoke(dx, dz) < 5.5 * 4.0 / r + 1.2) return c.state(t.trim());
             if (r > 5.8 && r <= 6.4) return c.state(t.cap());
@@ -152,7 +152,8 @@ final class HubPavilions {
         }
         for (int y = 3; y <= 21; y++) c.set(bx + 1, y, bz, Blocks.IRON_CHAIN);        // corde
         c.line(bx - 3, 12, bz, bx + 9, 12, bz, c.state("fer_noirci"));                // fleche encochee
-        c.set(bx + 10, 12, bz, "or_ouvrage");
+        c.set(bx + 10, 12, bz, Blocks.GLOWSTONE);
+        c.set(bx + 1, 22, bz, Blocks.LANTERN);
         c.set(bx - 3, 13, bz, "marbre");
         c.set(bx - 3, 11, bz, "marbre");
         c.set(bx - 4, 12, bz, "marbre");
@@ -171,7 +172,7 @@ final class HubPavilions {
                 if (d > R) continue;
                 BlockState b;
                 if (d > R - 1.3) b = c.state("or_ouvrage");
-                else if (d <= 1.9) b = c.state("or_ouvrage");
+                else if (d <= 1.9) b = c.state(Blocks.SEA_LANTERN);
                 else if (Math.abs(dx) < 1.2 || Math.abs(dy) < 1.2) b = c.state("marbre");
                 else b = (dx > 0) == (dy > 0) ? c.state("pierre_azur") : c.state("tuile_givre");
                 for (int dz = 0; dz < 2; dz++) c.set(x, y, bz + sz * dz, b);

@@ -62,6 +62,7 @@ public final class TeleportManager {
             return;
         }
         PlayerData d = RpgPlayers.get(player);
+        com.mmorpg.hub.HubManager.grantExit(player, w);
         if (d.waypoints.add(w.id)) {
             Net.toPlayer(player, new Payloads.Notify(Payloads.Notify.DISCOVERY, "LIEU DÉCOUVERT",
                     WaypointData.CATEGORY_NAMES[Math.max(0, Math.min(2, w.category))] + " : " + w.name, 0x60C0FF));

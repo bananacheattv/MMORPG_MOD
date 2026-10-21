@@ -1411,7 +1411,7 @@ public final class DevShowcase {
                 p.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).getHoverName().getString(), p.getOffhandItem().getHoverName().getString(), String.join(",", d.skillBar), p.getX(), p.getY(), p.getZ());
     }
 
-    private static final int[] HUB_ORIGIN = {400, 181, 400};
+    private static final int[] HUB_ORIGIN = {0, 96, 0};
 
     private static void hubView(Minecraft mc, String me, double dx, double dy, double dz, double tx, double ty, double tz) {
         double yaw = Math.toDegrees(Math.atan2(-(tx - dx), tz - dz));
@@ -1442,6 +1442,7 @@ public final class DevShowcase {
             cmd(mc, String.format("tp %s %d %d %d", me, HUB_ORIGIN[0], HUB_ORIGIN[1], HUB_ORIGIN[2]));
         }
         if (tick == 30) cmd(mc, "mmorpg hub");
+        if (tick == 60) cmd(mc, "hub");
         if (tick == 80) {
             MMORPG.LOGGER.info("[MMORPG] HUB construit : {} maitres, {} mannequins",
                     mc.level.getEntitiesOfClass(com.mmorpg.entity.hub.ClassMasterEntity.class, mc.player.getBoundingBox().inflate(120)).size(),
@@ -1585,7 +1586,7 @@ public final class DevShowcase {
         if (tick == 862) {
             var pl = sp(mc, me);
             var lvl = (net.minecraft.server.level.ServerLevel) pl.level();
-            var target = new net.minecraft.core.BlockPos(HUB_ORIGIN[0] + 5, HUB_ORIGIN[1] - 1, HUB_ORIGIN[2] + 14);
+            var target = new net.minecraft.core.BlockPos(HUB_ORIGIN[0] + 18, HUB_ORIGIN[1] - 1, HUB_ORIGIN[2]);
             com.mmorpg.hub.HubManager.forceNonOperator = true;
             pl.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
             boolean before = !lvl.getBlockState(target).isAir();
@@ -1635,6 +1636,7 @@ public final class DevShowcase {
             cmd(mc, String.format("tp %s %d %d %d", me, HUB_ORIGIN[0], HUB_ORIGIN[1], HUB_ORIGIN[2]));
         }
         if (tick == 30) cmd(mc, "mmorpg hub");
+        if (tick == 60) cmd(mc, "hub");
         if (tick == 31) cmd(mc, "gamemode creative " + me);
         int first = 420;
         for (int i = 0; i < DESIGN_VIEWS.length; i++) {
