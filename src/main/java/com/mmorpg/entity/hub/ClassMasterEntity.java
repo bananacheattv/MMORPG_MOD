@@ -26,14 +26,14 @@ import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 /**
- * PNJ du hub : un Maitre par classe (Guerrier, Mage, Archer, Tank), qui presente la classe, la fait essayer puis la fait choisir,
+ * PNJ du hub : un Maitre par classe (Guerrier, Mage, Archer, Paladin), qui presente la classe, la fait essayer puis la fait choisir,
  * et le Gardien de l'epreuve (salle d'essai : changer de classe ou de niveau, choisir, quitter). Chaque maitre a son modele
  * Blockbench anime et ses effets. Immobile, invulnerable et persistant ; un clic gauche ou droit ouvre le dialogue.
  */
 public class ClassMasterEntity extends PathfinderMob {
     public static final int GUERRIER = 0, MAGE = 1, ARCHER = 2, TANK = 3, EPREUVE = 4;
     public static final String[] IDS = {"guerrier", "mage", "archer", "tank", "epreuve"};
-    public static final String[] NAMES = {"Maître Guerrier", "Maître Mage", "Maître Archer", "Maître Tank", "Gardien de l'épreuve"};
+    public static final String[] NAMES = {"Maître Guerrier", "Maître Mage", "Maître Archer", "Maître Paladin", "Gardien de l'épreuve"};
 
     private static final EntityDataAccessor<Integer> KIND = SynchedEntityData.defineId(ClassMasterEntity.class, EntityDataSerializers.INT);
 

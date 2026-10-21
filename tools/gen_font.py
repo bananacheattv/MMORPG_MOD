@@ -162,7 +162,7 @@ def generate(assets_dir):
 
 
 def preview(path):
-    text = ["ELDORIA", "LE GUERRIER - LE MAGE", "L'ARCHER, LE TANK", "A VOUS DE JOUER !", "ÉPREUVE DES HÉROS 0123456789", "Maître des classes"]
+    text = ["ELDORIA", "LE GUERRIER - LE MAGE", "L'ARCHER, LE PALADIN", "A VOUS DE JOUER !", "ÉPREUVE DES HÉROS 0123456789", "Maître des classes"]
     scale = 4
     img = Image.new('RGBA', (420 * scale // 2, (len(text) * 14 + 4) * scale), (40, 36, 52, 255))
     y = 2

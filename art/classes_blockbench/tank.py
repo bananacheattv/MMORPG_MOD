@@ -6,7 +6,7 @@ import entity_kit as ek
 from classes_common import pal, Mat, Decal
 
 KEY = 'maitre_tank'
-TITLE = 'Maître Tank'
+TITLE = 'Maître Paladin'
 ENTITY_CLASS = 'MaitreTankEntity'
 VISIBLE_BOX = (1.2, 2.4, 0)
 

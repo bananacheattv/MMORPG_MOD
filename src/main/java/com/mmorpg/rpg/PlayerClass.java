@@ -25,9 +25,9 @@ public enum PlayerClass {
             "Rapide et précis, l'Archer élimine ses cibles avant qu'elles ne l'atteignent. Son Agilité augmente ses coups critiques et son esquive, ses flèches pleuvent sur le champ de bataille.",
             new double[]{4, 10, 3, 4, 3, 3, 8, 3}, new double[]{0.8, 2.2, 0.4, 1.0, 0.6, 0.5, 1.8, 0.5},
             85, 9, 3, new int[]{4, 2, 1, 5, 3}),
-    TANK("Tank", 0xFF3D8BD8, "Protecteur — défense et contrôle",
-            new String[]{"Tank", "Gardien", "Paladin", "Rempart Sacré", "Titan Immortel"},
-            "Bouclier vivant du groupe, le Tank attire l'attention des monstres et résiste aux pires assauts. Sa Vitalité colossale et ses auras sacrées protègent ses compagnons.",
+    TANK("Paladin", 0xFF3D8BD8, "Protecteur — défense et contrôle",
+            new String[]{"Paladin", "Gardien", "Templier", "Rempart Sacré", "Titan Immortel"},
+            "Bouclier vivant du groupe, le Paladin attire l'attention des monstres et résiste aux pires assauts. Sa Vitalité colossale et ses auras sacrées protègent ses compagnons.",
             new double[]{6, 2, 2, 10, 4, 3, 2, 9}, new double[]{1.2, 0.3, 0.2, 2.5, 0.8, 0.5, 0.3, 2.0},
             150, 19, 2, new int[]{2, 5, 1, 1, 2});
 
