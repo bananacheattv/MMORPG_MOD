@@ -369,6 +369,19 @@ public final class TrialManager {
         handleClick(event.getLevel(), event.getPos(), event.getEntity(), event);
     }
 
+    /** Dernier clic pris en compte pour chaque joueur (temps de jeu). */
+    private static final Map<UUID, Long> LAST_CLICK = new HashMap<>();
+    /** Un clic droit arrive deux fois au serveur (main puis main secondaire), et un clic gauche peut s'y ajouter : on ignore tout clic qui suit le precedent de moins de 0,3 s. */
+    private static final int CLICK_COOLDOWN_TICKS = 6;
+
+    private static boolean freshClick(ServerLevel level, ServerPlayer sp) {
+        long now = level.getGameTime();
+        Long last = LAST_CLICK.get(sp.getUUID());
+        if (last != null && now - last < CLICK_COOLDOWN_TICKS && now >= last) return false;
+        LAST_CLICK.put(sp.getUUID(), now);
+        return true;
+    }
+
     private static void handleClick(net.minecraft.world.level.Level lv, BlockPos pos, net.minecraft.world.entity.player.Player player, net.neoforged.bus.api.Event ev) {
         if (!(lv instanceof ServerLevel level) || !(player instanceof ServerPlayer sp)) return;
         TrialData data = TrialData.get(level.getServer());
@@ -377,6 +390,7 @@ public final class TrialManager {
             if ((!t.kind().equals(TrialData.SIMON) && !order) || !t.dim().equals(level.dimension())) continue;
             if (!order && t.pos().get(0) == pos.getX() && t.pos().get(1) == pos.getY() && t.pos().get(2) == pos.getZ()) {
                 cancel(ev);
+                if (!freshClick(level, sp)) return;
                 if (t.done()) sp.sendOverlayMessage(Component.literal("Cette énigme est déjà résolue.").withColor(0xA0E0A0));
                 else startSimon(level, t, sp);
                 return;
@@ -384,6 +398,7 @@ public final class TrialManager {
             for (int k = 0; k * 3 + 2 < t.pads().size(); k++) {
                 if (t.pads().get(k * 3) == pos.getX() && t.pads().get(k * 3 + 1) == pos.getY() && t.pads().get(k * 3 + 2) == pos.getZ()) {
                     cancel(ev);
+                    if (!freshClick(level, sp)) return;
                     padPressed(level, data, t, sp, k);
                     return;
                 }
@@ -569,6 +584,11 @@ public final class TrialManager {
     public static List<Integer> debugSequence(String id) {
         Simon s = SIMON.get(id);
         return s == null ? List.of() : List.copyOf(s.seq);
+    }
+
+    public static String debugSimon(String id) {
+        Simon s = SIMON.get(id);
+        return s == null ? "aucune" : "progression " + s.progress + "/" + s.seq.size() + " saisie " + s.input + " generation " + s.generation;
     }
 
     public static boolean debugInputReady(String id) {

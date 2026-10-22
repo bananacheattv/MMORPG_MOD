@@ -25,6 +25,7 @@ public final class Net {
         r.playToClient(Payloads.BossReveal.TYPE, Payloads.BossReveal.CODEC);
         r.playToClient(Payloads.Loading.TYPE, Payloads.Loading.CODEC);
         r.playToClient(Payloads.DeathInfo.TYPE, Payloads.DeathInfo.CODEC);
+        r.playToClient(Payloads.DungeonMusic.TYPE, Payloads.DungeonMusic.CODEC);
         r.playToServer(Payloads.DungeonEnter.TYPE, Payloads.DungeonEnter.CODEC, (packet, ctx) -> {
             if (ctx.player() instanceof ServerPlayer p) com.mmorpg.dungeon.DungeonMaster.enter(p, packet);
         });

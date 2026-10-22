@@ -232,5 +232,59 @@
         "name": "mmorpg:sfx/coins"
       }
     ]
+  },
+  "dungeon.crypte_gobeline": {
+    "category": "music",
+    "sounds": [
+      {
+        "name": "mmorpg:music/donjon_crypte_gobeline",
+        "stream": true
+      }
+    ]
+  },
+  "dungeon.catacombes": {
+    "category": "music",
+    "sounds": [
+      {
+        "name": "mmorpg:music/donjon_catacombes",
+        "stream": true
+      }
+    ]
+  },
+  "dungeon.forteresse_infernale": {
+    "category": "music",
+    "sounds": [
+      {
+        "name": "mmorpg:music/donjon_forteresse_infernale",
+        "stream": true
+      }
+    ]
+  },
+  "dungeon.sanctuaire_glace": {
+    "category": "music",
+    "sounds": [
+      {
+        "name": "mmorpg:music/donjon_sanctuaire_glace",
+        "stream": true
+      }
+    ]
+  },
+  "dungeon.citadelle_neant": {
+    "category": "music",
+    "sounds": [
+      {
+        "name": "mmorpg:music/donjon_citadelle_neant",
+        "stream": true
+      }
+    ]
+  },
+  "dungeon.boss": {
+    "category": "music",
+    "sounds": [
+      {
+        "name": "mmorpg:music/donjon_boss",
+        "stream": true
+      }
+    ]
   }
 }

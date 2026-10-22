@@ -420,6 +420,29 @@ public final class DevShowcase {
             }
             return;
         }
+        if (MODE.equals("menumusique")) {
+            if (tick == 5) cmd(mc, "gamemode survival");
+            if (tick == 20) com.mmorpg.client.screen.MenuScreen.open(com.mmorpg.client.screen.MenuScreen.Tab.PERSONNAGE);
+            if (tick == 40) shot(mc, "menu_musique_70");
+            if (tick == 45) com.mmorpg.client.ClientConfig.AMBIENT_MUSIC_VOLUME.set(40);
+            if (tick == 60) shot(mc, "menu_musique_40");
+            if (tick == 65) com.mmorpg.client.ClientConfig.AMBIENT_MUSIC_VOLUME.set(0);
+            if (tick == 80) shot(mc, "menu_musique_0");
+            if (tick == 85) com.mmorpg.client.ClientConfig.AMBIENT_MUSIC_VOLUME.set(70);
+            if (tick == 100) {
+                MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+                stop(mc);
+            }
+            return;
+        }
+        if (MODE.equals("musique")) {
+            musicPhase(mc, me);
+            return;
+        }
+        if (MODE.equals("dalles")) {
+            dallesPhase(mc, me);
+            return;
+        }
         if (MODE.equals("mort")) {
             deathPhase(mc, me);
             return;
@@ -2840,6 +2863,113 @@ public final class DevShowcase {
         if (d == null) return;
         d.hp = d.maxHp * fraction;
         bossRef.syncData(com.mmorpg.registry.ModAttachments.MOB);
+    }
+
+    /** Musique des donjons : entree dans le donjon, dans l'antre du boss, puis sortie. */
+    private static void musicPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) {
+            cmd(mc, "gamemode creative");
+            cmd(mc, "execute in minecraft:overworld run tp " + me + " 6000 150 6000 0 0");
+        }
+        if (tick == 8 && !mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        if (tick == 130) srv.execute(() -> dungeonBase = srv.getPlayerList().getPlayerByName(me).blockPosition());
+        if (tick == 135) cmd(mc, "mmorpg donjon construire sanctuaire_glace");
+        if (tick == 330) MMORPG.LOGGER.info("[MMORPG] MUSIQUE depart hors donjon");
+        if (tick == 340) srv.execute(() -> hubTeleport(srv, me, dungeonBase.getX(), dungeonBase.getY(), dungeonBase.getZ() + 8));
+        if (tick == 520) srv.execute(() -> {
+            MMORPG.LOGGER.info("[MMORPG] MUSIQUE dans le hall : piste active cote client = {}", com.mmorpg.client.DungeonMusicClient.debugState());
+            hubTeleport(srv, me, dungeonBase.getX(), dungeonBase.getY(), dungeonBase.getZ() + com.mmorpg.dungeon.Layout.ARENA.z0() + 3);
+        });
+        if (tick == 700) srv.execute(() -> {
+            MMORPG.LOGGER.info("[MMORPG] MUSIQUE dans l'antre : piste active cote client = {}", com.mmorpg.client.DungeonMusicClient.debugState());
+            hubTeleport(srv, me, dungeonBase.getX(), dungeonBase.getY(), dungeonBase.getZ() + com.mmorpg.dungeon.Layout.ARENA.z0() - 25);
+        });
+        if (tick == 880) srv.execute(() -> {
+            MMORPG.LOGGER.info("[MMORPG] MUSIQUE de retour dans la galerie : piste active cote client = {}", com.mmorpg.client.DungeonMusicClient.debugState());
+            hubTeleport(srv, me, dungeonBase.getX() + 200, 150, dungeonBase.getZ() - 200);
+        });
+        if (tick == 1080) {
+            MMORPG.LOGGER.info("[MMORPG] MUSIQUE hors donjon : piste active cote client = {}", com.mmorpg.client.DungeonMusicClient.debugState());
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        }
+    }
+
+    /** Clic droit reel sur un bloc, tel que le serveur le recoit : une fois pour chaque main (principale puis secondaire). */
+    private static void realClick(net.minecraft.server.level.ServerPlayer p, net.minecraft.core.BlockPos pos) {
+        for (var hand : net.minecraft.world.InteractionHand.values()) {
+            var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pos), net.minecraft.core.Direction.UP, pos, false);
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock(p, hand, pos, hit));
+        }
+    }
+
+    private static com.mmorpg.dungeon.TrialData.Trial nearTrial(net.minecraft.server.MinecraftServer srv, String kind) {
+        for (var t : com.mmorpg.dungeon.TrialData.get(srv).all()) {
+            if (t.kind().equals(kind) && Math.abs(t.pos().get(0) - 6000) < 40 && t.pos().get(2) > 5990) return t;
+        }
+        return null;
+    }
+
+    /** Enigmes a dalles avec de vrais clics (deux evenements par clic, comme en jeu) : sequence puis ordre. */
+    private static void dallesPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) {
+            cmd(mc, "gamemode survival");
+            cmd(mc, "execute in minecraft:overworld run tp " + me + " 6000 150 6000 0 0");
+        }
+        if (tick == 8 && !mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        if (tick == 10) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            pl.getAbilities().invulnerable = true;
+            pl.onUpdateAbilities();
+        });
+        if (tick == 130) srv.execute(() -> dungeonBase = srv.getPlayerList().getPlayerByName(me).blockPosition());
+        if (tick == 135) cmd(mc, "mmorpg donjon construire catacombes");
+        if (tick == 330) srv.execute(() -> {
+            var p = srv.getPlayerList().getPlayerByName(me);
+            var t = nearTrial(srv, "simon");
+            MMORPG.LOGGER.info("[MMORPG] DALLES enigme de sequence trouvee = {}", t != null);
+            hubTeleport(srv, me, t.pos().get(0), t.pos().get(1), t.pos().get(2) + 3);
+            realClick(p, new net.minecraft.core.BlockPos(t.pos().get(0), t.pos().get(1), t.pos().get(2)));      // lutrin
+        });
+        if (tick == 330 + 250) srv.execute(() -> {
+            var t = nearTrial(srv, "simon");
+            MMORPG.LOGGER.info("[MMORPG] DALLES saisie ouverte = {} ; sequence {}", com.mmorpg.dungeon.TrialManager.debugInputReady(t.id()), com.mmorpg.dungeon.TrialManager.debugSequence(t.id()));
+        });
+        for (int i = 0; i < 8; i++) {
+            int k = i;
+            if (tick == 330 + 260 + k * 10) srv.execute(() -> {
+                var p = srv.getPlayerList().getPlayerByName(me);
+                var t = nearTrial(srv, "simon");
+                var seq = com.mmorpg.dungeon.TrialManager.debugSequence(t.id());
+                if (k < seq.size() && !t.done()) {
+                    int pad = seq.get(k);
+                    realClick(p, new net.minecraft.core.BlockPos(t.pads().get(pad * 3), t.pads().get(pad * 3 + 1), t.pads().get(pad * 3 + 2)));
+                    MMORPG.LOGGER.info("[MMORPG] DALLES clic {} sur la dalle {} -> {}", k, pad, com.mmorpg.dungeon.TrialManager.debugSimon(t.id()));
+                }
+            });
+        }
+        if (tick == 330 + 260 + 100) srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] DALLES sequence resolue avec de vrais clics = {} (attendu true)", nearTrial(srv, "simon").done()));
+        if (tick == 330 + 380) srv.execute(() -> {
+            var t = nearTrial(srv, "order");
+            MMORPG.LOGGER.info("[MMORPG] DALLES enigme d'ordre trouvee = {} ; ordre {}", t != null, t.mobs());
+            hubTeleport(srv, me, t.pos().get(0), t.pos().get(1), t.pos().get(2) + 3);
+        });
+        for (int i = 0; i < 4; i++) {
+            int k = i;
+            if (tick == 330 + 400 + k * 10) srv.execute(() -> {
+                var p = srv.getPlayerList().getPlayerByName(me);
+                var t = nearTrial(srv, "order");
+                int pad = Integer.parseInt(t.mobs().get(k));
+                realClick(p, new net.minecraft.core.BlockPos(t.pads().get(pad * 3), t.pads().get(pad * 3 + 1), t.pads().get(pad * 3 + 2)));
+            });
+        }
+        if (tick == 330 + 460) srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] DALLES ordre resolu avec de vrais clics = {} (attendu true)", nearTrial(srv, "order").done()));
+        if (tick == 330 + 480) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        }
     }
 
     /** Ecran de mort personnalise : le joueur (guerrier niveau 20) meurt, l'ecran affiche l'experience perdue ; puis il renait. */

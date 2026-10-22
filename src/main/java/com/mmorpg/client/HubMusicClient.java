@@ -97,7 +97,7 @@ public final class HubMusicClient {
                     return;
                 }
             }
-            this.volume = Math.max(0.0001F, v * 0.9F);
+            this.volume = Math.max(0.0001F, v * 0.9F * ClientConfig.ambientMusic());
         }
 
         @Override

@@ -412,6 +412,7 @@
   "key.mmorpg.skip": "Passer la cinématique",
   "mmorpg.configuration.hudScale": "Échelle de l'interface MMORPG",
   "mmorpg.configuration.showDamageNumbers": "Afficher les dégâts flottants",
+  "mmorpg.configuration.ambientMusicVolume": "Volume de la musique d'ambiance (hub et donjons)",
   "mmorpg.configuration.showNameplates": "Afficher les barres de vie des monstres",
   "mmorpg.configuration.showOwnCosmetics": "Afficher ses propres cosmétiques",
   "mmorpg.configuration.title": "Configuration MMORPG",

@@ -19,7 +19,17 @@ public final class ClientConfig {
             .translation("mmorpg.configuration.showOwnCosmetics")
             .define("showOwnCosmetics", false);
 
+    public static final ModConfigSpec.IntValue AMBIENT_MUSIC_VOLUME = BUILDER
+            .comment("Volume de la musique d'ambiance du hub et des donjons, en pourcentage (0 = coupée)")
+            .translation("mmorpg.configuration.ambientMusicVolume")
+            .defineInRange("ambientMusicVolume", 70, 0, 100);
+
     public static final ModConfigSpec SPEC = BUILDER.build();
+
+    /** Volume de la musique d'ambiance entre 0 et 1. */
+    public static float ambientMusic() {
+        return AMBIENT_MUSIC_VOLUME.get() / 100F;
+    }
 
     private ClientConfig() {
     }

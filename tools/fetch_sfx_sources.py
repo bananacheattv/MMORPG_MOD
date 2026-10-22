@@ -23,6 +23,8 @@ PAGES = [
     'cc0-deep-monster-roar', 'pleasing-bell-sound-effect', 'magic-spell-sfx', 'energy-drain', 'teleport-spell', 'cure-magic',
     'flight-or-spell-sound', 'portal-sound', 'swishes-sound-pack', 'air-whoosh', 'heartbeat-sounds', 'horde-war-drums-loop',
     '10-impactshield-blocks', '20-sword-sound-effects-attacks-and-clashes',
+    # musiques d'ambiance des donjons (voir build_music.py) ; « node/<id> » quand le nom de la page est inconnu
+    'dungeon-ambience', 'dark-cavern-ambient', 'hells-god-part-2', 'beyond-the-frozen-veil', 'node/159643', 'node/55649',
 ]
 EXT = ('.zip', '.ogg', '.wav', '.mp3', '.flac')
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
@@ -50,9 +52,9 @@ def main():
     os.makedirs(cache, exist_ok=True)
     credits = []
     for slug in PAGES:
-        out = os.path.join(cache, slug)
+        out = os.path.join(cache, slug.replace('/', '_'))
         try:
-            page = get(f'{BASE}/content/{slug}').decode('utf-8', 'replace')
+            page = get(f'{BASE}/' + (slug if slug.startswith('node/') else f'content/{slug}')).decode('utf-8', 'replace')
         except Exception as e:                                   # noqa: BLE001
             print('ECHEC page', slug, e)
             continue
@@ -60,7 +62,7 @@ def main():
             print('IGNORE (licence non CC0)', slug)
             continue
         title, author = meta(page, slug)
-        credits.append((title, author, f'{BASE}/content/{slug}'))
+        credits.append((title, author, f'{BASE}/' + (slug if slug.startswith('node/') else f'content/{slug}')))
         if os.path.isdir(out) and os.listdir(out):
             continue
         urls = []

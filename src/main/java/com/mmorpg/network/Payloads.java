@@ -120,6 +120,17 @@ public final class Payloads {
         }
     }
 
+    /** Musique d'ambiance d'un donjon : nom du donjon, « boss » dans l'antre, ou vide hors des donjons. */
+    public record DungeonMusic(String track) implements CustomPacketPayload {
+        public static final Type<DungeonMusic> TYPE = new Type<>(MMORPG.id("dungeon_music"));
+        public static final StreamCodec<ByteBuf, DungeonMusic> CODEC = StreamCodec.composite(ByteBufCodecs.STRING_UTF8, DungeonMusic::track, DungeonMusic::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
     /** Cinematique d'apparition d'un boss invoque a l'autel (camera pilotee cote client). */
     public record BossReveal(int x, int y, int z, int ticks) implements CustomPacketPayload {
         public static final Type<BossReveal> TYPE = new Type<>(MMORPG.id("boss_reveal"));

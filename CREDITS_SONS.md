@@ -22,3 +22,9 @@ Les effets sonores d'Eldoria (`src/main/resources/assets/mmorpg/sounds/sfx/`) so
 - **Horde War Drums loop** — William Hector — <https://opengameart.org/content/horde-war-drums-loop>
 - **10 Impact/Shield Blocks** — StarNinjas — <https://opengameart.org/content/10-impactshield-blocks>
 - **20 Sword Sound Effects (Attacks and Clashes)** — StarNinjas — <https://opengameart.org/content/20-sword-sound-effects-attacks-and-clashes>
+- **Dungeon Ambience** — yd — <https://opengameart.org/content/dungeon-ambience>
+- **Dark Cavern Ambient** — Paul Wortmann — <https://opengameart.org/content/dark-cavern-ambient>
+- **Hell's God - part 2** — Centurion_of_war — <https://opengameart.org/content/hells-god-part-2>
+- **Beyond the Frozen Veil** — Synth-thetic — <https://opengameart.org/content/beyond-the-frozen-veil>
+- **Dark Place (loop)** — SkyleTheFrench — <https://opengameart.org/node/159643>
+- **Boss Battle Music** — SubspaceAudio — <https://opengameart.org/node/55649>
