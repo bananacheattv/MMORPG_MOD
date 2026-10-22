@@ -7,5 +7,14 @@
         "stream": true
       }
     ]
+  },
+  "hub.ambiance": {
+    "category": "music",
+    "sounds": [
+      {
+        "name": "mmorpg:music/eldoria_hub",
+        "stream": true
+      }
+    ]
   }
 }

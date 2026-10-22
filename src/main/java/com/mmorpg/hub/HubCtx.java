@@ -21,64 +21,64 @@ import net.minecraft.world.level.block.state.properties.SlabType;
  * Contexte de construction du hub : monde, origine, masques de l'ile et primitives de forme (disques, anneaux, murs cylindriques,
  * domes, ellipsoides, lignes) avec melanges de materiaux deterministes. Toutes les coordonnees sont relatives a l'origine.
  */
-final class HubCtx {
+public final class HubCtx {
     /** Choisit le bloc d'une cellule d'une forme ; {@code null} laisse la cellule intacte. */
-    interface Pick {
+    public interface Pick {
         BlockState at(int x, int y, int z);
     }
 
     /** Idem pour un dome : {@code elev} (degres, 0 = base, 90 = sommet) et {@code az} (degres, 0..360). */
-    interface DomePick {
+    public interface DomePick {
         BlockState at(int x, int y, int z, double elev, double az);
     }
 
-    final ServerLevel L;
-    final BlockPos O;
+    public final ServerLevel L;
+    public final BlockPos O;
     static final int X0 = -56, X1 = 80, Z0 = -112, Z1 = 70;
     boolean[][] foot;
     boolean[][] isle;
     float[][] edge;
 
-    HubCtx(ServerLevel level, BlockPos origin) {
+    public HubCtx(ServerLevel level, BlockPos origin) {
         this.L = level;
         this.O = origin;
     }
 
     // ------------------------------------------------------------------ blocs
 
-    void set(int x, int y, int z, BlockState s) {
+    public void set(int x, int y, int z, BlockState s) {
         Block b = s.getBlock();
         boolean shaped = b instanceof WallBlock || b instanceof CrossCollisionBlock || b instanceof IronBarsBlock;
         L.setBlock(O.offset(x, y, z), s, shaped ? Block.UPDATE_ALL : Block.UPDATE_CLIENTS);
     }
 
-    void set(int x, int y, int z, Block b) {
+    public void set(int x, int y, int z, Block b) {
         set(x, y, z, b.defaultBlockState());
     }
 
-    void set(int x, int y, int z, String decor) {
+    public void set(int x, int y, int z, String decor) {
         set(x, y, z, com.mmorpg.registry.DecorBlocks.state(decor));
     }
 
-    BlockState state(Object o) {
+    public BlockState state(Object o) {
         if (o instanceof BlockState s) return s;
         if (o instanceof Block b) return b.defaultBlockState();
         return com.mmorpg.registry.DecorBlocks.state((String) o);
     }
 
-    boolean air(int x, int y, int z) {
+    public boolean air(int x, int y, int z) {
         return L.getBlockState(O.offset(x, y, z)).isAir();
     }
 
-    BlockState get(int x, int y, int z) {
+    public BlockState get(int x, int y, int z) {
         return L.getBlockState(O.offset(x, y, z));
     }
 
-    void setIfAir(int x, int y, int z, BlockState s) {
+    public void setIfAir(int x, int y, int z, BlockState s) {
         if (air(x, y, z)) set(x, y, z, s);
     }
 
-    void fill(int x0, int y0, int z0, int x1, int y1, int z1, Object block) {
+    public void fill(int x0, int y0, int z0, int x1, int y1, int z1, Object block) {
         BlockState s = state(block);
         for (int x = Math.min(x0, x1); x <= Math.max(x0, x1); x++)
             for (int y = Math.min(y0, y1); y <= Math.max(y0, y1); y++)
@@ -91,37 +91,37 @@ final class HubCtx {
         return com.mmorpg.registry.DecorBlocks.has(id + suffix) ? id + suffix : "marbre" + suffix;
     }
 
-    BlockState stair(Object block, Direction facing, boolean top) {
+    public BlockState stair(Object block, Direction facing, boolean top) {
         return state(variant(block, "_stairs")).setValue(StairBlock.FACING, facing).setValue(StairBlock.HALF, top ? Half.TOP : Half.BOTTOM);
     }
 
-    BlockState slab(Object block, boolean top) {
+    public BlockState slab(Object block, boolean top) {
         return state(variant(block, "_slab")).setValue(SlabBlock.TYPE, top ? SlabType.TOP : SlabType.BOTTOM);
     }
 
-    BlockState axis(Object block, Direction.Axis a) {
+    public BlockState axis(Object block, Direction.Axis a) {
         BlockState st = state(block);
         return st.hasProperty(RotatedPillarBlock.AXIS) ? st.setValue(RotatedPillarBlock.AXIS, a) : st;
     }
 
-    BlockState leaves(Block b) {
+    public BlockState leaves(Block b) {
         return b.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
     }
 
-    BlockState hanging(Block lantern) {
+    public BlockState hanging(Block lantern) {
         return lantern.defaultBlockState().setValue(LanternBlock.HANGING, true);
     }
 
     // ------------------------------------------------------------------ hasard et melanges
 
-    float rnd(int x, int y, int z, int salt) {
+    public float rnd(int x, int y, int z, int salt) {
         long v = x * 374761393L + y * 668265263L + z * 2147483647L + salt * 1274126177L;
         v = (v ^ (v >>> 13)) * 1274126177L;
         v ^= v >>> 16;
         return (v & 0xFFFFL) / 65535F;
     }
 
-    float noise(float x, float z, float scale, int salt) {
+    public float noise(float x, float z, float scale, int salt) {
         float fx = x / scale;
         float fz = z / scale;
         int ix = Mth.floor(fx);
@@ -138,7 +138,7 @@ final class HubCtx {
     }
 
     /** Melange pondere : {@code mix(x, y, z, salt, "marbre", 50, Blocks.QUARTZ_BRICKS, 20, ...)} (bloc ou identifiant de decor, poids). */
-    BlockState mix(int x, int y, int z, int salt, Object... pairs) {
+    public BlockState mix(int x, int y, int z, int salt, Object... pairs) {
         int total = 0;
         for (int i = 1; i < pairs.length; i += 2) total += (Integer) pairs[i];
         float r = rnd(x, y, z, salt) * total;
@@ -152,7 +152,7 @@ final class HubCtx {
 
     // ------------------------------------------------------------------ formes
 
-    void disc(int cx, int y, int cz, double r, Pick p) {
+    public void disc(int cx, int y, int cz, double r, Pick p) {
         int n = (int) Math.ceil(r) + 1;
         for (int x = cx - n; x <= cx + n; x++) {
             for (int z = cz - n; z <= cz + n; z++) {
@@ -163,7 +163,7 @@ final class HubCtx {
         }
     }
 
-    void ring(int cx, int y, int cz, double r0, double r1, Pick p) {
+    public void ring(int cx, int y, int cz, double r0, double r1, Pick p) {
         int n = (int) Math.ceil(r1) + 1;
         for (int x = cx - n; x <= cx + n; x++) {
             for (int z = cz - n; z <= cz + n; z++) {
@@ -176,12 +176,12 @@ final class HubCtx {
     }
 
     /** Mur cylindrique d'epaisseur {@code thick} dont la face externe est a {@code r}. */
-    void wall(int cx, int cz, double r, int y0, int y1, double thick, Pick p) {
+    public void wall(int cx, int cz, double r, int y0, int y1, double thick, Pick p) {
         for (int y = y0; y <= y1; y++) ring(cx, y, cz, r - thick, r, p);
     }
 
     /** Coque de dome (hemisphere superieur) de rayon {@code R} et d'epaisseur {@code thick}, centree en (cx, cy, cz). */
-    void dome(int cx, int cy, int cz, double R, double thick, DomePick p) {
+    public void dome(int cx, int cy, int cz, double R, double thick, DomePick p) {
         int n = (int) Math.ceil(R) + 1;
         for (int x = cx - n; x <= cx + n; x++) {
             for (int y = cy; y <= cy + n; y++) {
@@ -200,7 +200,7 @@ final class HubCtx {
         }
     }
 
-    void ball(int cx, int cy, int cz, double rx, double ry, double rz, boolean onlyAir, Pick p) {
+    public void ball(int cx, int cy, int cz, double rx, double ry, double rz, boolean onlyAir, Pick p) {
         for (int x = (int) Math.floor(cx - rx); x <= Math.ceil(cx + rx); x++) {
             for (int y = (int) Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++) {
                 for (int z = (int) Math.floor(cz - rz); z <= Math.ceil(cz + rz); z++) {
@@ -214,7 +214,7 @@ final class HubCtx {
         }
     }
 
-    void line(int x0, int y0, int z0, int x1, int y1, int z1, BlockState s) {
+    public void line(int x0, int y0, int z0, int x1, int y1, int z1, BlockState s) {
         int n = Math.max(Math.abs(x1 - x0), Math.max(Math.abs(y1 - y0), Math.abs(z1 - z0)));
         for (int i = 0; i <= n; i++) {
             double t = n == 0 ? 0 : (double) i / n;
@@ -224,7 +224,7 @@ final class HubCtx {
 
     // ------------------------------------------------------------------ masques de l'ile
 
-    boolean in(boolean[][] m, int x, int z) {
+    public boolean in(boolean[][] m, int x, int z) {
         int i = x - X0;
         int j = z - Z0;
         return i >= 0 && j >= 0 && i < m.length && j < m[0].length && m[i][j];

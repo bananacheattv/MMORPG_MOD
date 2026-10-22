@@ -312,7 +312,8 @@ def generate(assets_dir):
     path = os.path.join(assets_dir, 'sounds', 'music', 'eldoria_theme.ogg')
     secs = render(path)
     with open(os.path.join(assets_dir, 'sounds.json'), 'w', encoding='utf-8', newline='\n') as f:
-        json.dump({'cinematique.theme': {'category': 'music', 'sounds': [{'name': 'mmorpg:music/eldoria_theme', 'stream': True}]}}, f, indent=2)
+        json.dump({'cinematique.theme': {'category': 'music', 'sounds': [{'name': 'mmorpg:music/eldoria_theme', 'stream': True}]},
+                   'hub.ambiance': {'category': 'music', 'sounds': [{'name': 'mmorpg:music/eldoria_hub', 'stream': True}]}}, f, indent=2)
         f.write('\n')
     print('musique generee : %.1f s' % secs)
 

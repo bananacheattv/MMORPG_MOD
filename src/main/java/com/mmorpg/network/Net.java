@@ -21,6 +21,7 @@ public final class Net {
         r.playToClient(Payloads.CombatText.TYPE, Payloads.CombatText.CODEC);
         r.playToClient(Payloads.CastAnimation.TYPE, Payloads.CastAnimation.CODEC);
         r.playToClient(Payloads.Notify.TYPE, Payloads.Notify.CODEC);
+        r.playToClient(Payloads.AreaEntry.TYPE, Payloads.AreaEntry.CODEC);
         r.playToClient(Payloads.MobInfo.TYPE, Payloads.MobInfo.CODEC);
         r.playToClient(Payloads.PartySync.TYPE, Payloads.PartySync.CODEC);
 

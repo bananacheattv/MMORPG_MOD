@@ -28,6 +28,12 @@ public final class ZoneCommands {
                 .then(Commands.literal("supprimer").then(Commands.argument("id", StringArgumentType.word())
                         .suggests((c, b) -> SharedSuggestionProvider.suggest(ids(c), b))
                         .executes(ZoneCommands::remove)))
+                .then(Commands.literal("style").then(Commands.argument("id", StringArgumentType.word())
+                        .suggests((c, b) -> SharedSuggestionProvider.suggest(ids(c), b))
+                        .then(Commands.argument("style", StringArgumentType.word())
+                                .suggests((c, b) -> SharedSuggestionProvider.suggest(List.of("zone", "boss"), b))
+                                .executes(c -> style(c, null))
+                                .then(Commands.argument("soustitre", StringArgumentType.greedyString()).executes(c -> style(c, StringArgumentType.getString(c, "soustitre")))))))
                 .then(Commands.literal("regle").then(Commands.argument("id", StringArgumentType.word())
                         .suggests((c, b) -> SharedSuggestionProvider.suggest(ids(c), b))
                         .then(Commands.argument("regle", StringArgumentType.word())
@@ -66,7 +72,7 @@ public final class ZoneCommands {
         var a = s.a;
         var b = s.b;
         ZoneData.Zone zone = new ZoneData.Zone(id, name, s.dimension, Math.min(a.getX(), b.getX()), Math.min(a.getZ(), b.getZ()),
-                Math.max(a.getX(), b.getX()), Math.max(a.getZ(), b.getZ()), true, true, true);
+                Math.max(a.getX(), b.getX()), Math.max(a.getZ(), b.getZ()), true, true, true, ZoneData.Zone.STYLE_ZONE, "");
         data.add(zone);
         ZoneManager.clearSelection(p);
         c.getSource().sendSuccess(() -> ok("Zone « " + name + " » créée (" + zone.area() + " blocs de surface) : " + ZoneManager.describe(zone)
@@ -102,6 +108,20 @@ public final class ZoneCommands {
             return 0;
         }
         c.getSource().sendSuccess(() -> ok("Zone « " + id + " » supprimée."), true);
+        return 1;
+    }
+
+    /** /zone style <id> <zone|boss> [sous-titre] : animation d'entree (filet dore ou salle de boss) et ligne affichee sous le titre. */
+    private static int style(CommandContext<CommandSourceStack> c, String subtitle) {
+        ZoneData data = ZoneData.get(c.getSource().getServer());
+        String id = StringArgumentType.getString(c, "id"), style = StringArgumentType.getString(c, "style");
+        ZoneData.Zone z = data.byId(id);
+        if (z == null || !(style.equals("zone") || style.equals("boss"))) {
+            c.getSource().sendFailure(Component.literal("Usage : /zone style <id> <zone|boss> [sous-titre]"));
+            return 0;
+        }
+        data.add(z.withStyle(style, subtitle == null ? z.subtitle() : subtitle));
+        c.getSource().sendSuccess(() -> ok(z.name() + " : animation « " + style + " »" + (subtitle == null ? "" : ", sous-titre « " + subtitle + " »")), true);
         return 1;
     }
 

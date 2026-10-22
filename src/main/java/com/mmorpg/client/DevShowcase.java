@@ -398,6 +398,32 @@ public final class DevShowcase {
             }
             return;
         }
+        if (MODE.equals("hubambiance")) {
+            var srv = mc.getSingleplayerServer();
+            switch (tick) {
+                case 2 -> {
+                    com.mmorpg.config.ConfigManager.general().hubCinematic = false;
+                    cmd(mc, "gamemode creative");
+                }
+                case 5 -> cmd(mc, "hub set");
+                case 900 -> cmd(mc, "hub");
+                case 960 -> shot(mc, "ambiance_citadelle");
+                case 1100 -> srv.execute(() -> hubSpot(srv, me, com.mmorpg.rpg.PlayerClass.GUERRIER));
+                case 1180 -> shot(mc, "ambiance_pavillon");
+                case 1250 -> {
+                    MMORPG.LOGGER.info("[MMORPG] Musique du hub active = {}", "voir journal ci-dessus");
+                    MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+                    stop(mc);
+                }
+                default -> {
+                }
+            }
+            return;
+        }
+        if (MODE.startsWith("donjon_")) {
+            dungeonPhase(mc, me, MODE.substring(7));
+            return;
+        }
         if (MODE.equals("zone")) {
             var srv = mc.getSingleplayerServer();
             switch (tick) {
@@ -2430,6 +2456,59 @@ public final class DevShowcase {
     }
 
     /** Fin de vitrine : remet l'option de pause modifiee pour les tests, puis ferme le jeu. */
+    private static net.minecraft.core.BlockPos dungeonBase;
+    /** Prises de vue d'un donjon : (x, z relatifs, hauteur de depart, cap, inclinaison, nom). Le sol est a y = 1. */
+    private static final double[][] DUNGEON_SHOTS = {
+            {0, 3, 1, 0, -4}, {0, 6, 1, 0, -42}, {0, 24, 1, 0, 0}, {0, 38, 1, 0, -6}, {0, 44, 1, 20, -48},
+            {0, 63, 1, 0, 12}, {0, 88, 1, 0, -4}, {0, 98, 1, -35, -40}, {0, 113, 1, 0, 0}, {0, 130, 1, 0, 0},
+            {0, 138, 1, 0, -28}, {0, 168, 1, 180, -15}, {0, 175, 1, 0, 0}, {0, 178, 1, 0, 0}};
+
+    private static void dungeonPhase(Minecraft mc, String me, String id) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) {
+            cmd(mc, "gamemode creative");
+            cmd(mc, "execute in minecraft:overworld run tp " + me + " 3000 150 3000 0 0");
+        }
+        if (tick == 8 && !mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        if (tick == 130) srv.execute(() -> dungeonBase = srv.getPlayerList().getPlayerByName(me).blockPosition());
+        if (tick == 135) cmd(mc, "mmorpg donjon " + id);
+        if (tick == 320 && dungeonBase != null) srv.execute(() -> {
+            var lv = srv.getPlayerList().getPlayerByName(me).level();
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 12; i++) sb.append(lv.getBlockState(dungeonBase.offset(i % 6 - 2, -1, 4 + i / 6)).getBlock().getDescriptionId()).append(' ');
+            MMORPG.LOGGER.info("[MMORPG] SOL {}", sb);
+        });
+        int first = 330;
+        int step = 22;
+        int n = (tick - first) / step;
+        if (tick >= first && n < DUNGEON_SHOTS.length) {
+            int local = (tick - first) % step;
+            double[] sh = DUNGEON_SHOTS[n];
+            if (local == 0 && dungeonBase != null) {
+                cmd(mc, String.format(java.util.Locale.ROOT, "tp %s %d %d %d %.1f %.1f", me,
+                        dungeonBase.getX() + (int) sh[0], dungeonBase.getY() + (int) sh[2] - 1, dungeonBase.getZ() + (int) sh[1], sh[3], sh[4]));
+            }
+            if (local == 14) {
+                com.mmorpg.client.AreaEntryClient.cancel();
+                mc.gui.hud.getChat().clearMessages(true);
+            }
+            if (local == 16) shot(mc, id + "_" + String.format("%02d", n));
+        }
+        if (tick == first + step * DUNGEON_SHOTS.length + 20) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        }
+    }
+
+    private static void hubSpot(net.minecraft.server.MinecraftServer srv, String name, com.mmorpg.rpg.PlayerClass cls) {
+        var p = srv.getPlayerList().getPlayerByName(name);
+        var hub = com.mmorpg.hub.HubData.get(srv);
+        if (p == null || !hub.exists()) return;
+        int[] sp = com.mmorpg.hub.HubLayout.classSpot(cls);
+        var o = hub.origin();
+        p.teleportTo(hub.level(srv), o.getX() + sp[0] + 8, o.getY(), o.getZ() + sp[2] + 8, java.util.Set.of(), 135F, 8F, true);
+    }
+
     private static void spawnDuelist(net.minecraft.server.MinecraftServer srv, String name) {
         var p = srv.getPlayerList().getPlayerByName(name);
         if (p == null) return;

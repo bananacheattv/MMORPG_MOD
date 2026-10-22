@@ -33,6 +33,7 @@ public final class ClientPayloadHandlers {
         });
         event.register(Payloads.MobInfo.TYPE, (payload, context) -> ClientData.mobInfo = payload.data().copy());
         event.register(Payloads.Notify.TYPE, (payload, context) -> HudEffects.addBanner(payload));
+        event.register(Payloads.AreaEntry.TYPE, (payload, context) -> com.mmorpg.client.AreaEntryClient.start(payload));
         event.register(Payloads.PartySync.TYPE, (payload, context) -> ClientData.party = payload.data().copy());
         event.register(Payloads.CastAnimation.TYPE, (payload, context) ->
                 com.mmorpg.client.fx.CastAnimations.start(payload.entityId(), payload.anim(), payload.duration()));

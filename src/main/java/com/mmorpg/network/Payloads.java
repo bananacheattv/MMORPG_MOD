@@ -91,6 +91,19 @@ public final class Payloads {
         }
     }
 
+    /** Animation d'entree dans une zone (style 0) ou une salle de boss (style 1). */
+    public record AreaEntry(String title, String subtitle, int style, int color) implements CustomPacketPayload {
+        public static final Type<AreaEntry> TYPE = new Type<>(MMORPG.id("area_entry"));
+        public static final StreamCodec<ByteBuf, AreaEntry> CODEC = StreamCodec.composite(
+                ByteBufCodecs.STRING_UTF8, AreaEntry::title, ByteBufCodecs.STRING_UTF8, AreaEntry::subtitle,
+                ByteBufCodecs.VAR_INT, AreaEntry::style, ByteBufCodecs.INT, AreaEntry::color, AreaEntry::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
     /** Informations du bestiaire (noms, niveaux, butin) issues de la configuration serveur. */
     public record MobInfo(CompoundTag data) implements CustomPacketPayload {
         public static final Type<MobInfo> TYPE = new Type<>(MMORPG.id("mob_info"));
