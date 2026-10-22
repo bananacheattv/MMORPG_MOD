@@ -321,6 +321,7 @@ public abstract class RpgBoss extends RpgMonster {
         for (var p : level.players()) {
             if (p.distanceToSqr(this) < 64 * 64) p.sendOverlayMessage(msg);
         }
+        com.mmorpg.dungeon.ArenaEvents.phase(level, this, phase);          // renforts et annonce quand le boss est dans l'antre d'un donjon
     }
 
     @Override

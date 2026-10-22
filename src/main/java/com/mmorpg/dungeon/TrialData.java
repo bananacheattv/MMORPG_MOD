@@ -23,6 +23,8 @@ public class TrialData extends SavedData {
     public static final String WAVES = "waves";
     public static final String JUMP = "jump";
     public static final String SIMON = "simon";
+    public static final String ORDER = "order";
+    public static final String TARGETS = "targets";
 
     /**
      * @param box    zone de declenchement (vagues, enigme) ou zone de chute (parcours : tombe si y < y0)
@@ -104,6 +106,31 @@ public class TrialData extends SavedData {
         trials.removeIf(t -> t.id().equals(trial.id()));
         trials.add(trial);
         setDirty();
+    }
+
+    /** Identifiant du donjon d'une epreuve (tout sauf le dernier segment : _a, _pit, _b). */
+    public static String group(String trialId) {
+        return trialId.substring(0, trialId.lastIndexOf('_'));
+    }
+
+    public List<Trial> inGroup(String group) {
+        List<Trial> out = new ArrayList<>();
+        for (Trial t : trials) {
+            if (group(t.id()).equals(group)) out.add(t);
+        }
+        return out;
+    }
+
+    void markUndone(String id) {
+        for (int i = 0; i < trials.size(); i++) {
+            Trial t = trials.get(i);
+            if (t.id().equals(id) && t.done()) {
+                trials.set(i, new Trial(t.id(), t.kind(), t.dim(), t.box(), t.gate(), t.gateBlock(), t.pos(), t.pads(), t.states(), t.level(),
+                        t.diff(), t.mobs(), t.title(), t.hint(), false));
+                setDirty();
+                return;
+            }
+        }
     }
 
     void markDone(String id) {

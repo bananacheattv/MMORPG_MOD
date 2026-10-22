@@ -24,6 +24,7 @@ final class Trials {
     }
 
     static final String NONE = "none";
+    static final String JUMPROOM = "jumproom";
 
     /** Quelle epreuve dans la salle de combat A, le couloir a fosse et la salle B (« waves », « simon », « jump » ou « none »). */
     record Plan(String a, String pit, String b, int diffA, int diffPit, int diffB) {
@@ -38,7 +39,11 @@ final class Trials {
      * @param mobs     monstres des vagues (cles de bestiaire)
      * @param titles   noms affiches pour chaque type d'epreuve
      */
-    record Palette(Block gate, Block padOn, Object platform, Object edge, Block lamp, List<String> mobs, Map<String, String> titles) {
+    record Palette(Block gate, Block padOn, Object platform, Object edge, Block lamp, List<String> mobs, Map<String, String> titles,
+                   Block hazard, Block lantern) {
+        String title(String kind) {
+            return titles.getOrDefault(kind, "ÉPREUVE");
+        }
     }
 
     static String id(Block b) {
@@ -51,7 +56,8 @@ final class Trials {
 
     /** Pose une herse sur toutes les cellules libres du couloir entre z0 et z1 et renvoie la boite occupee (relative). */
     static int[] gate(HubCtx c, int z0, int z1, Block block) {
-        int minX = 99, maxX = -99, minY = 99, maxY = -99, minZ = 99, maxZ = -99;
+        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
         for (int z = z0; z <= z1; z++) {
             for (int x = -5; x <= 5; x++) {
                 for (int y = 1; y <= 14; y++) {
@@ -81,18 +87,16 @@ final class Trials {
         int waves = 3 + (diff >= 2 ? 1 : 0);
         data.add(new Trial(id, TrialData.WAVES, level.dimension(), box(o, -13, 1, cz - 13, 13, 9, cz + 13), abs(o, g), id(pal.gate()),
                 List.of(o.getX(), o.getY() + 1, o.getZ() + cz), List.of(), List.of(), lvl, diff, pal.mobs(),
-                pal.titles().get(TrialData.WAVES), "Survivez à " + waves + " vagues : la herse s'ouvrira", false));
+                pal.title(TrialData.WAVES), "Survivez à " + waves + " vagues : la herse s'ouvrira", false));
     }
 
     // ================================================================== enigme de sequence
 
-    static void simon(HubCtx c, ServerLevel level, TrialData data, Palette pal, String id, int cz, int gateZ0, int gateZ1, int diff, int lvl) {
-        int[] g = gate(c, gateZ0, gateZ1, pal.gate());
+    /** Quatre dalles colorees sur un cercle autour du centre de la salle ; remplit {@code pads} et {@code states}. */
+    private static void buildPads(HubCtx c, Palette pal, int cz, List<Integer> pads, List<String> states) {
         BlockPos o = c.O;
         DyeColor[] colors = {DyeColor.RED, DyeColor.BLUE, DyeColor.LIME, DyeColor.YELLOW};
         int[][] spots = {{-6, -6}, {6, -6}, {-6, 6}, {6, 6}};
-        List<Integer> pads = new ArrayList<>();
-        List<String> states = new ArrayList<>();
         for (int k = 0; k < 4; k++) {
             int px = spots[k][0];
             int pz = cz + spots[k][1];
@@ -106,12 +110,137 @@ final class Trials {
             states.add(id(Blocks.CONCRETE.pick(colors[k])));
             states.add(id(pal.padOn()));
         }
+    }
+
+    static void simon(HubCtx c, ServerLevel level, TrialData data, Palette pal, String id, int cz, int gateZ0, int gateZ1, int diff, int lvl) {
+        int[] g = gate(c, gateZ0, gateZ1, pal.gate());
+        BlockPos o = c.O;
+        List<Integer> pads = new ArrayList<>();
+        List<String> states = new ArrayList<>();
+        buildPads(c, pal, cz, pads, states);
         // lutrin d'activation a l'entree de la salle
         c.set(0, 0, cz - 11, Blocks.CONCRETE.pick(DyeColor.BLACK));
         c.set(0, 1, cz - 11, Blocks.LECTERN.defaultBlockState().setValue(LecternBlock.FACING, net.minecraft.core.Direction.SOUTH));
         data.add(new Trial(id, TrialData.SIMON, level.dimension(), box(o, -14, 1, cz - 14, 14, 9, cz + 14), abs(o, g), id(pal.gate()),
                 List.of(o.getX(), o.getY() + 1, o.getZ() + cz - 11), pads, states, lvl, diff, List.of(),
-                pal.titles().get(TrialData.SIMON), "Activez le lutrin, observez les dalles puis répétez la séquence", false));
+                pal.title(TrialData.SIMON), "Activez le lutrin, observez les dalles puis répétez la séquence", false));
+    }
+
+    // ================================================================== cibles
+
+    /** Quatre cibles sur des piliers au fond de la salle : un coup (arme, sort ou fleche) sur chacune les allume ; toutes allumees = herse ouverte. */
+    static void targets(HubCtx c, ServerLevel level, TrialData data, Palette pal, String id, int cz, int gateZ0, int gateZ1, int diff, int lvl) {
+        int[] g = gate(c, gateZ0, gateZ1, pal.gate());
+        BlockPos o = c.O;
+        List<Integer> pads = new ArrayList<>();
+        List<String> states = new ArrayList<>();
+        int[] xs = {-9, -3, 3, 9};
+        for (int k = 0; k < 4; k++) {
+            int x = xs[k];
+            int z = cz + 9 - Math.abs(x) / 3;
+            for (int y = 1; y <= 2; y++) c.set(x, y, z, c.state(pal.edge()));
+            c.set(x, 3, z, Blocks.TARGET);
+            c.set(x, 0, z, c.state(pal.edge()));
+            pads.add(o.getX() + x);
+            pads.add(o.getY() + 3);
+            pads.add(o.getZ() + z);
+            states.add(id(Blocks.TARGET));
+            states.add(id(pal.padOn()));
+        }
+        data.add(new Trial(id, TrialData.TARGETS, level.dimension(), box(o, -14, 1, cz - 14, 14, 9, cz + 14), abs(o, g), id(pal.gate()),
+                List.of(o.getX(), o.getY() + 1, o.getZ() + cz), pads, states, lvl, diff, List.of(),
+                pal.title(TrialData.TARGETS), "Touchez les 4 cibles (arme, sort ou flèche) pour ouvrir la herse", false));
+    }
+
+    // ================================================================== enigme d'ordre
+
+    /** Les couleurs de la sequence sont gravees dans le mur du couloir d'entree (z = 26..32) ; les dalles se touchent dans cet ordre. */
+    static void order(HubCtx c, ServerLevel level, TrialData data, Palette pal, String id, int cz, int gateZ0, int gateZ1, int diff, int lvl, long seed) {
+        int[] g = gate(c, gateZ0, gateZ1, pal.gate());
+        BlockPos o = c.O;
+        List<Integer> pads = new ArrayList<>();
+        List<String> states = new ArrayList<>();
+        buildPads(c, pal, cz, pads, states);
+        List<Integer> seq = new ArrayList<>(List.of(0, 1, 2, 3));
+        java.util.Collections.shuffle(seq, new Random(seed));
+        DyeColor[] colors = {DyeColor.RED, DyeColor.BLUE, DyeColor.LIME, DyeColor.YELLOW};
+        for (int i = 0; i < 4; i++) {
+            int z = 26 + i * 2;
+            for (int side : new int[]{-4, 4}) {
+                c.set(side, 2, z, Blocks.CONCRETE.pick(DyeColor.BLACK));
+                c.set(side, 4, z, Blocks.CONCRETE.pick(DyeColor.BLACK));
+                c.set(side, 3, z, Blocks.CONCRETE.pick(colors[seq.get(i)]));
+            }
+            c.set(-3, 1, z, pal.lantern());
+        }
+        List<String> order = new ArrayList<>();
+        for (int k : seq) order.add(String.valueOf(k));
+        data.add(new Trial(id, TrialData.ORDER, level.dimension(), box(o, -14, 1, cz - 14, 14, 9, cz + 14), abs(o, g), id(pal.gate()),
+                List.of(o.getX(), o.getY() + 1, o.getZ() + cz), pads, states, lvl, diff, order,
+                pal.title(TrialData.ORDER), "Les couleurs gravées dans le couloir d'entrée donnent l'ordre des dalles", false));
+    }
+
+    // ================================================================== parcours de saut dans une salle ronde
+
+    /** Lampes sur le pourtour et lustres, pour une salle dont le decor habituel est remplace par un lac de danger. */
+    static void roomLamps(HubCtx c, Palette pal, int cz, int height, int r) {
+        for (int i = 0; i < 10; i++) {
+            double a = Math.PI * 2 * i / 10 + 0.3;
+            int x = (int) Math.round(Math.cos(a) * (r - 1.2));
+            int z = cz + (int) Math.round(Math.sin(a) * (r - 1.2));
+            if (c.air(x, 1, z)) c.set(x, 1, z, pal.lantern());
+        }
+        for (int i = 0; i < 3; i++) {
+            double a = Math.PI * 2 * i / 3 + 0.5;
+            Kit.chandelier(c, height + 5, (int) Math.round(Math.cos(a) * 6), cz + (int) Math.round(Math.sin(a) * 6), 3, pal.lantern());
+        }
+    }
+
+    /** Le sol central de la salle est creuse (voir StyledDungeon) : on y met le danger et un chemin de plateformes, de l'entree a la sortie. */
+    static void jumpRoom(HubCtx c, ServerLevel level, TrialData data, Palette pal, String id, int cz, int r, int diff, int lvl, long seed) {
+        BlockPos o = c.O;
+        int pr = r - 3;
+        c.disc(0, -8, cz, pr - 0.5, (x, y, z) -> c.state(pal.hazard() == Blocks.MUD ? Blocks.MUD : pal.hazard()));
+        if (pal.hazard() == Blocks.LAVA || pal.hazard() == Blocks.WATER) {
+            for (int y = -7; y <= -5; y++) c.disc(0, y, cz, pr - 0.5, (x, yy, z) -> c.state(pal.hazard()));
+        }
+        Random rnd = new Random(seed);
+        if (pal.hazard() == Blocks.MUD) {
+            for (int i = 0; i < 70; i++) {
+                int x = rnd.nextInt(2 * pr + 1) - pr;
+                int z = cz + rnd.nextInt(2 * pr + 1) - pr;
+                if (Math.hypot(x, z - cz) < pr - 1 && c.air(x, -7, z)) c.set(x, -7, z, Blocks.POINTED_DRIPSTONE);
+            }
+        }
+        int cursor = cz - pr;
+        int prevX = 0;
+        int count = 0;
+        int end = cz + pr;
+        while (true) {
+            int gap = diff <= 0 ? 2 : 3;
+            int len = diff <= 0 ? 3 : diff == 1 ? 2 : 1 + rnd.nextInt(2);
+            int wid = diff <= 0 ? 3 : 2;
+            int zs = cursor + gap + 1;
+            if (zs + len - 1 > end - 1) break;
+            double zc = zs + len / 2.0 - cz;
+            int lim = (int) Math.max(0, Math.sqrt(Math.max(0, (pr - 1.5) * (pr - 1.5) - zc * zc)) - wid / 2.0);
+            int cx = Math.max(-lim, Math.min(lim, prevX + rnd.nextInt(7) - 3));
+            for (int dx = 0; dx < wid; dx++) {
+                for (int dz = 0; dz < len; dz++) {
+                    int x = cx + dx - wid / 2;
+                    c.set(x, 0, zs + dz, c.state(pal.platform()));
+                    c.set(x, -1, zs + dz, c.state(pal.edge()));
+                }
+            }
+            if (count % 3 == 2) c.set(cx, 1, zs, pal.lantern());
+            cursor = zs + len - 1;
+            prevX = cx;
+            count++;
+            if (cursor >= end - 3) break;
+        }
+        data.add(new Trial(id, TrialData.JUMP, level.dimension(), box(o, -pr, -3, cz - pr, pr, 8, cz + pr), box(o, -6, 1, cz + pr, 6, 6, cz + r),
+                "", List.of(o.getX(), o.getY() + 1, o.getZ() + cz - pr - 1), List.of(), List.of(), lvl, diff, List.of(),
+                pal.title(TrialData.JUMP), "Traversez le lac de plateforme en plateforme : une chute vous ramène au départ", false));
     }
 
     // ================================================================== parcours de saut
@@ -155,6 +284,6 @@ final class Trials {
         }
         data.add(new Trial(id, TrialData.JUMP, level.dimension(), box(o, -4, -3, from, 4, 8, to), box(o, -4, 1, z1 - 2, 4, 6, z1),
                 "", List.of(o.getX(), o.getY() + 1, o.getZ() + z0 + 1), List.of(), List.of(), lvl, diff, List.of(),
-                pal.titles().get(TrialData.JUMP), "Traversez sans tomber : une chute vous ramène au départ", false));
+                pal.title(TrialData.JUMP), "Traversez sans tomber : une chute vous ramène au départ", false));
     }
 }

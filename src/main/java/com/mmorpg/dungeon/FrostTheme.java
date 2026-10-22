@@ -254,12 +254,12 @@ final class FrostTheme extends Theme {
     @Override
     Trials.Palette palette() {
         return new Trials.Palette(Blocks.BLUE_ICE, Blocks.SEA_LANTERN, Blocks.BLUE_ICE, Blocks.PACKED_ICE, Blocks.SOUL_LANTERN,
-                java.util.List.of("spectre_givre", "golem_cristal"), java.util.Map.of(TrialData.WAVES, "TEMPÊTE DE GIVRE", TrialData.JUMP, "BANQUISE BRISÉE", TrialData.SIMON, "ÉNIGME DES CRISTAUX"));
+                java.util.List.of("spectre_givre", "golem_cristal"), java.util.Map.of(TrialData.WAVES, "TEMPÊTE DE GIVRE", TrialData.JUMP, "BANQUISE BRISÉE", TrialData.SIMON, "ÉNIGME DES CRISTAUX"), Blocks.WATER, Blocks.SOUL_LANTERN);
     }
 
     @Override
     Trials.Plan plan() {
-        return new Trials.Plan(TrialData.SIMON, TrialData.JUMP, TrialData.WAVES, 1, 1, 2);
+        return new Trials.Plan(TrialData.SIMON, TrialData.JUMP, Trials.JUMPROOM, 1, 1, 1);
     }
 
     @Override

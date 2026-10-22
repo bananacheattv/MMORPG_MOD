@@ -36,6 +36,11 @@ public final class StyledDungeon {
 
     /** @return la position du teleporteur d'entree */
     public static BlockPos build(ServerLevel level, BlockPos origin, DungeonType t) {
+        return build(level, origin, t, 0);
+    }
+
+    /** @param bonus difficulte : 0 normal, 1 heroique, 2 mythique (epreuves plus dures, monstres plus forts, meilleur butin) */
+    public static BlockPos build(ServerLevel level, BlockPos origin, DungeonType t, int bonus) {
         BlockPos o = origin.below();
         HubCtx c = new HubCtx(level, o);
         Theme th = theme(c, t);
@@ -70,6 +75,9 @@ public final class StyledDungeon {
         v.vault(0, Theme.ARENA_Z + Theme.ARENA_R - 2, Theme.TREASURE_Z - 4, 2, 1, 5, 2, false);
         v.cyl(0, Theme.TREASURE_Z, Theme.TREASURE_R, 1, 9);
         v.dome(0, Theme.TREASURE_Z, Theme.TREASURE_R, Theme.TREASURE_R, 9, 5);
+        Trials.Plan plan0 = th.plan();
+        if (plan0.a().equals(Trials.JUMPROOM)) v.cyl(0, Theme.A_Z, Theme.A_R - 3, -8, 0);
+        if (plan0.b().equals(Trials.JUMPROOM)) v.cyl(0, Theme.B_Z, Theme.B_R - 3, -8, 0);
         th.shape(v);
         v.shell(c, (x, y, z, k, back) -> {
             if (!back && k != Carve.Kind.FLOOR && th.rnd(x, y, z, 77) < th.lightChance()) return th.light(x, y, z);
@@ -87,9 +95,11 @@ public final class StyledDungeon {
         }
 
         th.hall();
-        th.roomA();
+        if (th.plan().a().equals(Trials.JUMPROOM)) Trials.roomLamps(c, th.palette(), Theme.A_Z, Theme.A_H, Theme.A_R);
+        else th.roomA();
         th.pit();
-        th.roomB();
+        if (th.plan().b().equals(Trials.JUMPROOM)) Trials.roomLamps(c, th.palette(), Theme.B_Z, Theme.B_H, Theme.B_R);
+        else th.roomB();
         th.gallery();
         th.arena();
         th.treasure();
@@ -102,9 +112,10 @@ public final class StyledDungeon {
         Trials.Plan plan = th.plan();
         Trials.Palette pal = th.palette();
         long seed = base.asLong() * 31 + t.level;
-        buildTrial(c, level, trials, pal, plan.a(), key + "_a", Theme.A_Z, 68, 69, plan.diffA(), t.level, seed);
-        buildTrial(c, level, trials, pal, plan.pit(), key + "_pit", 0, Theme.PIT_Z0, Theme.PIT_Z1, plan.diffPit(), t.level, seed + 1);
-        buildTrial(c, level, trials, pal, plan.b(), key + "_b", Theme.B_Z, 115, 116, plan.diffB(), t.level, seed + 2);
+        int lvl = t.level + 4 * bonus;
+        buildTrial(c, level, trials, pal, plan.a(), key + "_a", Theme.A_Z, 68, 69, Math.min(3, plan.diffA() + bonus), lvl, seed);
+        buildTrial(c, level, trials, pal, plan.pit(), key + "_pit", 0, Theme.PIT_Z0, Theme.PIT_Z1, Math.min(3, plan.diffPit() + bonus), lvl, seed + 1);
+        buildTrial(c, level, trials, pal, plan.b(), key + "_b", Theme.B_Z, 115, 116, Math.min(3, plan.diffB() + bonus), lvl, seed + 2);
 
         // elements de jeu
         RandomSource r = level.getRandom();
@@ -125,7 +136,9 @@ public final class StyledDungeon {
         }
         DungeonBuilder.chest(level, o.offset(18, 1, Theme.B_Z), DungeonBuilder.roomLoot(t, r, false), r);
         c.set(0, 1, Theme.ARENA_Z, ModBlocks.AUTEL_INVOCATION.get());
-        DungeonBuilder.chest(level, o.offset(0, 1, Theme.TREASURE_Z + 3), DungeonBuilder.roomLoot(t, r, true), r);
+        var bossLoot = DungeonBuilder.roomLoot(t, r, true);
+        for (int i = 0; i < bonus; i++) bossLoot.addAll(DungeonBuilder.roomLoot(t, r, false));
+        DungeonBuilder.chest(level, o.offset(0, 1, Theme.TREASURE_Z + 3), bossLoot.subList(0, Math.min(27, bossLoot.size())), r);
 
         WaypointData data = WaypointData.get(level.getServer());
         data.removeAt(level.dimension(), tp);
@@ -137,7 +150,7 @@ public final class StyledDungeon {
         int oz = o.getZ();
         key = t.id + "_" + ox + "_" + oz;
         zones.add(new ZoneData.Zone(key, t.label, level.dimension(), ox - 27, oz - 2, ox + 27, oz + 192,
-                true, true, false, ZoneData.Zone.STYLE_ZONE, "Donjon · niveau " + t.level));
+                true, true, false, ZoneData.Zone.STYLE_ZONE, "Donjon · niveau " + t.level + (bonus == 1 ? " · héroïque" : bonus >= 2 ? " · mythique" : "")));
         zones.add(new ZoneData.Zone(key + "_boss", th.arenaName(), level.dimension(), ox - 23, oz + Theme.ARENA_Z - 23, ox + 23, oz + Theme.ARENA_Z + 23,
                 true, true, false, ZoneData.Zone.STYLE_BOSS, "Boss · niveau " + t.level));
         return tp;
@@ -148,6 +161,9 @@ public final class StyledDungeon {
         switch (kind) {
             case TrialData.WAVES -> Trials.waves(c, level, data, pal, id, cz, z0, z1, diff, lvl);
             case TrialData.SIMON -> Trials.simon(c, level, data, pal, id, cz, z0, z1, diff, lvl);
+            case TrialData.TARGETS -> Trials.targets(c, level, data, pal, id, cz, z0, z1, diff, lvl);
+            case TrialData.ORDER -> Trials.order(c, level, data, pal, id, cz, z0, z1, diff, lvl, seed);
+            case Trials.JUMPROOM -> Trials.jumpRoom(c, level, data, pal, id, cz, cz == Theme.A_Z ? Theme.A_R : Theme.B_R, diff, lvl, seed);
             case TrialData.JUMP -> Trials.jump(c, level, data, pal, id, z0, z1, diff, lvl, seed);
             default -> {
             }

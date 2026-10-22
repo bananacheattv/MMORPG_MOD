@@ -61,6 +61,8 @@ public final class TrialManager {
 
     private static final Map<String, Wave> WAVES = new HashMap<>();
     private static final Map<String, Simon> SIMON = new HashMap<>();
+    private static final Map<String, Integer> ORDER = new HashMap<>();
+    private static final Map<String, Set<Integer>> HITS = new HashMap<>();
     private static final Set<String> SEEN = new HashSet<>();
 
     private TrialManager() {
@@ -87,7 +89,7 @@ public final class TrialManager {
             switch (t.kind()) {
                 case TrialData.WAVES -> tickWaves(level, data, t);
                 case TrialData.JUMP -> tickJump(level, data, t);
-                case TrialData.SIMON -> announceTo(level, t);
+                case TrialData.SIMON, TrialData.ORDER, TrialData.TARGETS -> announceTo(level, t);
                 default -> {
                 }
             }
@@ -154,7 +156,8 @@ public final class TrialManager {
         w.wave = number;
         w.nextAt = -1;
         w.spawned = true;
-        int count = Math.min(14, 3 + number * 2 + t.diff() * 2);
+        int extra = Math.max(0, inside(level, t).size() - 1) * 2;          // le solo reste la reference : on n'ajoute des ennemis que pour les groupes
+        int count = Math.min(16, 3 + number * 2 + t.diff() * 2 + extra);
         int cx = t.pos().get(0), cy = t.pos().get(1), cz = t.pos().get(2);
         var random = level.getRandom();
         for (int i = 0; i < count; i++) {
@@ -212,8 +215,9 @@ public final class TrialManager {
         if (!(lv instanceof ServerLevel level) || !(player instanceof ServerPlayer sp)) return;
         TrialData data = TrialData.get(level.getServer());
         for (Trial t : data.all()) {
-            if (!t.kind().equals(TrialData.SIMON) || !t.dim().equals(level.dimension())) continue;
-            if (t.pos().get(0) == pos.getX() && t.pos().get(1) == pos.getY() && t.pos().get(2) == pos.getZ()) {
+            boolean order = t.kind().equals(TrialData.ORDER) || t.kind().equals(TrialData.TARGETS);
+            if ((!t.kind().equals(TrialData.SIMON) && !order) || !t.dim().equals(level.dimension())) continue;
+            if (!order && t.pos().get(0) == pos.getX() && t.pos().get(1) == pos.getY() && t.pos().get(2) == pos.getZ()) {
                 cancel(ev);
                 if (t.done()) sp.sendOverlayMessage(Component.literal("Cette énigme est déjà résolue.").withColor(0xA0E0A0));
                 else startSimon(level, t, sp);
@@ -286,7 +290,91 @@ public final class TrialManager {
         });
     }
 
+    private static void targetHit(ServerLevel level, TrialData data, Trial t, ServerPlayer p, int k) {
+        if (t.done()) return;
+        Set<Integer> hit = HITS.computeIfAbsent(t.id(), x -> new HashSet<>());
+        if (!hit.add(k)) return;
+        light(level, t, k, true);
+        note(level, t, k, 1.0F);
+        level.sendParticles(ParticleTypes.CRIT, padPos(t, k).getX() + 0.5, padPos(t, k).getY() + 0.5, padPos(t, k).getZ() + 0.5, 10, 0.3, 0.3, 0.3, 0.2);
+        if (p != null) p.sendOverlayMessage(Component.literal("Cible touchée : " + hit.size() + " / " + padCount(t)).withColor(0xFFE080));
+        if (hit.size() >= padCount(t)) {
+            HITS.remove(t.id());
+            complete(level, data, t, p, true);
+        }
+    }
+
+    /** Une fleche, un sort ou tout autre projectile qui touche une cible compte comme un coup. */
+    @SubscribeEvent
+    public static void onProjectile(net.neoforged.neoforge.event.entity.ProjectileImpactEvent event) {
+        if (!(event.getRayTraceResult() instanceof net.minecraft.world.phys.BlockHitResult hit)) return;
+        if (!(event.getProjectile().level() instanceof ServerLevel level)) return;
+        TrialData data = TrialData.get(level.getServer());
+        BlockPos pos = hit.getBlockPos();
+        for (Trial t : data.all()) {
+            if (!t.kind().equals(TrialData.TARGETS) || !t.dim().equals(level.dimension())) continue;
+            for (int k = 0; k * 3 + 2 < t.pads().size(); k++) {
+                if (t.pads().get(k * 3) == pos.getX() && t.pads().get(k * 3 + 1) == pos.getY() && t.pads().get(k * 3 + 2) == pos.getZ()) {
+                    ServerPlayer shooter = event.getProjectile() instanceof net.minecraft.world.entity.projectile.Projectile pr && pr.getOwner() instanceof ServerPlayer sp ? sp : null;
+                    targetHit(level, data, t, shooter, k);
+                    return;
+                }
+            }
+        }
+    }
+
+    /** Retire les monstres d'une vague en cours (remise a zero du donjon). */
+    static void discardWaveMobs(ServerLevel level, Trial t) {
+        Wave w = WAVES.get(t.id());
+        if (w == null) return;
+        for (UUID id : w.mobs) {
+            Entity e = level.getEntity(id);
+            if (e != null) e.discard();
+        }
+    }
+
+    /** Oublie l'etat en cours d'une epreuve (remise a zero du donjon). */
+    static void forget(String id) {
+        WAVES.remove(id);
+        SIMON.remove(id);
+        ORDER.remove(id);
+        HITS.remove(id);
+    }
+
+    /** Enigme d'ordre : la sequence est gravee dans le couloir d'entree, les dalles gardent leur lumiere tant que l'ordre est bon. */
+    private static void orderPressed(ServerLevel level, TrialData data, Trial t, ServerPlayer p, int k) {
+        if (t.done()) {
+            p.sendOverlayMessage(Component.literal("Cette énigme est déjà résolue.").withColor(0xA0E0A0));
+            return;
+        }
+        int progress = ORDER.getOrDefault(t.id(), 0);
+        int expected = Integer.parseInt(t.mobs().get(progress));
+        if (expected == k) {
+            progress++;
+            ORDER.put(t.id(), progress);
+            note(level, t, k, 1.0F);
+            light(level, t, k, true);
+            if (progress >= t.mobs().size()) {
+                ORDER.remove(t.id());
+                complete(level, data, t, p, true);
+            }
+        } else {
+            ORDER.put(t.id(), 0);
+            for (int i = 0; i < padCount(t); i++) light(level, t, i, false);
+            level.playSound(null, padPos(t, k), SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1.4F, 0.5F);
+            p.sendOverlayMessage(Component.literal("Mauvais ordre ! Relisez les couleurs gravées dans le couloir d'entrée.").withColor(0xFF6050));
+        }
+    }
+
     private static void padPressed(ServerLevel level, TrialData data, Trial t, ServerPlayer p, int k) {
+        if (t.kind().equals(TrialData.ORDER)) {
+            orderPressed(level, data, t, p, k);
+            return;
+        }
+        if (t.kind().equals(TrialData.TARGETS)) {
+            targetHit(level, data, t, p, k);
+            return;
+        }
         Simon s = SIMON.get(t.id());
         if (t.done()) {
             p.sendOverlayMessage(Component.literal("Cette énigme est déjà résolue.").withColor(0xA0E0A0));
@@ -356,6 +444,12 @@ public final class TrialManager {
                     Net.toPlayer(q, new Payloads.Notify(Payloads.Notify.QUEST, "ÉPREUVE RÉUSSIE", t.title().isEmpty() ? "Bravo !" : t.title(), 0x60FF80));
                 }
             }
+        }
+        var group = data.inGroup(TrialData.group(t.id()));
+        long doneCount = group.stream().filter(Trial::done).count();
+        if (p != null && !group.isEmpty()) {
+            p.sendSystemMessage(Component.literal("Épreuves du donjon : " + doneCount + " / " + group.size()
+                    + (doneCount == group.size() ? " — l'antre du boss est ouverte !" : "")).withColor(doneCount == group.size() ? 0x60FF80 : 0xFFE080));
         }
         if (t.kind().equals(TrialData.WAVES)) {
             ItemEntity coins = new ItemEntity(level, at.getX() + 0.5, at.getY() + 1, at.getZ() + 0.5, new ItemStack(ModItems.PIECE_OR.get(), 8 + t.level() / 4));

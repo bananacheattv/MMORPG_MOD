@@ -125,6 +125,10 @@ public final class DungeonBuilder {
         return com.mmorpg.dungeon.StyledDungeon.build(level, origin, t);
     }
 
+    public static BlockPos buildDungeon(ServerLevel level, BlockPos origin, DungeonType t, int difficulty) {
+        return com.mmorpg.dungeon.StyledDungeon.build(level, origin, t, difficulty);
+    }
+
     /** Petite place de ville avec teleporteur central enregistre comme Ville. */
     public static BlockPos buildCity(ServerLevel level, BlockPos origin, String name) {
         BlockPos o = origin.below();

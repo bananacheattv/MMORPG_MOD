@@ -268,12 +268,12 @@ class GoblinTheme extends Theme {
     @Override
     Trials.Palette palette() {
         return new Trials.Palette(Blocks.SPRUCE_FENCE, Blocks.SHROOMLIGHT, Blocks.SPRUCE_PLANKS, Blocks.DARK_OAK_PLANKS, Blocks.LANTERN,
-                java.util.List.of("gobelin", "loup_sombre"), java.util.Map.of(TrialData.WAVES, "ASSAUT DU CAMP", TrialData.JUMP, "PASSERELLE BRISÉE", TrialData.SIMON, "ÉNIGME DES TOTEMS"));
+                java.util.List.of("gobelin", "loup_sombre"), java.util.Map.of(TrialData.WAVES, "ASSAUT DU CAMP", TrialData.JUMP, "PASSERELLE BRISÉE", TrialData.SIMON, "ÉNIGME DES TOTEMS", TrialData.ORDER, "LANGAGE DES TOTEMS"), Blocks.MUD, Blocks.LANTERN);
     }
 
     @Override
     Trials.Plan plan() {
-        return new Trials.Plan(Trials.NONE, TrialData.JUMP, TrialData.WAVES, 0, 0, 0);
+        return new Trials.Plan(Trials.JUMPROOM, Trials.NONE, TrialData.ORDER, 1, 0, 0);
     }
 
     @Override

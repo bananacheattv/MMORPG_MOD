@@ -225,12 +225,12 @@ final class VoidTheme extends Theme {
     @Override
     Trials.Palette palette() {
         return new Trials.Palette(Blocks.CRYING_OBSIDIAN, Blocks.PEARLESCENT_FROGLIGHT, Blocks.PURPUR_BLOCK, Blocks.OBSIDIAN, Blocks.END_ROD,
-                java.util.List.of("chevalier_neant", "golem_cristal"), java.util.Map.of(TrialData.WAVES, "LÉGION DU NÉANT", TrialData.JUMP, "PARCOURS DU VIDE", TrialData.SIMON, "ÉNIGME DES ÉTOILES"));
+                java.util.List.of("chevalier_neant", "golem_cristal"), java.util.Map.of(TrialData.WAVES, "LÉGION DU NÉANT", TrialData.JUMP, "PARCOURS DU VIDE", TrialData.SIMON, "ÉNIGME DES ÉTOILES", TrialData.TARGETS, "TIR AUX ÉTOILES"), Blocks.OBSIDIAN, Blocks.SOUL_LANTERN);
     }
 
     @Override
     Trials.Plan plan() {
-        return new Trials.Plan(TrialData.WAVES, TrialData.JUMP, TrialData.SIMON, 2, 2, 3);
+        return new Trials.Plan(TrialData.TARGETS, TrialData.JUMP, TrialData.SIMON, 1, 2, 3);
     }
 
     @Override

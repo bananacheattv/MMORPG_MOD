@@ -235,12 +235,12 @@ final class InfernalTheme extends Theme {
     @Override
     Trials.Palette palette() {
         return new Trials.Palette(Blocks.NETHER_BRICK_FENCE, Blocks.GLOWSTONE, Blocks.POLISHED_BLACKSTONE_BRICKS, Blocks.BLACKSTONE, Blocks.LANTERN,
-                java.util.List.of("elementaire_feu", "orc_guerrier"), java.util.Map.of(TrialData.WAVES, "FOURNAISE DES DÉMONS", TrialData.JUMP, "TRAVERSÉE DE LAVE", TrialData.SIMON, "ÉNIGME DES FORGES"));
+                java.util.List.of("elementaire_feu", "orc_guerrier"), java.util.Map.of(TrialData.WAVES, "FOURNAISE DES DÉMONS", TrialData.JUMP, "TRAVERSÉE DE LAVE", TrialData.SIMON, "ÉNIGME DES FORGES", TrialData.ORDER, "LEVIERS DE LA FORGE"), Blocks.LAVA, Blocks.LANTERN);
     }
 
     @Override
     Trials.Plan plan() {
-        return new Trials.Plan(TrialData.WAVES, TrialData.JUMP, TrialData.SIMON, 1, 1, 2);
+        return new Trials.Plan(TrialData.WAVES, TrialData.JUMP, TrialData.ORDER, 1, 1, 1);
     }
 
     @Override

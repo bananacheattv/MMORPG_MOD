@@ -254,7 +254,7 @@ final class CryptTheme extends Theme {
     @Override
     Trials.Palette palette() {
         return new Trials.Palette(Blocks.IRON_BARS, Blocks.PEARLESCENT_FROGLIGHT, Blocks.POLISHED_DEEPSLATE, Blocks.DEEPSLATE_TILES, Blocks.SOUL_LANTERN,
-                java.util.List.of("squelette_maudit", "orc_guerrier"), java.util.Map.of(TrialData.WAVES, "RÉVEIL DES TOMBES", TrialData.JUMP, "PONT D'OSSEMENTS", TrialData.SIMON, "ÉNIGME DES CIERGES"));
+                java.util.List.of("squelette_maudit", "orc_guerrier"), java.util.Map.of(TrialData.WAVES, "RÉVEIL DES TOMBES", TrialData.JUMP, "PONT D'OSSEMENTS", TrialData.SIMON, "ÉNIGME DES CIERGES"), Blocks.SOUL_SAND, Blocks.SOUL_LANTERN);
     }
 
     @Override

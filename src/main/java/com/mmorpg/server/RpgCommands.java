@@ -148,18 +148,28 @@ public final class RpgCommands {
                         .executes(c -> spawnMob(c, 0))
                         .then(Commands.argument("niveau", IntegerArgumentType.integer(1, 100))
                                 .executes(c -> spawnMob(c, IntegerArgumentType.getInteger(c, "niveau"))))))
-                .then(Commands.literal("donjon").then(Commands.argument("type", StringArgumentType.word())
-                        .suggests((c, b) -> SharedSuggestionProvider.suggest(dungeons, b))
-                        .executes(c -> {
-                            DungeonBuilder.DungeonType t = DungeonBuilder.DungeonType.byId(StringArgumentType.getString(c, "type"));
-                            if (t == null) {
-                                c.getSource().sendFailure(Component.literal("Donjon inconnu"));
+                .then(Commands.literal("donjon")
+                        .then(Commands.literal("reinitialiser").executes(c -> {
+                            ServerLevel lv = c.getSource().getLevel();
+                            String g = com.mmorpg.dungeon.DungeonManager.groupAt(lv, BlockPos.containing(c.getSource().getPosition()));
+                            if (g == null) {
+                                c.getSource().sendFailure(Component.literal("Placez-vous dans un donjon pour le réinitialiser."));
                                 return 0;
                             }
-                            BlockPos tp = DungeonBuilder.buildDungeon(c.getSource().getLevel(), BlockPos.containing(c.getSource().getPosition()), t);
-                            c.getSource().sendSuccess(() -> ok("Donjon « " + t.label + " » (niv. " + t.level + ") construit vers le sud. Téléporteur en " + tp.toShortString()), true);
+                            int n = com.mmorpg.dungeon.DungeonManager.reset(c.getSource().getServer(), g);
+                            c.getSource().sendSuccess(() -> ok("Donjon réinitialisé : " + n + " épreuve(s) remise(s) à zéro (herses refermées)."), true);
                             return 1;
-                        })))
+                        }))
+                        .then(Commands.argument("type", StringArgumentType.word())
+                        .suggests((c, b) -> SharedSuggestionProvider.suggest(dungeons, b))
+                        .executes(c -> buildDungeonCommand(c, 0))
+                        .then(Commands.argument("difficulte", StringArgumentType.word())
+                                .suggests((c, b) -> SharedSuggestionProvider.suggest(List.of("normal", "heroique", "mythique"), b))
+                                .executes(c -> buildDungeonCommand(c, switch (StringArgumentType.getString(c, "difficulte")) {
+                                    case "heroique" -> 1;
+                                    case "mythique" -> 2;
+                                    default -> 0;
+                                })))))
                 .then(Commands.literal("ville").then(Commands.argument("nom", StringArgumentType.greedyString()).executes(c -> {
                     String name = StringArgumentType.getString(c, "nom");
                     BlockPos tp = DungeonBuilder.buildCity(c.getSource().getLevel(), BlockPos.containing(c.getSource().getPosition()), name);
@@ -351,6 +361,18 @@ public final class RpgCommands {
                         .then(Commands.argument("classe", StringArgumentType.word())
                                 .suggests((c, b) -> SharedSuggestionProvider.suggest(classes, b))
                                 .executes(RpgCommands::setClass)))));
+    }
+
+    private static int buildDungeonCommand(CommandContext<CommandSourceStack> c, int difficulty) {
+        DungeonBuilder.DungeonType t = DungeonBuilder.DungeonType.byId(StringArgumentType.getString(c, "type"));
+        if (t == null) {
+            c.getSource().sendFailure(Component.literal("Donjon inconnu"));
+            return 0;
+        }
+        BlockPos tp = DungeonBuilder.buildDungeon(c.getSource().getLevel(), BlockPos.containing(c.getSource().getPosition()), t, difficulty);
+        String label = difficulty == 1 ? " héroïque" : difficulty >= 2 ? " mythique" : "";
+        c.getSource().sendSuccess(() -> ok("Donjon « " + t.label + " »" + label + " (niv. " + t.level + ") construit vers le sud. Téléporteur en " + tp.toShortString()), true);
+        return 1;
     }
 
     private static int playCinematic(ServerPlayer target, CommandContext<CommandSourceStack> c) {
