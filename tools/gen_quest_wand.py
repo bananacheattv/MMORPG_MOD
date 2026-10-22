@@ -48,6 +48,13 @@ def sceptre():
     return out.resize((64, 64), Image.LANCZOS)
 
 
+def generate(ga=None):
+    if ga is not None:
+        ga.LANG[f'item.{ga.MODID}.sceptre_quetes'] = 'Sceptre des quêtes'
+        ga.LANG_EN[f'item.{ga.MODID}.sceptre_quetes'] = 'Quest Scepter'
+    main()
+
+
 def main():
     sceptre().save(os.path.join(ROOT, 'textures', 'item', 'sceptre_quetes.png'))
     with open(os.path.join(ROOT, 'models', 'item', 'sceptre_quetes.json'), 'w', encoding='utf-8', newline='\n') as f:

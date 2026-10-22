@@ -46,9 +46,10 @@ public final class ModItems {
     /** Mannequins d'entrainement (objets de placement), par variante. */
     public static final Map<String, DeferredItem<com.mmorpg.item.TrainingDummyItem>> DUMMY_ITEMS = new java.util.LinkedHashMap<>();
     static {
-        String[] ids = {"mannequin_entrainement", "mannequin_blinde", "mannequin_magique"};
-        Rarity[] rar = {Rarity.PEU_COMMUN, Rarity.RARE, Rarity.RARE};
-        String[] lore = {"Paille et bois : il encaisse tout sans broncher.", "Plastron d'acier : forte défense physique.", "Runes et cristal : forte résistance magique."};
+        String[] ids = {"mannequin_entrainement", "mannequin_blinde", "mannequin_magique", "mannequin_duelliste"};
+        Rarity[] rar = {Rarity.PEU_COMMUN, Rarity.RARE, Rarity.RARE, Rarity.EPIQUE};
+        String[] lore = {"Paille et bois : il encaisse tout sans broncher.", "Plastron d'acier : forte défense physique.", "Runes et cristal : forte résistance magique.",
+                "Il annonce son coup puis frappe : esquivez, ou encaissez (jamais mortel)."};
         for (int i = 0; i < ids.length; i++) {
             int v = i;
             DUMMY_ITEMS.put(com.mmorpg.entity.dummy.TrainingDummyEntity.VARIANTS[i], ITEMS.registerItem(ids[i],

@@ -13,6 +13,8 @@ Dans `config/mmorpg/quests.json`, donner la valeur `cryptes` au champ `giver` po
 
 Chaque quete possede un identifiant unique, `name`, `description`, `minLevel`, `giver`, une liste `requires` de quetes prealables, `daily`, `objectives` et `rewards`. Objectifs : `kill` (cle du monstre, `*` ou `boss`), `collect` (identifiant objet) et `level`. `count` indique la quantite ou le niveau cible. Les objectifs de collecte consomment les objets a la remise.
 
+**Mannequin duelliste** (`mmorpg:mannequin_duelliste`, variante `duelliste` de `mannequin.json`) : un mannequin d'armure rougie qui fixe le joueur le plus proche (6 blocs), annonce son coup (inclinaison en arriere, anneau de particules a 3,4 blocs, ~0,8 s), puis frappe tout joueur reste a portee. Reglages par variante : `strikePercent` (part de la vie max retiree, 18 par defaut, 0 = ne frappe pas) et `strikeIntervalSeconds` (3 par defaut). Il ne frappe jamais un joueur sous 35 % de vie ni un joueur creatif ou spectateur. Une place est reservee dans l'aire d'entrainement du hub (a refaire avec `/hub set`).
+
 **Sceptre des quetes** (`mmorpg:sceptre_quetes`, onglet creatif « Objets », operateurs uniquement) : clic droit = ouvre l'atelier de quetes (comme `/mmorpg editeurquetes`) ; clic droit ou gauche sur un PNJ = ouvre directement la fiche de ce PNJ (nom, zone, groupe, apparence). Un joueur non operateur qui le possede n'obtient qu'un message de refus. L'icone est generee par `tools/gen_quest_wand.py`.
 
 Utiliser `/mmorpg reload` apres modification. Les nouvelles quetes par defaut sont ajoutees sans ecraser les definitions personnalisees existantes. Les journalieres redeviennent disponibles a minuit selon la date du serveur.

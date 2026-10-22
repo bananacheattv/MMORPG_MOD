@@ -375,6 +375,29 @@ public final class DevShowcase {
             cinematicPhase(mc, me);
             return;
         }
+        if (MODE.equals("duelliste")) {
+            var srv = mc.getSingleplayerServer();
+            switch (tick) {
+                case 5 -> {
+                    cmd(mc, "kill @e[type=mmorpg:mannequin_entrainement]");
+                    cmd(mc, "tp " + me + " ~ ~ ~ -90 10");
+                }
+                case 15 -> srv.execute(() -> spawnDuelist(srv, me));
+                case 25 -> srv.execute(() -> duelState(srv, me, "avant", 1.0));
+                case 60 -> shot(mc, "duelliste_avertissement");
+                case 120 -> srv.execute(() -> duelState(srv, me, "apres un coup", -1));
+                case 125 -> srv.execute(() -> duelState(srv, me, "reglage vie 20 %", 0.2));
+                case 135 -> srv.execute(() -> duelState(srv, me, "avant coups sous le seuil", -1));
+                case 260 -> srv.execute(() -> duelState(srv, me, "apres 4 s sous le seuil (inchange attendu)", -1));
+                case 270 -> {
+                    MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+                    stop(mc);
+                }
+                default -> {
+                }
+            }
+            return;
+        }
         if (MODE.equals("sceptre")) {
             switch (tick) {
                 case 5 -> {
@@ -2372,6 +2395,27 @@ public final class DevShowcase {
     }
 
     /** Fin de vitrine : remet l'option de pause modifiee pour les tests, puis ferme le jeu. */
+    private static void spawnDuelist(net.minecraft.server.MinecraftServer srv, String name) {
+        var p = srv.getPlayerList().getPlayerByName(name);
+        if (p == null) return;
+        var e = com.mmorpg.registry.ModEntities.TRAINING_DUMMY.get().create(p.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        if (e == null) return;
+        e.snapTo(p.getX() + 2.5, p.getY(), p.getZ(), 90F, 0F);
+        e.setup(3);
+        p.level().addFreshEntity(e);
+        MMORPG.LOGGER.info("[MMORPG] DUELLISTE apparu en {} {} {} variante {}", e.getX(), e.getY(), e.getZ(), e.variantId());
+    }
+
+    /** Vie RPG du joueur cote serveur (fraction >= 0 : la regle d'abord), pour la verification du duelliste. */
+    private static void duelState(net.minecraft.server.MinecraftServer srv, String name, String label, double setFraction) {
+        var p = srv.getPlayerList().getPlayerByName(name);
+        if (p == null) return;
+        var d = com.mmorpg.server.RpgPlayers.get(p);
+        double max = d.stats.get(com.mmorpg.rpg.Stat.MAX_HP);
+        if (setFraction >= 0) d.hp = (float) (max * setFraction);
+        MMORPG.LOGGER.info("[MMORPG] DUELLISTE {} : vie {} / {}", label, d.hp, max);
+    }
+
     private static void stop(Minecraft mc) {
         mc.options.pauseOnLostFocus = true;
         mc.options.save();

@@ -43,6 +43,7 @@ public class DummyRenderer extends EntityRenderer<TrainingDummyEntity, DummyRend
         add(c, 0, MannequinStandardModel.LAYER, MannequinStandardModel.animations(), "mannequin_entrainement", false);
         add(c, 1, MannequinBlindeModel.LAYER, MannequinBlindeModel.animations(), "mannequin_entrainement_blinde", false);
         add(c, 2, MannequinMagiqueModel.LAYER, MannequinMagiqueModel.animations(), "mannequin_entrainement_magique", true);
+        add(c, 3, MannequinBlindeModel.LAYER, MannequinBlindeModel.animations(), "mannequin_entrainement_duelliste", false);
     }
 
     private void add(EntityRendererProvider.Context c, int i, ModelLayerLocation layer, net.minecraft.client.animation.AnimationDefinition[] anims,

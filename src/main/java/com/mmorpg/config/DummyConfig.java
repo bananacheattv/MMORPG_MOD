@@ -22,6 +22,10 @@ public class DummyConfig {
         public String name = "";
         public float physicalDefense = 0;
         public float magicDefense = 0;
+        /** Mannequin combattant : % de la vie maximale du joueur retiree par coup (0 = ne frappe pas). */
+        public float strikePercent = 0;
+        /** Delai entre deux coups, en secondes. */
+        public float strikeIntervalSeconds = 3;
 
         public Variant() {
         }
@@ -31,6 +35,12 @@ public class DummyConfig {
             this.physicalDefense = physicalDefense;
             this.magicDefense = magicDefense;
         }
+
+        public Variant(String name, float physicalDefense, float magicDefense, float strikePercent, float strikeIntervalSeconds) {
+            this(name, physicalDefense, magicDefense);
+            this.strikePercent = strikePercent;
+            this.strikeIntervalSeconds = strikeIntervalSeconds;
+        }
     }
 
     public static DummyConfig defaults() {
@@ -38,6 +48,7 @@ public class DummyConfig {
         c.variants.put("standard", new Variant("Mannequin d'entraînement", 0, 0));
         c.variants.put("blinde", new Variant("Mannequin blindé", 1500, 300));
         c.variants.put("magique", new Variant("Mannequin magique", 300, 1500));
+        c.variants.put("duelliste", new Variant("Mannequin duelliste", 800, 800, 18, 3));
         return c;
     }
 
@@ -53,6 +64,8 @@ public class DummyConfig {
             if (v.name == null || v.name.isBlank()) v.name = "Mannequin";
             v.physicalDefense = Math.max(0, v.physicalDefense);
             v.magicDefense = Math.max(0, v.magicDefense);
+            v.strikePercent = Math.max(0, Math.min(50, v.strikePercent));
+            v.strikeIntervalSeconds = Math.max(1.5F, Math.min(30, v.strikeIntervalSeconds));
         }
         return this;
     }

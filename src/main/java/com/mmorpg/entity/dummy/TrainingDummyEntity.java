@@ -12,6 +12,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -32,13 +33,14 @@ import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Mannequin d'entrainement : immortel, immobile, non poussable, ne riposte jamais. Il recoit les degats du mod comme un
+ * Mannequin d'entrainement : immortel, immobile, non poussable, ne riposte jamais (sauf la variante duelliste, qui
+ * annonce puis porte un coup mesure a qui reste a sa portee, sans jamais achever un joueur). Il recoit les degats du mod comme un
  * monstre (defense, critiques, menace du Tank, textes flottants) mais ne perd jamais de vie : chaque coup alimente ses
  * statistiques (DPS sur une fenetre glissante, total, plus gros coup, critiques) affichees au-dessus de lui.
  * Clic droit accroupi : remise a zero. Trois variantes : standard, blinde (defense physique) et magique (resistance magique).
  */
 public class TrainingDummyEntity extends PathfinderMob {
-    public static final String[] VARIANTS = {"standard", "blinde", "magique"};
+    public static final String[] VARIANTS = {"standard", "blinde", "magique", "duelliste"};
     /** Taille du tampon des coups recents (25 coups/s sur 10 s sont deja largement couverts). */
     private static final int RING = 512;
     private static final float DUMMY_HP = 999_999f;
@@ -53,6 +55,14 @@ public class TrainingDummyEntity extends PathfinderMob {
     private static final EntityDataAccessor<Long> BEST = SynchedEntityData.defineId(TrainingDummyEntity.class, EntityDataSerializers.LONG);
     private static final EntityDataAccessor<Integer> HITS = SynchedEntityData.defineId(TrainingDummyEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> CRITS = SynchedEntityData.defineId(TrainingDummyEntity.class, EntityDataSerializers.INT);
+
+    /** Mannequin duelliste : distance a laquelle il repere un joueur, portee de son coup, duree de l'avertissement (ticks). */
+    private static final double DUEL_SIGHT = 6.0;
+    private static final double DUEL_RANGE = 3.4;
+    private static final int DUEL_WINDUP = 16;
+    /** Un coup n'est jamais porte sous ce seuil de vie (en part de la vie max) : l'entrainement ne tue pas. */
+    private static final double DUEL_MERCY = 0.35;
+    private int duelClock;
 
     // tampon circulaire des coups recents (serveur uniquement, alloue au premier coup)
     private long[] ringTick;
@@ -258,7 +268,78 @@ public class TrainingDummyEntity extends PathfinderMob {
             if (this.tickCount == 1) refreshData();
             // le DPS retombe tout seul quand on arrete de frapper (recalcul toutes les 5 ticks, seulement s'il reste un coup recent)
             if (ringCount > 0 && this.tickCount % 5 == 0) updateDps(level.getGameTime());
+            if (variant() == 3) duelTick(level);
         }
+    }
+
+    // ================================================================== duelliste
+
+    private static boolean canBeStruck(ServerPlayer p) {
+        return p.isAlive() && !p.isCreative() && !p.isSpectator();
+    }
+
+    private @Nullable ServerPlayer nearestChallenger(ServerLevel level) {
+        ServerPlayer best = null;
+        for (ServerPlayer p : level.players()) {
+            if (!canBeStruck(p) || p.distanceToSqr(this) > DUEL_SIGHT * DUEL_SIGHT) continue;
+            if (best == null || p.distanceToSqr(this) < best.distanceToSqr(this)) best = p;
+        }
+        return best;
+    }
+
+    /** Le duelliste fixe le joueur le plus proche, annonce son coup (inclinaison en arriere, anneau de particules au sol), puis frappe. */
+    private void duelTick(ServerLevel level) {
+        DummyConfig.Variant v = config();
+        if (v.strikePercent <= 0) return;
+        ServerPlayer target = nearestChallenger(level);
+        if (target == null) {
+            duelClock = 0;
+            return;
+        }
+        float yaw = (float) (Math.toDegrees(Math.atan2(target.getZ() - this.getZ(), target.getX() - this.getX()))) - 90F;
+        this.setYRot(yaw);
+        this.setYBodyRot(yaw);
+        this.setYHeadRot(yaw);
+        int period = Math.max(DUEL_WINDUP + 4, Math.round(v.strikeIntervalSeconds * 20F));
+        duelClock++;
+        int untilStrike = (period - duelClock % period) % period;
+        if (untilStrike == DUEL_WINDUP) {
+            level.playSound(null, this.blockPosition(), SoundEvents.ANVIL_PLACE, SoundSource.HOSTILE, 0.6F, 0.6F);
+            swing(this.getX() - target.getX(), this.getZ() - target.getZ(), 9F);                 // se cabre en arriere
+        }
+        if (untilStrike > 0 && untilStrike <= DUEL_WINDUP && untilStrike % 2 == 0) {
+            for (int i = 0; i < 12; i++) {                                                         // anneau d'avertissement a la portee du coup
+                double a = (Math.PI * 2 * i) / 12 + untilStrike * 0.1;
+                level.sendParticles(ParticleTypes.CRIT, this.getX() + Math.cos(a) * DUEL_RANGE, this.getY() + 0.1,
+                        this.getZ() + Math.sin(a) * DUEL_RANGE, 1, 0, 0, 0, 0);
+            }
+        }
+        if (untilStrike == 0) strike(level, target, v);
+    }
+
+    private void strike(ServerLevel level, ServerPlayer focus, DummyConfig.Variant v) {
+        swing(focus.getX() - this.getX(), focus.getZ() - this.getZ(), 17F);                       // se jette vers l'avant
+        level.playSound(null, this.blockPosition(), SoundEvents.IRON_GOLEM_ATTACK, SoundSource.HOSTILE, 1.0F, 0.8F);
+        level.sendParticles(ParticleTypes.SWEEP_ATTACK, this.getX(), this.getY() + 1.0, this.getZ(), 1, 0, 0, 0, 0);
+        for (ServerPlayer p : level.players()) {
+            if (!canBeStruck(p) || p.distanceToSqr(this) > DUEL_RANGE * DUEL_RANGE) continue;
+            var data = com.mmorpg.server.RpgPlayers.get(p);
+            double max = data.stats.get(com.mmorpg.rpg.Stat.MAX_HP);
+            if (max <= 0 || data.hp < max * DUEL_MERCY) {
+                p.sendOverlayMessage(Component.literal("Le duelliste retient son coup : reprenez des forces.").withColor(0xA0E0A0));
+                continue;
+            }
+            float before = data.hp;
+            com.mmorpg.combat.RpgCombat.dealDamage(this, p, max * v.strikePercent / 100.0, false, false);
+            com.mmorpg.MMORPG.LOGGER.debug("[MMORPG] duelliste : {} perd {} points de vie", p.getName().getString(), before - data.hp);
+        }
+    }
+
+    /** Anime le ressort du mannequin sans toucher a ses statistiques : (dx, dz) = direction du mouvement. */
+    private void swing(double dx, double dz, float force) {
+        this.entityData.set(HIT_FORCE, force);
+        this.entityData.set(HIT_DIR, (float) Math.toDegrees(Math.atan2(dz, dx)));
+        this.entityData.set(HIT_SEQ, hitSeq() + 1);
     }
 
     @Override

@@ -55,7 +55,7 @@ public final class HubLayout {
 
     /** Mannequins : {x, z, variante, yaw}. */
     public static final int[][] DUMMIES_ROOM = {{-13, -86, 0, 0}, {0, -90, 1, 0}, {13, -86, 2, 0}, {-7, -78, 0, 0}, {7, -78, 0, 0}};
-    public static final int[][] DUMMIES_YARD = {{52, -8, 0, 90}, {52, 0, 1, 90}, {52, 8, 2, 90}, {60, -8, 2, 90}, {60, 0, 0, 90}, {60, 8, 1, 90}};
+    public static final int[][] DUMMIES_YARD = {{52, -8, 0, 90}, {52, 0, 1, 90}, {52, 8, 2, 90}, {60, -8, 2, 90}, {60, 0, 3, 90}, {60, 8, 1, 90}};
 
     public static BlockPos pos(BlockPos origin, int[] p) {
         return origin.offset(p[0], p[1], p[2]);

@@ -64,6 +64,10 @@ def generate(ga):
     gen_decor.generate(ga)
     import gen_music
     gen_music.generate(ga.ASSETS)
+    import gen_quest_wand
+    gen_quest_wand.generate(ga)
+    import gen_duelliste
+    gen_duelliste.generate(ga)
     classes = os.path.join(os.path.dirname(__file__), '..', 'art', 'classes_blockbench')
     for folder, key in MAITRES:
         for suffix in ('', '_emissive'):
