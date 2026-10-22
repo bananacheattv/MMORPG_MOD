@@ -40,6 +40,14 @@ public final class StyledDungeon {
         HubCtx c = new HubCtx(level, o);
         Theme th = theme(c, t);
 
+        // reconstruction au meme endroit (meme un autre donjon) : on efface zones et epreuves de l'ancien
+        var oldZones = ZoneData.get(level.getServer());
+        var oldTrials = TrialData.get(level.getServer());
+        oldTrials.removeInside(level.dimension(), o.getX() - 40, o.getZ() - 10, o.getX() + 40, o.getZ() + 200);
+        for (DungeonType other : DungeonType.values()) {
+            oldZones.removeOverlapping(level.dimension(), other.id + "_", o.getX() - 40, o.getZ() - 10, o.getX() + 40, o.getZ() + 200);
+        }
+
         Carve v = new Carve(-30, 30, -11, 36, -4, 194);
         v.cyl(0, Theme.HALL_Z, Theme.HALL_R, 1, Theme.HALL_H);
         v.dome(0, Theme.HALL_Z, Theme.HALL_R, Theme.HALL_R, Theme.HALL_H, 11);
@@ -48,8 +56,8 @@ public final class StyledDungeon {
         v.dome(0, Theme.A_Z, Theme.A_R, Theme.A_R, Theme.A_H, 9);
         v.vault(0, Theme.PIT_Z0 - 1, Theme.PIT_Z1 + 1, Theme.PIT_HALF, 1, 6, 4, false);
         v.box(-Theme.PIT_HALF, -Theme.PIT_DEPTH, Theme.PIT_Z0, Theme.PIT_HALF, -2, Theme.PIT_Z1);          // fosse sous le pont
-        v.box(-Theme.PIT_HALF, -1, Theme.PIT_Z0, -2, 0, Theme.PIT_Z1);
-        v.box(2, -1, Theme.PIT_Z0, Theme.PIT_HALF, 0, Theme.PIT_Z1);
+        v.box(-Theme.PIT_HALF, -1, Theme.PIT_Z0, -Theme.DECK - 1, 0, Theme.PIT_Z1);
+        v.box(Theme.DECK + 1, -1, Theme.PIT_Z0, Theme.PIT_HALF, 0, Theme.PIT_Z1);
         v.cyl(0, Theme.B_Z, Theme.B_R, 1, Theme.B_H);
         v.dome(0, Theme.B_Z, Theme.B_R, Theme.B_R, Theme.B_H, 9);
         for (int side : new int[]{-1, 1}) {
@@ -86,17 +94,35 @@ public final class StyledDungeon {
         th.arena();
         th.treasure();
 
+        // epreuves : herses, dalles, plateformes et enregistrement
+        BlockPos base = o;
+        String key = t.id + "_" + o.getX() + "_" + o.getZ();
+        TrialData trials = TrialData.get(level.getServer());
+        trials.removePrefix(key);
+        Trials.Plan plan = th.plan();
+        Trials.Palette pal = th.palette();
+        long seed = base.asLong() * 31 + t.level;
+        buildTrial(c, level, trials, pal, plan.a(), key + "_a", Theme.A_Z, 68, 69, plan.diffA(), t.level, seed);
+        buildTrial(c, level, trials, pal, plan.pit(), key + "_pit", 0, Theme.PIT_Z0, Theme.PIT_Z1, plan.diffPit(), t.level, seed + 1);
+        buildTrial(c, level, trials, pal, plan.b(), key + "_b", Theme.B_Z, 115, 116, plan.diffB(), t.level, seed + 2);
+
         // elements de jeu
         RandomSource r = level.getRandom();
         var mobs = t.mobs.get();
         BlockPos tp = o.offset(0, 1, Theme.HALL_Z);
         c.set(0, 1, Theme.HALL_Z, ModBlocks.TELEPORTEUR.get());
-        DungeonBuilder.spawner(level, o.offset(-7, 1, Theme.A_Z - 3), mobs.get(0), r);
-        DungeonBuilder.spawner(level, o.offset(7, 1, Theme.A_Z + 4), mobs.get(mobs.size() > 1 ? 1 : 0), r);
+        boolean freeA = plan.a().equals(Trials.NONE);
+        boolean freeB = plan.b().equals(Trials.NONE);
+        if (freeA) {
+            DungeonBuilder.spawner(level, o.offset(-7, 1, Theme.A_Z - 3), mobs.get(0), r);
+            DungeonBuilder.spawner(level, o.offset(7, 1, Theme.A_Z + 4), mobs.get(mobs.size() > 1 ? 1 : 0), r);
+        }
         DungeonBuilder.chest(level, o.offset(11, 1, Theme.A_Z + 9), DungeonBuilder.roomLoot(t, r, false), r);
-        DungeonBuilder.spawner(level, o.offset(-5, 1, Theme.B_Z - 6), mobs.get(0), r);
-        DungeonBuilder.spawner(level, o.offset(5, 1, Theme.B_Z + 6), mobs.get(mobs.size() > 1 ? 1 : 0), r);
-        DungeonBuilder.spawner(level, o.offset(-18, 1, Theme.B_Z), mobs.get(0), r);
+        if (freeB) {
+            DungeonBuilder.spawner(level, o.offset(-5, 1, Theme.B_Z - 6), mobs.get(0), r);
+            DungeonBuilder.spawner(level, o.offset(5, 1, Theme.B_Z + 6), mobs.get(mobs.size() > 1 ? 1 : 0), r);
+            DungeonBuilder.spawner(level, o.offset(-18, 1, Theme.B_Z), mobs.get(0), r);
+        }
         DungeonBuilder.chest(level, o.offset(18, 1, Theme.B_Z), DungeonBuilder.roomLoot(t, r, false), r);
         c.set(0, 1, Theme.ARENA_Z, ModBlocks.AUTEL_INVOCATION.get());
         DungeonBuilder.chest(level, o.offset(0, 1, Theme.TREASURE_Z + 3), DungeonBuilder.roomLoot(t, r, true), r);
@@ -109,12 +135,23 @@ public final class StyledDungeon {
         ZoneData zones = ZoneData.get(level.getServer());
         int ox = o.getX();
         int oz = o.getZ();
-        String key = t.id + "_" + ox + "_" + oz;
+        key = t.id + "_" + ox + "_" + oz;
         zones.add(new ZoneData.Zone(key, t.label, level.dimension(), ox - 27, oz - 2, ox + 27, oz + 192,
                 true, true, false, ZoneData.Zone.STYLE_ZONE, "Donjon · niveau " + t.level));
         zones.add(new ZoneData.Zone(key + "_boss", th.arenaName(), level.dimension(), ox - 23, oz + Theme.ARENA_Z - 23, ox + 23, oz + Theme.ARENA_Z + 23,
                 true, true, false, ZoneData.Zone.STYLE_BOSS, "Boss · niveau " + t.level));
         return tp;
+    }
+
+    private static void buildTrial(HubCtx c, ServerLevel level, TrialData data, Trials.Palette pal, String kind, String id, int cz, int z0, int z1,
+                                   int diff, int lvl, long seed) {
+        switch (kind) {
+            case TrialData.WAVES -> Trials.waves(c, level, data, pal, id, cz, z0, z1, diff, lvl);
+            case TrialData.SIMON -> Trials.simon(c, level, data, pal, id, cz, z0, z1, diff, lvl);
+            case TrialData.JUMP -> Trials.jump(c, level, data, pal, id, z0, z1, diff, lvl, seed);
+            default -> {
+            }
+        }
     }
 
     // ------------------------------------------------------------------ utilitaires pour les ambiances

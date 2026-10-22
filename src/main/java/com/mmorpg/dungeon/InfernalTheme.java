@@ -110,12 +110,12 @@ final class InfernalTheme extends Theme {
         // lac de lave sous le pont, poutres de basalte, braseros sur les piles
         for (int z = PIT_Z0; z <= PIT_Z1; z++) {
             for (int x = -PIT_HALF; x <= PIT_HALF; x++) {
-                if (Math.abs(x) <= 1) continue;
+                if (Math.abs(x) <= DECK) continue;
                 c.set(x, -PIT_DEPTH, z, Blocks.OBSIDIAN);
                 c.set(x, -PIT_DEPTH + 1, z, Blocks.LAVA);
                 c.set(x, -PIT_DEPTH + 2, z, Blocks.LAVA);
             }
-            for (int x = -1; x <= 1; x++) c.set(x, 0, z, c.mix(x, 0, z, 13, Blocks.POLISHED_BLACKSTONE_BRICKS, 60, Blocks.NETHER_BRICKS, 40));
+            for (int x = -DECK; x <= DECK; x++) c.set(x, 0, z, c.mix(x, 0, z, 13, Blocks.POLISHED_BLACKSTONE_BRICKS, 60, Blocks.NETHER_BRICKS, 40));
         }
         for (int z = PIT_Z0; z <= PIT_Z1; z += 4) {
             for (int side : new int[]{-2, 2}) {
@@ -230,6 +230,17 @@ final class InfernalTheme extends Theme {
             Kit.brazier(c, (int) Math.round(Math.cos(a) * 5.4), 1, (int) Math.round(cz + Math.sin(a) * 5.4), Blocks.NETHER_BRICK_WALL, Blocks.CAMPFIRE);
         }
         c.set(0, 1, (int) cz - 2, c.stair(Blocks.NETHER_BRICK_STAIRS, Direction.SOUTH, false));
+    }
+
+    @Override
+    Trials.Palette palette() {
+        return new Trials.Palette(Blocks.NETHER_BRICK_FENCE, Blocks.GLOWSTONE, Blocks.POLISHED_BLACKSTONE_BRICKS, Blocks.BLACKSTONE, Blocks.LANTERN,
+                java.util.List.of("elementaire_feu", "orc_guerrier"), java.util.Map.of(TrialData.WAVES, "FOURNAISE DES DÉMONS", TrialData.JUMP, "TRAVERSÉE DE LAVE", TrialData.SIMON, "ÉNIGME DES FORGES"));
+    }
+
+    @Override
+    Trials.Plan plan() {
+        return new Trials.Plan(TrialData.WAVES, TrialData.JUMP, TrialData.SIMON, 1, 1, 2);
     }
 
     @Override

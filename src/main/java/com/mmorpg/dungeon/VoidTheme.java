@@ -115,12 +115,12 @@ final class VoidTheme extends Theme {
         // abime du neant : le sol du fosse est un champ d'etoiles ; le pont lui-meme est de purpur et de cristal
         for (int z = PIT_Z0; z <= PIT_Z1; z++) {
             for (int x = -PIT_HALF; x <= PIT_HALF; x++) {
-                if (Math.abs(x) <= 1) continue;
+                if (Math.abs(x) <= DECK) continue;
                 c.set(x, -PIT_DEPTH, z, Blocks.CONCRETE.pick(DyeColor.BLACK));
                 if (c.rnd(x, 0, z, 9) < 0.2F) c.set(x, -PIT_DEPTH, z, Blocks.END_ROD.defaultBlockState().setValue(net.minecraft.world.level.block.DirectionalBlock.FACING, Direction.UP));
                 if (c.rnd(x, 1, z, 10) < 0.1F) c.set(x, -PIT_DEPTH + 1, z, Blocks.AMETHYST_CLUSTER);
             }
-            for (int x = -1; x <= 1; x++) c.set(x, 0, z, x == 0 ? c.state("dalle_runique") : c.state(Blocks.PURPUR_PILLAR));
+            for (int x = -DECK; x <= DECK; x++) c.set(x, 0, z, x == 0 ? c.state("dalle_runique") : c.state(Blocks.PURPUR_PILLAR));
         }
         for (int z = PIT_Z0; z <= PIT_Z1; z += 4) {
             for (int side : new int[]{-2, 2}) {
@@ -220,6 +220,17 @@ final class VoidTheme extends Theme {
             obelisk((int) Math.round(Math.cos(a) * 5.4), (int) Math.round(cz + Math.sin(a) * 5.4), 1, 3 + i % 2);
         }
         for (int[] p : new int[][]{{-2, 3}, {2, 3}}) c.set(p[0], 1, (int) cz + p[1], Blocks.AMETHYST_CLUSTER);
+    }
+
+    @Override
+    Trials.Palette palette() {
+        return new Trials.Palette(Blocks.CRYING_OBSIDIAN, Blocks.PEARLESCENT_FROGLIGHT, Blocks.PURPUR_BLOCK, Blocks.OBSIDIAN, Blocks.END_ROD,
+                java.util.List.of("chevalier_neant", "golem_cristal"), java.util.Map.of(TrialData.WAVES, "LÉGION DU NÉANT", TrialData.JUMP, "PARCOURS DU VIDE", TrialData.SIMON, "ÉNIGME DES ÉTOILES"));
+    }
+
+    @Override
+    Trials.Plan plan() {
+        return new Trials.Plan(TrialData.WAVES, TrialData.JUMP, TrialData.SIMON, 2, 2, 3);
     }
 
     @Override

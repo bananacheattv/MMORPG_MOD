@@ -126,12 +126,12 @@ final class CryptTheme extends Theme {
     void pit() {
         for (int z = PIT_Z0; z <= PIT_Z1; z++) {
             for (int x = -PIT_HALF; x <= PIT_HALF; x++) {
-                if (Math.abs(x) <= 1) continue;
+                if (Math.abs(x) <= DECK) continue;
                 c.set(x, -PIT_DEPTH, z, Blocks.SOUL_SOIL);
                 if (c.rnd(x, 0, z, 11) < 0.7F) c.set(x, -PIT_DEPTH + 1, z, Blocks.SOUL_FIRE);
                 if (c.rnd(x, 1, z, 12) < 0.12F) c.set(x, -PIT_DEPTH + 2, z, Blocks.COBWEB);
             }
-            for (int x = -1; x <= 1; x++) c.set(x, 0, z, c.mix(x, 0, z, 13, Blocks.POLISHED_DEEPSLATE, 50, Blocks.DEEPSLATE_TILES, 30, Blocks.CRACKED_DEEPSLATE_BRICKS, 20));
+            for (int x = -DECK; x <= DECK; x++) c.set(x, 0, z, c.mix(x, 0, z, 13, Blocks.POLISHED_DEEPSLATE, 50, Blocks.DEEPSLATE_TILES, 30, Blocks.CRACKED_DEEPSLATE_BRICKS, 20));
         }
         for (int z = PIT_Z0 + 1; z <= PIT_Z1 - 1; z += 4) {
             for (int side : new int[]{-2, 2}) {
@@ -249,6 +249,17 @@ final class CryptTheme extends Theme {
         sarcophagus(0, (int) cz - 1, false);
         spire(-3, (int) cz + 3, 4);
         spire(3, (int) cz + 3, 4);
+    }
+
+    @Override
+    Trials.Palette palette() {
+        return new Trials.Palette(Blocks.IRON_BARS, Blocks.PEARLESCENT_FROGLIGHT, Blocks.POLISHED_DEEPSLATE, Blocks.DEEPSLATE_TILES, Blocks.SOUL_LANTERN,
+                java.util.List.of("squelette_maudit", "orc_guerrier"), java.util.Map.of(TrialData.WAVES, "RÉVEIL DES TOMBES", TrialData.JUMP, "PONT D'OSSEMENTS", TrialData.SIMON, "ÉNIGME DES CIERGES"));
+    }
+
+    @Override
+    Trials.Plan plan() {
+        return new Trials.Plan(TrialData.SIMON, Trials.NONE, TrialData.WAVES, 1, 0, 1);
     }
 
     @Override

@@ -128,11 +128,11 @@ class GoblinTheme extends Theme {
         // fosse : boue et pieux de pierre, pont de planches avec cordes et lanternes
         for (int z = PIT_Z0; z <= PIT_Z1; z++) {
             for (int x = -PIT_HALF; x <= PIT_HALF; x++) {
-                if (Math.abs(x) <= 1) continue;
+                if (Math.abs(x) <= DECK) continue;
                 c.set(x, -PIT_DEPTH, z, Blocks.MUD);
                 if (c.rnd(x, 0, z, 9) < 0.55F) c.set(x, -PIT_DEPTH + 1, z, Blocks.POINTED_DRIPSTONE);
             }
-            for (int x = -1; x <= 1; x++) c.set(x, 0, z, (z % 3 == 0 ? Blocks.DARK_OAK_PLANKS : Blocks.SPRUCE_PLANKS));
+            for (int x = -DECK; x <= DECK; x++) c.set(x, 0, z, (z % 3 == 0 ? Blocks.DARK_OAK_PLANKS : Blocks.SPRUCE_PLANKS));
         }
         for (int z = PIT_Z0; z <= PIT_Z1; z += 4) {
             for (int side : new int[]{-2, 2}) {
@@ -263,6 +263,17 @@ class GoblinTheme extends Theme {
         c.set(-2, 1, (int) cz, Blocks.HAY_BLOCK);
         c.set(2, 1, (int) cz, Blocks.HAY_BLOCK);
         Kit.chandelier(c, 14, 0, (int) cz, 4, Blocks.LANTERN);
+    }
+
+    @Override
+    Trials.Palette palette() {
+        return new Trials.Palette(Blocks.SPRUCE_FENCE, Blocks.SHROOMLIGHT, Blocks.SPRUCE_PLANKS, Blocks.DARK_OAK_PLANKS, Blocks.LANTERN,
+                java.util.List.of("gobelin", "loup_sombre"), java.util.Map.of(TrialData.WAVES, "ASSAUT DU CAMP", TrialData.JUMP, "PASSERELLE BRISÉE", TrialData.SIMON, "ÉNIGME DES TOTEMS"));
+    }
+
+    @Override
+    Trials.Plan plan() {
+        return new Trials.Plan(Trials.NONE, TrialData.JUMP, TrialData.WAVES, 0, 0, 0);
     }
 
     @Override

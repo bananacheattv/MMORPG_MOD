@@ -127,13 +127,13 @@ final class FrostTheme extends Theme {
         // crevasse : abime de glace bleue eclairee par des lanternes marines, pont de calcite
         for (int z = PIT_Z0; z <= PIT_Z1; z++) {
             for (int x = -PIT_HALF; x <= PIT_HALF; x++) {
-                if (Math.abs(x) <= 1) continue;
+                if (Math.abs(x) <= DECK) continue;
                 c.set(x, -PIT_DEPTH, z, c.rnd(x, 0, z, 9) < 0.18F ? c.state(Blocks.SEA_LANTERN) : c.state(Blocks.BLUE_ICE));
                 if (c.rnd(x, 1, z, 10) < 0.25F) {
                     c.set(x, -PIT_DEPTH + 1, z, Blocks.POWDER_SNOW);
                 }
             }
-            for (int x = -1; x <= 1; x++) c.set(x, 0, z, c.mix(x, 0, z, 13, "tuile_givre", 45, Blocks.PACKED_ICE, 35, "marbre_poli", 20));
+            for (int x = -DECK; x <= DECK; x++) c.set(x, 0, z, c.mix(x, 0, z, 13, "tuile_givre", 45, Blocks.PACKED_ICE, 35, "marbre_poli", 20));
         }
         for (int z = PIT_Z0; z <= PIT_Z1; z += 4) {
             for (int side : new int[]{-2, 2}) {
@@ -249,6 +249,17 @@ final class FrostTheme extends Theme {
             crystal((int) Math.round(Math.cos(a) * 4.6), (int) Math.round(cz + Math.sin(a) * 4.6), 4 + i % 2 * 2);
         }
         icicles(0, cz, 6, 14, 14, 7);
+    }
+
+    @Override
+    Trials.Palette palette() {
+        return new Trials.Palette(Blocks.BLUE_ICE, Blocks.SEA_LANTERN, Blocks.BLUE_ICE, Blocks.PACKED_ICE, Blocks.SOUL_LANTERN,
+                java.util.List.of("spectre_givre", "golem_cristal"), java.util.Map.of(TrialData.WAVES, "TEMPÊTE DE GIVRE", TrialData.JUMP, "BANQUISE BRISÉE", TrialData.SIMON, "ÉNIGME DES CRISTAUX"));
+    }
+
+    @Override
+    Trials.Plan plan() {
+        return new Trials.Plan(TrialData.SIMON, TrialData.JUMP, TrialData.WAVES, 1, 1, 2);
     }
 
     @Override

@@ -12,7 +12,7 @@ abstract class Theme {
     /** Plan commun, en coordonnees relatives a l'origine du donjon (le sol est a y = 0, l'interieur commence a y = 1). */
     static final int HALL_Z = 12, HALL_R = 11, HALL_H = 13;
     static final int A_Z = 52, A_R = 15, A_H = 12;
-    static final int PIT_Z0 = 66, PIT_Z1 = 86, PIT_HALF = 4, PIT_DEPTH = 9;
+    static final int PIT_Z0 = 66, PIT_Z1 = 86, PIT_HALF = 4, PIT_DEPTH = 9, DECK = 2;
     static final int B_Z = 100, B_R = 14, B_H = 12;
     static final int GAL_Z0 = 114, GAL_Z1 = 132;
     static final int ARENA_Z = 154, ARENA_R = 21, ARENA_H = 16;
@@ -40,6 +40,12 @@ abstract class Theme {
 
     /** Source de lumiere integree a la coque. */
     abstract BlockState light(int x, int y, int z);
+
+    /** Materiaux et noms des epreuves de cette ambiance. */
+    abstract Trials.Palette palette();
+
+    /** Quelle epreuve dans quelle salle. */
+    abstract Trials.Plan plan();
 
     abstract void hall();
 

@@ -111,6 +111,11 @@ public class ZoneData extends SavedData {
         setDirty();
     }
 
+    /** Retire les zones dont l'identifiant commence par {@code prefix} et qui chevauchent le rectangle (reconstruction d'un donjon). */
+    public void removeOverlapping(ResourceKey<Level> dim, String idPrefix, int x0, int z0, int x1, int z1) {
+        if (zones.removeIf(z -> z.dimension().equals(dim) && z.id().startsWith(idPrefix) && z.minX() <= x1 && z.maxX() >= x0 && z.minZ() <= z1 && z.maxZ() >= z0)) setDirty();
+    }
+
     public boolean remove(String id) {
         boolean removed = zones.removeIf(z -> z.id().equals(id));
         if (removed) setDirty();
