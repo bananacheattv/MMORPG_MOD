@@ -221,7 +221,7 @@ public final class QuestManager {
         }
         d.activeQuests.put(id, new int[q.objectives.size()]);
         Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "QUÊTE ACCEPTÉE", q.name, 0xFFD040));
-        p.level().playSound(null, p.blockPosition(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 1f, 1f);
+        p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.QUEST_ACCEPT.get(), SoundSource.PLAYERS, 1f, 1f);
         d.dirty = true;
         openGiver(p, npc);
     }
@@ -277,7 +277,7 @@ public final class QuestManager {
         // familiers et cosmetiques : uniquement dans les caisses et les Lucky Blocks (q.rewards.pet / cosmetic ignores)
         if (q.rewards.evolution > 0) RpgPlayers.unlockEvolution(p, q.rewards.evolution);
         Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "QUÊTE TERMINÉE", q.name, 0x60FF80));
-        p.level().playSound(null, p.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 0.8f, 1.2f);
+        p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.SUCCESS.get(), SoundSource.PLAYERS, 1f, 1f);
         if (xp > 0) RpgPlayers.giveXp(p, xp, false);
         d.dirty = true;
         openGiver(p, npc);
@@ -317,7 +317,7 @@ public final class QuestManager {
             if (!wasComplete && completable(p, d, e.getKey())) {
                 Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "OBJECTIFS ACCOMPLIS",
                         q.name + " — retournez voir un Maître des Quêtes", 0x60FF80));
-                p.level().playSound(null, p.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.5f, 1.6f);
+                p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.CHIME.get(), SoundSource.PLAYERS, 0.9f, 1.1f);
             }
         }
     }

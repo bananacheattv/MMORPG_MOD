@@ -107,7 +107,7 @@ public final class CrateManager {
                 p.sendSystemMessage(Component.literal("✦ " + tier.label + " : " + be.announce).withColor(tier.color));
             }
             be.announce = "";
-            level.playSound(null, pos, SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.BLOCKS, 0.9f, 1.2f);
+            level.playSound(null, pos, com.mmorpg.registry.ModSounds.CHIME.get(), SoundSource.BLOCKS, 1f, 1f);
             level.sendParticles(ParticleTypes.TOTEM_OF_UNDYING, pos.getX() + .5, pos.getY() + 2.2, pos.getZ() + .5, 40, .4, .4, .4, .3);
             level.sendParticles(ParticleTypes.FIREWORK, pos.getX() + .5, pos.getY() + 2.2, pos.getZ() + .5, 20, .3, .3, .3, .1);
             level.scheduleTick(pos, state.getBlock(), CrateBlockEntity.SHOW_TICKS);

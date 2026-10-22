@@ -25,6 +25,10 @@ public class TrialData extends SavedData {
     public static final String SIMON = "simon";
     public static final String ORDER = "order";
     public static final String TARGETS = "targets";
+    /** Combat contre un gardien d'elite et son escorte (herse fermee tant qu'il vit). */
+    public static final String ELITE = "elite";
+    /** Embuscade dans un couloir : des monstres surgissent a l'arrivee du joueur ; ne bloque rien et ne compte pas dans les epreuves du donjon. */
+    public static final String AMBUSH = "ambush";
 
     /**
      * @param box    zone de declenchement (vagues, enigme) ou zone de chute (parcours : tombe si y < y0)

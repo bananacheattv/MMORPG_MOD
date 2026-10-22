@@ -306,7 +306,7 @@ public final class RpgPlayers {
         fullRestore(player);
         ServerLevel level = player.level();
         level.sendParticles(ParticleTypes.TOTEM_OF_UNDYING, player.getX(), player.getY() + 1, player.getZ(), 50, 0.4, 0.8, 0.4, 0.4);
-        level.playSound(null, player.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1f, 1f);
+        level.playSound(null, player.blockPosition(), com.mmorpg.registry.ModSounds.LEVELUP.get(), SoundSource.PLAYERS, 1f, 1f);
         int oldTier = PlayerClass.tier(oldLevel);
         int newTier = PlayerClass.tier(newLevel);
         if (newTier > oldTier && d.evolution < newTier) {
@@ -338,7 +338,7 @@ public final class RpgPlayers {
         String title = d.title();
         ServerLevel level = player.level();
         Net.toPlayer(player, new Payloads.Notify(Payloads.Notify.EVOLUTION, "ÉVOLUTION !", "Vous devenez " + title, d.playerClass.color));
-        level.playSound(null, player.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1f, 1f);
+        level.playSound(null, player.blockPosition(), com.mmorpg.registry.ModSounds.FANFARE.get(), SoundSource.PLAYERS, 0.7f, 1.2f);
         level.sendParticles(ParticleTypes.END_ROD, player.getX(), player.getY() + 1, player.getZ(), 80, 0.6, 1.2, 0.6, 0.25);
         if (ConfigManager.general().announceEvolutions) {
             player.level().getServer().getPlayerList().broadcastSystemMessage(
@@ -411,7 +411,7 @@ public final class RpgPlayers {
         sync(player);
         ServerLevel level = player.level();
         level.sendParticles(ParticleTypes.TOTEM_OF_UNDYING, player.getX(), player.getY() + 1, player.getZ(), 40, 0.4, 0.8, 0.4, 0.3);
-        level.playSound(null, player.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 0.8f, 1.2f);
+        level.playSound(null, player.blockPosition(), com.mmorpg.registry.ModSounds.SUCCESS.get(), SoundSource.PLAYERS, 1f, 1f);
         Net.toPlayer(player, new Payloads.Notify(Payloads.Notify.EVOLUTION, cls.label.toUpperCase(java.util.Locale.ROOT),
                 "Votre aventure commence !", cls.color));
     }
@@ -575,18 +575,22 @@ public final class RpgPlayers {
         sync(player);
     }
 
-    public static void onDeath(ServerPlayer player) {
+    public static void onDeath(ServerPlayer player, String cause) {
         PlayerData d = get(player);
         d.hp = 0;
         double loss = ConfigManager.general().deathXpLossPercent;
+        long lost = 0;
         if (loss > 0 && d.playerClass.isPlayable() && d.level < LevelSystem.MAX_LEVEL) {
-            long lost = Math.round(LevelSystem.xpToNext(d.level) * loss / 100.0);
+            lost = Math.round(LevelSystem.xpToNext(d.level) * loss / 100.0);
             lost = Math.min(lost, d.xp);
             if (lost > 0) {
                 d.xp -= lost;
+                d.dirty = true;
                 player.sendSystemMessage(Component.literal("Vous avez perdu " + lost + " points d'expérience.").withColor(0xFF6060));
             }
         }
+        // l'ecran de mort affiche l'experience perdue ; l'equipement, lui, est conserve (voir ServerEvents.onServerStarted)
+        com.mmorpg.network.Net.toPlayer(player, new Payloads.DeathInfo(Math.max(0, lost), d.level, d.xp, LevelSystem.xpToNext(d.level), cause));
         PetManager.despawn(player);
     }
 

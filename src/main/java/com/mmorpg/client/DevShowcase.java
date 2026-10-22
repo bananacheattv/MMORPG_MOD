@@ -420,6 +420,14 @@ public final class DevShowcase {
             }
             return;
         }
+        if (MODE.equals("mort")) {
+            deathPhase(mc, me);
+            return;
+        }
+        if (MODE.equals("sortie")) {
+            sortiePhase(mc, me);
+            return;
+        }
         if (MODE.equals("instances")) {
             instancesPhase(mc, me);
             return;
@@ -450,7 +458,7 @@ public final class DevShowcase {
                 case 5 -> {
                     mc.getWindow().setWindowed(1280, 720);
                     cmd(mc, "item replace entity " + me + " weapon.mainhand with mmorpg:baguette_zone");
-                    cmd(mc, "execute in minecraft:overworld run tp " + me + " 3000 150 3000 45 20");
+                    cmd(mc, "execute in minecraft:overworld run tp " + me + " 6000 150 6000 45 20");
                 }
                 case 12 -> srv.execute(() -> zoneStep(srv, me, 5));
                 case 15 -> srv.execute(() -> zoneStep(srv, me, 0));
@@ -2504,7 +2512,7 @@ public final class DevShowcase {
         var srv = mc.getSingleplayerServer();
         if (tick == 5) {
             cmd(mc, "gamemode creative");
-            cmd(mc, "execute in minecraft:overworld run tp " + me + " 3000 150 3000 0 0");
+            cmd(mc, "execute in minecraft:overworld run tp " + me + " 6000 150 6000 0 0");
         }
         if (tick == 8 && !mc.gui.hud.isHidden()) mc.gui.hud.toggle();
         if (tick == 130) srv.execute(() -> dungeonBase = srv.getPlayerList().getPlayerByName(me).blockPosition());
@@ -2542,10 +2550,36 @@ public final class DevShowcase {
                             mc.gui.hud.getChat().clearMessages(true);
                             shot(mc, id + "_epreuve_saut");
                         });
+                        // raccourci : sauter directement a l'arrivee ne valide rien
                         trialAt(10, () -> srv.execute(() -> hubTeleport(srv, me, t0.gate().get(0) + 4, t0.gate().get(1), t0.gate().get(2) + 1)));
-                        trialAt(25, () -> srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] EPREUVE saut reussi = {}", trialOf(srv, tid).done())));
+                        trialAt(25, () -> srv.execute(() -> {
+                            var p = srv.getPlayerList().getPlayerByName(me);
+                            MMORPG.LOGGER.info("[MMORPG] EPREUVE saut raccourci : valide = {} (attendu false) ; joueur renvoye au depart = {}", trialOf(srv, tid).done(),
+                                    Math.abs(p.getZ() - (t0.pos().get(2) + 0.5)) < 3);
+                        }));
+                        // trajet complet : un point tous les 6 blocs le long du parcours
+                        int zFirst = t0.box().get(2);
+                        int zLast = t0.box().get(5);
+                        for (int zz = zFirst + 1; zz <= zLast; zz += 6) {
+                            int zc = zz;
+                            trialAt(8, () -> srv.execute(() -> hubTeleport(srv, me, t0.pos().get(0), t0.pos().get(1), zc)));
+                        }
+                        trialAt(10, () -> srv.execute(() -> hubTeleport(srv, me, t0.gate().get(0) + 4, t0.gate().get(1), t0.gate().get(2) + 1)));
+                        trialAt(25, () -> srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] EPREUVE saut reussi = {} (attendu true)", trialOf(srv, tid).done())));
                     }
-                    case "waves" -> {
+                    case "ambush" -> {
+                        trialAt(5, () -> srv.execute(() -> hubTeleport(srv, me, t0.pos().get(0), t0.pos().get(1), t0.box().get(2) + 3)));
+                        trialAt(50, () -> srv.execute(() -> {
+                            var lv = srv.getPlayerList().getPlayerByName(me).level();
+                            int n = lv.getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new net.minecraft.world.phys.AABB(t0.pos().get(0) - 8, t0.pos().get(1) - 2, t0.box().get(2) - 4,
+                                    t0.pos().get(0) + 8, t0.pos().get(1) + 8, t0.box().get(5) + 4), m -> m instanceof com.mmorpg.entity.RpgMob).size();
+                            MMORPG.LOGGER.info("[MMORPG] EPREUVE embuscade : {} monstres apres l'arrivee", n);
+                            for (var m : lv.getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new net.minecraft.world.phys.AABB(t0.pos().get(0) - 8, t0.pos().get(1) - 2, t0.box().get(2) - 4,
+                                    t0.pos().get(0) + 8, t0.pos().get(1) + 8, t0.box().get(5) + 4), m -> m instanceof com.mmorpg.entity.RpgMob)) m.discard();
+                        }));
+                        trialAt(60, () -> srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] EPREUVE embuscade repoussee = {}", trialOf(srv, tid).done())));
+                    }
+                    case "waves", "elite" -> {
                         trialAt(5, () -> srv.execute(() -> hubTeleport(srv, me, t0.pos().get(0), t0.pos().get(1), t0.pos().get(2) - 2)));
                         trialAt(60, () -> srv.execute(() -> {
                             var lv = srv.getPlayerList().getPlayerByName(me).level();
@@ -2652,7 +2686,7 @@ public final class DevShowcase {
             trialAt(15, () -> srv.execute(() -> {
                 var p = srv.getPlayerList().getPlayerByName(me);
                 var lv = p.level();
-                var center = dungeonBase.offset(0, 0, 154);
+                var center = dungeonBase.offset(0, 0, com.mmorpg.dungeon.Layout.ARENA.z());
                 hubTeleport(srv, me, center.getX(), center.getY(), center.getZ() - 12);
                 String key = switch (id) {
                     case "crypte_gobeline" -> "roi_gobelin";
@@ -2671,7 +2705,7 @@ public final class DevShowcase {
             }));
             trialAt(8, () -> srv.execute(() -> {
                 var lv = srv.getPlayerList().getPlayerByName(me).level();
-                var center = dungeonBase.offset(0, 0, 154);
+                var center = dungeonBase.offset(0, 0, com.mmorpg.dungeon.Layout.ARENA.z());
                 int adds = lv.getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new net.minecraft.world.phys.AABB(center).inflate(26),
                         m -> m instanceof com.mmorpg.entity.RpgMob && !(m instanceof com.mmorpg.entity.boss.RpgBoss)).size();
                 MMORPG.LOGGER.info("[MMORPG] BOSS phase 2 : {} renforts dans l'arene (solo : peu attendus)", adds);
@@ -2681,8 +2715,8 @@ public final class DevShowcase {
                 shot(mc, id + "_boss_phase");
             });
             // entree dans l'antre du boss : l'animation doit se declencher
-            trialAt(20, () -> srv.execute(() -> hubTeleport(srv, me, dungeonBase.getX(), dungeonBase.getY(), dungeonBase.getZ() + 124)));
-            trialAt(30, () -> srv.execute(() -> hubTeleport(srv, me, dungeonBase.getX(), dungeonBase.getY(), dungeonBase.getZ() + 140)));
+            trialAt(20, () -> srv.execute(() -> hubTeleport(srv, me, dungeonBase.getX(), dungeonBase.getY(), dungeonBase.getZ() + com.mmorpg.dungeon.Layout.GALLERY.z0() + 10)));
+            trialAt(30, () -> srv.execute(() -> hubTeleport(srv, me, dungeonBase.getX(), dungeonBase.getY(), dungeonBase.getZ() + com.mmorpg.dungeon.Layout.ARENA.z0() + 6)));
             trialAt(14, () -> cmd(mc, "tp " + me + " ~ ~ ~ 0 8"));
             trialAt(34, () -> shot(mc, id + "_antre_animation"));
             trialAt(70, () -> shot(mc, id + "_antre_animation2"));
@@ -2715,7 +2749,7 @@ public final class DevShowcase {
         var srv = mc.getSingleplayerServer();
         if (tick == 5) {
             cmd(mc, "gamemode survival");
-            cmd(mc, "execute in minecraft:overworld run tp " + me + " 3000 150 3000 0 0");
+            cmd(mc, "execute in minecraft:overworld run tp " + me + " 6000 150 6000 0 0");
         }
         if (tick == 8 && !mc.gui.hud.isHidden()) mc.gui.hud.toggle();
         if (tick == 10) srv.execute(() -> {
@@ -2753,13 +2787,13 @@ public final class DevShowcase {
                 }
             }
             // 3. antre du boss : entree, combat, phases, victoire
-            trialAt(40, () -> srv.execute(() -> hubTeleport(srv, me, dungeonBase.getX(), dungeonBase.getY(), dungeonBase.getZ() + 122)));
-            trialAt(30, () -> srv.execute(() -> hubTeleport(srv, me, dungeonBase.getX(), dungeonBase.getY(), dungeonBase.getZ() + 136)));
+            trialAt(40, () -> srv.execute(() -> hubTeleport(srv, me, dungeonBase.getX(), dungeonBase.getY(), dungeonBase.getZ() + com.mmorpg.dungeon.Layout.GALLERY.z0() + 8)));
+            trialAt(30, () -> srv.execute(() -> hubTeleport(srv, me, dungeonBase.getX(), dungeonBase.getY(), dungeonBase.getZ() + com.mmorpg.dungeon.Layout.ARENA.z0() + 2)));
             trialAt(8, () -> cmd(mc, "tp " + me + " ~ ~ ~ 0 6"));
             trialAt(35, () -> shot(mc, id + "_cine_antre"));
             trialAt(120, () -> srv.execute(() -> {
                 var lv = srv.getPlayerList().getPlayerByName(me).level();
-                var center = dungeonBase.offset(0, 0, 154);
+                var center = dungeonBase.offset(0, 0, com.mmorpg.dungeon.Layout.ARENA.z());
                 String key = switch (id) {
                     case "crypte_gobeline" -> "roi_gobelin";
                     case "catacombes" -> "liche_ancienne";
@@ -2808,12 +2842,108 @@ public final class DevShowcase {
         bossRef.syncData(com.mmorpg.registry.ModAttachments.MOB);
     }
 
+    /** Ecran de mort personnalise : le joueur (guerrier niveau 20) meurt, l'ecran affiche l'experience perdue ; puis il renait. */
+    private static void deathPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) cmd(mc, "gamemode survival");
+        if (tick == 20) srv.execute(() -> {
+            var p = srv.getPlayerList().getPlayerByName(me);
+            var d = com.mmorpg.server.RpgPlayers.get(p);
+            d.playerClass = com.mmorpg.rpg.PlayerClass.GUERRIER;
+            d.level = 20;
+            d.xp = 3000;
+            d.dirty = true;
+            MMORPG.LOGGER.info("[MMORPG] MORT avant : niveau {} ; xp {}", d.level, d.xp);
+        });
+        if (tick == 60) srv.execute(() -> {
+            var p = srv.getPlayerList().getPlayerByName(me);
+            p.getAbilities().invulnerable = false;
+            p.onUpdateAbilities();
+            p.kill(p.level());
+        });
+        if (tick == 75) MMORPG.LOGGER.info("[MMORPG] MORT ecran affiche = {}", mc.gui.screen() == null ? "aucun" : mc.gui.screen().getClass().getSimpleName());
+        if (tick == 80) shot(mc, "mort_1");
+        if (tick == 110) shot(mc, "mort_2");
+        if (tick == 160) shot(mc, "mort_3");
+        if (tick == 170) srv.execute(() -> {
+            var p = srv.getPlayerList().getPlayerByName(me);
+            var d = com.mmorpg.server.RpgPlayers.get(p);
+            MMORPG.LOGGER.info("[MMORPG] MORT apres : niveau {} ; xp {} (attendu 5 % de l'XP du niveau retiree)", d.level, d.xp);
+            MMORPG.LOGGER.info("[MMORPG] MORT conservation de l'equipement : keep_inventory = {}", srv.getGameRules().get(net.minecraft.world.level.gamerules.GameRules.KEEP_INVENTORY));
+        });
+        if (tick == 180) mc.execute(() -> {
+            if (mc.player != null) mc.player.respawn();
+            mc.gui.setScreen(null);
+        });
+        if (tick == 230) {
+            MMORPG.LOGGER.info("[MMORPG] MORT ecran apres renaissance = {}", mc.gui.screen() == null ? "aucun" : mc.gui.screen().getClass().getSimpleName());
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        }
+    }
+
+    private static long exitKillTick;
+
+    /** Retour automatique apres la mort du boss : entree dans un exemplaire, mort du boss, compte a rebours, retour et exemplaire remis a neuf. */
+    private static void sortiePhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) {
+            cmd(mc, "gamemode survival");
+            cmd(mc, "execute in minecraft:overworld run tp " + me + " 6000 150 6000 0 0");
+        }
+        if (tick == 8 && !mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        if (tick == 10) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            pl.getAbilities().invulnerable = true;
+            pl.onUpdateAbilities();
+        });
+        if (tick == 30) srv.execute(() -> com.mmorpg.dungeon.InstanceManager.debugForgetAll(srv));
+        if (tick == 40) cmd(mc, "mmorpg donjon catacombes");
+        if (tick == 80) srv.execute(() -> {
+            var p = srv.getPlayerList().getPlayerByName(me);
+            var gate = com.mmorpg.world.WaypointData.get(srv).all().stream().filter(w -> w.name.startsWith("Catacombes") && com.mmorpg.dungeon.InstanceManager.isGate(srv, w.id)).findFirst().orElse(null);
+            MMORPG.LOGGER.info("[MMORPG] SORTIE depart ({}, {}, {}) ; entree = {}", (int) p.getX(), (int) p.getY(), (int) p.getZ(),
+                    gate != null && com.mmorpg.dungeon.InstanceManager.enter(p, gate.id));
+        });
+        if (tick == 700) srv.execute(() -> {
+            var p = srv.getPlayerList().getPlayerByName(me);
+            MMORPG.LOGGER.info("[MMORPG] SORTIE dans l'instance : dimension {} ; position ({}, {}, {}) ; exemplaire {}", p.level().dimension().identifier(),
+                    (int) p.getX(), (int) p.getY(), (int) p.getZ(), com.mmorpg.dungeon.InstanceManager.debugSlot(srv, "catacombes:0", 0));
+        });
+        if (tick == 710) srv.execute(() -> {
+            var p = srv.getPlayerList().getPlayerByName(me);
+            String[] o = com.mmorpg.dungeon.InstanceManager.debugSlot(srv, "catacombes:0", 0).split(",");
+            int ox = Integer.parseInt(o[0]), oy = Integer.parseInt(o[1]), oz = Integer.parseInt(o[2]);
+            var lv = p.level();
+            var altar = new net.minecraft.core.BlockPos(ox, oy, oz + com.mmorpg.dungeon.Layout.ARENA.z());
+            hubTeleport(srv, me, ox, oy, oz + com.mmorpg.dungeon.Layout.ARENA.z() - 12);
+            bossRef = com.mmorpg.entity.boss.BossManager.spawnBoss(lv, com.mmorpg.entity.boss.BossManager.typeFor("liche_ancienne"), "liche_ancienne", altar.above(), "Test");
+            MMORPG.LOGGER.info("[MMORPG] SORTIE boss apparu en ({}, {}, {})", (int) bossRef.getX(), (int) bossRef.getY(), (int) bossRef.getZ());
+        });
+        if (tick == 790) srv.execute(() -> {
+            var p = srv.getPlayerList().getPlayerByName(me);
+            exitKillTick = srv.getTickCount();
+            MMORPG.LOGGER.info("[MMORPG] SORTIE mort du boss au tick serveur {}", exitKillTick);
+            com.mmorpg.combat.RpgCombat.dealDamage(p, bossRef, 1.0E9, false, false);
+        });
+        if (tick > 790 && tick % 40 == 0 && tick <= 790 + 40 * 10) srv.execute(() -> {
+            var p = srv.getPlayerList().getPlayerByName(me);
+            MMORPG.LOGGER.info("[MMORPG] SORTIE +{} s : dimension {} ; position ({}, {}, {})", (srv.getTickCount() - exitKillTick) / 20, p.level().dimension().identifier(),
+                    (int) p.getX(), (int) p.getY(), (int) p.getZ());
+        });
+        if (tick == 790 + 40 * 10 + 60) srv.execute(() -> {
+            MMORPG.LOGGER.info("[MMORPG] SORTIE exemplaire apres le retour : {}", com.mmorpg.dungeon.InstanceManager.debugSlot(srv, "catacombes:0", 0));
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        });
+    }
+
     /** Verification des donjons instancies : porte, exemplaire par groupe, reutilisation, objet d'invocation. */
     private static void instancesPhase(Minecraft mc, String me) {
         var srv = mc.getSingleplayerServer();
         if (tick == 5) {
             cmd(mc, "gamemode creative");
-            cmd(mc, "execute in minecraft:overworld run tp " + me + " 3000 150 3000 0 0");
+            cmd(mc, "execute in minecraft:overworld run tp " + me + " 6000 150 6000 0 0");
         }
         if (tick == 8 && !mc.gui.hud.isHidden()) mc.gui.hud.toggle();
         if (tick == 50) srv.execute(() -> com.mmorpg.dungeon.InstanceManager.debugForgetAll(srv));
@@ -2859,10 +2989,10 @@ public final class DevShowcase {
             int parts = group.lastIndexOf('_');
             int oz = Integer.parseInt(group.substring(parts + 1));
             int ox = Integer.parseInt(group.substring(group.lastIndexOf('_', parts - 1) + 1, parts));
-            var arena = new net.minecraft.core.BlockPos(ox, trials.get(0).pos().get(1), oz + 154);
+            var arena = new net.minecraft.core.BlockPos(ox, trials.get(0).pos().get(1), oz + com.mmorpg.dungeon.Layout.ARENA.z());
             int drops = lv.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(arena).inflate(16), e -> e.getItem().is(key)).size();
             MMORPG.LOGGER.info("[MMORPG] INSTANCE objet d'invocation au sol apres la derniere epreuve = {} (attendu 1)", drops);
-            var chest = lv.getBlockEntity(new net.minecraft.core.BlockPos(ox, trials.get(0).pos().get(1), oz + 186));
+            var chest = lv.getBlockEntity(new net.minecraft.core.BlockPos(ox, trials.get(0).pos().get(1), oz + com.mmorpg.dungeon.Layout.TREASURE.z() + 3));
             boolean inChest = false;
             if (chest instanceof net.minecraft.world.level.block.entity.ChestBlockEntity cbe) {
                 for (int i = 0; i < cbe.getContainerSize(); i++) if (cbe.getItem(i).is(key)) inChest = true;
@@ -2883,7 +3013,7 @@ public final class DevShowcase {
         var srv = mc.getSingleplayerServer();
         if (tick == 5) {
             cmd(mc, "gamemode survival");
-            cmd(mc, "execute in minecraft:overworld run tp " + me + " 3000 150 3000 0 0");
+            cmd(mc, "execute in minecraft:overworld run tp " + me + " 6000 150 6000 0 0");
         }
         if (tick == 8 && !mc.gui.hud.isHidden()) mc.gui.hud.toggle();
         if (tick == 130) srv.execute(() -> dungeonBase = srv.getPlayerList().getPlayerByName(me).blockPosition());
@@ -2891,7 +3021,7 @@ public final class DevShowcase {
         if (tick == 330) srv.execute(() -> {
             var p = srv.getPlayerList().getPlayerByName(me);
             p.getAbilities().invulnerable = false;
-            var altar = dungeonBase.offset(0, 0, 154);
+            var altar = dungeonBase.offset(0, 0, com.mmorpg.dungeon.Layout.ARENA.z());
             for (var old : p.level().getEntitiesOfClass(com.mmorpg.entity.boss.RpgBoss.class, new net.minecraft.world.phys.AABB(altar).inflate(80))) old.discard();
             hubTeleport(srv, me, altar.getX() + 3, altar.getY(), altar.getZ() - 8);
             String key = switch (id) {
@@ -2907,6 +3037,12 @@ public final class DevShowcase {
         if (tick == 332 + 9 * 18 + 40) srv.execute(() -> {
             var p = srv.getPlayerList().getPlayerByName(me);
             MMORPG.LOGGER.info("[MMORPG] REVELATION camera du joueur rendue = {} ; joueur fige pendant la scene = {}", mc.getCameraEntity() == mc.player, true);
+            var altarPos = dungeonBase.offset(0, 0, com.mmorpg.dungeon.Layout.ARENA.z());
+            for (var bo : p.level().getEntitiesOfClass(com.mmorpg.entity.boss.RpgBoss.class, new net.minecraft.world.phys.AABB(altarPos).inflate(60))) {
+                boolean embedded = !p.level().noCollision(bo, bo.getBoundingBox().deflate(0.02));
+                MMORPG.LOGGER.info("[MMORPG] REVELATION boss {} en ({}, {}, {}) ; a {} blocs de l'autel ; coince dans un bloc = {} ; base = {}",
+                        bo.getName().getString(), (int) bo.getX(), (int) bo.getY(), (int) bo.getZ(), (int) Math.hypot(bo.getX() - altarPos.getX() - 0.5, bo.getZ() - altarPos.getZ() - 0.5), embedded, ((net.minecraft.world.entity.PathfinderMob) bo).getHomePosition());
+            }
             MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
             stop(mc);
         });
@@ -2917,7 +3053,7 @@ public final class DevShowcase {
         var srv = mc.getSingleplayerServer();
         if (tick == 5) {
             cmd(mc, "gamemode creative");
-            cmd(mc, "execute in minecraft:overworld run tp " + me + " 3000 150 3000 0 0");
+            cmd(mc, "execute in minecraft:overworld run tp " + me + " 6000 150 6000 0 0");
         }
         if (tick == 8 && !mc.gui.hud.isHidden()) mc.gui.hud.toggle();
         if (tick == 30) srv.execute(() -> com.mmorpg.dungeon.InstanceManager.debugForgetAll(srv));
@@ -2956,15 +3092,18 @@ public final class DevShowcase {
     private static net.minecraft.core.BlockPos dungeonBase;
     /** Prises de vue d'un donjon : (x, z relatifs, hauteur de depart, cap, inclinaison, nom). Le sol est a y = 1. */
     private static final double[][] DUNGEON_SHOTS = {
-            {0, 3, 1, 0, -4}, {0, 6, 1, 0, -42}, {0, 24, 1, 0, 0}, {0, 38, 1, 0, -6}, {0, 44, 1, 20, -48},
-            {0, 63, 1, 0, 12}, {0, 88, 1, 0, -4}, {0, 98, 1, -35, -40}, {0, 113, 1, 0, 0}, {0, 130, 1, 0, 0},
-            {0, 138, 1, 0, -28}, {0, 168, 1, 180, -15}, {0, 175, 1, 0, 0}, {0, 178, 1, 0, 0}};
+            {0, 3, 1, 0, -4}, {0, 6, 1, 0, -42}, {0, 32, 1, 0, 0}, {0, 52, 1, 0, 2}, {-10, 58, 1, 35, -10},
+            {0, 84, 1, 0, 8}, {0, 119, 1, 0, 3}, {0, 131, 1, 180, -8}, {0, 155, 1, 0, 0}, {0, 168, 1, 0, 2},
+            {0, 181, 1, 200, -10}, {0, 200, 1, 0, 6}, {0, 235, 1, 0, 2}, {0, 248, 1, 30, -10}, {0, 274, 1, 0, 0},
+            {0, 286, 1, 0, 2}, {0, 298, 1, 200, -12}, {0, 320, 1, 0, 0}, {0, 334, 1, 0, 2}, {0, 350, 1, 150, -10},
+            {0, 358, 1, 180, -6}, {0, 378, 1, 0, 0}, {0, 392, 1, 0, 0}, {0, 409, 1, 0, 0}, {0, 420, 1, 0, -12},
+            {0, 450, 1, 0, 0}};
 
     private static void dungeonPhase(Minecraft mc, String me, String id) {
         var srv = mc.getSingleplayerServer();
         if (tick == 5) {
             cmd(mc, "gamemode creative");
-            cmd(mc, "execute in minecraft:overworld run tp " + me + " 3000 150 3000 0 0");
+            cmd(mc, "execute in minecraft:overworld run tp " + me + " 6000 150 6000 0 0");
         }
         if (tick == 8 && !mc.gui.hud.isHidden()) mc.gui.hud.toggle();
         if (tick == 130) srv.execute(() -> dungeonBase = srv.getPlayerList().getPlayerByName(me).blockPosition());

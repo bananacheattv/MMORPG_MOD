@@ -45,10 +45,12 @@ final class Kit {
         c.set(x, y + 2, z, fire);
     }
 
-    /** Lustre : chaine verticale et croix de chaines portant quatre lanternes. */
-    static void chandelier(HubCtx c, int x, int topY, int z, int drop, Block lantern) {
-        for (int y = topY; y > topY - drop; y--) c.set(x, y, z, Blocks.IRON_CHAIN);
+    /** Lustre : chaine accrochee au plafond (on cherche le plafond au-dessus de {@code topY}) et croix de chaines portant cinq lanternes. */
+    static void chandelier(HubCtx c, int topY, int x, int z, int drop, Block lantern) {
+        int top = topY;
+        while (top < topY + 14 && c.air(x, top + 1, z)) top++;
         int by = topY - drop;
+        for (int y = top; y > by; y--) c.set(x, y, z, Blocks.IRON_CHAIN);
         for (int d = -2; d <= 2; d++) {
             c.set(x + d, by, z, c.axis(Blocks.IRON_CHAIN, Direction.Axis.X));
             c.set(x, by, z + d, c.axis(Blocks.IRON_CHAIN, Direction.Axis.Z));

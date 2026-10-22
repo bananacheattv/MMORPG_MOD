@@ -44,11 +44,16 @@ class GoblinTheme extends Theme {
 
     @Override
     void shape(Carve v) {
-        // terriers : petites cavites aux flancs des salles de combat
-        int[][] pockets = {{-16, 44}, {16, 40}, {-17, 58}, {15, 62}, {-13, 92}, {12, 108}, {-12, 108}};
-        for (int[] p : pockets) {
-            v.cyl(p[0], p[1], 3.2, 1, 5, 0.6, p[0] + p[1]);
-            v.dome(p[0], p[1], 3.2, 3.2, 5, 2.5);
+        // terriers : petites cavites aux flancs des salles de combat (jamais le long d'un lac de saut : on ne contourne rien)
+        for (int i = 0; i < Layout.ROOMS.length; i++) {
+            Layout.Room rm = Layout.ROOMS[i];
+            if (jumpRoom(i)) continue;
+            for (int[] p : new int[][]{{-1, -8}, {1, -4}, {-1, 7}, {1, 9}}) {
+                int x = p[0] * (rm.r() + 1);
+                int z = rm.z() + p[1];
+                v.cyl(x, z, 3.2, 1, 5, 0.6, x + z);
+                v.dome(x, z, 3.2, 3.2, 5, 2.5);
+            }
         }
     }
 
@@ -95,18 +100,18 @@ class GoblinTheme extends Theme {
     }
 
     @Override
-    void roomA() {
-        double cz = A_Z;
+    void roomA(Layout.Room rm) {
+        double cz = rm.z();
         for (int i = 0; i < 8; i++) {
             double a = Math.PI * 2 * i / 8 + Math.PI / 8;
             int x = (int) Math.round(Math.cos(a) * 11.5);
             int z = (int) Math.round(cz + Math.sin(a) * 11.5);
-            for (int y = 1; y <= A_H; y++) c.set(x, y, z, c.axis(Blocks.DARK_OAK_LOG, Direction.Axis.Y));
-            for (Direction d : Direction.Plane.HORIZONTAL) c.set(x + d.getStepX(), A_H, z + d.getStepZ(), c.stair(Blocks.DARK_OAK_STAIRS, d, true));
+            for (int y = 1; y <= rm.h(); y++) c.set(x, y, z, c.axis(Blocks.DARK_OAK_LOG, Direction.Axis.Y));
+            for (Direction d : Direction.Plane.HORIZONTAL) c.set(x + d.getStepX(), rm.h(), z + d.getStepZ(), c.stair(Blocks.DARK_OAK_STAIRS, d, true));
             c.set(x, 1, z, Blocks.SPRUCE_PLANKS);
         }
         // roue de chariot suspendue : anneau de planches porte par quatre chaines, lanternes sur le pourtour
-        int wy = A_H - 2;
+        int wy = rm.h() - 2;
         c.ring(0, wy, (int) cz, 3.0, 4.6, (x, y, z) -> Blocks.SPRUCE_PLANKS.defaultBlockState());
         c.disc(0, wy, (int) cz, 1.4, (x, y, z) -> Blocks.DARK_OAK_PLANKS.defaultBlockState());
         for (int[] o : new int[][]{{4, 0}, {-4, 0}, {0, 4}, {0, -4}}) {
@@ -124,9 +129,9 @@ class GoblinTheme extends Theme {
     }
 
     @Override
-    void pit() {
+    void pit(int z0, int z1) {
         // fosse : boue et pieux de pierre, pont de planches avec cordes et lanternes
-        for (int z = PIT_Z0; z <= PIT_Z1; z++) {
+        for (int z = z0; z <= z1; z++) {
             for (int x = -PIT_HALF; x <= PIT_HALF; x++) {
                 if (Math.abs(x) <= DECK) continue;
                 c.set(x, -PIT_DEPTH, z, Blocks.MUD);
@@ -134,14 +139,14 @@ class GoblinTheme extends Theme {
             }
             for (int x = -DECK; x <= DECK; x++) c.set(x, 0, z, (z % 3 == 0 ? Blocks.DARK_OAK_PLANKS : Blocks.SPRUCE_PLANKS));
         }
-        for (int z = PIT_Z0; z <= PIT_Z1; z += 4) {
+        for (int z = z0; z <= z1; z += 4) {
             for (int side : new int[]{-2, 2}) {
                 c.set(side, 1, z, Blocks.SPRUCE_FENCE);
                 c.set(side, 2, z, Blocks.SPRUCE_FENCE);
                 c.set(side, 3, z, Blocks.LANTERN);
             }
         }
-        for (int z = PIT_Z0; z <= PIT_Z1; z++) {
+        for (int z = z0; z <= z1; z++) {
             for (int side : new int[]{-2, 2}) {
                 if (z % 4 != 0) c.set(side, 1, z, Blocks.SPRUCE_FENCE);
             }
@@ -149,8 +154,8 @@ class GoblinTheme extends Theme {
     }
 
     @Override
-    void roomB() {
-        double cz = B_Z;
+    void roomB(Layout.Room rm) {
+        double cz = rm.z();
         // camp de guerre : cercle de pierre, chaudron, enclumes et ratelier
         c.ring(0, 1, (int) cz, 5.0, 6.2, (x, y, z) -> Blocks.MOSSY_STONE_BRICKS.defaultBlockState());
         c.set(0, 1, (int) cz, Blocks.CAULDRON);
@@ -163,13 +168,13 @@ class GoblinTheme extends Theme {
         }
         // cages suspendues
         for (int[] p : new int[][]{{-7, 4}, {7, -4}}) {
-            for (int y = B_H + 5; y > 6; y--) c.set(p[0], y, (int) cz + p[1], Blocks.IRON_CHAIN);
+            for (int y = rm.h() + 5; y > 6; y--) c.set(p[0], y, (int) cz + p[1], Blocks.IRON_CHAIN);
             c.fill(p[0] - 1, 3, (int) cz + p[1] - 1, p[0] + 1, 5, (int) cz + p[1] + 1, Blocks.IRON_BARS);
             c.fill(p[0], 4, (int) cz + p[1], p[0], 4, (int) cz + p[1], Blocks.AIR);
             c.set(p[0], 6, (int) cz + p[1], Blocks.IRON_BARS);
             c.set(p[0], 3, (int) cz + p[1], Blocks.IRON_BARS);
         }
-        Kit.ribs(c, 0, cz, B_R, B_R, B_H, 9, 8, Blocks.SPRUCE_LOG);
+        Kit.ribs(c, 0, cz, rm.r(), rm.r(), rm.h(), 9, 8, Blocks.SPRUCE_LOG);
         // alcoves : litieres de foin et totems
         for (int side : new int[]{-1, 1}) {
             c.fill(side * 20, 1, (int) cz - 2, side * 22, 1, (int) cz + 2, Blocks.HAY_BLOCK);
@@ -268,12 +273,23 @@ class GoblinTheme extends Theme {
     @Override
     Trials.Palette palette() {
         return new Trials.Palette(Blocks.SPRUCE_FENCE, Blocks.SHROOMLIGHT, Blocks.SPRUCE_PLANKS, Blocks.DARK_OAK_PLANKS, Blocks.LANTERN,
-                java.util.List.of("gobelin", "loup_sombre"), java.util.Map.of(TrialData.WAVES, "ASSAUT DU CAMP", TrialData.JUMP, "PASSERELLE BRISÉE", TrialData.SIMON, "ÉNIGME DES TOTEMS", TrialData.ORDER, "LANGAGE DES TOTEMS"), Blocks.MUD, Blocks.LANTERN);
+                java.util.List.of("gobelin", "loup_sombre"), java.util.Map.of(TrialData.WAVES, "ASSAUT DU CAMP", TrialData.JUMP, "PASSERELLE BRISÉE", TrialData.SIMON, "ÉNIGME DES TOTEMS", TrialData.ORDER, "LANGAGE DES TOTEMS", TrialData.TARGETS, "TIR AUX TOTEMS", TrialData.ELITE, "GARDIEN DU TERRIER", TrialData.AMBUSH, "EMBUSCADE GOBELINE"), Blocks.MUD, Blocks.LANTERN);
     }
 
     @Override
     Trials.Plan plan() {
-        return new Trials.Plan(Trials.JUMPROOM, Trials.NONE, TrialData.ORDER, 1, 0, 0);
+        // salle 1, couloir 1, salle 2, salle 3, couloir 2, salle 4, salle 5, gardien d'elite
+        return Trials.plan(TrialData.WAVES, 0, TrialData.JUMP, 0, TrialData.TARGETS, 0, TrialData.ORDER, 0, TrialData.JUMP, 1, TrialData.WAVES, 1, Trials.JUMPROOM, 1, TrialData.ELITE, 1);
+    }
+
+    @Override
+    String eliteKey() {
+        return "colosse_racine";
+    }
+
+    @Override
+    Look look() {
+        return new Look(Blocks.DARK_OAK_LOG, Blocks.SPRUCE_PLANKS, Blocks.DARK_OAK_STAIRS, Blocks.LANTERN, Blocks.CAMPFIRE, Blocks.MUD_BRICKS, Blocks.COBBLESTONE, Blocks.BONE_BLOCK);
     }
 
     @Override

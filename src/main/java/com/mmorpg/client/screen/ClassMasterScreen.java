@@ -374,7 +374,7 @@ public class ClassMasterScreen extends MmoScreen {
         hits.clear();                                                                        // seuls les boutons de la confirmation sont cliquables
         btn(g, "yes", bx + 14, by + bh - 28, 118, 18, "Oui, devenir " + cls.label, t > 0.9F, 0xFF2A7A2A, () -> {
             ClientNet.send(new Payloads.HubAction(Payloads.HubAction.CHOOSE, selectedClass, 0));
-            sound(SoundEvents.PLAYER_LEVELUP, 1.0F);
+            sound(com.mmorpg.registry.ModSounds.LEVELUP.get(), 1.0F);
             onClose();
         });
         btn(g, "no", bx + bw - 14 - 118, by + bh - 28, 118, 18, "Non, revenir", t > 0.9F, 0xFF5A3A3A, () -> confirming = false);

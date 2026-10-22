@@ -2,21 +2,24 @@ package com.mmorpg.dungeon;
 
 import com.mmorpg.hub.HubCtx;
 import com.mmorpg.world.DungeonBuilder.DungeonType;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * Une ambiance de donjon : materiaux de la coque et decor de chaque espace. Le plan (salle d'entree, deux salles de combat
- * reliees par un couloir a fosse, galerie des gardiens, arene du boss, tresor) est commun et defini dans {@link StyledDungeon}.
+ * Une ambiance de donjon : materiaux de la coque et decor de chaque espace. Le plan (hall d'entree, six salles d'epreuve reliees par des
+ * couloirs, galerie des gardiens, arene du boss, tresor) est commun et defini dans {@link Layout} ; l'assemblage dans {@link StyledDungeon}.
  */
 abstract class Theme {
-    /** Plan commun, en coordonnees relatives a l'origine du donjon (le sol est a y = 0, l'interieur commence a y = 1). */
-    static final int HALL_Z = 12, HALL_R = 11, HALL_H = 13;
-    static final int A_Z = 52, A_R = 15, A_H = 12;
-    static final int PIT_Z0 = 66, PIT_Z1 = 86, PIT_HALF = 4, PIT_DEPTH = 9, DECK = 2;
-    static final int B_Z = 100, B_R = 14, B_H = 12;
-    static final int GAL_Z0 = 114, GAL_Z1 = 132;
-    static final int ARENA_Z = 154, ARENA_R = 21, ARENA_H = 16;
-    static final int TREASURE_Z = 183, TREASURE_R = 7;
+    /** Constantes du plan (voir {@link Layout}) sous les noms utilises par les ambiances. */
+    static final int HALL_Z = Layout.HALL.z(), HALL_R = Layout.HALL.r(), HALL_H = Layout.HALL.h();
+    static final int PIT_HALF = Layout.PIT_HALF, PIT_DEPTH = Layout.PIT_DEPTH, DECK = Layout.DECK;
+    static final int GAL_Z0 = Layout.GALLERY.z0(), GAL_Z1 = Layout.GALLERY.z1();
+    static final int ARENA_Z = Layout.ARENA.z(), ARENA_R = Layout.ARENA.r(), ARENA_H = Layout.ARENA.h();
+    static final int TREASURE_Z = Layout.TREASURE.z(), TREASURE_R = Layout.TREASURE.r();
+
+    /** Blocs d'accent d'une ambiance, utilises pour decorer les salles et couloirs generiques ({@link Rooms}). */
+    record Look(Object pillar, Object accent, Block stair, Block lamp, Block fire, Object floorA, Object floorB, Object prop) {
+    }
 
     final HubCtx c;
     final DungeonType type;
@@ -44,17 +47,25 @@ abstract class Theme {
     /** Materiaux et noms des epreuves de cette ambiance. */
     abstract Trials.Palette palette();
 
-    /** Quelle epreuve dans quelle salle. */
+    /** Quelle epreuve dans quelle salle ou couloir. */
     abstract Trials.Plan plan();
+
+    /** Monstre d'elite qui garde la derniere salle avant l'antre du boss (cle de bestiaire). */
+    abstract String eliteKey();
+
+    /** Blocs d'accent de l'ambiance. */
+    abstract Look look();
 
     abstract void hall();
 
-    abstract void roomA();
+    /** Premiere salle d'epreuve (decor signature de l'ambiance). */
+    abstract void roomA(Layout.Room rm);
 
-    /** Remplit la fosse du couloir central (lave, glace, vide...) et orne le pont. */
-    abstract void pit();
+    /** Remplit la fosse d'un couloir (lave, glace, vide...) et orne le pont. */
+    abstract void pit(int z0, int z1);
 
-    abstract void roomB();
+    /** Deuxieme salle d'epreuve (decor signature de l'ambiance). */
+    abstract void roomB(Layout.Room rm);
 
     abstract void gallery();
 
@@ -69,6 +80,11 @@ abstract class Theme {
     abstract String lore();
 
     // ------------------------------------------------------------------ outils
+
+    /** La salle d'epreuve d'indice {@code i} (voir {@link Layout#ROOMS}) est-elle un lac a traverser en sautant ? */
+    final boolean jumpRoom(int i) {
+        return plan().roomKind(i).equals(Trials.JUMPROOM);
+    }
 
     final boolean arenaRegion(int z) {
         return z >= GAL_Z1;

@@ -107,6 +107,19 @@ public final class Payloads {
         }
     }
 
+    /** Mort du joueur : cause et experience perdue, affichees par l'ecran de mort personnalise (l'equipement n'est jamais perdu). */
+    public record DeathInfo(long xpLost, int level, long xpNow, long xpNext, String cause) implements CustomPacketPayload {
+        public static final Type<DeathInfo> TYPE = new Type<>(MMORPG.id("death_info"));
+        public static final StreamCodec<ByteBuf, DeathInfo> CODEC = StreamCodec.composite(
+                ByteBufCodecs.VAR_LONG, DeathInfo::xpLost, ByteBufCodecs.VAR_INT, DeathInfo::level, ByteBufCodecs.VAR_LONG, DeathInfo::xpNow,
+                ByteBufCodecs.VAR_LONG, DeathInfo::xpNext, ByteBufCodecs.STRING_UTF8, DeathInfo::cause, DeathInfo::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
     /** Cinematique d'apparition d'un boss invoque a l'autel (camera pilotee cote client). */
     public record BossReveal(int x, int y, int z, int ticks) implements CustomPacketPayload {
         public static final Type<BossReveal> TYPE = new Type<>(MMORPG.id("boss_reveal"));

@@ -60,7 +60,7 @@ public final class ArenaEvents {
             level.sendParticles(ParticleTypes.END_ROD, drop.getX(), drop.getY() + 0.5, drop.getZ(), 40, 0.4, 0.6, 0.4, 0.05);
             level.playSound(null, altar, com.mmorpg.registry.ModSounds.CHIME.get(), SoundSource.PLAYERS, 1.2F, 1.0F);
             for (ServerPlayer p : level.players()) {
-                if (Math.abs(p.getX() - altar.getX()) < 40 && p.getZ() > altar.getZ() - 170 && p.getZ() < altar.getZ() + 50) {
+                if (Math.abs(p.getX() - altar.getX()) < 40 && p.getZ() > altar.getZ() - (Theme.ARENA_Z + 10) && p.getZ() < altar.getZ() + 50) {
                     p.sendSystemMessage(net.minecraft.network.chat.Component.literal("✦ L'objet d'invocation est apparu près de l'autel de l'antre : "
                             + key.getName(new net.minecraft.world.item.ItemStack(key)).getString() + ".").withColor(0xFFE080));
                 }
@@ -127,6 +127,10 @@ public final class ArenaEvents {
             }
         }
         level.playSound(null, boss.blockPosition(), com.mmorpg.registry.ModSounds.FANFARE.get(), SoundSource.PLAYERS, 1.6F, 1.0F);
+        // retour automatique a l'entree du donjon apres quinze secondes (hors instance : le hall du donjon)
+        net.minecraft.world.phys.Vec3 hall = dungeonZone == null ? boss.position()
+                : new net.minecraft.world.phys.Vec3(dungeonZone.minX() + 33 + 0.5, boss.getY(), dungeonZone.minZ() + 2 + Theme.HALL_Z - 6 + 0.5);
+        InstanceManager.victoryExit(level, boss.getX(), boss.getZ(), hall);
         for (int i = 0; i < 10; i++) {
             int step = i;
             com.mmorpg.server.Scheduler.later(level, 10 + i * 14, () -> {

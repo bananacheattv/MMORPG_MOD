@@ -124,7 +124,7 @@ public final class ForgeManager {
         if (player.getRandom().nextInt(100) < chance) {
             stack.set(ModDataComponents.UPGRADE.get(), target);
             level.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 1f, 1.4f);
-            level.playSound(null, pos, SoundEvents.PLAYER_LEVELUP, SoundSource.BLOCKS, 0.6f, 1.8f);
+            level.playSound(null, pos, com.mmorpg.registry.ModSounds.CHIME.get(), SoundSource.BLOCKS, 0.8f, 1.2f);
             level.sendParticles(ParticleTypes.TOTEM_OF_UNDYING, pos.getX() + 0.5, pos.getY() + 1.2, pos.getZ() + 0.5, 30, 0.3, 0.4, 0.3, 0.3);
             Net.toPlayer(player, new Payloads.Notify(Payloads.Notify.LOOT, "AMÉLIORATION RÉUSSIE !",
                     stack.getHoverName().getString(), 0xFFD040));

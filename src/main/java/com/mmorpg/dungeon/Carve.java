@@ -124,10 +124,20 @@ final class Carve {
 
     /** Calcule la premiere couche de la coque (aucun bloc n'est pose) : a appeler une fois avant les tranches. */
     void prepareShell() {
+        beginShell();
+        prepareShellSlice(z0, z1);
+    }
+
+    /** Premiere etape de la preparation en tranches (voir {@link #prepareShellSlice}). */
+    void beginShell() {
         first = new boolean[in.length];
+    }
+
+    /** Calcule la premiere couche de la coque pour les tranches z comprises entre {@code za} et {@code zb} : permet d'etaler le calcul sur plusieurs ticks. */
+    void prepareShellSlice(int za, int zb) {
         for (int x = x0; x <= x1; x++) {
             for (int y = y0; y <= y1; y++) {
-                for (int z = z0; z <= z1; z++) {
+                for (int z = Math.max(z0, za); z <= Math.min(z1, zb); z++) {
                     if (!in[idx(x, y, z)] && touches(x, y, z, in)) first[idx(x, y, z)] = true;
                 }
             }

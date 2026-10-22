@@ -97,11 +97,11 @@ final class CryptTheme extends Theme {
     }
 
     @Override
-    void roomA() {
-        double cz = A_Z;
-        Kit.ribs(c, 0, cz, A_R, A_R, A_H, 9, 12, Blocks.POLISHED_DEEPSLATE);
-        Kit.band(c, 0, cz, A_R, 3, Blocks.CHISELED_DEEPSLATE);
-        Kit.colonnade(c, 0, cz, 12.5, 6, 0.0, 1, A_H, Blocks.POLISHED_DEEPSLATE, Blocks.DEEPSLATE_BRICKS, Blocks.DEEPSLATE_BRICK_STAIRS);
+    void roomA(Layout.Room rm) {
+        double cz = rm.z();
+        Kit.ribs(c, 0, cz, rm.r(), rm.r(), rm.h(), 9, 12, Blocks.POLISHED_DEEPSLATE);
+        Kit.band(c, 0, cz, rm.r(), 3, Blocks.CHISELED_DEEPSLATE);
+        Kit.colonnade(c, 0, cz, 12.5, 6, 0.0, 1, rm.h(), Blocks.POLISHED_DEEPSLATE, Blocks.DEEPSLATE_BRICKS, Blocks.DEEPSLATE_BRICK_STAIRS);
         // autel d'ossements : estrade ronde, piliers d'os et crane central
         Kit.rings(c, 0, 1, (int) cz, 5, Blocks.POLISHED_DEEPSLATE, Blocks.DEEPSLATE_TILES, Blocks.POLISHED_BLACKSTONE_BRICKS);
         c.set(0, 2, (int) cz, Blocks.BONE_BLOCK);
@@ -118,13 +118,13 @@ final class CryptTheme extends Theme {
         sarcophagus(11, (int) cz - 3, true);
         for (int i = 0; i < 4; i++) {
             double a = Math.PI * 2 * i / 4 + 0.6;
-            Kit.chandelier(c, A_H + 6, (int) Math.round(Math.cos(a) * 8), (int) Math.round(cz + Math.sin(a) * 8), 3, Blocks.SOUL_LANTERN);
+            Kit.chandelier(c, rm.h() + 6, (int) Math.round(Math.cos(a) * 8), (int) Math.round(cz + Math.sin(a) * 8), 3, Blocks.SOUL_LANTERN);
         }
     }
 
     @Override
-    void pit() {
-        for (int z = PIT_Z0; z <= PIT_Z1; z++) {
+    void pit(int z0, int z1) {
+        for (int z = z0; z <= z1; z++) {
             for (int x = -PIT_HALF; x <= PIT_HALF; x++) {
                 if (Math.abs(x) <= DECK) continue;
                 c.set(x, -PIT_DEPTH, z, Blocks.SOUL_SOIL);
@@ -133,7 +133,7 @@ final class CryptTheme extends Theme {
             }
             for (int x = -DECK; x <= DECK; x++) c.set(x, 0, z, c.mix(x, 0, z, 13, Blocks.POLISHED_DEEPSLATE, 50, Blocks.DEEPSLATE_TILES, 30, Blocks.CRACKED_DEEPSLATE_BRICKS, 20));
         }
-        for (int z = PIT_Z0 + 1; z <= PIT_Z1 - 1; z += 4) {
+        for (int z = z0 + 1; z <= z1 - 1; z += 4) {
             for (int side : new int[]{-2, 2}) {
                 c.set(side, 1, z, Blocks.DEEPSLATE_BRICK_WALL);
                 c.set(side, 2, z, Blocks.DEEPSLATE_BRICK_WALL);
@@ -141,13 +141,13 @@ final class CryptTheme extends Theme {
             }
         }
         // arches de l'ossuaire au-dessus du pont
-        for (int z = PIT_Z0 + 3; z <= PIT_Z1 - 3; z += 6) Kit.doorway(c, 0, z, 2, 5, Blocks.POLISHED_DEEPSLATE, Blocks.DEEPSLATE_BRICK_STAIRS);
+        for (int z = z0 + 3; z <= z1 - 3; z += 6) Kit.doorway(c, 0, z, 2, 5, Blocks.POLISHED_DEEPSLATE, Blocks.DEEPSLATE_BRICK_STAIRS);
     }
 
     @Override
-    void roomB() {
-        double cz = B_Z;
-        Kit.ribs(c, 0, cz, B_R, B_R, B_H, 9, 12, Blocks.POLISHED_DEEPSLATE);
+    void roomB(Layout.Room rm) {
+        double cz = rm.z();
+        Kit.ribs(c, 0, cz, rm.r(), rm.r(), rm.h(), 9, 12, Blocks.POLISHED_DEEPSLATE);
         // chapelle : rangees de bancs de part et d'autre d'une allee, autel au fond
         for (int row = 0; row < 4; row++) {
             int z = (int) cz - 7 + row * 3;
@@ -174,7 +174,7 @@ final class CryptTheme extends Theme {
         sarcophagus(21, (int) cz, false);
         for (int i = 0; i < 4; i++) {
             double a = Math.PI * 2 * i / 4 + 0.78;
-            Kit.chandelier(c, B_H + 6, (int) Math.round(Math.cos(a) * 8), (int) Math.round(cz + Math.sin(a) * 8), 4, Blocks.SOUL_LANTERN);
+            Kit.chandelier(c, rm.h() + 6, (int) Math.round(Math.cos(a) * 8), (int) Math.round(cz + Math.sin(a) * 8), 4, Blocks.SOUL_LANTERN);
         }
     }
 
@@ -254,12 +254,23 @@ final class CryptTheme extends Theme {
     @Override
     Trials.Palette palette() {
         return new Trials.Palette(Blocks.IRON_BARS, Blocks.PEARLESCENT_FROGLIGHT, Blocks.POLISHED_DEEPSLATE, Blocks.DEEPSLATE_TILES, Blocks.SOUL_LANTERN,
-                java.util.List.of("squelette_maudit", "orc_guerrier"), java.util.Map.of(TrialData.WAVES, "RÉVEIL DES TOMBES", TrialData.JUMP, "PONT D'OSSEMENTS", TrialData.SIMON, "ÉNIGME DES CIERGES"), Blocks.SOUL_SAND, Blocks.SOUL_LANTERN);
+                java.util.List.of("squelette_maudit", "orc_guerrier"), java.util.Map.of(TrialData.WAVES, "RÉVEIL DES TOMBES", TrialData.JUMP, "PONT D'OSSEMENTS", TrialData.SIMON, "ÉNIGME DES CIERGES", TrialData.ORDER, "SCEAUX DES DÉFUNTS", TrialData.TARGETS, "TIR AUX CRÂNES", TrialData.ELITE, "ROI DES CRYPTES", TrialData.AMBUSH, "RÔDEURS DES TOMBES"), Blocks.SOUL_SAND, Blocks.SOUL_LANTERN);
     }
 
     @Override
     Trials.Plan plan() {
-        return new Trials.Plan(TrialData.SIMON, Trials.NONE, TrialData.WAVES, 1, 0, 1);
+        // salle 1, couloir 1, salle 2, salle 3, couloir 2, salle 4, salle 5, gardien d'elite
+        return Trials.plan(TrialData.SIMON, 1, TrialData.JUMP, 0, TrialData.WAVES, 1, TrialData.ORDER, 1, TrialData.JUMP, 1, TrialData.TARGETS, 1, TrialData.WAVES, 1, TrialData.ELITE, 1);
+    }
+
+    @Override
+    String eliteKey() {
+        return "roi_cryptes";
+    }
+
+    @Override
+    Look look() {
+        return new Look(Blocks.POLISHED_DEEPSLATE, Blocks.DEEPSLATE_BRICKS, Blocks.DEEPSLATE_BRICK_STAIRS, Blocks.SOUL_LANTERN, Blocks.SOUL_CAMPFIRE, Blocks.DEEPSLATE_TILES, Blocks.POLISHED_DEEPSLATE, Blocks.CHISELED_DEEPSLATE);
     }
 
     @Override

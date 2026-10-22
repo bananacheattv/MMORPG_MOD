@@ -200,5 +200,37 @@
         "name": "mmorpg:sfx/note3"
       }
     ]
+  },
+  "sfx.death": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/death"
+      }
+    ]
+  },
+  "sfx.levelup": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/levelup"
+      }
+    ]
+  },
+  "sfx.quest_accept": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/quest_accept"
+      }
+    ]
+  },
+  "sfx.coins": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/coins"
+      }
+    ]
   }
 }

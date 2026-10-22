@@ -27,6 +27,12 @@ public final class ServerEvents {
         ConfigManager.load();
     }
 
+    /** L'equipement n'est jamais perdu a la mort : seule une part d'experience l'est (voir RpgPlayers.onDeath). */
+    @SubscribeEvent
+    public static void onServerStarted(net.neoforged.neoforge.event.server.ServerStartedEvent event) {
+        event.getServer().getGameRules().set(net.minecraft.world.level.gamerules.GameRules.KEEP_INVENTORY, true, event.getServer());
+    }
+
     @SubscribeEvent
     public static void onServerStopped(ServerStoppedEvent event) {
         Scheduler.clear();

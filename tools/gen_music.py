@@ -314,7 +314,7 @@ def generate(assets_dir):
     with open(os.path.join(assets_dir, 'sounds.json'), 'w', encoding='utf-8', newline='\n') as f:
         json.dump({'cinematique.theme': {'category': 'music', 'sounds': [{'name': 'mmorpg:music/eldoria_theme', 'stream': True}]},
                    'hub.ambiance': {'category': 'music', 'sounds': [{'name': 'mmorpg:music/eldoria_hub', 'stream': True}]},
-                   **__import__('gen_sfx').sounds_json_entries()}, f, indent=2)
+                   **__import__('build_sfx').sounds_json_entries()}, f, indent=2)
         f.write('\n')
     print('musique generee : %.1f s' % secs)
 
