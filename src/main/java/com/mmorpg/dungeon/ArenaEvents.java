@@ -20,6 +20,7 @@ import java.util.Map;
  * Evenements d'arene : quand un boss change de phase dans l'antre d'un donjon, des renforts surgissent et une annonce s'affiche.
  * Le solo reste la reference (peu de renforts, de niveau inferieur au boss) ; chaque joueur de plus dans l'arene en ajoute un.
  */
+@net.neoforged.fml.common.EventBusSubscriber(modid = com.mmorpg.MMORPG.MODID)
 public final class ArenaEvents {
     private static final Map<String, List<String>> ADDS = Map.of(
             "roi_gobelin", List.of("gobelin", "loup_sombre"),
@@ -56,7 +57,49 @@ public final class ArenaEvents {
         level.playSound(null, boss.blockPosition(), SoundEvents.ENDER_DRAGON_GROWL, SoundSource.HOSTILE, 1.5F, 0.7F);
         String name = boss.getName().getString().toUpperCase(java.util.Locale.ROOT);
         for (ServerPlayer p : near) {
-            Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.BOSS, name, "PHASE " + phase + " — des renforts surgissent !", phase >= 3 ? 0xFF3030 : 0xFF8040));
+            Net.toPlayer(p, new Payloads.AreaEntry(name, "Des renforts surgissent !", Payloads.AreaEntry.PHASE, phase >= 3 ? 0xFF3030 : 0xFF8040, String.valueOf(phase)));
+        }
+    }
+
+    /** Debut du combat (invocation) dans l'antre d'un donjon : annonce de la phase I. @return vrai si l'annonce a ete faite */
+    public static boolean begin(ServerLevel level, Mob boss, String displayName, int bossLevel, String summoner) {
+        var zone = ZoneManager.zoneAt(level, boss.blockPosition());
+        if (zone == null || !zone.boss()) return false;
+        for (ServerPlayer p : level.players()) {
+            if (p.distanceToSqr(boss) < 64 * 64) {
+                Net.toPlayer(p, new Payloads.AreaEntry(displayName.toUpperCase(java.util.Locale.ROOT), "Niveau " + bossLevel + " — invoqué par " + summoner,
+                        Payloads.AreaEntry.PHASE, 0xFF5A3C, "1"));
+            }
+        }
+        return true;
+    }
+
+    /** Victoire : le boss d'un antre de donjon meurt. */
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void onBossDeath(net.neoforged.neoforge.event.entity.living.LivingDeathEvent event) {
+        if (!(event.getEntity() instanceof com.mmorpg.entity.boss.RpgBoss boss) || !(boss.level() instanceof ServerLevel level)) return;
+        var zone = ZoneManager.zoneAt(level, boss.blockPosition());
+        if (zone == null || !zone.boss()) return;
+        var dungeonZone = com.mmorpg.zone.ZoneData.get(level.getServer()).byId(zone.id().replace("_boss", ""));
+        String label = dungeonZone == null ? "Donjon vaincu" : dungeonZone.name() + " vaincu";
+        String name = boss.getName().getString();
+        for (ServerPlayer p : level.players()) {
+            if (p.distanceToSqr(boss) < 64 * 64) {
+                Net.toPlayer(p, new Payloads.AreaEntry("VICTOIRE", name + " est tombé !", Payloads.AreaEntry.VICTORY, 0xFFD060, label));
+            }
+        }
+        level.playSound(null, boss.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1.5F, 0.9F);
+        for (int i = 0; i < 10; i++) {
+            int step = i;
+            com.mmorpg.server.Scheduler.later(level, 10 + i * 14, () -> {
+                var rnd = level.getRandom();
+                double x = boss.getX() + (rnd.nextDouble() - 0.5) * 14;
+                double z = boss.getZ() + (rnd.nextDouble() - 0.5) * 14;
+                double y = boss.getY() + 4 + rnd.nextDouble() * 6;
+                level.sendParticles(ParticleTypes.FIREWORK, x, y, z, 60, 1.6, 1.6, 1.6, 0.12);
+                level.sendParticles(step % 3 == 0 ? ParticleTypes.TOTEM_OF_UNDYING : ParticleTypes.END_ROD, x, y, z, 24, 1.2, 1.2, 1.2, 0.2);
+                level.playSound(null, BlockPos.containing(x, y, z), SoundEvents.FIREWORK_ROCKET_BLAST, SoundSource.PLAYERS, 1.2F, 0.9F + rnd.nextFloat() * 0.3F);
+            });
         }
     }
 }

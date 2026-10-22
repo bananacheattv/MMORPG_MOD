@@ -71,6 +71,7 @@ public final class BossManager {
         level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, boss.getX(), boss.getY() + 1, boss.getZ(), 1, 0, 0, 0, 0);
         level.playSound(null, pos, SoundEvents.ENDER_DRAGON_GROWL, SoundSource.HOSTILE, 2f, 0.8f);
         String name = cfg.displayName.isEmpty() ? boss.getName().getString() : cfg.displayName;
+        if (com.mmorpg.dungeon.ArenaEvents.begin(level, boss, name, cfg.minLevel, summonerName)) return boss;      // annonce cinematique dans l'antre d'un donjon
         for (ServerPlayer p : level.players()) {
             if (p.distanceToSqr(boss) < 96 * 96) {
                 Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.BOSS, name.toUpperCase(java.util.Locale.ROOT),

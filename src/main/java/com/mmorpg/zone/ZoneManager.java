@@ -179,11 +179,23 @@ public final class ZoneManager {
     /** Animation d'entree cote client (filet dore ou salle de boss), avec un son et quelques particules. */
     private static void announce(ServerPlayer p, ZoneData.Zone z) {
         String subtitle = z.subtitle().isEmpty() ? describe(z) : z.subtitle();
+        String lore = "";
         boolean boss = z.boss();
+        boolean dungeon = z.dungeon();
+        if (dungeon) {                                       // « texte d'ambiance|ligne de niveau »
+            int bar = subtitle.indexOf('|');
+            lore = bar < 0 ? "" : subtitle.substring(0, bar);
+            subtitle = bar < 0 ? subtitle : subtitle.substring(bar + 1);
+        }
+        int style = boss ? com.mmorpg.network.Payloads.AreaEntry.BOSS_ROOM : dungeon ? com.mmorpg.network.Payloads.AreaEntry.DUNGEON : com.mmorpg.network.Payloads.AreaEntry.ZONE;
         net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(p,
-                new com.mmorpg.network.Payloads.AreaEntry(z.name(), subtitle, boss ? 1 : 0, boss ? 0xFF5A3C : 0xFFD878));
+                new com.mmorpg.network.Payloads.AreaEntry(z.name(), subtitle, style, boss ? 0xFF5A3C : dungeon ? 0xFFC868 : 0xFFD878, lore));
         ServerLevel level = p.level();
-        if (boss) {
+        if (dungeon) {
+            level.playSound(null, p.blockPosition(), net.minecraft.sounds.SoundEvents.BELL_RESONATE, net.minecraft.sounds.SoundSource.AMBIENT, 0.9F, 0.6F);
+            level.playSound(null, p.blockPosition(), net.minecraft.sounds.SoundEvents.AMETHYST_BLOCK_RESONATE, net.minecraft.sounds.SoundSource.AMBIENT, 0.8F, 0.7F);
+            level.sendParticles(ParticleTypes.ASH, p.getX(), p.getY() + 1.5, p.getZ(), 40, 4, 1.5, 4, 0.01);
+        } else if (boss) {
             level.playSound(null, p.blockPosition(), net.minecraft.sounds.SoundEvents.ENDER_DRAGON_GROWL, net.minecraft.sounds.SoundSource.HOSTILE, 0.7F, 0.55F);
             level.playSound(null, p.blockPosition(), net.minecraft.sounds.SoundEvents.WARDEN_HEARTBEAT, net.minecraft.sounds.SoundSource.HOSTILE, 1.2F, 0.7F);
             level.sendParticles(ParticleTypes.SMOKE, p.getX(), p.getY() + 1, p.getZ(), 40, 4, 1.2, 4, 0.01);

@@ -263,6 +263,11 @@ final class CryptTheme extends Theme {
     }
 
     @Override
+    String lore() {
+        return "Les morts murmurent dans le noir. La Liche veille sur ses reliques.";
+    }
+
+    @Override
     String arenaName() {
         return "Sanctum de la Liche Ancienne";
     }

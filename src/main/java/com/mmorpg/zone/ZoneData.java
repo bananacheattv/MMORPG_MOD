@@ -22,6 +22,7 @@ public class ZoneData extends SavedData {
                        boolean noBuild, boolean noPvp, boolean noMobs, String style, String subtitle) {
         public static final String STYLE_ZONE = "zone";
         public static final String STYLE_BOSS = "boss";
+        public static final String STYLE_DUNGEON = "dungeon";
 
         static final Codec<Zone> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Codec.STRING.fieldOf("id").forGetter(Zone::id),
@@ -52,6 +53,10 @@ public class ZoneData extends SavedData {
 
         public Zone withStyle(String style, String subtitle) {
             return new Zone(id, name, dimension, minX, minZ, maxX, maxZ, noBuild, noPvp, noMobs, style, subtitle);
+        }
+
+        public boolean dungeon() {
+            return STYLE_DUNGEON.equals(style);
         }
 
         public boolean boss() {

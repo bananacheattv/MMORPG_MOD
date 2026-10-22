@@ -420,6 +420,10 @@ public final class DevShowcase {
             }
             return;
         }
+        if (MODE.startsWith("cine_")) {
+            cinePhase(mc, me, MODE.substring(5));
+            return;
+        }
         if (MODE.startsWith("epreuves_")) {
             trialsPhase(mc, me, MODE.substring(9));
             return;
@@ -2692,6 +2696,104 @@ public final class DevShowcase {
         if (p == null) return;
         p.teleportTo(p.level(), x + 0.5, y, z + 0.5, java.util.Set.of(), 0F, 5F, true);
         p.resetFallDistance();
+    }
+
+    /** Verification des cinematiques d'un donjon : entree, vagues, antre du boss, phases, victoire. */
+    private static void cinePhase(Minecraft mc, String me, String id) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) {
+            cmd(mc, "gamemode survival");
+            cmd(mc, "execute in minecraft:overworld run tp " + me + " 3000 150 3000 0 0");
+        }
+        if (tick == 8 && !mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        if (tick == 10) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            pl.getAbilities().invulnerable = true;
+            pl.onUpdateAbilities();
+        });
+        if (tick == 130) srv.execute(() -> dungeonBase = srv.getPlayerList().getPlayerByName(me).blockPosition());
+        if (tick == 135) cmd(mc, "mmorpg donjon " + id);
+        if (tick == 330) {
+            trialCursor = 330;
+            var all = new java.util.ArrayList<>(com.mmorpg.dungeon.TrialData.get(srv).all());
+            // 1. entree du donjon : on part de l'exterieur
+            trialAt(5, () -> srv.execute(() -> hubTeleport(srv, me, dungeonBase.getX(), dungeonBase.getY(), dungeonBase.getZ() - 12)));
+            trialAt(25, () -> srv.execute(() -> hubTeleport(srv, me, dungeonBase.getX(), dungeonBase.getY(), dungeonBase.getZ() + 3)));
+            trialAt(8, () -> cmd(mc, "tp " + me + " ~ ~ ~ 0 6"));
+            trialAt(30, () -> shot(mc, id + "_cine_entree_1"));
+            trialAt(70, () -> shot(mc, id + "_cine_entree_2"));
+            trialAt(80, () -> shot(mc, id + "_cine_entree_3"));
+            // 2. vagues (si le donjon en a)
+            for (var t0 : all) {
+                if (!t0.kind().equals("waves")) continue;
+                String tid = t0.id();
+                trialAt(60, () -> srv.execute(() -> hubTeleport(srv, me, t0.pos().get(0), t0.pos().get(1), t0.pos().get(2) - 8)));
+                for (int w = 1; w <= 3; w++) {
+                    int wave = w;
+                    trialAt(w == 1 ? 18 : 20, () -> shot(mc, id + "_cine_vague_" + wave));
+                    trialAt(30, () -> srv.execute(() -> {
+                        var lv = srv.getPlayerList().getPlayerByName(me).level();
+                        for (var m : lv.getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new net.minecraft.world.phys.AABB(new net.minecraft.core.BlockPos(t0.pos().get(0), t0.pos().get(1), t0.pos().get(2))).inflate(24),
+                                e -> e instanceof com.mmorpg.entity.RpgMob)) m.discard();
+                    }));
+                    trialAt(2, () -> { });
+                    trialAt(100, () -> { });
+                }
+            }
+            // 3. antre du boss : entree, combat, phases, victoire
+            trialAt(40, () -> srv.execute(() -> hubTeleport(srv, me, dungeonBase.getX(), dungeonBase.getY(), dungeonBase.getZ() + 122)));
+            trialAt(30, () -> srv.execute(() -> hubTeleport(srv, me, dungeonBase.getX(), dungeonBase.getY(), dungeonBase.getZ() + 136)));
+            trialAt(8, () -> cmd(mc, "tp " + me + " ~ ~ ~ 0 6"));
+            trialAt(35, () -> shot(mc, id + "_cine_antre"));
+            trialAt(120, () -> srv.execute(() -> {
+                var lv = srv.getPlayerList().getPlayerByName(me).level();
+                var center = dungeonBase.offset(0, 0, 154);
+                String key = switch (id) {
+                    case "crypte_gobeline" -> "roi_gobelin";
+                    case "catacombes" -> "liche_ancienne";
+                    case "forteresse_infernale" -> "seigneur_ignis";
+                    case "sanctuaire_glace" -> "titan_glace";
+                    default -> "avatar_neant";
+                };
+                bossRef = com.mmorpg.entity.boss.BossManager.spawnBoss(lv, com.mmorpg.entity.boss.BossManager.typeFor(key), key, center.above(), "Test");
+            }));
+            trialAt(30, () -> shot(mc, id + "_cine_boss_phase1"));
+            trialAt(100, () -> srv.execute(() -> setBossHp(0.5F)));
+            trialAt(30, () -> shot(mc, id + "_cine_boss_phase2"));
+            trialAt(120, () -> srv.execute(() -> setBossHp(0.2F)));
+            trialAt(30, () -> shot(mc, id + "_cine_boss_phase3"));
+            trialAt(110, () -> srv.execute(() -> {
+                var p = srv.getPlayerList().getPlayerByName(me);
+                if (bossRef != null) com.mmorpg.combat.RpgCombat.dealDamage(p, bossRef, 1.0E9, false, false);
+            }));
+            trialAt(40, () -> shot(mc, id + "_cine_victoire_1"));
+            trialAt(70, () -> shot(mc, id + "_cine_victoire_2"));
+            trialAt(70, () -> shot(mc, id + "_cine_victoire_3"));
+            trialAt(60, () -> {
+                MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+                stop(mc);
+            });
+        }
+        if (tick > 330) {
+            java.util.Iterator<Object[]> it = TRIAL_QUEUE.iterator();
+            while (it.hasNext()) {
+                Object[] e = it.next();
+                if (tick >= (int) e[0]) {
+                    it.remove();
+                    ((Runnable) e[1]).run();
+                }
+            }
+        }
+    }
+
+    private static net.minecraft.world.entity.Mob bossRef;
+
+    private static void setBossHp(float fraction) {
+        if (bossRef == null) return;
+        var d = bossRef.getExistingDataOrNull(com.mmorpg.registry.ModAttachments.MOB);
+        if (d == null) return;
+        d.hp = d.maxHp * fraction;
+        bossRef.syncData(com.mmorpg.registry.ModAttachments.MOB);
     }
 
     private static net.minecraft.core.BlockPos dungeonBase;

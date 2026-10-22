@@ -263,6 +263,11 @@ final class FrostTheme extends Theme {
     }
 
     @Override
+    String lore() {
+        return "Le givre ronge le temps lui-même. Le Titan dort sous la glace.";
+    }
+
+    @Override
     String arenaName() {
         return "Antre du Titan de Glace";
     }

@@ -244,6 +244,11 @@ final class InfernalTheme extends Theme {
     }
 
     @Override
+    String lore() {
+        return "La lave gronde sous vos pas. Ignis forge sa vengeance.";
+    }
+
+    @Override
     String arenaName() {
         return "Trône du Seigneur Ignis";
     }

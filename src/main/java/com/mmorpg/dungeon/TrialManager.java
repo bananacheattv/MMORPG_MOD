@@ -110,7 +110,7 @@ public final class TrialManager {
     }
 
     private static void announce(ServerPlayer p, Trial t) {
-        if (t.title().isEmpty() || !SEEN.add(p.getUUID() + t.id())) return;
+        if (t.title().isEmpty() || t.kind().equals(TrialData.WAVES) || !SEEN.add(p.getUUID() + t.id())) return;      // les vagues s'annoncent elles-memes
         Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.INFO, t.title(), t.done() ? "Épreuve déjà réussie" : t.hint(), t.done() ? 0x60FF80 : 0xFFC060));
     }
 
@@ -173,8 +173,10 @@ public final class TrialManager {
             }
         }
         level.playSound(null, new BlockPos(cx, cy, cz), SoundEvents.ENDERMAN_TELEPORT, SoundSource.HOSTILE, 1.2F, 0.6F);
+        boolean finale = number == w.total;
         for (ServerPlayer p : inside(level, t)) {
-            p.sendOverlayMessage(Component.literal("Vague " + number + " / " + w.total + " : " + count + " ennemis !").withColor(number == w.total ? 0xFF6050 : 0xFFC060));
+            net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(p, new Payloads.AreaEntry(finale ? "VAGUE FINALE" : "VAGUE " + number,
+                    number == 1 ? count + " ennemis — survivez à " + w.total + " vagues" : count + " ennemis surgissent !", Payloads.AreaEntry.WAVE, finale ? 0xFF4A30 : 0xFFB040, number + "/" + w.total));
         }
     }
 

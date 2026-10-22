@@ -234,6 +234,11 @@ final class VoidTheme extends Theme {
     }
 
     @Override
+    String lore() {
+        return "Au-delà des étoiles, le Néant vous regarde.";
+    }
+
+    @Override
     String arenaName() {
         return "Abîme de l'Avatar du Néant";
     }

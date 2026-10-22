@@ -277,6 +277,11 @@ class GoblinTheme extends Theme {
     }
 
     @Override
+    String lore() {
+        return "Les tambours de guerre résonnent sous la terre… Le Roi Gobelin vous attend.";
+    }
+
+    @Override
     String arenaName() {
         return "Antre du Roi Gobelin";
     }

@@ -92,11 +92,14 @@ public final class Payloads {
     }
 
     /** Animation d'entree dans une zone (style 0) ou une salle de boss (style 1). */
-    public record AreaEntry(String title, String subtitle, int style, int color) implements CustomPacketPayload {
+    public record AreaEntry(String title, String subtitle, int style, int color, String lore) implements CustomPacketPayload {
+        /** Styles : 0 zone, 1 salle de boss, 2 vague, 3 phase de boss, 4 victoire, 5 entree de donjon. */
+        public static final int ZONE = 0, BOSS_ROOM = 1, WAVE = 2, PHASE = 3, VICTORY = 4, DUNGEON = 5;
+
         public static final Type<AreaEntry> TYPE = new Type<>(MMORPG.id("area_entry"));
         public static final StreamCodec<ByteBuf, AreaEntry> CODEC = StreamCodec.composite(
                 ByteBufCodecs.STRING_UTF8, AreaEntry::title, ByteBufCodecs.STRING_UTF8, AreaEntry::subtitle,
-                ByteBufCodecs.VAR_INT, AreaEntry::style, ByteBufCodecs.INT, AreaEntry::color, AreaEntry::new);
+                ByteBufCodecs.VAR_INT, AreaEntry::style, ByteBufCodecs.INT, AreaEntry::color, ByteBufCodecs.STRING_UTF8, AreaEntry::lore, AreaEntry::new);
 
         @Override
         public Type<? extends CustomPacketPayload> type() {

@@ -65,6 +65,9 @@ abstract class Theme {
     /** Nom du boss et sous-titre de l'annonce d'entree dans l'arene. */
     abstract String arenaName();
 
+    /** Phrase d'ambiance affichee en lettres qui s'ecrivent a l'entree du donjon. */
+    abstract String lore();
+
     // ------------------------------------------------------------------ outils
 
     final boolean arenaRegion(int z) {

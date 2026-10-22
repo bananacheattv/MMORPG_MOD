@@ -150,7 +150,7 @@ public final class StyledDungeon {
         int oz = o.getZ();
         key = t.id + "_" + ox + "_" + oz;
         zones.add(new ZoneData.Zone(key, t.label, level.dimension(), ox - 27, oz - 2, ox + 27, oz + 192,
-                true, true, false, ZoneData.Zone.STYLE_ZONE, "Donjon · niveau " + t.level + (bonus == 1 ? " · héroïque" : bonus >= 2 ? " · mythique" : "")));
+                true, true, false, ZoneData.Zone.STYLE_DUNGEON, th.lore() + "|Donjon · niveau " + t.level + (bonus == 1 ? " · héroïque" : bonus >= 2 ? " · mythique" : "")));
         zones.add(new ZoneData.Zone(key + "_boss", th.arenaName(), level.dimension(), ox - 23, oz + Theme.ARENA_Z - 23, ox + 23, oz + Theme.ARENA_Z + 23,
                 true, true, false, ZoneData.Zone.STYLE_BOSS, "Boss · niveau " + t.level));
         return tp;

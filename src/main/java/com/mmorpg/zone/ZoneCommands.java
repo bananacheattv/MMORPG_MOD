@@ -31,7 +31,7 @@ public final class ZoneCommands {
                 .then(Commands.literal("style").then(Commands.argument("id", StringArgumentType.word())
                         .suggests((c, b) -> SharedSuggestionProvider.suggest(ids(c), b))
                         .then(Commands.argument("style", StringArgumentType.word())
-                                .suggests((c, b) -> SharedSuggestionProvider.suggest(List.of("zone", "boss"), b))
+                                .suggests((c, b) -> SharedSuggestionProvider.suggest(List.of("zone", "boss", "dungeon"), b))
                                 .executes(c -> style(c, null))
                                 .then(Commands.argument("soustitre", StringArgumentType.greedyString()).executes(c -> style(c, StringArgumentType.getString(c, "soustitre")))))))
                 .then(Commands.literal("regle").then(Commands.argument("id", StringArgumentType.word())
@@ -111,13 +111,13 @@ public final class ZoneCommands {
         return 1;
     }
 
-    /** /zone style <id> <zone|boss> [sous-titre] : animation d'entree (filet dore ou salle de boss) et ligne affichee sous le titre. */
+    /** /zone style <id> <zone|boss|dungeon> [sous-titre] : animation d'entree (filet dore ou salle de boss) et ligne affichee sous le titre. */
     private static int style(CommandContext<CommandSourceStack> c, String subtitle) {
         ZoneData data = ZoneData.get(c.getSource().getServer());
         String id = StringArgumentType.getString(c, "id"), style = StringArgumentType.getString(c, "style");
         ZoneData.Zone z = data.byId(id);
-        if (z == null || !(style.equals("zone") || style.equals("boss"))) {
-            c.getSource().sendFailure(Component.literal("Usage : /zone style <id> <zone|boss> [sous-titre]"));
+        if (z == null || !(style.equals("zone") || style.equals("boss") || style.equals("dungeon"))) {
+            c.getSource().sendFailure(Component.literal("Usage : /zone style <id> <zone|boss|dungeon> [sous-titre]"));
             return 0;
         }
         data.add(z.withStyle(style, subtitle == null ? z.subtitle() : subtitle));
