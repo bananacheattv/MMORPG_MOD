@@ -107,6 +107,19 @@ public final class Payloads {
         }
     }
 
+    /** Cinematique d'apparition d'un boss invoque a l'autel (camera pilotee cote client). */
+    public record BossReveal(int x, int y, int z, int ticks) implements CustomPacketPayload {
+        public static final Type<BossReveal> TYPE = new Type<>(MMORPG.id("boss_reveal"));
+        public static final StreamCodec<ByteBuf, BossReveal> CODEC = StreamCodec.composite(
+                ByteBufCodecs.VAR_INT, BossReveal::x, ByteBufCodecs.VAR_INT, BossReveal::y, ByteBufCodecs.VAR_INT, BossReveal::z,
+                ByteBufCodecs.VAR_INT, BossReveal::ticks, BossReveal::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
     /** Informations du bestiaire (noms, niveaux, butin) issues de la configuration serveur. */
     public record MobInfo(CompoundTag data) implements CustomPacketPayload {
         public static final Type<MobInfo> TYPE = new Type<>(MMORPG.id("mob_info"));

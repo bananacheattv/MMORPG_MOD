@@ -54,6 +54,10 @@ public final class TeleportManager {
         if (classRequired(player)) return;
         WaypointData data = WaypointData.get(level.getServer());
         WaypointData.Waypoint w = data.at(level.dimension(), pos);
+        if (w == null && level.dimension().equals(com.mmorpg.dungeon.InstanceManager.DIM)) {       // sortie d'un donjon instancie : aucun point de passage cree par exemplaire
+            openFor(player, null, false);
+            return;
+        }
         if (w == null) {
             w = data.create(level.dimension(), pos, "Téléporteur " + (data.all().size() + 1), WaypointData.WAYPOINT, 1, new UUID(0, 0));
         }
@@ -84,11 +88,15 @@ public final class TeleportManager {
 
     /** Ouvre la liste des destinations ; {@code current} est nul si le joueur utilise un parchemin. */
     public static void openFor(ServerPlayer player, WaypointData.Waypoint current) {
+        openFor(player, current, current == null);
+    }
+
+    public static void openFor(ServerPlayer player, WaypointData.Waypoint current, boolean scrollMode) {
         WaypointData data = WaypointData.get(player.level().getServer());
         PlayerData d = RpgPlayers.get(player);
         ListTag list = new ListTag();
         for (WaypointData.Waypoint w : data.all()) {
-            if (!d.waypoints.contains(w.id)) continue;
+            if (!d.waypoints.contains(w.id) && !com.mmorpg.dungeon.InstanceManager.isGate(player.level().getServer(), w.id)) continue;
             CompoundTag e = new CompoundTag();
             e.putString("id", w.id.toString());
             e.putString("name", w.name);
@@ -106,7 +114,7 @@ public final class TeleportManager {
         t.put("list", list);
         t.putInt("total", data.all().size());
         t.putString("current", current == null ? "" : current.name);
-        t.putBoolean("scroll", current == null);
+        t.putBoolean("scroll", scrollMode);
         Net.toPlayer(player, new S2COpenScreen(S2COpenScreen.TELEPORTER, t));
     }
 
@@ -144,7 +152,8 @@ public final class TeleportManager {
         WaypointData data = WaypointData.get(player.level().getServer());
         WaypointData.Waypoint w = data.get(id);
         PlayerData d = RpgPlayers.get(player);
-        if (w == null || !d.waypoints.contains(id)) return;
+        boolean gate = w != null && com.mmorpg.dungeon.InstanceManager.isGate(player.level().getServer(), id);
+        if (w == null || (!d.waypoints.contains(id) && !gate)) return;
         if (d.level < w.minLevel) {
             player.sendOverlayMessage(Component.literal("Niveau " + w.minLevel + " requis pour voyager vers " + w.name).withColor(0xFF5050));
             return;
@@ -162,6 +171,13 @@ public final class TeleportManager {
                 player.sendOverlayMessage(Component.literal("Vous devez être près d'un téléporteur ou posséder un parchemin.").withColor(0xFF5050));
                 return;
             }
+        }
+        if (gate) {                       // porte de donjon : exemplaire reserve pour le joueur ou son groupe
+            if (com.mmorpg.dungeon.InstanceManager.enter(player, id)) {
+                if (!near && !player.hasInfiniteMaterials()) scroll.shrink(1);
+                Net.toPlayer(player, new Payloads.Notify(Payloads.Notify.INFO, w.name.toUpperCase(java.util.Locale.ROOT), "Donjon — votre exemplaire", 0x60C0FF));
+            }
+            return;
         }
         ServerLevel target = player.level().getServer().getLevel(w.dimension);
         if (target == null) return;

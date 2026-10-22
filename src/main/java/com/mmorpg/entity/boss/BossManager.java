@@ -43,7 +43,8 @@ public final class BossManager {
             summoner.sendOverlayMessage(Component.literal("Un boss est déjà présent dans les environs !").withColor(0xFF5050));
             return false;
         }
-        level.playSound(null, altar, SoundEvents.WITHER_SPAWN, SoundSource.HOSTILE, 1.2f, 0.9f);
+        com.mmorpg.dungeon.BossReveal.play(level, altar);                       // camera du rituel dans l'antre d'un donjon
+        level.playSound(null, altar, com.mmorpg.registry.ModSounds.RITUAL.get(), SoundSource.HOSTILE, 1.5f, 1.0f);
         for (int t = 0; t < 60; t += 4) {
             final int tt = t;
             Scheduler.later(level, t, () -> {
@@ -69,7 +70,8 @@ public final class BossManager {
         MobLevels.forceLevel(boss, key, cfg.minLevel);
         level.addFreshEntity(boss);
         level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, boss.getX(), boss.getY() + 1, boss.getZ(), 1, 0, 0, 0, 0);
-        level.playSound(null, pos, SoundEvents.ENDER_DRAGON_GROWL, SoundSource.HOSTILE, 2f, 0.8f);
+        level.playSound(null, pos, com.mmorpg.registry.ModSounds.BOOM.get(), SoundSource.HOSTILE, 2f, 1.0f);
+        level.playSound(null, pos, com.mmorpg.registry.ModSounds.GROWL.get(), SoundSource.HOSTILE, 2f, 1.0f);
         String name = cfg.displayName.isEmpty() ? boss.getName().getString() : cfg.displayName;
         if (com.mmorpg.dungeon.ArenaEvents.begin(level, boss, name, cfg.minLevel, summonerName)) return boss;      // annonce cinematique dans l'antre d'un donjon
         for (ServerPlayer p : level.players()) {

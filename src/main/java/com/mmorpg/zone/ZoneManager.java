@@ -192,16 +192,15 @@ public final class ZoneManager {
                 new com.mmorpg.network.Payloads.AreaEntry(z.name(), subtitle, style, boss ? 0xFF5A3C : dungeon ? 0xFFC868 : 0xFFD878, lore));
         ServerLevel level = p.level();
         if (dungeon) {
-            level.playSound(null, p.blockPosition(), net.minecraft.sounds.SoundEvents.BELL_RESONATE, net.minecraft.sounds.SoundSource.AMBIENT, 0.9F, 0.6F);
-            level.playSound(null, p.blockPosition(), net.minecraft.sounds.SoundEvents.AMETHYST_BLOCK_RESONATE, net.minecraft.sounds.SoundSource.AMBIENT, 0.8F, 0.7F);
+            level.playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.BELL.get(), net.minecraft.sounds.SoundSource.AMBIENT, 1.0F, 1.0F);
+            level.playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.RISE.get(), net.minecraft.sounds.SoundSource.AMBIENT, 0.5F, 1.0F);
             level.sendParticles(ParticleTypes.ASH, p.getX(), p.getY() + 1.5, p.getZ(), 40, 4, 1.5, 4, 0.01);
         } else if (boss) {
-            level.playSound(null, p.blockPosition(), net.minecraft.sounds.SoundEvents.ENDER_DRAGON_GROWL, net.minecraft.sounds.SoundSource.HOSTILE, 0.7F, 0.55F);
-            level.playSound(null, p.blockPosition(), net.minecraft.sounds.SoundEvents.WARDEN_HEARTBEAT, net.minecraft.sounds.SoundSource.HOSTILE, 1.2F, 0.7F);
+            level.playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.GROWL.get(), net.minecraft.sounds.SoundSource.HOSTILE, 0.9F, 1.0F);
+            level.playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.HEARTBEAT.get(), net.minecraft.sounds.SoundSource.HOSTILE, 1.2F, 1.0F);
             level.sendParticles(ParticleTypes.SMOKE, p.getX(), p.getY() + 1, p.getZ(), 40, 4, 1.2, 4, 0.01);
         } else {
-            level.playSound(null, p.blockPosition(), net.minecraft.sounds.SoundEvents.AMETHYST_BLOCK_CHIME, net.minecraft.sounds.SoundSource.AMBIENT, 0.8F, 1.15F);
-            level.playSound(null, p.blockPosition(), net.minecraft.sounds.SoundEvents.BELL_BLOCK, net.minecraft.sounds.SoundSource.AMBIENT, 0.25F, 1.6F);
+            level.playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.CHIME.get(), net.minecraft.sounds.SoundSource.AMBIENT, 0.8F, 1.0F);
             level.sendParticles(ParticleTypes.END_ROD, p.getX(), p.getY() + 1.2, p.getZ(), 14, 1.2, 0.8, 1.2, 0.02);
         }
     }

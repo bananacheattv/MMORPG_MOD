@@ -137,12 +137,16 @@ public final class StyledDungeon {
         DungeonBuilder.chest(level, o.offset(18, 1, Theme.B_Z), DungeonBuilder.roomLoot(t, r, false), r);
         c.set(0, 1, Theme.ARENA_Z, ModBlocks.AUTEL_INVOCATION.get());
         var bossLoot = DungeonBuilder.roomLoot(t, r, true);
+        var summonKey = com.mmorpg.registry.ModItems.get(t.bossKey);
+        bossLoot.removeIf(s -> s.is(summonKey));
         for (int i = 0; i < bonus; i++) bossLoot.addAll(DungeonBuilder.roomLoot(t, r, false));
         DungeonBuilder.chest(level, o.offset(0, 1, Theme.TREASURE_Z + 3), bossLoot.subList(0, Math.min(27, bossLoot.size())), r);
 
-        WaypointData data = WaypointData.get(level.getServer());
-        data.removeAt(level.dimension(), tp);
-        data.create(level.dimension(), tp, t.label, WaypointData.DUNGEON, t.level, new UUID(0, 0));
+        if (!level.dimension().equals(InstanceManager.DIM)) {         // un exemplaire instancie n'est pas un point de passage : on y entre par la porte du donjon
+            WaypointData data = WaypointData.get(level.getServer());
+            data.removeAt(level.dimension(), tp);
+            data.create(level.dimension(), tp, t.label, WaypointData.DUNGEON, t.level, new UUID(0, 0));
+        }
 
         // annonces d'entree : le donjon, puis l'antre du boss (animation dediee)
         ZoneData zones = ZoneData.get(level.getServer());

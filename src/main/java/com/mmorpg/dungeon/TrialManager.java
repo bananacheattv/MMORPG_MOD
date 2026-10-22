@@ -172,7 +172,8 @@ public final class TrialManager {
                 level.sendParticles(ParticleTypes.PORTAL, e.getX(), e.getY() + 1, e.getZ(), 14, 0.3, 0.6, 0.3, 0.4);
             }
         }
-        level.playSound(null, new BlockPos(cx, cy, cz), SoundEvents.ENDERMAN_TELEPORT, SoundSource.HOSTILE, 1.2F, 0.6F);
+        level.playSound(null, new BlockPos(cx, cy, cz), com.mmorpg.registry.ModSounds.HORN.get(), SoundSource.HOSTILE, 1.4F, 1.0F);
+        level.playSound(null, new BlockPos(cx, cy, cz), com.mmorpg.registry.ModSounds.BOOM.get(), SoundSource.HOSTILE, 0.9F, 1.0F);
         boolean finale = number == w.total;
         for (ServerPlayer p : inside(level, t)) {
             net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(p, new Payloads.AreaEntry(finale ? "VAGUE FINALE" : "VAGUE " + number,
@@ -193,7 +194,7 @@ public final class TrialManager {
                     p.teleportTo(level, t.pos().get(0) + 0.5, t.pos().get(1), t.pos().get(2) + 0.5, Set.of(), 0F, 5F, true);
                     p.resetFallDistance();
                     p.sendOverlayMessage(Component.literal("Vous avez chuté : retour au départ du parcours.").withColor(0xFFA060));
-                    level.playSound(null, p.blockPosition(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.7F, 1.4F);
+                    level.playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.TELEPORT.get(), SoundSource.PLAYERS, 0.8F, 1.0F);
                 }
             }
             if (!t.done() && t.inGate(p.getX(), p.getY(), p.getZ())) complete(level, data, t, p, false);
@@ -252,9 +253,7 @@ public final class TrialManager {
     }
 
     private static void note(ServerLevel level, Trial t, int k, float volume) {
-        int[] semis = {0, 4, 7, 12, 16, 19};
-        float pitch = (float) Math.pow(2.0, semis[k % semis.length] / 12.0) * 0.7F;
-        level.playSound(null, padPos(t, k), SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.BLOCKS, volume, pitch);
+        level.playSound(null, padPos(t, k), com.mmorpg.registry.ModSounds.NOTES[k % com.mmorpg.registry.ModSounds.NOTES.length].get(), SoundSource.BLOCKS, volume, 1.0F);
     }
 
     private static void startSimon(ServerLevel level, Trial t, ServerPlayer p) {
@@ -363,7 +362,7 @@ public final class TrialManager {
         } else {
             ORDER.put(t.id(), 0);
             for (int i = 0; i < padCount(t); i++) light(level, t, i, false);
-            level.playSound(null, padPos(t, k), SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1.4F, 0.5F);
+            level.playSound(null, padPos(t, k), com.mmorpg.registry.ModSounds.ERROR.get(), SoundSource.BLOCKS, 1.4F, 0.5F);
             p.sendOverlayMessage(Component.literal("Mauvais ordre ! Relisez les couleurs gravées dans le couloir d'entrée.").withColor(0xFF6050));
         }
     }
@@ -397,10 +396,17 @@ public final class TrialManager {
             }
         } else {
             s.input = false;
-            level.playSound(null, padPos(t, k), SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.BLOCKS, 1.4F, 0.5F);
+            level.playSound(null, padPos(t, k), com.mmorpg.registry.ModSounds.ERROR.get(), SoundSource.BLOCKS, 1.4F, 0.5F);
             level.sendParticles(ParticleTypes.SMOKE, padPos(t, k).getX() + 0.5, padPos(t, k).getY() + 1.2, padPos(t, k).getZ() + 0.5, 16, 0.3, 0.2, 0.3, 0.02);
             p.sendOverlayMessage(Component.literal("Mauvaise dalle ! Reprenez le lutrin pour revoir la séquence.").withColor(0xFF6050));
         }
+    }
+
+    /** Test automatique : valide une epreuve comme si elle etait reussie. */
+    public static void debugComplete(ServerLevel level, String id, ServerPlayer p) {
+        TrialData data = TrialData.get(level.getServer());
+        Trial t = data.byId(id);
+        if (t != null) complete(level, data, t, p, true);
     }
 
     /** Test automatique : la sequence en cours (indices de dalles), ou vide. */
@@ -438,7 +444,7 @@ public final class TrialManager {
         Trial done = data.byId(t.id());
         if (gate && done != null) openGate(level, done);
         BlockPos at = BlockPos.containing(t.pos().get(0), t.pos().get(1), t.pos().get(2));
-        level.playSound(null, at, SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1.0F, 1.0F);
+        level.playSound(null, at, com.mmorpg.registry.ModSounds.SUCCESS.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         level.sendParticles(ParticleTypes.TOTEM_OF_UNDYING, at.getX() + 0.5, at.getY() + 1.5, at.getZ() + 0.5, 40, 1.5, 1.0, 1.5, 0.3);
         if (p != null) {
             for (ServerPlayer q : level.players()) {
@@ -449,6 +455,7 @@ public final class TrialManager {
         }
         var group = data.inGroup(TrialData.group(t.id()));
         long doneCount = group.stream().filter(Trial::done).count();
+        if (!group.isEmpty() && doneCount == group.size()) ArenaEvents.dropKey(level, TrialData.group(t.id()), t.pos().get(1));
         if (p != null && !group.isEmpty()) {
             p.sendSystemMessage(Component.literal("Épreuves du donjon : " + doneCount + " / " + group.size()
                     + (doneCount == group.size() ? " — l'antre du boss est ouverte !" : "")).withColor(doneCount == group.size() ? 0x60FF80 : 0xFFE080));
@@ -475,7 +482,7 @@ public final class TrialManager {
             }
         }
         BlockPos mid = new BlockPos((t.gate().get(0) + t.gate().get(3)) / 2, t.gate().get(1) + 1, (t.gate().get(2) + t.gate().get(5)) / 2);
-        level.playSound(null, mid, SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 1.4F, 0.7F);
+        level.playSound(null, mid, com.mmorpg.registry.ModSounds.DOOR.get(), SoundSource.BLOCKS, 1.4F, 0.7F);
     }
 
     @SuppressWarnings("unused")

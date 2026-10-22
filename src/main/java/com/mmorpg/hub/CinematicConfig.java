@@ -38,11 +38,11 @@ public final class CinematicConfig {
     }
 
     /** Version du format : 2 = parcours global continu. */
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
 
     public static final String DEFAULT = """
             {
-              "version": 2,
+              "version": 3,
               "fondEntree": 1.6,
               "fondSortie": 1.4,
               "parcours": [
@@ -111,8 +111,8 @@ public final class CinematicConfig {
                   "transition": "coupe",
                   "titre": {"texte": "ELDORIA", "sous": "Le hub des héros", "couleur": "#FFD060", "debut": 0.14, "fin": 0.82},
                   "sons": [
-                    {"t": 0.0, "son": "minecraft:block.beacon.activate", "volume": 0.7, "hauteur": 0.8},
-                    {"t": 0.12, "son": "minecraft:ui.toast.challenge_complete", "volume": 0.5, "hauteur": 0.7}
+                    {"t": 0.0, "son": "mmorpg:sfx.rise", "volume": 0.7, "hauteur": 0.8},
+                    {"t": 0.12, "son": "mmorpg:sfx.chime", "volume": 0.5, "hauteur": 0.7}
                   ],
                   "particules": [
                     {"t": 0.1, "type": "end_rod", "pos": [0, 3, 0], "nombre": 60, "dispersion": [6, 3, 6], "vitesse": 0.02},
@@ -127,8 +127,8 @@ public final class CinematicConfig {
                   "classe": "GUERRIER",
                   "titre": {"texte": "LE GUERRIER", "sous": "Force et Férocité — la lame avant tout", "couleur": "#FF6A50", "debut": 0.28, "fin": 0.97},
                   "sons": [
-                    {"t": 0.0, "son": "minecraft:block.anvil.use", "volume": 0.5, "hauteur": 0.6},
-                    {"t": 0.35, "son": "minecraft:item.trident.thunder", "volume": 0.5, "hauteur": 0.8}
+                    {"t": 0.0, "son": "mmorpg:sfx.warrior", "volume": 0.5, "hauteur": 0.6},
+                    {"t": 0.35, "son": "mmorpg:sfx.boom", "volume": 0.5, "hauteur": 0.8}
                   ],
                   "particules": [
                     {"t": 0.0, "type": "flame", "pos": [-20, 1.4, -20], "nombre": 40, "dispersion": [1.1, 1.4, 1.1], "vitesse": 0.04},
@@ -144,8 +144,8 @@ public final class CinematicConfig {
                   "classe": "ARCHER",
                   "titre": {"texte": "L'ARCHER", "sous": "Agilité et Dextérité — jamais là où l'on frappe", "couleur": "#6CE06C", "debut": 0.28, "fin": 0.97},
                   "sons": [
-                    {"t": 0.0, "son": "minecraft:entity.arrow.shoot", "volume": 0.6, "hauteur": 1.1},
-                    {"t": 0.45, "son": "minecraft:block.grass.break", "volume": 0.6, "hauteur": 0.8}
+                    {"t": 0.0, "son": "mmorpg:sfx.arrow", "volume": 0.6, "hauteur": 1.1},
+                    {"t": 0.45, "son": "mmorpg:sfx.whoosh", "volume": 0.6, "hauteur": 0.8}
                   ],
                   "particules": [
                     {"t": 0.0, "type": "happy_villager", "pos": [-20, 2, 20], "nombre": 30, "dispersion": [1.6, 1.4, 1.6], "vitesse": 0.02},
@@ -161,8 +161,8 @@ public final class CinematicConfig {
                   "classe": "TANK",
                   "titre": {"texte": "LE PALADIN", "sous": "Vitalité et Endurance — le rempart du groupe", "couleur": "#58A8FF", "debut": 0.28, "fin": 0.97},
                   "sons": [
-                    {"t": 0.0, "son": "minecraft:item.shield.block", "volume": 0.8, "hauteur": 0.8},
-                    {"t": 0.4, "son": "minecraft:block.anvil.land", "volume": 0.4, "hauteur": 0.7}
+                    {"t": 0.0, "son": "mmorpg:sfx.shield", "volume": 0.8, "hauteur": 0.8},
+                    {"t": 0.4, "son": "mmorpg:sfx.boom", "volume": 0.4, "hauteur": 0.7}
                   ],
                   "particules": [
                     {"t": 0.0, "type": "wax_on", "pos": [20, 2, 20], "nombre": 30, "dispersion": [1.4, 1.6, 1.4], "vitesse": 0.5},
@@ -178,8 +178,8 @@ public final class CinematicConfig {
                   "classe": "MAGE",
                   "titre": {"texte": "LE MAGE", "sous": "Intelligence et Esprit — l'arcane obéit", "couleur": "#B07CFF", "debut": 0.28, "fin": 0.97},
                   "sons": [
-                    {"t": 0.0, "son": "minecraft:block.enchantment_table.use", "volume": 0.8, "hauteur": 0.9},
-                    {"t": 0.4, "son": "minecraft:entity.evoker.cast_spell", "volume": 0.5, "hauteur": 1.1}
+                    {"t": 0.0, "son": "mmorpg:sfx.arcane", "volume": 0.8, "hauteur": 0.9},
+                    {"t": 0.4, "son": "mmorpg:sfx.chime", "volume": 0.5, "hauteur": 1.1}
                   ],
                   "particules": [
                     {"t": 0.0, "type": "enchant", "pos": [20, 3, -20], "nombre": 80, "dispersion": [1.5, 1.5, 1.5], "vitesse": 0.5},
@@ -194,8 +194,8 @@ public final class CinematicConfig {
                   "transition": "coupe",
                   "titre": {"texte": "À VOUS DE JOUER", "sous": "Parlez aux Maîtres de classe : essayez, puis choisissez votre voie", "couleur": "#FFE6A0", "debut": 0.35, "fin": 0.95},
                   "sons": [
-                    {"t": 0.0, "son": "minecraft:block.beacon.power_select", "volume": 0.7, "hauteur": 1.0},
-                    {"t": 0.85, "son": "minecraft:entity.player.levelup", "volume": 0.5, "hauteur": 1.2}
+                    {"t": 0.0, "son": "mmorpg:sfx.bell", "volume": 0.7, "hauteur": 1.0},
+                    {"t": 0.85, "son": "mmorpg:sfx.success", "volume": 0.5, "hauteur": 1.2}
                   ],
                   "particules": [
                     {"t": 0.5, "type": "end_rod", "pos": [0, 4, 40], "nombre": 40, "dispersion": [3, 2, 3], "vitesse": 0.03}

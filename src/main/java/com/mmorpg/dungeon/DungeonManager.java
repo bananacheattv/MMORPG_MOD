@@ -37,6 +37,7 @@ public final class DungeonManager {
     public static void onServerTick(ServerTickEvent.Post event) {
         MinecraftServer server = event.getServer();
         if (server.getTickCount() % 200 != 0) return;
+        InstanceManager.releaseTick(server);
         TrialData data = TrialData.get(server);
         ZoneData zones = ZoneData.get(server);
         Set<String> groups = new HashSet<>();
@@ -87,6 +88,7 @@ public final class DungeonManager {
             if (level == null) continue;
             TrialManager.discardWaveMobs(level, t);
             TrialManager.forget(t.id());
+            ArenaEvents.forgetKey(group);
             closeGate(level, t);
             for (int k = 0; k * 3 + 2 < t.pads().size() && k * 2 < t.states().size(); k++) {
                 level.setBlock(new BlockPos(t.pads().get(k * 3), t.pads().get(k * 3 + 1), t.pads().get(k * 3 + 2)), TrialManager.state(t.states().get(k * 2)), 3);

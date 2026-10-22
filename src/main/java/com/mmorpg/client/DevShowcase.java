@@ -420,6 +420,10 @@ public final class DevShowcase {
             }
             return;
         }
+        if (MODE.equals("instances")) {
+            instancesPhase(mc, me);
+            return;
+        }
         if (MODE.startsWith("cine_")) {
             cinePhase(mc, me, MODE.substring(5));
             return;
@@ -2496,7 +2500,7 @@ public final class DevShowcase {
         }
         if (tick == 8 && !mc.gui.hud.isHidden()) mc.gui.hud.toggle();
         if (tick == 130) srv.execute(() -> dungeonBase = srv.getPlayerList().getPlayerByName(me).blockPosition());
-        if (tick == 135) cmd(mc, "mmorpg donjon " + id);
+        if (tick == 135) cmd(mc, "mmorpg donjon construire " + id);
         if (tick == 330) {
             var all = new java.util.ArrayList<>(com.mmorpg.dungeon.TrialData.get(srv).all());
             MMORPG.LOGGER.info("[MMORPG] EPREUVES {} : {}", id, all.stream().map(t -> t.id().substring(t.id().lastIndexOf('_') + 1) + "=" + t.kind()).toList());
@@ -2712,7 +2716,7 @@ public final class DevShowcase {
             pl.onUpdateAbilities();
         });
         if (tick == 130) srv.execute(() -> dungeonBase = srv.getPlayerList().getPlayerByName(me).blockPosition());
-        if (tick == 135) cmd(mc, "mmorpg donjon " + id);
+        if (tick == 135) cmd(mc, "mmorpg donjon construire " + id);
         if (tick == 330) {
             trialCursor = 330;
             var all = new java.util.ArrayList<>(com.mmorpg.dungeon.TrialData.get(srv).all());
@@ -2796,6 +2800,76 @@ public final class DevShowcase {
         bossRef.syncData(com.mmorpg.registry.ModAttachments.MOB);
     }
 
+    /** Verification des donjons instancies : porte, exemplaire par groupe, reutilisation, objet d'invocation. */
+    private static void instancesPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) {
+            cmd(mc, "gamemode creative");
+            cmd(mc, "execute in minecraft:overworld run tp " + me + " 3000 150 3000 0 0");
+        }
+        if (tick == 8 && !mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        if (tick == 50) srv.execute(() -> com.mmorpg.dungeon.InstanceManager.debugForgetAll(srv));
+        if (tick == 60) cmd(mc, "mmorpg donjon catacombes");
+        if (tick == 100) srv.execute(() -> {
+            var p = srv.getPlayerList().getPlayerByName(me);
+            var gate = com.mmorpg.world.WaypointData.get(srv).all().stream().filter(w -> w.name.startsWith("Catacombes") && com.mmorpg.dungeon.InstanceManager.isGate(srv, w.id)).findFirst().orElse(null);
+            MMORPG.LOGGER.info("[MMORPG] INSTANCE porte creee = {} ; est une porte = {}", gate != null, gate != null && com.mmorpg.dungeon.InstanceManager.isGate(srv, gate.id));
+            if (gate != null) {
+                boolean ok = com.mmorpg.dungeon.InstanceManager.enter(p, gate.id);
+                MMORPG.LOGGER.info("[MMORPG] INSTANCE entree = {} ; dimension {} ; position ({}, {}, {})", ok, p.level().dimension().identifier(), (int) p.getX(), (int) p.getY(), (int) p.getZ());
+            }
+        });
+        if (tick == 200) {
+            cmd(mc, "tp " + me + " ~ ~ ~ 0 8");
+        }
+        if (tick == 230) shot(mc, "instance_entree");
+        if (tick == 240) srv.execute(() -> {
+            String pool = "catacombes:0";
+            var other = com.mmorpg.dungeon.InstanceManager.allocate(srv, pool, "autre-groupe");
+            var mine = com.mmorpg.dungeon.InstanceManager.allocate(srv, pool, com.mmorpg.dungeon.InstanceManager.ownerKey(srv.getPlayerList().getPlayerByName(me)));
+            MMORPG.LOGGER.info("[MMORPG] INSTANCE deux groupes -> exemplaires distincts = {} ; exemplaires construits = {} (attendu 2)",
+                    other != null && mine != null && other.index != mine.index, com.mmorpg.dungeon.InstanceManager.count(srv, pool));
+            com.mmorpg.dungeon.InstanceManager.release(srv, pool, "autre-groupe");
+            var reuse = com.mmorpg.dungeon.InstanceManager.allocate(srv, pool, "troisieme-groupe");
+            MMORPG.LOGGER.info("[MMORPG] INSTANCE exemplaire libere reutilise = {} ; exemplaires construits = {} (attendu 2)",
+                    reuse != null && other != null && reuse.index == other.index, com.mmorpg.dungeon.InstanceManager.count(srv, pool));
+        });
+        if (tick == 300) srv.execute(() -> {
+            var p = srv.getPlayerList().getPlayerByName(me);
+            var lv = p.level();
+            String group = null;
+            for (var t : com.mmorpg.dungeon.TrialData.get(srv).all()) if (Math.abs(t.pos().get(0) - p.getX()) < 40) group = com.mmorpg.dungeon.TrialData.group(t.id());
+            if (group == null) {
+                MMORPG.LOGGER.info("[MMORPG] INSTANCE aucune epreuve trouvee pres du joueur");
+                return;
+            }
+            var trials = com.mmorpg.dungeon.TrialData.get(srv).inGroup(group);
+            var key = com.mmorpg.registry.ModItems.get("grimoire_interdit");
+            var altar = new net.minecraft.core.BlockPos(trials.get(0).pos().get(0), trials.get(0).pos().get(1), trials.get(0).pos().get(2));
+            MMORPG.LOGGER.info("[MMORPG] INSTANCE groupe {} : {} epreuves", group, trials.size());
+            for (var t : trials) com.mmorpg.dungeon.TrialManager.debugComplete(lv, t.id(), p);
+            int parts = group.lastIndexOf('_');
+            int oz = Integer.parseInt(group.substring(parts + 1));
+            int ox = Integer.parseInt(group.substring(group.lastIndexOf('_', parts - 1) + 1, parts));
+            var arena = new net.minecraft.core.BlockPos(ox, trials.get(0).pos().get(1), oz + 154);
+            int drops = lv.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(arena).inflate(16), e -> e.getItem().is(key)).size();
+            MMORPG.LOGGER.info("[MMORPG] INSTANCE objet d'invocation au sol apres la derniere epreuve = {} (attendu 1)", drops);
+            var chest = lv.getBlockEntity(new net.minecraft.core.BlockPos(ox, trials.get(0).pos().get(1), oz + 186));
+            boolean inChest = false;
+            if (chest instanceof net.minecraft.world.level.block.entity.ChestBlockEntity cbe) {
+                for (int i = 0; i < cbe.getContainerSize(); i++) if (cbe.getItem(i).is(key)) inChest = true;
+            }
+            MMORPG.LOGGER.info("[MMORPG] INSTANCE objet d'invocation dans le coffre du tresor = {} (attendu false)", inChest);
+        });
+        if (tick == 320) {
+            cmd(mc, "tp " + me + " ~ ~ ~ 0 8");
+        }
+        if (tick == 380) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        }
+    }
+
     private static net.minecraft.core.BlockPos dungeonBase;
     /** Prises de vue d'un donjon : (x, z relatifs, hauteur de depart, cap, inclinaison, nom). Le sol est a y = 1. */
     private static final double[][] DUNGEON_SHOTS = {
@@ -2811,7 +2885,7 @@ public final class DevShowcase {
         }
         if (tick == 8 && !mc.gui.hud.isHidden()) mc.gui.hud.toggle();
         if (tick == 130) srv.execute(() -> dungeonBase = srv.getPlayerList().getPlayerByName(me).blockPosition());
-        if (tick == 135) cmd(mc, "mmorpg donjon " + id);
+        if (tick == 135) cmd(mc, "mmorpg donjon construire " + id);
         if (tick == 320 && dungeonBase != null) srv.execute(() -> {
             var lv = srv.getPlayerList().getPlayerByName(me).level();
             StringBuilder sb = new StringBuilder();

@@ -214,7 +214,7 @@ public final class RpgCombat {
             event.setCanceled(true);
             return;
         }
-        if (target instanceof ServerPlayer lockedTarget && com.mmorpg.hub.CinematicManager.isLocked(lockedTarget)) {
+        if (target instanceof ServerPlayer lockedTarget && (com.mmorpg.hub.CinematicManager.isLocked(lockedTarget) || com.mmorpg.dungeon.BossReveal.isLocked(lockedTarget))) {
             event.setCanceled(true);          // cinematique en cours : le joueur est intouchable
             return;
         }

@@ -16,5 +16,189 @@
         "stream": true
       }
     ]
+  },
+  "sfx.rise": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/rise"
+      }
+    ]
+  },
+  "sfx.boom": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/boom"
+      }
+    ]
+  },
+  "sfx.whoosh": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/whoosh"
+      }
+    ]
+  },
+  "sfx.bell": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/bell"
+      }
+    ]
+  },
+  "sfx.chime": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/chime"
+      }
+    ]
+  },
+  "sfx.warrior": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/warrior"
+      }
+    ]
+  },
+  "sfx.arrow": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/arrow"
+      }
+    ]
+  },
+  "sfx.arcane": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/arcane"
+      }
+    ]
+  },
+  "sfx.shield": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/shield"
+      }
+    ]
+  },
+  "sfx.fanfare": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/fanfare"
+      }
+    ]
+  },
+  "sfx.growl": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/growl"
+      }
+    ]
+  },
+  "sfx.ritual": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/ritual"
+      }
+    ]
+  },
+  "sfx.heartbeat": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/heartbeat"
+      }
+    ]
+  },
+  "sfx.horn": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/horn"
+      }
+    ]
+  },
+  "sfx.door": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/door"
+      }
+    ]
+  },
+  "sfx.success": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/success"
+      }
+    ]
+  },
+  "sfx.error": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/error"
+      }
+    ]
+  },
+  "sfx.firework": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/firework"
+      }
+    ]
+  },
+  "sfx.teleport": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/teleport"
+      }
+    ]
+  },
+  "sfx.note0": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/note0"
+      }
+    ]
+  },
+  "sfx.note1": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/note1"
+      }
+    ]
+  },
+  "sfx.note2": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/note2"
+      }
+    ]
+  },
+  "sfx.note3": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "mmorpg:sfx/note3"
+      }
+    ]
   }
 }

@@ -32,6 +32,43 @@ public final class ArenaEvents {
     private ArenaEvents() {
     }
 
+    private static final java.util.Set<String> KEYS_DROPPED = new java.util.HashSet<>();
+
+    static void forgetKey(String group) {
+        KEYS_DROPPED.remove(group);
+    }
+
+    /**
+     * Quand la derniere epreuve d'un donjon est reussie, l'objet qui active l'autel (sceau, grimoire, braise, cristal, oeil) apparait
+     * pres de l'autel de l'antre, une seule fois par exemplaire. @param floorY hauteur du sol du donjon + 1 (position d'une epreuve)
+     */
+    public static void dropKey(ServerLevel level, String group, int floorY) {
+        for (com.mmorpg.world.DungeonBuilder.DungeonType t : com.mmorpg.world.DungeonBuilder.DungeonType.values()) {
+            if (!group.startsWith(t.id + "_")) continue;
+            String[] xz = group.substring(t.id.length() + 1).split("_");
+            BlockPos altar = new BlockPos(Integer.parseInt(xz[0]), floorY, Integer.parseInt(xz[1]) + Theme.ARENA_Z);
+            var key = com.mmorpg.registry.ModItems.get(t.bossKey);
+            net.minecraft.world.phys.AABB around = new net.minecraft.world.phys.AABB(altar).inflate(14);
+            if (!KEYS_DROPPED.add(group)) return;
+            if (!level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, around, e -> e.getItem().is(key)).isEmpty()) return;
+            if (!level.getEntitiesOfClass(com.mmorpg.entity.boss.RpgBoss.class, around.inflate(20)).isEmpty()) return;
+            var drop = new net.minecraft.world.entity.item.ItemEntity(level, altar.getX() + 3.5, altar.getY() + 1.5, altar.getZ() + 0.5, new net.minecraft.world.item.ItemStack(key));
+            drop.setUnlimitedLifetime();
+            drop.setGlowingTag(true);
+            drop.setDeltaMovement(0, 0.1, 0);
+            level.addFreshEntity(drop);
+            level.sendParticles(ParticleTypes.END_ROD, drop.getX(), drop.getY() + 0.5, drop.getZ(), 40, 0.4, 0.6, 0.4, 0.05);
+            level.playSound(null, altar, com.mmorpg.registry.ModSounds.CHIME.get(), SoundSource.PLAYERS, 1.2F, 1.0F);
+            for (ServerPlayer p : level.players()) {
+                if (Math.abs(p.getX() - altar.getX()) < 40 && p.getZ() > altar.getZ() - 170 && p.getZ() < altar.getZ() + 50) {
+                    p.sendSystemMessage(net.minecraft.network.chat.Component.literal("✦ L'objet d'invocation est apparu près de l'autel de l'antre : "
+                            + key.getName(new net.minecraft.world.item.ItemStack(key)).getString() + ".").withColor(0xFFE080));
+                }
+            }
+            return;
+        }
+    }
+
     /** Appele par {@code RpgBoss.onPhaseChange}. */
     public static void phase(ServerLevel level, Mob boss, int phase) {
         var zone = ZoneManager.zoneAt(level, boss.blockPosition());
@@ -54,7 +91,8 @@ public final class ArenaEvents {
             double a = Math.PI * 2 * i / 24;
             level.sendParticles(ParticleTypes.FLAME, boss.getX() + Math.cos(a) * 3, boss.getY() + 0.3, boss.getZ() + Math.sin(a) * 3, 1, 0, 0.05, 0, 0.02);
         }
-        level.playSound(null, boss.blockPosition(), SoundEvents.ENDER_DRAGON_GROWL, SoundSource.HOSTILE, 1.5F, 0.7F);
+        level.playSound(null, boss.blockPosition(), com.mmorpg.registry.ModSounds.GROWL.get(), SoundSource.HOSTILE, 1.5F, 1.0F);
+        level.playSound(null, boss.blockPosition(), com.mmorpg.registry.ModSounds.BOOM.get(), SoundSource.HOSTILE, 1.2F, 1.0F);
         String name = boss.getName().getString().toUpperCase(java.util.Locale.ROOT);
         for (ServerPlayer p : near) {
             Net.toPlayer(p, new Payloads.AreaEntry(name, "Des renforts surgissent !", Payloads.AreaEntry.PHASE, phase >= 3 ? 0xFF3030 : 0xFF8040, String.valueOf(phase)));
@@ -88,7 +126,7 @@ public final class ArenaEvents {
                 Net.toPlayer(p, new Payloads.AreaEntry("VICTOIRE", name + " est tombé !", Payloads.AreaEntry.VICTORY, 0xFFD060, label));
             }
         }
-        level.playSound(null, boss.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 1.5F, 0.9F);
+        level.playSound(null, boss.blockPosition(), com.mmorpg.registry.ModSounds.FANFARE.get(), SoundSource.PLAYERS, 1.6F, 1.0F);
         for (int i = 0; i < 10; i++) {
             int step = i;
             com.mmorpg.server.Scheduler.later(level, 10 + i * 14, () -> {
@@ -98,7 +136,7 @@ public final class ArenaEvents {
                 double y = boss.getY() + 4 + rnd.nextDouble() * 6;
                 level.sendParticles(ParticleTypes.FIREWORK, x, y, z, 60, 1.6, 1.6, 1.6, 0.12);
                 level.sendParticles(step % 3 == 0 ? ParticleTypes.TOTEM_OF_UNDYING : ParticleTypes.END_ROD, x, y, z, 24, 1.2, 1.2, 1.2, 0.2);
-                level.playSound(null, BlockPos.containing(x, y, z), SoundEvents.FIREWORK_ROCKET_BLAST, SoundSource.PLAYERS, 1.2F, 0.9F + rnd.nextFloat() * 0.3F);
+                level.playSound(null, BlockPos.containing(x, y, z), com.mmorpg.registry.ModSounds.FIREWORK.get(), SoundSource.PLAYERS, 1.0F, 0.9F + rnd.nextFloat() * 0.3F);
             });
         }
     }
