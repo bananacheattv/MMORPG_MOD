@@ -32,6 +32,7 @@ public final class MMORPG {
         ModBlocks.BLOCK_ENTITIES.register(modBus);
         ModEntities.ENTITIES.register(modBus);
         ModItems.ITEMS.register(modBus);
+        com.mmorpg.registry.ModSounds.SOUNDS.register(modBus);
         ModAttachments.ATTACHMENTS.register(modBus);
         ModCreativeTabs.TABS.register(modBus);
         modBus.addListener(ModEntities::registerAttributes);

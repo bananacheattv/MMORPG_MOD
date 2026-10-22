@@ -33,6 +33,9 @@ public final class ClientPayloadHandlers {
         });
         event.register(Payloads.MobInfo.TYPE, (payload, context) -> ClientData.mobInfo = payload.data().copy());
         event.register(Payloads.Notify.TYPE, (payload, context) -> HudEffects.addBanner(payload));
+        event.register(Payloads.AreaEntry.TYPE, (payload, context) -> com.mmorpg.client.AreaEntryClient.start(payload));
+        event.register(Payloads.BossReveal.TYPE, (payload, context) -> com.mmorpg.client.BossRevealClient.start(payload));
+        event.register(Payloads.Loading.TYPE, (payload, context) -> com.mmorpg.client.LoadingClient.handle(payload));
         event.register(Payloads.PartySync.TYPE, (payload, context) -> ClientData.party = payload.data().copy());
         event.register(Payloads.CastAnimation.TYPE, (payload, context) ->
                 com.mmorpg.client.fx.CastAnimations.start(payload.entityId(), payload.anim(), payload.duration()));
@@ -62,6 +65,7 @@ public final class ClientPayloadHandlers {
             case S2COpenScreen.FORGE -> mc.gui.setScreen(new ForgeScreen(BlockPos.of(payload.extra().getLongOr("pos", 0))));
             case S2COpenScreen.QUEST_GIVER -> mc.gui.setScreen(new com.mmorpg.client.screen.QuestGiverScreen(payload.extra()));
             case S2COpenScreen.SHOP -> mc.gui.setScreen(new com.mmorpg.client.screen.ShopScreen(payload.extra()));
+            case S2COpenScreen.DUNGEON_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.DungeonMasterScreen(payload.extra()));
             case S2COpenScreen.CLASS_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.ClassMasterScreen(payload.extra()));
             case S2COpenScreen.TRIAL_STATE -> {
                 ClientData.trialActive = payload.extra().getBooleanOr("active", false);

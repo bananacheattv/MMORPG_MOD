@@ -35,6 +35,9 @@ public final class ClientEvents {
         });
         event.replaceLayer(VanillaGuiLayers.TAB_LIST, com.mmorpg.client.hud.PlayerListHud::render);
         event.registerAbove(VanillaGuiLayers.HOTBAR, MMORPG.id("hud"), MmoHud::render);
+        event.registerAboveAll(com.mmorpg.client.BossRevealClient.LAYER, com.mmorpg.client.BossRevealClient::render);
+        event.registerAboveAll(com.mmorpg.client.LoadingClient.LAYER, com.mmorpg.client.LoadingClient::render);
+        event.registerAboveAll(com.mmorpg.client.AreaEntryClient.LAYER, com.mmorpg.client.AreaEntryClient::render);
         event.registerAboveAll(com.mmorpg.client.cinematic.CinematicClient.LAYER, com.mmorpg.client.cinematic.CinematicClient::render);
     }
 

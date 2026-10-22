@@ -4,9 +4,6 @@ import com.mmorpg.MMORPG;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
-import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
-import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -159,7 +156,7 @@ public final class ZoneManager {
         String before = CURRENT.getOrDefault(p.getUUID(), "");
         if (!now.equals(before)) {
             CURRENT.put(p.getUUID(), now);
-            if (z != null) announce(p, z.name(), describe(z));
+            if (z != null) announce(p, z);
         }
         if (p.isHolding(com.mmorpg.registry.ModItems.BAGUETTE_ZONE.get())) outline(p);
     }
@@ -179,10 +176,33 @@ public final class ZoneManager {
         return sb.length() == 0 ? "Zone libre" : sb.toString();
     }
 
-    private static void announce(ServerPlayer p, String title, String subtitle) {
-        p.connection.send(new ClientboundSetTitlesAnimationPacket(10, 50, 20));
-        p.connection.send(new ClientboundSetTitleTextPacket(Component.literal(title).withColor(0xFFE6A0)));
-        p.connection.send(new ClientboundSetSubtitleTextPacket(Component.literal(subtitle).withColor(0xB8B0A0)));
+    /** Animation d'entree cote client (filet dore ou salle de boss), avec un son et quelques particules. */
+    private static void announce(ServerPlayer p, ZoneData.Zone z) {
+        String subtitle = z.subtitle().isEmpty() ? describe(z) : z.subtitle();
+        String lore = "";
+        boolean boss = z.boss();
+        boolean dungeon = z.dungeon();
+        if (dungeon) {                                       // « texte d'ambiance|ligne de niveau »
+            int bar = subtitle.indexOf('|');
+            lore = bar < 0 ? "" : subtitle.substring(0, bar);
+            subtitle = bar < 0 ? subtitle : subtitle.substring(bar + 1);
+        }
+        int style = boss ? com.mmorpg.network.Payloads.AreaEntry.BOSS_ROOM : dungeon ? com.mmorpg.network.Payloads.AreaEntry.DUNGEON : com.mmorpg.network.Payloads.AreaEntry.ZONE;
+        net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(p,
+                new com.mmorpg.network.Payloads.AreaEntry(z.name(), subtitle, style, boss ? 0xFF5A3C : dungeon ? 0xFFC868 : 0xFFD878, lore));
+        ServerLevel level = p.level();
+        if (dungeon) {
+            level.playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.BELL.get(), net.minecraft.sounds.SoundSource.AMBIENT, 1.0F, 1.0F);
+            level.playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.RISE.get(), net.minecraft.sounds.SoundSource.AMBIENT, 0.5F, 1.0F);
+            level.sendParticles(ParticleTypes.ASH, p.getX(), p.getY() + 1.5, p.getZ(), 40, 4, 1.5, 4, 0.01);
+        } else if (boss) {
+            level.playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.GROWL.get(), net.minecraft.sounds.SoundSource.HOSTILE, 0.9F, 1.0F);
+            level.playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.HEARTBEAT.get(), net.minecraft.sounds.SoundSource.HOSTILE, 1.2F, 1.0F);
+            level.sendParticles(ParticleTypes.SMOKE, p.getX(), p.getY() + 1, p.getZ(), 40, 4, 1.2, 4, 0.01);
+        } else {
+            level.playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.CHIME.get(), net.minecraft.sounds.SoundSource.AMBIENT, 0.8F, 1.0F);
+            level.sendParticles(ParticleTypes.END_ROD, p.getX(), p.getY() + 1.2, p.getZ(), 14, 1.2, 0.8, 1.2, 0.02);
+        }
     }
 
     /** Contour de la selection (et des zones proches) en particules visibles de l'operateur qui tient la baguette. */

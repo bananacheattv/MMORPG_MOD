@@ -19,7 +19,11 @@ import java.util.Locale;
 /** Zones nommees d'Eldoria (colonnes rectangulaires sur toute la hauteur) avec leurs regles : construction, PvP, monstres hostiles. */
 public class ZoneData extends SavedData {
     public record Zone(String id, String name, ResourceKey<Level> dimension, int minX, int minZ, int maxX, int maxZ,
-                       boolean noBuild, boolean noPvp, boolean noMobs) {
+                       boolean noBuild, boolean noPvp, boolean noMobs, String style, String subtitle) {
+        public static final String STYLE_ZONE = "zone";
+        public static final String STYLE_BOSS = "boss";
+        public static final String STYLE_DUNGEON = "dungeon";
+
         static final Codec<Zone> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Codec.STRING.fieldOf("id").forGetter(Zone::id),
                 Codec.STRING.fieldOf("name").forGetter(Zone::name),
@@ -30,7 +34,9 @@ public class ZoneData extends SavedData {
                 Codec.INT.fieldOf("maxZ").forGetter(Zone::maxZ),
                 Codec.BOOL.optionalFieldOf("noBuild", true).forGetter(Zone::noBuild),
                 Codec.BOOL.optionalFieldOf("noPvp", true).forGetter(Zone::noPvp),
-                Codec.BOOL.optionalFieldOf("noMobs", true).forGetter(Zone::noMobs)
+                Codec.BOOL.optionalFieldOf("noMobs", true).forGetter(Zone::noMobs),
+                Codec.STRING.optionalFieldOf("style", STYLE_ZONE).forGetter(Zone::style),
+                Codec.STRING.optionalFieldOf("subtitle", "").forGetter(Zone::subtitle)
         ).apply(i, Zone::new));
 
         public boolean contains(ResourceKey<Level> dim, BlockPos pos) {
@@ -42,7 +48,19 @@ public class ZoneData extends SavedData {
         }
 
         public Zone with(boolean noBuild, boolean noPvp, boolean noMobs) {
-            return new Zone(id, name, dimension, minX, minZ, maxX, maxZ, noBuild, noPvp, noMobs);
+            return new Zone(id, name, dimension, minX, minZ, maxX, maxZ, noBuild, noPvp, noMobs, style, subtitle);
+        }
+
+        public Zone withStyle(String style, String subtitle) {
+            return new Zone(id, name, dimension, minX, minZ, maxX, maxZ, noBuild, noPvp, noMobs, style, subtitle);
+        }
+
+        public boolean dungeon() {
+            return STYLE_DUNGEON.equals(style);
+        }
+
+        public boolean boss() {
+            return STYLE_BOSS.equals(style);
         }
     }
 
@@ -96,6 +114,11 @@ public class ZoneData extends SavedData {
         zones.removeIf(z -> z.id().equals(zone.id()));
         zones.add(zone);
         setDirty();
+    }
+
+    /** Retire les zones dont l'identifiant commence par {@code prefix} et qui chevauchent le rectangle (reconstruction d'un donjon). */
+    public void removeOverlapping(ResourceKey<Level> dim, String idPrefix, int x0, int z0, int x1, int z1) {
+        if (zones.removeIf(z -> z.dimension().equals(dim) && z.id().startsWith(idPrefix) && z.minX() <= x1 && z.maxX() >= x0 && z.minZ() <= z1 && z.maxZ() >= z0)) setDirty();
     }
 
     public boolean remove(String id) {

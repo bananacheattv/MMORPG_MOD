@@ -91,6 +91,62 @@ public final class Payloads {
         }
     }
 
+    /** Animation d'entree dans une zone (style 0) ou une salle de boss (style 1). */
+    public record AreaEntry(String title, String subtitle, int style, int color, String lore) implements CustomPacketPayload {
+        /** Styles : 0 zone, 1 salle de boss, 2 vague, 3 phase de boss, 4 victoire, 5 entree de donjon. */
+        public static final int ZONE = 0, BOSS_ROOM = 1, WAVE = 2, PHASE = 3, VICTORY = 4, DUNGEON = 5;
+
+        public static final Type<AreaEntry> TYPE = new Type<>(MMORPG.id("area_entry"));
+        public static final StreamCodec<ByteBuf, AreaEntry> CODEC = StreamCodec.composite(
+                ByteBufCodecs.STRING_UTF8, AreaEntry::title, ByteBufCodecs.STRING_UTF8, AreaEntry::subtitle,
+                ByteBufCodecs.VAR_INT, AreaEntry::style, ByteBufCodecs.INT, AreaEntry::color, ByteBufCodecs.STRING_UTF8, AreaEntry::lore, AreaEntry::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    /** Cinematique d'apparition d'un boss invoque a l'autel (camera pilotee cote client). */
+    public record BossReveal(int x, int y, int z, int ticks) implements CustomPacketPayload {
+        public static final Type<BossReveal> TYPE = new Type<>(MMORPG.id("boss_reveal"));
+        public static final StreamCodec<ByteBuf, BossReveal> CODEC = StreamCodec.composite(
+                ByteBufCodecs.VAR_INT, BossReveal::x, ByteBufCodecs.VAR_INT, BossReveal::y, ByteBufCodecs.VAR_INT, BossReveal::z,
+                ByteBufCodecs.VAR_INT, BossReveal::ticks, BossReveal::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    /** Ecran de chargement d'un donjon instancie : 0 = debut, 1 = progression, 2 = fin. */
+    public record Loading(int mode, String title, String lore, int color, int percent) implements CustomPacketPayload {
+        public static final int START = 0, PROGRESS = 1, END = 2;
+        public static final Type<Loading> TYPE = new Type<>(MMORPG.id("loading"));
+        public static final StreamCodec<ByteBuf, Loading> CODEC = StreamCodec.composite(
+                ByteBufCodecs.VAR_INT, Loading::mode, ByteBufCodecs.STRING_UTF8, Loading::title, ByteBufCodecs.STRING_UTF8, Loading::lore,
+                ByteBufCodecs.INT, Loading::color, ByteBufCodecs.VAR_INT, Loading::percent, Loading::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    /** Choix du joueur chez le Maitre des donjons : donjon et difficulte (0 normal, 1 heroique, 2 mythique). */
+    public record DungeonEnter(int npc, String dungeon, int difficulty) implements CustomPacketPayload {
+        public static final Type<DungeonEnter> TYPE = new Type<>(MMORPG.id("dungeon_enter"));
+        public static final StreamCodec<ByteBuf, DungeonEnter> CODEC = StreamCodec.composite(
+                ByteBufCodecs.VAR_INT, DungeonEnter::npc, ByteBufCodecs.STRING_UTF8, DungeonEnter::dungeon,
+                ByteBufCodecs.VAR_INT, DungeonEnter::difficulty, DungeonEnter::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
     /** Informations du bestiaire (noms, niveaux, butin) issues de la configuration serveur. */
     public record MobInfo(CompoundTag data) implements CustomPacketPayload {
         public static final Type<MobInfo> TYPE = new Type<>(MMORPG.id("mob_info"));

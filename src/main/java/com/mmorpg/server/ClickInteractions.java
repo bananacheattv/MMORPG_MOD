@@ -62,6 +62,7 @@ public final class ClickInteractions {
             switch (npc.role()) {
                 case QUETES -> QuestManager.openGiver(sp, npc);
                 case MARCHAND -> ShopManager.open(sp, npc);
+                case DONJON -> com.mmorpg.dungeon.DungeonMaster.open(sp, npc);
             }
         }
     }

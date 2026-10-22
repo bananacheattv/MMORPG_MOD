@@ -21,6 +21,12 @@ public final class Net {
         r.playToClient(Payloads.CombatText.TYPE, Payloads.CombatText.CODEC);
         r.playToClient(Payloads.CastAnimation.TYPE, Payloads.CastAnimation.CODEC);
         r.playToClient(Payloads.Notify.TYPE, Payloads.Notify.CODEC);
+        r.playToClient(Payloads.AreaEntry.TYPE, Payloads.AreaEntry.CODEC);
+        r.playToClient(Payloads.BossReveal.TYPE, Payloads.BossReveal.CODEC);
+        r.playToClient(Payloads.Loading.TYPE, Payloads.Loading.CODEC);
+        r.playToServer(Payloads.DungeonEnter.TYPE, Payloads.DungeonEnter.CODEC, (packet, ctx) -> {
+            if (ctx.player() instanceof ServerPlayer p) com.mmorpg.dungeon.DungeonMaster.enter(p, packet);
+        });
         r.playToClient(Payloads.MobInfo.TYPE, Payloads.MobInfo.CODEC);
         r.playToClient(Payloads.PartySync.TYPE, Payloads.PartySync.CODEC);
 

@@ -87,6 +87,7 @@ public final class HubBuilder {
         HubFlora.islets(c);
         texts(c);
         entities(c);
+        zones(c);
         var server = level.getServer();
         var old = server.getRespawnData();
         if (old.globalPos().dimension().equals(net.minecraft.world.level.Level.OVERWORLD) && !level.dimension().equals(net.minecraft.world.level.Level.OVERWORLD)) {
@@ -96,6 +97,28 @@ public final class HubBuilder {
         level.setRespawnData(new LevelData.RespawnData(GlobalPos.of(level.dimension(), spawn), 180F, 0F));
         HubData.get(level.getServer()).set(level.dimension(), c.O);
         return c.O;
+    }
+
+    /** Zones d'annonce du hub (animation d'entree) : la citadelle, la place, les pavillons, l'arene d'epreuve, l'aire d'entrainement. */
+    private static void zones(HubCtx c) {
+        var data = com.mmorpg.zone.ZoneData.get(c.L.getServer());
+        var dim = c.L.dimension();
+        int ox = c.O.getX();
+        int oz = c.O.getZ();
+        java.util.function.BiConsumer<String[], int[]> add = (txt, r) -> data.add(new com.mmorpg.zone.ZoneData.Zone("hub_" + txt[0], txt[1], dim,
+                ox + r[0], oz + r[1], ox + r[2], oz + r[3], false, false, false, com.mmorpg.zone.ZoneData.Zone.STYLE_ZONE, txt[2]));
+        add.accept(new String[]{"citadelle", "Citadelle d'Eldoria", "Capitale des héros"}, new int[]{-52, -106, HubLayout.YARD_X1 + 12, 66});
+        add.accept(new String[]{"rotonde", "Place des Héros", "Parlez au Maître des classes"}, new int[]{-31, -31, 31, 31});
+        add.accept(new String[]{"epreuve", "Épreuve des Héros", "Essayez une classe avant de la choisir"},
+                new int[]{-HubLayout.ROOM_HALF, HubLayout.ROOM_Z0, HubLayout.ROOM_HALF, HubLayout.ROOM_Z1});
+        add.accept(new String[]{"entrainement", "Aire d'entraînement", "Mannequins de combat"},
+                new int[]{HubLayout.YARD_X0, -HubLayout.YARD_HALF, HubLayout.YARD_X1, HubLayout.YARD_HALF});
+        add.accept(new String[]{"portail", "Portail d'Eldoria", "Le monde vous attend"}, new int[]{-12, 26, 12, 60});
+        String[][] mottos = {{"Guerrier", "Force et férocité"}, {"Mage", "Intelligence et esprit"}, {"Archer", "Agilité et dextérité"}, {"Paladin", "Vitalité et endurance"}};
+        for (int i = 0; i < 4; i++) {
+            int[] sp = HubLayout.classSpot(CLASSES[i]);
+            add.accept(new String[]{"pavillon_" + i, "Pavillon du " + mottos[i][0], mottos[i][1]}, new int[]{sp[0] - 12, sp[2] - 12, sp[0] + 12, sp[2] + 12});
+        }
     }
 
     // ================================================================== emprise de l'ile

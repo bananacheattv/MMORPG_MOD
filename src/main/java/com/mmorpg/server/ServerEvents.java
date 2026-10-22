@@ -38,6 +38,7 @@ public final class ServerEvents {
         RpgCommands.register(event.getDispatcher());
         RpgCommands.registerHub(event.getDispatcher());
         com.mmorpg.zone.ZoneCommands.register(event.getDispatcher());
+        RpgCommands.registerSetDonjon(event.getDispatcher());
         PlayerCommands.register(event.getDispatcher());
     }
 

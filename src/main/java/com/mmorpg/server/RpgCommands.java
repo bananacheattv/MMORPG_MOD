@@ -148,18 +148,32 @@ public final class RpgCommands {
                         .executes(c -> spawnMob(c, 0))
                         .then(Commands.argument("niveau", IntegerArgumentType.integer(1, 100))
                                 .executes(c -> spawnMob(c, IntegerArgumentType.getInteger(c, "niveau"))))))
-                .then(Commands.literal("donjon").then(Commands.argument("type", StringArgumentType.word())
-                        .suggests((c, b) -> SharedSuggestionProvider.suggest(dungeons, b))
-                        .executes(c -> {
-                            DungeonBuilder.DungeonType t = DungeonBuilder.DungeonType.byId(StringArgumentType.getString(c, "type"));
-                            if (t == null) {
-                                c.getSource().sendFailure(Component.literal("Donjon inconnu"));
+                .then(Commands.literal("donjon")
+                        .then(Commands.literal("reinitialiser").executes(c -> {
+                            ServerLevel lv = c.getSource().getLevel();
+                            String g = com.mmorpg.dungeon.DungeonManager.groupAt(lv, BlockPos.containing(c.getSource().getPosition()));
+                            if (g == null) {
+                                c.getSource().sendFailure(Component.literal("Placez-vous dans un donjon pour le réinitialiser."));
                                 return 0;
                             }
-                            BlockPos tp = DungeonBuilder.buildDungeon(c.getSource().getLevel(), BlockPos.containing(c.getSource().getPosition()), t);
-                            c.getSource().sendSuccess(() -> ok("Donjon « " + t.label + " » (niv. " + t.level + ") construit vers le sud. Téléporteur en " + tp.toShortString()), true);
+                            int n = com.mmorpg.dungeon.DungeonManager.reset(c.getSource().getServer(), g);
+                            c.getSource().sendSuccess(() -> ok("Donjon réinitialisé : " + n + " épreuve(s) remise(s) à zéro (herses refermées)."), true);
                             return 1;
-                        })))
+                        }))
+                        .then(Commands.literal("construire").then(typeArg(dungeons, RpgCommands::buildDungeonCommand)))
+                        .then(Commands.literal("prechauffer").then(Commands.argument("type", StringArgumentType.word())
+                                .suggests((c, b) -> SharedSuggestionProvider.suggest(dungeons, b))
+                                .then(Commands.argument("nombre", IntegerArgumentType.integer(1, 20)).executes(c -> {
+                                    DungeonBuilder.DungeonType t = DungeonBuilder.DungeonType.byId(StringArgumentType.getString(c, "type"));
+                                    if (t == null) {
+                                        c.getSource().sendFailure(Component.literal("Donjon inconnu"));
+                                        return 0;
+                                    }
+                                    int n = com.mmorpg.dungeon.InstanceManager.prewarm(c.getSource().getServer(), t, 0, IntegerArgumentType.getInteger(c, "nombre"));
+                                    c.getSource().sendSuccess(() -> ok(n + " exemplaire(s) de « " + t.label + " » construit(s) d'avance."), true);
+                                    return n;
+                                }))))
+                        .then(typeArg(dungeons, RpgCommands::createGateCommand)))
                 .then(Commands.literal("ville").then(Commands.argument("nom", StringArgumentType.greedyString()).executes(c -> {
                     String name = StringArgumentType.getString(c, "nom");
                     BlockPos tp = DungeonBuilder.buildCity(c.getSource().getLevel(), BlockPos.containing(c.getSource().getPosition()), name);
@@ -351,6 +365,84 @@ public final class RpgCommands {
                         .then(Commands.argument("classe", StringArgumentType.word())
                                 .suggests((c, b) -> SharedSuggestionProvider.suggest(classes, b))
                                 .executes(RpgCommands::setClass)))));
+    }
+
+    private interface DungeonAction {
+        int run(CommandContext<CommandSourceStack> c, int difficulty) throws com.mojang.brigadier.exceptions.CommandSyntaxException;
+    }
+
+    /** <type> [normal|heroique|mythique] : meme forme pour la construction directe et la creation d'une porte instanciee. */
+    private static com.mojang.brigadier.builder.RequiredArgumentBuilder<CommandSourceStack, String> typeArg(List<String> dungeons, DungeonAction action) {
+        return Commands.argument("type", StringArgumentType.word())
+                .suggests((c, b) -> SharedSuggestionProvider.suggest(dungeons, b))
+                .executes(c -> action.run(c, 0))
+                .then(Commands.argument("difficulte", StringArgumentType.word())
+                        .suggests((c, b) -> SharedSuggestionProvider.suggest(List.of("normal", "heroique", "mythique"), b))
+                        .executes(c -> action.run(c, switch (StringArgumentType.getString(c, "difficulte")) {
+                            case "heroique" -> 1;
+                            case "mythique" -> 2;
+                            default -> 0;
+                        })));
+    }
+
+    /** /mmorpg donjon <type> [difficulte] : cree la porte du donjon ici ; chaque joueur ou groupe y entre dans son propre exemplaire. */
+    private static int createGateCommand(CommandContext<CommandSourceStack> c, int difficulty) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        DungeonBuilder.DungeonType t = DungeonBuilder.DungeonType.byId(StringArgumentType.getString(c, "type"));
+        if (t == null) {
+            c.getSource().sendFailure(Component.literal("Donjon inconnu"));
+            return 0;
+        }
+        ServerPlayer admin = c.getSource().getEntity() instanceof ServerPlayer sp ? sp : null;
+        var w = com.mmorpg.dungeon.InstanceManager.createGate(c.getSource().getLevel(), BlockPos.containing(c.getSource().getPosition()), t, difficulty, admin);
+        c.getSource().sendSuccess(() -> ok("Porte du donjon « " + w.name + " » créée (niveau " + w.minLevel + " requis). Elle apparaît dans tous les téléporteurs ; chaque joueur ou groupe "
+                + "entre dans son propre exemplaire, construit à la première utilisation (/mmorpg donjon prechauffer " + t.id + " <n> pour en préparer)."), true);
+        return 1;
+    }
+
+    private static int buildDungeonCommand(CommandContext<CommandSourceStack> c, int difficulty) {
+        DungeonBuilder.DungeonType t = DungeonBuilder.DungeonType.byId(StringArgumentType.getString(c, "type"));
+        if (t == null) {
+            c.getSource().sendFailure(Component.literal("Donjon inconnu"));
+            return 0;
+        }
+        BlockPos tp = DungeonBuilder.buildDungeon(c.getSource().getLevel(), BlockPos.containing(c.getSource().getPosition()), t, difficulty);
+        String label = difficulty == 1 ? " héroïque" : difficulty >= 2 ? " mythique" : "";
+        c.getSource().sendSuccess(() -> ok("Donjon « " + t.label + " »" + label + " (niv. " + t.level + ") construit vers le sud. Téléporteur en " + tp.toShortString()), true);
+        return 1;
+    }
+
+    /** /setdonjon [type] : pose ici le Maitre des donjons (tous les donjons, ou un seul). Aucune autre preparation n'est necessaire. */
+    public static void registerSetDonjon(CommandDispatcher<CommandSourceStack> d) {
+        List<String> ids = Arrays.stream(DungeonBuilder.DungeonType.values()).map(t -> t.id).toList();
+        d.register(Commands.literal("setdonjon")
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .executes(c -> setDonjon(c, null))
+                .then(Commands.argument("type", StringArgumentType.word())
+                        .suggests((c, b) -> SharedSuggestionProvider.suggest(ids, b))
+                        .executes(c -> {
+                            var t = DungeonBuilder.DungeonType.byId(StringArgumentType.getString(c, "type"));
+                            if (t == null) {
+                                c.getSource().sendFailure(Component.literal("Donjon inconnu : " + StringArgumentType.getString(c, "type")));
+                                return 0;
+                            }
+                            return setDonjon(c, t);
+                        })));
+    }
+
+    private static int setDonjon(CommandContext<CommandSourceStack> c, DungeonBuilder.DungeonType only) {
+        ServerLevel level = c.getSource().getLevel();
+        if (c.getSource().getServer().getLevel(com.mmorpg.dungeon.InstanceManager.DIM) == null) {
+            c.getSource().sendFailure(Component.literal("La dimension des donjons est introuvable (mmorpg:donjons) : le mod est-il à jour ?"));
+            return 0;
+        }
+        String name = only == null ? "Maître des donjons" : "Gardien : " + only.label;
+        String group = only == null ? com.mmorpg.dungeon.DungeonMaster.GROUP_ALL : "donjon:" + only.id;
+        var npc = DungeonBuilder.spawnNpc(level, BlockPos.containing(c.getSource().getPosition()), com.mmorpg.entity.NpcEntity.Role.DONJON, name, 3, c.getSource().getRotation().y + 180);
+        if (npc == null) return 0;
+        npc.setup(com.mmorpg.entity.NpcEntity.Role.DONJON, name, 3, group);
+        c.getSource().sendSuccess(() -> ok(name + " posé. " + (only == null ? "Il propose les " + DungeonBuilder.DungeonType.values().length + " donjons" : "Il propose « " + only.label + " »")
+                + " : chaque joueur ou groupe y entre dans son propre exemplaire, construit automatiquement à la première visite (écran de chargement)."), true);
+        return 1;
     }
 
     private static int playCinematic(ServerPlayer target, CommandContext<CommandSourceStack> c) {
