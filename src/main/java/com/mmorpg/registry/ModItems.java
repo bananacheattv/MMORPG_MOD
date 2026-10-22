@@ -164,6 +164,10 @@ public final class ModItems {
     public static final DeferredItem<RpgMaterialItem> PIECE_OR = ITEMS.registerItem("piece_or",
             p -> new RpgMaterialItem(p, Rarity.COMMUN, "Monnaie", "La monnaie du royaume. Utilisée à la Forge Arcanique."), p -> p.stacksTo(99));
 
+    /** Outil d'administration : ouvre l'atelier de quetes (operateurs). */
+    public static final DeferredItem<com.mmorpg.item.QuestWandItem> SCEPTRE_QUETES = ITEMS.registerItem("sceptre_quetes",
+            com.mmorpg.item.QuestWandItem::new);
+
     // ------------------------------------------------------------------ invocations
     public static final DeferredItem<SummonKeyItem> SCEAU_ROI_GOBELIN = summon("sceau_roi_gobelin", Rarity.RARE, "roi_gobelin", "Roi Gobelin", 20);
     public static final DeferredItem<SummonKeyItem> GRIMOIRE_INTERDIT = summon("grimoire_interdit", Rarity.EPIQUE, "liche_ancienne", "Liche Ancienne", 45);

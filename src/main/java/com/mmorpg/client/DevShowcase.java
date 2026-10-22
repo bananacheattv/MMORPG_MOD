@@ -375,6 +375,38 @@ public final class DevShowcase {
             cinematicPhase(mc, me);
             return;
         }
+        if (MODE.equals("sceptre")) {
+            switch (tick) {
+                case 5 -> {
+                    mc.getWindow().setWindowed(1280, 720);
+                    cmd(mc, "item replace entity " + me + " weapon.mainhand with mmorpg:sceptre_quetes");
+                }
+                case 20 -> mc.gameMode.useItem(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND);
+                case 40 -> {
+                    MMORPG.LOGGER.info("[MMORPG] SCEPTRE clic droit dans le vide : ecran = {} (attendu QuestEditorScreen)", screenName(mc));
+                    shot(mc, "sceptre_atelier");
+                    mc.gui.setScreen(null);
+                    cmd(mc, "kill @e[type=mmorpg:pnj]");
+                    cmd(mc, "mmorpg ville Eldoria");
+                }
+                case 70 -> {
+                    cmd(mc, "item replace entity " + me + " weapon.mainhand with mmorpg:sceptre_quetes");
+                    cmd(mc, "tp " + me + " ~-2.5 ~ ~ 90 15");
+                }
+                case 90 -> talkTo(mc, nearestNpc(mc, com.mmorpg.entity.NpcEntity.Role.QUETES));
+                case 120 -> {
+                    MMORPG.LOGGER.info("[MMORPG] SCEPTRE clic sur un PNJ : ecran = {} (attendu QuestEditorScreen, fiche PNJ)", screenName(mc));
+                    shot(mc, "sceptre_fiche_pnj");
+                }
+                case 140 -> {
+                    MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+                    stop(mc);
+                }
+                default -> {
+                }
+            }
+            return;
+        }
         if (MODE.equals("hubdesign")) {
             hubDesignPhase(mc, me);
             return;

@@ -13,6 +13,8 @@ Dans `config/mmorpg/quests.json`, donner la valeur `cryptes` au champ `giver` po
 
 Chaque quete possede un identifiant unique, `name`, `description`, `minLevel`, `giver`, une liste `requires` de quetes prealables, `daily`, `objectives` et `rewards`. Objectifs : `kill` (cle du monstre, `*` ou `boss`), `collect` (identifiant objet) et `level`. `count` indique la quantite ou le niveau cible. Les objectifs de collecte consomment les objets a la remise.
 
+**Sceptre des quetes** (`mmorpg:sceptre_quetes`, onglet creatif « Objets », operateurs uniquement) : clic droit = ouvre l'atelier de quetes (comme `/mmorpg editeurquetes`) ; clic droit ou gauche sur un PNJ = ouvre directement la fiche de ce PNJ (nom, zone, groupe, apparence). Un joueur non operateur qui le possede n'obtient qu'un message de refus. L'icone est generee par `tools/gen_quest_wand.py`.
+
 Utiliser `/mmorpg reload` apres modification. Les nouvelles quetes par defaut sont ajoutees sans ecraser les definitions personnalisees existantes. Les journalieres redeviennent disponibles a minuit selon la date du serveur.
 
 Le journal du joueur propose Toutes / Campagne / Journalieres / A rendre. « Suivre en priorite » place la quete en tete du suivi a l'ecran. Dix quetes peuvent etre actives simultanement.
