@@ -19,6 +19,8 @@ public final class Keys {
     public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(MMORPG.id("mmorpg"));
     public static final KeyMapping MENU = new KeyMapping("key.mmorpg.menu", InputConstants.KEY_M, CATEGORY);
     public static final KeyMapping MOUNT = new KeyMapping("key.mmorpg.mount", InputConstants.KEY_N, CATEGORY);
+    /** Saute la cinematique d'arrivee. */
+    public static final KeyMapping SKIP = new KeyMapping("key.mmorpg.skip", InputConstants.KEY_SPACE, CATEGORY);
     public static final KeyMapping HUD_EDIT = new KeyMapping("key.mmorpg.hud_edit", InputConstants.KEY_U, CATEGORY);
     public static final KeyMapping[] SKILLS = createSkills();
 
@@ -41,6 +43,7 @@ public final class Keys {
         event.registerCategory(CATEGORY);
         event.register(MENU);
         event.register(HUD_EDIT);
+        event.register(SKIP);
         event.register(MOUNT);
         for (KeyMapping skill : SKILLS) event.register(skill);
     }

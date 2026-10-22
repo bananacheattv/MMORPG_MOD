@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "mmorpg:block/or_ouvrage_slab"
+    },
+    "type=top": {
+      "model": "mmorpg:block/or_ouvrage_slab_top"
+    },
+    "type=double": {
+      "model": "mmorpg:block/or_ouvrage"
+    }
+  }
+}

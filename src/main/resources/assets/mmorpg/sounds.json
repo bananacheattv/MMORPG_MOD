@@ -1,0 +1,11 @@
+{
+  "cinematique.theme": {
+    "category": "music",
+    "sounds": [
+      {
+        "name": "mmorpg:music/eldoria_theme",
+        "stream": true
+      }
+    ]
+  }
+}

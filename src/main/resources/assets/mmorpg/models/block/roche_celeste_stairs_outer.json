@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "mmorpg:block/roche_celeste",
+    "top": "mmorpg:block/roche_celeste",
+    "side": "mmorpg:block/roche_celeste"
+  }
+}

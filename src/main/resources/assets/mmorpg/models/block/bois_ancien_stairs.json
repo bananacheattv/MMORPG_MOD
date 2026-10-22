@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "mmorpg:block/bois_ancien",
+    "top": "mmorpg:block/bois_ancien",
+    "side": "mmorpg:block/bois_ancien"
+  }
+}

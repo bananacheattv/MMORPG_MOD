@@ -8,7 +8,7 @@ Branche : codex/eldoria-reprise. Sauvegarder chaque fonctionnalite dans un commi
 - Familiers adaptes a la classe : bonus offensifs et attributs adaptes au proprietaire, avec les memes valeurs dans le calcul serveur et dans le menu. Compilation reussie ; verification en jeu restante.
 - Nourriture et bonheur : bonheur persistant par familier, baisse de 1/minute invoque, nourriture fabricable (+25), bonus de 50 a 100 %, jauge dans le menu. Compilation reussie ; essai en jeu restant.
 - Charmes : XP et probabilites de butin +25 %, 30 minutes de jeu, timers sauvegardes, non cumulables, recettes de Forge.
-- Menace / aggro : degats cumules par joueur, multiplicateur x2 pour le tank, seuil de changement de cible de 10 %, provocation prioritaire pendant sa duree, nettoyage hors portee/deconnexion/mort et respect de la base des boss. Compilation reussie ; validation multijoueur en jeu restante.
+- Menace / aggro : degats cumules par joueur, multiplicateur x2 pour le paladin, seuil de changement de cible de 10 %, provocation prioritaire pendant sa duree, nettoyage hors portee/deconnexion/mort et respect de la base des boss. Compilation reussie ; validation multijoueur en jeu restante.
 - Bestiaire : filtres Monstres/Boss puis familles, compteurs et tri par niveau ; famille configurable dans mobs.json, compatible avec les anciens fichiers. Compilation reussie ; essai visuel en jeu restant.
 - Inventaire : artisanat 2x2 et seconde main bloques en survie (menus, serveur, raccourci F), objets existants restitues ; mode creatif conserve. Tests executes dans une copie du monde : recette impossible, restitution sans perte, slots bloques, raccourcis refuses et retour creatif reussis. Capture visuelle verifiee.
 - Competences : 16 nouvelles actives (44 competences au total), paliers 10/40/65/90 en plus des paliers existants, six emplacements conserves, liste avec defilement et pagination. Compilation et test automatique des debloquages 1-100 reussis ; ecrans verifies en jeu. Equilibrage et chaque effet de combat a tester en multijoueur.
@@ -43,3 +43,21 @@ Branche : codex/eldoria-reprise. Sauvegarder chaque fonctionnalite dans un commi
 15. Caisses + cles, lucky blocks.
 16. TAB et scoreboard custom.
 17. Montures deblocables.
+
+## Hub d'entrée (branche feature/hub-entree)
+
+Étapes : 1. mannequin d'entraînement, 2. PNJ de classe + choix après essai (pas d'écran dédié), 3. zone de test, 4. hub `/mmorpg hub`, 5. cinématique.
+
+- Étape 1 faite : `entity/dummy/TrainingDummyEntity`, rendu `client/model/dummy` (ressort amorti réel, direction/force du coup), panneau dans `MmoHud.dummyPanels`, config `mannequin.json`, objets/recettes/commande. Test : `-Pshowcase=mannequin` et `-Pshowcase=mannequin2`.
+- Étapes 2 à 5 (maîtres de classe, essai, hub, cinématique) : code dans `hub/` (HubBuilder, HubLayout, HubData, ClassTrial, CinematicManager/Config), `entity/hub/ClassMasterEntity`, `client/cinematic/`, `client/screen/ClassMasterScreen`, modèles `art/classes_blockbench/`. Documentation : README (« Hub d'entrée »), GUIDE_ADMIN (« Hub d'entrée, cinématique et essai des classes »).
+- Validé en jeu (`-Dmmorpg.checkDummy=true`, `server/DevDummyChecks`) : dégâts par variante, immortalité, provocation du Paladin, immobilité, absence de riposte, dégâts d'environnement ignorés, retrait créatif, remise à zéro, DPS.
+- Restent à valider : multijoueur (deux joueurs en cinématique / en essai en même temps).
+- Refonte « Citadelle d'Eldoria » : le hub est construit par `hub/HubBuilder` (île, place, rotonde), `HubPavilions`, `HubStructures` (portail, téléporteur, voie, arène, aire), `HubFlora` (jardins, îlots), avec les primitives de forme de `HubCtx` (disques, anneaux, murs cylindriques, dômes, ellipsoïdes) et le plan de `HubLayout` (coordonnées relatives ; place de rayon 31, pavillons en (±20, ±20), arène de rayon 22 au nord, aire à l'est). Les plans de `config/mmorpg/cinematique.json` existants datent de l'ancien plan : supprimer le fichier pour régénérer celui du nouveau hub.
+- Dimension dédiée : `data/mmorpg/dimension/hub.json` + `dimension_type/hub.json` (générés par `tools/gen_hub.py`, champs requis de 26.3 : `has_ender_dragon_fight`, `skybox`, `timelines`, `default_clock`) ; `HubManager.HUB_DIM` / `HUB_ORIGIN` (0, 96, 0) ; `/hub set` construit toujours là-bas ; `HubManager.registerExit` crée la destination « Monde principal » (ancien point d'apparition) et `grantExit` l'offre à l'utilisation du Téléporteur du hub.
+- Cinématique : parcours global (`parcours` dans cinematique.json, version 2) interpolé par Hermite dans `CinematicClient` ; orbite générée à vitesse angulaire douce (voir l'historique : outils `path_metrics`), clé `coupe` = coupe en fondu ; pré-chauffage du rendu sous écran de chargement ; musique `CinematicMusic` + `tools/gen_music.py` (numpy + soundfile, écriture OGG par blocs).
+- Entités du hub : identifiants stables (`HubBuilder.stable`) ; `HubData.stableBuild()` n'est vrai qu'après une reconstruction : tant que le hub date d'avant, `HubProtection` ne retire aucun ancien PNJ (sinon ils disparaissaient). Les objets au sol sans propriétaire sont toujours refusés dans le hub.
+- Blocs de décor : `registry/DecorBlocks` (liste identique à `tools/gen_decor.py`), onglet « Eldoria : bâtisseur » ; police `assets/mmorpg/font/eldoria.json` (`tools/gen_font.py`, helper client `EldoriaFont`).
+- Protection et commandes : `hub/HubProtection`, `/hub`, `/hub set`, `/hub reset <joueur>`, `/class set`, réglages `hubCinematic` / `hubTrialZone` / `hubProtection` (general.json).
+- Classe « Tank » renommée « Paladin » (affichage, évolutions : Paladin, Gardien, Templier, Rempart Sacré, Titan Immortel) ; l'identifiant interne `TANK` / `tank` est conservé pour les sauvegardes, les textures et les commandes (`/mmorpg classe <joueur> tank` et `paladin` marchent). Non fait : mannequin « boss » qui attaque (les mannequins ne ripostent volontairement pas).
+- Environnement : pas d'identifiants GitHub dans les sessions Claude (push à faire depuis GitHub Desktop) ; deux sessions Claude partagent ce dossier : `git add` fichier par fichier.
+

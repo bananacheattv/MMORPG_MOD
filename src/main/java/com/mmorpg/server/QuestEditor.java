@@ -30,7 +30,13 @@ public final class QuestEditor {
         var templates=new CompoundTag();com.mmorpg.quest.DefaultQuests.create().forEach((id,q)->templates.putString(id,JSON.toJson(q)));t.put("templates",templates);
         return t;
     }
-    public static void open(ServerPlayer p) {if(allowed(p)) Net.toPlayer(p,new S2COpenScreen(S2COpenScreen.QUEST_EDITOR,snapshot(p)));}
+    public static void open(ServerPlayer p) {open(p,"");}
+    /** Ouvre l'atelier ; avec l'identifiant d'un PNJ, la fiche de ce PNJ est ouverte directement. */
+    public static void open(ServerPlayer p,String npcId) {
+        if(!allowed(p)) return;
+        var t=snapshot(p);if(!npcId.isEmpty()) t.putString("openNpc",npcId);
+        Net.toPlayer(p,new S2COpenScreen(S2COpenScreen.QUEST_EDITOR,t));
+    }
     public static void action(ServerPlayer p,CompoundTag data) {
         if(!allowed(p)) return;
         String status;String selectedNpc="";

@@ -40,6 +40,14 @@ public final class QuestEditorScreen extends MmoScreen {
             var list=data.getListOrEmpty("npcs");for(int i=0;i<list.size();i++) npcs.add(list.getCompoundOrEmpty(i));}
         String selected=data.getStringOr("npcSelected","");
         if(!selected.isEmpty()) {npcId=selected;}
+        String open=data.getStringOr("openNpc","");
+        if(!open.isEmpty()) {
+            npcs.stream().filter(n->open.equals(n.getStringOr("id",""))).findFirst().ifPresent(n->{
+                mode=0;editingNpc=true;npcId=open;npcName=n.getStringOr("name","");npcZone=n.getStringOr("zone","");
+                npcGroup=n.getStringOr("group","");npcSkin=n.getIntOr("skin",0);npcRole=n.getIntOr("role",0);
+                if(width>0) rebuild();
+            });
+        }
         if(success&&data.getStringOr("saved","").equals(questId)) expected=catalogue.getStringOr(questId,"");
     }
     private void rebuild() {clearWidgets();fieldLabels.clear();init();}

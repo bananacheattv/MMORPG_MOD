@@ -42,7 +42,7 @@ public final class RpgCommands {
     }
 
     public static void register(CommandDispatcher<CommandSourceStack> d) {
-        List<String> classes = Arrays.stream(PlayerClass.values()).map(PlayerClass::id).toList();
+        List<String> classes = Arrays.stream(PlayerClass.values()).map(c -> c == PlayerClass.TANK ? "paladin" : c.id()).toList();
         List<String> bosses = List.of("roi_gobelin", "liche_ancienne", "seigneur_ignis", "titan_glace", "avatar_neant");
         List<String> mobs = new ArrayList<>(ModEntities.SPAWNABLE.keySet());
         List<String> dungeons = Arrays.stream(DungeonBuilder.DungeonType.values()).map(t -> t.id).toList();
@@ -202,6 +202,41 @@ public final class RpgCommands {
                                     c.getSource().sendSuccess(() -> ok("Cosmétique(s) débloqué(s)"), true);
                                     return 1;
                                 }))))
+                .then(Commands.literal("hub").executes(RpgCommands::buildHub))
+                .then(Commands.literal("cinematique")
+                        .executes(c -> playCinematic(c.getSource().getPlayerOrException(), c))
+                        .then(Commands.argument("joueur", EntityArgument.player()).executes(c -> playCinematic(EntityArgument.getPlayer(c, "joueur"), c))))
+                .then(Commands.literal("essai").then(Commands.literal("fin")
+                        .executes(c -> endTrial(c.getSource().getPlayerOrException(), c))
+                        .then(Commands.argument("joueur", EntityArgument.player()).executes(c -> endTrial(EntityArgument.getPlayer(c, "joueur"), c)))))
+                .then(Commands.literal("mannequin")
+                        .then(Commands.literal("supprimer").executes(c -> {
+                            var list = c.getSource().getLevel().getEntitiesOfClass(com.mmorpg.entity.dummy.TrainingDummyEntity.class,
+                                    new net.minecraft.world.phys.AABB(BlockPos.containing(c.getSource().getPosition())).inflate(10));
+                            list.forEach(n -> n.discard());
+                            c.getSource().sendSuccess(() -> ok(list.size() + " mannequin(s) supprimé(s)"), true);
+                            return list.size();
+                        }))
+                        .then(Commands.argument("variante", StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(com.mmorpg.entity.dummy.TrainingDummyEntity.VARIANTS, b))
+                                .executes(c -> {
+                                    String id = StringArgumentType.getString(c, "variante");
+                                    int v = java.util.Arrays.asList(com.mmorpg.entity.dummy.TrainingDummyEntity.VARIANTS).indexOf(id);
+                                    if (v < 0) {
+                                        c.getSource().sendFailure(Component.literal("Variante inconnue : standard, blinde ou magique."));
+                                        return 0;
+                                    }
+                                    var level = c.getSource().getLevel();
+                                    var dummy = com.mmorpg.registry.ModEntities.TRAINING_DUMMY.get().create(level, null, BlockPos.containing(c.getSource().getPosition()),
+                                            net.minecraft.world.entity.EntitySpawnReason.COMMAND, true, false);
+                                    if (dummy == null) return 0;
+                                    var pos = c.getSource().getPosition();
+                                    dummy.snapTo(pos.x, pos.y, pos.z, c.getSource().getRotation().y + 180, 0);
+                                    dummy.setup(v);
+                                    level.addFreshEntity(dummy);
+                                    c.getSource().sendSuccess(() -> ok("Mannequin « " + dummy.config().name + " » posé."), true);
+                                    return 1;
+                                })))
                 .then(Commands.literal("pnj")
                         .then(Commands.literal("quetes_groupe")
                             .then(Commands.argument("groupe", StringArgumentType.word())
@@ -260,6 +295,85 @@ public final class RpgCommands {
                     c.getSource().sendSuccess(() -> ok("Configuration rechargée (" + ConfigManager.mobs().size() + " monstres)"), true);
                     return 1;
                 })));
+    }
+
+    private static int buildHub(CommandContext<CommandSourceStack> c) {
+        var level = c.getSource().getServer().getLevel(com.mmorpg.hub.HubManager.HUB_DIM);
+        if (level == null) {
+            c.getSource().sendFailure(Component.literal("La dimension du hub (mmorpg:hub) est introuvable : le mod est-il à jour sur ce monde ?"));
+            return 0;
+        }
+        c.getSource().sendSuccess(() -> ok("Construction de la Citadelle d'Eldoria en cours..."), false);
+        com.mmorpg.hub.HubBuilder.build(level, com.mmorpg.hub.HubManager.HUB_ORIGIN);
+        c.getSource().sendSuccess(() -> ok("Hub d'Eldoria construit dans la dimension mmorpg:hub : rotonde, bassin, 4 pavillons de classe, portail, arène d'épreuve, aire d'entraînement, téléporteur. Point d'apparition du monde défini sur le hub : utilisez /hub pour vous y rendre."), true);
+        return 1;
+    }
+
+    private static int setClass(CommandContext<CommandSourceStack> c) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        ServerPlayer p = EntityArgument.getPlayer(c, "joueur");
+        PlayerClass cls = PlayerClass.byName(StringArgumentType.getString(c, "classe"));
+        PlayerData data = RpgPlayers.get(p);
+        data.resetClass();
+        if (cls.isPlayable()) {
+            data.classChosenOnce = true;
+            RpgPlayers.selectClass(p, cls);
+        } else {
+            RpgPlayers.recomputeAndSync(p);
+            RpgPlayers.openClassSelection(p);
+        }
+        c.getSource().sendSuccess(() -> ok("Classe de " + p.getName().getString() + " : " + cls.label), true);
+        return 1;
+    }
+
+    /** /hub (tous les joueurs), /hub set, /hub reset <joueur> et /class set <joueur> <classe> (operateurs). */
+    public static void registerHub(CommandDispatcher<CommandSourceStack> d) {
+        List<String> classes = Arrays.stream(PlayerClass.values()).map(c -> c == PlayerClass.TANK ? "paladin" : c.id()).toList();
+        d.register(Commands.literal("hub")
+                .executes(c -> {
+                    ServerPlayer p = c.getSource().getPlayerOrException();
+                    if (!com.mmorpg.hub.HubManager.goToHub(p)) {
+                        c.getSource().sendFailure(Component.literal("Le hub n'est pas encore construit (un opérateur doit utiliser /hub set)."));
+                        return 0;
+                    }
+                    return 1;
+                })
+                .then(Commands.literal("set").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).executes(RpgCommands::buildHub))
+                .then(Commands.literal("reset").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .then(Commands.argument("joueur", EntityArgument.player()).executes(c -> {
+                            ServerPlayer p = EntityArgument.getPlayer(c, "joueur");
+                            com.mmorpg.hub.HubManager.reset(p);
+                            c.getSource().sendSuccess(() -> ok("Hub de " + p.getName().getString() + " réinitialisé (cinématique, essais et classe)."), true);
+                            return 1;
+                        }))));
+        d.register(Commands.literal("class")
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .then(Commands.literal("set").then(Commands.argument("joueur", EntityArgument.player())
+                        .then(Commands.argument("classe", StringArgumentType.word())
+                                .suggests((c, b) -> SharedSuggestionProvider.suggest(classes, b))
+                                .executes(RpgCommands::setClass)))));
+    }
+
+    private static int playCinematic(ServerPlayer target, CommandContext<CommandSourceStack> c) {
+        if (!ConfigManager.general().hubCinematic) {
+            c.getSource().sendFailure(Component.literal("La cinématique est désactivée (hubCinematic dans general.json)."));
+            return 0;
+        }
+        if (!com.mmorpg.hub.CinematicManager.start(target, false)) {
+            c.getSource().sendFailure(Component.literal("Le hub n'est pas construit (/mmorpg hub)."));
+            return 0;
+        }
+        c.getSource().sendSuccess(() -> ok("Cinématique lancée pour " + target.getGameProfile().name()), true);
+        return 1;
+    }
+
+    private static int endTrial(ServerPlayer target, CommandContext<CommandSourceStack> c) {
+        if (!com.mmorpg.hub.ClassTrial.active(target)) {
+            c.getSource().sendFailure(Component.literal(target.getGameProfile().name() + " n'est pas en essai."));
+            return 0;
+        }
+        com.mmorpg.hub.ClassTrial.end(target, true, "Essai terminé : votre personnage a été restauré.");
+        c.getSource().sendSuccess(() -> ok("Essai terminé, personnage restauré."), true);
+        return 1;
     }
 
     private static int spawnNpc(CommandContext<CommandSourceStack> c, com.mmorpg.entity.NpcEntity.Role role) {

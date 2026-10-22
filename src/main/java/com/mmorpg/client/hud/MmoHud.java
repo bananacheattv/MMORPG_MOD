@@ -35,6 +35,10 @@ import java.util.Map;
 public final class MmoHud {
     private static final List<LivingEntity> VISIBLE = new ArrayList<>();
     private static final List<com.mmorpg.entity.NpcEntity> NPCS = new ArrayList<>();
+    private static final List<com.mmorpg.entity.dummy.TrainingDummyEntity> DUMMIES = new ArrayList<>();
+    /** Valeurs affichees (adoucies vers les vraies) par mannequin : {dps, total, meilleur coup}. */
+    private static final java.util.Map<Integer, float[]> DUMMY_SHOWN = new java.util.HashMap<>();
+    private static long lastDummyNanos;
     private static LivingEntity lastTarget;
     private static long lastTargetTime;
     private static LivingEntity boss;
@@ -47,6 +51,8 @@ public final class MmoHud {
     public static void tick(Minecraft mc) {
         if (mc.player == null || mc.level == null) {
             VISIBLE.clear();
+            DUMMIES.clear();
+            DUMMY_SHOWN.clear();
             boss = null;
             return;
         }
@@ -60,11 +66,17 @@ public final class MmoHud {
         if (mc.level.getGameTime() % 4 != 0) return;
         VISIBLE.clear();
         NPCS.clear();
+        DUMMIES.clear();
+        int dummyRange = com.mmorpg.config.ConfigManager.dummy().panelRange;
         LivingEntity bestBoss = null;
         double bestDist = 64 * 64;
         for (Entity e : mc.level.entitiesForRendering()) {
             if (e instanceof com.mmorpg.entity.NpcEntity npc && npc.distanceToSqr(mc.player) < 24 * 24 && mc.player.hasLineOfSight(npc)) {
                 NPCS.add(npc);
+                continue;
+            }
+            if (e instanceof com.mmorpg.entity.dummy.TrainingDummyEntity dummy) {          // mannequin : panneau dedie, pas de barre de vie
+                if (dummy.distanceToSqr(mc.player) < (double) dummyRange * dummyRange && mc.player.hasLineOfSight(dummy)) DUMMIES.add(dummy);
                 continue;
             }
             if (!(e instanceof LivingEntity le) || e == mc.player || !le.isAlive()) continue;
@@ -121,6 +133,10 @@ public final class MmoHud {
             skillBar(g);
             HudLayout.end(g);
         }
+        if ((ClientData.trialActive || HudLayout.editing) && HudLayout.begin(g, HudLayout.ESSAI)) {
+            trialBanner(g);
+            HudLayout.end(g);
+        }
         if (HudLayout.begin(g, HudLayout.BANNIERE)) {
             banner(g);
             HudLayout.end(g);
@@ -158,7 +174,7 @@ public final class MmoHud {
 
     private static boolean targetShown() {
         LivingEntity t = lastTarget;
-        return t != null && t.isAlive() && !(t instanceof com.mmorpg.entity.NpcEntity);
+        return t != null && t.isAlive() && !(t instanceof com.mmorpg.entity.NpcEntity) && !(t instanceof com.mmorpg.entity.dummy.TrainingDummyEntity);
     }
 
     /** Sans personnalisation, la cible se place sous les effets et le groupe sous la cible (comme avant). */
@@ -512,6 +528,32 @@ public final class MmoHud {
         }
     }
 
+    /** Indicateur d'essai de classe : glisse depuis le haut a l'apparition, losange qui pulse, duree ecoulee. */
+    private static void trialBanner(GuiGraphicsExtractor g) {
+        PlayerClass cls = ClientData.trialActive ? PlayerClass.byId(ClientData.trialClass) : PlayerClass.GUERRIER;
+        int level = ClientData.trialActive ? ClientData.trialLevel : 50;
+        float k = Math.min(1f, (System.nanoTime() - ClientData.trialSince) / 4.0E8f);
+        float slide = HudLayout.editing ? 0f : (1f - (1f - (float) Math.pow(1f - k, 3))) * -34f;
+        g.pose().pushMatrix();
+        g.pose().translate(0, slide);
+        Font f = font();
+        int w = 210;
+        int h = 30;
+        smallPanel(g, 0, 0, w, h, cls.color);
+        float pulse = 0.5f + 0.5f * (float) Math.sin(System.currentTimeMillis() / 260.0);
+        Ui.diamond(g, 10, 15, 4, Ui.lighter(cls.color, 0.2f + 0.5f * pulse));
+        g.text(f, com.mmorpg.client.EldoriaFont.of("ESSAI — " + cls.label + " niv. " + level), 20, 5, cls.color, true);
+        long secs = HudLayout.editing ? 83 : (System.nanoTime() - ClientData.trialSince) / 1_000_000_000L;
+        String time = String.format(java.util.Locale.ROOT, "%d:%02d", secs / 60, secs % 60);
+        g.text(f, time, w - 8 - f.width(time), 5, Ui.MUTED, false);
+        g.pose().pushMatrix();
+        g.pose().translate(20, 18);
+        g.pose().scale(0.75f, 0.75f);
+        g.text(f, "Rien n'est conservé · parlez au Gardien pour quitter", 0, 0, Ui.TEXT, false);
+        g.pose().popMatrix();
+        g.pose().popMatrix();
+    }
+
     private static void banner(GuiGraphicsExtractor g) {
         HudEffects.Banner b = HudEffects.banner();
         int bw = bannerSize()[0];
@@ -539,6 +581,62 @@ public final class MmoHud {
     }
 
     // ================================================================== elements projetes dans le monde
+
+    /** Panneaux de statistiques au-dessus des mannequins : DPS, total, plus gros coup, critiques (valeurs adoucies a chaque image). */
+    private static void dummyPanels(GuiGraphicsExtractor g, Minecraft mc, int w, int h, float partial) {
+        if (DUMMIES.isEmpty()) return;
+        long now = System.nanoTime();
+        float dt = lastDummyNanos == 0 ? 0f : Math.min(0.1f, (now - lastDummyNanos) / 1.0E9f);
+        lastDummyNanos = now;
+        float ease = 1f - (float) Math.exp(-dt * 10f);
+        Font f = font();
+        for (com.mmorpg.entity.dummy.TrainingDummyEntity d : DUMMIES) {
+            if (d.isRemoved()) continue;
+            Vec3 pos = d.getPosition(partial).add(0, d.getBbHeight() + 0.55, 0);
+            float[] s = project(mc, pos, w, h);
+            if (s == null) continue;
+            float[] shown = DUMMY_SHOWN.computeIfAbsent(d.getId(), k -> new float[]{d.dps(), d.total(), d.best()});
+            shown[0] += (d.dps() - shown[0]) * ease;
+            shown[1] += (d.total() - shown[1]) * ease;
+            shown[2] += (d.best() - shown[2]) * ease;
+            float fade = Math.max(0.35f, Math.min(1f, 1.5f - s[2] / 28f));
+            float scale = Math.max(0.55f, Math.min(1.1f, 6.5f / Math.max(4f, s[2])));
+            int bw = 104;
+            int bh = 58;
+            g.pose().pushMatrix();
+            g.pose().translate(s[0], s[1]);
+            g.pose().scale(scale, scale);
+            int x = -bw / 2;
+            int y = -bh;
+            // reste dans l'ecran (de pres, la tete du mannequin sort par le haut)
+            float top = s[1] + y * scale;
+            if (top < 4) g.pose().translate(0, 4 - top);
+            g.fillGradient(x, y, x + bw, y + bh, Ui.alpha(0xD01C1624, fade), Ui.alpha(0xD00C0A12, fade));
+            Ui.border(g, x, y, bw, bh, Ui.alpha(Ui.GOLD_DARK, fade));
+            Ui.diamond(g, x, y, 2, Ui.alpha(Ui.GOLD, fade));
+            Ui.diamond(g, x + bw - 1, y, 2, Ui.alpha(Ui.GOLD, fade));
+            g.centeredText(f, Component.literal(d.config().name), 0, y + 4, Ui.alpha(Ui.GOLD_LIGHT, fade));
+            g.fill(x + 6, y + 14, x + bw - 6, y + 15, Ui.alpha(Ui.GOLD_DARK, fade));
+            String dps = Ui.fmt(Math.round(shown[0]));
+            Ui.scaledText(g, dps, 0, y + 18, 1.6f, Ui.alpha(d.dps() > 0 ? 0xFFFFD060 : Ui.MUTED, fade), true);
+            g.centeredText(f, Component.literal("DPS (" + com.mmorpg.config.ConfigManager.dummy().dpsWindowSeconds + " s)"), 0, y + 31, Ui.alpha(Ui.MUTED, fade));
+            g.text(f, "Total", x + 6, y + 41, Ui.alpha(Ui.TEXT, fade), false);
+            String total = Ui.fmt(Math.round(shown[1]));
+            g.text(f, total, x + bw - 6 - f.width(total), y + 41, Ui.alpha(0xFFFFFFFF, fade), false);
+            g.pose().pushMatrix();
+            g.pose().translate(x + 6, y + 50);
+            g.pose().scale(0.75f, 0.75f);
+            int crits = d.crits();
+            int hits = d.hits();
+            String left = "Max " + Ui.fmt(Math.round(shown[2]));
+            String right = "Crit " + crits + "/" + hits + (hits > 0 ? " (" + Math.round(100f * crits / hits) + " %)" : "");
+            g.text(f, left, 0, 0, Ui.alpha(0xFFE8C060, fade), false);
+            g.text(f, right, (int) ((bw - 12) / 0.75f) - f.width(right), 0, Ui.alpha(0xFFFF9060, fade), false);
+            g.pose().popMatrix();
+            g.pose().popMatrix();
+        }
+        if (DUMMY_SHOWN.size() > 64) DUMMY_SHOWN.keySet().removeIf(id -> DUMMIES.stream().noneMatch(e -> e.getId() == id));
+    }
 
     private static float[] project(Minecraft mc, Vec3 world, int w, int h) {
         Camera cam = mc.gameRenderer.mainCamera();
@@ -580,6 +678,7 @@ public final class MmoHud {
                 g.fill(bx, by, bx + (int) (bw * md.hpFraction()), by + 2, Ui.alpha(md.hpFraction() > 0.5f ? 0xFF40D040 : md.hpFraction() > 0.25f ? 0xFFE0C030 : 0xFFE03030, fade));
             }
         }
+        dummyPanels(g, mc, w, h, partial);
         boolean anyReady = false;
         for (int i = 0; i < ClientData.quests.size(); i++) {
             if (ClientData.quests.getCompoundOrEmpty(i).getBooleanOr("completable", false)) anyReady = true;

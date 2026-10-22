@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "mmorpg:block/pierre_azur",
+    "top": "mmorpg:block/pierre_azur",
+    "side": "mmorpg:block/pierre_azur"
+  }
+}

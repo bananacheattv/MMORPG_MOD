@@ -25,6 +25,10 @@ public final class ModAttachments {
     public static final Supplier<AttachmentType<MobData>> MOB = ATTACHMENTS.register("mob_data",
             () -> AttachmentType.serializable(MobData::new).sync(MobData.STREAM_CODEC).build());
 
+    /** Donnees du hub : cinematique vue, classes essayees, sauvegarde du personnage pendant un essai. */
+    public static final Supplier<AttachmentType<com.mmorpg.hub.HubPlayerData>> HUB = ATTACHMENTS.register("hub_data",
+            () -> AttachmentType.serializable(com.mmorpg.hub.HubPlayerData::new).copyOnDeath().build());
+
     private ModAttachments() {
     }
 }

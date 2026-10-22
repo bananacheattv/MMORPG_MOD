@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "mmorpg:block/fer_noirci_slab"
+    },
+    "type=top": {
+      "model": "mmorpg:block/fer_noirci_slab_top"
+    },
+    "type=double": {
+      "model": "mmorpg:block/fer_noirci"
+    }
+  }
+}

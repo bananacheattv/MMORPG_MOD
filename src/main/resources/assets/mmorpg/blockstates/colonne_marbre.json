@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "mmorpg:block/colonne_marbre"
+    },
+    "axis=z": {
+      "model": "mmorpg:block/colonne_marbre_horizontal",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "mmorpg:block/colonne_marbre_horizontal",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

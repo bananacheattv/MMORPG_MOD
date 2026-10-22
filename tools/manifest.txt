@@ -285,3 +285,6 @@ item bastion_eternel_casque
 item bastion_eternel_plastron
 item bastion_eternel_jambieres
 item bastion_eternel_bottes
+item mannequin_entrainement
+item mannequin_blinde
+item mannequin_magique
