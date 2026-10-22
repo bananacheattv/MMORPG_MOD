@@ -32,6 +32,7 @@ public final class ModCreativeTabs {
                 ModItems.CRATE_BLOCKS.forEach(i -> out.accept(i.get()));
                 out.accept(ModItems.TELEPORTEUR.get());
                 out.accept(ModItems.SCEPTRE_QUETES.get());
+                out.accept(ModItems.BAGUETTE_ZONE.get());
                 out.accept(ModItems.AUTEL_INVOCATION.get());
                 ModItems.MATERIALS.forEach(i -> out.accept(i.get()));
                 out.accept(ModItems.PIECE_OR.get());

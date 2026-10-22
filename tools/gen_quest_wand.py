@@ -1,4 +1,4 @@
-"""Genere l'icone, le modele et la definition de l'item "Sceptre des quetes" (outil d'administration)."""
+"""Genere les icones, modeles et definitions des outils d'administration : sceptre des quetes et baguette de zone."""
 import json
 import os
 from PIL import Image, ImageDraw, ImageFilter
@@ -48,10 +48,51 @@ def sceptre():
     return out.resize((64, 64), Image.LANCZOS)
 
 
+def baguette():
+    """Baguette de zone : tige claire, gemme turquoise et un cadre pointille (le rectangle d'une zone)."""
+    im = Image.new('RGBA', (S, S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    u = S / 64.0
+
+    def p(x, y):
+        return (x * u, y * u)
+
+    d.line([p(10, 56), p(40, 26)], fill=(56, 70, 84, 255), width=int(6.5 * u))
+    d.line([p(10, 56), p(40, 26)], fill=(150, 172, 190, 255), width=int(4 * u))
+    d.line([p(9.5, 55), p(39, 25)], fill=(214, 232, 244, 255), width=int(1.4 * u))
+    for t in (0.2, 0.55):
+        x, y = 10 + 30 * t, 56 - 30 * t
+        d.ellipse([p(x - 3.8, y - 3.8), p(x + 3.8, y + 3.8)], fill=(40, 96, 110, 255))
+        d.ellipse([p(x - 2.8, y - 2.8), p(x + 2.8, y + 2.8)], fill=(96, 220, 214, 255))
+    gem = [p(42, 8), p(54, 18), p(42, 30), p(30, 18)]
+    d.polygon(gem, fill=(40, 190, 200, 255), outline=(14, 90, 110, 255))
+    d.polygon([p(42, 8), p(54, 18), p(42, 18)], fill=(170, 250, 250, 255))
+    d.polygon([p(42, 18), p(54, 18), p(42, 30)], fill=(24, 130, 150, 255))
+    d.polygon([p(30, 18), p(42, 18), p(42, 8)], fill=(110, 230, 232, 255))
+    d.ellipse([p(37, 11), p(41, 15)], fill=(240, 255, 255, 255))
+    glow = Image.new('RGBA', (S, S), (0, 0, 0, 0))
+    ImageDraw.Draw(glow).ellipse([p(27, 4), p(57, 34)], fill=(80, 230, 230, 90))
+    glow = glow.filter(ImageFilter.GaussianBlur(7 * u))
+    out = Image.alpha_composite(glow, im)
+    d = ImageDraw.Draw(out)
+    # cadre pointille avec ses quatre coins
+    x0, y0, x1, y1 = 40, 40, 60, 60
+    for t in range(0, 20, 4):
+        d.rectangle([p(x0 + t, y0 - 0.7), p(x0 + t + 2, y0 + 0.7)], fill=(250, 214, 90, 255))
+        d.rectangle([p(x0 + t, y1 - 0.7), p(x0 + t + 2, y1 + 0.7)], fill=(250, 214, 90, 255))
+        d.rectangle([p(x0 - 0.7, y0 + t), p(x0 + 0.7, y0 + t + 2)], fill=(250, 214, 90, 255))
+        d.rectangle([p(x1 - 0.7, y0 + t), p(x1 + 0.7, y0 + t + 2)], fill=(250, 214, 90, 255))
+    for cx, cy in ((x0, y0), (x1, y0), (x0, y1), (x1, y1)):
+        d.ellipse([p(cx - 2.2, cy - 2.2), p(cx + 2.2, cy + 2.2)], fill=(224, 70, 70, 255), outline=(110, 24, 24, 255))
+    return out.resize((64, 64), Image.LANCZOS)
+
+
 def generate(ga=None):
     if ga is not None:
         ga.LANG[f'item.{ga.MODID}.sceptre_quetes'] = 'Sceptre des quêtes'
         ga.LANG_EN[f'item.{ga.MODID}.sceptre_quetes'] = 'Quest Scepter'
+        ga.LANG[f'item.{ga.MODID}.baguette_zone'] = 'Baguette de zone'
+        ga.LANG_EN[f'item.{ga.MODID}.baguette_zone'] = 'Zone Wand'
     main()
 
 
@@ -61,7 +102,12 @@ def main():
         json.dump({"parent": "minecraft:item/handheld", "textures": {"layer0": "mmorpg:item/sceptre_quetes"}}, f, indent=2)
     with open(os.path.join(ROOT, 'items', 'sceptre_quetes.json'), 'w', encoding='utf-8', newline='\n') as f:
         json.dump({"model": {"type": "minecraft:model", "model": "mmorpg:item/sceptre_quetes"}}, f, indent=2)
-    print('sceptre_quetes : icone, modele, definition ecrits')
+    baguette().save(os.path.join(ROOT, 'textures', 'item', 'baguette_zone.png'))
+    with open(os.path.join(ROOT, 'models', 'item', 'baguette_zone.json'), 'w', encoding='utf-8', newline='\n') as f:
+        json.dump({"parent": "minecraft:item/handheld", "textures": {"layer0": "mmorpg:item/baguette_zone"}}, f, indent=2)
+    with open(os.path.join(ROOT, 'items', 'baguette_zone.json'), 'w', encoding='utf-8', newline='\n') as f:
+        json.dump({"model": {"type": "minecraft:model", "model": "mmorpg:item/baguette_zone"}}, f, indent=2)
+    print('sceptre_quetes et baguette_zone : icones, modeles, definitions ecrits')
 
 
 if __name__ == '__main__':

@@ -398,6 +398,41 @@ public final class DevShowcase {
             }
             return;
         }
+        if (MODE.equals("zone")) {
+            var srv = mc.getSingleplayerServer();
+            switch (tick) {
+                case 5 -> {
+                    mc.getWindow().setWindowed(1280, 720);
+                    cmd(mc, "item replace entity " + me + " weapon.mainhand with mmorpg:baguette_zone");
+                    cmd(mc, "execute in minecraft:overworld run tp " + me + " 3000 150 3000 45 20");
+                }
+                case 12 -> srv.execute(() -> zoneStep(srv, me, 5));
+                case 15 -> srv.execute(() -> zoneStep(srv, me, 0));
+                case 90 -> shot(mc, "zone_selection");
+                case 95 -> cmd(mc, "zone creer Jardin de test");
+                case 112 -> shot(mc, "zone_titre");
+                case 118 -> {
+                    cmd(mc, "zone ici");
+                    cmd(mc, "gamemode survival");
+                }
+                case 130 -> srv.execute(() -> zoneStep(srv, me, 1));
+                case 135 -> srv.execute(() -> zoneStep(srv, me, 2));
+                case 140 -> cmd(mc, "zone regle jardin_de_test construction autorise");
+                case 150 -> srv.execute(() -> zoneStep(srv, me, 3));
+                case 155 -> srv.execute(() -> zoneStep(srv, me, 4));
+                case 160 -> {
+                    cmd(mc, "zone supprimer jardin_de_test");
+                    cmd(mc, "gamemode creative");
+                }
+                case 175 -> {
+                    MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+                    stop(mc);
+                }
+                default -> {
+                }
+            }
+            return;
+        }
         if (MODE.equals("sceptre")) {
             switch (tick) {
                 case 5 -> {
@@ -2404,6 +2439,41 @@ public final class DevShowcase {
         e.setup(3);
         p.level().addFreshEntity(e);
         MMORPG.LOGGER.info("[MMORPG] DUELLISTE apparu en {} {} {} variante {}", e.getX(), e.getY(), e.getZ(), e.variantId());
+    }
+
+    private static void zoneStep(net.minecraft.server.MinecraftServer srv, String name, int step) {
+        var p = srv.getPlayerList().getPlayerByName(name);
+        if (p == null) return;
+        var level = p.level();
+        var target = p.blockPosition().relative(net.minecraft.core.Direction.EAST, 2);
+        switch (step) {
+            case 0 -> {
+                com.mmorpg.zone.ZoneManager.pick(p, p.blockPosition().offset(-6, -1, -6));
+                com.mmorpg.zone.ZoneManager.pick(p, p.blockPosition().offset(6, -1, 6));
+            }
+            case 1, 3 -> {
+                level.setBlock(target, net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), 3);
+                p.gameMode.destroyBlock(target);
+                boolean intact = level.getBlockState(target).is(net.minecraft.world.level.block.Blocks.STONE);
+                MMORPG.LOGGER.info("[MMORPG] ZONE casse un bloc ({}) : bloc {} (attendu {})", step == 1 ? "construction interdite" : "construction autorisee",
+                        intact ? "intact" : "casse", step == 1 ? "intact" : "casse");
+            }
+            case 2 -> {
+                var z = com.mmorpg.zone.ZoneManager.zoneAt(level, p.blockPosition());
+                MMORPG.LOGGER.info("[MMORPG] ZONE a la position du joueur : {}", z == null ? "aucune" : z.name() + " / " + com.mmorpg.zone.ZoneManager.describe(z));
+            }
+            case 5 -> {
+                for (int dx = -9; dx <= 9; dx++) for (int dz = -9; dz <= 9; dz++) {
+                    level.setBlock(p.blockPosition().offset(dx, -1, dz), net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState(), 3);
+                }
+            }
+            case 4 -> {
+                var far = p.blockPosition().offset(60, 0, 0);
+                MMORPG.LOGGER.info("[MMORPG] ZONE hors zone (60 blocs) : {} (attendu aucune)", com.mmorpg.zone.ZoneManager.zoneAt(level, far) == null ? "aucune" : "dans une zone");
+            }
+            default -> {
+            }
+        }
     }
 
     /** Vie RPG du joueur cote serveur (fraction >= 0 : la regle d'abord), pour la verification du duelliste. */
