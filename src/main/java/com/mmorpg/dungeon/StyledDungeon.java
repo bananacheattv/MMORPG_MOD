@@ -39,125 +39,198 @@ public final class StyledDungeon {
         return build(level, origin, t, 0);
     }
 
-    /** @param bonus difficulte : 0 normal, 1 heroique, 2 mythique (epreuves plus dures, monstres plus forts, meilleur butin) */
-    public static BlockPos build(ServerLevel level, BlockPos origin, DungeonType t, int bonus) {
-        BlockPos o = origin.below();
-        HubCtx c = new HubCtx(level, o);
-        Theme th = theme(c, t);
+    /** Construction decoupee en etapes : on peut les executer d'un coup ({@link #build}) ou une par tick (donjons instancies, avec progression). */
+    public static final class Job {
+        final ServerLevel level;
+        final BlockPos o;
+        final HubCtx c;
+        final Theme th;
+        final DungeonType t;
+        final int bonus;
+        Carve v;
+        public BlockPos tp;
+        final java.util.List<Runnable> steps = new java.util.ArrayList<>();
 
-        // reconstruction au meme endroit (meme un autre donjon) : on efface zones et epreuves de l'ancien
-        var oldZones = ZoneData.get(level.getServer());
-        var oldTrials = TrialData.get(level.getServer());
-        oldTrials.removeInside(level.dimension(), o.getX() - 40, o.getZ() - 10, o.getX() + 40, o.getZ() + 200);
-        for (DungeonType other : DungeonType.values()) {
-            oldZones.removeOverlapping(level.dimension(), other.id + "_", o.getX() - 40, o.getZ() - 10, o.getX() + 40, o.getZ() + 200);
+        Job(ServerLevel level, BlockPos origin, DungeonType t, int bonus) {
+            this.level = level;
+            this.o = origin.below();
+            this.c = new HubCtx(level, o);
+            this.th = theme(c, t);
+            this.t = t;
+            this.bonus = bonus;
+            this.tp = o.offset(0, 1, Theme.HALL_Z);
+            plan();
         }
 
-        Carve v = new Carve(-30, 30, -11, 36, -4, 194);
-        v.cyl(0, Theme.HALL_Z, Theme.HALL_R, 1, Theme.HALL_H);
-        v.dome(0, Theme.HALL_Z, Theme.HALL_R, Theme.HALL_R, Theme.HALL_H, 11);
-        v.vault(0, 21, 38, 3, 1, 5, 3, false);
-        v.cyl(0, Theme.A_Z, Theme.A_R, 1, Theme.A_H);
-        v.dome(0, Theme.A_Z, Theme.A_R, Theme.A_R, Theme.A_H, 9);
-        v.vault(0, Theme.PIT_Z0 - 1, Theme.PIT_Z1 + 1, Theme.PIT_HALF, 1, 6, 4, false);
-        v.box(-Theme.PIT_HALF, -Theme.PIT_DEPTH, Theme.PIT_Z0, Theme.PIT_HALF, -2, Theme.PIT_Z1);          // fosse sous le pont
-        v.box(-Theme.PIT_HALF, -1, Theme.PIT_Z0, -Theme.DECK - 1, 0, Theme.PIT_Z1);
-        v.box(Theme.DECK + 1, -1, Theme.PIT_Z0, Theme.PIT_HALF, 0, Theme.PIT_Z1);
-        v.cyl(0, Theme.B_Z, Theme.B_R, 1, Theme.B_H);
-        v.dome(0, Theme.B_Z, Theme.B_R, Theme.B_R, Theme.B_H, 9);
-        for (int side : new int[]{-1, 1}) {
-            v.cyl(side * 18, Theme.B_Z, 6, 1, 9);
-            v.dome(side * 18, Theme.B_Z, 6, 6, 9, 5);
+        public int size() {
+            return steps.size();
         }
-        v.vault(0, Theme.GAL_Z0 - 2, Theme.GAL_Z1 + 1, 4, 1, 7, 4, false);
-        v.cyl(0, Theme.ARENA_Z, Theme.ARENA_R, 1, Theme.ARENA_H);
-        v.dome(0, Theme.ARENA_Z, Theme.ARENA_R, Theme.ARENA_R, Theme.ARENA_H, 15);
-        v.vault(0, Theme.ARENA_Z + Theme.ARENA_R - 2, Theme.TREASURE_Z - 4, 2, 1, 5, 2, false);
-        v.cyl(0, Theme.TREASURE_Z, Theme.TREASURE_R, 1, 9);
-        v.dome(0, Theme.TREASURE_Z, Theme.TREASURE_R, Theme.TREASURE_R, 9, 5);
-        Trials.Plan plan0 = th.plan();
-        if (plan0.a().equals(Trials.JUMPROOM)) v.cyl(0, Theme.A_Z, Theme.A_R - 3, -8, 0);
-        if (plan0.b().equals(Trials.JUMPROOM)) v.cyl(0, Theme.B_Z, Theme.B_R - 3, -8, 0);
-        th.shape(v);
-        v.shell(c, (x, y, z, k, back) -> {
-            if (!back && k != Carve.Kind.FLOOR && th.rnd(x, y, z, 77) < th.lightChance()) return th.light(x, y, z);
-            return th.shell(x, y, z, k, back);
-        });
 
-        // fondations : le sol ne doit jamais flotter, meme pose en plein ciel
-        for (int x = v.x0; x <= v.x1; x++) {
-            for (int z = v.z0; z <= v.z1; z++) {
-                if (!v.inside(x, 1, z) || v.inside(x, -1, z)) continue;
-                for (int y = -1; y >= -5; y--) {
-                    if (c.air(x, y, z)) c.set(x, y, z, th.shell(x, y, z, Carve.Kind.WALL, true));
+        public void run(int i) {
+            steps.get(i).run();
+        }
+
+        private void plan() {
+            String key = t.id + "_" + o.getX() + "_" + o.getZ();
+            Trials.Plan plan = th.plan();
+            Trials.Palette pal = th.palette();
+            steps.add(this::shapes);
+            int slices = 8;
+            int span = (194 - -4 + slices) / slices;
+            for (int k = 0; k < slices; k++) {
+                int za = -4 + k * span;
+                int zb = Math.min(194, za + span - 1);
+                steps.add(() -> v.shellSlice(c, (x, y, z, kind, back) -> {
+                    if (!back && kind != Carve.Kind.FLOOR && th.rnd(x, y, z, 77) < th.lightChance()) return th.light(x, y, z);
+                    return th.shell(x, y, z, kind, back);
+                }, za, zb));
+            }
+            for (int k = 0; k < 2; k++) {
+                int za = -4 + k * 100;
+                int zb = k == 0 ? 95 : 194;
+                steps.add(() -> foundation(za, zb));
+            }
+            steps.add(th::hall);
+            steps.add(() -> {
+                if (plan.a().equals(Trials.JUMPROOM)) Trials.roomLamps(c, pal, Theme.A_Z, Theme.A_H, Theme.A_R);
+                else th.roomA();
+            });
+            steps.add(th::pit);
+            steps.add(() -> {
+                if (plan.b().equals(Trials.JUMPROOM)) Trials.roomLamps(c, pal, Theme.B_Z, Theme.B_H, Theme.B_R);
+                else th.roomB();
+            });
+            steps.add(th::gallery);
+            steps.add(th::arena);
+            steps.add(th::treasure);
+            TrialData trials = TrialData.get(level.getServer());
+            long seed = o.asLong() * 31 + t.level;
+            int lvl = t.level + 4 * bonus;
+            steps.add(() -> buildTrial(c, level, trials, pal, plan.a(), key + "_a", Theme.A_Z, 68, 69, Math.min(3, plan.diffA() + bonus), lvl, seed));
+            steps.add(() -> buildTrial(c, level, trials, pal, plan.pit(), key + "_pit", 0, Theme.PIT_Z0, Theme.PIT_Z1, Math.min(3, plan.diffPit() + bonus), lvl, seed + 1));
+            steps.add(() -> buildTrial(c, level, trials, pal, plan.b(), key + "_b", Theme.B_Z, 115, 116, Math.min(3, plan.diffB() + bonus), lvl, seed + 2));
+            steps.add(() -> gameElements(plan));
+            steps.add(this::registerZones);
+        }
+
+        private void shapes() {
+            // reconstruction au meme endroit (meme un autre donjon) : on efface zones et epreuves de l'ancien
+            var oldZones = ZoneData.get(level.getServer());
+            var oldTrials = TrialData.get(level.getServer());
+            oldTrials.removeInside(level.dimension(), o.getX() - 40, o.getZ() - 10, o.getX() + 40, o.getZ() + 200);
+            for (DungeonType other : DungeonType.values()) {
+                oldZones.removeOverlapping(level.dimension(), other.id + "_", o.getX() - 40, o.getZ() - 10, o.getX() + 40, o.getZ() + 200);
+            }
+            v = new Carve(-30, 30, -11, 36, -4, 194);
+            v.cyl(0, Theme.HALL_Z, Theme.HALL_R, 1, Theme.HALL_H);
+            v.dome(0, Theme.HALL_Z, Theme.HALL_R, Theme.HALL_R, Theme.HALL_H, 11);
+            v.vault(0, 21, 38, 3, 1, 5, 3, false);
+            v.cyl(0, Theme.A_Z, Theme.A_R, 1, Theme.A_H);
+            v.dome(0, Theme.A_Z, Theme.A_R, Theme.A_R, Theme.A_H, 9);
+            v.vault(0, Theme.PIT_Z0 - 1, Theme.PIT_Z1 + 1, Theme.PIT_HALF, 1, 6, 4, false);
+            v.box(-Theme.PIT_HALF, -Theme.PIT_DEPTH, Theme.PIT_Z0, Theme.PIT_HALF, -2, Theme.PIT_Z1);          // fosse sous le pont
+            v.box(-Theme.PIT_HALF, -1, Theme.PIT_Z0, -Theme.DECK - 1, 0, Theme.PIT_Z1);
+            v.box(Theme.DECK + 1, -1, Theme.PIT_Z0, Theme.PIT_HALF, 0, Theme.PIT_Z1);
+            v.cyl(0, Theme.B_Z, Theme.B_R, 1, Theme.B_H);
+            v.dome(0, Theme.B_Z, Theme.B_R, Theme.B_R, Theme.B_H, 9);
+            for (int side : new int[]{-1, 1}) {
+                v.cyl(side * 18, Theme.B_Z, 6, 1, 9);
+                v.dome(side * 18, Theme.B_Z, 6, 6, 9, 5);
+            }
+            v.vault(0, Theme.GAL_Z0 - 2, Theme.GAL_Z1 + 1, 4, 1, 7, 4, false);
+            v.cyl(0, Theme.ARENA_Z, Theme.ARENA_R, 1, Theme.ARENA_H);
+            v.dome(0, Theme.ARENA_Z, Theme.ARENA_R, Theme.ARENA_R, Theme.ARENA_H, 15);
+            v.vault(0, Theme.ARENA_Z + Theme.ARENA_R - 2, Theme.TREASURE_Z - 4, 2, 1, 5, 2, false);
+            v.cyl(0, Theme.TREASURE_Z, Theme.TREASURE_R, 1, 9);
+            v.dome(0, Theme.TREASURE_Z, Theme.TREASURE_R, Theme.TREASURE_R, 9, 5);
+            Trials.Plan plan0 = th.plan();
+            if (plan0.a().equals(Trials.JUMPROOM)) v.cyl(0, Theme.A_Z, Theme.A_R - 3, -8, 0);
+            if (plan0.b().equals(Trials.JUMPROOM)) v.cyl(0, Theme.B_Z, Theme.B_R - 3, -8, 0);
+            th.shape(v);
+            v.prepareShell();
+            TrialData.get(level.getServer()).removePrefix(t.id + "_" + o.getX() + "_" + o.getZ());
+        }
+
+        /** Fondations : le sol ne doit jamais flotter, meme pose en plein ciel. */
+        private void foundation(int za, int zb) {
+            for (int x = v.x0; x <= v.x1; x++) {
+                for (int z = Math.max(v.z0, za); z <= Math.min(v.z1, zb); z++) {
+                    if (!v.inside(x, 1, z) || v.inside(x, -1, z)) continue;
+                    for (int y = -1; y >= -5; y--) {
+                        if (c.air(x, y, z)) c.set(x, y, z, th.shell(x, y, z, Carve.Kind.WALL, true));
+                    }
                 }
             }
         }
 
-        th.hall();
-        if (th.plan().a().equals(Trials.JUMPROOM)) Trials.roomLamps(c, th.palette(), Theme.A_Z, Theme.A_H, Theme.A_R);
-        else th.roomA();
-        th.pit();
-        if (th.plan().b().equals(Trials.JUMPROOM)) Trials.roomLamps(c, th.palette(), Theme.B_Z, Theme.B_H, Theme.B_R);
-        else th.roomB();
-        th.gallery();
-        th.arena();
-        th.treasure();
-
-        // epreuves : herses, dalles, plateformes et enregistrement
-        BlockPos base = o;
-        String key = t.id + "_" + o.getX() + "_" + o.getZ();
-        TrialData trials = TrialData.get(level.getServer());
-        trials.removePrefix(key);
-        Trials.Plan plan = th.plan();
-        Trials.Palette pal = th.palette();
-        long seed = base.asLong() * 31 + t.level;
-        int lvl = t.level + 4 * bonus;
-        buildTrial(c, level, trials, pal, plan.a(), key + "_a", Theme.A_Z, 68, 69, Math.min(3, plan.diffA() + bonus), lvl, seed);
-        buildTrial(c, level, trials, pal, plan.pit(), key + "_pit", 0, Theme.PIT_Z0, Theme.PIT_Z1, Math.min(3, plan.diffPit() + bonus), lvl, seed + 1);
-        buildTrial(c, level, trials, pal, plan.b(), key + "_b", Theme.B_Z, 115, 116, Math.min(3, plan.diffB() + bonus), lvl, seed + 2);
-
-        // elements de jeu
-        RandomSource r = level.getRandom();
-        var mobs = t.mobs.get();
-        BlockPos tp = o.offset(0, 1, Theme.HALL_Z);
-        c.set(0, 1, Theme.HALL_Z, ModBlocks.TELEPORTEUR.get());
-        boolean freeA = plan.a().equals(Trials.NONE);
-        boolean freeB = plan.b().equals(Trials.NONE);
-        if (freeA) {
-            DungeonBuilder.spawner(level, o.offset(-7, 1, Theme.A_Z - 3), mobs.get(0), r);
-            DungeonBuilder.spawner(level, o.offset(7, 1, Theme.A_Z + 4), mobs.get(mobs.size() > 1 ? 1 : 0), r);
-        }
-        DungeonBuilder.chest(level, o.offset(11, 1, Theme.A_Z + 9), DungeonBuilder.roomLoot(t, r, false), r);
-        if (freeB) {
-            DungeonBuilder.spawner(level, o.offset(-5, 1, Theme.B_Z - 6), mobs.get(0), r);
-            DungeonBuilder.spawner(level, o.offset(5, 1, Theme.B_Z + 6), mobs.get(mobs.size() > 1 ? 1 : 0), r);
-            DungeonBuilder.spawner(level, o.offset(-18, 1, Theme.B_Z), mobs.get(0), r);
-        }
-        DungeonBuilder.chest(level, o.offset(18, 1, Theme.B_Z), DungeonBuilder.roomLoot(t, r, false), r);
-        c.set(0, 1, Theme.ARENA_Z, ModBlocks.AUTEL_INVOCATION.get());
-        var bossLoot = DungeonBuilder.roomLoot(t, r, true);
-        var summonKey = com.mmorpg.registry.ModItems.get(t.bossKey);
-        bossLoot.removeIf(s -> s.is(summonKey));
-        for (int i = 0; i < bonus; i++) bossLoot.addAll(DungeonBuilder.roomLoot(t, r, false));
-        DungeonBuilder.chest(level, o.offset(0, 1, Theme.TREASURE_Z + 3), bossLoot.subList(0, Math.min(27, bossLoot.size())), r);
-
-        if (!level.dimension().equals(InstanceManager.DIM)) {         // un exemplaire instancie n'est pas un point de passage : on y entre par la porte du donjon
-            WaypointData data = WaypointData.get(level.getServer());
-            data.removeAt(level.dimension(), tp);
-            data.create(level.dimension(), tp, t.label, WaypointData.DUNGEON, t.level, new UUID(0, 0));
+        private void gameElements(Trials.Plan plan) {
+            RandomSource r = level.getRandom();
+            var mobs = t.mobs.get();
+            c.set(0, 1, Theme.HALL_Z, ModBlocks.TELEPORTEUR.get());
+            boolean freeA = plan.a().equals(Trials.NONE);
+            boolean freeB = plan.b().equals(Trials.NONE);
+            if (freeA) {
+                DungeonBuilder.spawner(level, o.offset(-7, 1, Theme.A_Z - 3), mobs.get(0), r);
+                DungeonBuilder.spawner(level, o.offset(7, 1, Theme.A_Z + 4), mobs.get(mobs.size() > 1 ? 1 : 0), r);
+            }
+            DungeonBuilder.chest(level, o.offset(11, 1, Theme.A_Z + 9), DungeonBuilder.roomLoot(t, r, false), r);
+            if (freeB) {
+                DungeonBuilder.spawner(level, o.offset(-5, 1, Theme.B_Z - 6), mobs.get(0), r);
+                DungeonBuilder.spawner(level, o.offset(5, 1, Theme.B_Z + 6), mobs.get(mobs.size() > 1 ? 1 : 0), r);
+                DungeonBuilder.spawner(level, o.offset(-18, 1, Theme.B_Z), mobs.get(0), r);
+            }
+            DungeonBuilder.chest(level, o.offset(18, 1, Theme.B_Z), DungeonBuilder.roomLoot(t, r, false), r);
+            c.set(0, 1, Theme.ARENA_Z, ModBlocks.AUTEL_INVOCATION.get());
+            var bossLoot = DungeonBuilder.roomLoot(t, r, true);
+            var summonKey = com.mmorpg.registry.ModItems.get(t.bossKey);
+            bossLoot.removeIf(s -> s.is(summonKey));
+            for (int i = 0; i < bonus; i++) bossLoot.addAll(DungeonBuilder.roomLoot(t, r, false));
+            DungeonBuilder.chest(level, o.offset(0, 1, Theme.TREASURE_Z + 3), bossLoot.subList(0, Math.min(27, bossLoot.size())), r);
         }
 
-        // annonces d'entree : le donjon, puis l'antre du boss (animation dediee)
-        ZoneData zones = ZoneData.get(level.getServer());
-        int ox = o.getX();
-        int oz = o.getZ();
-        key = t.id + "_" + ox + "_" + oz;
-        zones.add(new ZoneData.Zone(key, t.label, level.dimension(), ox - 27, oz - 2, ox + 27, oz + 192,
-                true, true, false, ZoneData.Zone.STYLE_DUNGEON, th.lore() + "|Donjon · niveau " + t.level + (bonus == 1 ? " · héroïque" : bonus >= 2 ? " · mythique" : "")));
-        zones.add(new ZoneData.Zone(key + "_boss", th.arenaName(), level.dimension(), ox - 23, oz + Theme.ARENA_Z - 23, ox + 23, oz + Theme.ARENA_Z + 23,
-                true, true, false, ZoneData.Zone.STYLE_BOSS, "Boss · niveau " + t.level));
-        return tp;
+        private void registerZones() {
+            if (!level.dimension().equals(InstanceManager.DIM)) {         // un exemplaire instancie n'est pas un point de passage : on y entre par la porte du donjon
+                WaypointData data = WaypointData.get(level.getServer());
+                data.removeAt(level.dimension(), tp);
+                data.create(level.dimension(), tp, t.label, WaypointData.DUNGEON, t.level, new UUID(0, 0));
+            }
+            // annonces d'entree : le donjon, puis l'antre du boss (animation dediee)
+            ZoneData zones = ZoneData.get(level.getServer());
+            int ox = o.getX();
+            int oz = o.getZ();
+            String key = t.id + "_" + ox + "_" + oz;
+            zones.add(new ZoneData.Zone(key, t.label, level.dimension(), ox - 27, oz - 2, ox + 27, oz + 192,
+                    true, true, false, ZoneData.Zone.STYLE_DUNGEON, th.lore() + "|Donjon · niveau " + t.level + (bonus == 1 ? " · héroïque" : bonus >= 2 ? " · mythique" : "")));
+            zones.add(new ZoneData.Zone(key + "_boss", th.arenaName(), level.dimension(), ox - 23, oz + Theme.ARENA_Z - 23, ox + 23, oz + Theme.ARENA_Z + 23,
+                    true, true, false, ZoneData.Zone.STYLE_BOSS, "Boss · niveau " + t.level));
+        }
+    }
+
+    public static Job prepare(ServerLevel level, BlockPos origin, DungeonType t, int bonus) {
+        return new Job(level, origin, t, bonus);
+    }
+
+    /** Phrase d'ambiance d'un donjon (ecran de chargement, entree). */
+    public static String loreOf(DungeonType t) {
+        return theme(null, t).lore();
+    }
+
+    /** Couleur d'accent d'un donjon. */
+    public static int colorOf(DungeonType t) {
+        return switch (t) {
+            case CRYPTE_GOBELINE -> 0xA8D060;
+            case CATACOMBES -> 0xB890F0;
+            case FORTERESSE_INFERNALE -> 0xFF8040;
+            case SANCTUAIRE_GLACE -> 0x90E0FF;
+            case CITADELLE_NEANT -> 0xC870FF;
+        };
+    }
+
+    /** @param bonus difficulte : 0 normal, 1 heroique, 2 mythique (epreuves plus dures, monstres plus forts, meilleur butin) */
+    public static BlockPos build(ServerLevel level, BlockPos origin, DungeonType t, int bonus) {
+        Job job = prepare(level, origin, t, bonus);
+        for (int i = 0; i < job.size(); i++) job.run(i);
+        return job.tp;
     }
 
     private static void buildTrial(HubCtx c, ServerLevel level, TrialData data, Trials.Palette pal, String kind, String id, int cz, int z0, int z1,

@@ -428,6 +428,10 @@ public final class DevShowcase {
             revealPhase(mc, me, MODE.substring(7));
             return;
         }
+        if (MODE.equals("setdonjon")) {
+            setDonjonPhase(mc, me);
+            return;
+        }
         if (MODE.startsWith("cine_")) {
             cinePhase(mc, me, MODE.substring(5));
             return;
@@ -2906,6 +2910,47 @@ public final class DevShowcase {
             MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
             stop(mc);
         });
+    }
+
+    /** /setdonjon, PNJ, menu, ecran de chargement et entree dans un exemplaire construit par etapes. */
+    private static void setDonjonPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) {
+            cmd(mc, "gamemode creative");
+            cmd(mc, "execute in minecraft:overworld run tp " + me + " 3000 150 3000 0 0");
+        }
+        if (tick == 8 && !mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        if (tick == 30) srv.execute(() -> com.mmorpg.dungeon.InstanceManager.debugForgetAll(srv));
+        if (tick == 40) cmd(mc, "setdonjon");
+        if (tick == 70) {
+            var npc = nearestNpc(mc, com.mmorpg.entity.NpcEntity.Role.DONJON);
+            MMORPG.LOGGER.info("[MMORPG] SETDONJON pnj pose = {} ({})", npc != null, npc == null ? "" : npc.displayName());
+            talkTo(mc, npc);
+        }
+        if (tick == 90) {
+            MMORPG.LOGGER.info("[MMORPG] SETDONJON ecran ouvert = {}", screenName(mc));
+            shot(mc, "setdonjon_menu");
+        }
+        if (tick == 100) {
+            var npc = nearestNpc(mc, com.mmorpg.entity.NpcEntity.Role.DONJON);
+            if (npc != null) com.mmorpg.client.ClientNet.send(new com.mmorpg.network.Payloads.DungeonEnter(npc.getId(), "catacombes", 0));
+            mc.gui.setScreen(null);
+        }
+        if (tick == 108) shot(mc, "setdonjon_chargement_1");
+        if (tick == 130) shot(mc, "setdonjon_chargement_2");
+        if (tick == 150) shot(mc, "setdonjon_chargement_3");
+        if (tick == 170) shot(mc, "setdonjon_chargement_4");
+        if (tick == 260) srv.execute(() -> {
+            var p = srv.getPlayerList().getPlayerByName(me);
+            MMORPG.LOGGER.info("[MMORPG] SETDONJON arrivee : dimension {} ; position ({}, {}, {}) ; chargement encore affiche = {}", p.level().dimension().identifier(),
+                    (int) p.getX(), (int) p.getY(), (int) p.getZ(), com.mmorpg.client.LoadingClient.active());
+        });
+        if (tick == 300) cmd(mc, "tp " + me + " ~ ~ ~ 0 6");
+        if (tick == 340) shot(mc, "setdonjon_arrivee");
+        if (tick == 360) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        }
     }
 
     private static net.minecraft.core.BlockPos dungeonBase;

@@ -39,6 +39,17 @@ public final class BossReveal {
         return LOCKED.containsKey(p.getUUID());
     }
 
+    /** Fige un joueur (et le rend invulnerable) pendant quelques ticks : chargement d'un donjon, transitions. */
+    public static void hold(ServerPlayer p, int ticks) {
+        Lock old = LOCKED.get(p.getUUID());
+        LOCKED.put(p.getUUID(), new Lock(p.level().getGameTime() + ticks, old != null ? old.pos : p.position()));
+    }
+
+    /** Libere un joueur fige (avant une teleportation voulue : sinon la position retenue le ramenerait en arriere). */
+    public static void release(ServerPlayer p) {
+        LOCKED.remove(p.getUUID());
+    }
+
     /** Lance la scene pour les joueurs proches de l'autel si celui-ci se trouve dans l'antre d'un donjon. */
     public static void play(ServerLevel level, BlockPos altar) {
         var zone = ZoneManager.zoneAt(level, altar);

@@ -120,27 +120,30 @@ final class Carve {
 
     // ------------------------------------------------------------------ coque
 
-    /** Creuse l'interieur puis pose la coque (deux couches) ; l'interieur deja occupe par du decor n'est pas touche. */
-    void shell(HubCtx c, ShellPick pick) {
-        BlockState air = Blocks.AIR.defaultBlockState();
-        boolean[] first = new boolean[in.length];
+    private boolean[] first;
+
+    /** Calcule la premiere couche de la coque (aucun bloc n'est pose) : a appeler une fois avant les tranches. */
+    void prepareShell() {
+        first = new boolean[in.length];
         for (int x = x0; x <= x1; x++) {
             for (int y = y0; y <= y1; y++) {
                 for (int z = z0; z <= z1; z++) {
-                    if (in[idx(x, y, z)]) {
-                        c.set(x, y, z, air);
-                    } else if (touches(x, y, z, in)) {
-                        first[idx(x, y, z)] = true;
-                    }
+                    if (!in[idx(x, y, z)] && touches(x, y, z, in)) first[idx(x, y, z)] = true;
                 }
             }
         }
+    }
+
+    /** Creuse l'interieur puis pose la coque (deux couches) pour les tranches z comprises entre {@code za} et {@code zb}. */
+    void shellSlice(HubCtx c, ShellPick pick, int za, int zb) {
+        BlockState air = Blocks.AIR.defaultBlockState();
         for (int x = x0; x <= x1; x++) {
             for (int y = y0; y <= y1; y++) {
-                for (int z = z0; z <= z1; z++) {
+                for (int z = Math.max(z0, za); z <= Math.min(z1, zb); z++) {
                     int i = idx(x, y, z);
-                    if (in[i]) continue;
-                    if (first[i]) {
+                    if (in[i]) {
+                        c.set(x, y, z, air);
+                    } else if (first[i]) {
                         Kind k = inside(x, y + 1, z) && !inside(x, y - 1, z) ? Kind.FLOOR
                                 : inside(x, y - 1, z) && !inside(x, y + 1, z) ? Kind.CEILING : Kind.WALL;
                         BlockState s = pick.at(x, y, z, k, false);
@@ -152,6 +155,12 @@ final class Carve {
                 }
             }
         }
+    }
+
+    /** Creuse l'interieur puis pose la coque d'un coup (construction directe). */
+    void shell(HubCtx c, ShellPick pick) {
+        prepareShell();
+        shellSlice(c, pick, z0, z1);
     }
 
     private boolean touches(int x, int y, int z, boolean[] set) {

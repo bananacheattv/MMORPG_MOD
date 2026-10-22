@@ -27,6 +27,7 @@ public record S2COpenScreen(int screen, CompoundTag extra) implements CustomPack
     public static final int CINEMATIC = 12;
     /** Etat de l'essai de classe (pas d'ecran) : actif, classe, niveau. */
     public static final int TRIAL_STATE = 13;
+    public static final int DUNGEON_MASTER = 14;
 
     public static final Type<S2COpenScreen> TYPE = new Type<>(MMORPG.id("open_screen"));
     public static final StreamCodec<ByteBuf, S2COpenScreen> CODEC = StreamCodec.composite(

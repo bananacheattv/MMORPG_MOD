@@ -120,6 +120,33 @@ public final class Payloads {
         }
     }
 
+    /** Ecran de chargement d'un donjon instancie : 0 = debut, 1 = progression, 2 = fin. */
+    public record Loading(int mode, String title, String lore, int color, int percent) implements CustomPacketPayload {
+        public static final int START = 0, PROGRESS = 1, END = 2;
+        public static final Type<Loading> TYPE = new Type<>(MMORPG.id("loading"));
+        public static final StreamCodec<ByteBuf, Loading> CODEC = StreamCodec.composite(
+                ByteBufCodecs.VAR_INT, Loading::mode, ByteBufCodecs.STRING_UTF8, Loading::title, ByteBufCodecs.STRING_UTF8, Loading::lore,
+                ByteBufCodecs.INT, Loading::color, ByteBufCodecs.VAR_INT, Loading::percent, Loading::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    /** Choix du joueur chez le Maitre des donjons : donjon et difficulte (0 normal, 1 heroique, 2 mythique). */
+    public record DungeonEnter(int npc, String dungeon, int difficulty) implements CustomPacketPayload {
+        public static final Type<DungeonEnter> TYPE = new Type<>(MMORPG.id("dungeon_enter"));
+        public static final StreamCodec<ByteBuf, DungeonEnter> CODEC = StreamCodec.composite(
+                ByteBufCodecs.VAR_INT, DungeonEnter::npc, ByteBufCodecs.STRING_UTF8, DungeonEnter::dungeon,
+                ByteBufCodecs.VAR_INT, DungeonEnter::difficulty, DungeonEnter::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
     /** Informations du bestiaire (noms, niveaux, butin) issues de la configuration serveur. */
     public record MobInfo(CompoundTag data) implements CustomPacketPayload {
         public static final Type<MobInfo> TYPE = new Type<>(MMORPG.id("mob_info"));

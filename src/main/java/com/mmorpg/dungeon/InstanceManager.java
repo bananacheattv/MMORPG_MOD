@@ -2,6 +2,8 @@ package com.mmorpg.dungeon;
 
 import com.mmorpg.MMORPG;
 import com.mmorpg.dungeon.InstanceData.Slot;
+import com.mmorpg.network.Net;
+import com.mmorpg.network.Payloads;
 import com.mmorpg.rpg.PlayerData;
 import com.mmorpg.server.PartyManager;
 import com.mmorpg.server.RpgPlayers;
@@ -77,21 +79,162 @@ public final class InstanceManager {
 
     // ================================================================== entree
 
-    /** Envoie le joueur (et les membres de son groupe proches) dans leur exemplaire du donjon. @return vrai si l'entree a eu lieu */
+    /** Envoie le joueur (et les membres de son groupe proches) dans leur exemplaire du donjon d'une porte. @return vrai si l'entree a commence */
     public static boolean enter(ServerPlayer player, UUID gateId) {
+        String pool = InstanceData.get(player.level().getServer()).gate(gateId);
+        return pool != null && enterPool(player, pool);
+    }
+
+    private static final class Build {
+        final Slot slot;
+        final StyledDungeon.Job job;
+        int next;
+        long nextAt;
+        long worstNanos;
+
+        Build(Slot slot, StyledDungeon.Job job) {
+            this.slot = slot;
+            this.job = job;
+        }
+
+        int percent() {
+            return job.size() == 0 ? 100 : next * 100 / job.size();
+        }
+    }
+
+    private record Transition(UUID player, Slot slot, long teleportAt, String title, String lore, int color) {
+    }
+
+    private static final java.util.Map<String, Build> BUILDS = new java.util.HashMap<>();
+    private static final List<Transition> TRANSITIONS = new java.util.ArrayList<>();
+    /** Duree minimale de l'ecran de chargement (ticks) : meme un exemplaire deja pret laisse le temps de lire. */
+    private static final int MIN_LOADING_TICKS = 70;
+    /** Une etape de construction tous les 2 ticks : le serveur ne se fige jamais. */
+    private static final int STEP_INTERVAL = 2;
+
+    private static String slotKey(Slot s) {
+        return s.pool + "#" + s.index;
+    }
+
+    /**
+     * Reserve l'exemplaire du joueur (son groupe) et l'y envoie derriere un ecran de chargement ; l'exemplaire est construit par
+     * etapes s'il n'existe pas encore. @return vrai si le chargement a commence
+     */
+    public static boolean enterPool(ServerPlayer player, String pool) {
         MinecraftServer server = player.level().getServer();
-        String pool = InstanceData.get(server).gate(gateId);
-        if (pool == null) return false;
-        Slot slot = allocate(server, pool, ownerKey(player));
+        ServerLevel dim = server.getLevel(DIM);
+        if (dim == null) return false;
+        Slot slot = reserve(server, pool, ownerKey(player));
         if (slot == null) {
             player.sendOverlayMessage(Component.literal("Tous les exemplaires de ce donjon sont occupés : réessayez dans un instant.").withColor(0xFF6050));
             return false;
         }
+        DungeonType t = typeOf(pool);
+        String title = t.label + (difficultyOf(pool) == 1 ? " (héroïque)" : difficultyOf(pool) >= 2 ? " (mythique)" : "");
+        String lore = StyledDungeon.loreOf(t);
+        int color = StyledDungeon.colorOf(t);
+        long at = server.overworld().getGameTime() + MIN_LOADING_TICKS;
         for (ServerPlayer m : PartyManager.onlineMembers(player)) {
-            if (m != player && (m.level() != player.level() || m.distanceToSqr(player) > 24 * 24)) continue;       // les autres membres rejoignent par la porte
-            teleportIn(m, slot);
+            if (m != player && (m.level() != player.level() || m.distanceToSqr(player) > 24 * 24)) continue;       // les autres membres rejoignent par le PNJ
+            BossReveal.hold(m, MIN_LOADING_TICKS + 400);
+            TRANSITIONS.removeIf(x -> x.player().equals(m.getUUID()));
+            TRANSITIONS.add(new Transition(m.getUUID(), slot, at, title, lore, color));
+            Net.toPlayer(m, new Payloads.Loading(Payloads.Loading.START, title, lore, color, slot.ready ? 100 : 0));
+        }
+        if (!slot.ready && !BUILDS.containsKey(slotKey(slot))) {
+            ServerLevel level = server.getLevel(DIM);
+            BUILDS.put(slotKey(slot), new Build(slot, StyledDungeon.prepare(level, new BlockPos(slot.x, slot.y, slot.z), t, difficultyOf(pool))));
         }
         return true;
+    }
+
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void onServerTick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) {
+        MinecraftServer server = event.getServer();
+        if (BUILDS.isEmpty() && TRANSITIONS.isEmpty()) return;
+        long now = server.overworld().getGameTime();
+        var it = BUILDS.entrySet().iterator();
+        while (it.hasNext()) {
+            Build b = it.next().getValue();
+            if (now < b.nextAt) continue;
+            b.nextAt = now + STEP_INTERVAL;
+            long t0 = System.nanoTime();
+            try {
+                b.job.run(b.next++);
+            } catch (RuntimeException e) {
+                MMORPG.LOGGER.error("[MMORPG] Construction d'un exemplaire de donjon interrompue", e);
+                b.next = b.job.size();
+            }
+            b.worstNanos = Math.max(b.worstNanos, System.nanoTime() - t0);
+            if (b.next >= b.job.size()) {
+                b.slot.ready = true;
+                InstanceData.get(server).dirty();
+                MMORPG.LOGGER.info("[MMORPG] Donjon {} : exemplaire {} construit en {} etapes, la plus longue a pris {} ms", b.slot.pool, b.slot.index, b.job.size(), b.worstNanos / 1_000_000);
+                it.remove();
+            }
+        }
+        var tr = TRANSITIONS.iterator();
+        while (tr.hasNext()) {
+            Transition x = tr.next();
+            ServerPlayer p = server.getPlayerList().getPlayer(x.player());
+            if (p == null) {
+                tr.remove();
+                continue;
+            }
+            Build b = BUILDS.get(slotKey(x.slot()));
+            BossReveal.hold(p, 40);
+            if (!x.slot().ready) {
+                if (now % 4 == 0) Net.toPlayer(p, new Payloads.Loading(Payloads.Loading.PROGRESS, x.title(), x.lore(), x.color(), b == null ? 0 : b.percent()));
+            } else if (now >= x.teleportAt()) {
+                Net.toPlayer(p, new Payloads.Loading(Payloads.Loading.PROGRESS, x.title(), x.lore(), x.color(), 100));
+                BossReveal.release(p);
+                teleportIn(p, x.slot());
+                Net.toPlayer(p, new Payloads.Loading(Payloads.Loading.END, x.title(), x.lore(), x.color(), 100));
+                tr.remove();
+            } else if (now % 4 == 0) {
+                Net.toPlayer(p, new Payloads.Loading(Payloads.Loading.PROGRESS, x.title(), x.lore(), x.color(), 100));
+            }
+        }
+    }
+
+    /** Exemplaire du proprietaire, sinon un exemplaire libre (remis a zero), sinon un nouveau (marque « en construction »). */
+    static @Nullable Slot reserve(MinecraftServer server, String pool, String owner) {
+        InstanceData data = InstanceData.get(server);
+        List<Slot> slots = data.slotsOf(pool);
+        for (Slot s : slots) {
+            if (s.owner.equals(owner)) {
+                s.lastBusy = server.getTickCount();
+                data.dirty();
+                return s;
+            }
+        }
+        for (Slot s : slots) {
+            if (s.owner.isEmpty()) {
+                s.owner = owner;
+                s.lastBusy = server.getTickCount();
+                data.dirty();
+                if (s.ready) DungeonManager.reset(server, group(pool, s));
+                return s;
+            }
+        }
+        if (slots.size() >= MAX_PER_POOL) return null;
+        DungeonType t = typeOf(pool);
+        int poolIndex = 0;
+        for (int i = 0; i < TYPES.length; i++) {
+            if (TYPES[i] == t) poolIndex = i * 3 + difficultyOf(pool);
+        }
+        Slot s = new Slot(pool, slots.size(), 200 + slots.size() * 120, 101, 1000 + poolIndex * 400, owner, server.getTickCount(), false);
+        data.slots.add(s);
+        data.dirty();
+        return s;
+    }
+
+    /** Le groupe du joueur a-t-il deja un exemplaire de ce donjon (pour afficher « Reprendre ») ? */
+    public static boolean hasInstance(MinecraftServer server, String pool, String owner) {
+        for (Slot s : InstanceData.get(server).slotsOf(pool)) {
+            if (s.owner.equals(owner)) return true;
+        }
+        return false;
     }
 
     static void teleportIn(ServerPlayer p, Slot slot) {
@@ -122,7 +265,11 @@ public final class InstanceManager {
                 s.owner = owner;
                 s.lastBusy = server.getTickCount();
                 data.dirty();
-                DungeonManager.reset(server, group(pool, s));
+                if (s.ready) DungeonManager.reset(server, group(pool, s));
+                else {
+                    DungeonBuilder.buildDungeon(server.getLevel(DIM), new BlockPos(s.x, s.y, s.z), typeOf(pool), difficultyOf(pool));
+                    s.ready = true;
+                }
                 return s;
             }
         }
@@ -138,6 +285,7 @@ public final class InstanceManager {
         data.slots.add(s);
         data.dirty();
         DungeonBuilder.buildDungeon(level, new BlockPos(s.x, s.y, s.z), t, difficultyOf(pool));
+        s.ready = true;
         MMORPG.LOGGER.info("[MMORPG] Donjon {} : exemplaire {} construit en ({}, {})", pool, s.index, s.x, s.z);
         return s;
     }

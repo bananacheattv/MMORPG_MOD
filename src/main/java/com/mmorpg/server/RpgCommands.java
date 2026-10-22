@@ -411,6 +411,40 @@ public final class RpgCommands {
         return 1;
     }
 
+    /** /setdonjon [type] : pose ici le Maitre des donjons (tous les donjons, ou un seul). Aucune autre preparation n'est necessaire. */
+    public static void registerSetDonjon(CommandDispatcher<CommandSourceStack> d) {
+        List<String> ids = Arrays.stream(DungeonBuilder.DungeonType.values()).map(t -> t.id).toList();
+        d.register(Commands.literal("setdonjon")
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .executes(c -> setDonjon(c, null))
+                .then(Commands.argument("type", StringArgumentType.word())
+                        .suggests((c, b) -> SharedSuggestionProvider.suggest(ids, b))
+                        .executes(c -> {
+                            var t = DungeonBuilder.DungeonType.byId(StringArgumentType.getString(c, "type"));
+                            if (t == null) {
+                                c.getSource().sendFailure(Component.literal("Donjon inconnu : " + StringArgumentType.getString(c, "type")));
+                                return 0;
+                            }
+                            return setDonjon(c, t);
+                        })));
+    }
+
+    private static int setDonjon(CommandContext<CommandSourceStack> c, DungeonBuilder.DungeonType only) {
+        ServerLevel level = c.getSource().getLevel();
+        if (c.getSource().getServer().getLevel(com.mmorpg.dungeon.InstanceManager.DIM) == null) {
+            c.getSource().sendFailure(Component.literal("La dimension des donjons est introuvable (mmorpg:donjons) : le mod est-il à jour ?"));
+            return 0;
+        }
+        String name = only == null ? "Maître des donjons" : "Gardien : " + only.label;
+        String group = only == null ? com.mmorpg.dungeon.DungeonMaster.GROUP_ALL : "donjon:" + only.id;
+        var npc = DungeonBuilder.spawnNpc(level, BlockPos.containing(c.getSource().getPosition()), com.mmorpg.entity.NpcEntity.Role.DONJON, name, 3, c.getSource().getRotation().y + 180);
+        if (npc == null) return 0;
+        npc.setup(com.mmorpg.entity.NpcEntity.Role.DONJON, name, 3, group);
+        c.getSource().sendSuccess(() -> ok(name + " posé. " + (only == null ? "Il propose les " + DungeonBuilder.DungeonType.values().length + " donjons" : "Il propose « " + only.label + " »")
+                + " : chaque joueur ou groupe y entre dans son propre exemplaire, construit automatiquement à la première visite (écran de chargement)."), true);
+        return 1;
+    }
+
     private static int playCinematic(ServerPlayer target, CommandContext<CommandSourceStack> c) {
         if (!ConfigManager.general().hubCinematic) {
             c.getSource().sendFailure(Component.literal("La cinématique est désactivée (hubCinematic dans general.json)."));

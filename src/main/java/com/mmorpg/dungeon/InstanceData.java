@@ -27,6 +27,13 @@ public class InstanceData extends SavedData {
         /** Proprietaire : identifiant du chef de groupe (ou du joueur seul) ; vide = libre. */
         public String owner;
         public long lastBusy;
+        /** Faux tant que le donjon n'est pas entierement construit (construction en cours ou interrompue). */
+        public boolean ready = true;
+
+        public Slot(String pool, int index, int x, int y, int z, String owner, long lastBusy, boolean ready) {
+            this(pool, index, x, y, z, owner, lastBusy);
+            this.ready = ready;
+        }
 
         public Slot(String pool, int index, int x, int y, int z, String owner, long lastBusy) {
             this.pool = pool;
@@ -45,8 +52,9 @@ public class InstanceData extends SavedData {
                 Codec.INT.fieldOf("y").forGetter(s -> s.y),
                 Codec.INT.fieldOf("z").forGetter(s -> s.z),
                 Codec.STRING.optionalFieldOf("owner", "").forGetter(s -> s.owner),
-                Codec.LONG.optionalFieldOf("lastBusy", 0L).forGetter(s -> s.lastBusy)
-        ).apply(i, Slot::new));
+                Codec.LONG.optionalFieldOf("lastBusy", 0L).forGetter(s -> s.lastBusy),
+                Codec.BOOL.optionalFieldOf("ready", true).forGetter(s -> s.ready)
+        ).apply(i, (pool, index, x, y, z, owner, lastBusy, ready) -> new Slot(pool, index, x, y, z, owner, lastBusy, ready)));
     }
 
     private static final Codec<InstanceData> CODEC = RecordCodecBuilder.create(i -> i.group(
