@@ -90,6 +90,10 @@ public final class ForgeRecipes {
         add(Category.CONSOMMABLES, "caisse_aventure", 1, 40, 5, N, "minecraft:oak_planks", 8, "ferraille_gobeline", 4);
         add(Category.CONSOMMABLES, "lucky_block", 1, 120, 10, N, "minecraft:gold_ingot", 4, "trefle_chance", 1);
         add(Category.CONSOMMABLES, "charme_chance", 1, 100, 10, N, "trefle_chance", 1, "minecraft:gold_ingot", 2);
+        // mannequins d'entrainement (hub) : le standard sert de base aux variantes
+        add(Category.CONSOMMABLES, "mannequin_entrainement", 1, 20, 1, N, "minecraft:hay_block", 2, "minecraft:oak_log", 2, "minecraft:string", 4);
+        add(Category.CONSOMMABLES, "mannequin_blinde", 1, 60, 1, N, "mannequin_entrainement", 1, "minecraft:iron_ingot", 8, "ferraille_gobeline", 4);
+        add(Category.CONSOMMABLES, "mannequin_magique", 1, 100, 1, N, "mannequin_entrainement", 1, "cristal_arcanique", 2, "tissu_enchante", 4);
         add(Category.FAMILIERS, "nourriture_familier", 4, 5, 1, N, "minecraft:wheat", 4, "minecraft:carrot", 2);
         // ---------------------------------------------------------------- materiaux intermediaires
         add(Category.MATERIAUX, "lingot_mithril", 1, 5, 20, N, "minecraft:iron_ingot", 2, "acier_orc", 2, "poussiere_ame", 1);

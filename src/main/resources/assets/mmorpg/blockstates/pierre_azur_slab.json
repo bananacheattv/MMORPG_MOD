@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "mmorpg:block/pierre_azur_slab"
+    },
+    "type=top": {
+      "model": "mmorpg:block/pierre_azur_slab_top"
+    },
+    "type=double": {
+      "model": "mmorpg:block/pierre_azur"
+    }
+  }
+}

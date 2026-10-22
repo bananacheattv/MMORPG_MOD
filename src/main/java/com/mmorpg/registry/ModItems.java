@@ -43,6 +43,19 @@ public final class ModItems {
     public static final List<DeferredItem<? extends Item>> SPAWN_EGGS = new ArrayList<>();
     public static final Map<String, DeferredItem<? extends Item>> BY_ID = new LinkedHashMap<>();
     public static final Map<PetType, DeferredItem<PetEggItem>> PET_EGGS = new EnumMap<>(PetType.class);
+    /** Mannequins d'entrainement (objets de placement), par variante. */
+    public static final Map<String, DeferredItem<com.mmorpg.item.TrainingDummyItem>> DUMMY_ITEMS = new java.util.LinkedHashMap<>();
+    static {
+        String[] ids = {"mannequin_entrainement", "mannequin_blinde", "mannequin_magique", "mannequin_duelliste"};
+        Rarity[] rar = {Rarity.PEU_COMMUN, Rarity.RARE, Rarity.RARE, Rarity.EPIQUE};
+        String[] lore = {"Paille et bois : il encaisse tout sans broncher.", "Plastron d'acier : forte défense physique.", "Runes et cristal : forte résistance magique.",
+                "Il annonce son coup puis frappe : esquivez, ou encaissez (jamais mortel)."};
+        for (int i = 0; i < ids.length; i++) {
+            int v = i;
+            DUMMY_ITEMS.put(com.mmorpg.entity.dummy.TrainingDummyEntity.VARIANTS[i], ITEMS.registerItem(ids[i],
+                    p -> new com.mmorpg.item.TrainingDummyItem(p, rar[v], v, lore[v])));
+        }
+    }
     public static final Map<PetType, DeferredItem<Item>> PET_SPRITES = new EnumMap<>(PetType.class);
     public static final Map<ItemDefs.Element, DeferredItem<Item>> PROJECTILE_SPRITES = new EnumMap<>(ItemDefs.Element.class);
 
@@ -151,6 +164,14 @@ public final class ModItems {
     public static final DeferredItem<RpgMaterialItem> GLANDE_VENIN = material("glande_venin", Rarity.PEU_COMMUN, "Glande gorgée de venin des Araignées venimeuses.");
     public static final DeferredItem<RpgMaterialItem> PIECE_OR = ITEMS.registerItem("piece_or",
             p -> new RpgMaterialItem(p, Rarity.COMMUN, "Monnaie", "La monnaie du royaume. Utilisée à la Forge Arcanique."), p -> p.stacksTo(99));
+
+    /** Outil d'administration : ouvre l'atelier de quetes (operateurs). */
+    public static final DeferredItem<com.mmorpg.item.QuestWandItem> SCEPTRE_QUETES = ITEMS.registerItem("sceptre_quetes",
+            com.mmorpg.item.QuestWandItem::new);
+
+    /** Outil d'administration : delimite les zones (operateurs). */
+    public static final DeferredItem<com.mmorpg.item.ZoneWandItem> BAGUETTE_ZONE = ITEMS.registerItem("baguette_zone",
+            com.mmorpg.item.ZoneWandItem::new);
 
     // ------------------------------------------------------------------ invocations
     public static final DeferredItem<SummonKeyItem> SCEAU_ROI_GOBELIN = summon("sceau_roi_gobelin", Rarity.RARE, "roi_gobelin", "Roi Gobelin", 20);

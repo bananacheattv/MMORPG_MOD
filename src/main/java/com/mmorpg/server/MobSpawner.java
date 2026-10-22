@@ -54,6 +54,7 @@ public final class MobSpawner {
     }
 
     private static void trySpawnNear(ServerLevel level, ServerPlayer player, GeneralConfig g) {
+        if (com.mmorpg.hub.HubProtection.inHub(level, player.blockPosition())) return;      // pas de monstres dans le hub
         AABB area = player.getBoundingBox().inflate(48, 24, 48);
         int nearby = level.getEntitiesOfClass(Mob.class, area, m -> m instanceof RpgMob).size();
         if (nearby >= g.maxCustomMobsNearPlayer) return;

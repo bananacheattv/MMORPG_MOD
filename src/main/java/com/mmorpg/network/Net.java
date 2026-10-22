@@ -31,6 +31,9 @@ public final class Net {
         r.playToServer(Payloads.LootEdit.TYPE, Payloads.LootEdit.CODEC, (packet, ctx) -> {
             if (ctx.player() instanceof ServerPlayer p) com.mmorpg.server.LootEditor.action(p, packet.data());
         });
+        r.playToServer(Payloads.HubAction.TYPE, Payloads.HubAction.CODEC, (packet, ctx) -> {
+            if (ctx.player() instanceof ServerPlayer p) com.mmorpg.hub.HubManager.action(p, packet.action(), packet.a(), packet.b());
+        });
         r.playToServer(Payloads.Allocate.TYPE, Payloads.Allocate.CODEC, ServerHandlers::allocate);
         r.playToServer(Payloads.SkillAction.TYPE, Payloads.SkillAction.CODEC, ServerHandlers::skillAction);
         r.playToServer(Payloads.MountAction.TYPE, Payloads.MountAction.CODEC, ServerHandlers::mountAction);

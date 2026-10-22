@@ -36,6 +36,8 @@ public final class ServerEvents {
     @SubscribeEvent
     public static void onCommands(RegisterCommandsEvent event) {
         RpgCommands.register(event.getDispatcher());
+        RpgCommands.registerHub(event.getDispatcher());
+        com.mmorpg.zone.ZoneCommands.register(event.getDispatcher());
         PlayerCommands.register(event.getDispatcher());
     }
 

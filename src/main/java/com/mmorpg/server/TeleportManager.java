@@ -41,7 +41,17 @@ public final class TeleportManager {
         openSetup(player, w);
     }
 
+    /** Tant qu'aucune classe n'est choisie, les teleporteurs restent fermes (sauf aux administrateurs). */
+    private static boolean classRequired(ServerPlayer player) {
+        if (!com.mmorpg.hub.HubData.get(player.level().getServer()).exists()) return false;   // sans hub : comportement classique
+        if (RpgPlayers.get(player).playerClass.isPlayable() && !com.mmorpg.hub.ClassTrial.active(player)) return false;
+        if (com.mmorpg.hub.HubManager.isOperator(player) && !com.mmorpg.hub.ClassTrial.active(player)) return false;
+        player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Choisissez d'abord votre classe auprès des Maîtres de classe pour utiliser le téléporteur.").withColor(0xFFC060));
+        return true;
+    }
+
     public static void onUse(ServerLevel level, BlockPos pos, ServerPlayer player) {
+        if (classRequired(player)) return;
         WaypointData data = WaypointData.get(level.getServer());
         WaypointData.Waypoint w = data.at(level.dimension(), pos);
         if (w == null) {
@@ -52,6 +62,7 @@ public final class TeleportManager {
             return;
         }
         PlayerData d = RpgPlayers.get(player);
+        com.mmorpg.hub.HubManager.grantExit(player, w);
         if (d.waypoints.add(w.id)) {
             Net.toPlayer(player, new Payloads.Notify(Payloads.Notify.DISCOVERY, "LIEU DÉCOUVERT",
                     WaypointData.CATEGORY_NAMES[Math.max(0, Math.min(2, w.category))] + " : " + w.name, 0x60C0FF));
@@ -123,6 +134,7 @@ public final class TeleportManager {
     }
 
     public static void travel(ServerPlayer player, String idString) {
+        if (classRequired(player)) return;
         UUID id;
         try {
             id = UUID.fromString(idString);

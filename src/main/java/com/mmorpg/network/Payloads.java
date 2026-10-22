@@ -114,6 +114,19 @@ public final class Payloads {
         }
     }
 
+    /** Action du hub : essayer / choisir une classe, quitter l'essai, revoir la cinematique ou la terminer. */
+    public record HubAction(int action, int a, int b) implements CustomPacketPayload {
+        public static final int TRY = 0, CHOOSE = 1, QUIT = 2, REPLAY = 3, CINEMATIC_END = 4, CINEMATIC_SKIP = 5;
+        public static final Type<HubAction> TYPE = new Type<>(MMORPG.id("hub_action"));
+        public static final StreamCodec<ByteBuf, HubAction> CODEC = StreamCodec.composite(
+                ByteBufCodecs.VAR_INT, HubAction::action, ByteBufCodecs.VAR_INT, HubAction::a, ByteBufCodecs.VAR_INT, HubAction::b, HubAction::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
     public record Allocate(int attribute, int amount) implements CustomPacketPayload {
         public static final Type<Allocate> TYPE = new Type<>(MMORPG.id("allocate"));
         public static final StreamCodec<ByteBuf, Allocate> CODEC = StreamCodec.composite(

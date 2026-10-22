@@ -51,6 +51,16 @@ public final class AnimatedModels {
         event.registerLayerDefinition(AutelInvocationModel.LAYER, AutelInvocationModel::createBodyLayer);
         event.registerLayerDefinition(TeleporteurModel.LAYER, TeleporteurModel::createBodyLayer);
         event.registerLayerDefinition(ForgeArcaniqueModel.LAYER, ForgeArcaniqueModel::createBodyLayer);
+        // mannequins d'entrainement (art/mannequin_blockbench)
+        event.registerLayerDefinition(com.mmorpg.client.model.dummy.MannequinStandardModel.LAYER, com.mmorpg.client.model.dummy.MannequinStandardModel::createBodyLayer);
+        event.registerLayerDefinition(com.mmorpg.client.model.dummy.MannequinBlindeModel.LAYER, com.mmorpg.client.model.dummy.MannequinBlindeModel::createBodyLayer);
+        event.registerLayerDefinition(com.mmorpg.client.model.dummy.MannequinMagiqueModel.LAYER, com.mmorpg.client.model.dummy.MannequinMagiqueModel::createBodyLayer);
+        // maitres de classe du hub (art/classes_blockbench)
+        event.registerLayerDefinition(com.mmorpg.client.model.hub.MaitreGuerrierModel.LAYER, com.mmorpg.client.model.hub.MaitreGuerrierModel::createBodyLayer);
+        event.registerLayerDefinition(com.mmorpg.client.model.hub.MaitreMageModel.LAYER, com.mmorpg.client.model.hub.MaitreMageModel::createBodyLayer);
+        event.registerLayerDefinition(com.mmorpg.client.model.hub.MaitreArcherModel.LAYER, com.mmorpg.client.model.hub.MaitreArcherModel::createBodyLayer);
+        event.registerLayerDefinition(com.mmorpg.client.model.hub.MaitreTankModel.LAYER, com.mmorpg.client.model.hub.MaitreTankModel::createBodyLayer);
+        event.registerLayerDefinition(com.mmorpg.client.model.hub.GardienEpreuveModel.LAYER, com.mmorpg.client.model.hub.GardienEpreuveModel::createBodyLayer);
         // familiers (art/familiers_blockbench)
         event.registerLayerDefinition(com.mmorpg.client.model.pet.FeuFolletModel.LAYER, com.mmorpg.client.model.pet.FeuFolletModel::createBodyLayer);
         event.registerLayerDefinition(com.mmorpg.client.model.pet.BebeSlimeModel.LAYER, com.mmorpg.client.model.pet.BebeSlimeModel::createBodyLayer);

@@ -39,7 +39,7 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
             "Augmente le Mana (+4), la Puissance magique (+0,5), la régénération de mana (+0,12/s) et réduit les recharges (+0,03 %).",
             "Attribut du Guerrier : augmente l'Attaque (+0,5), les dégâts critiques (+0,5 %) et le vol de vie (+0,02 %).",
             "Attribut de l'Archer : augmente le critique (+0,08 %), la vitesse d'attaque (+0,03 %) et l'Attaque (+0,4).",
-            "Attribut du Tank : augmente la Défense (+1), les PV (+5) et la régénération de vie (+0,08/s)."
+            "Attribut du Paladin : augmente la Défense (+1), les PV (+5) et la régénération de vie (+0,08/s)."
     };
 
     private record Hit(int x, int y, int w, int h, Runnable action) {

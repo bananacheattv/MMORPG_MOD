@@ -29,7 +29,7 @@ Mod MMORPG complet : 4 classes qui évoluent (niveaux 1 à 100), 28 compétences
 | Guerrier | Guerrier | Berserker | Seigneur de Guerre | Champion Légendaire | Dieu de la Guerre |
 | Mage | Mage | Sorcier | Archimage | Arcaniste Suprême | Avatar des Arcanes |
 | Archer | Archer | Rôdeur | Tireur d'Élite | Sentinelle Sylvestre | Archer Divin |
-| Tank | Tank | Gardien | Paladin | Rempart Sacré | Titan Immortel |
+| Paladin | Paladin | Gardien | Templier | Rempart Sacré | Titan Immortel |
 
 ### Compétences (7 par classe, rangs 1 à 5)
 
@@ -38,7 +38,7 @@ Une compétence se débloque au rang 1 dès que son niveau est atteint. On gagne
 - **Guerrier** : Frappe Puissante, Cri de Guerre, Maîtrise des Armes (passif), Tourbillon d'Acier (25), Charge Brutale (50), Rage Sanguinaire (75), Fureur du Dieu de la Guerre (100, ultime).
 - **Mage** : Boule de Feu, Nova de Givre, Flux Arcanique (passif), Éclair en Chaîne (25), Transfert Arcanique (50), Bouclier de Mana (75), Météore Céleste (100, ultime).
 - **Archer** : Tir Perçant, Pluie de Flèches, Œil de Lynx (passif), Saut Acrobatique (25), Flèche Explosive (50), Volée de Flèches (75), Tempête Divine (100, ultime).
-- **Tank** : Coup de Bouclier, Provocation, Peau de Fer (passif), Forteresse (25), Onde de Choc (50), Aura Sacrée (75), Rempart du Titan (100, ultime).
+- **Paladin** : Coup de Bouclier, Provocation, Peau de Fer (passif), Forteresse (25), Onde de Choc (50), Aura Sacrée (75), Rempart du Titan (100, ultime).
 
 ## Statistiques
 
@@ -49,7 +49,7 @@ Une compétence se débloque au rang 1 dès que son niveau est atteint. On gagne
   | Guerrier | Force, **Férocité** | Attaque, PV ; dégâts critiques, vol de vie |
   | Archer | Agilité, **Dextérité** | Attaque, esquive, vitesse ; critique, vitesse d'attaque |
   | Mage | Intelligence, Esprit | Puissance magique, mana ; régénération, recharges |
-  | Tank | Vitalité, **Endurance** | PV, défense ; défense, régénération de vie |
+  | Paladin | Vitalité, **Endurance** | PV, défense ; défense, régénération de vie |
 - **14 statistiques dérivées** : PV, Mana, Attaque, Puissance magique, Défense, Critique, Dégâts critiques, Esquive, Vitesse, Vitesse d'attaque, Régénération de vie et de mana, Vol de vie, Réduction de recharge.
 - **Ordre de calcul** : attributs → formules → bonus d'équipement, de familier et de sets → multiplicateur d'évolution → bonus en % → plafonds (critique 75 %, esquive 45 %, recharge 40 %…).
 - **Réduction de dégâts** : `DEF / (DEF + 200 + 10 × niveau de l'attaquant)`, plafonnée à 80 %.
@@ -123,6 +123,24 @@ Les familiers sont des **modèles 3D animés** (Blockbench, `art/familiers_block
 - **se posent** quand le joueur s'arrête et s'envolent dès qu'il repart : Chouette sage, Phénix doré.
 
 Immobiles un moment, ils se reposent : le loup s'assoit puis s'endort, le golem et la chouette s'endorment, le slime s'aplatit, le feu follet entre en canalisation. À l'invocation, ils jouent une animation de joie.
+
+## Hub d'entrée
+
+Un opérateur construit le hub avec `/hub set` (ou `/mmorpg hub`) dans sa **dimension dédiée** `mmorpg:hub` (vide, cycle jour/nuit du monde principal, sans monstres) : la **Citadelle d'Eldoria**, une grande île céleste (face inférieure rocheuse, cascades, lianes et cristaux lumineux, îlots flottants) avec une place de 31 blocs de rayon, sa **rotonde à dôme vitré** et son bassin annulaire à ponts, **quatre pavillons de classe** à colonnade ronde (chacun avec une grande sculpture : épée du Guerrier, obélisque du Mage, arc de l'Archer, bouclier du Paladin), un **portail à tours rondes**, le Téléporteur vers les villes et donjons, une **arène d'épreuve** à dôme et une **aire d'entraînement** circulaire avec ses mannequins. Le point d'apparition du monde y est placé. Les joueurs reviennent au hub avec `/hub` ; le Téléporteur du hub propose aussi la destination **« Monde principal »** (l'ancien point d'apparition du monde). La nuit, la citadelle reste éclairée : lampadaires, lanternes, cristaux lumineux dans les nervures du dôme et les colonnades, rangées lumineuses au sol des pavillons, palissade éclairée.
+
+Le hub est **protégé** (réglage `hubProtection`) : on n'y casse ni ne pose de blocs, il n'y a ni PvP ni monstres hostiles (les opérateurs en créatif gardent la main pour l'aménager).
+
+À sa première arrivée dans le hub, un joueur voit une **cinématique** d'environ une minute (un seul mouvement de caméra continu et pré-chauffé pour rester fluide, barres cinéma, titres, sons et particules ; Espace ou Échap pour passer) qui survole le hub et présente les quatre classes. Il parle ensuite aux **Maîtres de classe**, des PNJ au modèle animé propre à chaque classe : il peut **essayer** n'importe quelle classe à un niveau choisi (1, 25, 50, 75 ou 100) dans la salle d'épreuve, avec son équipement et ses compétences, sans rien gagner ni perdre (son personnage est entièrement restauré à la sortie), puis **choisir** définitivement celle qu'il a essayée. Le Téléporteur du hub reste fermé tant qu'aucune classe n'est choisie.
+
+## Blocs de bâtisseur et police Eldoria
+
+L'onglet créatif **« Eldoria : bâtisseur »** propose 19 matériaux décoratifs aux textures peintes pour le mod (marbre d'Eldoria, marbre poli et doré, colonne de marbre, pierre azur, pierre solaire, dalle runique, cristaux azur / arcanique / d'ambre lumineux, tuiles azur / pourpre / écarlate / sylvestre / de givre, bois ancien, or ouvragé, roche céleste, fer noirci), la plupart avec leurs **marches et dalles** pour arrondir les constructions. Ils servent au hub et sont utilisables par tous les bâtisseurs. Textures et modèles : `tools/gen_decor.py`.
+
+La **police pixel Eldoria** (capitales à empattements, accents français ; `tools/gen_font.py`) habille les titres de la cinématique, du dialogue des Maîtres de classe, de la bannière d'essai et les grands titres 3D du hub.
+
+## Mannequins d'entraînement
+
+Trois mannequins (standard, blindé, magique) pour mesurer ses dégâts : on les fabrique à la Forge Arcanique et on les pose avec un clic droit. Ils sont immortels, immobiles et ne ripostent pas ; un panneau au-dessus d'eux affiche le DPS sur 10 s, le total, le plus gros coup et les critiques (accroupi + clic droit pour remettre à zéro). Le blindé résiste aux coups physiques, le magique aux sorts. Réglages dans `config/mmorpg/mannequin.json`.
 
 ## Téléporteurs, villes et donjons
 
