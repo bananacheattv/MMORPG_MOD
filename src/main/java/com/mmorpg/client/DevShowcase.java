@@ -424,6 +424,10 @@ public final class DevShowcase {
             instancesPhase(mc, me);
             return;
         }
+        if (MODE.startsWith("reveal_")) {
+            revealPhase(mc, me, MODE.substring(7));
+            return;
+        }
         if (MODE.startsWith("cine_")) {
             cinePhase(mc, me, MODE.substring(5));
             return;
@@ -2868,6 +2872,40 @@ public final class DevShowcase {
             MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
             stop(mc);
         }
+    }
+
+    /** Cinematique d'apparition du boss a l'autel : camera du rituel puis du surgissement. */
+    private static void revealPhase(Minecraft mc, String me, String id) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) {
+            cmd(mc, "gamemode survival");
+            cmd(mc, "execute in minecraft:overworld run tp " + me + " 3000 150 3000 0 0");
+        }
+        if (tick == 8 && !mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        if (tick == 130) srv.execute(() -> dungeonBase = srv.getPlayerList().getPlayerByName(me).blockPosition());
+        if (tick == 135) cmd(mc, "mmorpg donjon construire " + id);
+        if (tick == 330) srv.execute(() -> {
+            var p = srv.getPlayerList().getPlayerByName(me);
+            p.getAbilities().invulnerable = false;
+            var altar = dungeonBase.offset(0, 0, 154);
+            for (var old : p.level().getEntitiesOfClass(com.mmorpg.entity.boss.RpgBoss.class, new net.minecraft.world.phys.AABB(altar).inflate(80))) old.discard();
+            hubTeleport(srv, me, altar.getX() + 3, altar.getY(), altar.getZ() - 8);
+            String key = switch (id) {
+                case "crypte_gobeline" -> "roi_gobelin";
+                case "catacombes" -> "liche_ancienne";
+                case "forteresse_infernale" -> "seigneur_ignis";
+                case "sanctuaire_glace" -> "titan_glace";
+                default -> "avatar_neant";
+            };
+            MMORPG.LOGGER.info("[MMORPG] REVELATION invocation = {}", com.mmorpg.entity.boss.BossManager.summon(p.level(), altar, key, p));
+        });
+        if (tick >= 332 && tick <= 332 + 8 * 18 && (tick - 332) % 18 == 0) shot(mc, id + "_revelation_" + String.format("%02d", (tick - 332) / 18));
+        if (tick == 332 + 9 * 18 + 40) srv.execute(() -> {
+            var p = srv.getPlayerList().getPlayerByName(me);
+            MMORPG.LOGGER.info("[MMORPG] REVELATION camera du joueur rendue = {} ; joueur fige pendant la scene = {}", mc.getCameraEntity() == mc.player, true);
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        });
     }
 
     private static net.minecraft.core.BlockPos dungeonBase;

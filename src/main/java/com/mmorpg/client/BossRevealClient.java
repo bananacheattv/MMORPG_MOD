@@ -109,8 +109,11 @@ public final class BossRevealClient {
         Vec3 target = center.add(0, Mth.lerp(Ease.IN_OUT_CUBIC.apply(b), 0.6F, 2.6F), 0);
         Vec3 pos = center.add(Math.cos(az) * radius + Math.sin(t * 70F) * shake, height + Math.sin(t * 53F) * shake, Math.sin(az) * radius + Math.cos(t * 61F) * shake);
         // la camera ne traverse jamais un mur : elle s'arrete devant
-        var hit = mc.level.clip(new ClipContext(target, pos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, camera));
-        if (hit.getType() != HitResult.Type.MISS) pos = hit.getLocation().subtract(pos.subtract(target).normalize().scale(0.4));
+        // (le trace part de 3,5 blocs du centre : l'autel lui-meme est plein, on ne veut pas coller la camera contre lui)
+        Vec3 dir = pos.subtract(target).normalize();
+        Vec3 from = target.add(dir.scale(3.5));
+        var hit = mc.level.clip(new ClipContext(from, pos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, camera));
+        if (hit.getType() != HitResult.Type.MISS) pos = hit.getLocation().subtract(dir.scale(0.4));
         // fin : on rejoint les yeux du joueur en douceur
         float o = t > duration - OUTRO ? Ease.IN_OUT_CUBIC.apply((t - (duration - OUTRO)) / OUTRO) : 0F;
         Vec3 eye = mc.player.getEyePosition();
