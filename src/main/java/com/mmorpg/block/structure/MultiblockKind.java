@@ -24,7 +24,8 @@ import java.util.function.Supplier;
 public enum MultiblockKind implements StringRepresentable {
     AUTEL("autel_invocation", () -> ModBlocks.AUTEL_INVOCATION.get()),
     TELEPORTEUR("teleporteur", () -> ModBlocks.TELEPORTEUR.get()),
-    FORGE("forge_arcanique", () -> ModBlocks.FORGE_ARCANIQUE.get());
+    FORGE("forge_arcanique", () -> ModBlocks.FORGE_ARCANIQUE.get()),
+    PRESSE("presse_compression", () -> ModBlocks.PRESSE_COMPRESSION.get());
 
     /** Decalage maximal des cellules par rapport au bloc fonctionnel (proprietes du bloc de structure). */
     public static final int RANGE_XZ = 3;

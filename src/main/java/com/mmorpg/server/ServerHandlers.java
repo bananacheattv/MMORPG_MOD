@@ -112,6 +112,8 @@ public final class ServerHandlers {
             ForgeManager.craft(sp, p.pos(), p.recipe(), p.value());
         } else if (p.action() == Payloads.ForgeAction.UPGRADE) {
             ForgeManager.upgrade(sp, p.pos(), p.value(), p.recipe());
+        } else if (p.action() == Payloads.ForgeAction.COMPRESS) {
+            com.mmorpg.mine.Compression.compress(sp, p.pos(), p.value(), p.recipe());
         }
     }
 }

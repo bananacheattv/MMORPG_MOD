@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public final class ForgeRecipes {
     public enum Category {
-        ARMES("Armes"), ARMURES("Armures"), MATERIAUX("Matériaux"), CONSOMMABLES("Consommables"),
+        ARMES("Armes"), ARMURES("Armures"), OUTILS("Outils"), MATERIAUX("Matériaux"), CONSOMMABLES("Consommables"),
         INVOCATIONS("Invocations"), FAMILIERS("Familiers");
 
         public final String label;
@@ -63,6 +63,47 @@ public final class ForgeRecipes {
         add(Category.ARMES, id, 1, gold, def.level(), def.cls(), ingredients);
     }
 
+    /** Minerais des mines par rang (voir MineBlocks) et niveau a partir duquel ils sont extraits. */
+    private static final String[] MINE_ORES = {"verdite", "argentite", "ambrasite", "glacium", "neantite"};
+    private static final int[] MINE_LEVEL = {1, 18, 38, 55, 75};
+    /** Quantite de minerai compresse (et de lingot rare) par piece : casque, plastron, jambieres, bottes. */
+    private static final int[] MINE_WEIGHT = {1, 2, 2, 1};
+
+    private static int oreTier(int level) {
+        int t = 0;
+        for (int i = 0; i < MINE_LEVEL.length; i++) if (level >= MINE_LEVEL[i]) t = i;
+        return t;
+    }
+
+    /** Outils des mines (pioche, hache, pelle, houe) : le palier t se fabrique avec le minerai compresse du rang t-1 et, au sommet, des lingots rares. */
+    private static void tools() {
+        PlayerClass none = PlayerClass.NONE;
+        String[] tier = {"debutant", "verdite", "argentite", "ambrasite", "glacium", "neantite"};
+        int[] gold = {0, 40, 120, 300, 700, 1600};
+        String[] rare = {null, null, null, "lingot_aelium", "lingot_orichalque", "lingot_astralium"};
+        for (int t = 1; t < tier.length; t++) {
+            String ore = MINE_ORES[t - 1];
+            int lvl = MINE_LEVEL[t - 1];
+            String[] kinds = {"pioche", "hache", "pelle", "houe"};
+            int[] compressed = {3, 3, 1, 2};
+            int[] ingots = {6, 6, 3, 4};
+            for (int k = 0; k < kinds.length; k++) {
+                List<Object> ing = new ArrayList<>();
+                ing.add("compresse_" + ore);
+                ing.add(compressed[k]);
+                ing.add("lingot_" + ore);
+                ing.add(ingots[k]);
+                ing.add("minecraft:stick");
+                ing.add(2);
+                if (rare[t] != null) {
+                    ing.add(rare[t]);
+                    ing.add(k == 0 ? 2 : 1);
+                }
+                add(Category.OUTILS, kinds[k] + "_" + tier[t], 1, gold[t] * (k == 0 ? 2 : 1) / 2, lvl, none, ing.toArray());
+            }
+        }
+    }
+
     /** Recettes d'un set complet : la quantite de materiaux depend de la piece (casque 5, plastron 8, jambieres 7, bottes 4). */
     private static void armorSet(String setId, int goldPerPiece, String matA, int baseA, String matB, int baseB, String special) {
         ItemDefs.ArmorSet set = ItemDefs.SETS.get(setId);
@@ -78,6 +119,14 @@ public final class ForgeRecipes {
             if (special != null && i == 1) {
                 ing.add(special);
                 ing.add(1);
+            }
+            // metallurgie des mines : minerai compresse du rang de la panoplie, et lingot rare des panoplies de niveau 25+
+            ing.add("compresse_" + MINE_ORES[oreTier(set.level())]);
+            ing.add(MINE_WEIGHT[i]);
+            String rare = set.level() >= 75 ? "lingot_astralium" : set.level() >= 50 ? "lingot_orichalque" : set.level() >= 25 ? "lingot_aelium" : null;
+            if (rare != null) {
+                ing.add(rare);
+                ing.add(MINE_WEIGHT[i] * (set.level() >= 90 ? 2 : 1));
             }
             add(Category.ARMURES, setId + "_" + ItemDefs.PIECES[i], 1, goldPerPiece * weight[i] / 5, set.level(), set.cls(), ing.toArray());
         }
@@ -217,6 +266,8 @@ public final class ForgeRecipes {
         armorSet("eternel_arcanes", 1000, "alliage_celeste", 3, "tissu_enchante", 5, "fragment_divin");
         armorSet("sentinelle_astrale", 1000, "alliage_celeste", 3, "cuir_renforce", 5, "fragment_divin");
         armorSet("egide_divine", 1000, "alliage_celeste", 3, "lingot_adamantite", 5, "fragment_divin");
+
+        tools();
 
         // ---------------------------------------------------------------- consommables
         add(Category.CONSOMMABLES, "potion_soin_mineure", 2, 2, 1, N, "minecraft:glass_bottle", 2, "minecraft:apple", 1, "oreille_gobelin", 1);

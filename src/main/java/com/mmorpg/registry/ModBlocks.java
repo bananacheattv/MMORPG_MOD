@@ -20,6 +20,8 @@ public final class ModBlocks {
 
     public static final DeferredBlock<ForgeBlock> FORGE_ARCANIQUE = BLOCKS.registerBlock("forge_arcanique", ForgeBlock::new,
             p -> p.mapColor(MapColor.METAL).strength(2.5f, 6f).sound(SoundType.ANVIL).lightLevel(s -> 6).noOcclusion().pushReaction(PushReaction.IMMOVEABLE));
+    public static final DeferredBlock<com.mmorpg.block.PresseBlock> PRESSE_COMPRESSION = BLOCKS.registerBlock("presse_compression", com.mmorpg.block.PresseBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(2.5f, 6f).sound(SoundType.ANVIL).lightLevel(s -> 5).noOcclusion().pushReaction(PushReaction.IMMOVEABLE));
     public static final DeferredBlock<TeleporterBlock> TELEPORTEUR = BLOCKS.registerBlock("teleporteur", TeleporterBlock::new,
             p -> p.mapColor(MapColor.QUARTZ).strength(3f, 1200f).sound(SoundType.AMETHYST).lightLevel(s -> 12).noOcclusion()
                     .pushReaction(PushReaction.IMMOVEABLE));
@@ -50,7 +52,7 @@ public final class ModBlocks {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, MMORPG.MODID);
     /** Entite des blocs fonctionnels de structure (rendu des modeles 3D). */
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<StructureBlockEntity>> STRUCTURE = BLOCK_ENTITIES.register("structure",
-            () -> new BlockEntityType<>(StructureBlockEntity::new, FORGE_ARCANIQUE.get(), TELEPORTEUR.get(), AUTEL_INVOCATION.get()));
+            () -> new BlockEntityType<>(StructureBlockEntity::new, FORGE_ARCANIQUE.get(), TELEPORTEUR.get(), AUTEL_INVOCATION.get(), PRESSE_COMPRESSION.get()));
 
     /** Caisses : roue d'ouverture animee (etat synchronise). */
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.mmorpg.block.crate.CrateBlockEntity>> CRATE = BLOCK_ENTITIES.register("caisse",

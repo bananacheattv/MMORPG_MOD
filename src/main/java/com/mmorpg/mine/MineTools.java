@@ -74,14 +74,19 @@ public final class MineTools {
         for (int t = 0; t < TIER_ID.length; t++) {
             final int tier = t;
             ToolMaterial mat = MATERIAL[t];
-            DeferredItem<Item> pick = ModItems.ITEMS.registerItem("pioche_" + TIER_ID[t], p -> new Pickaxe(p.pickaxe(mat, 1.0F, -2.8F), tier));
-            ITEMS.add(pick);
-            DeferredItem<Item> hoe = ModItems.ITEMS.registerItem("houe_" + TIER_ID[t], p -> new Item(p.hoe(mat, -2.0F, -1.0F + tier * 0.25F)));
-            ITEMS.add(hoe);
+            reg("pioche_" + TIER_ID[t], p -> new Pickaxe(p.pickaxe(mat, 1.0F, -2.8F), tier));
+            reg("houe_" + TIER_ID[t], p -> new Item(p.hoe(mat, -2.0F, -1.0F + tier * 0.25F)));
             if (t == 0) continue;
-            ITEMS.add(ModItems.ITEMS.registerItem("hache_" + TIER_ID[t], p -> new Item(p.axe(mat, 6.0F + tier * 0.5F, -3.1F + tier * 0.1F))));
-            ITEMS.add(ModItems.ITEMS.registerItem("pelle_" + TIER_ID[t], p -> new Item(p.shovel(mat, 1.5F, -3.0F))));
+            reg("hache_" + TIER_ID[t], p -> new Item(p.axe(mat, 6.0F + tier * 0.5F, -3.1F + tier * 0.1F)));
+            reg("pelle_" + TIER_ID[t], p -> new Item(p.shovel(mat, 1.5F, -3.0F)));
         }
+    }
+
+    /** Enregistre un outil et l'ajoute a l'index des objets (ModItems.get). */
+    private static void reg(String id, java.util.function.Function<Item.Properties, Item> factory) {
+        DeferredItem<Item> item = ModItems.ITEMS.registerItem(id, factory);
+        ITEMS.add(item);
+        ModItems.BY_ID.put(id, item);
     }
 
     private static ToolMaterial material(TagKey<net.minecraft.world.level.block.Block> incorrect, int tier) {

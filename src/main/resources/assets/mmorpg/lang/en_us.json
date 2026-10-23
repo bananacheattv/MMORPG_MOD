@@ -586,5 +586,6 @@
   "item.mmorpg.pioche_neantite": "Neantite Pickaxe",
   "item.mmorpg.hache_neantite": "Neantite Axe",
   "item.mmorpg.pelle_neantite": "Neantite Shovel",
-  "item.mmorpg.houe_neantite": "Neantite Hoe"
+  "item.mmorpg.houe_neantite": "Neantite Hoe",
+  "block.mmorpg.presse_compression": "Compression Press"
 }

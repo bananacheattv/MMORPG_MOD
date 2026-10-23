@@ -178,6 +178,10 @@ public final class DevShowcase {
             structuresPhase(mc, me);
             return;
         }
+        if (MODE.equals("metallurgie")) {      // presse de compression, outils des mines, lingots rares, recettes de la forge
+            metallurgiePhase(mc, me);
+            return;
+        }
         if (MODE.equals("reprise_montures")) {
             if (tick == 5) {
                 mc.getWindow().setWindowed(1280, 720); mc.gui.setScreen(null);
@@ -1160,6 +1164,122 @@ public final class DevShowcase {
     }
 
     private static net.minecraft.core.BlockPos structOrigin;
+
+    /** Presse de compression en action, ecran de compression, onglet Outils de la forge, pioche en main, tirages de lingots rares. */
+    private static void metallurgiePhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) mc.getWindow().setWindowed(1280, 720);
+        if (tick == 20) {
+            cmd(mc, "difficulty peaceful");
+            cmd(mc, "time set day");
+            cmd(mc, "weather clear");
+            cmd(mc, "gamemode creative " + me);
+            cmd(mc, "mmorpg niveau " + me + " 100");
+            cmd(mc, "clear " + me);
+            cmd(mc, "fill ~-30 180 ~-30 ~30 180 ~30 minecraft:smooth_stone");
+            cmd(mc, "fill ~-30 181 ~-30 ~30 195 ~30 minecraft:air");
+            cmd(mc, "tp " + me + " ~ 181 ~ 180 0");
+        }
+        if (tick == 28) cmd(mc, "kill @e[type=!minecraft:player,distance=..80]");
+        if (tick == 30) {
+            structOrigin = mc.player.blockPosition();
+            cmd(mc, "setblock ~ ~ ~-12 mmorpg:presse_compression[facing=south]");
+        }
+        if (structOrigin == null) return;
+        if (tick == 45) {
+            look(mc, me, 0, 8, 16, 0, -12, 18);
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+            if (!mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        }
+        if (tick == 75) shot(mc, "80_presse_arret");
+        if (tick == 90) look(mc, me, -7, 2.5, 0.5, 0, -12, 14);
+        if (tick == 130) shot(mc, "81_presse_active_3q");
+        if (tick == 140) look(mc, me, 0, 3, -4, 0, -12, 18);
+        if (tick == 170) shot(mc, "82_presse_active_face");
+        if (tick == 180) {
+            cmd(mc, "give " + me + " mmorpg:lingot_verdite 40");
+            cmd(mc, "give " + me + " mmorpg:piece_or 200");
+        }
+        net.minecraft.core.BlockPos press = structOrigin.offset(0, 0, -12);
+        if (tick == 195) look(mc, me, 0, 1, -5, 0, -12, 10);
+        if (tick == 200) {
+            if (mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+            mc.gui.setScreen(new com.mmorpg.client.screen.CompressorScreen(press));
+        }
+        if (tick == 215) shot(mc, "83_presse_ecran");
+        if (tick == 220) ClientNet.send(new Payloads.ForgeAction(Payloads.ForgeAction.COMPRESS, "verdite", 5, press));
+        if (tick == 235) {
+            int n = mc.player.getInventory().countItem(com.mmorpg.registry.ModItems.get("compresse_verdite"));
+            int left = mc.player.getInventory().countItem(com.mmorpg.registry.ModItems.get("lingot_verdite"));
+            MMORPG.LOGGER.info("[MMORPG] METALLURGIE compression : {} minerai(s) compresse(s) (attendu 2), {} lingot(s) restants (attendu 8)", n, left);
+            shot(mc, "84_presse_apres");
+        }
+        if (tick == 245) {
+            try {
+                var f = ForgeScreen.class.getDeclaredField("tab");
+                f.setAccessible(true);
+                f.setInt(null, com.mmorpg.crafting.ForgeRecipes.Category.OUTILS.ordinal());
+            } catch (ReflectiveOperationException e) {
+                MMORPG.LOGGER.warn("[MMORPG] vitrine : onglet outils introuvable", e);
+            }
+            mc.gui.setScreen(new ForgeScreen(press));
+        }
+        if (tick == 265) shot(mc, "85_forge_outils");
+        if (tick == 270) {
+            try {
+                var f = ForgeScreen.class.getDeclaredField("tab");
+                f.setAccessible(true);
+                f.setInt(null, com.mmorpg.crafting.ForgeRecipes.Category.ARMURES.ordinal());
+            } catch (ReflectiveOperationException e) {
+                MMORPG.LOGGER.warn("[MMORPG] vitrine : onglet armures introuvable", e);
+            }
+            mc.gui.setScreen(new ForgeScreen(press));
+        }
+        if (tick == 290) shot(mc, "86_forge_armures");
+        if (tick == 295) {
+            mc.gui.setScreen(null);
+            cmd(mc, "item replace entity " + me + " hotbar.0 with mmorpg:pioche_neantite");
+            cmd(mc, "item replace entity " + me + " hotbar.1 with mmorpg:hache_glacium");
+            cmd(mc, "item replace entity " + me + " hotbar.2 with mmorpg:pelle_ambrasite");
+            cmd(mc, "item replace entity " + me + " hotbar.3 with mmorpg:houe_argentite");
+            cmd(mc, "item replace entity " + me + " hotbar.4 with mmorpg:pioche_debutant");
+        }
+        if (tick == 310) shot(mc, "87_pioche_neantite_en_main");
+        if (tick == 315) {
+            // tirages : 1500 minerais de Neantite a la pioche de Neantite, puis a la pioche du debutant (refus attendu)
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                var lv = pl.level();
+                var pos = pl.blockPosition().above(3);
+                var ore = com.mmorpg.mine.MineBlocks.ORES.get(4);
+                int[] total = new int[3];
+                int ingots = 0, mined = 0;
+                for (int i = 0; i < 1500; i++) {
+                    if (i % 40 == 0) {
+                        for (String id : new String[]{"lingot_aelium", "lingot_orichalque", "lingot_astralium"}) total[java.util.Arrays.asList("lingot_aelium", "lingot_orichalque", "lingot_astralium").indexOf(id)] += pl.getInventory().countItem(com.mmorpg.registry.ModItems.get(id));
+                        ingots += pl.getInventory().countItem(com.mmorpg.registry.ModItems.get(ore.ingotId()));
+                        pl.getInventory().clearContent();
+                        pl.getInventory().setItem(0, new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("pioche_neantite")));
+                    }
+                    if (com.mmorpg.mine.MineManager.mine(lv, pl, pos, ore)) mined++;
+                }
+                for (String id : new String[]{"lingot_aelium", "lingot_orichalque", "lingot_astralium"}) total[java.util.Arrays.asList("lingot_aelium", "lingot_orichalque", "lingot_astralium").indexOf(id)] += pl.getInventory().countItem(com.mmorpg.registry.ModItems.get(id));
+                ingots += pl.getInventory().countItem(com.mmorpg.registry.ModItems.get(ore.ingotId()));
+                MMORPG.LOGGER.info("[MMORPG] METALLURGIE tirages (pioche de Neantite, minerai de Neantite) : {} extraits, {} lingots de base, aelium {}, orichalque {}, astralium {}", mined, ingots, total[0], total[1], total[2]);
+                pl.getInventory().clearContent();
+                pl.getInventory().setItem(0, new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("pioche_debutant")));
+                boolean refused = !com.mmorpg.mine.MineManager.mine(lv, pl, pos, ore);
+                MMORPG.LOGGER.info("[MMORPG] METALLURGIE pioche du debutant sur la Neantite : refus = {} (attendu true)", refused);
+                var ore0 = com.mmorpg.mine.MineBlocks.ORES.get(0);
+                boolean ok0 = com.mmorpg.mine.MineManager.mine(lv, pl, pos, ore0);
+                MMORPG.LOGGER.info("[MMORPG] METALLURGIE pioche du debutant sur la Verdite : extrait = {} (attendu true)", ok0);
+            });
+        }
+        if (tick == 340) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        }
+    }
 
     /**
      * Controle des structures multiblocs (autel, teleporteur, forge) : vue d'ensemble eteinte puis active, gros plans,

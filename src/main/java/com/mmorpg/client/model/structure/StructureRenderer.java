@@ -60,6 +60,8 @@ public class StructureRenderer implements BlockEntityRenderer<StructureBlockEnti
                 "plateforme", "arche", "cristal", "pupitre"));
         models.put(MultiblockKind.FORGE, models(c, ForgeArcaniqueModel.LAYER, ForgeArcaniqueModel.animations(),
                 new int[]{ForgeArcaniqueAnims.ETEINTE, ForgeArcaniqueAnims.ALLUMAGE, ForgeArcaniqueAnims.ACTIVE}, "forge_arcanique", null));
+        models.put(MultiblockKind.PRESSE, models(c, PresseCompressionModel.LAYER, PresseCompressionModel.animations(),
+                new int[]{PresseCompressionAnims.ARRET, PresseCompressionAnims.DEMARRAGE, PresseCompressionAnims.ACTIVE}, "presse_compression", null));
     }
 
     private static Models models(BlockEntityRendererProvider.Context c, ModelLayerLocation layer, AnimationDefinition[] defs, int[] anims,

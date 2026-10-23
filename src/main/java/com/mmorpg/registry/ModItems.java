@@ -254,6 +254,7 @@ public final class ModItems {
 
     // ------------------------------------------------------------------ blocs
     public static final DeferredItem<BlockItem> FORGE_ARCANIQUE = ITEMS.registerSimpleBlockItem("forge_arcanique", ModBlocks.FORGE_ARCANIQUE);
+    public static final DeferredItem<BlockItem> PRESSE_COMPRESSION = ITEMS.registerSimpleBlockItem("presse_compression", ModBlocks.PRESSE_COMPRESSION);
     public static final DeferredItem<com.mmorpg.item.AdminBlockItem> TELEPORTEUR = ITEMS.registerItem("teleporteur",
             p -> new com.mmorpg.item.AdminBlockItem(ModBlocks.TELEPORTEUR.get(), p), () -> new Item.Properties().useBlockDescriptionPrefix());
     public static final DeferredItem<BlockItem> AUTEL_INVOCATION = ITEMS.registerSimpleBlockItem("autel_invocation", ModBlocks.AUTEL_INVOCATION);
