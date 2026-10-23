@@ -94,6 +94,12 @@ public final class ModItems {
     public static final DeferredItem<RpgMaterialItem> ALLIAGE_CELESTE = material("alliage_celeste", Rarity.MYTHIQUE, "Alliage de fin de progression pour les panoplies mythiques de classe.");
     public static final DeferredItem<RpgMaterialItem> LINGOT_MITHRIL = material("lingot_mithril", Rarity.RARE, "Métal léger et résistant, façonné à la Forge Arcanique.");
     public static final DeferredItem<RpgMaterialItem> LINGOT_ADAMANTITE = material("lingot_adamantite", Rarity.EPIQUE, "Le métal le plus dur du monde connu.");
+    // lingots des Mines d'Aeloria (voir com.mmorpg.mine) : donnes directement par les minerais, utilises par les recettes de la Forge
+    public static final DeferredItem<RpgMaterialItem> LINGOT_VERDITE = material("lingot_verdite", Rarity.COMMUN, "Extrait des veines vertes des Mines d'Aeloria.");
+    public static final DeferredItem<RpgMaterialItem> LINGOT_ARGENTITE = material("lingot_argentite", Rarity.PEU_COMMUN, "Extrait des galeries d'argentite des Mines d'Aeloria.");
+    public static final DeferredItem<RpgMaterialItem> LINGOT_AMBRASITE = material("lingot_ambrasite", Rarity.RARE, "Un métal incandescent des profondeurs des Mines d'Aeloria.");
+    public static final DeferredItem<RpgMaterialItem> LINGOT_GLACIUM = material("lingot_glacium", Rarity.EPIQUE, "Un métal glacé qui ne fond jamais, extrait au cœur des Mines d'Aeloria.");
+    public static final DeferredItem<RpgMaterialItem> LINGOT_NEANTITE = material("lingot_neantite", Rarity.LEGENDAIRE, "Le métal du Néant, extrait dans l'abîme des Mines d'Aeloria.");
     public static final DeferredItem<RpgMaterialItem> TISSU_ENCHANTE = material("tissu_enchante", Rarity.RARE, "Étoffe tissée de poussière d'âme.");
     public static final DeferredItem<RpgMaterialItem> CUIR_RENFORCE = material("cuir_renforce", Rarity.PEU_COMMUN, "Cuir renforcé de fourrure sombre.");
     // ---- materiaux de butin supplementaires (monstres, zones des monstres importes) et intermediaires de la Forge

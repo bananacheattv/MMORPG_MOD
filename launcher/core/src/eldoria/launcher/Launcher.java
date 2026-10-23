@@ -163,6 +163,7 @@ public final class Launcher {
     private void buildUi() {
         frame = new JFrame("Aeloria MMORPG - Launcher");
         frame.setUndecorated(true);
+        if (Theme.EMBLEM_IMG != null) frame.setIconImage(Theme.scaled(Theme.EMBLEM_IMG, "icon", 64, 64));
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setMaximizedBounds(java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
         JPanel root = new JPanel(new BorderLayout());
@@ -186,8 +187,8 @@ public final class Launcher {
                 g.fillRect(0, 0, getWidth(), getHeight());
                 // filigrane : grand emblème tres pale
                 Graphics2D w = (Graphics2D) g.create();
-                w.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.05f));
-                Theme.emblem(w, getWidth() * 0.78, getHeight() * 1.0, getHeight() * 0.9);
+                w.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 0.07f));
+                Theme.emblem(w, getWidth() * 0.80, getHeight() * 0.98, getHeight() * 0.95);
                 w.dispose();
                 g.dispose();
             }
@@ -221,10 +222,11 @@ public final class Launcher {
                 g.fillRect(0, 0, getWidth(), getHeight());
                 g.setPaint(Theme.LINE);
                 g.fillRect(0, getHeight() - 1, getWidth(), 1);
-                Theme.wordmark(g, 14, 22, 15f);
+                Theme.emblem(g, 22, 16, 26);
+                Theme.wordmark(g, 40, 22, 15f);
                 g.setFont(Theme.font(Font.PLAIN, 11f));
                 g.setPaint(Theme.MUTED);
-                g.drawString("LAUNCHER", 14 + Theme.wordmarkWidth(g, 15f) + 10, 21);
+                g.drawString("LAUNCHER", 40 + Theme.wordmarkWidth(g, 15f) + 10, 21);
                 g.dispose();
             }
 
@@ -383,13 +385,11 @@ public final class Launcher {
             @Override
             protected void paintComponent(Graphics g0) {
                 Graphics2D g = Theme.smooth(g0);
-                Theme.emblem(g, getWidth() / 2.0, getHeight() / 2.0 - 6, 190);
-                int w = Theme.wordmarkWidth(g, 34f);
-                Theme.wordmark(g, (getWidth() - w) / 2, getHeight() - 14, 34f);
+                Theme.logo(g, getWidth() / 2.0, 20, 430);
                 g.dispose();
             }
         };
-        emblem.setPreferredSize(new Dimension(420, 290));
+        emblem.setPreferredSize(new Dimension(450, 250));
         p.add(emblem, c);
 
         c.gridy++;

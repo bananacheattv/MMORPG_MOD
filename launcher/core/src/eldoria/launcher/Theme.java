@@ -67,8 +67,71 @@ final class Theme {
 
     // ------------------------------------------------------------------------------------------------ emblème
 
-    /** Emblème d'Aeloria : anneau d'or ouvert, cristal facetté violet et rune en « A ». */
+    /** Images du logo (embarquees dans le jar du launcher, voir tools/build_logo.py) ; null si elles manquent : le dessin par code prend le relais. */
+    static final BufferedImage EMBLEM_IMG = load("/eldoria/launcher/emblem.png");
+    static final BufferedImage LOGO_IMG = load("/eldoria/launcher/logo.png");
+    private static final java.util.Map<String, BufferedImage> SCALED = new java.util.HashMap<>();
+
+    private static BufferedImage load(String name) {
+        try (java.io.InputStream in = Theme.class.getResourceAsStream(name)) {
+            return in == null ? null : javax.imageio.ImageIO.read(in);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /** Version reduite de bonne qualite (reduction par moities successives), mise en cache. */
+    static BufferedImage scaled(BufferedImage src, String key, int w, int h) {
+        String k = key + w + "x" + h;
+        BufferedImage hit = SCALED.get(k);
+        if (hit != null) return hit;
+        BufferedImage cur = src;
+        int cw = src.getWidth(), ch = src.getHeight();
+        while (cw / 2 >= w && ch / 2 >= h) {
+            cw /= 2;
+            ch /= 2;
+            cur = step(cur, cw, ch);
+        }
+        cur = step(cur, w, h);
+        SCALED.put(k, cur);
+        return cur;
+    }
+
+    private static BufferedImage step(BufferedImage src, int w, int h) {
+        BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = out.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.drawImage(src, 0, 0, w, h, null);
+        g.dispose();
+        return out;
+    }
+
+    /** Embleme d'Aeloria centre en (cx, cy), {@code size} de haut. */
     static void emblem(Graphics2D g, double cx, double cy, double size) {
+        if (EMBLEM_IMG == null) {
+            emblemVector(g, cx, cy, size);
+            return;
+        }
+        int s = Math.max(8, (int) Math.round(size));
+        g.drawImage(scaled(EMBLEM_IMG, "e", s, s), (int) Math.round(cx - s / 2.0), (int) Math.round(cy - s / 2.0), null);
+    }
+
+    /** Logo complet (embleme et nom) centre horizontalement en cx, haut en y, {@code width} de large ; renvoie sa hauteur. */
+    static int logo(Graphics2D g, double cx, double y, int width) {
+        if (LOGO_IMG == null) {
+            emblemVector(g, cx, y + 100, 190);
+            int w = wordmarkWidth(g, 34f);
+            wordmark(g, (int) (cx - w / 2.0), (int) (y + 250), 34f);
+            return 280;
+        }
+        int h = (int) Math.round(LOGO_IMG.getHeight() * width / (double) LOGO_IMG.getWidth());
+        g.drawImage(scaled(LOGO_IMG, "l", width, h), (int) Math.round(cx - width / 2.0), (int) Math.round(y), null);
+        return h;
+    }
+
+    /** Emblème d'Aeloria dessiné par code (secours) : anneau d'or ouvert, cristal facetté violet et rune en « A ». */
+    static void emblemVector(Graphics2D g, double cx, double cy, double size) {
         double r = size / 2;
         // halo
         g.setPaint(new RadialGradientPaint((float) cx, (float) cy, (float) (r * 1.25), new float[]{0f, 0.55f, 1f},

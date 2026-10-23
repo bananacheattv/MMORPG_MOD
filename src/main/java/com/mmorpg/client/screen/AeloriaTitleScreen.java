@@ -6,7 +6,6 @@ import com.mmorpg.client.cinematic.Ease;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CommonButtons;
-import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.components.PlainTextButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.CreditsAndAttributionScreen;
@@ -35,7 +34,6 @@ public class AeloriaTitleScreen extends Screen {
             "Cinq boss vous attendent, du Roi Gobelin à l'Avatar du Néant.",
             "On ne perd jamais son équipement en mourant, seulement un peu d'expérience.",
     };
-    private final LogoRenderer logo = new LogoRenderer(false);
     private long openedAt;
 
     public AeloriaTitleScreen() {
@@ -113,12 +111,7 @@ public class AeloriaTitleScreen extends Screen {
         g.fillGradient(0, 0, width, height / 4, argb(0.55F * fade, 0x000000), argb(0F, 0x000000));
         embers(g, t, fade);
         super.extractRenderState(g, mx, my, a);
-        g.pose().pushMatrix();
-        g.pose().translate(this.width / 2F, 0F);
-        g.pose().scale(1.45F, 1.45F);
-        g.pose().translate(-this.width / 2F, 0F);
-        this.logo.extractRenderState(g, this.width, fade);
-        g.pose().popMatrix();
+        com.mmorpg.client.ui.Logo.full(g, this.width / 2, 8, 256);
         int cx = width / 2;
         // accroche sous le logo et filet d'or
         String tagline = "CITADELLE DES HÉROS";

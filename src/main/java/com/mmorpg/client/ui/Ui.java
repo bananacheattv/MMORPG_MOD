@@ -181,9 +181,10 @@ public final class Ui {
         Font f = font();
         g.fill(0, 0, width, 27, BAR);
         g.fill(0, 27, width, 28, LINE);
+        Logo.emblem(g, 8, 2, 24);
         var logo = com.mmorpg.client.AeloriaFont.of("AELORIA");
         g.pose().pushMatrix();
-        g.pose().translate(12, 9);
+        g.pose().translate(36, 9);
         g.pose().scale(1.2F, 1.2F);
         g.text(f, logo, 0, 0, GOLD, true);
         g.pose().popMatrix();

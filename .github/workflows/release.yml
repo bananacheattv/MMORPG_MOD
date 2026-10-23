@@ -58,6 +58,9 @@ jobs:
     needs: build
     runs-on: windows-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: launcher/assets
       - uses: actions/download-artifact@v4
         with:
           name: dist
@@ -74,7 +77,7 @@ jobs:
           New-Item -ItemType Directory in | Out-Null
           Copy-Item dist/AeloriaLauncher.jar in/
           jpackage --type app-image --name AeloriaLauncher --input in --main-jar AeloriaLauncher.jar `
-            --main-class eldoria.boot.Bootstrap --app-version 1.0.0 --vendor Aeloria `
+            --main-class eldoria.boot.Bootstrap --app-version 1.0.0 --vendor Aeloria --icon launcher/assets/aeloria.ico `
             --add-modules java.se,jdk.zipfs,jdk.charsets,jdk.unsupported,jdk.localedata --dest out
           Compress-Archive -Path out/AeloriaLauncher -DestinationPath AeloriaLauncher-Windows.zip
 

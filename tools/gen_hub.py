@@ -62,6 +62,8 @@ def generate(ga):
     gen_font.generate(ga.ASSETS)
     import gen_decor
     gen_decor.generate(ga)
+    import gen_mine
+    gen_mine.generate(ga)
     import gen_music
     gen_music.generate(ga.ASSETS)
     import gen_hub_music

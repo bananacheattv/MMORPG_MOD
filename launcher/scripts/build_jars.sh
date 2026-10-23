@@ -7,5 +7,6 @@ rm -rf "$OUT/classes" && mkdir -p "$OUT/classes/boot" "$OUT/classes/core"
 javac --release 21 -encoding UTF-8 -d "$OUT/classes/boot" $(find bootstrap/src -name '*.java')
 javac --release 21 -encoding UTF-8 -d "$OUT/classes/core" $(find core/src -name '*.java')
 jar --create --file "$OUT/AeloriaLauncher.jar" --main-class eldoria.boot.Bootstrap -C "$OUT/classes/boot" .
+[ -d core/resources ] && cp -r core/resources/. "$OUT/classes/core/"
 jar --create --file "$OUT/launcher-core.jar" -C "$OUT/classes/core" .
 echo "Jars : $OUT/AeloriaLauncher.jar $OUT/launcher-core.jar"

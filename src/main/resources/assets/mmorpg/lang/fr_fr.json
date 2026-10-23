@@ -545,5 +545,17 @@
   "entity.mmorpg.chevalier_fracture": "Chevalier fracturé",
   "item.mmorpg.chevalier_fracture_spawn_egg": "Œuf d’apparition : Chevalier fracturé",
   "entity.mmorpg.devoreur_etoiles": "Dévoreur d’étoiles",
-  "item.mmorpg.devoreur_etoiles_spawn_egg": "Œuf d’apparition : Dévoreur d’étoiles"
+  "item.mmorpg.devoreur_etoiles_spawn_egg": "Œuf d’apparition : Dévoreur d’étoiles",
+  "block.mmorpg.minerai_verdite": "Minerai de Verdite",
+  "item.mmorpg.lingot_verdite": "Lingot de Verdite",
+  "block.mmorpg.minerai_argentite": "Minerai de Argentite",
+  "item.mmorpg.lingot_argentite": "Lingot de Argentite",
+  "block.mmorpg.minerai_ambrasite": "Minerai de Ambrasite",
+  "item.mmorpg.lingot_ambrasite": "Lingot de Ambrasite",
+  "block.mmorpg.minerai_glacium": "Minerai de Glacium",
+  "item.mmorpg.lingot_glacium": "Lingot de Glacium",
+  "block.mmorpg.minerai_neantite": "Minerai de Néantite",
+  "item.mmorpg.lingot_neantite": "Lingot de Néantite",
+  "block.mmorpg.veine_epuisee": "Veine épuisée",
+  "item.mmorpg.pioche_mineur_info": "Il faut une pioche pour extraire ce minerai."
 }

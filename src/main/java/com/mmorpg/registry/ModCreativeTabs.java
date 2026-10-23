@@ -51,7 +51,10 @@ public final class ModCreativeTabs {
             .title(Component.translatable("itemGroup.mmorpg.batisseur"))
             .withTabsBefore(OBJECTS.getKey())
             .icon(() -> new ItemStack(DecorBlocks.get("marbre_dore")))
-            .displayItems((params, out) -> DecorBlocks.ITEMS.forEach(i -> out.accept(i.get())))
+            .displayItems((params, out) -> {
+                DecorBlocks.ITEMS.forEach(i -> out.accept(i.get()));
+                com.mmorpg.mine.MineBlocks.ITEMS.forEach(i -> out.accept(i.get()));
+            })
             .build());
 
     private ModCreativeTabs() {

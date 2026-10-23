@@ -228,15 +228,16 @@ public class AeloriaPauseScreen extends PauseScreen {
         int w = this.width;
         g.fill(0, 0, w, 27, BAR);
         g.fill(0, 27, w, 28, LINE);
+        com.mmorpg.client.ui.Logo.emblem(g, 8, 2, 24);
         var logo = AeloriaFont.of("AELORIA");
         int lw = font.width(logo);
         float sc = 1.2F;
         g.pose().pushMatrix();
-        g.pose().translate(12, 9);
+        g.pose().translate(36, 9);
         g.pose().scale(sc, sc);
         g.text(font, logo, 0, 0, GOLD, true);
         g.pose().popMatrix();
-        int x = 12 + Math.round(lw * sc) + 18;
+        int x = 36 + Math.round(lw * sc) + 18;
         String[] tabs = {"Menu", "Personnage", "Quêtes", "Groupe", "Options"};
         for (String t : tabs) {
             int tw = font.width(t);
