@@ -1355,11 +1355,10 @@ public final class DevShowcase {
         int cx = com.mmorpg.hub.HubMarket.CX;
         // {x, y, z, yaw, pitch, nom}
         double[][] views = {
-                {0, 6, 42, 180, 8}, {0, 38, 0, 0, 90}, {0, 9, -27, 0, 6}, {-24, 4, -6, 270, 8}, {6, 3, 17, 180, 12}, {18, 12, 18, 225, 20},
-                {cx + 40, 8, 0, 90, 12}, {cx + 20, 7, 0, 90, 20}, {cx + 4, 4, -9, 180, 8}, {cx - 4, 4, 3, 90, 8}, {cx + 4, 5, 8, 0, 8},
-                {cx + 8, 3, -6, 180, 10}, {cx + 20, 4, -9, 270, 8}, {cx - 22, 4, 12, 180, 12}, {cx - 16, 5, 14, 90, 14}, {cx, 50, 0, 90, 80},
-                {cx, 32, -46, 0, 36}, {-20, 10, 0, 90, 8}};
-        String[] names = {"hall_entree", "hall_dessus", "hall_nord", "hall_colonnade", "hall_centre", "hall_pavillon", "entree", "teleporteur_fontaine", "banque", "hdv", "forges", "etal_alchimie", "portail_mines", "ferme", "hdv_ferme", "vue_du_ciel", "vue_nord", "avenue"};
+                {0, 6, 42, 180, 8}, {0, 38, 0, 0, 90}, {-24, 4, -6, 270, 8}, {6, 3, 17, 180, 12},
+                {cx + 46, 7, 0, 90, 8}, {cx + 14, 64, 0, 90, 58}, {cx, 5, 8, 180, 8}, {cx - 6, 5, 0, 90, 8}, {cx, 5, -8, 0, 8}, {cx + 20, 6, -12, 215, 10}, {-40, 8, 0, 90, 8}};
+        String[] names = {"hall_entree", "hall_dessus", "hall_colonnade", "hall_centre", "marche_arche", "marche_vue_haute", "marche_banque", "marche_hdv",
+                "marche_forges", "marche_tour", "avenue"};
         int idx = t / 60;
         if (idx < views.length && t % 60 == 5) {
             double[] v = views[idx];

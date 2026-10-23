@@ -73,6 +73,6 @@ public final class HubLayout {
 
     /** Volume englobant tout le hub (cinematique, protection). */
     public static AABB hubBounds(BlockPos origin) {
-        return new AABB(origin.getX() - 132, origin.getY() - 36, origin.getZ() + ROOM_Z0 - 10, origin.getX() + YARD_X1 + 12, origin.getY() + 48, origin.getZ() + 66);
+        return new AABB(origin.getX() - 146, origin.getY() - 36, origin.getZ() + ROOM_Z0 - 10, origin.getX() + YARD_X1 + 12, origin.getY() + 48, origin.getZ() + 66);
     }
 }

@@ -27,9 +27,11 @@ public final class HubMarket {
     /** Centre du marche : une allee de 15 blocs de large le relie a la place des heros. */
     public static final int CX = -92;
     static final int RADIUS = 32;
+    /** Rayon de l'ile du marche : la place (RADIUS) et, tout autour, la couronne des maisons, halles et tours. */
+    static final int OUTER = 50;
 
     static boolean footprint(int x, int z) {
-        return Math.hypot(x - CX, z) <= RADIUS + 1.4 || (x <= -28 && x >= CX + 20 && Math.abs(z) <= 7);
+        return Math.hypot(x - CX, z) <= OUTER + 1.4 || (x <= -26 && x >= CX + OUTER - 8 && Math.abs(z) <= 7);
     }
 
     // ------------------------------------------------------------------ geometrie locale d'un batiment oriente vers le centre
@@ -62,6 +64,7 @@ public final class HubMarket {
     static void build(HubCtx c) {
         floor(c);
         fountain(c);
+        town(c);
         BlockPos o = c.O;
         // structures 3D : la Banque au nord (face au sud), l'Hotel des ventes a l'ouest (face a l'est), forges et presse au sud (face au nord)
         structure(c, ModBlocks.BANQUE.get(), CX, -25, Direction.SOUTH);
@@ -93,42 +96,69 @@ public final class HubMarket {
     // ------------------------------------------------------------------ sol, bordure et allee
 
     private static void floor(HubCtx c) {
-        for (int x = CX - RADIUS - 2; x <= CX + RADIUS + 2; x++) {
-            for (int z = -RADIUS - 2; z <= RADIUS + 2; z++) {
+        for (int x = CX - OUTER - 2; x <= CX + OUTER + 2; x++) {
+            for (int z = -OUTER - 2; z <= OUTER + 2; z++) {
                 double r = Math.hypot(x - CX, z);
-                if (r > RADIUS + 0.6) continue;
+                if (r > OUTER + 0.6) continue;
+                if (r > RADIUS + 0.6) {                                                  // couronne des batiments : pave, terre et pelouse
+                    c.set(x, -2, z, Blocks.DIRT);
+                    c.set(x, -1, z, c.mix(x, 0, z, 43, Blocks.STONE_BRICKS, 26, Blocks.COBBLESTONE, 26, Blocks.GRASS_BLOCK, 24, Blocks.COARSE_DIRT, 10, Blocks.MOSSY_COBBLESTONE, 14));
+                    for (int y = 0; y <= 6; y++) c.set(x, y, z, Blocks.AIR);
+                    continue;
+                }
                 BlockState top;
                 int dx = x - CX;
                 boolean spoke = Math.abs(dx) <= 1 || Math.abs(z) <= 1 || Math.abs(Math.abs(dx) - Math.abs(z)) <= 1;
                 if (r <= 8.4) top = c.state("pierre_azur");
                 else if (r <= 10.6) top = (r > 9.2 && r <= 10.0) ? c.state("marbre_dore") : c.state("marbre_poli");
-                else if (r > RADIUS - 1.4) top = c.state("pierre_solaire");
-                else if (r > RADIUS - 3.4 && r <= RADIUS - 2.2) top = c.state("marbre_dore");
-                else if (spoke) top = c.mix(x, 0, z, 41, "marbre_poli", 70, "marbre", 30);
-                else top = c.mix(x, 0, z, 42, "marbre", 80, "marbre_poli", 18, "pierre_azur", 2);
+                else if (r > RADIUS - 1.4) top = c.state(Blocks.POLISHED_ANDESITE);
+                else if (spoke) top = c.mix(x, 0, z, 41, Blocks.STONE_BRICKS, 40, Blocks.POLISHED_ANDESITE, 24, Blocks.ANDESITE, 14, Blocks.COBBLESTONE, 10, Blocks.TUFF_BRICKS, 12);
+                else top = c.mix(x, 0, z, 42, Blocks.STONE_BRICKS, 30, Blocks.COBBLESTONE, 18, Blocks.ANDESITE, 14, Blocks.POLISHED_ANDESITE, 14, Blocks.GRAVEL, 6, Blocks.MOSSY_COBBLESTONE, 8, "marbre_poli", 10);
                 c.set(x, -2, z, Blocks.STONE_BRICKS);
                 c.set(x, -1, z, top);
                 for (int y = 0; y <= 6; y++) c.set(x, y, z, Blocks.AIR);
             }
         }
-        for (int a = 0; a < 360; a++) {                              // balustrade et lanternes sur le pourtour (sauf l'allee et le parvis du teleporteur)
+        for (int a = 0; a < 360; a += 15) {                          // lampadaires de bois sur le pourtour de la place
             double rad = Math.toRadians(a);
-            int x = CX + (int) Math.round(Math.cos(rad) * (RADIUS - 0.4));
-            int z = (int) Math.round(Math.sin(rad) * (RADIUS - 0.4));
-            if (x > CX + 22 && Math.abs(z) <= 8) continue;
-            c.set(x, 0, z, Blocks.SANDSTONE_WALL);
-            if (a % 12 == 0) {
-                for (int y = 0; y <= 2; y++) c.set(x, y, z, Blocks.SANDSTONE_WALL);
-                c.set(x, 3, z, Blocks.LANTERN);
-            }
+            int x = CX + (int) Math.round(Math.cos(rad) * (RADIUS - 2.2));
+            int z = (int) Math.round(Math.sin(rad) * (RADIUS - 2.2));
+            if (x > CX + 20 && Math.abs(z) <= 9) continue;
+            for (int y = 0; y <= 3; y++) c.set(x, y, z, Blocks.DARK_OAK_FENCE);
+            c.set(x, 4, z, Blocks.LANTERN);
+        }
+    }
+
+    // ------------------------------------------------------------------ couronne de maisons, halles et tours
+
+    private static void town(HubCtx c) {
+        // grandes halles derriere la banque (nord), l'hotel des ventes (ouest) et les forges (sud)
+        HubTown.house(c, CX, -41, 0, 1, 25, 13, 4, "tuile_pourpre");
+        HubTown.house(c, CX, 41, 0, -1, 25, 13, 3, "tuile_azur");
+        HubTown.house(c, CX - 41, 0, 1, 0, 25, 13, 4, "tuile_pourpre");
+        // maisons de part et d'autre
+        for (int s : new int[]{-1, 1}) {
+            HubTown.house(c, CX + 21 * s, -41, 0, 1, 9, 9, 3, s > 0 ? "tuile_azur" : "tuile_pourpre");
+            HubTown.house(c, CX + 21 * s, 41, 0, -1, 9, 9, 3, s > 0 ? "tuile_pourpre" : "tuile_azur");
+            HubTown.house(c, CX - 41, 21 * s, 1, 0, 9, 9, 3, s > 0 ? "tuile_azur" : "tuile_pourpre");
+            HubTown.house(c, CX + 41, 21 * s, -1, 0, 9, 9, 3, s > 0 ? "tuile_pourpre" : "tuile_azur");
+        }
+        // tours des angles et tours de l'entree
+        for (int sx : new int[]{-1, 1}) {
+            for (int sz : new int[]{-1, 1}) HubTown.tower(c, CX + 30 * sx, 30 * sz, 5, 28, (sx * sz > 0) ? "tuile_azur" : "tuile_pourpre", true);
+            HubTown.tower(c, CX + 37, 11 * sx, 4, 20, "tuile_pourpre", true);
+        }
+        for (int z = -7; z <= 7; z++) {                                                  // arche de l'entree entre les deux tours
+            for (int y = 12; y <= 14; y++) c.set(CX + 37, y, z, y == 12 ? c.state("or_ouvrage") : c.state(Blocks.STONE_BRICKS));
+            if (Math.abs(z) <= 2) for (int y = 8; y <= 11; y++) c.set(CX + 37, y, z, y == 8 ? c.state("or_ouvrage") : c.state("tuile_pourpre"));
         }
     }
 
     private static void avenue(HubCtx c) {
-        for (int x = -62; x <= CX + 24; x++) {                       // allee d'entree : de la place des heros au marche
+        for (int x = CX + OUTER - 8; x <= -26; x++) {                // allee d'entree : de la place des heros au marche
             for (int z = -7; z <= 7; z++) {
                 if (x >= -31 && Math.hypot(x, z) <= 31.6) continue;
-                if (x < CX + 24 && Math.hypot(x - CX, z) <= RADIUS) continue;
+                if (Math.hypot(x - CX, z) <= OUTER) continue;
                 int az = Math.abs(z);
                 c.set(x, -2, z, az <= 3 ? c.state(Blocks.STONE_BRICKS) : c.state(Blocks.DIRT));
                 c.set(x, -1, z, az <= 1 ? c.state("marbre_dore") : az <= 3 ? c.mix(x, 0, z, 91, "marbre_poli", 60, "pierre_solaire", 40) : Blocks.GRASS_BLOCK.defaultBlockState());
@@ -136,7 +166,7 @@ public final class HubMarket {
                 if (az >= 4 && c.rnd(x, 0, z, 92) < 0.25F) c.set(x, 0, z, Blocks.SHORT_GRASS);
             }
         }
-        for (int x = -56; x <= -36; x += 5) for (int s : new int[]{-4, 4}) HubBuilder.lamp(c, x, s);
+        for (int x = CX + OUTER - 4; x <= -32; x += 6) for (int s : new int[]{-4, 4}) HubBuilder.lamp(c, x, s);
     }
 
     // ------------------------------------------------------------------ fontaine centrale

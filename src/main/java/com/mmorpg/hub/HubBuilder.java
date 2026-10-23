@@ -42,7 +42,7 @@ public final class HubBuilder {
     /** Etiquette des entites decoratives du hub (textes), retirees a chaque reconstruction. */
     public static final String TAG = "mmorpg_hub";
     /** Version du plan du hub : 2 = Marche d'Aeloria (banque, hotel des ventes, forges, marchands). Un hub plus ancien est reconstruit au demarrage. */
-    public static final int LAYOUT_VERSION = 3;
+    public static final int LAYOUT_VERSION = 4;
     static final PlayerClass[] CLASSES = {PlayerClass.GUERRIER, PlayerClass.MAGE, PlayerClass.ARCHER, PlayerClass.TANK};
     static final Block[] FLOWERS = {Blocks.DANDELION, Blocks.POPPY, Blocks.CORNFLOWER, Blocks.AZURE_BLUET, Blocks.ALLIUM,
             Blocks.OXEYE_DAISY, Blocks.PINK_TULIP, Blocks.LILY_OF_THE_VALLEY};
@@ -120,7 +120,7 @@ public final class HubBuilder {
                 new int[]{HubLayout.YARD_X0, -HubLayout.YARD_HALF, HubLayout.YARD_X1, HubLayout.YARD_HALF});
         add.accept(new String[]{"portail", "Portail d'Aeloria", "Le monde vous attend"}, new int[]{-12, 26, 12, 60});
         add.accept(new String[]{"marche", "Marché d'Aeloria", "Banque, hôtel des ventes, forges et marchands"},
-                new int[]{HubMarket.CX - HubMarket.RADIUS - 2, -HubMarket.RADIUS - 2, HubMarket.CX + HubMarket.RADIUS + 2, HubMarket.RADIUS + 2});
+                new int[]{HubMarket.CX - HubMarket.OUTER - 2, -HubMarket.OUTER - 2, HubMarket.CX + HubMarket.OUTER + 2, HubMarket.OUTER + 2});
         String[][] mottos = {{"Guerrier", "Force et férocité"}, {"Mage", "Intelligence et esprit"}, {"Archer", "Agilité et dextérité"}, {"Paladin", "Vitalité et endurance"}};
         for (int i = 0; i < 4; i++) {
             int[] sp = HubLayout.classSpot(CLASSES[i]);
