@@ -24,6 +24,7 @@ public final class ClientPayloadHandlers {
     @SubscribeEvent
     public static void register(RegisterClientPayloadHandlersEvent event) {
         event.register(S2COpenScreen.TYPE, (payload, context) -> openScreen(payload));
+        event.register(Payloads.AdminReply.TYPE, (payload, context) -> com.mmorpg.client.screen.AdminScreen.handle(payload));
         event.register(Payloads.SyncPlayer.TYPE, (payload, context) -> ClientData.load(payload.data()));
         event.register(Payloads.Vitals.TYPE, (payload, context) -> {
             ClientData.hp = payload.hp();

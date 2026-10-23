@@ -59,6 +59,10 @@ public final class Net {
         r.playToServer(Payloads.Teleport.TYPE, Payloads.Teleport.CODEC, ServerHandlers::teleport);
         r.playToServer(Payloads.TeleporterSetup.TYPE, Payloads.TeleporterSetup.CODEC, ServerHandlers::teleporterSetup);
         r.playToServer(Payloads.ForgeAction.TYPE, Payloads.ForgeAction.CODEC, ServerHandlers::forgeAction);
+        r.playToServer(Payloads.AdminRequest.TYPE, Payloads.AdminRequest.CODEC, (packet, ctx) -> {
+            if (ctx.player() instanceof ServerPlayer p) com.mmorpg.admin.Admin.handle(p, packet);
+        });
+        r.playToClient(Payloads.AdminReply.TYPE, Payloads.AdminReply.CODEC);
         r.playToServer(Payloads.ServiceAction.TYPE, Payloads.ServiceAction.CODEC, ServerHandlers::serviceAction);
         r.playToServer(Payloads.QuestAction.TYPE, Payloads.QuestAction.CODEC, ServerHandlers::questAction);
         r.playToServer(Payloads.ShopAction.TYPE, Payloads.ShopAction.CODEC, ServerHandlers::shopAction);

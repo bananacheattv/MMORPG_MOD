@@ -178,6 +178,10 @@ public final class DevShowcase {
             structuresPhase(mc, me);
             return;
         }
+        if (MODE.equals("admin")) {          // menu d'administration : mot de passe, edition d'un fichier, refus d'une structure invalide
+            adminPhase(mc, me);
+            return;
+        }
         if (MODE.equals("marche")) {          // Marche d'Aeloria : reconstruction du hub puis visite du quartier
             marchePhase(mc, me);
             return;
@@ -1176,6 +1180,130 @@ public final class DevShowcase {
     }
 
     private static net.minecraft.core.BlockPos structOrigin;
+
+    private static Object adminField(Object target, String name) {
+        try {
+            var f = target.getClass().getDeclaredField(name);
+            f.setAccessible(true);
+            return f.get(target);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static void adminCall(Object target, String method, Class<?>[] types, Object... args) {
+        try {
+            var m = target.getClass().getDeclaredMethod(method, types);
+            m.setAccessible(true);
+            m.invoke(target, args);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /** Menu d'administration : essai avec un mauvais mot de passe, bon mot de passe, ouverture, edition et enregistrement reels. */
+    private static void adminPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) mc.getWindow().setWindowed(1280, 720);
+        if (tick == 10 && !mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        if (tick == 20) srv.execute(() -> {
+            try {
+                com.mmorpg.admin.AdminAuth.setPassword("MotDePasse-Test-42");
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        });
+        if (tick == 40) cmd(mc, "adminmenu \"mauvais\"");
+        if (tick == 60) MMORPG.LOGGER.info("[MMORPG] ADMIN apres mauvais mot de passe : ecran admin ouvert = {} (attendu false)", mc.gui.screen() instanceof com.mmorpg.client.screen.AdminScreen);
+        if (tick == 70) {
+            // un joueur non authentifie ne recoit rien : on demande un fichier sans etre connecte
+            ClientNet.send(new Payloads.AdminRequest(Payloads.AdminRequest.GET, "shop", 0, 1, ""));
+        }
+        if (tick == 90) cmd(mc, "adminmenu \"MotDePasse-Test-42\"");
+        if (tick == 110) {
+            var sc = mc.gui.screen();
+            MMORPG.LOGGER.info("[MMORPG] ADMIN apres bon mot de passe : ecran admin ouvert = {} (attendu true)", sc instanceof com.mmorpg.client.screen.AdminScreen);
+            if (sc != null) adminCall(sc, "select", new Class<?>[]{String.class}, "shop");
+        }
+        if (tick == 135) shot(mc, "120_admin_boutique");
+        if (tick == 140) {
+            var sc = mc.gui.screen();
+            @SuppressWarnings("unchecked") var path = (java.util.List<Object>) adminField(sc, "path");
+            path.add("buy");
+            path.add(0);
+        }
+        if (tick == 160) shot(mc, "121_admin_article");
+        if (tick == 165) {
+            var sc = mc.gui.screen();
+            @SuppressWarnings("unchecked") var path = (java.util.List<Object>) adminField(sc, "path");
+            path.clear();
+            var root = (com.google.gson.JsonObject) adminField(sc, "root");
+            // edition reelle d'une valeur numerique : ouverture du champ, saisie, validation (comme un clic puis Entree)
+            adminCall(sc, "startEdit", new Class<?>[]{Object.class, com.google.gson.JsonElement.class, int.class, int.class, int.class},
+                    "equipmentMultiplier", root.get("equipmentMultiplier"), 400, 300, 120);
+            ((net.minecraft.client.gui.components.EditBox) adminField(sc, "edit")).setValue("7.5");
+            adminCall(sc, "commitEdit", new Class<?>[]{});
+            MMORPG.LOGGER.info("[MMORPG] ADMIN edition : valeur dans l'arbre = {} (attendu 7.5), modifie = {}", root.get("equipmentMultiplier"), adminField(sc, "dirty"));
+            // entree ajoutee puis supprimee dans une liste (copie de la derniere)
+            var buy = root.getAsJsonArray("buy");
+            int n0 = buy.size();
+            path.add("buy");
+            adminCall(sc, "addEntry", new Class<?>[]{});
+            MMORPG.LOGGER.info("[MMORPG] ADMIN ajout dans une liste : {} -> {} entrees (attendu +1)", n0, buy.size());
+            buy.remove(buy.size() - 1);
+            path.clear();
+        }
+        if (tick == 180) shot(mc, "122_admin_modifie");
+        if (tick == 185) adminCall(mc.gui.screen(), "save", new Class<?>[]{});
+        if (tick == 215) {
+            srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] ADMIN enregistrement : equipmentMultiplier en memoire = {} (attendu 7.5), sauvegardes = {}",
+                    com.mmorpg.config.ConfigManager.shop().equipmentMultiplier, countBackups("shop")));
+            shot(mc, "123_admin_enregistre");
+        }
+        if (tick == 225) {
+            // structure invalide : refusee, fichier inchange
+            ClientNet.send(new Payloads.AdminRequest(Payloads.AdminRequest.SAVE, "shop", 0, 1, "{\"buy\": \"pas une liste\"}"));
+        }
+        if (tick == 250) {
+            srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] ADMIN structure invalide : boutique intacte = {} articles (attendu > 10)", com.mmorpg.config.ConfigManager.shop().buy.size()));
+            shot(mc, "124_admin_refus");
+            ClientNet.send(new Payloads.AdminRequest(Payloads.AdminRequest.SAVE, "shop", 0, 1, "{ pas du json"));
+        }
+        if (tick == 275) shot(mc, "125_admin_json_casse");
+        if (tick == 280) {
+            // retour a la valeur d'origine (6.0) pour ne pas laisser le monde de test modifie
+            var sc = mc.gui.screen();
+            var root = (com.google.gson.JsonObject) adminField(sc, "root");
+            root.addProperty("equipmentMultiplier", 6.0);
+            adminCall(sc, "save", new Class<?>[]{});
+        }
+        if (tick == 292) adminCall(mc.gui.screen(), "select", new Class<?>[]{String.class}, "mobs");
+        if (tick == 302) {
+            var root = adminField(mc.gui.screen(), "root");
+            MMORPG.LOGGER.info("[MMORPG] ADMIN gros fichier : mobs.json charge = {} monstres (attendu > 50)", root instanceof com.google.gson.JsonObject o ? o.size() : -1);
+            adminCall(mc.gui.screen(), "save", new Class<?>[]{});
+        }
+        if (tick == 310) {
+            srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] ADMIN valeur restauree : {} (attendu 6.0)", com.mmorpg.config.ConfigManager.shop().equipmentMultiplier));
+            ClientNet.send(new Payloads.AdminRequest(Payloads.AdminRequest.LOGOUT, "", 0, 1, ""));
+        }
+        if (tick == 320) ClientNet.send(new Payloads.AdminRequest(Payloads.AdminRequest.SAVE, "shop", 0, 1, "{}"));
+        if (tick == 345) {
+            srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] ADMIN apres deconnexion : boutique toujours intacte = {} articles (attendu > 10)", com.mmorpg.config.ConfigManager.shop().buy.size()));
+        }
+        if (tick == 360) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        }
+    }
+
+    private static long countBackups(String name) {
+        try (var files = java.nio.file.Files.list(com.mmorpg.config.ConfigManager.dir().resolve("sauvegardes"))) {
+            return files.filter(p -> p.getFileName().toString().startsWith(name + "-")).count();
+        } catch (java.io.IOException e) {
+            return -1;
+        }
+    }
 
     private static int marcheT0 = -1;
 
