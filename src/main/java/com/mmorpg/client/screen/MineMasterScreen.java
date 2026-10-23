@@ -35,7 +35,7 @@ public class MineMasterScreen extends MmoScreen {
         super(data.getStringOr("name", "Maître des mines"));
         this.npc = data.getIntOr("npc", -1);
         this.npcName = data.getStringOr("name", "Maître des mines");
-        this.tagline = data.getStringOr("tagline", "Une mine par palier de niveau : les suivantes se débloquent en trouvant leur portail caché");
+        this.tagline = data.getStringOr("tagline", "Trouvez le portail caché de chaque mine pour ouvrir la suivante");
         this.unit = data.getStringOr("unit", "Mine");
         this.base = data.getIntOr("base", 0);
         this.playerLevel = data.getIntOr("playerLevel", 1);
@@ -85,7 +85,7 @@ public class MineMasterScreen extends MmoScreen {
             Ui.header(g, dx + 8, ty, dw - 16, "CE QUE VOUS Y TROUVEZ");
             ty += 18;
             ListTag info = s.getListOrEmpty("info");
-            for (int i = 0; i < info.size(); i++) ty += Ui.wrap(g, info.getStringOr(i, ""), dx + 8, ty, dw - 16, i == 0 ? color : Ui.TEXT) + 3;
+            for (int i = 0; i < info.size() && ty < y0 + dh - 62; i++) ty += Ui.wrap(g, info.getStringOr(i, ""), dx + 8, ty, dw - 16, i == 0 ? color : Ui.TEXT) + 3;
         }
         if (!built) {
             Ui.wrap(g, "Cette zone est en construction (" + percent + " %) : le chargement durera un peu plus longtemps.", dx + 8, y0 + dh - 62, dw - 16, 0xFFFFC060);

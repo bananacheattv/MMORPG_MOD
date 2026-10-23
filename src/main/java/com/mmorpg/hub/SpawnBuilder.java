@@ -42,8 +42,11 @@ public final class SpawnBuilder {
 
     public static BlockPos build(ServerLevel level, BlockPos feet) {
         HubCtx c = new HubCtx(level, feet.immutable());
+        boolean npcs = com.mmorpg.config.ConfigManager.spawn().autoNpcs;
+        var market = HubMarket.marketNpcIds();
         for (Entity e : level.getEntities((Entity) null, bounds(c.O), x -> x instanceof com.mmorpg.entity.NpcEntity || x instanceof Display.TextDisplay)) {
             if (e instanceof Display.TextDisplay && !e.entityTags().contains(HubBuilder.TAG)) continue;
+            if (e instanceof com.mmorpg.entity.NpcEntity && (!npcs || !market.contains(e.getUUID()))) continue;     // les PNJ poses a la main restent
             e.discard();
         }
         HubBuilder.computeMasks(c, SpawnCity::footprint);

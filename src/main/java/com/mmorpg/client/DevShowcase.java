@@ -182,6 +182,14 @@ public final class DevShowcase {
             adminPhase(mc, me);
             return;
         }
+        if (MODE.equals("sorts")) {          // sorts des monstres 3D : six monstres a la fois attaquent le joueur, on compte les sorts lances
+            sortsPhase(mc, me);
+            return;
+        }
+        if (MODE.equals("attaques")) {          // animations d'attaque des 30 monstres 3D : trois instants de chaque coup, vus de trois quarts
+            attaquesPhase(mc, me);
+            return;
+        }
         if (MODE.equals("plaines")) {          // Plaines d'Aeloria : construction, visite des six regions, monstres, portails
             plainesPhase(mc, me);
             return;
@@ -1321,6 +1329,165 @@ public final class DevShowcase {
         } catch (java.io.IOException e) {
             return -1;
         }
+    }
+
+    /** Les 30 monstres 3D, six par six, autour du joueur invulnerable de la place de la premiere plaine : les sorts doivent partir. */
+    private static void sortsPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) mc.getWindow().setWindowed(960, 600);
+        if (tick == 10) {
+            cmd(mc, "gamemode survival " + me);
+            cmd(mc, "mmorpg niveau " + me + " 100");
+            cmd(mc, "difficulty normal");
+            cmd(mc, "time set day");
+            cmd(mc, "weather clear");
+            if (!mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        }
+        if (tick < 60) return;
+        if (!com.mmorpg.plains.PlainsManager.built(srv, 0)) {
+            if (tick > 12000) stop(mc);
+            return;
+        }
+        var all = com.mmorpg.entity.mob.ImportedMobs.ALL;
+        int batch = 6, per = 330;
+        int t = tick - 60, idx = t / per, rel = t % per;
+        int batches = (all.length + batch - 1) / batch;
+        if (idx >= batches) {
+            if (t == batches * per + 5) {
+                MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+                stop(mc);
+            }
+            return;
+        }
+        if (rel == 0) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var lv = srv.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
+            pl.getAbilities().invulnerable = true;
+            pl.onUpdateAbilities();
+            pl.setHealth(pl.getMaxHealth());
+            var lay = com.mmorpg.plains.PlainsLayout.get(0);
+            int plz = 100, plx = lay.pathX(plz);                         // sur le chemin, hors de la place d'entree (la place est une zone sans monstres)
+            double cx = lay.x0() + plx + 0.5, cz = com.mmorpg.plains.PlainsLayout.Z0 + plz + 0.5, cy = lay.height(plx, plz) + 1;
+            pl.teleportTo(lv, cx, cy, cz, java.util.Set.of(), 0F, 0F, true);
+            for (var old : lv.getEntitiesOfClass(net.minecraft.world.entity.Mob.class, pl.getBoundingBox().inflate(60, 60, 60), m -> m instanceof com.mmorpg.entity.mob.ImportedMobEntity)) old.discard();
+            for (int i = 0; i < batch && idx * batch + i < all.length; i++) {
+                var e = all[idx * batch + i];
+                double a = Math.PI * 2 * i / batch;
+                int mx = (int) (cx + Math.cos(a) * 7), mz = (int) (cz + Math.sin(a) * 7);
+                var pos = new net.minecraft.core.BlockPos(mx, Math.max(lay.height(mx - lay.x0(), mz - com.mmorpg.plains.PlainsLayout.Z0), com.mmorpg.plains.PlainsLayout.BASE) + 1, mz);
+                var mob = com.mmorpg.server.MobSpawner.spawnForCommand(lv, e.key(), pos, 40);
+                if (mob instanceof net.minecraft.world.entity.Mob m) m.setTarget(pl);
+            }
+        });
+        if (rel >= 10 && rel < 20 && rel % 3 == 0) srv.execute(() -> {                    // le joueur est soigne en continu : on garde les monstres sur lui
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            if (pl.isAlive()) pl.setHealth(pl.getMaxHealth());
+            for (var m : pl.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, pl.getBoundingBox().inflate(40), x -> x instanceof com.mmorpg.entity.mob.ImportedMobEntity)) {
+                if (m.getTarget() != pl) m.setTarget(pl);
+            }
+        });
+        if (rel == 120) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var mobs = pl.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, pl.getBoundingBox().inflate(40), m -> m instanceof com.mmorpg.entity.mob.ImportedMobEntity);
+            int targeting = 0;
+            for (var m : mobs) if (m.getTarget() != null) targeting++;
+            MMORPG.LOGGER.info("[MMORPG] SORTS lot {} : {} monstres presents, {} ont une cible, joueur pv {}", idx + 1, mobs.size(), targeting, pl.getHealth());
+        });
+        if (rel == 25) srv.execute(() -> {                                                          // essai direct de chaque sort, joueur protege
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            StringBuilder sb = new StringBuilder();
+            if (!pl.isAlive()) {
+                MMORPG.LOGGER.info("[MMORPG] SORTS lot {} : joueur mort, essai direct ignore", idx + 1);
+                return;
+            }
+            pl.getAbilities().invulnerable = true;
+            pl.onUpdateAbilities();
+            for (var m : pl.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, pl.getBoundingBox().inflate(40), x -> x instanceof com.mmorpg.entity.mob.ImportedMobEntity)) {
+                for (var sp : com.mmorpg.entity.mob.ImportedSpells.of(com.mmorpg.entity.mob.ImportedMobs.ALL.length > 0 ? net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(m.getType()).getPath() : "")) {
+                    try {
+                        com.mmorpg.entity.mob.ImportedSpells.cast(m, sp, pl);
+                        sb.append(sp.id()).append(" ok  ");
+                    } catch (Exception ex) {
+                        sb.append(sp.id()).append(" ERREUR ").append(ex).append("  ");
+                    }
+                }
+            }
+            MMORPG.LOGGER.info("[MMORPG] SORTS lot {} essai direct : {}", idx + 1, sb);
+        });
+        if (rel == 300) srv.execute(() -> {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < batch && idx * batch + i < all.length; i++) {
+                var key = all[idx * batch + i].key();
+                var spells = com.mmorpg.entity.mob.ImportedSpells.of(key);
+                for (var sp : spells) sb.append(key).append('/').append(sp.id()).append('=').append(com.mmorpg.entity.mob.ImportedSpells.CAST_LOG.getOrDefault(key + "/" + sp.id(), 0)).append("  ");
+                if (spells.isEmpty()) sb.append(key).append("(aucun sort)  ");
+            }
+            MMORPG.LOGGER.info("[MMORPG] SORTS lot {} : {}", idx + 1, sb);
+        });
+    }
+
+    private static net.minecraft.world.entity.Mob atkMob;
+
+    /** Chaque monstre 3D importe est pose seul sur la place de la premiere plaine, fige, puis frappe : captures a 0,25 s, 0,45 s et 0,65 s. */
+    private static void attaquesPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) mc.getWindow().setWindowed(960, 600);
+        if (tick == 10) {
+            cmd(mc, "gamemode spectator " + me);
+            cmd(mc, "time set day");
+            cmd(mc, "weather clear");
+            if (!mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+        }
+        if (tick < 60) return;
+        if (!com.mmorpg.plains.PlainsManager.built(srv, 0)) {
+            if (tick % 100 == 0) MMORPG.LOGGER.info("[MMORPG] ATTAQUES attente de la plaine 1");
+            if (tick > 12000) stop(mc);
+            return;
+        }
+        var all = com.mmorpg.entity.mob.ImportedMobs.ALL;
+        String only = System.getProperty("mmorpg.attaques", "");
+        java.util.List<com.mmorpg.entity.mob.ImportedMobs.Entry> list = new java.util.ArrayList<>();
+        for (var e : all) if (only.isEmpty() || java.util.Arrays.asList(only.split(",")).contains(e.key())) list.add(e);
+        int t = tick - 60, per = 44;
+        int idx = t / per, rel = t % per;
+        if (idx >= list.size()) {
+            if (t == list.size() * per + 5) {
+                MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+                stop(mc);
+            }
+            return;
+        }
+        var entry = list.get(idx);
+        if (rel == 0) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var lv = srv.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
+            if (atkMob != null) atkMob.discard();
+            var lay = com.mmorpg.plains.PlainsLayout.get(0);
+            for (var old : lv.getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new net.minecraft.world.phys.AABB(lay.x0() + com.mmorpg.plains.PlainsLayout.PLAZA_X, 40, com.mmorpg.plains.PlainsLayout.Z0 + com.mmorpg.plains.PlainsLayout.PLAZA_Z, 0, 0, 0).inflate(60, 80, 60),
+                    m -> m instanceof com.mmorpg.entity.mob.ImportedMobEntity)) old.discard();
+            double mx = lay.x0() + com.mmorpg.plains.PlainsLayout.PLAZA_X + 0.5, mz = com.mmorpg.plains.PlainsLayout.Z0 + com.mmorpg.plains.PlainsLayout.PLAZA_Z + 0.5, my = com.mmorpg.plains.PlainsLayout.BASE + 1;
+            var type = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getValue(MMORPG.id(entry.key()));
+            var mob = (net.minecraft.world.entity.Mob) type.create(lv, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            mob.snapTo(mx, my, mz, 0F, 0F);
+            mob.setNoAi(true);
+            mob.setSilent(true);
+            mob.setPersistenceRequired();
+            lv.addFreshEntity(mob);
+            atkMob = mob;
+            double h = entry.scaledHeight(), d = Math.max(3.6, Math.max(h * 2.1, entry.scaledWidth() * 3.2));
+            double dx = d * 0.62, dz = d * 0.78;
+            float yaw = (float) Math.toDegrees(Math.atan2(dx, -dz));
+            double eye = my + h * 0.55 + 0.1;
+            float pitch = (float) Math.toDegrees(Math.atan2(eye - (my + h * 0.5), d)) ;
+            pl.teleportTo(lv, mx + dx, eye - 1.62, mz + dz, java.util.Set.of(), yaw, pitch, true);
+        });
+        if (rel == 14) srv.execute(() -> {
+            if (atkMob != null) atkMob.level().broadcastEntityEvent(atkMob, (byte) 4);
+        });
+        if (rel == 14 + 5) shot(mc, "atk_" + entry.key() + "_a");
+        if (rel == 14 + 9) shot(mc, "atk_" + entry.key() + "_b");
+        if (rel == 14 + 13) shot(mc, "atk_" + entry.key() + "_c");
     }
 
     private static int plT0 = -1;

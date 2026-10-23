@@ -220,7 +220,7 @@ public final class PlainsManager {
         data.putInt("base", PACKET_BASE);
         data.putString("name", "Plaines d'Aeloria");
         data.putString("unit", "Plaine");
-        data.putString("tagline", "Une plaine par palier de niveau : trouvez le portail caché de chacune pour ouvrir la suivante");
+        data.putString("tagline", "Trouvez le portail caché de chaque plaine pour ouvrir la suivante");
         data.putInt("playerLevel", d.level);
         data.putBoolean("built", allBuilt(server));
         data.putInt("percent", percent());

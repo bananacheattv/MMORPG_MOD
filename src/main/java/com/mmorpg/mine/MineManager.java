@@ -443,7 +443,7 @@ public final class MineManager {
         data.putInt("base", 0);
         data.putString("name", npc == null ? "Les mines d'Aeloria" : npc.displayName());
         data.putString("unit", "Mine");
-        data.putString("tagline", "Une mine par palier de niveau : trouvez le portail caché de chacune pour ouvrir la suivante");
+        data.putString("tagline", "Trouvez le portail caché de chaque mine pour ouvrir la suivante");
         data.putInt("playerLevel", d.level);
         data.putBoolean("built", allBuilt(p.level().getServer()));
         data.putInt("percent", percent());

@@ -32,6 +32,7 @@ public final class ConfigManager {
     private static ShopConfig shop = ShopConfig.defaults();
     private static LootTables loot = LootTables.defaults();
     private static DummyConfig dummy = DummyConfig.defaults();
+    private static SpawnConfig spawn = SpawnConfig.defaults();
 
     private ConfigManager() {
     }
@@ -99,6 +100,11 @@ public final class ConfigManager {
 
     public static ShopConfig shop() {
         return shop;
+    }
+
+    /** Amenagement du grand Spawn (PNJ et stations). */
+    public static SpawnConfig spawn() {
+        return spawn;
     }
 
     public static String shopJson() {
@@ -179,6 +185,7 @@ public final class ConfigManager {
             }
             for (Map.Entry<String, MobConfig> e : defaults.entrySet()) {
                 MobConfig existing = result.putIfAbsent(e.getKey(), e.getValue());
+                if (existing != null) e.getValue().abilities.forEach(existing.abilities::putIfAbsent);          // nouveaux reglages de sorts
                 if (existing != null && existing.dropsVersion < DefaultMobs.DROPS_VERSION) mergeDrops(existing, e.getValue());
             }
             for (MobConfig cfg : result.values()) {
@@ -240,6 +247,15 @@ public final class ConfigManager {
             }
             dummy = (dummyCfg == null ? DummyConfig.defaults() : dummyCfg).sanitize();
             write(dm, dummy);
+            Path sp = dir().resolve("spawn.json");
+            SpawnConfig spawnCfg = null;
+            if (Files.exists(sp)) {
+                try (Reader r = Files.newBufferedReader(sp, StandardCharsets.UTF_8)) {
+                    spawnCfg = GSON.fromJson(r, SpawnConfig.class);
+                }
+            }
+            spawn = (spawnCfg == null ? SpawnConfig.defaults() : spawnCfg).sanitize();
+            write(sp, spawn);
             MMORPG.LOGGER.info("[MMORPG] Configuration chargée : {} monstres/boss, {} quêtes, {} articles en boutique", mobs.size(), quests.size(), shop.buy.size());
         } catch (Exception e) {
             MMORPG.LOGGER.error("[MMORPG] Impossible de lire la configuration, valeurs par défaut utilisées", e);

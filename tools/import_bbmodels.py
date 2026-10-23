@@ -40,6 +40,13 @@ def convert(path, kind):
 
     tree = [node(e) for e in data['outliner']]
     assert seen == set(elements), f'Unattached cubes in {path}'
+    if kind == 'mobs':                                                   # coup propre a chaque monstre (tools/mob_attacks.py)
+        import sys
+        sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+        import mob_attacks
+        custom = mob_attacks.attack_for(key, data['groups'])
+        if custom:
+            data['animations'] = [a for a in data['animations'] if a['name'] != 'attack'] + [custom]
     animations = []
     for a in data['animations']:
         lines = []
