@@ -99,8 +99,9 @@ public final class ClassTrial {
         hd.trialLevel = level;
         hd.triedMask |= 1 << cls.ordinal();
         if (fresh) hd.trialStartTick = p.level().getGameTime();
-        if (fresh || !HubLayout.roomBounds(hub.origin()).contains(p.position())) {
-            Vec3 at = HubLayout.center(hub.origin(), HubLayout.TRIAL_SPAWN);
+        net.minecraft.core.BlockPos home = hub.originAt(p.getX());
+        if (fresh || !HubLayout.roomBounds(home).contains(p.position())) {
+            Vec3 at = HubLayout.center(home, HubLayout.TRIAL_SPAWN);
             p.teleportTo(hubLevel, at.x, at.y, at.z, Set.of(), 180F, 0F, true);
             hubLevel.sendParticles(ParticleTypes.PORTAL, at.x, at.y + 1, at.z, 40, 0.4, 0.8, 0.4, 0.2);
             hubLevel.playSound(null, p.blockPosition(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.7F, 1.3F);
@@ -298,7 +299,7 @@ public final class ClassTrial {
         HubPlayerData hd = data(p);
         if (!hd.inTrial) return;
         HubData hub = HubData.get(p.level().getServer());
-        if (!hub.exists() || p.level() != hub.level(p.level().getServer()) || !HubLayout.roomBounds(hub.origin()).contains(p.position())
+        if (!hub.exists() || p.level() != hub.level(p.level().getServer()) || !HubLayout.roomBounds(hub.originAt(p.getX())).contains(p.position())
                 || p.gameMode.getGameModeForPlayer() == GameType.SPECTATOR) {
             end(p, false, "Essai terminé : personnage restauré.");
         }
@@ -320,7 +321,7 @@ public final class ClassTrial {
         p.setHealth(p.getMaxHealth());
         RpgPlayers.fullRestore(p);
         if (hub.exists() && level != null) {
-            Vec3 at = HubLayout.center(hub.origin(), HubLayout.TRIAL_SPAWN);
+            Vec3 at = HubLayout.center(hub.originAt(p.getX()), HubLayout.TRIAL_SPAWN);
             p.teleportTo(level, at.x, at.y, at.z, Set.of(), 180F, 0F, true);
         }
         p.sendOverlayMessage(Component.literal("Vaincu ! L'essai continue, sans aucune perte.").withColor(0xFFC060));

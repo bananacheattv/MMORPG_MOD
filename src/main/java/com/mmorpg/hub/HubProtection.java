@@ -35,9 +35,13 @@ public final class HubProtection {
     /** La position est-elle dans le volume du hub (et la protection activee) ? */
     public static boolean inHub(Level level, BlockPos pos) {
         if (!(level instanceof ServerLevel sl) || !ConfigManager.general().hubProtection) return false;
+        if (sl.dimension().equals(SpawnBuilder.DIM)) {                                      // le spawn est protege comme le hub
+            SpawnData sp = SpawnData.get(sl.getServer());
+            return sp.exists() && SpawnBuilder.bounds(sp.origin()).contains(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+        }
         HubData hub = HubData.get(sl.getServer());
         if (!hub.exists() || hub.origin() == null || !sl.dimension().equals(hub.dimension())) return false;
-        return HubLayout.hubBounds(hub.origin()).contains(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+        return HubLayout.hubBounds(hub.originAt(pos.getX())).contains(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
     }
 
     private static boolean builder(Entity e) {
@@ -81,20 +85,24 @@ public final class HubProtection {
     public static void onJoin(EntityJoinLevelEvent event) {
         if (!(event.getLevel() instanceof ServerLevel sl) || !sl.dimension().equals(HubManager.HUB_DIM)) return;
         Entity e = event.getEntity();
-        if (HubBuilder.isStable(e.getUUID())) return;
+        if (HubBuilder.isStable(e.getUUID()) && !HubBuilder.isLegacyMarketNpc(e.getUUID())) return;
         HubData hub = HubData.get(sl.getServer());
         if (!hub.exists() || hub.origin() == null) return;
         // objets au sol sans proprietaire : fleurs, herbes et lanternes qui se detachent pendant la construction (jamais ceux jetes par un joueur)
         if (e instanceof net.minecraft.world.entity.item.ItemEntity item && item.getOwner() == null
-                && HubLayout.hubBounds(hub.origin()).contains(e.getX(), e.getY(), e.getZ())) {
+                && HubLayout.hubBounds(hub.originAt(e.getX())).contains(e.getX(), e.getY(), e.getZ())) {
             event.setCanceled(true);
             return;
         }
         if (!hub.stableBuild()) return;                       // hub construit avant les identifiants stables : on ne touche a rien tant qu'il n'est pas reconstruit
+        if (HubBuilder.isLegacyMarketNpc(e.getUUID())) {      // PNJ de l'ancien marche : il vit maintenant dans le spawn
+            event.setCanceled(true);
+            return;
+        }
         boolean legacy = e instanceof com.mmorpg.entity.hub.ClassMasterEntity
                 || (e instanceof com.mmorpg.entity.NpcEntity n && "maitre_classes".equals(n.group()))
                 || (e instanceof net.minecraft.world.entity.Display.TextDisplay && e.entityTags().contains(HubBuilder.TAG))
-                || (e instanceof com.mmorpg.entity.dummy.TrainingDummyEntity && HubBuilder.isDummySlot(hub.origin(), e.getX(), e.getZ()));
+                || (e instanceof com.mmorpg.entity.dummy.TrainingDummyEntity && HubBuilder.isDummySlot(hub.originAt(e.getX()), e.getX(), e.getZ()));
         if (legacy) event.setCanceled(true);
     }
 

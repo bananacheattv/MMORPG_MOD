@@ -60,7 +60,33 @@ public final class MineTools {
         @Override
         public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> out, TooltipFlag flag) {
             String reach = tier >= MineBlocks.ORES.size() - 1 ? "tous les minerais" : "jusqu'à la " + MineBlocks.ORES.get(Math.min(tier, MineBlocks.ORES.size() - 1)).name();
-            ItemTooltips.simple(RARITY[tier], "Pioche des mines", "Extrait " + (tier == 0 ? "la Verdite" : reach) + ". Plus le palier est haut, plus les lingots doublent et plus les lingots rares tombent.", out);
+            String vein = MineManager.veinLimit(tier) > 0 ? "\nBonus : accroupi, extrait toute la veine d'un coup (jusqu'à " + MineManager.veinLimit(tier) + " minerais)." : "\nÀ partir de l'Ambrasite : accroupi, extrait toute la veine d'un coup.";
+            ItemTooltips.simple(RARITY[tier], "Pioche des mines", "Extrait " + (tier == 0 ? "la Verdite" : reach) + ". Plus le palier est haut, plus les lingots doublent et plus les lingots rares tombent." + vein, out);
+        }
+    }
+
+    /** Hache, pelle ou houe des mines : la houe recolte en zone et replante (voir AeloriaCropBlock). */
+    public static final class Tool extends Item {
+        private final int tier;
+        private final String kind;
+
+        public Tool(Properties properties, int tier, String kind) {
+            super(properties);
+            this.tier = tier;
+            this.kind = kind;
+        }
+
+        @Override
+        public Component getName(ItemStack stack) {
+            return Component.translatable(this.getDescriptionId()).withColor(TIER_COLOR[tier]);
+        }
+
+        @Override
+        public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> out, TooltipFlag flag) {
+            String text = kind.equals("Houe")
+                    ? "Chaque récolte mûre peut donner des récoltes en plus." + (tier >= 2 ? "\nBonus : récolte aussi les plantes mûres alentour (rayon " + (tier >= 4 ? 2 : 1) + ") et les replante." : "\nÀ partir de l'Argentite : récolte en zone et replante.")
+                    : "Outil forgé dans le minerai du palier ; plus le palier est haut, plus il est solide et rapide.";
+            ItemTooltips.simple(RARITY[tier], kind + " des mines", text, out);
         }
     }
 
@@ -75,10 +101,10 @@ public final class MineTools {
             final int tier = t;
             ToolMaterial mat = MATERIAL[t];
             reg("pioche_" + TIER_ID[t], p -> new Pickaxe(p.pickaxe(mat, 1.0F, -2.8F), tier));
-            reg("houe_" + TIER_ID[t], p -> new Item(p.hoe(mat, -2.0F, -1.0F + tier * 0.25F)));
+            reg("houe_" + TIER_ID[t], p -> new Tool(p.hoe(mat, -2.0F, -1.0F + tier * 0.25F), tier, "Houe"));
             if (t == 0) continue;
-            reg("hache_" + TIER_ID[t], p -> new Item(p.axe(mat, 6.0F + tier * 0.5F, -3.1F + tier * 0.1F)));
-            reg("pelle_" + TIER_ID[t], p -> new Item(p.shovel(mat, 1.5F, -3.0F)));
+            reg("hache_" + TIER_ID[t], p -> new Tool(p.axe(mat, 6.0F + tier * 0.5F, -3.1F + tier * 0.1F), tier, "Hache"));
+            reg("pelle_" + TIER_ID[t], p -> new Tool(p.shovel(mat, 1.5F, -3.0F), tier, "Pelle"));
         }
     }
 

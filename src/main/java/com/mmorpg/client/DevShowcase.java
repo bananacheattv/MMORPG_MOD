@@ -1320,8 +1320,9 @@ public final class DevShowcase {
     }
 
     private static int marcheT0 = -1;
+    private static int hub2Step;
 
-    /** Marche d'Aeloria : attend la reconstruction du hub (plan 2), puis photographie chaque coin du quartier. */
+    /** Hub (Grande Nef) et Spawn (Marche) dans deux dimensions : reconstruction, visite, portails et seconde copie du hub. */
     private static void marchePhase(Minecraft mc, String me) {
         var srv = mc.getSingleplayerServer();
         if (tick == 5) mc.getWindow().setWindowed(1280, 720);
@@ -1334,69 +1335,86 @@ public final class DevShowcase {
             mc.options.setCameraType(CameraType.FIRST_PERSON);
         }
         if (marcheT0 < 0) {
-            if (tick % 20 == 0 && tick > 20) {
+            if (tick == 40) {
+                srv.execute(() -> {
+                    var hub = com.mmorpg.hub.HubData.get(srv);
+                    var lv = hub.level(srv);
+                    if (lv != null && hub.origin() != null) com.mmorpg.hub.HubBuilder.build(lv, hub.origin(), 0);       // reconstruction forcee : verifie le plan courant
+                    var sl = srv.getLevel(com.mmorpg.hub.SpawnBuilder.DIM);
+                    if (sl != null) com.mmorpg.hub.SpawnBuilder.build(sl, com.mmorpg.hub.HubManager.HUB_ORIGIN);
+                });
+            }
+            if (tick > 40 && tick % 20 == 0) {
                 var hub = com.mmorpg.hub.HubData.get(srv);
-                MMORPG.LOGGER.info("[MMORPG] MARCHE plan du hub = {} (attendu {})", hub.layout(), com.mmorpg.hub.HubBuilder.LAYOUT_VERSION);
-                if (tick == 40) {
-                    srv.execute(() -> {
-                        var lv = com.mmorpg.hub.HubData.get(srv).level(srv);
-                        var o = com.mmorpg.hub.HubData.get(srv).origin();
-                        if (lv != null && o != null) com.mmorpg.hub.HubBuilder.build(lv, o);      // reconstruction forcee : verifie le plan courant
-                    });
-                } else if (tick > 40 && hub.layout() >= com.mmorpg.hub.HubBuilder.LAYOUT_VERSION) marcheT0 = tick + 40;
+                var spawn = com.mmorpg.hub.SpawnData.get(srv);
+                MMORPG.LOGGER.info("[MMORPG] MARCHE plan du hub = {} (attendu {}), plan du spawn = {} (attendu {})", hub.layout(), com.mmorpg.hub.HubBuilder.LAYOUT_VERSION,
+                        spawn.layout(), com.mmorpg.hub.SpawnBuilder.LAYOUT_VERSION);
+                if (hub.layout() >= com.mmorpg.hub.HubBuilder.LAYOUT_VERSION && spawn.layout() >= com.mmorpg.hub.SpawnBuilder.LAYOUT_VERSION) marcheT0 = tick + 40;
             }
             if (tick > 5000) {
-                MMORPG.LOGGER.info("[MMORPG] MARCHE : hub jamais reconstruit");
+                MMORPG.LOGGER.info("[MMORPG] MARCHE : construction jamais terminee");
                 stop(mc);
             }
             return;
         }
         int t = tick - marcheT0;
         int cx = com.mmorpg.hub.HubMarket.CX;
-        // {x, y, z, yaw, pitch, nom}
+        // {x, y, z, yaw, pitch, monde : 0 hub, 1 spawn}
         double[][] views = {
-                {0, 4, -13, 180, 6}, {0, 3, 15, 180, 8},
-                {cx + 21, 2, -30, 180, 8}, {cx + 21, 1.6, -44.5, 0, 6}, {cx + 21, 5.6, -44.5, 0, 6}, {cx, 1.6, -46, 0, 6}, {cx, 1.6, 46, 180, 6}, {cx - 46, 1.6, 0, 270, 6},
-                {cx - 21, 3, 30, 200, 8}, {cx + 34, 14, -34, 235, 22}};
-        String[] names = {"hall_porche_nord", "hall_centre", "facade_taverne", "interieur_taverne", "etage_taverne", "interieur_guilde", "interieur_atelier", "interieur_ventes",
-                "facade_atelier", "tour_est"};
+                {0, 6, 42, 180, 8, 0}, {0, 38, 0, 0, 90, 0}, {-30, 4, 0, 90, 8, 0}, {-44, 5, 0, 90, 8, 0},
+                {cx + 44, 6, 0, 90, 8, 1}, {cx + 14, 64, 0, 90, 58, 1}, {cx + 10, 5, 0, 180, 8, 1}, {cx + 21, 1.6, -44.5, 0, 6, 1}};
+        String[] names = {"hub_entree", "hub_dessus", "hub_pont", "hub_portail", "spawn_portail_citadelle", "spawn_vue_haute", "spawn_banque", "spawn_taverne"};
         int idx = t / 60;
         if (idx < views.length && t % 60 == 5) {
             double[] v = views[idx];
             srv.execute(() -> {
                 var pl = srv.getPlayerList().getPlayerByName(me);
                 var hub = com.mmorpg.hub.HubData.get(srv);
-                var lv = hub.level(srv);
-                var o = hub.origin();
+                boolean spawn = v[5] > 0;
+                var lv = spawn ? srv.getLevel(com.mmorpg.hub.SpawnBuilder.DIM) : hub.level(srv);
+                var o = spawn ? com.mmorpg.hub.SpawnData.get(srv).origin() : hub.origin();
                 pl.teleportTo(lv, o.getX() + v[0] + 0.5, o.getY() + v[1], o.getZ() + v[2] + 0.5, java.util.Set.of(), (float) v[3], (float) v[4], true);
             });
         }
-        if (idx < views.length && t % 60 == 50) shot(mc, "110_marche_" + names[idx]);
-        if (t == views.length * 60 + 5) {
-            srv.execute(() -> {
-                var hub = com.mmorpg.hub.HubData.get(srv);
-                var lv = hub.level(srv);
-                int npcs = 0;
-                StringBuilder sb = new StringBuilder();
-                for (var e : lv.getEntities((net.minecraft.world.entity.Entity) null, com.mmorpg.hub.HubLayout.hubBounds(hub.origin()), x -> x instanceof com.mmorpg.entity.NpcEntity)) {
-                    npcs++;
-                    sb.append(((com.mmorpg.entity.NpcEntity) e).displayName()).append("; ");
-                }
-                MMORPG.LOGGER.info("[MMORPG] MARCHE PNJ du hub : {} [{}]", npcs, sb);
-                var o = hub.origin();
-                int cxx = com.mmorpg.hub.HubMarket.CX;
-                String[] check = {"banque_aeloria", "hdv_aeloria", "presse_compression", "forge_arcanique", "teleporteur"};
-                int[][] at = {{cxx, 0, -25}, {cxx - 27, 0, 0}, {cxx, 0, 24}, {cxx - 21, 0, 25}, {cxx + 25, 0, 0}};
-                for (int i = 0; i < check.length; i++) {
-                    var st = lv.getBlockState(o.offset(at[i][0], at[i][1], at[i][2]));
-                    MMORPG.LOGGER.info("[MMORPG] MARCHE bloc {} en place : {}", check[i], st.getBlock().getDescriptionId().contains(check[i]));
-                }
-            });
-        }
-        if (t == views.length * 60 + 30) {
+        if (idx < views.length && t % 60 == 50) shot(mc, "110_" + names[idx]);
+        int end = views.length * 60;
+        // portails : on entre dans le portail du hub (attendu : le spawn), puis dans celui du spawn (attendu : le hub)
+        if (t == end + 5) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var hub = com.mmorpg.hub.HubData.get(srv);
+            var o = hub.origin();
+            pl.teleportTo(hub.level(srv), o.getX() + com.mmorpg.hub.HubPortals.HUB_GATE_X + 1.5, o.getY() + 1, o.getZ() + 0.5, java.util.Set.of(), 90F, 0F, true);
+        });
+        if (t == end + 45) srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] MARCHE portail du hub : monde = {} (attendu mmorpg:spawn)",
+                srv.getPlayerList().getPlayerByName(me).level().dimension().identifier()));
+        if (t == end + 50) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var o = com.mmorpg.hub.SpawnData.get(srv).origin();
+            pl.teleportTo(srv.getLevel(com.mmorpg.hub.SpawnBuilder.DIM), o.getX() + cx + 38.5, o.getY() + 1, o.getZ() + 0.5, java.util.Set.of(), 90F, 0F, true);
+        });
+        if (t == end + 100) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var hub = com.mmorpg.hub.HubData.get(srv);
+            MMORPG.LOGGER.info("[MMORPG] MARCHE portail du spawn : monde = {} (attendu mmorpg:hub), x relatif = {}", pl.level().dimension().identifier(), pl.getX() - hub.origin().getX());
+        });
+        // seconde copie du hub (Hub 2) : creation, arrivee et PNJ propres a chaque copie (la construction bloque le serveur : le reste se fait dans la meme tache)
+        if (t == end + 110) srv.execute(() -> {
+            var hub = com.mmorpg.hub.HubData.get(srv);
+            int i = hub.addHub();
+            com.mmorpg.hub.HubBuilder.build(hub.level(srv), hub.origin(i), i);
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            boolean ok = com.mmorpg.hub.HubManager.goToHub(pl, 1);
+            int npcs = pl.level().getEntities((net.minecraft.world.entity.Entity) null, com.mmorpg.hub.HubLayout.hubBounds(hub.origin(1)), x -> x instanceof com.mmorpg.entity.NpcEntity).size();
+            int npcs1 = pl.level().getEntities((net.minecraft.world.entity.Entity) null, com.mmorpg.hub.HubLayout.hubBounds(hub.origin(0)), x -> x instanceof com.mmorpg.entity.NpcEntity).size();
+            MMORPG.LOGGER.info("[MMORPG] MARCHE Hub 2 : arrivee = {}, x = {} (attendu ~320), copies = {}, PNJ du Hub 2 = {}, PNJ du Hub 1 = {}", ok, (int) pl.getX() - hub.origin().getX(), hub.count(), npcs, npcs1);
+            hub2Step = tick;
+        });
+        if (hub2Step > 0 && tick == hub2Step + 60) shot(mc, "110_hub2_arrivee");
+        if (hub2Step > 0 && tick == hub2Step + 80) {
             MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
             stop(mc);
         }
+        if (t > end + 6000) stop(mc);
     }
 
     /** Banque et hotel des ventes : vue des modeles 3D puis actions reelles (messages serveur). */
@@ -1709,6 +1727,41 @@ public final class DevShowcase {
                 MMORPG.LOGGER.info("[MMORPG] METALLURGIE pioche du debutant sur la Verdite : extrait = {} (attendu true)", ok0);
             });
         }
+        if (tick == 325) srv.execute(() -> {
+            // bonus de pioche : veine d'un coup (accroupi) a la pioche de Neantite, puis a une pioche d'Argentite (aucun bonus)
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var lv = pl.level();
+            var base = pl.blockPosition().above(8);
+            var ore = com.mmorpg.mine.MineBlocks.ORES.get(0);
+            for (int pass = 0; pass < 2; pass++) {
+                var origin = base.offset(pass * 8, 0, 0);
+                for (int x = 0; x < 5; x++) for (int y = 0; y < 2; y++) for (int z = 0; z < 3; z++) lv.setBlock(origin.offset(x, y, z), com.mmorpg.mine.MineBlocks.block(ore).defaultBlockState(), 3);
+                pl.getInventory().setItem(0, new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get(pass == 0 ? "pioche_neantite" : "pioche_argentite")));
+                pl.setShiftKeyDown(true);
+                com.mmorpg.mine.MineManager.mineAndVein(lv, pl, origin, ore);
+                int depleted = 0;
+                for (int x = 0; x < 5; x++) for (int y = 0; y < 2; y++) for (int z = 0; z < 3; z++) if (lv.getBlockState(origin.offset(x, y, z)).is(com.mmorpg.mine.MineBlocks.EPUISE.get())) depleted++;
+                MMORPG.LOGGER.info("[MMORPG] OUTILS veine ({}) : {} minerais epuises sur 30 (attendu {})", pass == 0 ? "Neantite" : "Argentite", depleted, pass == 0 ? 15 : 1);
+            }
+            // bonus de houe : recolte en zone et replantation (Neantite : rayon 2)
+            var field = base.offset(0, 4, 0);
+            var crop = com.mmorpg.farm.FarmCrops.BLOCKS.get("lueur").get();
+            for (int x = -3; x <= 3; x++) for (int z = -3; z <= 3; z++) {
+                lv.setBlock(field.offset(x, -1, z), net.minecraft.world.level.block.Blocks.FARMLAND.defaultBlockState(), 3);
+                lv.setBlock(field.offset(x, 0, z), crop.defaultBlockState().setValue(com.mmorpg.farm.AeloriaCropBlock.AGE, 7), 3);
+            }
+            pl.getInventory().setItem(0, new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("houe_neantite")));
+            var st = lv.getBlockState(field);
+            lv.removeBlock(field, false);
+            st.getBlock().playerDestroy(lv, pl, field, st, null, pl.getMainHandItem());
+            int replanted = 0, mature = 0;
+            for (int x = -3; x <= 3; x++) for (int z = -3; z <= 3; z++) {
+                var s2 = lv.getBlockState(field.offset(x, 0, z));
+                if (s2.getBlock() == crop) { if (s2.getValue(com.mmorpg.farm.AeloriaCropBlock.AGE) == 0) replanted++; else mature++; }
+            }
+            MMORPG.LOGGER.info("[MMORPG] OUTILS houe de Neantite : {} plantes replantees (attendu 25 : la cassee + rayon 2), {} encore mures (attendu 24)", replanted, mature);
+            pl.setShiftKeyDown(false);
+        });
         if (tick == 340) {
             MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
             stop(mc);

@@ -159,7 +159,46 @@ public final class MineManager {
         if (!(player instanceof ServerPlayer sp) || !(event.getLevel() instanceof ServerLevel level)) return;
         if (sp.isCreative() && sp.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)) return;      // un batisseur peut casser le bloc
         event.setCanceled(true);
-        mine(level, sp, event.getPos(), ore.ore());
+        mineAndVein(level, sp, event.getPos(), ore.ore());
+    }
+
+    /** Extrait le minerai casse, puis (pioches d'Ambrasite et au-dela, accroupi) toute sa veine. */
+    public static boolean mineAndVein(ServerLevel level, ServerPlayer p, BlockPos pos, MineBlocks.Ore ore) {
+        boolean ok = mine(level, p, pos, ore);
+        if (ok) vein(level, p, pos, ore);
+        return ok;
+    }
+
+    /** Minerais d'une meme veine extraits d'un coup (accroupi) selon le palier de la pioche : Ambrasite 4, Glacium 8, Neantite 14. */
+    public static int veinLimit(int pickTier) {
+        return pickTier >= 5 ? 14 : pickTier == 4 ? 8 : pickTier == 3 ? 4 : 0;
+    }
+
+    /** Pioches d'Ambrasite et au-dela : accroupi, extrait aussi les minerais de meme espece qui touchent celui qu'on vient de briser. */
+    private static void vein(ServerLevel level, ServerPlayer p, BlockPos start, MineBlocks.Ore ore) {
+        int limit = veinLimit(MineTools.pickTier(p.getMainHandItem()));
+        if (limit <= 0 || !p.isShiftKeyDown()) return;
+        java.util.ArrayDeque<BlockPos> queue = new java.util.ArrayDeque<>();
+        java.util.Set<BlockPos> seen = new java.util.HashSet<>();
+        seen.add(start);
+        queue.add(start);
+        int mined = 0;
+        while (!queue.isEmpty() && mined < limit) {
+            BlockPos at = queue.poll();
+            for (int dx = -1; dx <= 1 && mined < limit; dx++) {
+                for (int dy = -1; dy <= 1 && mined < limit; dy++) {
+                    for (int dz = -1; dz <= 1 && mined < limit; dz++) {
+                        BlockPos n = at.offset(dx, dy, dz);
+                        if (!seen.add(n)) continue;
+                        if (!(level.getBlockState(n).getBlock() instanceof MineOreBlock other) || !other.ore().id().equals(ore.id())) continue;
+                        if (!mine(level, p, n, ore)) return;                                   // pioche cassee ou refus : on s'arrete
+                        mined++;
+                        queue.add(n);
+                    }
+                }
+            }
+        }
+        if (mined > 0) p.sendOverlayMessage(Component.literal("Veine : +" + mined + " minerai" + (mined > 1 ? "s" : "") + " extrait" + (mined > 1 ? "s" : "") + " d'un coup").withColor(ore.color()));
     }
 
     /** Extrait un minerai : le lingot va dans le sac, le bloc s'epuise puis repousse. @return vrai si le minerai a ete extrait */

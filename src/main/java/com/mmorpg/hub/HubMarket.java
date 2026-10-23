@@ -31,7 +31,7 @@ public final class HubMarket {
     static final int OUTER = 50;
 
     static boolean footprint(int x, int z) {
-        return Math.hypot(x - CX, z) <= OUTER + 1.4 || (x <= -26 && x >= CX + OUTER - 8 && Math.abs(z) <= 7);
+        return Math.hypot(x - CX, z) <= OUTER + 1.4;
     }
 
     // ------------------------------------------------------------------ geometrie locale d'un batiment oriente vers le centre
@@ -85,7 +85,6 @@ public final class HubMarket {
         gate(c, CX + 24, 19, -1, 0, false);
         farm(c, CX - 29, 17);
         plantings(c);
-        avenue(c);
     }
 
     private static void structure(HubCtx c, Block block, int x, int z, Direction facing) {
@@ -148,25 +147,21 @@ public final class HubMarket {
             for (int sz : new int[]{-1, 1}) HubTown.tower(c, CX + 30 * sx, 30 * sz, 5, 28, (sx * sz > 0) ? "tuile_azur" : "tuile_pourpre", true);
             HubTown.tower(c, CX + 37, 11 * sx, 4, 20, "tuile_pourpre", true);
         }
-        for (int z = -7; z <= 7; z++) {                                                  // arche de l'entree entre les deux tours
+        // portail de la Citadelle entre les deux tours : cadre de marbre et de cristal, voile violet (voir HubPortals)
+        for (int z = -7; z <= 7; z++) {
             for (int y = 12; y <= 14; y++) c.set(CX + 37, y, z, y == 12 ? c.state("or_ouvrage") : c.state(Blocks.STONE_BRICKS));
-            if (Math.abs(z) <= 2) for (int y = 8; y <= 11; y++) c.set(CX + 37, y, z, y == 8 ? c.state("or_ouvrage") : c.state("tuile_pourpre"));
         }
-    }
-
-    private static void avenue(HubCtx c) {
-        for (int x = CX + OUTER - 8; x <= -26; x++) {                // allee d'entree : de la place des heros au marche
-            for (int z = -7; z <= 7; z++) {
-                if (x >= -31 && Math.hypot(x, z) <= 31.6) continue;
-                if (Math.hypot(x - CX, z) <= OUTER) continue;
-                int az = Math.abs(z);
-                c.set(x, -2, z, az <= 3 ? c.state(Blocks.STONE_BRICKS) : c.state(Blocks.DIRT));
-                c.set(x, -1, z, az <= 1 ? c.state("marbre_dore") : az <= 3 ? c.mix(x, 0, z, 91, "marbre_poli", 60, "pierre_solaire", 40) : Blocks.GRASS_BLOCK.defaultBlockState());
-                for (int y = 0; y <= 8; y++) c.set(x, y, z, Blocks.AIR);
-                if (az >= 4 && c.rnd(x, 0, z, 92) < 0.25F) c.set(x, 0, z, Blocks.SHORT_GRASS);
+        for (int z = -5; z <= 5; z += 10) {
+            for (int y = 0; y <= 11; y++) c.set(CX + 37, y, z, c.axis("colonne_marbre", Direction.Axis.Y));
+            c.set(CX + 37, 12, z, "or_ouvrage");
+            c.set(CX + 37, 15, z, "cristal_arcane");
+        }
+        for (int z = -4; z <= 4; z++) {
+            for (int y = 1; y <= 11; y++) {
+                boolean arch = Math.abs(z) <= 4 - Math.max(0, y - 8);
+                c.set(CX + 37, y, z, arch ? Blocks.STAINED_GLASS.pick(net.minecraft.world.item.DyeColor.PURPLE).defaultBlockState() : c.state("or_ouvrage"));
             }
         }
-        for (int x = CX + OUTER - 4; x <= -32; x += 6) for (int s : new int[]{-4, 4}) HubBuilder.lamp(c, x, s);
     }
 
     // ------------------------------------------------------------------ fontaine centrale

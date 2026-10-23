@@ -582,6 +582,8 @@ public final class RpgPlayers {
             } else if (ConfigManager.general().openClassSelectionOnJoin) {
                 openClassSelection(player);
             }
+        } else if (d.playerClass.isPlayable() && player.level().dimension().equals(com.mmorpg.hub.HubManager.HUB_DIM)) {
+            com.mmorpg.hub.HubManager.goToSpawn(player);                // un joueur qui a sa classe retrouve le spawn commun, pas le hub
         }
     }
 
