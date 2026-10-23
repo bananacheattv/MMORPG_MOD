@@ -7,7 +7,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 /**
- * Effets sonores d'Eldoria (enregistrements libres CC0 montes par tools/build_sfx.py, fichiers dans assets/mmorpg/sounds/sfx) :
+ * Effets sonores d'Aeloria (enregistrements libres CC0 montes par tools/build_sfx.py, fichiers dans assets/mmorpg/sounds/sfx) :
  * cinematiques du hub, donjons, epreuves, boss, mort, niveaux et quetes. Aucun son de Minecraft n'y est reutilise.
  */
 public final class ModSounds {

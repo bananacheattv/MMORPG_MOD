@@ -285,7 +285,7 @@ def main():
         os.makedirs(os.path.join(ICI, sub), exist_ok=True)
     mc = os.path.join(ICI, 'minecraft', 'assets', NS)
     bk.write_json(os.path.join(ICI, 'minecraft', 'pack.mcmeta'),
-                  {'pack': {'description': 'Arcs Eldoria (6 evolutions)', 'min_format': 97, 'max_format': 97}}, indent=2)
+                  {'pack': {'description': 'Arcs Aeloria (6 evolutions)', 'min_format': 97, 'max_format': 97}}, indent=2)
     rest_models, sheets = [], []
     for spec in SPECS:
         models = [build(spec, s) for s in STAGES]
@@ -299,7 +299,7 @@ def main():
             bk.write_json(os.path.join(folder, f'{m.key}.bbmodel'), bb)
             bk.write_json(os.path.join(mc, 'models', 'item', f'{m.key}.json'),
                           bk.java_model(m, atlas, f'{NS}:item/{key}', DISPLAY, COLORS,
-                                        'Eldoria MMORPG - generer_arcs.py (Blockbench, Java Block/Item)'))
+                                        'Aeloria MMORPG - generer_arcs.py (Blockbench, Java Block/Item)'))
         bk.write_json(os.path.join(mc, 'items', f'{key}.json'), item_definition(key), indent=2)
         bk.views(models[0], atlas, os.path.join(ICI, 'apercu', f'{key}_vues.png'),
                  f"{spec['titre']} — niveau {spec['level']}  ({len(models[0].parts)} cubes au repos)")

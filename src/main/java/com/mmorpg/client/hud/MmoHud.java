@@ -117,8 +117,8 @@ public final class MmoHud {
             partyFrames(g, mc);
             HudLayout.end(g);
         }
-        if (HudLayout.begin(g, HudLayout.ELDORIA)) {
-            eldoriaBoard(g, mc);
+        if (HudLayout.begin(g, HudLayout.AELORIA)) {
+            aeloriaBoard(g, mc);
             HudLayout.end(g);
         }
         if (HudLayout.begin(g, HudLayout.QUETES)) {
@@ -361,10 +361,10 @@ public final class MmoHud {
         Ui.bar(g, x + 6, y + 17, w - 12, 8, frac, 0xFFE84040, 0xFF7A1010, hpText);
     }
 
-    private static void eldoriaBoard(GuiGraphicsExtractor g, Minecraft mc) {
+    private static void aeloriaBoard(GuiGraphicsExtractor g, Minecraft mc) {
         var d = ClientData.DATA;
         Ui.frame(g, 0, 0, 153, 44, Ui.GOLD, false);
-        g.text(mc.font, "✦ ELDORIA", 5, 4, Ui.GOLD, false);
+        g.text(mc.font, "✦ AELORIA", 5, 4, Ui.GOLD, false);
         int online = mc.getConnection() == null ? 0 : mc.getConnection().getOnlinePlayers().size();
         String count = online + " en ligne";
         g.text(mc.font, count, 148 - mc.font.width(count), 4, Ui.MUTED, false);
@@ -542,7 +542,7 @@ public final class MmoHud {
         smallPanel(g, 0, 0, w, h, cls.color);
         float pulse = 0.5f + 0.5f * (float) Math.sin(System.currentTimeMillis() / 260.0);
         Ui.diamond(g, 10, 15, 4, Ui.lighter(cls.color, 0.2f + 0.5f * pulse));
-        g.text(f, com.mmorpg.client.EldoriaFont.of("ESSAI — " + cls.label + " niv. " + level), 20, 5, cls.color, true);
+        g.text(f, com.mmorpg.client.AeloriaFont.of("ESSAI — " + cls.label + " niv. " + level), 20, 5, cls.color, true);
         long secs = HudLayout.editing ? 83 : (System.nanoTime() - ClientData.trialSince) / 1_000_000_000L;
         String time = String.format(java.util.Locale.ROOT, "%d:%02d", secs / 60, secs % 60);
         g.text(f, time, w - 8 - f.width(time), 5, Ui.MUTED, false);

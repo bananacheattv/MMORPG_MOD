@@ -214,13 +214,13 @@ public final class DevShowcase {
         }
         if (MODE.equals("reprise_tab")) {
             if (tick == 5) { mc.getWindow().setWindowed(1280, 720); mc.gui.setScreen(null); }
-            if (tick == 110) shot(mc, "codex_tableau_eldoria");
+            if (tick == 110) shot(mc, "codex_tableau_aeloria");
             if (tick == 115) mc.options.keyPlayerList.setDown(true);
             if (tick == 130) {
                 var info = mc.getConnection().getPlayerInfo(mc.player.getUUID());
                 if (info == null || info.getTabListDisplayName() == null || !info.getTabListDisplayName().getString().contains(ClientData.DATA.playerClass.label)) throw new IllegalStateException("Missing RPG tab name");
                 MMORPG.LOGGER.info("[CODEX CHECKS] TAB PASS: synchronized class and level name");
-                shot(mc, "codex_tab_eldoria");
+                shot(mc, "codex_tab_aeloria");
             }
             if (tick == 140) { mc.options.keyPlayerList.setDown(false); stop(mc); }
             return;
@@ -420,6 +420,17 @@ public final class DevShowcase {
             }
             return;
         }
+        if (MODE.equals("premiere")) {
+            if (tick == 100 || tick == 400) {
+                MMORPG.LOGGER.info("[MMORPG] PREMIERE CONNEXION a {} ticks : dimension {} ; position ({}, {}, {}) ; classe {}", tick, mc.level.dimension().identifier(),
+                        (int) mc.player.getX(), (int) mc.player.getY(), (int) mc.player.getZ(), ClientData.DATA.playerClass);
+            }
+            if (tick == 410) {
+                MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+                stop(mc);
+            }
+            return;
+        }
         if (MODE.equals("menumusique")) {
             if (tick == 5) cmd(mc, "gamemode survival");
             if (tick == 20) com.mmorpg.client.screen.MenuScreen.open(com.mmorpg.client.screen.MenuScreen.Tab.PERSONNAGE);
@@ -522,7 +533,7 @@ public final class DevShowcase {
                     shot(mc, "sceptre_atelier");
                     mc.gui.setScreen(null);
                     cmd(mc, "kill @e[type=mmorpg:pnj]");
-                    cmd(mc, "mmorpg ville Eldoria");
+                    cmd(mc, "mmorpg ville Aeloria");
                 }
                 case 70 -> {
                     cmd(mc, "item replace entity " + me + " weapon.mainhand with mmorpg:sceptre_quetes");
@@ -629,7 +640,7 @@ public final class DevShowcase {
             // ---------------- phase 2 : ville, donjon, forge
             case 580 -> {
                 cmd(mc, "kill @e[type=mmorpg:roi_gobelin]");
-                cmd(mc, "mmorpg ville Capitale d'Eldoria");
+                cmd(mc, "mmorpg ville Capitale d'Aeloria");
                 cmd(mc, "give " + me + " minecraft:iron_ingot 10");
                 cmd(mc, "give " + me + " minecraft:stick 10");
                 cmd(mc, "give " + me + " minecraft:cobblestone 10");
@@ -701,7 +712,7 @@ public final class DevShowcase {
                 cmd(mc, "weather clear");
                 cmd(mc, "mmorpg quetes " + me + " reset");
                 cmd(mc, "kill @e[type=mmorpg:pnj]");
-                cmd(mc, "mmorpg ville Eldoria");
+                cmd(mc, "mmorpg ville Aeloria");
                 cmd(mc, "mmorpg or " + me + " 500");
                 cmd(mc, "give " + me + " mmorpg:oreille_gobelin 12");
                 cmd(mc, "give " + me + " mmorpg:croc_loup 7");
@@ -3355,7 +3366,7 @@ public final class DevShowcase {
 
     private static CompoundTag fakeTeleporters() {
         ListTag list = new ListTag();
-        String[][] rows = {{"Capitale d'Eldoria", "0", "1"}, {"Port de Valmer", "0", "10"}, {"Crypte Gobeline", "1", "15"},
+        String[][] rows = {{"Capitale d'Aeloria", "0", "1"}, {"Port de Valmer", "0", "10"}, {"Crypte Gobeline", "1", "15"},
                 {"Catacombes de la Liche", "1", "35"}, {"Citadelle du Néant", "1", "90"}, {"Col des Brumes", "2", "1"}};
         for (int i = 0; i < rows.length; i++) {
             CompoundTag e = new CompoundTag();
@@ -3374,7 +3385,7 @@ public final class DevShowcase {
         CompoundTag t = new CompoundTag();
         t.put("list", list);
         t.putInt("total", 9);
-        t.putString("current", "Capitale d'Eldoria");
+        t.putString("current", "Capitale d'Aeloria");
         t.putBoolean("scroll", false);
         return t;
     }

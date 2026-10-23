@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Mannequin d'entrainement d'Eldoria (format Blockbench "Modded Entity"), genere par script.
+Mannequin d'entrainement d'Aeloria (format Blockbench "Modded Entity"), genere par script.
 
   python generer_mannequin.py            les 3 variantes, avec apercus et GIF
   python generer_mannequin.py --rapide   sans GIF

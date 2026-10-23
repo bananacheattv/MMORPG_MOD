@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Effets sonores d'Eldoria a partir d'enregistrements libres de droits (CC0, OpenGameArt), montes et mixes : couches, hauteur, reverberation.
+"""Effets sonores d'Aeloria a partir d'enregistrements libres de droits (CC0, OpenGameArt), montes et mixes : couches, hauteur, reverberation.
 
 Les sources sont recuperees par fetch_sfx_sources.py (dossier de cache tools/_sfx_cache par defaut, ou celui passe en argument).
 Chaque effet est un OGG Vorbis mono (positionnable dans le monde) ecrit dans assets/mmorpg/sounds/sfx/ avec les memes noms qu'avant :

@@ -21,7 +21,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.sound.PlaySoundEvent;
 
 /**
- * Musique d'ambiance du hub (assets/mmorpg/sounds/music/eldoria_hub.ogg, generee par tools/gen_hub_music.py ; remplacez le fichier
+ * Musique d'ambiance du hub (assets/mmorpg/sounds/music/aeloria_hub.ogg, generee par tools/gen_hub_music.py ; remplacez le fichier
  * pour utiliser votre propre piece) : jouee en boucle dans la categorie « musique » tant que le joueur est dans la dimension du hub,
  * hors cinematique. Fondus d'entree et de sortie ; les musiques vanilla sont coupees pendant ce temps.
  */

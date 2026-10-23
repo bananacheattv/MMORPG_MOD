@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Musique de la cinematique d'arrivee du hub (« Eldoria ») : piece originale synthetisee (OGG Vorbis stereo, ~70 s), en re majeur,
+"""Musique de la cinematique d'arrivee du hub (« Aeloria ») : piece originale synthetisee (OGG Vorbis stereo, ~70 s), en re majeur,
 a 82 mesures/min, calee sur la ligne de temps de la cinematique : survol de la citadelle (mesures 0-6), puis une section par classe
 (Guerrier : bois graves et tambours ; Mage : celesta et chœur ; Paladin : cors et timbales ; Archer : cordes pincees et flute), puis
 le retour au joueur (mesures 19-23) qui s'acheve sur l'accord de re majeur.
 
-Dependances : numpy, soundfile. Sortie : assets/mmorpg/sounds/music/eldoria_theme.ogg et assets/mmorpg/sounds.json
+Dependances : numpy, soundfile. Sortie : assets/mmorpg/sounds/music/aeloria_theme.ogg et assets/mmorpg/sounds.json
 Appele par tools/gen_hub.py ; lancer ce fichier seul regenere la piece.
 """
 import json
@@ -309,11 +309,11 @@ def render(path):
 
 
 def generate(assets_dir):
-    path = os.path.join(assets_dir, 'sounds', 'music', 'eldoria_theme.ogg')
+    path = os.path.join(assets_dir, 'sounds', 'music', 'aeloria_theme.ogg')
     secs = render(path)
     with open(os.path.join(assets_dir, 'sounds.json'), 'w', encoding='utf-8', newline='\n') as f:
-        json.dump({'cinematique.theme': {'category': 'music', 'sounds': [{'name': 'mmorpg:music/eldoria_theme', 'stream': True}]},
-                   'hub.ambiance': {'category': 'music', 'sounds': [{'name': 'mmorpg:music/eldoria_hub', 'stream': True}]},
+        json.dump({'cinematique.theme': {'category': 'music', 'sounds': [{'name': 'mmorpg:music/aeloria_theme', 'stream': True}]},
+                   'hub.ambiance': {'category': 'music', 'sounds': [{'name': 'mmorpg:music/aeloria_hub', 'stream': True}]},
                    **__import__('build_sfx').sounds_json_entries()}, f, indent=2)
         f.write('\n')
     print('musique generee : %.1f s' % secs)

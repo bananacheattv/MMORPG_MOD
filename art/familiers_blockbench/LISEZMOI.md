@@ -1,4 +1,4 @@
-# Familiers d'Eldoria — modèles Blockbench animés
+# Familiers d'Aeloria — modèles Blockbench animés
 
 Huit familiers **générés par script** : `python generer_familiers.py` (Python 3.8+, Pillow, numpy).
 Même kit que les boss (`../entity_kit.py`) et mêmes règles : voir `../boss_blockbench/LISEZMOI.md`.

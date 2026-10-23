@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Police pixel « Eldoria » : capitales a empattements dessinees a la main (aucune police tierce), chiffres, ponctuation et
+"""Police pixel « Aeloria » : capitales a empattements dessinees a la main (aucune police tierce), chiffres, ponctuation et
 accents francais. Les minuscules reprennent les capitales (petites capitales), ce qui donne un style de titre coherent.
 
-Genere assets/mmorpg/font/eldoria.json et assets/mmorpg/textures/font/eldoria.png (fournisseur « bitmap » de Minecraft).
+Genere assets/mmorpg/font/aeloria.json et assets/mmorpg/textures/font/aeloria.png (fournisseur « bitmap » de Minecraft).
 Appele par tools/gen_hub.py ; lancer ce fichier seul pour obtenir un apercu (apercu_police.png).
 """
 import json
@@ -150,19 +150,19 @@ def generate(assets_dir):
     font_dir = os.path.join(assets_dir, 'font')
     os.makedirs(tex_dir, exist_ok=True)
     os.makedirs(font_dir, exist_ok=True)
-    sheet.save(os.path.join(tex_dir, 'eldoria.png'))
+    sheet.save(os.path.join(tex_dir, 'aeloria.png'))
     definition = {"providers": [
         {"type": "space", "advances": {" ": 5}},
-        {"type": "bitmap", "file": "mmorpg:font/eldoria.png", "ascent": 11, "height": 12, "chars": grid},
+        {"type": "bitmap", "file": "mmorpg:font/aeloria.png", "ascent": 11, "height": 12, "chars": grid},
     ]}
-    with open(os.path.join(font_dir, 'eldoria.json'), 'w', encoding='utf-8', newline='\n') as f:
+    with open(os.path.join(font_dir, 'aeloria.json'), 'w', encoding='utf-8', newline='\n') as f:
         json.dump(definition, f, ensure_ascii=True, indent=2)
         f.write('\n')
     return sheet
 
 
 def preview(path):
-    text = ["ELDORIA", "LE GUERRIER - LE MAGE", "L'ARCHER, LE PALADIN", "A VOUS DE JOUER !", "ÉPREUVE DES HÉROS 0123456789", "Maître des classes"]
+    text = ["AELORIA", "LE GUERRIER - LE MAGE", "L'ARCHER, LE PALADIN", "A VOUS DE JOUER !", "ÉPREUVE DES HÉROS 0123456789", "Maître des classes"]
     scale = 4
     img = Image.new('RGBA', (420 * scale // 2, (len(text) * 14 + 4) * scale), (40, 36, 52, 255))
     y = 2

@@ -2,7 +2,7 @@ package com.mmorpg.client;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 
-/** Options d'affichage cote client (modifiables depuis Mods > Eldoria MMORPG > Configurer). */
+/** Options d'affichage cote client (modifiables depuis Mods > Aeloria MMORPG > Configurer). */
 public final class ClientConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 

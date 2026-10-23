@@ -7,7 +7,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
-/** Compact Eldoria roster, including single-player worlds. */
+/** Compact Aeloria roster, including single-player worlds. */
 public final class PlayerListHud {
     public static void render(GuiGraphicsExtractor g, DeltaTracker delta) {
         var mc = Minecraft.getInstance();
@@ -20,7 +20,7 @@ public final class PlayerListHud {
         int x = (g.guiWidth() - w) / 2, y = 12;
         g.fill(x, y, x + w, y + 46 + rows * 13, 0xFF110F1A);
         Ui.frame(g, x, y, w, 46 + rows * 13, Ui.GOLD, false);
-        g.centeredText(mc.font, Component.literal("✦ ELDORIA ✦"), x + w / 2, y + 5, Ui.GOLD);
+        g.centeredText(mc.font, Component.literal("✦ AELORIA ✦"), x + w / 2, y + 5, Ui.GOLD);
         int online = mc.getConnection().getOnlinePlayers().size();
         g.centeredText(mc.font, Component.literal(online + " aventurier(s) en ligne"), x + w / 2, y + 16, Ui.MUTED);
         for (int i = 0; i < n; i++) {

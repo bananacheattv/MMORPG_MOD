@@ -31,6 +31,9 @@ public final class ServerEvents {
     @SubscribeEvent
     public static void onServerStarted(net.neoforged.neoforge.event.server.ServerStartedEvent event) {
         event.getServer().getGameRules().set(net.minecraft.world.level.gamerules.GameRules.KEEP_INVENTORY, true, event.getServer());
+        // monde neuf : le hub est construit tout seul (un peu apres le demarrage), la premiere connexion s'y fait toujours
+        var server = event.getServer();
+        Scheduler.later(server.overworld(), 60, () -> com.mmorpg.hub.HubManager.ensureHub(server));
     }
 
     @SubscribeEvent

@@ -1,6 +1,6 @@
 package com.mmorpg.client.screen;
 
-import com.mmorpg.client.EldoriaFont;
+import com.mmorpg.client.AeloriaFont;
 import com.mmorpg.client.cinematic.Ease;
 import com.mmorpg.client.ui.MmoScreen;
 import com.mmorpg.client.ui.Ui;
@@ -57,7 +57,7 @@ public class RpgDeathScreen extends MmoScreen {
         float in = Ease.OUT_CUBIC.apply((t - 0.2F) / 0.9F);
         // titre
         String title = "VOUS ÊTES TOMBÉ";
-        var comp = EldoriaFont.of(title);
+        var comp = AeloriaFont.of(title);
         int tw = font.width(comp);
         float scale = Math.min(3.2F, width * 0.8F / Math.max(1, tw));
         g.pose().pushMatrix();

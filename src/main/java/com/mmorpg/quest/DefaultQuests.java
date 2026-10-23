@@ -92,7 +92,7 @@ public final class DefaultQuests {
                 "Des chevaliers venus du Néant franchissent les failles. Repoussez-les."),
                 "kill", "chevalier_neant", 12), 500000, 800, "pierre_amelioration_sup", 3));
         m.put("avatar_neant", req(reward(obj(q("L'Avatar du Néant", 95,
-                "L'Avatar du Néant est la menace ultime. Ouvrez l'Œil du Néant et sauvez Eldoria."),
+                "L'Avatar du Néant est la menace ultime. Ouvrez l'Œil du Néant et sauvez Aeloria."),
                 "kill", "avatar_neant", 1), 1500000, 3000, "fragment_divin", 1, "cle_quete", 2), "chevaliers_neant", "titan_glace"));
         // ------------------------------------------------ quetes journalieres
         QuestDef daily = q("Contrat de chasse", 1, "Contrat quotidien : éliminez 20 monstres, quels qu'ils soient.");

@@ -144,7 +144,7 @@ public final class AreaEntryClient {
         float a = window(t, 0.25F, 1.05F, out - 0.9F, out);
         if (a > 0.01F) {
             float settle = Ease.OUT_CUBIC.apply((t - 0.25F) / 0.9F);
-            var text = EldoriaFont.of(title);
+            var text = AeloriaFont.of(title);
             int tw = mc.font.width(text);
             float fit = Math.min(1F, w * 0.84F / Math.max(1, tw * 2.3F));
             float scale = (2.3F + (1F - settle) * 0.45F) * fit;
@@ -192,7 +192,7 @@ public final class AreaEntryClient {
         float a = window(t, 0.3F, 0.9F, out - 1F, out);
         if (a > 0.01F) {
             float settle = Ease.OUT_CUBIC.apply((t - 0.3F) / 0.8F);
-            var text = EldoriaFont.of(title);
+            var text = AeloriaFont.of(title);
             int tw = mc.font.width(text);
             float fit = Math.min(1F, w * 0.84F / Math.max(1, tw * 3.4F));
             float scale = (3.4F + (1F - settle) * 1.8F) * fit;
@@ -213,7 +213,7 @@ public final class AreaEntryClient {
             g.pose().pushMatrix();
             g.pose().translate(cx, cy - Math.round(9F * scale / 2F) - 16);
             g.pose().scale(1.3F, 1.3F);
-            g.centeredText(mc.font, EldoriaFont.of("— ANTRE DU BOSS —"), 0, 0, 0xFF5040 | alpha(ka));
+            g.centeredText(mc.font, AeloriaFont.of("— ANTRE DU BOSS —"), 0, 0, 0xFF5040 | alpha(ka));
             g.pose().popMatrix();
             float sa = window(t, 1.0F, 1.7F, out - 1F, out);
             if (!subtitle.isEmpty()) {
@@ -229,7 +229,7 @@ public final class AreaEntryClient {
     /** Titre centre qui s'ajuste a la largeur de l'ecran. */
     private static void bigTitle(GuiGraphicsExtractor g, String text, int cx, int cy, float scale, int col, float a) {
         Minecraft mc = Minecraft.getInstance();
-        var comp = EldoriaFont.of(text);
+        var comp = AeloriaFont.of(text);
         int tw = mc.font.width(comp);
         float fit = Math.min(1F, g.guiWidth() * 0.86F / Math.max(1, tw * scale));
         g.pose().pushMatrix();

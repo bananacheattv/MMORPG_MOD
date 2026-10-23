@@ -317,9 +317,9 @@ public final class RpgCommands {
             c.getSource().sendFailure(Component.literal("La dimension du hub (mmorpg:hub) est introuvable : le mod est-il à jour sur ce monde ?"));
             return 0;
         }
-        c.getSource().sendSuccess(() -> ok("Construction de la Citadelle d'Eldoria en cours..."), false);
+        c.getSource().sendSuccess(() -> ok("Construction de la Citadelle d'Aeloria en cours..."), false);
         com.mmorpg.hub.HubBuilder.build(level, com.mmorpg.hub.HubManager.HUB_ORIGIN);
-        c.getSource().sendSuccess(() -> ok("Hub d'Eldoria construit dans la dimension mmorpg:hub : rotonde, bassin, 4 pavillons de classe, portail, arène d'épreuve, aire d'entraînement, téléporteur. Point d'apparition du monde défini sur le hub : utilisez /hub pour vous y rendre."), true);
+        c.getSource().sendSuccess(() -> ok("Hub d'Aeloria construit dans la dimension mmorpg:hub : rotonde, bassin, 4 pavillons de classe, portail, arène d'épreuve, aire d'entraînement, téléporteur. Point d'apparition du monde défini sur le hub : utilisez /hub pour vous y rendre."), true);
         return 1;
     }
 

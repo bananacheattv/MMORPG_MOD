@@ -1,4 +1,4 @@
-# Boss d'Eldoria — modèles Blockbench animés
+# Boss d'Aeloria — modèles Blockbench animés
 
 Cinq boss **générés par script** (aucune modélisation à la main) : `python generer_boss.py` (Python 3.8+, Pillow, numpy).
 Le code commun est dans `../entity_kit.py` ; chaque boss a son module (`roi_gobelin.py`, `liche_ancienne.py`, `ignis.py`, `titan_glace.py`, `avatar_neant.py`).

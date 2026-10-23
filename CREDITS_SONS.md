@@ -1,6 +1,6 @@
 # Sources des effets sonores
 
-Les effets sonores d'Eldoria (`src/main/resources/assets/mmorpg/sounds/sfx/`) sont montes par `tools/build_sfx.py` (couches, hauteur, reverberation) a partir d'enregistrements publies sous licence **CC0** (domaine public) sur OpenGameArt.org. Aucune attribution n'est exigee ; la liste ci-dessous remercie leurs auteurs.
+Les effets sonores d'Aeloria (`src/main/resources/assets/mmorpg/sounds/sfx/`) sont montes par `tools/build_sfx.py` (couches, hauteur, reverberation) a partir d'enregistrements publies sous licence **CC0** (domaine public) sur OpenGameArt.org. Aucune attribution n'est exigee ; la liste ci-dessous remercie leurs auteurs.
 
 - **RPG Sound Pack** — artisticdude — <https://opengameart.org/content/rpg-sound-pack>
 - **50 RPG sound effects** — Kenney — <https://opengameart.org/content/50-rpg-sound-effects>

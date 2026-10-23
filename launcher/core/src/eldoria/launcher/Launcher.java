@@ -37,7 +37,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 /**
- * Coeur du launcher Eldoria (mis a jour automatiquement a chaque push) : synchronise les mods,
+ * Coeur du launcher Aeloria (mis a jour automatiquement a chaque push) : synchronise les mods,
  * installe Minecraft + NeoForge, connecte le compte (Microsoft ou hors ligne) et lance le jeu directement.
  */
 public final class Launcher {
@@ -92,7 +92,7 @@ public final class Launcher {
     // ---------------------------------------------------------------- UI
 
     private void buildUi() {
-        frame = new JFrame("Eldoria MMORPG - Launcher");
+        frame = new JFrame("Aeloria MMORPG - Launcher");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         JPanel root = new JPanel(new BorderLayout(10, 10));
         root.setBorder(BorderFactory.createEmptyBorder(14, 14, 14, 14));
@@ -100,7 +100,7 @@ public final class Launcher {
 
         JPanel north = new JPanel(new BorderLayout(8, 8));
         north.setOpaque(false);
-        JLabel title = new JLabel("ELDORIA MMORPG");
+        JLabel title = new JLabel("AELORIA MMORPG");
         title.setFont(new Font(Font.SERIF, Font.BOLD, 30));
         title.setForeground(new Color(0xf0c860));
         north.add(title, BorderLayout.NORTH);
@@ -185,7 +185,7 @@ public final class Launcher {
         e.printStackTrace();
         log("ERREUR : " + e.getMessage());
         status(what + " - voir le journal", 0);
-        ui(() -> JOptionPane.showMessageDialog(frame, what + " :\n" + e.getMessage(), "Eldoria", JOptionPane.ERROR_MESSAGE));
+        ui(() -> JOptionPane.showMessageDialog(frame, what + " :\n" + e.getMessage(), "Aeloria", JOptionPane.ERROR_MESSAGE));
     }
 
     // ---------------------------------------------------------------- reglages
@@ -333,7 +333,7 @@ public final class Launcher {
             String name = pseudo != null ? pseudo.getText().trim() : System.getProperty("eldoria.pseudo", "Joueur");
             if (!name.matches("[A-Za-z0-9_]{3,16}")) {
                 ui(() -> JOptionPane.showMessageDialog(frame, "Connecte-toi avec Microsoft ou entre un pseudo (3-16 lettres, chiffres ou _).",
-                        "Eldoria", JOptionPane.WARNING_MESSAGE));
+                        "Aeloria", JOptionPane.WARNING_MESSAGE));
                 return;
             }
             acc = MsAuth.Account.offline(name);

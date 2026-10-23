@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Blocs de decor « Eldoria » (marbre, pierres, cristaux, tuiles, bois ancien...) utilises par le hub et disponibles pour les
- * batisseurs (onglet « Eldoria : batisseur »). Textures et modeles : tools/gen_decor.py, dont la liste doit rester identique.
+ * Blocs de decor « Aeloria » (marbre, pierres, cristaux, tuiles, bois ancien...) utilises par le hub et disponibles pour les
+ * batisseurs (onglet « Aeloria : batisseur »). Textures et modeles : tools/gen_decor.py, dont la liste doit rester identique.
  */
 public final class DecorBlocks {
     private DecorBlocks() {

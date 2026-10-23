@@ -533,6 +533,7 @@ public final class RpgPlayers {
     // ================================================================== cycle de vie
 
     public static void onLogin(ServerPlayer player) {
+        com.mmorpg.hub.HubManager.ensureHub(player.level().getServer());
         PlayerData d = get(player);
         d.unlockSkills();
         for (Cosmetic c : Cosmetic.values()) {
@@ -559,6 +560,8 @@ public final class RpgPlayers {
                         com.mmorpg.hub.HubManager.goToHub(player);
                         player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Parlez aux Maîtres de classe : essayez, puis choisissez votre voie.").withColor(0xFFE6A0));
                     }
+                } else if (!player.level().dimension().equals(com.mmorpg.hub.HubManager.HUB_DIM)) {
+                    com.mmorpg.hub.HubManager.goToHub(player);          // pas encore de classe : on se reconnecte toujours dans le hub
                 }
             } else if (ConfigManager.general().openClassSelectionOnJoin) {
                 openClassSelection(player);

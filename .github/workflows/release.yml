@@ -74,7 +74,7 @@ jobs:
           New-Item -ItemType Directory in | Out-Null
           Copy-Item dist/EldoriaLauncher.jar in/
           jpackage --type app-image --name EldoriaLauncher --input in --main-jar EldoriaLauncher.jar `
-            --main-class eldoria.boot.Bootstrap --app-version 1.0.0 --vendor Eldoria `
+            --main-class eldoria.boot.Bootstrap --app-version 1.0.0 --vendor Aeloria `
             --add-modules java.se,jdk.zipfs,jdk.charsets,jdk.unsupported,jdk.localedata --dest out
           Compress-Archive -Path out/EldoriaLauncher -DestinationPath EldoriaLauncher-Windows.zip
 
@@ -104,4 +104,4 @@ jobs:
           NOTES
           gh release delete latest --cleanup-tag -y || true
           gh release create latest art/dist/* art/windows/EldoriaLauncher-Windows.zip \
-            --target "$GITHUB_SHA" --title "Eldoria MMORPG - build ${{ github.run_number }}" --notes-file notes.md --latest
+            --target "$GITHUB_SHA" --title "Aeloria MMORPG - build ${{ github.run_number }}" --notes-file notes.md --latest

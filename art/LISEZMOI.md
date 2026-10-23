@@ -1,4 +1,4 @@
-# Modèles Blockbench — Eldoria MMORPG
+# Modèles Blockbench — Aeloria MMORPG
 
 Tous les modèles sont **générés par script**, de façon reproductible : il n'y a aucune modélisation à la main. Python 3 et Pillow suffisent (`pip install pillow`).
 
@@ -133,7 +133,7 @@ Une armure 3D n'est **pas** un modèle d'item : elle s'affiche sur le corps du j
 3. **Déclarer la texture** dans l'*equipment asset* (`assets/<ns>/equipment/<nom>.json`) et la placer dans `textures/entity/equipment/humanoid/`.
 4. **Facultatif : rendre les parties lumineuses brillantes.** Il faut une seconde passe de rendu avec `_emissive.png` (type de rendu « eyes »).
 
-Pour le mod Eldoria (Minecraft 26.3 + NeoForge), cette intégration peut être faite directement, sans dépendance supplémentaire. Il faut d'abord décider comment répartir les 20 panoplies entre les 17 armures existantes et les 4 classes. Avec GeckoLib, il faudrait au contraire convertir les projets au format « GeckoLib Animated Model ».
+Pour le mod Aeloria (Minecraft 26.3 + NeoForge), cette intégration peut être faite directement, sans dépendance supplémentaire. Il faut d'abord décider comment répartir les 20 panoplies entre les 17 armures existantes et les 4 classes. Avec GeckoLib, il faudrait au contraire convertir les projets au format « GeckoLib Animated Model ».
 
 ## 3. Effets lumineux : ce qui marche tel quel et ce qui demande du code
 

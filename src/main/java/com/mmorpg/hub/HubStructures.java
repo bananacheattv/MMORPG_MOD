@@ -131,7 +131,7 @@ final class HubStructures {
         c.L.setBlock(tp, ModBlocks.TELEPORTEUR.get().defaultBlockState(), Block.UPDATE_ALL);
         WaypointData data = WaypointData.get(c.L.getServer());
         data.removeAt(c.L.dimension(), tp);
-        data.create(c.L.dimension(), tp, "Hub d'Eldoria", WaypointData.CITY, 1, new UUID(0, 0));
+        data.create(c.L.dimension(), tp, "Hub d'Aeloria", WaypointData.CITY, 1, new UUID(0, 0));
     }
 
     // ================================================================== voie de l'arene : arches de marbre

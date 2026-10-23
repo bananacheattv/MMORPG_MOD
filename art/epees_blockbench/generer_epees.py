@@ -214,7 +214,7 @@ def main():
     for sub in ('textures', 'apercu', os.path.join(mc, 'models', 'item'), os.path.join(mc, 'textures', 'item'), os.path.join(mc, 'items')):
         os.makedirs(os.path.join(ICI, sub), exist_ok=True)
     bk.write_json(os.path.join(ICI, 'minecraft', 'pack.mcmeta'),
-                  {'pack': {'description': 'Epees Eldoria (6 evolutions)', 'min_format': 97, 'max_format': 97}}, indent=2)
+                  {'pack': {'description': 'Epees Aeloria (6 evolutions)', 'min_format': 97, 'max_format': 97}}, indent=2)
     done = []
     for fn in EPEES:
         m, grip = fn()
@@ -224,7 +224,7 @@ def main():
         atlas.save(os.path.join(mc, 'textures', 'item', f'{m.key}.png'))
         bk.write_json(os.path.join(ICI, f'{m.key}.bbmodel'), bk.bbmodel(m, atlas, m.key, NS, display, COLORS))
         bk.write_json(os.path.join(mc, 'models', 'item', f'{m.key}.json'),
-                      bk.java_model(m, atlas, f'{NS}:item/{m.key}', display, COLORS, 'Eldoria MMORPG - generer_epees.py'))
+                      bk.java_model(m, atlas, f'{NS}:item/{m.key}', display, COLORS, 'Aeloria MMORPG - generer_epees.py'))
         bk.write_json(os.path.join(mc, 'items', f'{m.key}.json'), {'model': {'type': 'minecraft:model', 'model': f'{NS}:item/{m.key}'}}, indent=2)
         bk.views(m, atlas, os.path.join(ICI, 'apercu', f'{m.key}_vues.png'), f'{m.titre} — niveau {m.level}  ({len(m.parts)} cubes)')
         x1, x2, y1, y2 = bk.bbox(m)

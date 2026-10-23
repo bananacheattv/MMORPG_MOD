@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Structures multiblocs d'Eldoria pour Blockbench (format "Modded Entity"), generees entierement par script :
+Structures multiblocs d'Aeloria pour Blockbench (format "Modded Entity"), generees entierement par script :
 autel d'invocation, teleporteur, forge arcanique.
 
 Usage :

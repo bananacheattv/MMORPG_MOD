@@ -6,14 +6,14 @@ import net.minecraft.network.chat.FontDescription;
 import net.minecraft.network.chat.MutableComponent;
 
 /**
- * Police « Eldoria » (assets/mmorpg/font/eldoria.json, generee par tools/gen_font.py) : capitales a empattements pour les titres
+ * Police « Aeloria » (assets/mmorpg/font/aeloria.json, generee par tools/gen_font.py) : capitales a empattements pour les titres
  * du hub, de la cinematique et des dialogues. Les minuscules s'affichent en petites capitales.
  */
-public final class EldoriaFont {
-    private EldoriaFont() {
+public final class AeloriaFont {
+    private AeloriaFont() {
     }
 
-    public static final FontDescription FONT = new FontDescription.Resource(MMORPG.id("eldoria"));
+    public static final FontDescription FONT = new FontDescription.Resource(MMORPG.id("aeloria"));
 
     public static MutableComponent of(String text) {
         return Component.literal(text).withStyle(style -> style.withFont(FONT));

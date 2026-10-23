@@ -329,7 +329,7 @@ final class Game {
         vars.put("clientid", "0");
         vars.put("auth_xuid", acc.xuid());
         vars.put("user_type", acc.type());
-        vars.put("version_type", "Eldoria");
+        vars.put("version_type", "Aeloria");
         vars.put("natives_directory", natives.toString());
         vars.put("launcher_name", "EldoriaLauncher");
         vars.put("launcher_version", "1");

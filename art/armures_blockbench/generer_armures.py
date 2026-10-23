@@ -891,7 +891,7 @@ def build_texture(A):
 
 # ============================================================================================== export .bbmodel (Modded Entity)
 def uid(*key):
-    return str(uuid.uuid5(uuid.NAMESPACE_URL, 'eldoria-armure/' + '/'.join(map(str, key))))
+    return str(uuid.uuid5(uuid.NAMESPACE_URL, 'aeloria-armure/' + '/'.join(map(str, key))))
 
 
 def bbmodel(A, tex):

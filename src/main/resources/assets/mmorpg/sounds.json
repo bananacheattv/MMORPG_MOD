@@ -3,7 +3,7 @@
     "category": "music",
     "sounds": [
       {
-        "name": "mmorpg:music/eldoria_theme",
+        "name": "mmorpg:music/aeloria_theme",
         "stream": true
       }
     ]
@@ -12,7 +12,7 @@
     "category": "music",
     "sounds": [
       {
-        "name": "mmorpg:music/eldoria_hub",
+        "name": "mmorpg:music/aeloria_hub",
         "stream": true
       }
     ]

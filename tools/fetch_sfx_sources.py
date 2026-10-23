@@ -31,7 +31,7 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 
 
 def get(url):
-    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Eldoria sfx fetch)'})
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Aeloria sfx fetch)'})
     with urllib.request.urlopen(req, timeout=120) as r:
         return r.read()
 
@@ -90,7 +90,7 @@ def main():
     path = os.path.join(ROOT, 'CREDITS_SONS.md')
     with open(path, 'w', encoding='utf-8', newline='\n') as f:
         f.write('# Sources des effets sonores\n\n'
-                'Les effets sonores d\'Eldoria (`src/main/resources/assets/mmorpg/sounds/sfx/`) sont montes par `tools/build_sfx.py` '
+                'Les effets sonores d\'Aeloria (`src/main/resources/assets/mmorpg/sounds/sfx/`) sont montes par `tools/build_sfx.py` '
                 '(couches, hauteur, reverberation) a partir d\'enregistrements publies sous licence **CC0** (domaine public) sur OpenGameArt.org. '
                 'Aucune attribution n\'est exigee ; la liste ci-dessous remercie leurs auteurs.\n\n')
         for title, author, url in credits:
