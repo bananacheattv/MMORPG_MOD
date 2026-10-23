@@ -178,6 +178,10 @@ public final class DevShowcase {
             structuresPhase(mc, me);
             return;
         }
+        if (MODE.equals("services")) {          // banque et hotel des ventes : modeles 3D, interfaces, depot, vente, achat, comptoir
+            servicesPhase(mc, me);
+            return;
+        }
         if (MODE.equals("cultures")) {          // cultures d'Aeloria : stades, recolte a la houe, niveau de semis
             culturesPhase(mc, me);
             return;
@@ -1168,6 +1172,128 @@ public final class DevShowcase {
     }
 
     private static net.minecraft.core.BlockPos structOrigin;
+
+    /** Banque et hotel des ventes : vue des modeles 3D puis actions reelles (messages serveur). */
+    private static void servicesPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) mc.getWindow().setWindowed(1280, 720);
+        if (tick == 20) {
+            cmd(mc, "difficulty peaceful");
+            cmd(mc, "time set day");
+            cmd(mc, "weather clear");
+            cmd(mc, "gamemode creative " + me);
+            cmd(mc, "mmorpg niveau " + me + " 100");
+            cmd(mc, "clear " + me);
+            cmd(mc, "fill ~-40 180 ~-40 ~40 180 ~40 minecraft:smooth_stone");
+            cmd(mc, "fill ~-40 181 ~-40 ~40 195 ~40 minecraft:air");
+            cmd(mc, "tp " + me + " ~ 181 ~ 180 0");
+        }
+        if (tick == 28) cmd(mc, "kill @e[type=!minecraft:player,distance=..80]");
+        if (tick == 30) {
+            structOrigin = mc.player.blockPosition();
+            cmd(mc, "setblock ~ ~ ~-16 mmorpg:banque_aeloria[facing=south]");
+            cmd(mc, "setblock ~ ~ ~16 mmorpg:hdv_aeloria[facing=north]");
+        }
+        if (structOrigin == null) return;
+        net.minecraft.core.BlockPos bank = structOrigin.offset(0, 0, -16);
+        net.minecraft.core.BlockPos hdv = structOrigin.offset(0, 0, 16);
+        if (tick == 45) {
+            look(mc, me, 0, 5, -4, 0, -16, 14);
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+            if (!mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        }
+        if (tick == 80) shot(mc, "100_banque_3d");
+        if (tick == 85) look(mc, me, 0, 4, 4, 0, 16, 14);
+        if (tick == 120) shot(mc, "101_hdv_3d");
+        // banque : depot de 1000 or, interface, retrait de 400, coffre
+        if (tick == 130) {
+            if (mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+            look(mc, me, 0, 1, -8, 0, -16, 5);
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                com.mmorpg.rpg.PlayerData d = com.mmorpg.server.RpgPlayers.get(pl);
+                d.gold = 5000;
+                d.dirty = true;
+            });
+        }
+        if (tick == 140) ClientNet.send(new Payloads.ServiceAction(Payloads.ServiceAction.BANK, com.mmorpg.economy.Bank.ACT_DEPOSIT, 1000, "", 0, bank));
+        if (tick == 150) ClientNet.send(new Payloads.ServiceAction(Payloads.ServiceAction.BANK, com.mmorpg.economy.Bank.ACT_WITHDRAW, 400, "", 0, bank));
+        if (tick == 160) {
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                long wallet = com.mmorpg.server.RpgPlayers.get(pl).gold;
+                long inBank = com.mmorpg.economy.BankData.get(srv).account(pl.getUUID()).gold;
+                MMORPG.LOGGER.info("[MMORPG] SERVICES banque : porte-monnaie {} (attendu 4400), en banque {} (attendu 600)", wallet, inBank);
+                com.mmorpg.economy.Bank.open(pl, bank);
+            });
+        }
+        if (tick == 175) shot(mc, "102_banque_ecran");
+        if (tick == 180) mc.gui.setScreen(null);
+        if (tick == 185) {
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                pl.getInventory().setItem(5, new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("lingot_neantite"), 12));
+                com.mmorpg.economy.Bank.action(pl, bank, com.mmorpg.economy.Bank.ACT_OPEN_PAGE, 0, 0);
+            });
+        }
+        if (tick == 205) shot(mc, "103_banque_coffre");
+        if (tick == 210) mc.gui.setScreen(null);
+        // hotel des ventes : mise en vente, annonce d'un autre vendeur, achat, annulation, comptoir
+        if (tick == 215) {
+            look(mc, me, 0, 1, 8, 0, 16, 5);
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                pl.getInventory().setItem(0, new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("pioche_neantite")));
+                var data = com.mmorpg.economy.AuctionData.get(srv);
+                java.util.UUID other = new java.util.UUID(1, 2);
+                data.add(new com.mmorpg.economy.AuctionData.Listing(data.nextId(), other, "Aldric", new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("lingot_astralium"), 3), 900, System.currentTimeMillis() + 36L * 3600_000L));
+                data.add(new com.mmorpg.economy.AuctionData.Listing(data.nextId(), other, "Aldric", new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("compresse_glacium"), 2), 450, System.currentTimeMillis() + 5L * 3600_000L));
+                data.add(new com.mmorpg.economy.AuctionData.Listing(data.nextId(), other, "Mira", new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("nectar_neant"), 4), 700, System.currentTimeMillis() + 47L * 3600_000L));
+            });
+        }
+        if (tick == 225) ClientNet.send(new Payloads.ServiceAction(Payloads.ServiceAction.AUCTION, com.mmorpg.economy.Auction.ACT_SELL, 2500, "", 0, hdv));
+        if (tick == 235) {
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                var data = com.mmorpg.economy.AuctionData.get(srv);
+                long mine = data.listings().stream().filter(l -> l.seller().equals(pl.getUUID())).count();
+                MMORPG.LOGGER.info("[MMORPG] SERVICES hdv : annonces du joueur {} (attendu 1), main vide = {} (attendu true), total annonces {} (attendu 4)",
+                        mine, pl.getMainHandItem().isEmpty(), data.listings().size());
+                com.mmorpg.economy.Auction.open(pl, hdv, "", 0);
+            });
+        }
+        if (tick == 255) shot(mc, "104_hdv_ecran");
+        if (tick == 260) {
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                var data = com.mmorpg.economy.AuctionData.get(srv);
+                long target = data.listings().stream().filter(l -> l.sellerName().equals("Mira")).findFirst().get().id();
+                long before = com.mmorpg.server.RpgPlayers.get(pl).gold;
+                com.mmorpg.economy.Auction.action(pl, hdv, com.mmorpg.economy.Auction.ACT_BUY, target, "", 0);
+                long after = com.mmorpg.server.RpgPlayers.get(pl).gold;
+                MMORPG.LOGGER.info("[MMORPG] SERVICES hdv achat : or {} -> {} (attendu -700), nectars en poche {} (attendu 4), gains en attente du vendeur {} (attendu 665)",
+                        before, after, pl.getInventory().countItem(com.mmorpg.registry.ModItems.get("nectar_neant")), data.earnings(new java.util.UUID(1, 2)));
+                long mineId = data.listings().stream().filter(l -> l.seller().equals(pl.getUUID())).findFirst().get().id();
+                com.mmorpg.economy.Auction.action(pl, hdv, com.mmorpg.economy.Auction.ACT_CANCEL, mineId, "", 0);
+                MMORPG.LOGGER.info("[MMORPG] SERVICES hdv annulation : pioche de retour = {} (attendu 1)", pl.getInventory().countItem(com.mmorpg.registry.ModItems.get("pioche_neantite")));
+                data.addEarnings(pl.getUUID(), 300);
+                long g0 = com.mmorpg.server.RpgPlayers.get(pl).gold;
+                com.mmorpg.economy.Auction.action(pl, hdv, com.mmorpg.economy.Auction.ACT_CLAIM, 0, "", 0);
+                MMORPG.LOGGER.info("[MMORPG] SERVICES hdv comptoir : or {} -> {} (attendu +300)", g0, com.mmorpg.server.RpgPlayers.get(pl).gold);
+                // refus : acheter sa propre annonce, mettre en vente a prix nul, sans objet en main
+                pl.getInventory().setItem(0, net.minecraft.world.item.ItemStack.EMPTY);
+                int before2 = data.listings().size();
+                com.mmorpg.economy.Auction.action(pl, hdv, com.mmorpg.economy.Auction.ACT_SELL, 100, "", 0);
+                MMORPG.LOGGER.info("[MMORPG] SERVICES hdv vente sans objet : annonces {} -> {} (attendu inchange)", before2, data.listings().size());
+                com.mmorpg.economy.Auction.open(pl, hdv, "lingot", 0);
+            });
+        }
+        if (tick == 285) shot(mc, "105_hdv_ecran_apres");
+        if (tick == 300) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        }
+    }
 
     /** Cultures : une rangee par plante (stades 0, 3, 5 et 7), recolte a la houe de Neantite, refus de semis sous le niveau requis. */
     private static void culturesPhase(Minecraft mc, String me) {

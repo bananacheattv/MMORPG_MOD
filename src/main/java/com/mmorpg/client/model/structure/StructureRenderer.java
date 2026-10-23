@@ -62,6 +62,10 @@ public class StructureRenderer implements BlockEntityRenderer<StructureBlockEnti
                 new int[]{ForgeArcaniqueAnims.ETEINTE, ForgeArcaniqueAnims.ALLUMAGE, ForgeArcaniqueAnims.ACTIVE}, "forge_arcanique", null));
         models.put(MultiblockKind.PRESSE, models(c, PresseCompressionModel.LAYER, PresseCompressionModel.animations(),
                 new int[]{PresseCompressionAnims.ARRET, PresseCompressionAnims.DEMARRAGE, PresseCompressionAnims.ACTIVE}, "presse_compression", null));
+        models.put(MultiblockKind.BANQUE, models(c, BanqueAeloriaModel.LAYER, BanqueAeloriaModel.animations(),
+                new int[]{BanqueAeloriaAnims.REPOS, BanqueAeloriaAnims.OUVERTURE, BanqueAeloriaAnims.ACTIVE}, "banque_aeloria", null));
+        models.put(MultiblockKind.HDV, models(c, HdvAeloriaModel.LAYER, HdvAeloriaModel.animations(),
+                new int[]{HdvAeloriaAnims.REPOS, HdvAeloriaAnims.OUVERTURE, HdvAeloriaAnims.ACTIVE}, "hdv_aeloria", null));
     }
 
     private static Models models(BlockEntityRendererProvider.Context c, ModelLayerLocation layer, AnimationDefinition[] defs, int[] anims,

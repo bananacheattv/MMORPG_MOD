@@ -32,6 +32,9 @@ public record S2COpenScreen(int screen, CompoundTag extra) implements CustomPack
     public static final int MINE_MASTER = 15;
     /** Presse de compression (minerais compresses). */
     public static final int COMPRESSOR = 16;
+    /** Banque d'Aeloria (solde et coffre) et hotel des ventes. */
+    public static final int BANK = 17;
+    public static final int AUCTION = 18;
 
     public static final Type<S2COpenScreen> TYPE = new Type<>(MMORPG.id("open_screen"));
     public static final StreamCodec<ByteBuf, S2COpenScreen> CODEC = StreamCodec.composite(

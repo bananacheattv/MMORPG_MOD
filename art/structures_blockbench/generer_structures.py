@@ -30,7 +30,7 @@ sys.path.insert(0, ICI)
 sys.path.insert(0, os.path.join(ICI, '..'))
 import entity_kit as ek  # noqa: E402
 
-STRUCTURES = ['autel_invocation', 'teleporteur', 'forge_arcanique', 'presse_compression']
+STRUCTURES = ['autel_invocation', 'teleporteur', 'forge_arcanique', 'presse_compression', 'banque_aeloria', 'hdv_aeloria']
 SRC = os.path.join(ICI, '..', '..', 'src', 'main', 'java', 'com', 'mmorpg')
 HEADER = 'art/structures_blockbench/generer_structures.py'
 

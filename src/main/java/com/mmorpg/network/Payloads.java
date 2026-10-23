@@ -310,6 +310,21 @@ public final class Payloads {
     }
 
     /** Action a la forge : 0 = fabriquer (recette, quantite), 1 = ameliorer (emplacement d'inventaire). */
+    /** Action d'un service de la ville : banque (service 0) ou hotel des ventes (service 1). */
+    public record ServiceAction(int service, int action, long amount, String text, int page, BlockPos pos) implements CustomPacketPayload {
+        public static final int BANK = 0, AUCTION = 1;
+        public static final Type<ServiceAction> TYPE = new Type<>(MMORPG.id("service_action"));
+        public static final StreamCodec<ByteBuf, ServiceAction> CODEC = StreamCodec.composite(
+                ByteBufCodecs.VAR_INT, ServiceAction::service, ByteBufCodecs.VAR_INT, ServiceAction::action,
+                ByteBufCodecs.VAR_LONG, ServiceAction::amount, ByteBufCodecs.STRING_UTF8, ServiceAction::text,
+                ByteBufCodecs.VAR_INT, ServiceAction::page, BlockPos.STREAM_CODEC, ServiceAction::pos, ServiceAction::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
     public record ForgeAction(int action, String recipe, int value, BlockPos pos) implements CustomPacketPayload {
         public static final int CRAFT = 0, UPGRADE = 1, COMPRESS = 2;
         public static final Type<ForgeAction> TYPE = new Type<>(MMORPG.id("forge_action"));

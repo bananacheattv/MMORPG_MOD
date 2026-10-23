@@ -607,5 +607,7 @@
   "item.mmorpg.pain_argent": "Pain d'argent",
   "item.mmorpg.confiture_ambree": "Confiture ambrée",
   "item.mmorpg.elixir_givre": "Élixir de givre",
-  "item.mmorpg.nectar_neant": "Nectar du Néant"
+  "item.mmorpg.nectar_neant": "Nectar du Néant",
+  "block.mmorpg.banque_aeloria": "Banque d'Aeloria",
+  "block.mmorpg.hdv_aeloria": "Hôtel des ventes"
 }

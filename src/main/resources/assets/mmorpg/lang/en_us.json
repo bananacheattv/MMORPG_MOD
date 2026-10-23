@@ -606,5 +606,7 @@
   "item.mmorpg.pain_argent": "Silver Bread",
   "item.mmorpg.confiture_ambree": "Amber Jam",
   "item.mmorpg.elixir_givre": "Frost Elixir",
-  "item.mmorpg.nectar_neant": "Void Nectar"
+  "item.mmorpg.nectar_neant": "Void Nectar",
+  "block.mmorpg.banque_aeloria": "Aeloria Bank",
+  "block.mmorpg.hdv_aeloria": "Auction House"
 }

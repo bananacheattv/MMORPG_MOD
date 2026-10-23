@@ -3,6 +3,8 @@
   "values": [
     "mmorpg:forge_arcanique",
     "mmorpg:presse_compression",
+    "mmorpg:banque_aeloria",
+    "mmorpg:hdv_aeloria",
     "mmorpg:teleporteur",
     "mmorpg:autel_invocation",
     "mmorpg:marbre",
