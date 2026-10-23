@@ -16,25 +16,39 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Menu d'administration (/adminmenu) : editeur en arbre de toutes les configurations du serveur. On choisit un fichier, on descend dans
  * ses objets et listes, on modifie les valeurs (texte, nombre, oui/non), on ajoute (copie d'une entree existante), on duplique, deplace
  * ou supprime des entrees, puis on enregistre : le serveur verifie la structure, garde l'ancienne version et recharge la configuration.
+ * Les objets sont montres avec leur icone, et les champs a valeurs connues (objets, monstres, quetes, dimensions, biomes, valeurs deja
+ * utilisees dans le fichier) proposent une liste deroulante filtrable.
  */
 public class AdminScreen extends MmoScreen {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Map<String, String> LABELS = Map.of("general", "Général", "mobs", "Monstres et boss", "quests", "Quêtes", "shop", "Boutique",
             "butins", "Tables de butin", "mannequin", "Mannequins", "cinematique", "Cinématique");
     private static final int ROW = 16;
+    private static final int DD_ROWS = 9;
 
     private final List<String> files;
+    private final List<String> catalogMobs = new ArrayList<>();
+    private final List<String> catalogQuests = new ArrayList<>();
     private String file = "";
     private JsonElement root;
     private final List<Object> path = new ArrayList<>();
@@ -48,10 +62,27 @@ public class AdminScreen extends MmoScreen {
     private EditBox newKey;
     private Object editKey;
     private final StringBuilder incoming = new StringBuilder();
+    private final Map<String, ItemStack> icons = new HashMap<>();
+    private static List<String> itemIds;
+    // liste deroulante de la valeur en cours d'edition
+    private List<String> options = List.of();
+    private boolean optionsAreItems;
+    private int ddScroll;
+    private int ddSel = -1;
+    private int[] ddBox;
 
-    public AdminScreen(List<String> files) {
+    public AdminScreen(List<String> lines) {
         super("Administration");
-        this.files = files;
+        this.files = new ArrayList<>();
+        for (String l : lines) {
+            if (l.startsWith("\u0001mobs=")) addAll(catalogMobs, l.substring(6));
+            else if (l.startsWith("\u0001quests=")) addAll(catalogQuests, l.substring(8));
+            else if (!l.isBlank()) files.add(l);
+        }
+    }
+
+    private static void addAll(List<String> to, String csv) {
+        for (String s : csv.split(",")) if (!s.isBlank()) to.add(s);
     }
 
     // ================================================================== reception des paquets
@@ -191,6 +222,121 @@ public class AdminScreen extends MmoScreen {
         else c.getAsJsonArray().set((Integer) key, v);
     }
 
+    // ================================================================== icones d'objets
+
+    /** Pile d'un identifiant d'objet (« mmorpg:potion_soin », ou « potion_soin » du mod) ; vide si ce n'est pas un objet. */
+    private ItemStack stackOf(String id) {
+        if (id == null || id.isEmpty() || id.length() > 80) return ItemStack.EMPTY;
+        return icons.computeIfAbsent(id, k -> {
+            Identifier rl = Identifier.tryParse(k.contains(":") ? k : "mmorpg:" + k);
+            if (rl == null) return ItemStack.EMPTY;
+            Item item = BuiltInRegistries.ITEM.getOptional(rl).orElse(Items.AIR);
+            return item == Items.AIR ? ItemStack.EMPTY : new ItemStack(item);
+        });
+    }
+
+    /** Icone d'une valeur : un identifiant d'objet, ou une entree qui en contient un (champ « item »). */
+    private ItemStack iconOf(JsonElement v) {
+        if (v.isJsonPrimitive() && v.getAsJsonPrimitive().isString()) return stackOf(v.getAsString());
+        if (v.isJsonObject()) {
+            JsonElement it = v.getAsJsonObject().get("item");
+            if (it != null && it.isJsonPrimitive() && it.getAsJsonPrimitive().isString()) return stackOf(it.getAsString());
+            JsonElement type = v.getAsJsonObject().get("type");
+            JsonElement target = v.getAsJsonObject().get("target");
+            if (type != null && target != null && type.isJsonPrimitive() && "collect".equals(type.getAsString()) && target.isJsonPrimitive()) return stackOf(target.getAsString());
+        }
+        return ItemStack.EMPTY;
+    }
+
+    private static List<String> allItems() {
+        if (itemIds == null) {
+            List<String> mod = new ArrayList<>();
+            List<String> other = new ArrayList<>();
+            for (Identifier id : BuiltInRegistries.ITEM.keySet()) {
+                if (BuiltInRegistries.ITEM.getValue(id) == Items.AIR) continue;
+                (id.getNamespace().equals("mmorpg") ? mod : other).add(id.toString());
+            }
+            mod.sort(null);
+            other.sort(null);
+            mod.addAll(other);
+            itemIds = mod;
+        }
+        return itemIds;
+    }
+
+    // ================================================================== listes deroulantes
+
+    /** Nom du champ qui contient la valeur : sa cle, ou la cle de la liste qui la contient. */
+    private String fieldName(JsonElement container, Object key) {
+        if (key instanceof String s) return s;
+        for (int i = path.size() - 1; i >= 0; i--) if (path.get(i) instanceof String s) return s;
+        return "";
+    }
+
+    /** Valeurs deja utilisees pour un champ de ce nom dans tout le fichier (toutes les fiches), sans doublons. */
+    private List<String> usedValues(String field) {
+        Set<String> out = new LinkedHashSet<>();
+        collect(root, field, out);
+        return new ArrayList<>(out);
+    }
+
+    private static void collect(JsonElement e, String field, Set<String> out) {
+        if (e == null || out.size() > 400) return;
+        if (e.isJsonObject()) {
+            for (var en : e.getAsJsonObject().entrySet()) {
+                JsonElement v = en.getValue();
+                if (en.getKey().equals(field)) {
+                    if (v.isJsonPrimitive() && v.getAsJsonPrimitive().isString()) out.add(v.getAsString());
+                    else if (v.isJsonArray()) for (JsonElement x : v.getAsJsonArray()) if (x.isJsonPrimitive() && x.getAsJsonPrimitive().isString()) out.add(x.getAsString());
+                }
+                collect(v, field, out);
+            }
+        } else if (e.isJsonArray()) {
+            for (JsonElement x : e.getAsJsonArray()) collect(x, field, out);
+        }
+    }
+
+    /** Valeurs proposees pour un champ texte : objets, monstres, quetes, dimensions, biomes ou valeurs deja utilisees. */
+    private List<String> optionsFor(JsonElement container, Object key, JsonElement value) {
+        String field = fieldName(container, key);
+        String v = value.getAsString();
+        optionsAreItems = false;
+        if (field.equals("item") || field.equals("result") || (!stackOf(v).isEmpty() && !field.equals("target") && !field.equals("name"))) {
+            optionsAreItems = true;
+            return allItems();
+        }
+        if (field.equals("target")) {
+            String type = container.isJsonObject() && container.getAsJsonObject().has("type") ? container.getAsJsonObject().get("type").getAsString() : "";
+            if (type.equals("collect") || !stackOf(v).isEmpty()) {
+                optionsAreItems = true;
+                return allItems();
+            }
+            if (type.equals("kill")) return catalogMobs;
+        }
+        if (field.equals("requires")) return catalogQuests;
+        if (field.equals("dimensions")) {
+            Set<String> dims = new LinkedHashSet<>(List.of("minecraft:overworld", "minecraft:the_nether", "minecraft:the_end", "mmorpg:hub", "mmorpg:donjons"));
+            dims.addAll(usedValues(field));
+            return new ArrayList<>(dims);
+        }
+        if (field.equals("biomes")) {
+            Set<String> biomes = new LinkedHashSet<>(usedValues(field));
+            var level = Minecraft.getInstance().level;
+            if (level != null) level.registryAccess().lookup(Registries.BIOME).ifPresent(reg -> reg.keySet().stream().map(Identifier::toString).sorted().forEach(biomes::add));
+            return new ArrayList<>(biomes);
+        }
+        List<String> used = usedValues(field);
+        return used.size() >= 2 && used.size() <= 60 ? used : List.of();
+    }
+
+    private List<String> filtered() {
+        String q = edit.getValue().toLowerCase(Locale.ROOT).strip();
+        if (q.isEmpty() || options.contains(edit.getValue())) return options;
+        List<String> out = new ArrayList<>();
+        for (String o : options) if (o.toLowerCase(Locale.ROOT).contains(q)) out.add(o);
+        return out;
+    }
+
     // ================================================================== edition
 
     @Override
@@ -209,6 +355,10 @@ public class AdminScreen extends MmoScreen {
         edit = new EditBox(this.font, left, top, 200, 14, Component.literal("Valeur"));
         edit.setMaxLength(2000);
         edit.visible = false;
+        edit.setResponder(s -> {
+            ddScroll = 0;
+            ddSel = -1;
+        });
         this.addRenderableWidget(edit);
         filter = new EditBox(this.font, left + 116, top + 44, 170, 14, Component.literal("Filtre"));
         filter.setHint(Component.literal("Filtrer cette liste...").withColor(0xFF807868));
@@ -232,10 +382,20 @@ public class AdminScreen extends MmoScreen {
         edit.visible = true;
         edit.setFocused(true);
         this.setFocused(edit);
+        JsonElement cur = current();
+        options = value.getAsJsonPrimitive().isString() && cur != null ? optionsFor(cur, key, value) : List.of();
+        ddScroll = 0;
+        ddSel = -1;
+        if (!options.isEmpty() && options.size() < 200) {
+            int at = options.indexOf(value.getAsString());
+            if (at > DD_ROWS - 3) ddScroll = at - 2;
+        }
     }
 
     private void stopEdit() {
         editKey = null;
+        options = List.of();
+        ddBox = null;
         if (edit != null) {
             edit.visible = false;
             edit.setFocused(false);
@@ -265,6 +425,11 @@ public class AdminScreen extends MmoScreen {
             msgColor = Ui.RED;
         }
         stopEdit();
+    }
+
+    private void pick(String value) {
+        edit.setValue(value);
+        commitEdit();
     }
 
     private void addEntry() {
@@ -319,6 +484,7 @@ public class AdminScreen extends MmoScreen {
         Ui.wrap(g, "Appliqué à l'enregistrement. L'ancien fichier est conservé dans config/mmorpg/sauvegardes.", left + 8, y + 30, 98, Ui.MUTED);
         filter.visible = root != null;
         newKey.visible = false;
+        ddBox = null;
         int x1 = left + 116;
         int w1 = pw - 124;
         if (file.isEmpty()) {
@@ -331,7 +497,6 @@ public class AdminScreen extends MmoScreen {
         }
         // fil d'Ariane
         int bx = x1;
-        List<Object> sub = new ArrayList<>();
         for (int i = -1; i < path.size(); i++) {
             String t = i < 0 ? LABELS.getOrDefault(file, file) : label(path.get(i));
             String shown = font.plainSubstrByWidth(t, 110);
@@ -358,6 +523,7 @@ public class AdminScreen extends MmoScreen {
         int actionsW = array ? 70 : 18;
         int valueX = x1 + 150;
         int valueW = w1 - 150 - actionsW - 8;
+        int editRowY = -1;
         for (int i = 0; i < Math.min(visible, ks.size() - scroll); i++) {
             Object key = ks.get(i + scroll);
             JsonElement v = child(cur, key);
@@ -366,7 +532,13 @@ public class AdminScreen extends MmoScreen {
             if (hot) g.fill(x1 + 2, ry, x1 + w1 - 2, ry + ROW - 1, 0x30FFFFFF);
             String k = label(key);
             String h = array ? hint(v) : "";
-            g.text(font, font.plainSubstrByWidth(array && !h.isEmpty() ? k + " " + h : k, 142), x1 + 6, ry + 4, 0xFFE8D8A8, false);
+            ItemStack keyIcon = array ? iconOf(v) : ItemStack.EMPTY;
+            int kx = x1 + 6;
+            if (!keyIcon.isEmpty()) {
+                g.item(keyIcon, kx, ry - 1);
+                kx += 18;
+            }
+            g.text(font, font.plainSubstrByWidth(array && !h.isEmpty() ? k + " " + h : k, 142 - (kx - x1 - 6)), kx, ry + 4, 0xFFE8D8A8, false);
             if (v.isJsonObject() || v.isJsonArray()) {
                 g.text(font, "▸ " + summary(v), valueX, ry + 4, 0xFF9FC8FF, false);
                 click(x1 + 2, ry, w1 - actionsW - 6, ROW - 1, () -> {
@@ -384,9 +556,18 @@ public class AdminScreen extends MmoScreen {
                 });
             } else {
                 boolean editing = key.equals(editKey);
+                boolean str = v.isJsonPrimitive() && v.getAsJsonPrimitive().isString();
+                ItemStack icon = str ? stackOf(v.getAsString()) : ItemStack.EMPTY;
+                int tx = valueX;
+                if (!icon.isEmpty() && !editing) {
+                    g.item(icon, valueX, ry - 1);
+                    tx += 18;
+                    if (hovered(valueX, ry - 1, 16, 16)) g.setTooltipForNextFrame(font, icon, mouseX, mouseY);
+                }
                 if (!editing) {
                     boolean num = v.isJsonPrimitive() && v.getAsJsonPrimitive().isNumber();
-                    g.text(font, font.plainSubstrByWidth(summary(v), valueW), valueX, ry + 4, num ? 0xFF9AE6FF : Ui.TEXT, false);
+                    g.text(font, font.plainSubstrByWidth(summary(v), valueW - (tx - valueX) - 12), tx, ry + 4, num ? 0xFF9AE6FF : Ui.TEXT, false);
+                    if (str && hot) g.text(font, "▾", valueX + valueW - 8, ry + 4, Ui.MUTED, false);
                 }
                 final int ex = valueX - 2;
                 final int ey = ry;
@@ -396,6 +577,7 @@ public class AdminScreen extends MmoScreen {
                     edit.setX(valueX - 2);
                     edit.setY(ry - 1);
                     edit.setWidth(Math.max(60, valueW));
+                    editRowY = ry;
                 }
             }
             int ax = x1 + w1 - actionsW - 2;
@@ -451,6 +633,48 @@ public class AdminScreen extends MmoScreen {
         });
         String shown = msg.isEmpty() ? (dirty ? "Modifications non enregistrées" : "") : msg;
         Ui.wrap(g, shown, x1 + 168, by - 1, w1 - 172, msg.isEmpty() ? 0xFFE0B050 : msgColor);
+        if (editKey != null && editRowY >= 0 && !options.isEmpty()) dropdown(g, valueX - 2, editRowY, Math.max(valueW, 250), listTop, listBottom + 40);
+    }
+
+    /** Liste deroulante sous (ou au-dessus de) la ligne en cours d'edition : filtre selon le texte saisi, icones pour les objets. */
+    private void dropdown(GuiGraphicsExtractor g, int x, int rowY, int w, int minY, int maxY) {
+        List<String> list = filtered();
+        int shown = Math.min(DD_ROWS, Math.max(1, list.size()));
+        int h = shown * ROW + 4;
+        int y = rowY + ROW;
+        if (y + h > maxY) y = Math.max(minY - 20, rowY - h);
+        int maxScroll = Math.max(0, list.size() - DD_ROWS);
+        ddScroll = Math.max(0, Math.min(ddScroll, maxScroll));
+        ddBox = new int[]{x, y, w, h};
+        g.fill(x - 1, y - 1, x + w + 1, y + h + 1, 0xFFE2B85A);
+        g.fill(x, y, x + w, y + h, 0xF00C0A16);
+        if (list.isEmpty()) {
+            g.text(font, "Aucune valeur connue : saisie libre.", x + 6, y + 6, Ui.MUTED, false);
+            return;
+        }
+        for (int i = 0; i < shown; i++) {
+            int idx = i + ddScroll;
+            if (idx >= list.size()) break;
+            String o = list.get(idx);
+            int ry = y + 2 + i * ROW;
+            boolean hot = hovered(x, ry, w - 6, ROW) || idx == ddSel;
+            if (hot) g.fill(x + 1, ry, x + w - 5, ry + ROW, 0x50E2B85A);
+            int tx = x + 4;
+            if (optionsAreItems) {
+                ItemStack st = stackOf(o);
+                if (!st.isEmpty()) g.item(st, x + 2, ry);
+                tx = x + 22;
+            }
+            g.text(font, font.plainSubstrByWidth(o, w - (tx - x) - 10), tx, ry + 4, hot ? Ui.GOLD_LIGHT : Ui.TEXT, false);
+            click(x, ry, w - 6, ROW, () -> pick(o));
+        }
+        if (list.size() > DD_ROWS) {                               // ascenseur
+            int bh = Math.max(10, h * DD_ROWS / list.size());
+            int by = y + (h - bh) * ddScroll / Math.max(1, maxScroll);
+            g.fill(x + w - 4, y + 1, x + w - 1, y + h - 1, 0x40FFFFFF);
+            g.fill(x + w - 4, by, x + w - 1, by + bh, 0xFFE2B85A);
+            g.text(font, list.size() + " valeurs", x + w - 4 - font.width(list.size() + " valeurs"), y + h + 3, Ui.MUTED, false);
+        }
     }
 
     // ================================================================== clavier, souris
@@ -458,12 +682,20 @@ public class AdminScreen extends MmoScreen {
     @Override
     public boolean keyPressed(KeyEvent event) {
         if (edit != null && edit.visible && edit.isFocused()) {
+            List<String> list = options.isEmpty() ? List.of() : filtered();
             if (event.key() == 257 || event.key() == 335) {
-                commitEdit();
+                if (ddSel >= 0 && ddSel < list.size()) pick(list.get(ddSel));
+                else commitEdit();
                 return true;
             }
             if (event.key() == 256) {
                 stopEdit();
+                return true;
+            }
+            if (!list.isEmpty() && (event.key() == 264 || event.key() == 265)) {            // fleches bas / haut
+                ddSel = Math.max(0, Math.min(list.size() - 1, ddSel + (event.key() == 264 ? 1 : -1)));
+                if (ddSel < ddScroll) ddScroll = ddSel;
+                if (ddSel >= ddScroll + DD_ROWS) ddScroll = ddSel - DD_ROWS + 1;
                 return true;
             }
         }
@@ -473,16 +705,22 @@ public class AdminScreen extends MmoScreen {
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         if (edit != null && edit.visible && !edit.isMouseOver(event.x(), event.y())) {
-            Object before = editKey;
-            commitEdit();
-            // le clic qui valide une saisie ne declenche pas aussi la ligne en dessous si elle est la meme
-            if (before != null) return true;
+            boolean inDropdown = ddBox != null && Ui.in(event.x(), event.y(), ddBox[0], ddBox[1], ddBox[2], ddBox[3]);
+            if (!inDropdown) {
+                Object before = editKey;
+                commitEdit();
+                if (before != null) return true;
+            }
         }
         return super.mouseClicked(event, doubleClick);
     }
 
     @Override
     public boolean mouseScrolled(double x, double y, double sx, double sy) {
+        if (ddBox != null && Ui.in(x, y, ddBox[0], ddBox[1], ddBox[2], ddBox[3])) {
+            ddScroll = Math.max(0, ddScroll - (int) Math.signum(sy) * 2);
+            return true;
+        }
         scroll = Math.max(0, scroll - (int) Math.signum(sy) * 2);
         return true;
     }

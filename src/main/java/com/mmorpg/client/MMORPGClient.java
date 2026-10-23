@@ -12,6 +12,7 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 @Mod(value = MMORPG.MODID, dist = Dist.CLIENT)
 public final class MMORPGClient {
     public MMORPGClient(ModContainer container) {
+        EarlyTheme.install();
         container.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
     }

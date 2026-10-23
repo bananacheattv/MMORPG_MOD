@@ -101,16 +101,22 @@ public final class HubManager {
     }
 
     /**
-     * Construit le hub s'il n'existe pas encore (monde neuf) : sans lui, un nouveau joueur apparaitrait dans le monde ordinaire au lieu
-     * de la Citadelle. La construction definit aussi le point d'apparition du monde sur le hub. @return vrai si le hub vient d'etre construit
+     * Construit le hub (Hub 1) et le spawn s'ils n'existent pas encore (monde neuf) : sans eux, un nouveau joueur apparaitrait dans le monde
+     * ordinaire au lieu de la Citadelle. Un hub ou un spawn construit avec un ancien plan est reconstruit. @return vrai si quelque chose a ete construit
      */
     public static boolean ensureHub(net.minecraft.server.MinecraftServer server) {
+        boolean built = ensureHubOnly(server);
+        boolean spawn = SpawnBuilder.ensure(server);
+        return built || spawn;
+    }
+
+    private static boolean ensureHubOnly(net.minecraft.server.MinecraftServer server) {
         HubData existing = HubData.get(server);
         if (existing.exists()) {
             ServerLevel hubLevel = existing.level(server);
             if (existing.layout() < HubBuilder.LAYOUT_VERSION && hubLevel != null && existing.origin() != null) {
-                com.mmorpg.MMORPG.LOGGER.info("[MMORPG] Hub de plan {} : ajout du Marche d'Aeloria (plan {})", existing.layout(), HubBuilder.LAYOUT_VERSION);
-                HubBuilder.build(hubLevel, existing.origin());
+                com.mmorpg.MMORPG.LOGGER.info("[MMORPG] Hub de plan {} : mise a jour vers le plan {} ({} copie(s))", existing.layout(), HubBuilder.LAYOUT_VERSION, existing.count());
+                for (int i = 0; i < existing.count(); i++) HubBuilder.build(hubLevel, existing.origin(i), i);
                 return true;
             }
             return false;
@@ -122,29 +128,119 @@ public final class HubManager {
         return true;
     }
 
-    private static boolean healed;
+    private static final java.util.Set<Integer> HEALED = new java.util.HashSet<>();
 
-    /** Une fois par demarrage du serveur, des qu'un joueur arrive dans le hub (ses troncons sont charges) : les PNJ manquants reapparaissent. */
-    public static void healOnce(ServerLevel level) {
-        if (healed) return;
+    /** Une fois par demarrage du serveur et par copie, des qu'un joueur y arrive (ses troncons sont charges) : les PNJ manquants reapparaissent. */
+    public static void healOnce(ServerLevel level, double x) {
         HubData hub = HubData.get(level.getServer());
         if (!hub.exists() || !hub.stableBuild() || hub.origin() == null) return;
-        healed = true;
-        var origin = hub.origin();
+        int index = hub.indexAt(x);
+        if (!HEALED.add(index)) return;
+        var origin = hub.origin(index);
         com.mmorpg.server.Scheduler.later(level, 60, () -> HubBuilder.respawn(level, origin));
     }
 
-    /** /hub : retour au point d'apparition du hub (met fin a un essai en cours). */
+    // ------------------------------------------------------------------ copies du hub (salons)
+
+    private static int playersIn(net.minecraft.server.MinecraftServer server, HubData hub, int index) {
+        var box = HubLayout.hubBounds(hub.origin(index));
+        int n = 0;
+        for (ServerPlayer q : server.getPlayerList().getPlayers()) {
+            if (q.level().dimension().equals(hub.dimension()) && box.contains(q.getX(), q.getY(), q.getZ())) n++;
+        }
+        return n;
+    }
+
+    /** Copie du hub du joueur : sa copie actuelle si elle n'est pas pleine, sinon la premiere qui a de la place (une nouvelle au besoin). */
+    public static int assignHub(ServerPlayer p) {
+        var server = p.level().getServer();
+        HubData hub = HubData.get(server);
+        HubPlayerData hd = ClassTrial.data(p);
+        if (!hub.exists()) return 0;
+        int mine = Math.max(0, Math.min(hd.hub, hub.count() - 1));
+        boolean here = p.level().dimension().equals(hub.dimension()) && hub.indexAt(p.getX()) == mine;
+        if (here || playersIn(server, hub, mine) < HubData.CAPACITY) {
+            hd.hub = mine;
+            return mine;
+        }
+        for (int i = 0; i < hub.count(); i++) {
+            if (playersIn(server, hub, i) < HubData.CAPACITY) {
+                hd.hub = i;
+                return i;
+            }
+        }
+        ServerLevel level = hub.level(server);
+        int index = hub.addHub();
+        server.getPlayerList().broadcastSystemMessage(Component.literal("Ouverture du Hub " + (index + 1) + "…").withColor(0xFFD060), false);
+        if (level != null) HubBuilder.build(level, hub.origin(index), index);
+        hd.hub = index;
+        return index;
+    }
+
+    /** Origine de la copie du hub ou le joueur doit se trouver (celle qui contient sa position, sinon celle qui lui est attribuee). */
+    public static net.minecraft.core.BlockPos hubOriginOf(ServerPlayer p) {
+        HubData hub = HubData.get(p.level().getServer());
+        if (p.level().dimension().equals(hub.dimension())) return hub.originAt(p.getX());
+        return hub.origin(assignHub(p));
+    }
+
+    /** /hub : retour au point d'apparition de son hub (met fin a un essai en cours). */
     public static boolean goToHub(ServerPlayer p) {
+        return goToHub(p, -1);
+    }
+
+    /** /hub n : va dans la copie n (1, 2...) si elle existe et n'est pas pleine ; -1 pour sa copie habituelle. */
+    public static boolean goToHub(ServerPlayer p, int wanted) {
         HubData hub = HubData.get(p.level().getServer());
         ServerLevel level = hub.level(p.level().getServer());
         if (!hub.exists() || level == null) return false;
         if (CinematicManager.isLocked(p)) return true;
+        int index;
+        if (wanted >= 0) {
+            if (wanted >= hub.count()) return false;
+            if (playersIn(p.level().getServer(), hub, wanted) >= HubData.CAPACITY && hub.indexAt(p.getX()) != wanted) {
+                p.sendOverlayMessage(Component.literal("Le Hub " + (wanted + 1) + " est plein.").withColor(0xFF8080));
+                return true;
+            }
+            ClassTrial.data(p).hub = wanted;
+            index = wanted;
+        } else {
+            index = assignHub(p);
+        }
         if (ClassTrial.active(p)) ClassTrial.end(p, false, null);
         p.stopRiding();
-        Vec3 at = HubLayout.center(hub.origin(), HubLayout.SPAWN);
+        Vec3 at = HubLayout.center(hub.origin(index), HubLayout.SPAWN);
         p.teleportTo(level, at.x, at.y, at.z, Set.of(), 180F, 0F, true);
+        p.sendOverlayMessage(Component.literal("Hub " + (index + 1)).withColor(0xFFD060));
         CinematicManager.arrivedAtHub(p);
+        return true;
+    }
+
+    /** Retour du spawn vers sa copie du hub, au bout du pont (cote portail). */
+    public static boolean goToHubFromSpawn(ServerPlayer p) {
+        HubData hub = HubData.get(p.level().getServer());
+        ServerLevel level = hub.level(p.level().getServer());
+        if (!hub.exists() || level == null) return false;
+        int index = assignHub(p);
+        if (ClassTrial.active(p)) ClassTrial.end(p, false, null);
+        p.stopRiding();
+        Vec3 at = HubLayout.center(hub.origin(index), new int[]{HubPortals.HUB_GATE_X + 7, 0, 0});
+        p.teleportTo(level, at.x, at.y, at.z, Set.of(), 270F, 0F, true);
+        p.sendOverlayMessage(Component.literal("Hub " + (index + 1)).withColor(0xFFD060));
+        return true;
+    }
+
+    /** /spawn et /marche : le Spawn d'Aeloria, monde commun a tous les joueurs (cote est de la fontaine, face au portail de la Citadelle). */
+    public static boolean goToSpawn(ServerPlayer p) {
+        SpawnData spawn = SpawnData.get(p.level().getServer());
+        ServerLevel level = p.level().getServer().getLevel(SpawnBuilder.DIM);
+        if (!spawn.exists() || level == null) return false;
+        if (CinematicManager.isLocked(p)) return true;
+        if (ClassTrial.active(p)) ClassTrial.end(p, false, null);
+        p.stopRiding();
+        Vec3 at = HubLayout.center(spawn.origin(), new int[]{HubMarket.CX + 31, 0, 0});
+        p.teleportTo(level, at.x, at.y, at.z, Set.of(), 90F, 0F, true);
+        p.sendOverlayMessage(Component.literal("Spawn d'Aeloria").withColor(0xFFD060));
         return true;
     }
 
@@ -184,7 +280,7 @@ public final class HubManager {
         HubData hub = HubData.get(p.level().getServer());
         ServerLevel level = hub.level(p.level().getServer());
         if (hub.exists() && level != null) {
-            Vec3 at = HubLayout.center(hub.origin(), new int[]{HubLayout.CLASS_MASTER[0], 0, HubLayout.CLASS_MASTER[2] + 4});
+            Vec3 at = HubLayout.center(hub.originAt(p.getX()), new int[]{HubLayout.CLASS_MASTER[0], 0, HubLayout.CLASS_MASTER[2] + 4});
             p.teleportTo(level, at.x, at.y, at.z, Set.of(), 0F, 0F, true);
         }
         RpgPlayers.selectClass(p, cls);

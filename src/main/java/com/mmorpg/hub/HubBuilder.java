@@ -41,66 +41,98 @@ public final class HubBuilder {
 
     /** Etiquette des entites decoratives du hub (textes), retirees a chaque reconstruction. */
     public static final String TAG = "mmorpg_hub";
-    /** Version du plan du hub : 2 = Marche d'Aeloria (banque, hotel des ventes, forges, marchands). Un hub plus ancien est reconstruit au demarrage. */
-    public static final int LAYOUT_VERSION = 2;
+    /** Version du plan du hub : 5 = Grande Nef sans marche (le marche vit dans la dimension du spawn), pont et portail du spawn. Un hub plus ancien est reconstruit au demarrage. */
+    public static final int LAYOUT_VERSION = 5;
     static final PlayerClass[] CLASSES = {PlayerClass.GUERRIER, PlayerClass.MAGE, PlayerClass.ARCHER, PlayerClass.TANK};
     static final Block[] FLOWERS = {Blocks.DANDELION, Blocks.POPPY, Blocks.CORNFLOWER, Blocks.AZURE_BLUET, Blocks.ALLIUM,
             Blocks.OXEYE_DAISY, Blocks.PINK_TULIP, Blocks.LILY_OF_THE_VALLEY};
 
     /** Identifiant stable d'une entite du hub : reconstruire le hub ne cree donc jamais de doublon, meme dans une zone non chargee. */
     static UUID stable(String key) {
+        return stable(key, instance);
+    }
+
+    /** Copie du hub en cours de construction (0 = Hub 1) : chaque copie a ses propres identifiants, la premiere garde ceux d'avant. */
+    private static int instance;
+
+    static int instance() {
+        return instance;
+    }
+
+    private static UUID stable(String key, int copy) {
         // la graine garde l'ancien nom du jeu : elle fixe l'identite des PNJ et des textes deja poses dans les hubs existants
-        return UUID.nameUUIDFromBytes(("eldoria-hub:" + key).getBytes(StandardCharsets.UTF_8));
+        return UUID.nameUUIDFromBytes(("eldoria-hub:" + key + (copy == 0 ? "" : "#" + copy)).getBytes(StandardCharsets.UTF_8));
+    }
+
+    /** Identifiants des PNJ de l'ancien marche du hub (le marche est desormais dans le spawn) : ils sont retires du hub. */
+    public static boolean isLegacyMarketNpc(UUID id) {
+        for (String k : new String[]{"graines", "alchimie", "armurerie", "minerais", "mines", "donjons", "ferme"}) {
+            if (id.equals(stable("npc:marche:" + k, 0))) return true;
+        }
+        return false;
     }
 
     private static final Set<UUID> STABLE = new HashSet<>();
 
     static {
-        for (int i = 0; i < 8; i++) STABLE.add(stable("master:" + i));
-        STABLE.add(stable("npc:maitre"));
-        for (int i = 0; i < 16; i++) {
-            STABLE.add(stable("dummy:room:" + i));
-            STABLE.add(stable("dummy:yard:" + i));
+        for (int copy = 0; copy < 32; copy++) {
+            for (int i = 0; i < 8; i++) STABLE.add(stable("master:" + i, copy));
+            STABLE.add(stable("npc:maitre", copy));
+            for (int i = 0; i < 16; i++) {
+                STABLE.add(stable("dummy:room:" + i, copy));
+                STABLE.add(stable("dummy:yard:" + i, copy));
+            }
+            for (int i = 0; i < 40; i++) STABLE.add(stable("text:" + i, copy));
         }
-        for (int i = 0; i < 40; i++) STABLE.add(stable("text:" + i));
-        for (String k : new String[]{"graines", "alchimie", "armurerie", "minerais", "mines", "donjons", "ferme"}) STABLE.add(stable("npc:marche:" + k));
     }
 
     public static boolean isStable(UUID id) {
         return STABLE.contains(id);
     }
 
-    private static int textIndex;
+    static int textIndex;
 
     /** Construit le hub avec sa place centrale au niveau {@code feet} (sol en dessous) et renvoie le centre. */
     public static BlockPos build(ServerLevel level, BlockPos feet) {
+        return build(level, feet, 0);
+    }
+
+    /** Construit la copie {@code index} du hub (0 = Hub 1) : place, rotonde, pavillons, portail, arene, aire, pont du spawn. */
+    public static BlockPos build(ServerLevel level, BlockPos feet, int index) {
         HubCtx c = new HubCtx(level, feet.immutable());
+        instance = index;
         textIndex = 0;
+        HubPortals.clearLegacyMarket(c);
         removeOld(c);
         computeMasks(c);
         terrain(c);
-        plaza(c);
-        rotunda(c);
+        HubHall.plaza(c);
+        HubHall.rotunda(c);
         HubPavilions.build(c);
         HubStructures.gate(c);
         HubStructures.teleporter(c);
         HubStructures.causeway(c);
         HubStructures.arena(c);
         HubStructures.yard(c);
-        HubMarket.build(c);
+        HubPortals.spawnGate(c);
         HubFlora.gardens(c);
         HubFlora.islets(c);
         texts(c);
         entities(c);
         zones(c);
         var server = level.getServer();
-        var old = server.getRespawnData();
-        if (old.globalPos().dimension().equals(net.minecraft.world.level.Level.OVERWORLD) && !level.dimension().equals(net.minecraft.world.level.Level.OVERWORLD)) {
-            HubManager.registerExit(server, old.globalPos().pos());
+        if (index == 0) {
+            var old = server.getRespawnData();
+            if (old.globalPos().dimension().equals(net.minecraft.world.level.Level.OVERWORLD) && !level.dimension().equals(net.minecraft.world.level.Level.OVERWORLD)) {
+                HubManager.registerExit(server, old.globalPos().pos());
+            }
+            if (!SpawnData.get(server).exists()) {                                          // sans spawn, la mort et la reconnexion ramenent au hub
+                BlockPos spawn = HubLayout.pos(c.O, HubLayout.SPAWN);
+                level.setRespawnData(new LevelData.RespawnData(GlobalPos.of(level.dimension(), spawn), 180F, 0F));
+            }
         }
-        BlockPos spawn = HubLayout.pos(c.O, HubLayout.SPAWN);
-        level.setRespawnData(new LevelData.RespawnData(GlobalPos.of(level.dimension(), spawn), 180F, 0F));
-        HubData.get(level.getServer()).set(level.dimension(), c.O);
+        HubData.get(level.getServer()).built(level.dimension(), c.O.subtract(new BlockPos(index * HubData.SPACING, 0, 0)), index);
+        instance = 0;
         return c.O;
     }
 
@@ -110,17 +142,18 @@ public final class HubBuilder {
         var dim = c.L.dimension();
         int ox = c.O.getX();
         int oz = c.O.getZ();
-        java.util.function.BiConsumer<String[], int[]> add = (txt, r) -> data.add(new com.mmorpg.zone.ZoneData.Zone("hub_" + txt[0], txt[1], dim,
+        String tag = instance == 0 ? "" : instance + "_";
+        String suffix = " · Hub " + (instance + 1);
+        java.util.function.BiConsumer<String[], int[]> add = (txt, r) -> data.add(new com.mmorpg.zone.ZoneData.Zone("hub_" + tag + txt[0], txt[1], dim,
                 ox + r[0], oz + r[1], ox + r[2], oz + r[3], false, false, false, com.mmorpg.zone.ZoneData.Zone.STYLE_ZONE, txt[2]));
-        add.accept(new String[]{"citadelle", "Citadelle d'Aeloria", "Capitale des héros"}, new int[]{-52, -106, HubLayout.YARD_X1 + 12, 66});
+        add.accept(new String[]{"citadelle", "Citadelle d'Aeloria" + suffix, "Capitale des héros"}, new int[]{-52, -106, HubLayout.YARD_X1 + 12, 66});
         add.accept(new String[]{"rotonde", "Place des Héros", "Parlez au Maître des classes"}, new int[]{-31, -31, 31, 31});
         add.accept(new String[]{"epreuve", "Épreuve des Héros", "Essayez une classe avant de la choisir"},
                 new int[]{-HubLayout.ROOM_HALF, HubLayout.ROOM_Z0, HubLayout.ROOM_HALF, HubLayout.ROOM_Z1});
         add.accept(new String[]{"entrainement", "Aire d'entraînement", "Mannequins de combat"},
                 new int[]{HubLayout.YARD_X0, -HubLayout.YARD_HALF, HubLayout.YARD_X1, HubLayout.YARD_HALF});
         add.accept(new String[]{"portail", "Portail d'Aeloria", "Le monde vous attend"}, new int[]{-12, 26, 12, 60});
-        add.accept(new String[]{"marche", "Marché d'Aeloria", "Banque, hôtel des ventes, forges et marchands"},
-                new int[]{HubMarket.CX - HubMarket.RADIUS - 2, -HubMarket.RADIUS - 2, HubMarket.CX + HubMarket.RADIUS + 2, HubMarket.RADIUS + 2});
+        add.accept(new String[]{"pont", "Pont du Spawn", "Le Marché d'Aeloria vous attend"}, new int[]{-52, -8, -28, 8});
         String[][] mottos = {{"Guerrier", "Force et férocité"}, {"Mage", "Intelligence et esprit"}, {"Archer", "Agilité et dextérité"}, {"Paladin", "Vitalité et endurance"}};
         for (int i = 0; i < 4; i++) {
             int[] sp = HubLayout.classSpot(CLASSES[i]);
@@ -132,7 +165,8 @@ public final class HubBuilder {
 
     static boolean footprint(int x, int z) {
         if (x * x + z * z <= 31.6 * 31.6) return true;                                      // place
-        if (HubMarket.footprint(x, z)) return true;                                         // marche et allee
+        if (x <= -28 && x >= -52 && Math.abs(z) <= 7) return true;                           // pont du spawn
+        if (Math.hypot(x + 50, z) <= 9) return true;                                         // parvis du portail du spawn
         if (Math.hypot(x, z - 46) <= 13 || (Math.abs(x) <= 11 && z >= 28 && z <= 46)) return true;   // portail et parvis
         if (Math.abs(x) <= 7 && z >= -54 && z <= -28) return true;                          // voie vers l'arene
         if (Math.hypot(x, z + 74) <= 24) return true;                                       // arene
@@ -146,12 +180,17 @@ public final class HubBuilder {
     }
 
     private static void computeMasks(HubCtx c) {
+        computeMasks(c, HubBuilder::footprint);
+    }
+
+    /** Masques de l'ile pour l'emprise donnee (le hub, ou le marche du spawn). */
+    static void computeMasks(HubCtx c, java.util.function.BiPredicate<Integer, Integer> footprint) {
         int w = HubCtx.X1 - HubCtx.X0 + 1;
         int d = HubCtx.Z1 - HubCtx.Z0 + 1;
         c.foot = new boolean[w][d];
         c.isle = new boolean[w][d];
         c.edge = new float[w][d];
-        for (int x = HubCtx.X0; x <= HubCtx.X1; x++) for (int z = HubCtx.Z0; z <= HubCtx.Z1; z++) c.foot[x - HubCtx.X0][z - HubCtx.Z0] = footprint(x, z);
+        for (int x = HubCtx.X0; x <= HubCtx.X1; x++) for (int z = HubCtx.Z0; z <= HubCtx.Z1; z++) c.foot[x - HubCtx.X0][z - HubCtx.Z0] = footprint.test(x, z);
         for (int x = HubCtx.X0; x <= HubCtx.X1; x++) {           // ile = emprise dilatee d'une bordure de pelouse (4 blocs, arrondie)
             for (int z = HubCtx.Z0; z <= HubCtx.Z1; z++) {
                 if (!c.foot[x - HubCtx.X0][z - HubCtx.Z0]) continue;
@@ -197,7 +236,7 @@ public final class HubBuilder {
                 Blocks.COBBLESTONE, 8, frac < 0.35F ? Blocks.MOSS_BLOCK : Blocks.MOSSY_COBBLESTONE, 12);
     }
 
-    private static void terrain(HubCtx c) {
+    static void terrain(HubCtx c) {
         BlockState air = Blocks.AIR.defaultBlockState();
         for (int x = HubCtx.X0; x <= HubCtx.X1; x++) {
             for (int z = HubCtx.Z0; z <= HubCtx.Z1; z++) {
@@ -268,144 +307,9 @@ public final class HubBuilder {
         return Math.abs(x) <= 2 || Math.abs(z) <= 2 || Math.abs(Math.abs(x) - Math.abs(z)) <= 2;
     }
 
-    private static double spokeDeg(int x, int z) {
-        double a = Math.toDegrees(Math.atan2(z, x));
-        double m = ((a % 45) + 45) % 45;
-        return Math.min(m, 45 - m);
-    }
-
-    private static void plaza(HubCtx c) {
-        for (int x = -33; x <= 33; x++) {
-            for (int z = -33; z <= 33; z++) {
-                double r = Math.hypot(x, z);
-                if (r > 31.6) continue;
-                boolean water = false;
-                BlockState top;
-                BlockState under = Blocks.STONE_BRICKS.defaultBlockState();
-                boolean cardinal = Math.abs(x) <= 2 || Math.abs(z) <= 2;
-                boolean diag = Math.abs(Math.abs(x) - Math.abs(z)) <= 2;
-                if (r <= 2.2) top = c.state("marbre_dore");
-                else if (r <= 3.4) top = c.state("or_ouvrage");
-                else if (r <= 6.4) top = spokeDeg(x, z) < 6 * 3.4 / Math.max(r, 3.4) ? c.state("pierre_solaire") : c.state("marbre_poli");
-                else if (r <= 7.4) top = c.state("pierre_solaire");
-                else if (r <= 9.4) top = ((x + z) & 1) == 0 ? c.state("marbre_poli") : c.state("marbre");
-                else if (r <= 10.6) top = c.state("marbre_poli");
-                else if (r <= 16.4) {
-                    if (cardinal || (diag && r > 10.6)) {
-                        top = (Math.abs(x) <= 0 || Math.abs(z) <= 0 || x == z || x == -z) ? c.state("marbre_dore") : c.state("marbre_poli");
-                    } else {
-                        top = Blocks.WATER.defaultBlockState();
-                        under = c.state("pierre_azur");
-                        water = true;
-                    }
-                } else if (r <= 17.6) top = c.state("marbre_poli");
-                else if (r <= 26.6) {
-                    if (r > 21.4 && r <= 22.8) top = c.state("pierre_solaire");
-                    else if (cardinal || diag) top = c.mix(x, 0, z, 31, "marbre_poli", 60, "marbre", 25, "pierre_solaire", 15);
-                    else top = Blocks.GRASS_BLOCK.defaultBlockState();
-                } else if (r > 30.4) top = c.state("pierre_solaire");
-                else top = c.mix(x, 0, z, 33, "marbre_poli", 45, "pierre_azur", 25, "marbre", 20, "pierre_solaire", 10);
-                c.set(x, -2, z, under);
-                c.set(x, -1, z, top);
-                if (top.getBlock() == Blocks.GRASS_BLOCK) {
-                    float g = c.rnd(x, 0, z, 35);
-                    if (g < 0.2F) c.set(x, 0, z, Blocks.SHORT_GRASS);
-                    else if (g < 0.34F) c.set(x, 0, z, FLOWERS[(int) (c.rnd(x, 1, z, 36) * FLOWERS.length) % FLOWERS.length]);
-                } else if (!water) {
-                    c.set(x, 0, z, Blocks.AIR);
-                }
-            }
-        }
-        for (int x = -18; x <= 18; x++) {                          // levres basses du bassin, sauf aux ponts
-            for (int z = -18; z <= 18; z++) {
-                if (Math.abs(x) <= 2 || Math.abs(z) <= 2 || Math.abs(Math.abs(x) - Math.abs(z)) <= 2) continue;
-                double r = Math.hypot(x, z);
-                if ((r > 10.0 && r <= 10.6) || (r > 16.4 && r <= 17.0)) c.set(x, 0, z, c.slab("marbre_poli", false));
-            }
-        }
-        for (int a = 0; a < 360; a += 12) {                        // lanternes sur la levre externe du bassin
-            int x = (int) Math.round(Math.cos(Math.toRadians(a)) * 17.4);
-            int z = (int) Math.round(Math.sin(Math.toRadians(a)) * 17.4);
-            if (HubBuilder.avenue(x, z)) continue;
-            for (int y = 0; y <= 1; y++) c.set(x, y, z, Blocks.SANDSTONE_WALL);
-            c.set(x, 2, z, Blocks.LANTERN);
-        }
-        for (int a = 0; a < 360; a++) {                            // balustrade du pourtour et pilastres de lanternes
-            double rad = Math.toRadians(a);
-            int x = (int) Math.round(Math.cos(rad) * 31);
-            int z = (int) Math.round(Math.sin(rad) * 31);
-            if (Math.abs(x) <= 8 && z > 0) continue;               // portail
-            if (Math.abs(x) <= 8 && z < 0) continue;               // voie de l'arene
-            if (Math.abs(x) > 8 && Math.abs(z) <= 8) continue;     // allees de l'aire et du marche
-            boolean nearPavilion = false;
-            for (PlayerClass cls : CLASSES) {
-                int[] s = HubLayout.classSpot(cls);
-                if (Math.hypot(x - s[0], z - s[2]) < 12) nearPavilion = true;
-            }
-            if (nearPavilion) continue;
-            c.set(x, 0, z, Blocks.SANDSTONE_WALL);
-            if (a % 10 == 0) {
-                for (int y = 0; y <= 2; y++) c.set(x, y, z, Blocks.SANDSTONE_WALL);
-                c.set(x, 3, z, Blocks.LANTERN);
-            }
-        }
-        for (int[] d : new int[][]{{0, 1}, {0, -1}, {1, 0}, {-1, 0}}) {   // lampadaires le long des quatre avenues
-            for (int k = 12; k <= 29; k += 4) {
-                for (int s : new int[]{-3, 3}) {
-                    int x = d[0] != 0 ? d[0] * k : s;
-                    int z = d[1] != 0 ? d[1] * k : s;
-                    lamp(c, x, z);
-                }
-            }
-        }
-    }
-
     static void lamp(HubCtx c, int x, int z) {
         for (int y = 0; y <= 3; y++) c.set(x, y, z, Blocks.SANDSTONE_WALL);
         c.set(x, 4, z, Blocks.LANTERN);
-    }
-
-    // ================================================================== rotonde centrale
-
-    private static void rotunda(HubCtx c) {
-        final double R = 9.8;
-        for (int k = 0; k < 12; k++) {                             // 12 colonnes, quatre ouvertures cardinales
-            double a = Math.toRadians(15 + k * 30);
-            int x = (int) Math.round(Math.cos(a) * 8.4);
-            int z = (int) Math.round(Math.sin(a) * 8.4);
-            c.set(x, 0, z, "marbre_dore");
-            for (int y = 1; y <= 10; y++) c.set(x, y, z, "colonne_marbre");
-            c.set(x, 11, z, "marbre_dore");
-            for (int[] o : new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}) c.set(x + o[0], 11, z + o[1], c.slab("marbre_dore", false));
-            c.set(x, 12, z, "or_ouvrage");
-        }
-        c.ring(0, 12, 0, 7.5, 9.8, (x, y, z) -> c.state("marbre"));       // architrave
-        c.ring(0, 13, 0, 8.0, 9.4, (x, y, z) -> (x + z) % 3 == 0 ? c.state("cristal_azur") : c.state("or_ouvrage"));
-        c.dome(0, 13, 0, R + 0.8, 1.35, (x, y, z, el, az) -> {
-            if (el > 76) return null;                                                         // oculus
-            double m = az % 30;
-            if (el < 9) return c.state("or_ouvrage");
-            if (el > 68) return c.state("marbre_dore");
-            if (m < 2.6 || m > 27.4) return el > 24 && el < 36 ? c.state("cristal_azur") : c.state("marbre_dore");   // nervures, a cristaux lumineux
-            if (el > 14 && m > 7 && m < 23) return Blocks.STAINED_GLASS.pick(DyeColor.LIGHT_BLUE).defaultBlockState();
-            return c.state("tuile_azur");
-        });
-        for (int k = 0; k < 12; k++) {                             // lustres : chaines et lanternes sous l'architrave
-            double a = Math.toRadians(k * 30);
-            int x = (int) Math.round(Math.cos(a) * 7.2);
-            int z = (int) Math.round(Math.sin(a) * 7.2);
-            c.set(x, 11, z, Blocks.IRON_CHAIN);
-            c.set(x, 10, z, Blocks.IRON_CHAIN);
-            c.set(x, 9, z, Blocks.LANTERN.defaultBlockState().setValue(net.minecraft.world.level.block.LanternBlock.HANGING, true));
-        }
-        c.set(0, 7, 0, "cristal_azur");                            // coeur de cristal flottant au-dessus du Maitre des classes
-        c.set(0, 6, 0, "cristal_azur");
-        c.set(0, 8, 0, "cristal_azur");
-        for (Direction d : Direction.Plane.HORIZONTAL) c.set(d.getStepX(), 7, d.getStepZ(), "cristal_azur");
-        for (int k = 0; k < 8; k++) {
-            double a = Math.toRadians(k * 45 + 22.5);
-            c.set((int) Math.round(Math.cos(a) * 2.6), 7, (int) Math.round(Math.sin(a) * 2.6), Blocks.END_ROD);
-        }
     }
 
     // ================================================================== textes en police Aeloria
@@ -428,9 +332,11 @@ public final class HubBuilder {
      */
     public static void respawn(ServerLevel level, BlockPos origin) {
         HubCtx c = new HubCtx(level, origin.immutable());
+        instance = HubData.get(level.getServer()).indexAt(origin.getX());
         textIndex = 0;
         texts(c);
         entities(c);
+        instance = 0;
     }
 
     private static void texts(HubCtx c) {
@@ -450,7 +356,6 @@ public final class HubBuilder {
         text(c, 0, 12, 24, "TÉLÉPORTEUR", "#9FD8FF", 3.4F);
         text(c, 0, 17, HubLayout.ROOM_Z1 - 1, "ÉPREUVE DES HÉROS", "#FFC060", 5F);
         text(c, HubLayout.YARD_CENTER_X - 17, 11, 0, "AIRE D'ENTRAÎNEMENT", "#FFB070", 4F);
-        HubMarket.texts(c);
     }
 
     // ================================================================== PNJ et mannequins
@@ -483,7 +388,6 @@ public final class HubBuilder {
         spawnMaster(c, ClassMasterEntity.EPREUVE, HubLayout.TRIAL_MASTER[0], 0, HubLayout.TRIAL_MASTER[2], 90F);
         for (int i = 0; i < HubLayout.DUMMIES_ROOM.length; i++) spawnDummy(c, HubLayout.DUMMIES_ROOM[i], "room:" + i);
         for (int i = 0; i < HubLayout.DUMMIES_YARD.length; i++) spawnDummy(c, HubLayout.DUMMIES_YARD[i], "yard:" + i);
-        HubMarket.entities(c);
     }
 
     private static void spawnMaster(HubCtx c, int kind, int x, int y, int z, float yaw) {

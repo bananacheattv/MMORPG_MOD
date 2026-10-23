@@ -351,6 +351,15 @@ public final class RpgCommands {
                     }
                     return 1;
                 })
+                .then(Commands.argument("numero", com.mojang.brigadier.arguments.IntegerArgumentType.integer(1, 99)).executes(c -> {
+                    ServerPlayer p = c.getSource().getPlayerOrException();
+                    int n = com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(c, "numero");
+                    if (!com.mmorpg.hub.HubManager.goToHub(p, n - 1)) {
+                        c.getSource().sendFailure(Component.literal("Le Hub " + n + " n'existe pas."));
+                        return 0;
+                    }
+                    return 1;
+                }))
                 .then(Commands.literal("set").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).executes(RpgCommands::buildHub))
                 .then(Commands.literal("reset").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.argument("joueur", EntityArgument.player()).executes(c -> {
@@ -359,6 +368,16 @@ public final class RpgCommands {
                             c.getSource().sendSuccess(() -> ok("Hub de " + p.getName().getString() + " réinitialisé (cinématique, essais et classe)."), true);
                             return 1;
                         }))));
+        for (String name : new String[]{"spawn", "marche"}) {
+            d.register(Commands.literal(name).executes(c -> {
+                ServerPlayer p = c.getSource().getPlayerOrException();
+                if (!com.mmorpg.hub.HubManager.goToSpawn(p)) {
+                    c.getSource().sendFailure(Component.literal("Le Spawn d'Aeloria n'est pas encore construit (un opérateur doit utiliser /hub set)."));
+                    return 0;
+                }
+                return 1;
+            }));
+        }
         d.register(Commands.literal("class")
                 .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("set").then(Commands.argument("joueur", EntityArgument.player())

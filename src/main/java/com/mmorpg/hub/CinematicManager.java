@@ -47,14 +47,15 @@ public final class CinematicManager {
         if (!hub.exists() || level == null) return false;
         if (ClassTrial.active(p)) ClassTrial.end(p, false, null);
         if (isLocked(p)) return true;
-        Vec3 spawn = HubLayout.center(hub.origin(), HubLayout.SPAWN);
+        BlockPos hubOrigin = hub.origin(HubManager.assignHub(p));
+        Vec3 spawn = HubLayout.center(hubOrigin, HubLayout.SPAWN);
         p.stopRiding();
         p.teleportTo(level, spawn.x, spawn.y, spawn.z, Set.of(), 180F, 6F, true);
         String json = CinematicConfig.load();
         double seconds = CinematicConfig.totalSeconds(json);
         LOCKED.put(p.getUUID(), new Lock(p.level().getGameTime() + (long) (seconds * 20) + 400, spawn));
         CompoundTag t = new CompoundTag();
-        BlockPos o = hub.origin();
+        BlockPos o = hubOrigin;
         t.putLong("origin", o.asLong());
         t.putString("json", json);
         t.putBoolean("first", first);
@@ -81,7 +82,7 @@ public final class CinematicManager {
 
     public static void arrivedAtHub(ServerPlayer p) {
         ARRIVED.add(p.getUUID());
-        HubManager.healOnce(p.level());
+        HubManager.healOnce(p.level(), p.getX());
     }
 
     @SubscribeEvent

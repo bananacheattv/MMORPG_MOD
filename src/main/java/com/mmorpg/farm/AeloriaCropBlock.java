@@ -51,6 +51,30 @@ public class AeloriaCropBlock extends CropBlock {
         RpgPlayers.giveXp(player, 2 + rank * 3L, false);
         level.sendParticles(ParticleTypes.HAPPY_VILLAGER, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 4, 0.3, 0.3, 0.3, 0.0);
         if (hoe <= 0) return;
+        bonus(level, pos, hoe);
+        if (hoe < 2) return;
+        // houe d'Argentite et au-dela : recolte en zone (rayon 1, ou 2 des le Glacium), replante la plante cassee et ses voisines
+        level.setBlock(pos, getStateForAge(0), 3);
+        int r = hoe >= 4 ? 2 : 1;
+        int n = 0;
+        for (int dx = -r; dx <= r; dx++) {
+            for (int dz = -r; dz <= r; dz++) {
+                if (dx == 0 && dz == 0) continue;
+                BlockPos at = pos.offset(dx, 0, dz);
+                BlockState st = level.getBlockState(at);
+                if (!(st.getBlock() instanceof AeloriaCropBlock cb) || !cb.isMaxAge(st)) continue;
+                net.minecraft.world.level.block.Block.dropResources(st, level, at, null, player, tool);
+                cb.bonus(level, at, hoe);
+                level.setBlock(at, cb.getStateForAge(0), 3);
+                RpgPlayers.giveXp(player, 2 + FarmCrops.CROPS.indexOf(cb.crop) * 3L, false);
+                n++;
+            }
+        }
+        if (n > 0) player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Récolte en zone : +" + n + " plante" + (n > 1 ? "s" : "")).withColor(crop.color()));
+    }
+
+    /** Recoltes supplementaires de la houe : deux tirages de 10 % par palier. */
+    private void bonus(ServerLevel level, BlockPos pos, int hoe) {
         int extra = 0;
         for (int i = 0; i < 2; i++) {
             if (level.getRandom().nextInt(100) < hoe * 10) extra++;

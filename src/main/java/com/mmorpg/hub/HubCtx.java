@@ -34,7 +34,7 @@ public final class HubCtx {
 
     public final ServerLevel L;
     public final BlockPos O;
-    static final int X0 = -134, X1 = 80, Z0 = -112, Z1 = 70;
+    static final int X0 = -146, X1 = 80, Z0 = -112, Z1 = 70;
     boolean[][] foot;
     boolean[][] isle;
     float[][] edge;
