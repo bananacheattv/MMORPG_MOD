@@ -68,6 +68,7 @@ public final class ClientPayloadHandlers {
             case S2COpenScreen.QUEST_GIVER -> mc.gui.setScreen(new com.mmorpg.client.screen.QuestGiverScreen(payload.extra()));
             case S2COpenScreen.SHOP -> mc.gui.setScreen(new com.mmorpg.client.screen.ShopScreen(payload.extra()));
             case S2COpenScreen.DUNGEON_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.DungeonMasterScreen(payload.extra()));
+            case S2COpenScreen.MINE_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.MineMasterScreen(payload.extra()));
             case S2COpenScreen.CLASS_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.ClassMasterScreen(payload.extra()));
             case S2COpenScreen.TRIAL_STATE -> {
                 ClientData.trialActive = payload.extra().getBooleanOr("active", false);

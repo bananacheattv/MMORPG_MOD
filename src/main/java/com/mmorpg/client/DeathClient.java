@@ -16,7 +16,7 @@ import net.neoforged.neoforge.client.event.ScreenEvent;
  */
 @EventBusSubscriber(modid = MMORPG.MODID, value = Dist.CLIENT)
 public final class DeathClient {
-    private static Payloads.DeathInfo last = new Payloads.DeathInfo(0, 1, 0, 0, "");
+    private static Payloads.DeathInfo last = new Payloads.DeathInfo(0, 1, 0, 0, "", "");
     private static long receivedAt;
 
     private DeathClient() {
@@ -32,7 +32,7 @@ public final class DeathClient {
         if (event.getNewScreen() instanceof DeathScreen && !(event.getCurrentScreen() instanceof RpgDeathScreen)) {
             // les informations datent de cette mort si elles viennent d'arriver ; sinon (mort sans classe, ancienne version) on n'affiche rien de plus
             boolean fresh = System.nanoTime() - receivedAt < 15_000_000_000L;
-            event.setNewScreen(new RpgDeathScreen(fresh ? last : new Payloads.DeathInfo(0, 1, 0, 0, "")));
+            event.setNewScreen(new RpgDeathScreen(fresh ? last : new Payloads.DeathInfo(0, 1, 0, 0, "", "")));
         }
     }
 }

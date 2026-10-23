@@ -16,7 +16,7 @@ import java.util.Random;
  * <p>Cinq etages se suivent du nord au sud, chacun avec sa roche, son minerai, sa lumiere et ses monstres.
  */
 public final class MineLayout {
-    public static final int X0 = 20000, Z0 = 20000;      // coin nord-ouest de la mine (dimension des donjons)
+    public static final int X0 = 22000, Z0 = 22000;      // coin nord-ouest de la mine (dimension des donjons)
     public static final int Y0 = 12;                      // fond de la mine
     public static final int SIZE = 440;                   // largeur et longueur du cadre
     public static final int HEIGHT = 100;
@@ -93,12 +93,13 @@ public final class MineLayout {
             for (int z = 0; z < SIZE; z++) {
                 double dx = (x - SIZE / 2.0) / (SIZE / 2.0 - WALL - 3), dz = (z - SIZE / 2.0) / (SIZE / 2.0 - WALL - 3);
                 double d = Math.hypot(dx, dz) + 0.06 * fbm(x / 38.0, z / 38.0, 11, 3) + 0.03 * fbm(x / 12.0, z / 12.0, 12, 2);
-                kind[x][z] = (byte) (d < 1.0 ? 1 : 0);
+                boolean border = x < WALL + 2 || z < WALL + 2 || x >= SIZE - WALL - 2 || z >= SIZE - WALL - 2;      // la paroi doit tenir dans le cadre
+                kind[x][z] = (byte) (d < 1.0 && !border ? 1 : 0);
             }
         }
         // l'entree : un couloir large prolonge la caverne vers le bord nord
         for (int x = PLAZA_X - 20; x <= PLAZA_X + 20; x++) {
-            for (int z = 2; z < 60; z++) kind[x][z] = 1;
+            for (int z = WALL + 2; z < 60; z++) kind[x][z] = 1;
         }
         // parois : toute cellule vide a moins de WALL cellules d'une cellule interieure
         byte[][] walls = new byte[SIZE][SIZE];
@@ -128,10 +129,18 @@ public final class MineLayout {
                 double t = Mth.clamp((z - 20) / (double) (SIZE - 70), 0, 1);
                 double slope = 1 - smooth(smooth(t));                       // plateau a l'entree, pente reguliere, fond plat
                 double base = 12 + 62 * slope;
-                double hills = 6.5 * fbm(x / 64.0, z / 64.0, 21, 3) + 2.6 * fbm(x / 21.0, z / 21.0, 22, 2);
+                double hills = 15.0 * fbm(x / 72.0, z / 72.0, 21, 3) + 7.0 * fbm(x / 27.0, z / 27.0, 22, 3) + 2.4 * fbm(x / 9.0, z / 9.0, 23, 2);
+                double ridge = 1 - 2 * Math.abs(fbm(x / 58.0, z / 58.0, 24, 2));                 // cretes (valeurs hautes) et vallees (basses)
+                double valley = Math.max(0, 1 - 5 * Math.abs(fbm(x / 46.0, z / 46.0, 25, 2)));  // couloirs creuses
                 double calm = smooth(Mth.clamp((z - 30) / 70.0, 0, 1));    // pres de l'entree le relief s'attenue
-                h[x][z] = base + hills * calm;
+                h[x][z] = base + (hills + 6.5 * ridge - 7.0 * valley) * calm;
             }
+        }
+
+        // pente maximale d'un bloc par case dans les quatre directions : trois passes aller-retour
+        for (int pass = 0; pass < 3; pass++) {
+            for (int x = 1; x < SIZE; x++) for (int z = 1; z < SIZE; z++) h[x][z] = Mth.clamp(h[x][z], Math.max(h[x - 1][z], h[x][z - 1]) - 1.0, Math.min(h[x - 1][z], h[x][z - 1]) + 1.0);
+            for (int x = SIZE - 2; x >= 0; x--) for (int z = SIZE - 2; z >= 0; z--) h[x][z] = Mth.clamp(h[x][z], Math.max(h[x + 1][z], h[x][z + 1]) - 1.0, Math.min(h[x + 1][z], h[x][z + 1]) + 1.0);
         }
 
         // ---- bassins (de l'eau ou de la lave selon l'etage) : le sol est aplati puis creuse en cuvette
@@ -211,6 +220,25 @@ public final class MineLayout {
                 }
             }
         }
+    }
+
+    /** Nombre de cases de caverne qui touchent le vide ou le bord du cadre (doit rester nul : sinon un trou laisse voir l'exterieur). */
+    public int leaks() {
+        int n = 0;
+        for (int x = 0; x < SIZE; x++) {
+            for (int z = 0; z < SIZE; z++) {
+                if (kind[x][z] != 1) continue;
+                boolean leak = false;
+                for (int dx = -1; dx <= 1 && !leak; dx++) {
+                    for (int dz = -1; dz <= 1 && !leak; dz++) {
+                        int nx = x + dx, nz = z + dz;
+                        leak = nx < 0 || nz < 0 || nx >= SIZE || nz >= SIZE || kind[nx][nz] == 0;
+                    }
+                }
+                if (leak && n++ < 6) com.mmorpg.MMORPG.LOGGER.info("[MMORPG] fuite de la caverne en ({}, {})", x, z);
+            }
+        }
+        return n;
     }
 
     /** Position au hasard dans la caverne, a plus de {@code margin} de la paroi. */

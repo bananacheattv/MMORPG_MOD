@@ -429,6 +429,20 @@ public final class RpgCommands {
                         })));
     }
 
+    /** /setmine : pose ici le Maitre des mines (menu des etages, ecran de chargement et arrivee dans la mine). */
+    public static void registerSetMine(CommandDispatcher<CommandSourceStack> d) {
+        d.register(Commands.literal("setmine")
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .executes(c -> {
+                    var npc = DungeonBuilder.spawnNpc(c.getSource().getLevel(), BlockPos.containing(c.getSource().getPosition()), com.mmorpg.entity.NpcEntity.Role.MINES,
+                            "Maître des mines", 1, c.getSource().getRotation().y + 180);
+                    if (npc == null) return 0;
+                    npc.setup(com.mmorpg.entity.NpcEntity.Role.MINES, "Maître des mines", 1, "");
+                    c.getSource().sendSuccess(() -> ok("Maître des mines posé : il ouvre le menu des cinq étages (écran de chargement puis arrivée dans la mine)."), true);
+                    return 1;
+                }));
+    }
+
     private static int setDonjon(CommandContext<CommandSourceStack> c, DungeonBuilder.DungeonType only) {
         ServerLevel level = c.getSource().getLevel();
         if (c.getSource().getServer().getLevel(com.mmorpg.dungeon.InstanceManager.DIM) == null) {

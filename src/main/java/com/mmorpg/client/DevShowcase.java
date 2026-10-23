@@ -1387,6 +1387,7 @@ public final class DevShowcase {
     }
 
     private static int mineT = -1;
+    private static boolean mineIntro;
     private static long mineBuildStart;
 
     private static void tpMine(net.minecraft.server.MinecraftServer srv, String me, int lx, int lz, float yaw) {
@@ -1405,6 +1406,7 @@ public final class DevShowcase {
             cmd(mc, "gamemode survival");
             cmd(mc, "difficulty normal");
             mineT = -1;
+            mineIntro = false;
             mineBuildStart = System.nanoTime();
         }
         if (tick > 20 && mineT < 0 && tick % 40 == 0) srv.execute(() -> {
@@ -1423,6 +1425,35 @@ public final class DevShowcase {
             return;
         }
         mineT++;
+        if (!mineIntro) {                                  // menu des mines puis ecran de chargement et arrivee a l'etage 3 (comme par le Maitre des mines)
+            int u = mineT;
+            if (u == 2) srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                com.mmorpg.server.RpgPlayers.get(pl).level = 100;
+                pl.getAbilities().invulnerable = true;
+                pl.onUpdateAbilities();
+                MMORPG.LOGGER.info("[MMORPG] MINES fuites de la caverne : {}", com.mmorpg.mine.MineLayout.get().leaks());
+                com.mmorpg.mine.MineManager.open(pl, null);
+            });
+            if (u == 40) shot(mc, "mine_menu");
+            if (u == 45) {
+                com.mmorpg.client.ClientNet.send(new com.mmorpg.network.Payloads.MineEnter(-1, 2));
+                mc.gui.setScreen(null);
+            }
+            if (u == 70) shot(mc, "mine_chargement");
+            if (u == 100) shot(mc, "mine_chargement2");
+            if (u == 190) srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                MMORPG.LOGGER.info("[MMORPG] MINES arrivee par le menu : dimension {} ; position ({}, {}, {}) ; chargement encore affiche = {}", pl.level().dimension().identifier(),
+                        (int) pl.getX(), (int) pl.getY(), (int) pl.getZ(), com.mmorpg.client.LoadingClient.active());
+            });
+            if (u == 200) shot(mc, "mine_arrivee");
+            if (u == 215) {
+                mineIntro = true;
+                mineT = 0;
+            }
+            return;
+        }
         int t = mineT;
         if (t == 5) srv.execute(() -> {
             var pl = srv.getPlayerList().getPlayerByName(me);
@@ -1432,7 +1463,7 @@ public final class DevShowcase {
             pl.onUpdateAbilities();
             pl.getInventory().setItem(0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_PICKAXE));
             pl.getInventory().setSelectedSlot(0);
-            MMORPG.LOGGER.info("[MMORPG] MINES entree : {}", com.mmorpg.mine.MineManager.enter(pl));
+            MMORPG.LOGGER.info("[MMORPG] MINES entree : {}", com.mmorpg.mine.MineManager.enterNow(pl, 0));
         });
         if (t == 60) shot(mc, "mine_place");
         // un etage toutes les 140 ticks

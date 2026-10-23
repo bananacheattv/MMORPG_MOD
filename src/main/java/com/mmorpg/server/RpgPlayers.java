@@ -593,11 +593,13 @@ public final class RpgPlayers {
             }
         }
         // l'ecran de mort affiche l'experience perdue ; l'equipement, lui, est conserve (voir ServerEvents.onServerStarted)
-        com.mmorpg.network.Net.toPlayer(player, new Payloads.DeathInfo(Math.max(0, lost), d.level, d.xp, LevelSystem.xpToNext(d.level), cause));
+        String lostLoot = SessionLoot.onDeath(player);          // mines et donjons : le butin de la session est perdu
+        com.mmorpg.network.Net.toPlayer(player, new Payloads.DeathInfo(Math.max(0, lost), d.level, d.xp, LevelSystem.xpToNext(d.level), cause, lostLoot));
         PetManager.despawn(player);
     }
 
     public static void onLogout(ServerPlayer player) {
+        SessionLoot.forget(player);
         PetManager.despawn(player);
         PartyManager.onLogout(player);
         ClickInteractions.forget(player);

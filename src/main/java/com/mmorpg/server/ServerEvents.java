@@ -49,6 +49,7 @@ public final class ServerEvents {
         com.mmorpg.mine.MineManager.register(event.getDispatcher());
         com.mmorpg.zone.ZoneCommands.register(event.getDispatcher());
         RpgCommands.registerSetDonjon(event.getDispatcher());
+        RpgCommands.registerSetMine(event.getDispatcher());
         PlayerCommands.register(event.getDispatcher());
     }
 

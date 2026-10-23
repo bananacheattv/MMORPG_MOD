@@ -27,6 +27,18 @@ public final class LoadingClient {
     private static final float FADE_IN = 0.45F;
     private static final float FADE_OUT = 0.9F;
     private static final float TIMEOUT = 60F;
+    /** Les titres de chargement des mines commencent par cette marque (le texte n'est pas affiche). */
+    public static final String MINE_MARK = "\u26CF ";
+    private static final String[] MINE_TIPS = {
+            "Il faut une pioche pour extraire un minerai : le lingot arrive directement dans votre sac.",
+            "Un minerai épuisé repousse tout seul au bout de quelques dizaines de secondes.",
+            "Plus on descend, plus les monstres sont forts : chaque étage a son propre minerai.",
+            "Les lingots des mines servent à forger les armes et armures à la Forge Arcanique.",
+            "Les gouffres se descendent par des échelles : cherchez-les sur les bords.",
+            "Le menu des mines (commande /mine) permet de rejoindre un étage déjà atteint.",
+            "Les lanternes et les campements des mineurs éclairent les passages sûrs.",
+            "Une veine riche donne parfois deux lingots d'un coup.",
+    };
     private static final String[] TIPS = {
             "Toutes les épreuves se font en solo : un groupe ne fait que renforcer les vagues.",
             "Une chute dans un parcours de saut vous ramène simplement au départ.",
@@ -42,6 +54,7 @@ public final class LoadingClient {
     private static boolean ending;
     private static boolean fading;
     private static long fadeNanos;
+    private static boolean mine;
     private static String title = "";
     private static String lore = "";
     private static int color = 0xFFC868;
@@ -61,7 +74,8 @@ public final class LoadingClient {
     public static void handle(Payloads.Loading p) {
         switch (p.mode()) {
             case Payloads.Loading.START -> {
-                title = p.title().toUpperCase(java.util.Locale.ROOT);
+                mine = p.title().startsWith(MINE_MARK);
+                title = (mine ? p.title().substring(MINE_MARK.length()) : p.title()).toUpperCase(java.util.Locale.ROOT);
                 lore = p.lore();
                 color = p.color() & 0xFFFFFF;
                 target = p.percent();
@@ -183,7 +197,8 @@ public final class LoadingClient {
         g.fillGradient(bx, by, bx + fill, by + 3, alpha(0.35F * k) | 0xFFFFFF, alpha(0F));
         String pct = Math.round(shown) + " %";
         g.text(mc.font, pct, cx - mc.font.width(pct) / 2, by + 10, 0xC8C0B0 | alpha(k), true);
-        String label = shown >= 99.5F ? "Entrée dans le donjon…" : "Construction de votre donjon…";
+        String label = mine ? (shown >= 99.5F ? "Arrivée dans la mine…" : "Descente dans les mines…")
+                : shown >= 99.5F ? "Entrée dans le donjon…" : "Construction de votre donjon…";
         g.text(mc.font, label, cx - mc.font.width(label) / 2, by - 12, 0xA8A090 | alpha(k), true);
         // sablier : quatre losanges qui tournent
         int sx = cx;
@@ -195,7 +210,8 @@ public final class LoadingClient {
             diamond(g, sx + ox, sy + oy, i == (int) (t * 4F) % 4 ? 3 : 2, color | alpha((i == (int) (t * 4F) % 4 ? 1F : 0.45F) * k));
         }
         // conseil
-        String tip = "Astuce : " + TIPS[(int) (t / 4.5F) % TIPS.length].replaceFirst("^Astuce : ", "");
+        String[] tips0 = mine ? MINE_TIPS : TIPS;
+        String tip = "Astuce : " + tips0[(int) (t / 4.5F) % tips0.length].replaceFirst("^Astuce : ", "");
         float tipFade = Mth.clamp(Math.min(((t % 4.5F) / 0.4F), (4.5F - (t % 4.5F)) / 0.4F), 0F, 1F);
         int tipw = mc.font.width(tip);
         float tips = Math.min(1F, w * 0.9F / Math.max(1, tipw));
