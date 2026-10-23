@@ -61,7 +61,7 @@ public abstract class MenuScreen extends MmoScreen {
     protected final void renderContent(GuiGraphicsExtractor g, int mx, int my, float a) {
         Ui.panel(g, left, top, pw, ph);
         drawTabs(g, font, left, top, pw, tab, mx, my, (r, action) -> click(r[0], r[1], r[2], r[3], action));
-        g.fill(left + 6, top + 24, left + pw - 6, top + 25, Ui.GOLD_DARK);
+        g.fill(left + 6, top + 24, left + pw - 6, top + 25, Ui.LINE);
         renderTab(g, mx, my, a);
     }
 
@@ -75,8 +75,8 @@ public abstract class MenuScreen extends MmoScreen {
         // bouton d'edition de l'interface (HUD) au bout de la barre d'onglets
         int ex = left + pw - 8 - 18;
         boolean eh = Ui.in(mx, my, ex, top + 6, 18, 18);
-        g.fillGradient(ex, top + 6, ex + 18, top + 24, eh ? 0xFF3A2E24 : 0xFF241C1A, 0xFF141012);
-        Ui.border(g, ex, top + 6, 18, 18, eh ? Ui.GOLD : Ui.GOLD_DARK);
+        g.fill(ex, top + 6, ex + 18, top + 24, eh ? Ui.CARD_HOVER : Ui.CARD);
+        Ui.border(g, ex, top + 6, 18, 18, eh ? Ui.GOLD : Ui.LINE);
         g.fill(ex + 4, top + 10, ex + 14, top + 11, eh ? Ui.GOLD_LIGHT : Ui.MUTED);         // pictogramme : cadres d'interface
         g.fill(ex + 4, top + 10, ex + 5, top + 20, eh ? Ui.GOLD_LIGHT : Ui.MUTED);
         g.fill(ex + 4, top + 19, ex + 14, top + 20, eh ? Ui.GOLD_LIGHT : Ui.MUTED);
@@ -87,17 +87,18 @@ public abstract class MenuScreen extends MmoScreen {
                 net.minecraft.network.chat.Component.literal("Déplacer, redimensionner ou masquer les éléments affichés").withColor(0x9C9282)), mx, my);
         click.accept(new int[]{ex, top + 6, 18, 18}, () -> Minecraft.getInstance().gui.setScreen(new HudEditorScreen(Minecraft.getInstance().gui.screen())));
         drawMusicButton(g, font, ex - 20, top + 6, mx, my, click);
+        float common = 1f;                                    // meme taille de texte pour tous les onglets
+        for (Tab t : tabs) common = Math.min(common, (tw - 8) / (float) Math.max(1, font.width(t.label)));
         for (int i = 0; i < tabs.length; i++) {
             Tab t = tabs[i];
             int tx = left + 8 + i * tw;
             int ty = top + 6;
             boolean on = t == active;
             boolean hover = Ui.in(mx, my, tx, ty, tw - 2, 18);
-            g.fillGradient(tx, ty, tx + tw - 2, ty + 18, on ? 0xFF5A4220 : hover ? 0xFF3A2E24 : 0xFF241C1A, on ? 0xFF2A1E10 : 0xFF141012);
-            Ui.border(g, tx, ty, tw - 2, 18, on ? Ui.GOLD : Ui.GOLD_DARK);
-            if (on) g.fill(tx + 1, ty + 17, tx + tw - 3, ty + 18, 0xFF2A1E10);
+            g.fill(tx, ty, tx + tw - 2, ty + 18, on ? Ui.CARD_HOVER : hover ? Ui.CARD : 0x00000000);
+            if (on) g.fill(tx, ty + 16, tx + tw - 2, ty + 18, Ui.GOLD);
             int lw = font.width(t.label);
-            float sc = Math.min(1f, (tw - 8) / (float) Math.max(1, lw));
+            float sc = common;
             Ui.scaledText(g, t.label, tx + (tw - 2) / 2f, ty + 9 - 4 * sc, sc, on ? Ui.GOLD_LIGHT : hover ? Ui.TEXT : Ui.MUTED, true);
             if (!on) click.accept(new int[]{tx, ty, tw - 2, 18}, () -> open(t));
         }
@@ -111,8 +112,8 @@ public abstract class MenuScreen extends MmoScreen {
         int vol = com.mmorpg.client.ClientConfig.AMBIENT_MUSIC_VOLUME.get();
         boolean hover = Ui.in(mx, my, x, y, 18, 18);
         int col = hover ? Ui.GOLD_LIGHT : Ui.MUTED;
-        g.fillGradient(x, y, x + 18, y + 18, hover ? 0xFF3A2E24 : 0xFF241C1A, 0xFF141012);
-        Ui.border(g, x, y, 18, 18, hover ? Ui.GOLD : Ui.GOLD_DARK);
+        g.fill(x, y, x + 18, y + 18, hover ? Ui.CARD_HOVER : Ui.CARD);
+        Ui.border(g, x, y, 18, 18, hover ? Ui.GOLD : Ui.LINE);
         g.fill(x + 3, y + 7, x + 6, y + 11, col);                                       // haut-parleur
         for (int i = 0; i < 4; i++) g.fill(x + 6 + i, y + 7 - i, x + 7 + i, y + 11 + i, col);
         if (vol <= 0) {                                                                // coupe : croix

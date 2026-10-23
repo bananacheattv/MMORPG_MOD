@@ -66,11 +66,11 @@ public class ShopScreen extends MmoScreen {
         g.item(new ItemStack(ModItems.PIECE_OR.get()), left + pw - 26 - font.width(goldTxt), top + 4);
         g.text(font, goldTxt, left + pw - 8 - font.width(goldTxt), top + 9, 0xFFFFD040, true);
         int tw = 90;
-        button(g, left + pw / 2 - tw - 2, top + 22, tw, 16, "Acheter", true, !sellTab ? 0xFF6A4A1A : 0xFF2A2420, () -> {
+        button(g, left + pw / 2 - tw - 2, top + 22, tw, 16, "Acheter", true, !sellTab ? 0xFFE2B85A : 0xFF3B3350, () -> {
             sellTab = false;
             scroll = 0;
         });
-        button(g, left + pw / 2 + 2, top + 22, tw, 16, "Vendre", true, sellTab ? 0xFF6A4A1A : 0xFF2A2420, () -> {
+        button(g, left + pw / 2 + 2, top + 22, tw, 16, "Vendre", true, sellTab ? 0xFFE2B85A : 0xFF3B3350, () -> {
             sellTab = true;
             scroll = 0;
         });
@@ -144,7 +144,7 @@ public class ShopScreen extends MmoScreen {
             int priceX = x0 + w - 150 - font.width(p);
             g.text(font, font.plainSubstrByWidth(s.getHoverName().getString(), priceX - (x0 + 22) - 6), x0 + 22, ry + 5, color, false);
             g.text(font, p, priceX, ry + 5, 0xFFFFD040, false);
-            button(g, x0 + w - 142, ry + 2, 60, 14, "Vendre 1", true, 0xFF6A4A1A,
+            button(g, x0 + w - 142, ry + 2, 60, 14, "Vendre 1", true, 0xFFE2B85A,
                     () -> ClientNet.send(new Payloads.ShopAction(Payloads.ShopAction.SELL, slot, 1, npc)));
             button(g, x0 + w - 78, ry + 2, 74, 14, "Tout vendre", true, 0xFF7A3A1A,
                     () -> ClientNet.send(new Payloads.ShopAction(Payloads.ShopAction.SELL_ALL, slot, 0, npc)));

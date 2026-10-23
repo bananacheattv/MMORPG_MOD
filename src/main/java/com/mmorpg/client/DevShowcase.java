@@ -441,6 +441,52 @@ public final class DevShowcase {
             }
             return;
         }
+        if (MODE.equals("ecransplats")) {          // tous les ecrans du mod en interface plate (fenetre 1280x720, echelle 2 = 640x360)
+            if (tick == 5) {
+                mc.getWindow().setWindowed(1280, 720);
+                mc.options.guiScale().set(2);
+                mc.resizeGui();
+                cmd(mc, "gamemode survival " + me);
+            }
+            MenuScreen.Tab[] tabs = MenuScreen.Tab.values();
+            int step = (tick - 30) / 25;
+            if (tick >= 30 && step < tabs.length) {
+                if ((tick - 30) % 25 == 0) MenuScreen.open(tabs[step]);
+                if ((tick - 30) % 25 == 18) shot(mc, "plat_" + tabs[step].name().toLowerCase());
+            }
+            int t2 = tick - 30 - tabs.length * 25;
+            if (t2 >= 0) {
+                net.minecraft.nbt.CompoundTag empty = new net.minecraft.nbt.CompoundTag();
+                java.util.function.Supplier<net.minecraft.client.gui.screens.Screen>[] makers = new java.util.function.Supplier[]{
+                        () -> new com.mmorpg.client.screen.ClassSelectScreen(),
+                        () -> new com.mmorpg.client.screen.ShopScreen(empty),
+                        () -> new com.mmorpg.client.screen.DungeonMasterScreen(empty),
+                        () -> new com.mmorpg.client.screen.QuestGiverScreen(empty),
+                        () -> new com.mmorpg.client.screen.TeleporterScreen(empty),
+                        () -> new com.mmorpg.client.screen.ForgeScreen(mc.player.blockPosition()),
+                        () -> new com.mmorpg.client.screen.ClassMasterScreen(empty),
+                        () -> new com.mmorpg.client.screen.HudEditorScreen(null)};
+                String[] names = {"classe", "boutique", "donjon", "quetegiver", "teleporteur", "forge", "maitreclasse", "hud"};
+                int i = t2 / 25;
+                if (i < makers.length) {
+                    if (t2 % 25 == 0) {
+                        try {
+                            mc.gui.setScreen(makers[i].get());
+                        } catch (Throwable e) {
+                            MMORPG.LOGGER.warn("[MMORPG] PLAT {} : {}", names[i], e.toString());
+                        }
+                    }
+                    if (t2 % 25 == 18) shot(mc, "plat_" + names[i]);
+                } else if (t2 == makers.length * 25 + 5) {
+                    mc.gui.setScreen(null);
+                    mc.options.guiScale().set(0);
+                    mc.resizeGui();
+                    MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+                    stop(mc);
+                }
+            }
+            return;
+        }
         if (MODE.equals("interface")) {
             if (tick == 5) cmd(mc, "gamemode creative");
             if (tick == 20) mc.gui.setScreen(new net.minecraft.client.gui.screens.PauseScreen(true));
