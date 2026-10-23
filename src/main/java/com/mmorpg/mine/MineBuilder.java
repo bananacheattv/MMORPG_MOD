@@ -46,6 +46,7 @@ public final class MineBuilder {
     private int totemsDone = 0;
     private boolean exitDone = false;
     private final Set<Long> forced = new HashSet<>();
+    private final java.util.ArrayDeque<Long> pending = new java.util.ArrayDeque<>();
     private int row = 0;
     private int slabEnd = 0;
     private boolean plazaDone = false;
@@ -90,6 +91,7 @@ public final class MineBuilder {
         if (row == 0 && slabEnd == 0) clearTexts();
         while (row < MineLayout.SIZE) {
             if (row >= slabEnd) nextSlab();
+            if (!drainChunks(start, nanos)) return false;
             for (int lx = 0; lx < MineLayout.SIZE; lx++) column(lx, row);
             row++;
             if (!plazaDone && row >= MineLayout.PLAZA_Z + 22) {
@@ -120,10 +122,7 @@ public final class MineBuilder {
         int cz0 = (MineLayout.Z0 + slabStart - 16) >> 4, cz1 = (MineLayout.Z0 + slabEnd + 16) >> 4;
         for (int cx = cx0; cx <= cx1; cx++) {
             for (int cz = cz0; cz <= cz1; cz++) {
-                if (forced.add(ChunkKey.of(cx, cz))) {
-                    level.setChunkForced(cx, cz, true);
-                    level.getChunk(cx, cz);
-                }
+                if (forced.add(ChunkKey.of(cx, cz))) pending.add(ChunkKey.of(cx, cz));
             }
         }
         // on libere ce qui est derriere nous (les echelles et la place utilisent le chargement a la demande)
@@ -134,6 +133,20 @@ public final class MineBuilder {
             level.setChunkForced(ChunkKey.x(k), cz, false);
             return true;
         });
+    }
+
+    /**
+     * Charge de force les chunks de la tranche, quelques-uns par passage : attendre des centaines de chunks d'un coup bloquerait le tick
+     * (et le chien de garde du serveur le prendrait pour un plantage au premier demarrage). @return vrai quand tout est charge
+     */
+    private boolean drainChunks(long start, long nanos) {
+        while (!pending.isEmpty()) {
+            long k = pending.pollFirst();
+            level.setChunkForced(ChunkKey.x(k), ChunkKey.z(k), true);
+            level.getChunk(ChunkKey.x(k), ChunkKey.z(k));
+            if (System.nanoTime() - start > nanos) break;
+        }
+        return pending.isEmpty();
     }
 
     /** Libere les chunks charges de force (fin de construction ou abandon). */

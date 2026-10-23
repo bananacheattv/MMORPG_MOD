@@ -155,7 +155,7 @@ public final class MineManager {
             }
             return;
         }
-        for (int r = 0; r < MineLayout.SECTORS && job == null; r++) {
+        for (int r = 0; r < MineLayout.SECTORS && job == null && !com.mmorpg.plains.PlainsManager.building(); r++) {          // une construction a la fois dans la dimension
             if (!built(server, r)) start(server, r);
         }
         if (job != null) return;
