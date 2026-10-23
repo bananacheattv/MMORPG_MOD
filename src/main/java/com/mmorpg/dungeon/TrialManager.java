@@ -158,7 +158,7 @@ public final class TrialManager {
 
     /** Quatre vagues, cinq aux difficultes elevees. */
     static int waveCount(Trial t) {
-        return 4 + (t.diff() >= 2 ? 1 : 0);
+        return 5 + (t.diff() >= 2 ? 1 : 0);
     }
 
     // ================================================================== gardien d'elite et embuscades
@@ -203,7 +203,7 @@ public final class TrialManager {
             name = boss.getName().getString().toUpperCase(java.util.Locale.ROOT);
             level.sendParticles(ParticleTypes.PORTAL, boss.getX(), boss.getY() + 2, boss.getZ(), 60, 0.8, 1.6, 0.8, 0.6);
         }
-        int escorts = Math.min(10, 2 + t.diff() * 2 + Math.max(0, players - 1) * 2);
+        int escorts = Math.min(18, 6 + t.diff() * 3 + Math.max(0, players - 1) * 3);
         for (int i = 0; i < escorts; i++) {
             double a = random.nextDouble() * Math.PI * 2;
             double r = 8 + random.nextDouble() * 4;
@@ -280,13 +280,13 @@ public final class TrialManager {
         w.nextAt = -1;
         w.spawned = true;
         w.graceUntil = level.getGameTime() + 40;
-        int extra = Math.max(0, inside(level, t).size() - 1) * 2;          // le solo reste la reference : on n'ajoute des ennemis que pour les groupes
-        int count = Math.min(16, 3 + number * 2 + t.diff() * 2 + extra);
+        int extra = Math.max(0, inside(level, t).size() - 1) * 3;          // le solo reste la reference : on n'ajoute des ennemis que pour les groupes
+        int count = Math.min(30, 6 + number * 3 + t.diff() * 3 + extra);
         int cx = t.pos().get(0), cy = t.pos().get(1), cz = t.pos().get(2);
         var random = level.getRandom();
         for (int i = 0; i < count; i++) {
             double a = random.nextDouble() * Math.PI * 2;
-            double r = 5 + random.nextDouble() * 5;
+            double r = 5 + random.nextDouble() * 7;
             BlockPos p = new BlockPos((int) Math.round(cx + Math.cos(a) * r), cy, (int) Math.round(cz + Math.sin(a) * r));
             String key = t.mobs().get(i % t.mobs().size());
             int lvl = t.level() + (number == w.total ? 3 : 0) + t.diff();
@@ -320,6 +320,41 @@ public final class TrialManager {
         JUMP_PROGRESS.computeIfAbsent(t.id(), k -> new HashMap<>()).put(p.getUUID(), 0);
     }
 
+    /** Derniere position (x, z, dans le parcours ?) vue pour chaque joueur, pour detecter les deplacements instantanes. */
+    private static final Map<UUID, double[]> JUMP_LAST = new HashMap<>();
+
+    /** Parcours de saut non termine qui contient ce point (null sinon). */
+    private static Trial jumpAt(ServerLevel level, double x, double y, double z) {
+        for (Trial t : TrialData.get(level.getServer()).all()) {
+            if (!t.kind().equals(TrialData.JUMP) || t.done() || !t.dim().equals(level.dimension())) continue;
+            var b = t.box();
+            if (x >= b.get(0) && x < b.get(3) + 1 && z >= b.get(2) && z < b.get(5) + 1 && y >= b.get(1) - 22 && y < b.get(4) + 1) return t;
+        }
+        return null;
+    }
+
+    /** Pas de perle ni de fruit de chorus dans (ou vers) un parcours de saut. */
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onTeleport(net.neoforged.neoforge.event.entity.EntityTeleportEvent event) {
+        if (!(event instanceof net.neoforged.neoforge.event.entity.EntityTeleportEvent.EnderPearl)
+                && !(event instanceof net.neoforged.neoforge.event.entity.EntityTeleportEvent.ItemConsumption)) return;
+        if (!(event.getEntity() instanceof ServerPlayer p) || !(p.level() instanceof ServerLevel level)) return;
+        if (jumpAt(level, p.getX(), p.getY(), p.getZ()) == null && jumpAt(level, event.getTargetX(), event.getTargetY(), event.getTargetZ()) == null) return;
+        event.setCanceled(true);
+        p.sendOverlayMessage(Component.literal("Impossible de se téléporter ici : traversez à pied.").withColor(0xFFA060));
+    }
+
+    /** Pas de pont de fortune : on ne pose pas de bloc dans un parcours de saut. */
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onPlaceInJump(net.neoforged.neoforge.event.level.BlockEvent.EntityPlaceEvent event) {
+        if (!(event.getLevel() instanceof ServerLevel level) || !(event.getEntity() instanceof ServerPlayer p)) return;
+        if (p.isCreative() && p.permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_GAMEMASTER)) return;
+        BlockPos pos = event.getPos();
+        if (jumpAt(level, pos.getX(), pos.getY(), pos.getZ()) == null) return;
+        event.setCanceled(true);
+        p.sendOverlayMessage(Component.literal("On ne construit pas dans cette épreuve.").withColor(0xFFA060));
+    }
+
     private static void tickJump(ServerLevel level, TrialData data, Trial t) {
         int x0 = t.box().get(0), z0 = t.box().get(2), x1 = t.box().get(3), z1 = t.box().get(5);
         double fallY = t.box().get(1);
@@ -328,17 +363,25 @@ public final class TrialManager {
         for (ServerPlayer p : level.players()) {
             if (!p.isAlive() || p.isSpectator() || p.getAbilities().flying) continue;
             int reached = progress.getOrDefault(p.getUUID(), 0);
+            boolean inBox = p.getX() >= x0 && p.getX() < x1 + 1 && p.getZ() >= z0 && p.getZ() < z1 + 1;
+            double[] before = JUMP_LAST.get(p.getUUID());
+            JUMP_LAST.put(p.getUUID(), new double[]{p.getX(), p.getZ(), inBox ? 1 : 0});
+            // deplacement impossible a pied en 0,25 s (perle, fruit de chorus, commande...) : on ne gagne pas de terrain ainsi
+            if (!t.done() && inBox && before != null && before[2] == 1 && Math.hypot(p.getX() - before[0], p.getZ() - before[1]) > 7) {
+                backToStart(level, t, p, "Le parcours doit être traversé à pied : retour au départ.");
+                continue;
+            }
             if (p.getX() >= x0 && p.getX() < x1 + 1 && p.getZ() >= z0 && p.getZ() < z1 + 1) {
                 if (p.getY() >= fallY && p.getY() < t.box().get(4) + 1) {
                     announce(p, t);
                     int idx = (int) ((p.getZ() - z0) / JUMP_SPAN);
-                    if (!t.done() && idx > reached + 2) {                    // teleportation, bond demesure... : on ne saute pas une partie du parcours
+                    if (!t.done() && idx > reached + 1) {                    // teleportation, bond demesure... : on ne saute pas une partie du parcours
                         backToStart(level, t, p, "Le parcours doit être traversé en entier : retour au départ.");
                         continue;
                     }
                     if (idx > reached) progress.put(p.getUUID(), idx);
                 }
-                if (p.getY() < fallY && p.getY() > fallY - 22) {
+                if (p.getY() < fallY) {
                     backToStart(level, t, p, "Vous avez chuté : retour au départ du parcours.");
                     continue;
                 }
@@ -370,15 +413,17 @@ public final class TrialManager {
     }
 
     /** Dernier clic pris en compte pour chaque joueur (temps de jeu). */
-    private static final Map<UUID, Long> LAST_CLICK = new HashMap<>();
+    private static final Map<UUID, long[]> LAST_CLICK = new HashMap<>();
     /** Un clic droit arrive deux fois au serveur (main puis main secondaire), et un clic gauche peut s'y ajouter : on ignore tout clic qui suit le precedent de moins de 0,3 s. */
     private static final int CLICK_COOLDOWN_TICKS = 6;
 
-    private static boolean freshClick(ServerLevel level, ServerPlayer sp) {
+    private static boolean freshClick(ServerLevel level, ServerPlayer sp, BlockPos pos) {
         long now = level.getGameTime();
-        Long last = LAST_CLICK.get(sp.getUUID());
-        if (last != null && now - last < CLICK_COOLDOWN_TICKS && now >= last) return false;
-        LAST_CLICK.put(sp.getUUID(), now);
+        long key = pos.asLong();
+        long[] last = LAST_CLICK.get(sp.getUUID());
+        // seul un second clic sur le MEME bloc est ignore : deux dalles touchees coup sur coup comptent toutes les deux
+        if (last != null && last[1] == key && now - last[0] < CLICK_COOLDOWN_TICKS && now >= last[0]) return false;
+        LAST_CLICK.put(sp.getUUID(), new long[]{now, key});
         return true;
     }
 
@@ -390,7 +435,7 @@ public final class TrialManager {
             if ((!t.kind().equals(TrialData.SIMON) && !order) || !t.dim().equals(level.dimension())) continue;
             if (!order && t.pos().get(0) == pos.getX() && t.pos().get(1) == pos.getY() && t.pos().get(2) == pos.getZ()) {
                 cancel(ev);
-                if (!freshClick(level, sp)) return;
+                if (!freshClick(level, sp, pos)) return;
                 if (t.done()) sp.sendOverlayMessage(Component.literal("Cette énigme est déjà résolue.").withColor(0xA0E0A0));
                 else startSimon(level, t, sp);
                 return;
@@ -398,7 +443,7 @@ public final class TrialManager {
             for (int k = 0; k * 3 + 2 < t.pads().size(); k++) {
                 if (t.pads().get(k * 3) == pos.getX() && t.pads().get(k * 3 + 1) == pos.getY() && t.pads().get(k * 3 + 2) == pos.getZ()) {
                     cancel(ev);
-                    if (!freshClick(level, sp)) return;
+                    if (!freshClick(level, sp, pos)) return;
                     padPressed(level, data, t, sp, k);
                     return;
                 }
@@ -420,6 +465,10 @@ public final class TrialManager {
 
     private static void light(ServerLevel level, Trial t, int k, boolean on) {
         level.setBlock(padPos(t, k), state(t.states().get(k * 2 + (on ? 1 : 0))), 3);
+        // une dalle allumee eclaire la salle (bloc de lumiere au-dessus)
+        BlockPos above = padPos(t, k).above();
+        if (on) level.setBlock(above, Blocks.LIGHT.defaultBlockState(), 3);
+        else if (level.getBlockState(above).is(Blocks.LIGHT)) level.setBlock(above, Blocks.AIR.defaultBlockState(), 3);
     }
 
     private static void note(ServerLevel level, Trial t, int k, float volume) {

@@ -36,6 +36,52 @@ public final class ArenaEvents {
 
     static void forgetKey(String group) {
         KEYS_DROPPED.remove(group);
+        SUMMONED.remove(group);
+        DWELL.remove(group);
+    }
+
+    /** Exemplaires de donjon dont le boss a deja ete invoque (une fois par partie ; remis a zero avec l'exemplaire). */
+    private static final java.util.Set<String> SUMMONED = new java.util.HashSet<>();
+    /** Temps de jeu auquel un joueur est entre au fond de l'arene, par exemplaire. */
+    private static final Map<String, Long> DWELL = new java.util.HashMap<>();
+    /** Delai (ticks) entre l'entree dans l'arene et le reveil du boss : le temps de decouvrir la salle. */
+    private static final int WAKE_DELAY = 70;
+
+    /**
+     * Le boss se reveille tout seul quand un joueur entre au fond de son arene (le rituel de l'autel se joue comme avant) : plus besoin
+     * de l'objet d'invocation, qui reste utilisable pour rappeler un boss apres une remise a zero.
+     */
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void onServerTick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) {
+        var server = event.getServer();
+        if (server.getTickCount() % 10 != 0) return;
+        for (ServerLevel level : server.getAllLevels()) {
+            for (ServerPlayer p : level.players()) {
+                if (!p.isAlive() || p.isSpectator()) continue;
+                var zone = ZoneManager.zoneAt(level, p.blockPosition());
+                if (zone == null || !zone.boss()) continue;
+                String group = zone.id().replace("_boss", "");
+                if (SUMMONED.contains(group)) continue;
+                double ax = zone.minX() + 23 + 0.5, az = zone.minZ() + 23 + 0.5;
+                if (Math.hypot(p.getX() - ax, p.getZ() - az) > Theme.ARENA_R - 4) continue;       // au fond de la salle, pas sur le seuil
+                long now = level.getGameTime();
+                long since = DWELL.computeIfAbsent(group, k -> now);
+                if (now - since < WAKE_DELAY) continue;
+                for (com.mmorpg.world.DungeonBuilder.DungeonType t : com.mmorpg.world.DungeonBuilder.DungeonType.values()) {
+                    if (!group.startsWith(t.id + "_")) continue;
+                    BlockPos altar = null;
+                    for (int y = p.getBlockY() + 3; y >= p.getBlockY() - 5 && altar == null; y--) {
+                        BlockPos at = BlockPos.containing(ax, y, az);
+                        if (level.getBlockState(at).getBlock() instanceof com.mmorpg.block.AltarBlock) altar = at;
+                    }
+                    if (altar == null) break;
+                    SUMMONED.add(group);
+                    DWELL.remove(group);
+                    com.mmorpg.entity.boss.BossManager.summon(level, altar, t.bossKey, p);
+                    break;
+                }
+            }
+        }
     }
 
     /**

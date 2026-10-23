@@ -130,6 +130,8 @@ final class Trials {
         BlockPos o = c.O;
         DyeColor[] colors = {DyeColor.RED, DyeColor.BLUE, DyeColor.LIME, DyeColor.YELLOW};
         int[][] spots = {{-6, -6}, {6, -6}, {-6, 6}, {6, 6}};
+        // allumee, une dalle prend la teinte vive de sa couleur (et non un bloc lumineux identique pour toutes)
+        Block[] lit = {Blocks.REDSTONE_BLOCK, Blocks.LAPIS_BLOCK, Blocks.EMERALD_BLOCK, Blocks.GOLD_BLOCK};
         for (int k = 0; k < 4; k++) {
             int px = spots[k][0];
             int pz = cz + spots[k][1];
@@ -141,7 +143,7 @@ final class Trials {
             pads.add(o.getY() + 1);
             pads.add(o.getZ() + pz);
             states.add(id(Blocks.CONCRETE.pick(colors[k])));
-            states.add(id(pal.padOn()));
+            states.add(id(lit[k]));
         }
     }
 
@@ -306,11 +308,14 @@ final class Trials {
         int from = z0 + 3;
         int to = z1 - 3;
         // le pont disparait : il ne reste que le depart et l'arrivee
+        // (de mur a mur : contreforts sous le pont, rebords, decors... rien ne doit permettre de longer ou de contourner les plateformes)
         for (int z = from; z <= to; z++) {
-            for (int x = -2; x <= 2; x++) {
+            for (int x = -4; x <= 4; x++) {
+                for (int y = -6; y <= 6; y++) {
+                    if (y == 0 || y > -1 && y < 1) continue;
+                    c.set(x, y, z, Blocks.AIR);
+                }
                 c.set(x, 0, z, Blocks.AIR);
-                c.set(x, -1, z, Blocks.AIR);
-                for (int y = 1; y <= 4; y++) c.set(x, y, z, Blocks.AIR);
             }
         }
         Random r = new Random(seed);

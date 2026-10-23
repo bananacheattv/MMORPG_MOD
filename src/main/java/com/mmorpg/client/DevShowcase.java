@@ -487,6 +487,43 @@ public final class DevShowcase {
             }
             return;
         }
+        if (MODE.equals("bossauto")) {          // le boss se reveille tout seul quand on entre au fond de l'arene
+            var srv = mc.getSingleplayerServer();
+            if (tick == 5) {
+                cmd(mc, "gamemode survival");
+                cmd(mc, "execute in minecraft:overworld run tp " + me + " 6000 150 6000 0 0");
+            }
+            if (tick == 135) cmd(mc, "mmorpg donjon construire goblin");
+            if (tick == 330) srv.execute(() -> {
+                var zone = com.mmorpg.zone.ZoneData.get(srv).all().stream().filter(z -> z.id().endsWith("_boss") && z.minX() > 5000).findFirst().orElse(null);
+                MMORPG.LOGGER.info("[MMORPG] BOSSAUTO zone = {}", zone == null ? "aucune" : zone.id());
+                if (zone != null) {
+                    var pl = srv.getPlayerList().getPlayerByName(me);
+                    pl.getAbilities().invulnerable = true;
+                    pl.onUpdateAbilities();
+                    var lv = pl.level();
+                    var old = lv.getEntitiesOfClass(com.mmorpg.entity.boss.RpgBoss.class, new net.minecraft.world.phys.AABB(zone.minX() - 60, 0, zone.minZ() - 60, zone.maxX() + 60, 320, zone.maxZ() + 60));
+                    MMORPG.LOGGER.info("[MMORPG] BOSSAUTO boss deja presents (restes de tests) : {} -> retires", old.size());
+                    old.forEach(net.minecraft.world.entity.Entity::discard);
+                    hubTeleport(srv, me, zone.minX() + 23, 151, zone.minZ() + 23 - 6);
+                }
+            });
+            if (tick == 345) srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                var near = pl.level().getEntitiesOfClass(com.mmorpg.entity.boss.RpgBoss.class, pl.getBoundingBox().inflate(48));
+                MMORPG.LOGGER.info("[MMORPG] BOSSAUTO apres 0,75 s a l'entree : {} boss", near.size());
+            });
+            if (tick == 520) srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                var near = pl.level().getEntitiesOfClass(com.mmorpg.entity.boss.RpgBoss.class, pl.getBoundingBox().inflate(48));
+                MMORPG.LOGGER.info("[MMORPG] BOSSAUTO apres le delai : {} boss ({})", near.size(), near.isEmpty() ? "-" : near.get(0).getName().getString());
+            });
+            if (tick == 530) {
+                MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+                stop(mc);
+            }
+            return;
+        }
         if (MODE.equals("interface")) {
             if (tick == 5) cmd(mc, "gamemode creative");
             if (tick == 20) mc.gui.setScreen(new net.minecraft.client.gui.screens.PauseScreen(true));
@@ -2617,6 +2654,48 @@ public final class DevShowcase {
     }
 
     /** Verification automatique des epreuves d'un donjon : chute, vagues, enigme, puis entree dans l'arene du boss. */
+    /**
+     * Existe-t-il, dans un parcours de saut, un chemin de l'entree a la sortie qui ne demande que des enjambees d'un bloc (distance
+     * horizontale <= 2,3 entre deux points d'appui, denivele <= 1) ? Tout appui au-dessus de la ligne de chute compte (rebords, piliers...).
+     */
+    private static boolean walkRouteExists(net.minecraft.server.MinecraftServer srv, com.mmorpg.dungeon.TrialData.Trial tg) {
+        var level = srv.getLevel(tg.dim());
+        var bx = tg.box();
+        int x0 = bx.get(0), y0 = bx.get(1), z0 = bx.get(2), x1 = bx.get(3), z1 = bx.get(5);
+        java.util.Set<Long> stand = new java.util.HashSet<>();
+        java.util.Deque<int[]> queue = new java.util.ArrayDeque<>();
+        java.util.Set<Long> seen = new java.util.HashSet<>();
+        for (int x = x0 - 1; x <= x1 + 1; x++) {
+            for (int z = z0 - 3; z <= z1 + 3; z++) {
+                for (int y = y0 - 1; y <= y0 + 8; y++) {
+                    var pos = new net.minecraft.core.BlockPos(x, y, z);
+                    if (level.getBlockState(pos).getCollisionShape(level, pos).isEmpty()) continue;
+                    if (!level.getBlockState(pos.above()).getCollisionShape(level, pos.above()).isEmpty()) continue;
+                    if (!level.getBlockState(pos.above(2)).getCollisionShape(level, pos.above(2)).isEmpty()) continue;
+                    stand.add(pos.asLong());
+                    if (z < z0) {
+                        queue.add(new int[]{x, y, z});
+                        seen.add(pos.asLong());
+                    }
+                }
+            }
+        }
+        while (!queue.isEmpty()) {
+            int[] c = queue.poll();
+            if (c[2] > z1) return true;
+            for (int dx = -2; dx <= 2; dx++) {
+                for (int dz = -2; dz <= 2; dz++) {
+                    if (dx * dx + dz * dz > 5) continue;
+                    for (int dy = -1; dy <= 1; dy++) {
+                        long k = new net.minecraft.core.BlockPos(c[0] + dx, c[1] + dy, c[2] + dz).asLong();
+                        if (stand.contains(k) && seen.add(k)) queue.add(new int[]{c[0] + dx, c[1] + dy, c[2] + dz});
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     private static void trialsPhase(Minecraft mc, String me, String id) {
         var srv = mc.getSingleplayerServer();
         if (tick == 5) {
@@ -2630,6 +2709,11 @@ public final class DevShowcase {
             var all = new java.util.ArrayList<>(com.mmorpg.dungeon.TrialData.get(srv).all());
             MMORPG.LOGGER.info("[MMORPG] EPREUVES {} : {}", id, all.stream().map(t -> t.id().substring(t.id().lastIndexOf('_') + 1) + "=" + t.kind()).toList());
             for (var tg : all) MMORPG.LOGGER.info("[MMORPG] EPREUVE geometrie {} boite {} herse {} bloc {}", tg.id().substring(tg.id().lastIndexOf('_') + 1), tg.box(), tg.gate(), tg.gateBlock());
+            for (var tg : all) {
+                if (!tg.kind().equals("jump")) continue;
+                srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] EPREUVE contournement {} : route a pied possible = {} (attendu false)",
+                        tg.id().substring(tg.id().lastIndexOf('_') + 1), walkRouteExists(srv, tg)));
+            }
             trialCursor = 330;
             trialAt(5, () -> {
                 cmd(mc, "gamemode survival");

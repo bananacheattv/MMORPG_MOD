@@ -248,6 +248,8 @@ public final class StyledDungeon {
                 if (plan.roomKind(i).equals(Trials.NONE)) {
                     DungeonBuilder.spawner(level, o.offset(-7, 1, rm.z() - 3), mobs.get(0), r);
                     DungeonBuilder.spawner(level, o.offset(7, 1, rm.z() + 4), mobs.get(mobs.size() > 1 ? 1 : 0), r);
+                    DungeonBuilder.spawner(level, o.offset(-7, 1, rm.z() + 6), mobs.get(0), r);
+                    DungeonBuilder.spawner(level, o.offset(7, 1, rm.z() - 5), mobs.get(mobs.size() > 1 ? 1 : 0), r);
                 }
                 // un coffre par salle : dans la salle, ou derriere le lac de plateformes
                 BlockPos at = th.jumpRoom(i) ? o.offset(3, 1, rm.z1() + 6) : o.offset(rm.r() - 3, 1, rm.z() + (i % 2 == 0 ? 7 : -7));
