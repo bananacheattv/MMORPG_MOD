@@ -24,6 +24,11 @@ public final class ClientConfig {
             .translation("mmorpg.configuration.ambientMusicVolume")
             .defineInRange("ambientMusicVolume", 70, 0, 100);
 
+    public static final ModConfigSpec.ConfigValue<String> MAIN_MENU_SERVER = BUILDER
+            .comment("Adresse du serveur proposee par le bouton « Rejoindre Aeloria » du menu principal (vide : pas de bouton)")
+            .translation("mmorpg.configuration.mainMenuServer")
+            .define("mainMenuServer", "");
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 
     /** Volume de la musique d'ambiance entre 0 et 1. */
