@@ -41,6 +41,8 @@ public final class HubBuilder {
 
     /** Etiquette des entites decoratives du hub (textes), retirees a chaque reconstruction. */
     public static final String TAG = "mmorpg_hub";
+    /** Version du plan du hub : 2 = Marche d'Aeloria (banque, hotel des ventes, forges, marchands). Un hub plus ancien est reconstruit au demarrage. */
+    public static final int LAYOUT_VERSION = 2;
     static final PlayerClass[] CLASSES = {PlayerClass.GUERRIER, PlayerClass.MAGE, PlayerClass.ARCHER, PlayerClass.TANK};
     static final Block[] FLOWERS = {Blocks.DANDELION, Blocks.POPPY, Blocks.CORNFLOWER, Blocks.AZURE_BLUET, Blocks.ALLIUM,
             Blocks.OXEYE_DAISY, Blocks.PINK_TULIP, Blocks.LILY_OF_THE_VALLEY};
@@ -61,6 +63,7 @@ public final class HubBuilder {
             STABLE.add(stable("dummy:yard:" + i));
         }
         for (int i = 0; i < 40; i++) STABLE.add(stable("text:" + i));
+        for (String k : new String[]{"graines", "alchimie", "armurerie", "minerais", "mines", "donjons", "ferme"}) STABLE.add(stable("npc:marche:" + k));
     }
 
     public static boolean isStable(UUID id) {
@@ -84,6 +87,7 @@ public final class HubBuilder {
         HubStructures.causeway(c);
         HubStructures.arena(c);
         HubStructures.yard(c);
+        HubMarket.build(c);
         HubFlora.gardens(c);
         HubFlora.islets(c);
         texts(c);
@@ -115,6 +119,8 @@ public final class HubBuilder {
         add.accept(new String[]{"entrainement", "Aire d'entraînement", "Mannequins de combat"},
                 new int[]{HubLayout.YARD_X0, -HubLayout.YARD_HALF, HubLayout.YARD_X1, HubLayout.YARD_HALF});
         add.accept(new String[]{"portail", "Portail d'Aeloria", "Le monde vous attend"}, new int[]{-12, 26, 12, 60});
+        add.accept(new String[]{"marche", "Marché d'Aeloria", "Banque, hôtel des ventes, forges et marchands"},
+                new int[]{HubMarket.CX - HubMarket.RADIUS - 2, -HubMarket.RADIUS - 2, HubMarket.CX + HubMarket.RADIUS + 2, HubMarket.RADIUS + 2});
         String[][] mottos = {{"Guerrier", "Force et férocité"}, {"Mage", "Intelligence et esprit"}, {"Archer", "Agilité et dextérité"}, {"Paladin", "Vitalité et endurance"}};
         for (int i = 0; i < 4; i++) {
             int[] sp = HubLayout.classSpot(CLASSES[i]);
@@ -126,6 +132,7 @@ public final class HubBuilder {
 
     static boolean footprint(int x, int z) {
         if (x * x + z * z <= 31.6 * 31.6) return true;                                      // place
+        if (HubMarket.footprint(x, z)) return true;                                         // marche et allee
         if (Math.hypot(x, z - 46) <= 13 || (Math.abs(x) <= 11 && z >= 28 && z <= 46)) return true;   // portail et parvis
         if (Math.abs(x) <= 7 && z >= -54 && z <= -28) return true;                          // voie vers l'arene
         if (Math.hypot(x, z + 74) <= 24) return true;                                       // arene
@@ -329,7 +336,7 @@ public final class HubBuilder {
             int z = (int) Math.round(Math.sin(rad) * 31);
             if (Math.abs(x) <= 8 && z > 0) continue;               // portail
             if (Math.abs(x) <= 8 && z < 0) continue;               // voie de l'arene
-            if (x > 0 && Math.abs(z) <= 8) continue;               // allee de l'aire
+            if (Math.abs(x) > 8 && Math.abs(z) <= 8) continue;     // allees de l'aire et du marche
             boolean nearPavilion = false;
             for (PlayerClass cls : CLASSES) {
                 int[] s = HubLayout.classSpot(cls);
@@ -443,6 +450,7 @@ public final class HubBuilder {
         text(c, 0, 12, 24, "TÉLÉPORTEUR", "#9FD8FF", 3.4F);
         text(c, 0, 17, HubLayout.ROOM_Z1 - 1, "ÉPREUVE DES HÉROS", "#FFC060", 5F);
         text(c, HubLayout.YARD_CENTER_X - 17, 11, 0, "AIRE D'ENTRAÎNEMENT", "#FFB070", 4F);
+        HubMarket.texts(c);
     }
 
     // ================================================================== PNJ et mannequins
@@ -451,7 +459,7 @@ public final class HubBuilder {
         AABB box = HubLayout.hubBounds(c.O);
         for (Entity e : c.L.getEntities((Entity) null, box, x -> x instanceof ClassMasterEntity || x instanceof TrainingDummyEntity
                 || x instanceof Display.TextDisplay
-                || (x instanceof com.mmorpg.entity.NpcEntity n && "maitre_classes".equals(n.group())))) {
+                || (x instanceof com.mmorpg.entity.NpcEntity n && ("maitre_classes".equals(n.group()) || isStable(n.getUUID()))))) {
             if (e instanceof Display.TextDisplay && !e.entityTags().contains(TAG)) continue;
             e.discard();
         }
@@ -475,6 +483,7 @@ public final class HubBuilder {
         spawnMaster(c, ClassMasterEntity.EPREUVE, HubLayout.TRIAL_MASTER[0], 0, HubLayout.TRIAL_MASTER[2], 90F);
         for (int i = 0; i < HubLayout.DUMMIES_ROOM.length; i++) spawnDummy(c, HubLayout.DUMMIES_ROOM[i], "room:" + i);
         for (int i = 0; i < HubLayout.DUMMIES_YARD.length; i++) spawnDummy(c, HubLayout.DUMMIES_YARD[i], "yard:" + i);
+        HubMarket.entities(c);
     }
 
     private static void spawnMaster(HubCtx c, int kind, int x, int y, int z, float yaw) {

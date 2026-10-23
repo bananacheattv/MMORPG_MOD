@@ -18,22 +18,30 @@ public class HubData extends SavedData {
     private static final Codec<HubData> CODEC = RecordCodecBuilder.create(i -> i.group(
             BlockPos.CODEC.optionalFieldOf("origin").forGetter(d -> java.util.Optional.ofNullable(d.origin)),
             ResourceKey.codec(Registries.DIMENSION).optionalFieldOf("dimension", Level.OVERWORLD).forGetter(d -> d.dimension),
-            Codec.BOOL.optionalFieldOf("stable", false).forGetter(d -> d.stable)
-    ).apply(i, (o, dim, st) -> new HubData(o.orElse(null), dim, st)));
+            Codec.BOOL.optionalFieldOf("stable", false).forGetter(d -> d.stable),
+            Codec.INT.optionalFieldOf("layout", 1).forGetter(d -> d.layout)
+    ).apply(i, (o, dim, st, lay) -> new HubData(o.orElse(null), dim, st, lay)));
     public static final SavedDataType<HubData> TYPE = new SavedDataType<>(MMORPG.id("hub"), HubData::new, CODEC);
 
     private @Nullable BlockPos origin;
     private ResourceKey<Level> dimension = Level.OVERWORLD;
     /** Vrai quand le hub a ete construit avec des identifiants d'entites stables (les anciens exemplaires peuvent alors etre retires). */
     private boolean stable;
+    /** Version du plan avec laquelle le hub a ete construit (voir HubBuilder.LAYOUT_VERSION). */
+    private int layout = 1;
 
     public HubData() {
     }
 
-    private HubData(@Nullable BlockPos origin, ResourceKey<Level> dimension, boolean stable) {
+    private HubData(@Nullable BlockPos origin, ResourceKey<Level> dimension, boolean stable, int layout) {
+        this.layout = layout;
         this.origin = origin;
         this.dimension = dimension;
         this.stable = stable;
+    }
+
+    public int layout() {
+        return layout;
     }
 
     public boolean stableBuild() {
@@ -64,6 +72,7 @@ public class HubData extends SavedData {
         this.dimension = dim;
         this.origin = origin.immutable();
         this.stable = true;
+        this.layout = HubBuilder.LAYOUT_VERSION;
         setDirty();
     }
 

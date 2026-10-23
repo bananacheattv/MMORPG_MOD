@@ -219,6 +219,7 @@ public final class ConfigManager {
                 }
             }
             shop = shopCfg == null ? ShopConfig.defaults() : shopCfg;
+            shop.addNewContent();
             write(sh, shop);
 
             Path lt = dir().resolve("butins.json");

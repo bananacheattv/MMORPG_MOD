@@ -178,6 +178,10 @@ public final class DevShowcase {
             structuresPhase(mc, me);
             return;
         }
+        if (MODE.equals("marche")) {          // Marche d'Aeloria : reconstruction du hub puis visite du quartier
+            marchePhase(mc, me);
+            return;
+        }
         if (MODE.equals("services")) {          // banque et hotel des ventes : modeles 3D, interfaces, depot, vente, achat, comptoir
             servicesPhase(mc, me);
             return;
@@ -1172,6 +1176,85 @@ public final class DevShowcase {
     }
 
     private static net.minecraft.core.BlockPos structOrigin;
+
+    private static int marcheT0 = -1;
+
+    /** Marche d'Aeloria : attend la reconstruction du hub (plan 2), puis photographie chaque coin du quartier. */
+    private static void marchePhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) mc.getWindow().setWindowed(1280, 720);
+        if (tick == 10) {
+            cmd(mc, "gamemode creative " + me);
+            cmd(mc, "mmorpg niveau " + me + " 100");
+            cmd(mc, "time set day");
+            cmd(mc, "weather clear");
+            if (!mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+        }
+        if (marcheT0 < 0) {
+            if (tick % 20 == 0 && tick > 20) {
+                var hub = com.mmorpg.hub.HubData.get(srv);
+                MMORPG.LOGGER.info("[MMORPG] MARCHE plan du hub = {} (attendu {})", hub.layout(), com.mmorpg.hub.HubBuilder.LAYOUT_VERSION);
+                if (tick == 40) {
+                    srv.execute(() -> {
+                        var lv = com.mmorpg.hub.HubData.get(srv).level(srv);
+                        var o = com.mmorpg.hub.HubData.get(srv).origin();
+                        if (lv != null && o != null) com.mmorpg.hub.HubBuilder.build(lv, o);      // reconstruction forcee : verifie le plan courant
+                    });
+                } else if (tick > 40 && hub.layout() >= com.mmorpg.hub.HubBuilder.LAYOUT_VERSION) marcheT0 = tick + 40;
+            }
+            if (tick > 5000) {
+                MMORPG.LOGGER.info("[MMORPG] MARCHE : hub jamais reconstruit");
+                stop(mc);
+            }
+            return;
+        }
+        int t = tick - marcheT0;
+        int cx = com.mmorpg.hub.HubMarket.CX;
+        // {x, y, z, yaw, pitch, nom}
+        double[][] views = {
+                {cx + 40, 8, 0, 90, 12}, {cx + 20, 7, 0, 90, 20}, {cx + 4, 4, -9, 180, 8}, {cx - 4, 4, 3, 90, 8}, {cx + 4, 5, 8, 0, 8},
+                {cx + 8, 3, -6, 180, 10}, {cx + 20, 4, -9, 270, 8}, {cx - 22, 4, 12, 180, 12}, {cx - 16, 5, 14, 90, 14}, {cx, 50, 0, 90, 80},
+                {cx, 32, -46, 0, 36}, {-20, 10, 0, 90, 8}};
+        String[] names = {"entree", "teleporteur_fontaine", "banque", "hdv", "forges", "etal_alchimie", "portail_mines", "ferme", "hdv_ferme", "vue_du_ciel", "vue_nord", "avenue"};
+        int idx = t / 60;
+        if (idx < views.length && t % 60 == 5) {
+            double[] v = views[idx];
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                var hub = com.mmorpg.hub.HubData.get(srv);
+                var lv = hub.level(srv);
+                var o = hub.origin();
+                pl.teleportTo(lv, o.getX() + v[0] + 0.5, o.getY() + v[1], o.getZ() + v[2] + 0.5, java.util.Set.of(), (float) v[3], (float) v[4], true);
+            });
+        }
+        if (idx < views.length && t % 60 == 50) shot(mc, "110_marche_" + names[idx]);
+        if (t == views.length * 60 + 5) {
+            srv.execute(() -> {
+                var hub = com.mmorpg.hub.HubData.get(srv);
+                var lv = hub.level(srv);
+                int npcs = 0;
+                StringBuilder sb = new StringBuilder();
+                for (var e : lv.getEntities((net.minecraft.world.entity.Entity) null, com.mmorpg.hub.HubLayout.hubBounds(hub.origin()), x -> x instanceof com.mmorpg.entity.NpcEntity)) {
+                    npcs++;
+                    sb.append(((com.mmorpg.entity.NpcEntity) e).displayName()).append("; ");
+                }
+                MMORPG.LOGGER.info("[MMORPG] MARCHE PNJ du hub : {} [{}]", npcs, sb);
+                var o = hub.origin();
+                int cxx = com.mmorpg.hub.HubMarket.CX;
+                String[] check = {"banque_aeloria", "hdv_aeloria", "presse_compression", "forge_arcanique", "teleporteur"};
+                int[][] at = {{cxx, 0, -25}, {cxx - 27, 0, 0}, {cxx, 0, 24}, {cxx - 21, 0, 25}, {cxx + 25, 0, 0}};
+                for (int i = 0; i < check.length; i++) {
+                    var st = lv.getBlockState(o.offset(at[i][0], at[i][1], at[i][2]));
+                    MMORPG.LOGGER.info("[MMORPG] MARCHE bloc {} en place : {}", check[i], st.getBlock().getDescriptionId().contains(check[i]));
+                }
+            });
+        }
+        if (t == views.length * 60 + 30) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        }
+    }
 
     /** Banque et hotel des ventes : vue des modeles 3D puis actions reelles (messages serveur). */
     private static void servicesPhase(Minecraft mc, String me) {
