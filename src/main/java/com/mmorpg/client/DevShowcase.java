@@ -182,6 +182,10 @@ public final class DevShowcase {
             adminPhase(mc, me);
             return;
         }
+        if (MODE.equals("plaines")) {          // Plaines d'Aeloria : construction, visite des six regions, monstres, portails
+            plainesPhase(mc, me);
+            return;
+        }
         if (MODE.equals("marche")) {          // Marche d'Aeloria : reconstruction du hub puis visite du quartier
             marchePhase(mc, me);
             return;
@@ -1316,6 +1320,105 @@ public final class DevShowcase {
             return files.filter(p -> p.getFileName().toString().startsWith(name + "-")).count();
         } catch (java.io.IOException e) {
             return -1;
+        }
+    }
+
+    private static int plT0 = -1;
+
+    /** Plaines d'Aeloria : attend la construction, visite chaque region, compte les monstres apparus, puis traverse les deux portails. */
+    private static void plainesPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) mc.getWindow().setWindowed(1280, 720);
+        if (tick == 10) {
+            cmd(mc, "gamemode creative " + me);
+            cmd(mc, "mmorpg niveau " + me + " 100");
+            cmd(mc, "time set day");
+            cmd(mc, "weather clear");
+            if (!mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+        }
+        if (plT0 < 0) {
+            if (tick > 40 && tick % 100 == 0) {
+                boolean ok = com.mmorpg.plains.PlainsManager.built(srv) && !com.mmorpg.plains.PlainsManager.building()
+                        && com.mmorpg.hub.SpawnData.get(srv).layout() >= com.mmorpg.hub.SpawnBuilder.LAYOUT_VERSION;
+                MMORPG.LOGGER.info("[MMORPG] PLAINES attente : {} % (pret = {}, plan du spawn = {})", com.mmorpg.plains.PlainsManager.percent(), ok, com.mmorpg.hub.SpawnData.get(srv).layout());
+                if (ok) plT0 = tick + 40;
+            }
+            if (tick > 24000) {
+                MMORPG.LOGGER.info("[MMORPG] PLAINES : construction jamais terminee");
+                stop(mc);
+            }
+            return;
+        }
+        var lay = com.mmorpg.plains.PlainsLayout.get();
+        int S = com.mmorpg.plains.PlainsLayout.SECTOR_LEN;
+        int st2 = com.mmorpg.plains.PlainsLayout.sectorStart(2);
+        // {colonne x (-1 = chemin), colonne z, hauteur au-dessus du sol, yaw, pitch}
+        double[][] views = {
+                {180, 22, 2, 180, 6}, {180, 13, 46, 0, 72}, {-1, 60, 6, 0, 12}, {-1, com.mmorpg.plains.PlainsLayout.sectorStart(1) - 16, 5, 0, 8}, {-1, 150, 7, 0, 14},
+                {-1, st2 + 30, 6, 0, 14}, {-1, com.mmorpg.plains.PlainsLayout.sectorStart(3) + 30, 6, 0, 14}, {-1, com.mmorpg.plains.PlainsLayout.sectorStart(4) + 30, 6, 0, 14},
+                {-1, com.mmorpg.plains.PlainsLayout.sectorStart(5) + 30, 6, 0, 14}, {-1, com.mmorpg.plains.PlainsLayout.sectorStart(0) + 2, 5, 0, 16}};
+        String[] names = {"place", "place_haut", "prairie", "portique", "marais", "os", "givre", "cendres", "astre", "campement"};
+        int t = tick - plT0, per = 70;
+        int idx = t / per;
+        if (idx < views.length && t % per == 5) {
+            double[] v = views[idx];
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                var lv = srv.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
+                int lz = (int) v[1];
+                int lx = v[0] < 0 ? com.mmorpg.plains.PlainsLayout.pathX(lz) : (int) v[0];
+                int y = Math.max(lay.height(lx, lz), com.mmorpg.plains.PlainsLayout.BASE) + (int) v[2];
+                pl.teleportTo(lv, com.mmorpg.plains.PlainsLayout.X0 + lx + 0.5, y, com.mmorpg.plains.PlainsLayout.Z0 + lz + 0.5, java.util.Set.of(), (float) v[3], (float) v[4], true);
+            });
+        }
+        if (idx < views.length && t % per == 60) shot(mc, "120_plaines_" + names[idx]);
+        int end = views.length * per;
+        // monstres : on reste dans les Landes des Ossements et on compte ce qui apparait autour du joueur
+        if (t == end + 5) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var lv = srv.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
+            int lz = st2 + 36, lx = com.mmorpg.plains.PlainsLayout.pathX(lz);
+            pl.teleportTo(lv, com.mmorpg.plains.PlainsLayout.X0 + lx + 0.5, lay.height(lx, lz) + 1, com.mmorpg.plains.PlainsLayout.Z0 + lz + 0.5, java.util.Set.of(), 0F, 10F, true);
+        });
+        if (t == end + 260) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var mobs = pl.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, pl.getBoundingBox().inflate(48, 30, 48), m -> m instanceof com.mmorpg.entity.RpgMob);
+            int lo = 999, hi = 0;
+            java.util.Set<String> kinds = new java.util.TreeSet<>();
+            for (var m : mobs) {
+                var md = m.getData(com.mmorpg.registry.ModAttachments.MOB);
+                int lvl = md.level;
+                lo = Math.min(lo, lvl);
+                hi = Math.max(hi, lvl);
+                kinds.add(md.key);
+            }
+            MMORPG.LOGGER.info("[MMORPG] PLAINES monstres autour du joueur (Landes des Ossements) : {} (attendu 12 a 16), niveaux {} a {} (attendu 33 a 50), especes = {}", mobs.size(), lo, hi, kinds);
+        });
+        if (t == end + 265) shot(mc, "120_plaines_monstres");
+        // portails : Spawn -> plaines, puis arche des plaines -> Spawn
+        if (t == end + 280) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var o = com.mmorpg.hub.SpawnData.get(srv).origin();
+            pl.teleportTo(srv.getLevel(com.mmorpg.hub.SpawnBuilder.DIM), o.getX() + com.mmorpg.plains.PlainsManager.SPAWN_GATE_X + 2.5, o.getY() + 1,
+                    o.getZ() + com.mmorpg.plains.PlainsManager.SPAWN_GATE_Z + 0.5, java.util.Set.of(), 90F, 6F, true);
+        });
+        if (t == end + 290) shot(mc, "120_plaines_portail_spawn");
+        if (t == end + 330) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            MMORPG.LOGGER.info("[MMORPG] PLAINES portail du spawn : monde = {} (attendu mmorpg:donjons), x/z locaux = {}/{} (attendu 180/13)", pl.level().dimension().identifier(),
+                    (int) pl.getX() - com.mmorpg.plains.PlainsLayout.X0, (int) pl.getZ() - com.mmorpg.plains.PlainsLayout.Z0);
+            var lv = srv.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
+            pl.teleportTo(lv, com.mmorpg.plains.PlainsLayout.X0 + 180.5, com.mmorpg.plains.PlainsLayout.BASE + 1, com.mmorpg.plains.PlainsLayout.Z0 + com.mmorpg.plains.PlainsBuilder.ARCH_Z + 1.5,
+                    java.util.Set.of(), 180F, 0F, true);
+        });
+        if (t == end + 390) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            MMORPG.LOGGER.info("[MMORPG] PLAINES arche de retour : monde = {} (attendu mmorpg:spawn)", pl.level().dimension().identifier());
+        });
+        if (t == end + 400) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
         }
     }
 

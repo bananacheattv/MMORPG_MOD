@@ -83,6 +83,7 @@ public final class HubMarket {
         stall(c, CX - 12, 13, 0, -1, 3);
         gate(c, CX + 24, -18, -1, 0, true);
         gate(c, CX + 24, 19, -1, 0, false);
+        plainsGate(c, CX - 24, -18);
         farm(c, CX - 29, 17);
         plantings(c);
     }
@@ -267,6 +268,33 @@ public final class HubMarket {
         put(c, cx, cz, fx, fz, 0, 0, -1, accent);
     }
 
+    /** Portail des Plaines d'Aeloria (voir PlainsManager) : arche de pierre et de bois face a l'est, voile vert que l'on traverse en marchant. */
+    private static void plainsGate(HubCtx c, int cx, int cz) {
+        for (int u = -4; u <= 4; u++) {
+            for (int v = -3; v <= 3; v++) {
+                for (int y = 0; y <= 9; y++) put(c, cx, cz, 1, 0, u, y, v, Blocks.AIR);
+                double r = Math.hypot(u, v);
+                put(c, cx, cz, 1, 0, u, -1, v, r <= 2.4 ? c.state("dalle_runique") : r <= 3.6 ? c.state(Blocks.MOSSY_STONE_BRICKS) : c.state("pierre_solaire"));
+            }
+        }
+        for (int u : new int[]{-3, 3}) {
+            put(c, cx, cz, 1, 0, u, 0, 0, Blocks.MOSSY_STONE_BRICKS);
+            for (int y = 1; y <= 6; y++) put(c, cx, cz, 1, 0, u, y, 0, y % 3 == 0 ? c.state(Blocks.STRIPPED_OAK_LOG) : c.state(Blocks.OAK_LOG));
+            put(c, cx, cz, 1, 0, u, 7, 0, Blocks.MOSSY_STONE_BRICKS);
+            put(c, cx, cz, 1, 0, u, 8, 0, Blocks.LANTERN);
+        }
+        for (int u = -3; u <= 3; u++) {
+            put(c, cx, cz, 1, 0, u, 7, 0, Blocks.MOSSY_STONE_BRICKS);
+            put(c, cx, cz, 1, 0, u, 8, 0, Math.abs(u) == 3 ? c.state(Blocks.OAK_LOG) : c.state(Blocks.OAK_SLAB));
+        }
+        for (int u = -2; u <= 2; u++) {                              // voile vert, avec de la verdure qui retombe
+            for (int y = 1; y <= 6; y++) put(c, cx, cz, 1, 0, u, y, 0, Blocks.STAINED_GLASS.pick(net.minecraft.world.item.DyeColor.LIME));
+            put(c, cx, cz, 1, 0, u, 7, 1, Blocks.VINE);
+        }
+        for (int u : new int[]{-2, 2}) put(c, cx, cz, 1, 0, u, 1, 1, Blocks.FERN);
+        for (int u = -3; u <= 3; u++) for (int y = 0; y <= 7; y++) put(c, cx, cz, 1, 0, u, y, -1, c.mix(cx + u, y, cz, 97, Blocks.MOSSY_COBBLESTONE, 50, Blocks.OAK_LEAVES, 30, Blocks.MOSS_BLOCK, 20));
+    }
+
     // ------------------------------------------------------------------ jardins des cultivateurs
 
     private static void farm(HubCtx c, int cx, int cz) {
@@ -319,6 +347,8 @@ public final class HubMarket {
         HubBuilder.text(c, CX + 25, 11, 0, "TÉLÉPORTEUR", "#9FD8FF", 3F);
         HubBuilder.text(c, CX + 24, 12, -18, "MINES D'AELORIA", "#FFAA50", 4F);
         HubBuilder.text(c, CX + 24, 12, 19, "DONJONS", "#C090FF", 4F);
+        HubBuilder.text(c, CX - 24, 12, -18, "PLAINES D'AELORIA", "#8CE68C", 4F);
+        HubBuilder.text(c, CX - 24, 10.2, -18, "Farm en plein air · niveaux 1 à 98", "#F0E8D8", 1.8F);
         HubBuilder.text(c, CX - 29, 7, 17, "JARDINS D'AELORIA", "#8CE68C", 3.4F);
         HubBuilder.text(c, CX + 12, 8, -13, "ALCHIMIE", "#9FD8FF", 2.6F);
         HubBuilder.text(c, CX + 12, 8, 13, "GRAINES", "#8CE68C", 2.6F);

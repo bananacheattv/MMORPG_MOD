@@ -21,7 +21,7 @@ public final class SpawnBuilder {
 
     public static final ResourceKey<Level> DIM = ResourceKey.create(Registries.DIMENSION, MMORPG.id("spawn"));
     /** Version du plan du spawn : un spawn plus ancien est reconstruit au demarrage. */
-    public static final int LAYOUT_VERSION = 1;
+    public static final int LAYOUT_VERSION = 2;
 
     /** Volume du spawn (protection, nettoyage). */
     public static AABB bounds(BlockPos o) {
