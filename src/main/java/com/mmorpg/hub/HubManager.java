@@ -148,6 +148,19 @@ public final class HubManager {
         return true;
     }
 
+    /** /marche : retour au Marche d'Aeloria (cote est de la fontaine, face au teleporteur). */
+    public static boolean goToMarket(ServerPlayer p) {
+        HubData hub = HubData.get(p.level().getServer());
+        ServerLevel level = hub.level(p.level().getServer());
+        if (!hub.exists() || level == null || hub.layout() < 2) return false;
+        if (CinematicManager.isLocked(p)) return true;
+        if (ClassTrial.active(p)) ClassTrial.end(p, false, null);
+        p.stopRiding();
+        Vec3 at = HubLayout.center(hub.origin(), new int[]{HubMarket.CX + 16, 0, 4});
+        p.teleportTo(level, at.x, at.y, at.z, Set.of(), 90F, 0F, true);
+        return true;
+    }
+
     /** /hub reset : repart de zero (cinematique, essais et classe), comme a la toute premiere connexion. */
     public static void reset(ServerPlayer p) {
         if (ClassTrial.active(p)) ClassTrial.end(p, false, null);

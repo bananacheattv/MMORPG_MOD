@@ -87,6 +87,9 @@ final class HubHall {
         }
         colonnade(c);
         spikes(c);
+        porch(c, 1, 0);          // porche de l'allee de l'aire d'entrainement (est)
+        porch(c, -1, 0);         // porche de l'allee du marche (ouest)
+        porch(c, 0, -1);         // porche de la voie de l'arene (nord)
     }
 
     // ------------------------------------------------------------------ colonnes colossales, corniche, lustres, bannieres
@@ -191,6 +194,55 @@ final class HubHall {
             c.set(x, h, z, Blocks.AMETHYST_CLUSTER);
             for (Direction d : Direction.Plane.HORIZONTAL) {
                 if (c.rnd(x + d.getStepX(), 1, z + d.getStepZ(), 72) < 0.5F) c.set(x + d.getStepX(), 0, z + d.getStepZ(), Blocks.AMETHYST_CLUSTER);
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ porches de pierre dense
+
+    private static BlockState wallBlock(HubCtx c, int l, int y, int x, int z) {
+        if (y <= 1) return y == 1 ? Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState() : Blocks.POLISHED_BLACKSTONE.defaultBlockState();
+        if (y == 6 || y == 12 || y == 17) return c.state("or_ouvrage");
+        if (y == 7 || y == 13) return Blocks.CHISELED_STONE_BRICKS.defaultBlockState();
+        if (Math.floorMod(l, 4) == 0) return c.axis("colonne_marbre", Direction.Axis.Y);
+        return c.mix(x, y, z, 311, Blocks.STONE_BRICKS, 34, Blocks.DEEPSLATE_TILES, 22, Blocks.POLISHED_BLACKSTONE_BRICKS, 20, Blocks.CHISELED_STONE_BRICKS, 8,
+                Blocks.CRACKED_STONE_BRICKS, 8, Blocks.POLISHED_DEEPSLATE, 8);
+    }
+
+    /** Porche d'entree : mur epais de pierre appareillee (nervures, bandeaux d'or, niches a lanternes), arc brise, ecusson et bannieres. */
+    private static void porch(HubCtx c, int ax, int az) {
+        for (int l = -7; l <= 7; l++) {
+            for (int rr = 25; rr <= 28; rr++) {
+                for (int y = 0; y <= 20; y++) {
+                    int x = ax != 0 ? ax * rr : l;
+                    int z = az != 0 ? az * rr : l;
+                    int al = Math.abs(l);
+                    boolean arch = al <= 4 && y <= 10 - Math.max(0, al - 2) * 2;
+                    if (arch) {
+                        if (y == 0) continue;                                     // le tapis de l'avenue reste au sol
+                        c.set(x, y, z, Blocks.AIR);
+                        continue;
+                    }
+                    boolean border = (al == 5 && y <= 8) || (y >= 9 - Math.max(0, al - 2) * 2 && y <= 11 - Math.max(0, al - 2) * 2 && al <= 6);
+                    BlockState st = border ? c.state("marbre_dore") : wallBlock(c, l, y, x, z);
+                    boolean niche = rr == 25 && Math.floorMod(l, 4) == 2 && y >= 3 && y <= 5 && al >= 5;
+                    if (niche) st = y == 4 ? Blocks.LANTERN.defaultBlockState() : Blocks.AIR.defaultBlockState();
+                    if (y >= 19 && (Math.abs(l) + rr) % 2 == 0) st = Blocks.AIR.defaultBlockState();             // creneaux
+                    c.set(x, y, z, st);
+                }
+            }
+        }
+        for (int dy = 12; dy <= 16; dy++) {                                            // ecusson d'or au-dessus de l'arc
+            int half = 2 - Math.abs(dy - 14);
+            for (int l = -half; l <= half; l++) {
+                int rr = 24;
+                c.set(ax != 0 ? ax * rr : l, dy, az != 0 ? az * rr : l, dy == 14 ? Blocks.GLOWSTONE.defaultBlockState() : Blocks.GOLD_BLOCK.defaultBlockState());
+            }
+        }
+        for (int side : new int[]{-1, 1}) {                                            // bannieres de part et d'autre de l'arc
+            int l = side * 6;
+            for (int dy = 6; dy <= 15; dy++) {
+                c.set(ax != 0 ? ax * 24 : l, dy, az != 0 ? az * 24 : l, dy == 15 ? c.state("or_ouvrage") : c.state("tuile_pourpre"));
             }
         }
     }

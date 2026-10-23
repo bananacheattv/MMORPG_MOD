@@ -359,6 +359,14 @@ public final class RpgCommands {
                             c.getSource().sendSuccess(() -> ok("Hub de " + p.getName().getString() + " réinitialisé (cinématique, essais et classe)."), true);
                             return 1;
                         }))));
+        d.register(Commands.literal("marche").executes(c -> {
+            ServerPlayer p = c.getSource().getPlayerOrException();
+            if (!com.mmorpg.hub.HubManager.goToMarket(p)) {
+                c.getSource().sendFailure(Component.literal("Le Marché d'Aeloria n'est pas encore construit (un opérateur doit utiliser /hub set)."));
+                return 0;
+            }
+            return 1;
+        }));
         d.register(Commands.literal("class")
                 .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("set").then(Commands.argument("joueur", EntityArgument.player())

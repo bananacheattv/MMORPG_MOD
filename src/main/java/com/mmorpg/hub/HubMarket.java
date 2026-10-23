@@ -133,15 +133,15 @@ public final class HubMarket {
 
     private static void town(HubCtx c) {
         // grandes halles derriere la banque (nord), l'hotel des ventes (ouest) et les forges (sud)
-        HubTown.house(c, CX, -41, 0, 1, 25, 13, 4, "tuile_pourpre");
-        HubTown.house(c, CX, 41, 0, -1, 25, 13, 3, "tuile_azur");
-        HubTown.house(c, CX - 41, 0, 1, 0, 25, 13, 4, "tuile_pourpre");
+        HubTown.house(c, CX, -41, 0, 1, 25, 13, 4, "tuile_pourpre", HubTown.Style.GUILDE);
+        HubTown.house(c, CX, 41, 0, -1, 25, 13, 3, "tuile_azur", HubTown.Style.ATELIER);
+        HubTown.house(c, CX - 41, 0, 1, 0, 25, 13, 4, "tuile_pourpre", HubTown.Style.VENTES);
         // maisons de part et d'autre
         for (int s : new int[]{-1, 1}) {
-            HubTown.house(c, CX + 21 * s, -41, 0, 1, 9, 9, 3, s > 0 ? "tuile_azur" : "tuile_pourpre");
-            HubTown.house(c, CX + 21 * s, 41, 0, -1, 9, 9, 3, s > 0 ? "tuile_pourpre" : "tuile_azur");
-            HubTown.house(c, CX - 41, 21 * s, 1, 0, 9, 9, 3, s > 0 ? "tuile_azur" : "tuile_pourpre");
-            HubTown.house(c, CX + 41, 21 * s, -1, 0, 9, 9, 3, s > 0 ? "tuile_pourpre" : "tuile_azur");
+            HubTown.house(c, CX + 21 * s, -41, 0, 1, 9, 9, 3, s > 0 ? "tuile_azur" : "tuile_pourpre", s > 0 ? HubTown.Style.TAVERNE : HubTown.Style.MAISON);
+            HubTown.house(c, CX + 21 * s, 41, 0, -1, 9, 9, 3, s > 0 ? "tuile_pourpre" : "tuile_azur", s > 0 ? HubTown.Style.ATELIER : HubTown.Style.MAISON);
+            HubTown.house(c, CX - 41, 21 * s, 1, 0, 9, 9, 3, s > 0 ? "tuile_azur" : "tuile_pourpre", s > 0 ? HubTown.Style.MAISON : HubTown.Style.TAVERNE);
+            HubTown.house(c, CX + 41, 21 * s, -1, 0, 9, 9, 3, s > 0 ? "tuile_pourpre" : "tuile_azur", s > 0 ? HubTown.Style.TAVERNE : HubTown.Style.MAISON);
         }
         // tours des angles et tours de l'entree
         for (int sx : new int[]{-1, 1}) {
