@@ -491,11 +491,12 @@ public final class DevShowcase {
             var srv = mc.getSingleplayerServer();
             if (tick == 5) {
                 cmd(mc, "gamemode survival");
-                cmd(mc, "execute in minecraft:overworld run tp " + me + " 6000 150 6000 0 0");
+                cmd(mc, "execute in minecraft:overworld run tp " + me + " 9000 150 9000 0 0");
             }
-            if (tick == 135) cmd(mc, "mmorpg donjon construire goblin");
+            if (tick == 130) srv.execute(() -> dungeonBase = srv.getPlayerList().getPlayerByName(me).blockPosition());
+            if (tick == 135) cmd(mc, "mmorpg donjon construire crypte_gobeline");
             if (tick == 330) srv.execute(() -> {
-                var zone = com.mmorpg.zone.ZoneData.get(srv).all().stream().filter(z -> z.id().endsWith("_boss") && z.minX() > 5000).findFirst().orElse(null);
+                var zone = com.mmorpg.zone.ZoneData.get(srv).all().stream().filter(z -> z.id().endsWith("_boss") && z.minX() > 8000).findFirst().orElse(null);
                 MMORPG.LOGGER.info("[MMORPG] BOSSAUTO zone = {}", zone == null ? "aucune" : zone.id());
                 if (zone != null) {
                     var pl = srv.getPlayerList().getPlayerByName(me);
@@ -505,20 +506,44 @@ public final class DevShowcase {
                     var old = lv.getEntitiesOfClass(com.mmorpg.entity.boss.RpgBoss.class, new net.minecraft.world.phys.AABB(zone.minX() - 60, 0, zone.minZ() - 60, zone.maxX() + 60, 320, zone.maxZ() + 60));
                     MMORPG.LOGGER.info("[MMORPG] BOSSAUTO boss deja presents (restes de tests) : {} -> retires", old.size());
                     old.forEach(net.minecraft.world.entity.Entity::discard);
-                    hubTeleport(srv, me, zone.minX() + 23, 151, zone.minZ() + 23 - 6);
+                    bossTp = new int[]{zone.minX() + 23, dungeonBase.getY() + 1, zone.minZ() + 23 - 6};
                 }
             });
-            if (tick == 345) srv.execute(() -> {
+            if (tick == 335 && bossTp != null) srv.execute(() -> {
                 var pl = srv.getPlayerList().getPlayerByName(me);
+                pl.connection.teleport(bossTp[0] + 0.5, bossTp[1], bossTp[2] + 0.5, 0F, 5F);
+                MMORPG.LOGGER.info("[MMORPG] BOSSAUTO connection.teleport -> position ({}, {}, {})", pl.getX(), pl.getY(), pl.getZ());
+            });
+            if (tick > 332 && tick < 400 && tick % 12 == 0) srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                MMORPG.LOGGER.info("[MMORPG] BOSSAUTO suivi tick {} : ({}, {}, {})", tick, (int) pl.getX(), (int) pl.getY(), (int) pl.getZ());
+            });
+            if (tick == 400) srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                var lvl0 = pl.level();
+                var zz = com.mmorpg.zone.ZoneManager.zoneAt(lvl0, pl.blockPosition());
+                if (zz != null) {
+                    int found = 0;
+                    for (int xx = zz.minX() + 15; xx <= zz.minX() + 31 && found < 3; xx++) for (int zq = zz.minZ() + 15; zq <= zz.minZ() + 31 && found < 3; zq++) for (int yy = 40; yy < 200 && found < 3; yy++) {
+                        var bs = lvl0.getBlockState(new net.minecraft.core.BlockPos(xx, yy, zq));
+                        if (bs.getBlock() instanceof com.mmorpg.block.AltarBlock) {
+                            found++;
+                            MMORPG.LOGGER.info("[MMORPG] BOSSAUTO autel en ({}, {}, {}) ; centre de zone ({}, {})", xx, yy, zq, zz.minX() + 23, zz.minZ() + 23);
+                        }
+                    }
+                    if (found == 0) MMORPG.LOGGER.info("[MMORPG] BOSSAUTO aucun autel trouve dans la zone");
+                }
+                var z0 = com.mmorpg.zone.ZoneManager.zoneAt(pl.level(), pl.blockPosition());
+                MMORPG.LOGGER.info("[MMORPG] BOSSAUTO joueur ({}, {}, {}) zone = {} boss = {} dimension = {}", pl.getX(), pl.getY(), pl.getZ(), z0 == null ? "aucune" : z0.id(), z0 != null && z0.boss(), pl.level().dimension());
                 var near = pl.level().getEntitiesOfClass(com.mmorpg.entity.boss.RpgBoss.class, pl.getBoundingBox().inflate(48));
                 MMORPG.LOGGER.info("[MMORPG] BOSSAUTO apres 0,75 s a l'entree : {} boss", near.size());
             });
-            if (tick == 520) srv.execute(() -> {
+            if (tick == 640) srv.execute(() -> {
                 var pl = srv.getPlayerList().getPlayerByName(me);
                 var near = pl.level().getEntitiesOfClass(com.mmorpg.entity.boss.RpgBoss.class, pl.getBoundingBox().inflate(48));
                 MMORPG.LOGGER.info("[MMORPG] BOSSAUTO apres le delai : {} boss ({})", near.size(), near.isEmpty() ? "-" : near.get(0).getName().getString());
             });
-            if (tick == 530) {
+            if (tick == 650) {
                 MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
                 stop(mc);
             }
@@ -1322,6 +1347,7 @@ public final class DevShowcase {
                 down ? com.mojang.blaze3d.platform.InputConstants.PRESS : com.mojang.blaze3d.platform.InputConstants.RELEASE);
     }
 
+    private static int[] bossTp;
     private static int[] dragFrom;
     private static Object[] itemTest;
 

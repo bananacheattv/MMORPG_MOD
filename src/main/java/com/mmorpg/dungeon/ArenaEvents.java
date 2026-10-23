@@ -70,14 +70,20 @@ public final class ArenaEvents {
                 for (com.mmorpg.world.DungeonBuilder.DungeonType t : com.mmorpg.world.DungeonBuilder.DungeonType.values()) {
                     if (!group.startsWith(t.id + "_")) continue;
                     BlockPos altar = null;
-                    for (int y = p.getBlockY() + 3; y >= p.getBlockY() - 5 && altar == null; y--) {
+                    for (int y = p.getBlockY() + 8; y >= p.getBlockY() - 40 && altar == null; y--) {
                         BlockPos at = BlockPos.containing(ax, y, az);
                         if (level.getBlockState(at).getBlock() instanceof com.mmorpg.block.AltarBlock) altar = at;
                     }
-                    if (altar == null) break;
+                    if (altar == null) {
+                        com.mmorpg.MMORPG.LOGGER.debug("[MMORPG] boss auto : autel introuvable pres de {} {}", ax, az);
+                        break;
+                    }
                     SUMMONED.add(group);
+                    com.mmorpg.MMORPG.LOGGER.info("[MMORPG] Boss de {} : reveil automatique (autel {})", group, altar.toShortString());
                     DWELL.remove(group);
-                    com.mmorpg.entity.boss.BossManager.summon(level, altar, t.bossKey, p);
+                    if (com.mmorpg.registry.ModItems.get(t.bossKey) instanceof com.mmorpg.item.SummonKeyItem summonKey) {          // t.bossKey = objet d'invocation, d'ou l'on tire le boss
+                        com.mmorpg.entity.boss.BossManager.summon(level, altar, summonKey.bossKey(), p);
+                    }
                     break;
                 }
             }
