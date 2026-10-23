@@ -56,6 +56,8 @@ public class PlayerData implements ValueIOSerializable {
     public final Set<UUID> waypoints = new HashSet<>();
     public final Map<String, Integer> kills = new HashMap<>();
     public boolean classChosenOnce = false;
+    /** Pioche et houe du debutant deja remises (une seule fois ; /outils en redonne si elles sont perdues). */
+    public boolean starterTools = false;
     /** Palier d'evolution debloque aupres du Maitre des classes (quetes) ; -1 = ancien joueur pas encore migre. */
     public int evolution = 0;
 
@@ -188,6 +190,7 @@ public class PlayerData implements ValueIOSerializable {
         t.store("waypoints", UUIDUtil.CODEC.listOf(), new ArrayList<>(waypoints));
         t.store("kills", STR_INT_MAP, kills);
         t.putBoolean("chosen", classChosenOnce);
+        t.putBoolean("starterTools", starterTools);
         t.putInt("evolution", evolution);
         t.putLong("gold", gold);
         t.putInt("xpCharmSeconds", xpCharmSeconds);
@@ -242,6 +245,7 @@ public class PlayerData implements ValueIOSerializable {
         kills.clear();
         kills.putAll(t.read("kills", STR_INT_MAP).orElse(Map.of()));
         classChosenOnce = t.getBooleanOr("chosen", playerClass != PlayerClass.NONE);
+        starterTools = t.getBooleanOr("starterTools", false);
         // joueurs d'avant les quetes d'evolution : ils gardent le palier deja atteint
         evolution = t.getIntOr("evolution", -1);
         if (evolution < 0) evolution = PlayerClass.tier(level);

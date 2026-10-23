@@ -35,6 +35,7 @@ public final class ModCreativeTabs {
                 out.accept(ModItems.BAGUETTE_ZONE.get());
                 out.accept(ModItems.AUTEL_INVOCATION.get());
                 ModItems.MATERIALS.forEach(i -> out.accept(i.get()));
+                com.mmorpg.mine.MineTools.ITEMS.forEach(i -> out.accept(i.get()));
                 out.accept(ModItems.PIECE_OR.get());
                 ModItems.CONSUMABLES.forEach(i -> out.accept(i.get()));
                 ModItems.SUMMONS.forEach(i -> out.accept(i.get()));

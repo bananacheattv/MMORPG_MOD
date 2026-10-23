@@ -100,6 +100,14 @@ public final class ModItems {
     public static final DeferredItem<RpgMaterialItem> LINGOT_AMBRASITE = material("lingot_ambrasite", Rarity.RARE, "Un métal incandescent des profondeurs des Mines d'Aeloria.");
     public static final DeferredItem<RpgMaterialItem> LINGOT_GLACIUM = material("lingot_glacium", Rarity.EPIQUE, "Un métal glacé qui ne fond jamais, extrait au cœur des Mines d'Aeloria.");
     public static final DeferredItem<RpgMaterialItem> LINGOT_NEANTITE = material("lingot_neantite", Rarity.LEGENDAIRE, "Le métal du Néant, extrait dans l'abîme des Mines d'Aeloria.");
+    public static final DeferredItem<RpgMaterialItem> LINGOT_AELIUM = material("lingot_aelium", Rarity.RARE, "Lingot rare, parfois libéré d'une veine des Mines d'Aeloria. Indispensable aux armures de niveau 25 et plus.");
+    public static final DeferredItem<RpgMaterialItem> LINGOT_ORICHALQUE = material("lingot_orichalque", Rarity.EPIQUE, "Lingot épique, rarement libéré d'une veine profonde. Indispensable aux armures de niveau 50 et plus.");
+    public static final DeferredItem<RpgMaterialItem> LINGOT_ASTRALIUM = material("lingot_astralium", Rarity.LEGENDAIRE, "Lingot légendaire, tombé d'une veine une fois par génération. Indispensable aux armures de niveau 75 et plus.");
+    public static final DeferredItem<RpgMaterialItem> COMPRESSE_VERDITE = material("compresse_verdite", Rarity.PEU_COMMUN, "Verdite comprimée à la Presse de compression. Entre dans les armures et outils de premier rang.");
+    public static final DeferredItem<RpgMaterialItem> COMPRESSE_ARGENTITE = material("compresse_argentite", Rarity.RARE, "Argentite comprimée à la Presse de compression.");
+    public static final DeferredItem<RpgMaterialItem> COMPRESSE_AMBRASITE = material("compresse_ambrasite", Rarity.EPIQUE, "Ambrasite comprimée à la Presse de compression.");
+    public static final DeferredItem<RpgMaterialItem> COMPRESSE_GLACIUM = material("compresse_glacium", Rarity.LEGENDAIRE, "Glacium comprimé à la Presse de compression.");
+    public static final DeferredItem<RpgMaterialItem> COMPRESSE_NEANTITE = material("compresse_neantite", Rarity.MYTHIQUE, "Néantite comprimée à la Presse de compression : le sommet de la métallurgie d'Aeloria.");
     public static final DeferredItem<RpgMaterialItem> TISSU_ENCHANTE = material("tissu_enchante", Rarity.RARE, "Étoffe tissée de poussière d'âme.");
     public static final DeferredItem<RpgMaterialItem> CUIR_RENFORCE = material("cuir_renforce", Rarity.PEU_COMMUN, "Cuir renforcé de fourrure sombre.");
     // ---- materiaux de butin supplementaires (monstres, zones des monstres importes) et intermediaires de la Forge

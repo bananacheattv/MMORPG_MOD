@@ -416,6 +416,17 @@ public final class RpgPlayers {
                 "Votre aventure commence !", cls.color));
     }
 
+    /** Pioche et houe du debutant : de quoi extraire la Verdite des Mines d'Aeloria et cultiver les premieres graines. */
+    public static void giveStarterTools(ServerPlayer player) {
+        give(player, ModItems.get("pioche_debutant"), 1);
+        give(player, ModItems.get("houe_debutant"), 1);
+        player.sendSystemMessage(Component.literal("Vous avez reçu une ").withColor(0xE0D8C0)
+                .append(Component.literal("pioche").withColor(0xFFD040))
+                .append(Component.literal(" et une ").withColor(0xE0D8C0))
+                .append(Component.literal("houe du débutant").withColor(0xFFD040))
+                .append(Component.literal(" : le Maître des mines vous attend.").withColor(0xE0D8C0)));
+    }
+
     private static void giveStarterKit(ServerPlayer player, PlayerClass cls) {
         String weapon = switch (cls) {
             case GUERRIER -> "epee_recrue";
@@ -545,6 +556,10 @@ public final class RpgPlayers {
         });
         recompute(player);
         if (d.hp <= 0) d.hp = (float) d.stats.get(Stat.MAX_HP);
+        if (!d.starterTools) {
+            d.starterTools = true;
+            giveStarterTools(player);
+        }
         sync(player);
         BestiaryInfo.sendTo(player);
         PartyManager.sync(player);

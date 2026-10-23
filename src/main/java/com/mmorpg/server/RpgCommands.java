@@ -429,6 +429,24 @@ public final class RpgCommands {
                         })));
     }
 
+    /** /outils : redonne la pioche et la houe du debutant si on n'en possede plus. */
+    public static void registerOutils(CommandDispatcher<CommandSourceStack> d) {
+        d.register(Commands.literal("outils").executes(c -> {
+            var sp = c.getSource().getPlayerOrException();
+            boolean pick = false, hoe = false;
+            for (int i = 0; i < sp.getInventory().getContainerSize(); i++) {
+                var st = sp.getInventory().getItem(i);
+                if (st.is(com.mmorpg.registry.ModItems.get("pioche_debutant"))) pick = true;
+                if (st.is(com.mmorpg.registry.ModItems.get("houe_debutant"))) hoe = true;
+            }
+            if (!pick) RpgPlayers.give(sp, com.mmorpg.registry.ModItems.get("pioche_debutant"), 1);
+            if (!hoe) RpgPlayers.give(sp, com.mmorpg.registry.ModItems.get("houe_debutant"), 1);
+            String msg = pick && hoe ? "Vous avez déjà vos outils du débutant." : "Outils du débutant remis.";
+            c.getSource().sendSuccess(() -> ok(msg), false);
+            return 1;
+        }));
+    }
+
     /** /setmine : pose ici le Maitre des mines (menu des etages, ecran de chargement et arrivee dans la mine). */
     public static void registerSetMine(CommandDispatcher<CommandSourceStack> d) {
         d.register(Commands.literal("setmine")

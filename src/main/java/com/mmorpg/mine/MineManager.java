@@ -169,6 +169,13 @@ public final class MineManager {
             p.sendOverlayMessage(Component.literal("Il faut une pioche pour extraire la " + ore.name() + ".").withColor(0xFFC060));
             return false;
         }
+        int pick = MineTools.pickTier(tool);
+        if (pick < ore.tier()) {
+            String need = MineTools.TIER_ID[Math.min(ore.tier(), MineTools.TIER_ID.length - 1)];
+            p.sendOverlayMessage(Component.literal("Votre pioche est trop fragile pour la " + ore.name() + " : il faut une pioche de palier « " + need + " » ou mieux.").withColor(0xFF7060));
+            level.playSound(null, pos, SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, 0.3F, 1.4F);
+            return false;
+        }
         PlayerData d = RpgPlayers.get(p);
         if (d.level < ore.minLevel()) {
             p.sendOverlayMessage(Component.literal("Niveau " + ore.minLevel() + " requis pour extraire la " + ore.name() + ".").withColor(0xFF7060));
@@ -176,12 +183,13 @@ public final class MineManager {
             return false;
         }
         var random = level.getRandom();
-        int count = 1 + (random.nextInt(100) < 12 + ore.tier() * 2 ? 1 : 0);                  // veine riche : un lingot de plus
+        int count = 1 + (random.nextInt(100) < 12 + ore.tier() * 2 + pick * 4 ? 1 : 0);      // veine riche : un lingot de plus (la pioche aide)
         ItemStack ingot = new ItemStack(ModItems.get(ore.ingotId()), count);
         if (!p.getInventory().add(ingot)) level.addFreshEntity(new net.minecraft.world.entity.item.ItemEntity(level, p.getX(), p.getY() + 0.5, p.getZ(), ingot));
         tool.hurtAndBreak(1, p, EquipmentSlot.MAINHAND);
         RpgPlayers.giveXp(p, 3 + ore.minLevel() / 2L, false);
         p.sendOverlayMessage(Component.literal("+" + count + " Lingot de " + ore.name() + (count > 1 ? "  (veine riche !)" : "")).withColor(ore.color()));
+        rareDrop(level, p, pos, ore, pick);
         BlockState old = level.getBlockState(pos);
         level.setBlock(pos, MineBlocks.EPUISE.get().defaultBlockState(), 3);
         level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, old), pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 18, 0.3, 0.3, 0.3, 0.08);
@@ -191,6 +199,32 @@ public final class MineManager {
         long wait = (long) (ore.cooldown() * 20 * (0.8 + random.nextDouble() * 0.4));
         MineData.get(level.getServer()).add(new MineData.Respawn(pos.getX(), pos.getY(), pos.getZ(), ore.tier(), level.getGameTime() + wait));
         return true;
+    }
+
+    /** Chances (en %) par minerai extrait, avant bonus de pioche : {Aelium, Orichalque, Astralium} selon le palier du minerai. */
+    private static final double[][] RARE_CHANCE = {
+            {3.0, 0, 0}, {4.5, 0.5, 0}, {6.0, 1.2, 0.05}, {7.0, 2.0, 0.2}, {8.0, 3.0, 0.6}};
+
+    /** Lingots rares, epiques et legendaires : tirage independant du lingot de base ; la pioche augmente toutes les chances de 25 % par palier. */
+    private static void rareDrop(ServerLevel level, ServerPlayer p, BlockPos pos, MineBlocks.Ore ore, int pick) {
+        double[] chance = RARE_CHANCE[Math.min(ore.tier(), RARE_CHANCE.length - 1)];
+        double mult = 1.0 + 0.25 * pick;
+        String[] ids = {"lingot_aelium", "lingot_orichalque", "lingot_astralium"};
+        String[] names = {"Lingot d'Aelium", "Lingot d'Orichalque", "Lingot d'Astralium"};
+        int[] colors = {0x6EF0E0, 0xFF8A5A, 0xFFE070};
+        var random = level.getRandom();
+        for (int i = 2; i >= 0; i--) {
+            if (chance[i] <= 0 || random.nextDouble() * 100.0 >= chance[i] * mult) continue;
+            ItemStack drop = new ItemStack(ModItems.get(ids[i]));
+            if (!p.getInventory().add(drop)) level.addFreshEntity(new net.minecraft.world.entity.item.ItemEntity(level, p.getX(), p.getY() + 0.5, p.getZ(), drop));
+            level.sendParticles(ParticleTypes.END_ROD, pos.getX() + 0.5, pos.getY() + 0.8, pos.getZ() + 0.5, 12 + i * 14, 0.4, 0.4, 0.4, 0.05 + 0.03 * i);
+            level.playSound(null, pos, i == 0 ? SoundEvents.AMETHYST_CLUSTER_BREAK : SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.8F + 0.2F * i, 1.4F - 0.2F * i);
+            p.sendSystemMessage(Component.literal("✦ Trouvaille " + (i == 0 ? "rare" : i == 1 ? "épique" : "légendaire") + " : " + names[i] + " !").withColor(colors[i]));
+            if (i == 2) {
+                level.getServer().getPlayerList().broadcastSystemMessage(Component.literal("✦ " + p.getName().getString() + " a extrait un Lingot d'Astralium dans les Mines d'Aeloria !").withColor(colors[2]), false);
+            }
+            return;                                                                          // un seul lingot rare par minerai (le plus precieux d'abord)
+        }
     }
 
     private static void respawns(MinecraftServer server, ServerLevel level) {
