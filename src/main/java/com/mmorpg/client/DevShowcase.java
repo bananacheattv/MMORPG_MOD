@@ -1915,6 +1915,7 @@ public final class DevShowcase {
                 return;
             }
             var ore = ((com.mmorpg.mine.MineOreBlock) lv.getBlockState(found).getBlock()).ore();
+            pl.getInventory().setItem(0, new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("pioche_" + com.mmorpg.mine.MineTools.TIER_ID[Math.min(5, ore.tier() + 1)])));
             int before = pl.getInventory().countItem(com.mmorpg.registry.ModItems.get(ore.ingotId()));
             boolean ok = com.mmorpg.mine.MineManager.mine(lv, pl, found, ore);
             int after = pl.getInventory().countItem(com.mmorpg.registry.ModItems.get(ore.ingotId()));
