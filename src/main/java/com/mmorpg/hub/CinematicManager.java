@@ -81,6 +81,7 @@ public final class CinematicManager {
 
     public static void arrivedAtHub(ServerPlayer p) {
         ARRIVED.add(p.getUUID());
+        HubManager.healOnce(p.level());
     }
 
     @SubscribeEvent

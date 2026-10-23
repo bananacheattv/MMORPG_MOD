@@ -47,7 +47,8 @@ public final class HubBuilder {
 
     /** Identifiant stable d'une entite du hub : reconstruire le hub ne cree donc jamais de doublon, meme dans une zone non chargee. */
     static UUID stable(String key) {
-        return UUID.nameUUIDFromBytes(("aeloria-hub:" + key).getBytes(StandardCharsets.UTF_8));
+        // la graine garde l'ancien nom du jeu : elle fixe l'identite des PNJ et des textes deja poses dans les hubs existants
+        return UUID.nameUUIDFromBytes(("eldoria-hub:" + key).getBytes(StandardCharsets.UTF_8));
     }
 
     private static final Set<UUID> STABLE = new HashSet<>();
@@ -412,6 +413,17 @@ public final class HubBuilder {
         CommandSourceStack src = c.L.getServer().createCommandSourceStack().withLevel(c.L).withSuppressedOutput();
         c.L.getServer().getCommands().performPrefixedCommand(src,
                 String.format(Locale.ROOT, "summon minecraft:text_display %.2f %.2f %.2f %s", c.O.getX() + x + 0.5, c.O.getY() + y, c.O.getZ() + z + 0.5, snbt));
+    }
+
+    /**
+     * Fait reapparaitre les PNJ, mannequins et textes du hub qui manquent (identifiants stables : ceux qui existent deja sont ignores).
+     * Sert a reparer un hub dont les entites ont ete retirees sans le reconstruire.
+     */
+    public static void respawn(ServerLevel level, BlockPos origin) {
+        HubCtx c = new HubCtx(level, origin.immutable());
+        textIndex = 0;
+        texts(c);
+        entities(c);
     }
 
     private static void texts(HubCtx c) {

@@ -421,11 +421,21 @@ public final class DevShowcase {
             return;
         }
         if (MODE.equals("premiere")) {
+            if (tick == 30) cmd(mc, "hub");
+            if (tick == 500) {
+                var box = mc.player.getBoundingBox().inflate(90);
+                int masters = mc.level.getEntitiesOfClass(com.mmorpg.entity.hub.ClassMasterEntity.class, box).size();
+                int npcs = mc.level.getEntitiesOfClass(com.mmorpg.entity.NpcEntity.class, box).size();
+                int dummies = mc.level.getEntitiesOfClass(com.mmorpg.entity.dummy.TrainingDummyEntity.class, box).size();
+                int texts = mc.level.getEntitiesOfClass(net.minecraft.world.entity.Display.TextDisplay.class, box).size();
+                MMORPG.LOGGER.info("[MMORPG] PNJ DU HUB : {} maitres de classe, {} PNJ, {} mannequins, {} textes (attendu 5, 1, 12, 9 ou plus)", masters, npcs, dummies, texts);
+                shot(mc, "hub_pnj");
+            }
             if (tick == 100 || tick == 400) {
                 MMORPG.LOGGER.info("[MMORPG] PREMIERE CONNEXION a {} ticks : dimension {} ; position ({}, {}, {}) ; classe {}", tick, mc.level.dimension().identifier(),
                         (int) mc.player.getX(), (int) mc.player.getY(), (int) mc.player.getZ(), ClientData.DATA.playerClass);
             }
-            if (tick == 410) {
+            if (tick == 520) {
                 MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
                 stop(mc);
             }
