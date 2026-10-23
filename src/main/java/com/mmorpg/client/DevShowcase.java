@@ -178,6 +178,26 @@ public final class DevShowcase {
             structuresPhase(mc, me);
             return;
         }
+        if (MODE.equals("admin")) {          // menu d'administration : mot de passe, edition d'un fichier, refus d'une structure invalide
+            adminPhase(mc, me);
+            return;
+        }
+        if (MODE.equals("marche")) {          // Marche d'Aeloria : reconstruction du hub puis visite du quartier
+            marchePhase(mc, me);
+            return;
+        }
+        if (MODE.equals("services")) {          // banque et hotel des ventes : modeles 3D, interfaces, depot, vente, achat, comptoir
+            servicesPhase(mc, me);
+            return;
+        }
+        if (MODE.equals("cultures")) {          // cultures d'Aeloria : stades, recolte a la houe, niveau de semis
+            culturesPhase(mc, me);
+            return;
+        }
+        if (MODE.equals("metallurgie")) {      // presse de compression, outils des mines, lingots rares, recettes de la forge
+            metallurgiePhase(mc, me);
+            return;
+        }
         if (MODE.equals("reprise_montures")) {
             if (tick == 5) {
                 mc.getWindow().setWindowed(1280, 720); mc.gui.setScreen(null);
@@ -1161,6 +1181,525 @@ public final class DevShowcase {
 
     private static net.minecraft.core.BlockPos structOrigin;
 
+    private static Object adminField(Object target, String name) {
+        try {
+            var f = target.getClass().getDeclaredField(name);
+            f.setAccessible(true);
+            return f.get(target);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static void adminCall(Object target, String method, Class<?>[] types, Object... args) {
+        try {
+            var m = target.getClass().getDeclaredMethod(method, types);
+            m.setAccessible(true);
+            m.invoke(target, args);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /** Menu d'administration : essai avec un mauvais mot de passe, bon mot de passe, ouverture, edition et enregistrement reels. */
+    private static void adminPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) mc.getWindow().setWindowed(1280, 720);
+        if (tick == 10 && !mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        if (tick == 20) srv.execute(() -> {
+            try {
+                com.mmorpg.admin.AdminAuth.setPassword("MotDePasse-Test-42");
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        });
+        if (tick == 40) cmd(mc, "adminmenu \"mauvais\"");
+        if (tick == 60) MMORPG.LOGGER.info("[MMORPG] ADMIN apres mauvais mot de passe : ecran admin ouvert = {} (attendu false)", mc.gui.screen() instanceof com.mmorpg.client.screen.AdminScreen);
+        if (tick == 70) {
+            // un joueur non authentifie ne recoit rien : on demande un fichier sans etre connecte
+            ClientNet.send(new Payloads.AdminRequest(Payloads.AdminRequest.GET, "shop", 0, 1, ""));
+        }
+        if (tick == 90) cmd(mc, "adminmenu \"MotDePasse-Test-42\"");
+        if (tick == 110) {
+            var sc = mc.gui.screen();
+            MMORPG.LOGGER.info("[MMORPG] ADMIN apres bon mot de passe : ecran admin ouvert = {} (attendu true)", sc instanceof com.mmorpg.client.screen.AdminScreen);
+            if (sc != null) adminCall(sc, "select", new Class<?>[]{String.class}, "shop");
+        }
+        if (tick == 135) shot(mc, "120_admin_boutique");
+        if (tick == 140) {
+            var sc = mc.gui.screen();
+            @SuppressWarnings("unchecked") var path = (java.util.List<Object>) adminField(sc, "path");
+            path.add("buy");
+            path.add(0);
+        }
+        if (tick == 160) shot(mc, "121_admin_article");
+        if (tick == 165) {
+            var sc = mc.gui.screen();
+            @SuppressWarnings("unchecked") var path = (java.util.List<Object>) adminField(sc, "path");
+            path.clear();
+            var root = (com.google.gson.JsonObject) adminField(sc, "root");
+            // edition reelle d'une valeur numerique : ouverture du champ, saisie, validation (comme un clic puis Entree)
+            adminCall(sc, "startEdit", new Class<?>[]{Object.class, com.google.gson.JsonElement.class, int.class, int.class, int.class},
+                    "equipmentMultiplier", root.get("equipmentMultiplier"), 400, 300, 120);
+            ((net.minecraft.client.gui.components.EditBox) adminField(sc, "edit")).setValue("7.5");
+            adminCall(sc, "commitEdit", new Class<?>[]{});
+            MMORPG.LOGGER.info("[MMORPG] ADMIN edition : valeur dans l'arbre = {} (attendu 7.5), modifie = {}", root.get("equipmentMultiplier"), adminField(sc, "dirty"));
+            // entree ajoutee puis supprimee dans une liste (copie de la derniere)
+            var buy = root.getAsJsonArray("buy");
+            int n0 = buy.size();
+            path.add("buy");
+            adminCall(sc, "addEntry", new Class<?>[]{});
+            MMORPG.LOGGER.info("[MMORPG] ADMIN ajout dans une liste : {} -> {} entrees (attendu +1)", n0, buy.size());
+            buy.remove(buy.size() - 1);
+            path.clear();
+        }
+        if (tick == 180) shot(mc, "122_admin_modifie");
+        if (tick == 185) adminCall(mc.gui.screen(), "save", new Class<?>[]{});
+        if (tick == 215) {
+            srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] ADMIN enregistrement : equipmentMultiplier en memoire = {} (attendu 7.5), sauvegardes = {}",
+                    com.mmorpg.config.ConfigManager.shop().equipmentMultiplier, countBackups("shop")));
+            shot(mc, "123_admin_enregistre");
+        }
+        if (tick == 225) {
+            // structure invalide : refusee, fichier inchange
+            ClientNet.send(new Payloads.AdminRequest(Payloads.AdminRequest.SAVE, "shop", 0, 1, "{\"buy\": \"pas une liste\"}"));
+        }
+        if (tick == 250) {
+            srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] ADMIN structure invalide : boutique intacte = {} articles (attendu > 10)", com.mmorpg.config.ConfigManager.shop().buy.size()));
+            shot(mc, "124_admin_refus");
+            ClientNet.send(new Payloads.AdminRequest(Payloads.AdminRequest.SAVE, "shop", 0, 1, "{ pas du json"));
+        }
+        if (tick == 275) shot(mc, "125_admin_json_casse");
+        if (tick == 280) {
+            // retour a la valeur d'origine (6.0) pour ne pas laisser le monde de test modifie
+            var sc = mc.gui.screen();
+            var root = (com.google.gson.JsonObject) adminField(sc, "root");
+            root.addProperty("equipmentMultiplier", 6.0);
+            adminCall(sc, "save", new Class<?>[]{});
+        }
+        if (tick == 292) adminCall(mc.gui.screen(), "select", new Class<?>[]{String.class}, "mobs");
+        if (tick == 302) {
+            var root = adminField(mc.gui.screen(), "root");
+            MMORPG.LOGGER.info("[MMORPG] ADMIN gros fichier : mobs.json charge = {} monstres (attendu > 50)", root instanceof com.google.gson.JsonObject o ? o.size() : -1);
+            adminCall(mc.gui.screen(), "save", new Class<?>[]{});
+        }
+        if (tick == 310) {
+            srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] ADMIN valeur restauree : {} (attendu 6.0)", com.mmorpg.config.ConfigManager.shop().equipmentMultiplier));
+            ClientNet.send(new Payloads.AdminRequest(Payloads.AdminRequest.LOGOUT, "", 0, 1, ""));
+        }
+        if (tick == 320) ClientNet.send(new Payloads.AdminRequest(Payloads.AdminRequest.SAVE, "shop", 0, 1, "{}"));
+        if (tick == 345) {
+            srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] ADMIN apres deconnexion : boutique toujours intacte = {} articles (attendu > 10)", com.mmorpg.config.ConfigManager.shop().buy.size()));
+        }
+        if (tick == 360) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        }
+    }
+
+    private static long countBackups(String name) {
+        try (var files = java.nio.file.Files.list(com.mmorpg.config.ConfigManager.dir().resolve("sauvegardes"))) {
+            return files.filter(p -> p.getFileName().toString().startsWith(name + "-")).count();
+        } catch (java.io.IOException e) {
+            return -1;
+        }
+    }
+
+    private static int marcheT0 = -1;
+
+    /** Marche d'Aeloria : attend la reconstruction du hub (plan 2), puis photographie chaque coin du quartier. */
+    private static void marchePhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) mc.getWindow().setWindowed(1280, 720);
+        if (tick == 10) {
+            cmd(mc, "gamemode creative " + me);
+            cmd(mc, "mmorpg niveau " + me + " 100");
+            cmd(mc, "time set day");
+            cmd(mc, "weather clear");
+            if (!mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+        }
+        if (marcheT0 < 0) {
+            if (tick % 20 == 0 && tick > 20) {
+                var hub = com.mmorpg.hub.HubData.get(srv);
+                MMORPG.LOGGER.info("[MMORPG] MARCHE plan du hub = {} (attendu {})", hub.layout(), com.mmorpg.hub.HubBuilder.LAYOUT_VERSION);
+                if (tick == 40) {
+                    srv.execute(() -> {
+                        var lv = com.mmorpg.hub.HubData.get(srv).level(srv);
+                        var o = com.mmorpg.hub.HubData.get(srv).origin();
+                        if (lv != null && o != null) com.mmorpg.hub.HubBuilder.build(lv, o);      // reconstruction forcee : verifie le plan courant
+                    });
+                } else if (tick > 40 && hub.layout() >= com.mmorpg.hub.HubBuilder.LAYOUT_VERSION) marcheT0 = tick + 40;
+            }
+            if (tick > 5000) {
+                MMORPG.LOGGER.info("[MMORPG] MARCHE : hub jamais reconstruit");
+                stop(mc);
+            }
+            return;
+        }
+        int t = tick - marcheT0;
+        int cx = com.mmorpg.hub.HubMarket.CX;
+        // {x, y, z, yaw, pitch, nom}
+        double[][] views = {
+                {cx + 40, 8, 0, 90, 12}, {cx + 20, 7, 0, 90, 20}, {cx + 4, 4, -9, 180, 8}, {cx - 4, 4, 3, 90, 8}, {cx + 4, 5, 8, 0, 8},
+                {cx + 8, 3, -6, 180, 10}, {cx + 20, 4, -9, 270, 8}, {cx - 22, 4, 12, 180, 12}, {cx - 16, 5, 14, 90, 14}, {cx, 50, 0, 90, 80},
+                {cx, 32, -46, 0, 36}, {-20, 10, 0, 90, 8}};
+        String[] names = {"entree", "teleporteur_fontaine", "banque", "hdv", "forges", "etal_alchimie", "portail_mines", "ferme", "hdv_ferme", "vue_du_ciel", "vue_nord", "avenue"};
+        int idx = t / 60;
+        if (idx < views.length && t % 60 == 5) {
+            double[] v = views[idx];
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                var hub = com.mmorpg.hub.HubData.get(srv);
+                var lv = hub.level(srv);
+                var o = hub.origin();
+                pl.teleportTo(lv, o.getX() + v[0] + 0.5, o.getY() + v[1], o.getZ() + v[2] + 0.5, java.util.Set.of(), (float) v[3], (float) v[4], true);
+            });
+        }
+        if (idx < views.length && t % 60 == 50) shot(mc, "110_marche_" + names[idx]);
+        if (t == views.length * 60 + 5) {
+            srv.execute(() -> {
+                var hub = com.mmorpg.hub.HubData.get(srv);
+                var lv = hub.level(srv);
+                int npcs = 0;
+                StringBuilder sb = new StringBuilder();
+                for (var e : lv.getEntities((net.minecraft.world.entity.Entity) null, com.mmorpg.hub.HubLayout.hubBounds(hub.origin()), x -> x instanceof com.mmorpg.entity.NpcEntity)) {
+                    npcs++;
+                    sb.append(((com.mmorpg.entity.NpcEntity) e).displayName()).append("; ");
+                }
+                MMORPG.LOGGER.info("[MMORPG] MARCHE PNJ du hub : {} [{}]", npcs, sb);
+                var o = hub.origin();
+                int cxx = com.mmorpg.hub.HubMarket.CX;
+                String[] check = {"banque_aeloria", "hdv_aeloria", "presse_compression", "forge_arcanique", "teleporteur"};
+                int[][] at = {{cxx, 0, -25}, {cxx - 27, 0, 0}, {cxx, 0, 24}, {cxx - 21, 0, 25}, {cxx + 25, 0, 0}};
+                for (int i = 0; i < check.length; i++) {
+                    var st = lv.getBlockState(o.offset(at[i][0], at[i][1], at[i][2]));
+                    MMORPG.LOGGER.info("[MMORPG] MARCHE bloc {} en place : {}", check[i], st.getBlock().getDescriptionId().contains(check[i]));
+                }
+            });
+        }
+        if (t == views.length * 60 + 30) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        }
+    }
+
+    /** Banque et hotel des ventes : vue des modeles 3D puis actions reelles (messages serveur). */
+    private static void servicesPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) mc.getWindow().setWindowed(1280, 720);
+        if (tick == 20) {
+            cmd(mc, "difficulty peaceful");
+            cmd(mc, "time set day");
+            cmd(mc, "weather clear");
+            cmd(mc, "gamemode creative " + me);
+            cmd(mc, "mmorpg niveau " + me + " 100");
+            cmd(mc, "clear " + me);
+            cmd(mc, "fill ~-40 180 ~-40 ~40 180 ~40 minecraft:smooth_stone");
+            cmd(mc, "fill ~-40 181 ~-40 ~40 195 ~40 minecraft:air");
+            cmd(mc, "tp " + me + " ~ 181 ~ 180 0");
+        }
+        if (tick == 28) cmd(mc, "kill @e[type=!minecraft:player,distance=..80]");
+        if (tick == 30) {
+            structOrigin = mc.player.blockPosition();
+            cmd(mc, "setblock ~ ~ ~-16 mmorpg:banque_aeloria[facing=south]");
+            cmd(mc, "setblock ~ ~ ~16 mmorpg:hdv_aeloria[facing=north]");
+        }
+        if (structOrigin == null) return;
+        net.minecraft.core.BlockPos bank = structOrigin.offset(0, 0, -16);
+        net.minecraft.core.BlockPos hdv = structOrigin.offset(0, 0, 16);
+        if (tick == 45) {
+            look(mc, me, 0, 5, -4, 0, -16, 14);
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+            if (!mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        }
+        if (tick == 80) shot(mc, "100_banque_3d");
+        if (tick == 85) look(mc, me, 0, 4, 4, 0, 16, 14);
+        if (tick == 120) shot(mc, "101_hdv_3d");
+        // banque : depot de 1000 or, interface, retrait de 400, coffre
+        if (tick == 130) {
+            if (mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+            look(mc, me, 0, 1, -8, 0, -16, 5);
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                com.mmorpg.rpg.PlayerData d = com.mmorpg.server.RpgPlayers.get(pl);
+                d.gold = 5000;
+                d.dirty = true;
+            });
+        }
+        if (tick == 140) ClientNet.send(new Payloads.ServiceAction(Payloads.ServiceAction.BANK, com.mmorpg.economy.Bank.ACT_DEPOSIT, 1000, "", 0, bank));
+        if (tick == 150) ClientNet.send(new Payloads.ServiceAction(Payloads.ServiceAction.BANK, com.mmorpg.economy.Bank.ACT_WITHDRAW, 400, "", 0, bank));
+        if (tick == 160) {
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                long wallet = com.mmorpg.server.RpgPlayers.get(pl).gold;
+                long inBank = com.mmorpg.economy.BankData.get(srv).account(pl.getUUID()).gold;
+                MMORPG.LOGGER.info("[MMORPG] SERVICES banque : porte-monnaie {} (attendu 4400), en banque {} (attendu 600)", wallet, inBank);
+                com.mmorpg.economy.Bank.open(pl, bank);
+            });
+        }
+        if (tick == 175) shot(mc, "102_banque_ecran");
+        if (tick == 180) mc.gui.setScreen(null);
+        if (tick == 185) {
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                pl.getInventory().setItem(5, new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("lingot_neantite"), 12));
+                com.mmorpg.economy.Bank.action(pl, bank, com.mmorpg.economy.Bank.ACT_OPEN_PAGE, 0, 0);
+            });
+        }
+        if (tick == 205) shot(mc, "103_banque_coffre");
+        if (tick == 210) mc.gui.setScreen(null);
+        // hotel des ventes : mise en vente, annonce d'un autre vendeur, achat, annulation, comptoir
+        if (tick == 215) {
+            look(mc, me, 0, 1, 8, 0, 16, 5);
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                pl.getInventory().setItem(0, new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("pioche_neantite")));
+                var data = com.mmorpg.economy.AuctionData.get(srv);
+                java.util.UUID other = new java.util.UUID(1, 2);
+                data.add(new com.mmorpg.economy.AuctionData.Listing(data.nextId(), other, "Aldric", new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("lingot_astralium"), 3), 900, System.currentTimeMillis() + 36L * 3600_000L));
+                data.add(new com.mmorpg.economy.AuctionData.Listing(data.nextId(), other, "Aldric", new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("compresse_glacium"), 2), 450, System.currentTimeMillis() + 5L * 3600_000L));
+                data.add(new com.mmorpg.economy.AuctionData.Listing(data.nextId(), other, "Mira", new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("nectar_neant"), 4), 700, System.currentTimeMillis() + 47L * 3600_000L));
+            });
+        }
+        if (tick == 225) ClientNet.send(new Payloads.ServiceAction(Payloads.ServiceAction.AUCTION, com.mmorpg.economy.Auction.ACT_SELL, 2500, "", 0, hdv));
+        if (tick == 235) {
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                var data = com.mmorpg.economy.AuctionData.get(srv);
+                long mine = data.listings().stream().filter(l -> l.seller().equals(pl.getUUID())).count();
+                MMORPG.LOGGER.info("[MMORPG] SERVICES hdv : annonces du joueur {} (attendu 1), main vide = {} (attendu true), total annonces {} (attendu 4)",
+                        mine, pl.getMainHandItem().isEmpty(), data.listings().size());
+                com.mmorpg.economy.Auction.open(pl, hdv, "", 0);
+            });
+        }
+        if (tick == 255) shot(mc, "104_hdv_ecran");
+        if (tick == 260) {
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                var data = com.mmorpg.economy.AuctionData.get(srv);
+                long target = data.listings().stream().filter(l -> l.sellerName().equals("Mira")).findFirst().get().id();
+                long before = com.mmorpg.server.RpgPlayers.get(pl).gold;
+                com.mmorpg.economy.Auction.action(pl, hdv, com.mmorpg.economy.Auction.ACT_BUY, target, "", 0);
+                long after = com.mmorpg.server.RpgPlayers.get(pl).gold;
+                MMORPG.LOGGER.info("[MMORPG] SERVICES hdv achat : or {} -> {} (attendu -700), nectars en poche {} (attendu 4), gains en attente du vendeur {} (attendu 665)",
+                        before, after, pl.getInventory().countItem(com.mmorpg.registry.ModItems.get("nectar_neant")), data.earnings(new java.util.UUID(1, 2)));
+                long mineId = data.listings().stream().filter(l -> l.seller().equals(pl.getUUID())).findFirst().get().id();
+                com.mmorpg.economy.Auction.action(pl, hdv, com.mmorpg.economy.Auction.ACT_CANCEL, mineId, "", 0);
+                MMORPG.LOGGER.info("[MMORPG] SERVICES hdv annulation : pioche de retour = {} (attendu 1)", pl.getInventory().countItem(com.mmorpg.registry.ModItems.get("pioche_neantite")));
+                data.addEarnings(pl.getUUID(), 300);
+                long g0 = com.mmorpg.server.RpgPlayers.get(pl).gold;
+                com.mmorpg.economy.Auction.action(pl, hdv, com.mmorpg.economy.Auction.ACT_CLAIM, 0, "", 0);
+                MMORPG.LOGGER.info("[MMORPG] SERVICES hdv comptoir : or {} -> {} (attendu +300)", g0, com.mmorpg.server.RpgPlayers.get(pl).gold);
+                // refus : acheter sa propre annonce, mettre en vente a prix nul, sans objet en main
+                pl.getInventory().setItem(0, net.minecraft.world.item.ItemStack.EMPTY);
+                int before2 = data.listings().size();
+                com.mmorpg.economy.Auction.action(pl, hdv, com.mmorpg.economy.Auction.ACT_SELL, 100, "", 0);
+                MMORPG.LOGGER.info("[MMORPG] SERVICES hdv vente sans objet : annonces {} -> {} (attendu inchange)", before2, data.listings().size());
+                com.mmorpg.economy.Auction.open(pl, hdv, "lingot", 0);
+            });
+        }
+        if (tick == 285) shot(mc, "105_hdv_ecran_apres");
+        if (tick == 300) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        }
+    }
+
+    /** Cultures : une rangee par plante (stades 0, 3, 5 et 7), recolte a la houe de Neantite, refus de semis sous le niveau requis. */
+    private static void culturesPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        String[] ids = {"lueur", "argent", "ambre", "givre", "neant"};
+        int[] stages = {0, 3, 5, 7};
+        if (tick == 5) mc.getWindow().setWindowed(1280, 720);
+        if (tick == 20) {
+            cmd(mc, "difficulty peaceful");
+            cmd(mc, "time set day");
+            cmd(mc, "weather clear");
+            cmd(mc, "gamemode creative " + me);
+            cmd(mc, "mmorpg niveau " + me + " 100");
+            cmd(mc, "clear " + me);
+            cmd(mc, "fill ~-30 180 ~-30 ~30 180 ~30 minecraft:smooth_stone");
+            cmd(mc, "fill ~-30 181 ~-30 ~30 195 ~30 minecraft:air");
+            cmd(mc, "tp " + me + " ~ 181 ~ 180 0");
+        }
+        if (tick == 28) cmd(mc, "kill @e[type=!minecraft:player,distance=..80]");
+        if (tick == 30) {
+            structOrigin = mc.player.blockPosition();
+            for (int r = 0; r < ids.length; r++) {
+                cmd(mc, "fill ~-2 ~-1 ~" + (r * 2 - 4) + " ~2 ~-1 ~" + (r * 2 - 4) + " minecraft:farmland[moisture=7]");
+                for (int c = 0; c < stages.length; c++) {
+                    cmd(mc, "setblock ~" + (c - 2) + " ~ ~" + (r * 2 - 4) + " mmorpg:culture_" + ids[r] + "[age=" + stages[c] + "]");
+                }
+            }
+        }
+        if (structOrigin == null) return;
+        if (tick == 45) {
+            look(mc, me, 6, 4, 2, 0, 0, 40);
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+            if (!mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        }
+        if (tick == 75) shot(mc, "90_cultures_stades");
+        if (tick == 80) look(mc, me, 1, 2.2, -1, 0.5, 2, 50);
+        if (tick == 110) shot(mc, "91_cultures_gros_plan");
+        if (tick == 120) {
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                var lv = pl.level();
+                pl.getInventory().setItem(0, new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("houe_neantite")));
+                pl.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+                int[] tot = new int[2];
+                for (int i = 0; i < 40; i++) {
+                    var pos = structOrigin.offset(1, 0, -4);
+                    lv.setBlock(pos, com.mmorpg.farm.FarmCrops.BLOCKS.get("lueur").get().defaultBlockState().setValue(com.mmorpg.farm.AeloriaCropBlock.AGE, 7), 3);
+                    var st = lv.getBlockState(pos);
+                    st.getBlock().playerDestroy(lv, pl, pos, st, null, pl.getMainHandItem());
+                }
+                for (var e : lv.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, pl.getBoundingBox().inflate(30))) {
+                    if (e.getItem().is(com.mmorpg.registry.ModItems.get("racine_lueur"))) tot[0] += e.getItem().getCount();
+                    if (e.getItem().is(com.mmorpg.registry.ModItems.get("graine_lueur"))) tot[1] += e.getItem().getCount();
+                }
+                MMORPG.LOGGER.info("[MMORPG] CULTURES 40 recoltes a la houe de Neantite : {} racines de Lueur (attendu entre 40 et 80, ~52), {} graines", tot[0], tot[1]);
+            });
+        }
+        if (tick == 150) {
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                com.mmorpg.rpg.PlayerData d = com.mmorpg.server.RpgPlayers.get(pl);
+                int old = d.level;
+                d.level = 1;
+                pl.getInventory().setItem(1, new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("graine_neant"), 3));
+                var item = (com.mmorpg.farm.SeedItem) com.mmorpg.registry.ModItems.get("graine_neant");
+                var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(structOrigin.offset(0, -1, 7)), net.minecraft.core.Direction.UP, structOrigin.offset(0, -1, 7), false);
+                var lv = pl.level();
+                lv.setBlock(structOrigin.offset(0, -1, 7), net.minecraft.world.level.block.Blocks.FARMLAND.defaultBlockState(), 3);
+                var res = item.useOn(new net.minecraft.world.item.context.UseOnContext(lv, pl, net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.item.ItemStack(item), hit));
+                MMORPG.LOGGER.info("[MMORPG] CULTURES semis niveau 1 de l'Orchidee du Neant : {} (attendu FAIL)", res);
+                d.level = old;
+            });
+        }
+        if (tick == 180) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        }
+    }
+
+    /** Presse de compression en action, ecran de compression, onglet Outils de la forge, pioche en main, tirages de lingots rares. */
+    private static void metallurgiePhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) mc.getWindow().setWindowed(1280, 720);
+        if (tick == 20) {
+            cmd(mc, "difficulty peaceful");
+            cmd(mc, "time set day");
+            cmd(mc, "weather clear");
+            cmd(mc, "gamemode creative " + me);
+            cmd(mc, "mmorpg niveau " + me + " 100");
+            cmd(mc, "clear " + me);
+            cmd(mc, "fill ~-30 180 ~-30 ~30 180 ~30 minecraft:smooth_stone");
+            cmd(mc, "fill ~-30 181 ~-30 ~30 195 ~30 minecraft:air");
+            cmd(mc, "tp " + me + " ~ 181 ~ 180 0");
+        }
+        if (tick == 28) cmd(mc, "kill @e[type=!minecraft:player,distance=..80]");
+        if (tick == 30) {
+            structOrigin = mc.player.blockPosition();
+            cmd(mc, "setblock ~ ~ ~-12 mmorpg:presse_compression[facing=south]");
+        }
+        if (structOrigin == null) return;
+        if (tick == 45) {
+            look(mc, me, 0, 8, 16, 0, -12, 18);
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+            if (!mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        }
+        if (tick == 75) shot(mc, "80_presse_arret");
+        if (tick == 90) look(mc, me, -7, 2.5, 0.5, 0, -12, 14);
+        if (tick == 130) shot(mc, "81_presse_active_3q");
+        if (tick == 140) look(mc, me, 0, 3, -4, 0, -12, 18);
+        if (tick == 170) shot(mc, "82_presse_active_face");
+        if (tick == 180) {
+            cmd(mc, "give " + me + " mmorpg:lingot_verdite 40");
+            cmd(mc, "give " + me + " mmorpg:piece_or 200");
+        }
+        net.minecraft.core.BlockPos press = structOrigin.offset(0, 0, -12);
+        if (tick == 195) look(mc, me, 0, 1, -5, 0, -12, 10);
+        if (tick == 200) {
+            if (mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+            mc.gui.setScreen(new com.mmorpg.client.screen.CompressorScreen(press));
+        }
+        if (tick == 215) shot(mc, "83_presse_ecran");
+        if (tick == 220) ClientNet.send(new Payloads.ForgeAction(Payloads.ForgeAction.COMPRESS, "verdite", 5, press));
+        if (tick == 235) {
+            int n = mc.player.getInventory().countItem(com.mmorpg.registry.ModItems.get("compresse_verdite"));
+            int left = mc.player.getInventory().countItem(com.mmorpg.registry.ModItems.get("lingot_verdite"));
+            MMORPG.LOGGER.info("[MMORPG] METALLURGIE compression : {} minerai(s) compresse(s) (attendu 2), {} lingot(s) restants (attendu 8)", n, left);
+            shot(mc, "84_presse_apres");
+        }
+        if (tick == 245) {
+            try {
+                var f = ForgeScreen.class.getDeclaredField("tab");
+                f.setAccessible(true);
+                f.setInt(null, com.mmorpg.crafting.ForgeRecipes.Category.OUTILS.ordinal());
+            } catch (ReflectiveOperationException e) {
+                MMORPG.LOGGER.warn("[MMORPG] vitrine : onglet outils introuvable", e);
+            }
+            mc.gui.setScreen(new ForgeScreen(press));
+        }
+        if (tick == 265) shot(mc, "85_forge_outils");
+        if (tick == 270) {
+            try {
+                var f = ForgeScreen.class.getDeclaredField("tab");
+                f.setAccessible(true);
+                f.setInt(null, com.mmorpg.crafting.ForgeRecipes.Category.ARMURES.ordinal());
+            } catch (ReflectiveOperationException e) {
+                MMORPG.LOGGER.warn("[MMORPG] vitrine : onglet armures introuvable", e);
+            }
+            mc.gui.setScreen(new ForgeScreen(press));
+        }
+        if (tick == 290) shot(mc, "86_forge_armures");
+        if (tick == 295) {
+            mc.gui.setScreen(null);
+            cmd(mc, "item replace entity " + me + " hotbar.0 with mmorpg:pioche_neantite");
+            cmd(mc, "item replace entity " + me + " hotbar.1 with mmorpg:hache_glacium");
+            cmd(mc, "item replace entity " + me + " hotbar.2 with mmorpg:pelle_ambrasite");
+            cmd(mc, "item replace entity " + me + " hotbar.3 with mmorpg:houe_argentite");
+            cmd(mc, "item replace entity " + me + " hotbar.4 with mmorpg:pioche_debutant");
+        }
+        if (tick == 310) shot(mc, "87_pioche_neantite_en_main");
+        if (tick == 315) {
+            // tirages : 1500 minerais de Neantite a la pioche de Neantite, puis a la pioche du debutant (refus attendu)
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                var lv = pl.level();
+                var pos = pl.blockPosition().above(3);
+                var ore = com.mmorpg.mine.MineBlocks.ORES.get(4);
+                int[] total = new int[3];
+                int ingots = 0, mined = 0;
+                for (int i = 0; i < 1500; i++) {
+                    if (i % 40 == 0) {
+                        for (String id : new String[]{"lingot_aelium", "lingot_orichalque", "lingot_astralium"}) total[java.util.Arrays.asList("lingot_aelium", "lingot_orichalque", "lingot_astralium").indexOf(id)] += pl.getInventory().countItem(com.mmorpg.registry.ModItems.get(id));
+                        ingots += pl.getInventory().countItem(com.mmorpg.registry.ModItems.get(ore.ingotId()));
+                        pl.getInventory().clearContent();
+                        pl.getInventory().setItem(0, new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("pioche_neantite")));
+                    }
+                    if (com.mmorpg.mine.MineManager.mine(lv, pl, pos, ore)) mined++;
+                }
+                for (String id : new String[]{"lingot_aelium", "lingot_orichalque", "lingot_astralium"}) total[java.util.Arrays.asList("lingot_aelium", "lingot_orichalque", "lingot_astralium").indexOf(id)] += pl.getInventory().countItem(com.mmorpg.registry.ModItems.get(id));
+                ingots += pl.getInventory().countItem(com.mmorpg.registry.ModItems.get(ore.ingotId()));
+                MMORPG.LOGGER.info("[MMORPG] METALLURGIE tirages (pioche de Neantite, minerai de Neantite) : {} extraits, {} lingots de base, aelium {}, orichalque {}, astralium {}", mined, ingots, total[0], total[1], total[2]);
+                pl.getInventory().clearContent();
+                pl.getInventory().setItem(0, new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("pioche_debutant")));
+                boolean refused = !com.mmorpg.mine.MineManager.mine(lv, pl, pos, ore);
+                MMORPG.LOGGER.info("[MMORPG] METALLURGIE pioche du debutant sur la Neantite : refus = {} (attendu true)", refused);
+                var ore0 = com.mmorpg.mine.MineBlocks.ORES.get(0);
+                boolean ok0 = com.mmorpg.mine.MineManager.mine(lv, pl, pos, ore0);
+                MMORPG.LOGGER.info("[MMORPG] METALLURGIE pioche du debutant sur la Verdite : extrait = {} (attendu true)", ok0);
+            });
+        }
+        if (tick == 340) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        }
+    }
+
     /**
      * Controle des structures multiblocs (autel, teleporteur, forge) : vue d'ensemble eteinte puis active, gros plans,
      * collision de la plateforme de l'autel, interface d'amelioration avec un trefle et amelioration reelle.
@@ -1387,6 +1926,7 @@ public final class DevShowcase {
     }
 
     private static int mineT = -1;
+    private static boolean mineIntro;
     private static long mineBuildStart;
 
     private static void tpMine(net.minecraft.server.MinecraftServer srv, String me, int lx, int lz, float yaw) {
@@ -1405,6 +1945,7 @@ public final class DevShowcase {
             cmd(mc, "gamemode survival");
             cmd(mc, "difficulty normal");
             mineT = -1;
+            mineIntro = false;
             mineBuildStart = System.nanoTime();
         }
         if (tick > 20 && mineT < 0 && tick % 40 == 0) srv.execute(() -> {
@@ -1423,6 +1964,35 @@ public final class DevShowcase {
             return;
         }
         mineT++;
+        if (!mineIntro) {                                  // menu des mines puis ecran de chargement et arrivee a l'etage 3 (comme par le Maitre des mines)
+            int u = mineT;
+            if (u == 2) srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                com.mmorpg.server.RpgPlayers.get(pl).level = 100;
+                pl.getAbilities().invulnerable = true;
+                pl.onUpdateAbilities();
+                MMORPG.LOGGER.info("[MMORPG] MINES fuites de la caverne : {}", com.mmorpg.mine.MineLayout.get().leaks());
+                com.mmorpg.mine.MineManager.open(pl, null);
+            });
+            if (u == 40) shot(mc, "mine_menu");
+            if (u == 45) {
+                com.mmorpg.client.ClientNet.send(new com.mmorpg.network.Payloads.MineEnter(-1, 2));
+                mc.gui.setScreen(null);
+            }
+            if (u == 70) shot(mc, "mine_chargement");
+            if (u == 100) shot(mc, "mine_chargement2");
+            if (u == 190) srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                MMORPG.LOGGER.info("[MMORPG] MINES arrivee par le menu : dimension {} ; position ({}, {}, {}) ; chargement encore affiche = {}", pl.level().dimension().identifier(),
+                        (int) pl.getX(), (int) pl.getY(), (int) pl.getZ(), com.mmorpg.client.LoadingClient.active());
+            });
+            if (u == 200) shot(mc, "mine_arrivee");
+            if (u == 215) {
+                mineIntro = true;
+                mineT = 0;
+            }
+            return;
+        }
         int t = mineT;
         if (t == 5) srv.execute(() -> {
             var pl = srv.getPlayerList().getPlayerByName(me);
@@ -1432,7 +2002,7 @@ public final class DevShowcase {
             pl.onUpdateAbilities();
             pl.getInventory().setItem(0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_PICKAXE));
             pl.getInventory().setSelectedSlot(0);
-            MMORPG.LOGGER.info("[MMORPG] MINES entree : {}", com.mmorpg.mine.MineManager.enter(pl));
+            MMORPG.LOGGER.info("[MMORPG] MINES entree : {}", com.mmorpg.mine.MineManager.enterNow(pl, 0));
         });
         if (t == 60) shot(mc, "mine_place");
         // un etage toutes les 140 ticks
@@ -1473,6 +2043,7 @@ public final class DevShowcase {
                 return;
             }
             var ore = ((com.mmorpg.mine.MineOreBlock) lv.getBlockState(found).getBlock()).ore();
+            pl.getInventory().setItem(0, new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("pioche_" + com.mmorpg.mine.MineTools.TIER_ID[Math.min(5, ore.tier() + 1)])));
             int before = pl.getInventory().countItem(com.mmorpg.registry.ModItems.get(ore.ingotId()));
             boolean ok = com.mmorpg.mine.MineManager.mine(lv, pl, found, ore);
             int after = pl.getInventory().countItem(com.mmorpg.registry.ModItems.get(ore.ingotId()));

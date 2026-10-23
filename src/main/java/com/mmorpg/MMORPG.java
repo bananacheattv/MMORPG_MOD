@@ -29,6 +29,8 @@ public final class MMORPG {
         ModDataComponents.COMPONENTS.register(modBus);
         com.mmorpg.registry.DecorBlocks.init();
         com.mmorpg.mine.MineBlocks.init();
+        com.mmorpg.mine.MineTools.init();
+        com.mmorpg.farm.FarmCrops.init();
         ModBlocks.BLOCKS.register(modBus);
         ModBlocks.BLOCK_ENTITIES.register(modBus);
         ModEntities.ENTITIES.register(modBus);

@@ -32,6 +32,25 @@ public class ShopConfig {
         }
     }
 
+    /**
+     * Contenu des Mines, de la metallurgie et des cultures : graines et outils du debutant en vente, prix de rachat des lingots,
+     * minerais compresses, recoltes et aliments. Ajoute au chargement ce qui manque a une boutique existante (les prix modifies sont conserves).
+     */
+    public void addNewContent() {
+        Object[][] offers = {{"graine_lueur", 4, 16, 1}, {"graine_argent", 3, 60, 18}, {"graine_ambre", 3, 180, 38}, {"graine_givre", 3, 480, 55},
+                {"graine_neant", 3, 1400, 75}, {"pioche_debutant", 1, 80, 1}, {"houe_debutant", 1, 60, 1}};
+        for (Object[] o : offers) {
+            String id = "mmorpg:" + o[0];
+            if (buy.stream().noneMatch(x -> x.item.equals(id))) buy.add(new Offer((String) o[0], (Integer) o[1], (Integer) o[2], (Integer) o[3]));
+        }
+        Object[][] prices = {{"lingot_verdite", 6}, {"lingot_argentite", 18}, {"lingot_ambrasite", 45}, {"lingot_glacium", 110}, {"lingot_neantite", 280},
+                {"lingot_aelium", 160}, {"lingot_orichalque", 650}, {"lingot_astralium", 3200},
+                {"compresse_verdite", 90}, {"compresse_argentite", 260}, {"compresse_ambrasite", 650}, {"compresse_glacium", 1600}, {"compresse_neantite", 4000},
+                {"racine_lueur", 4}, {"ble_argent", 10}, {"baie_ambree", 26}, {"fleur_givre", 70}, {"orchidee_neant", 210},
+                {"pain_argent", 12}, {"confiture_ambree", 40}, {"elixir_givre", 110}, {"nectar_neant", 300}};
+        for (Object[] o : prices) sellPrices.putIfAbsent("mmorpg:" + o[0], (Integer) o[1]);
+    }
+
     public static ShopConfig defaults() {
         ShopConfig c = new ShopConfig();
         c.buy.add(new Offer("potion_soin_mineure", 1, 8, 1));
@@ -55,6 +74,7 @@ public class ShopConfig {
         c.buy.add(new Offer("minecraft:string", 4, 4, 1));
         c.buy.add(new Offer("minecraft:leather", 2, 5, 1));
         c.buy.add(new Offer("minecraft:glass_bottle", 4, 3, 1));
+        c.addNewContent();
         c.materialPriceByRarity.put("COMMUN", 1);
         c.materialPriceByRarity.put("PEU_COMMUN", 3);
         c.materialPriceByRarity.put("RARE", 8);

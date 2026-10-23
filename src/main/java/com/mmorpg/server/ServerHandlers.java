@@ -106,12 +106,23 @@ public final class ServerHandlers {
         }
     }
 
+    public static void serviceAction(Payloads.ServiceAction p, IPayloadContext ctx) {
+        if (!(ctx.player() instanceof ServerPlayer sp)) return;
+        if (p.service() == Payloads.ServiceAction.BANK) {
+            com.mmorpg.economy.Bank.action(sp, p.pos(), p.action(), p.amount(), p.page());
+        } else if (p.service() == Payloads.ServiceAction.AUCTION) {
+            com.mmorpg.economy.Auction.action(sp, p.pos(), p.action(), p.amount(), p.text(), p.page());
+        }
+    }
+
     public static void forgeAction(Payloads.ForgeAction p, IPayloadContext ctx) {
         if (!(ctx.player() instanceof ServerPlayer sp)) return;
         if (p.action() == Payloads.ForgeAction.CRAFT) {
             ForgeManager.craft(sp, p.pos(), p.recipe(), p.value());
         } else if (p.action() == Payloads.ForgeAction.UPGRADE) {
             ForgeManager.upgrade(sp, p.pos(), p.value(), p.recipe());
+        } else if (p.action() == Payloads.ForgeAction.COMPRESS) {
+            com.mmorpg.mine.Compression.compress(sp, p.pos(), p.value(), p.recipe());
         }
     }
 }

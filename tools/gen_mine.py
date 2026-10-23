@@ -29,6 +29,15 @@ ORES = [
 
 LEVELS = [1, 18, 38, 55, 75]
 
+# lingots rares (obtenus au hasard en minant, necessaires aux armures) : id, nom fr, nom en, (clair, moyen, sombre), eclat
+TOOL_TIERS = [('debutant', 'du débutant', "Beginner's"), ('verdite', 'de Verdite', 'Verdite'), ('argentite', "d'Argentite", 'Argentite'), ('ambrasite', "d'Ambrasite", 'Ambrasite'), ('glacium', 'de Glacium', 'Glacium'), ('neantite', 'de Néantite', 'Neantite')]
+
+RARES = [
+    ('aelium', 'Aelium', 'Aelium', ((170, 255, 240), (60, 215, 200), (20, 120, 130)), (240, 255, 255)),
+    ('orichalque', 'Orichalque', 'Orichalcum', ((255, 190, 120), (240, 90, 60), (140, 30, 50)), (255, 235, 190)),
+    ('astralium', 'Astralium', 'Astralium', ((255, 250, 215), (255, 214, 96), (214, 140, 50)), (255, 255, 255)),
+]
+
 
 def mix(a, b, t):
     return tuple(int(round(a[i] + (b[i] - a[i]) * t)) for i in range(3))
@@ -96,6 +105,10 @@ def depleted_texture():
 
 def ingot_texture(index):
     oid, _, _, _, (c1, c2, c3), spark = ORES[index]
+    return ingot_texture_pal(c1, c2, c3, spark)
+
+
+def ingot_texture_pal(c1, c2, c3, spark):
     img = Image.new('RGBA', (S, S), (0, 0, 0, 0))
     outline = add(c3, -70)
     # lingot vu en perspective : face du dessus (clair), face avant (moyen), flanc droit (sombre)
@@ -126,6 +139,40 @@ def ingot_texture(index):
     return img
 
 
+def ingot_from(c1, c2, c3, spark, stars=0):
+    """Lingot (meme gabarit que ingot_texture) a partir d'une palette ; `stars` ajoute des etincelles pour les metaux rares."""
+    img = ingot_texture_pal(c1, c2, c3, spark)
+    rng = random.Random(sum(c1) + stars)
+    for _ in range(stars):
+        x, y = rng.choice(((1, 3), (13, 5), (14, 9), (2, 11), (12, 12), (6, 2), (9, 12)))
+        img.putpixel((x, y), spark + (255,))
+        if rng.random() < 0.6:
+            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                if 0 <= x + dx < S and 0 <= y + dy < S and img.getpixel((x + dx, y + dy))[3] == 0:
+                    img.putpixel((x + dx, y + dy), c1 + (150,))
+    return img
+
+
+def compressed_texture(index):
+    """Minerai compresse : plaque dense a cadre sombre, coeur lumineux et quatre rivets."""
+    oid, _, _, _, (c1, c2, c3), spark = ORES[index]
+    img = Image.new('RGBA', (S, S), (0, 0, 0, 0))
+    outline = add(c3, -80)
+    for y in range(2, 14):
+        for x in range(2, 14):
+            edge = x in (2, 13) or y in (2, 13)
+            inner = x in (3, 12) or y in (3, 12)
+            col = outline if edge else mix(c3, c2, 0.35) if inner else mix(c2, c1, 0.5 * (1 - (abs(x - 7.5) + abs(y - 7.5)) / 11))
+            img.putpixel((x, y), col + (255,))
+    for (x, y) in ((4, 4), (11, 4), (4, 11), (11, 11)):
+        img.putpixel((x, y), c1 + (255,))
+    for dx, dy in ((0, 0), (1, 0), (0, 1), (1, 1)):
+        img.putpixel((7 + dx, 7 + dy), spark + (255,))
+    for (x, y) in ((6, 7), (9, 7), (7, 6), (7, 9), (8, 9), (9, 8)):
+        img.putpixel((x, y), mix(c1, spark, 0.5) + (255,))
+    return img
+
+
 def write_json(p, obj):
     os.makedirs(os.path.dirname(p), exist_ok=True)
     with open(p, 'w', encoding='utf-8') as f:
@@ -153,7 +200,7 @@ def generate(ga=None, root=None):
     data = os.path.join(root, 'data')
     fr, en = {}, {}
     mineable = []
-    sheet = Image.new('RGBA', (S * 6, S * 2), (24, 24, 32, 255))
+    sheet = Image.new('RGBA', (S * 8, S * 3), (24, 24, 32, 255))
     for i, (oid, nfr, nen, _, _, _) in enumerate(ORES):
         block_id = 'minerai_' + oid
         ingot_id = 'lingot_' + oid
@@ -177,6 +224,31 @@ def generate(ga=None, root=None):
         fr[f'item.{MODID}.{ingot_id}'] = f'Lingot de {nfr}'
         en[f'item.{MODID}.{ingot_id}'] = f'{nen} Ingot'
         mineable.append(f'{MODID}:{block_id}')
+    # lingots rares et minerais compresses
+    for i, (rid, nfr, nen, (c1, c2, c3), spark) in enumerate(RARES):
+        ing = ingot_from(c1, c2, c3, spark, stars=i * 3)
+        iid = 'lingot_' + rid
+        ing.save(os.path.join(assets, 'textures', 'item', iid + '.png'))
+        write_json(os.path.join(assets, 'models', 'item', iid + '.json'), {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{iid}'}})
+        write_json(os.path.join(assets, 'items', iid + '.json'), {'model': {'type': 'minecraft:model', 'model': f'{MODID}:item/{iid}'}})
+        fr[f'item.{MODID}.{iid}'] = "Lingot d'" + nfr
+        en[f'item.{MODID}.{iid}'] = f'{nen} Ingot'
+        sheet.paste(ing, (i * S, 2 * S), ing)
+    for tid, tfr, ten in TOOL_TIERS:
+        for kind, kfr, ken in (('pioche', 'Pioche', 'Pickaxe'), ('hache', 'Hache', 'Axe'), ('pelle', 'Pelle', 'Shovel'), ('houe', 'Houe', 'Hoe')):
+            if tid == 'debutant' and kind in ('hache', 'pelle'):
+                continue
+            fr[f'item.{MODID}.{kind}_{tid}'] = f'{kfr} {tfr}'
+            en[f'item.{MODID}.{kind}_{tid}'] = f'{ten} {ken}'
+    for i, (oid, nfr, nen, _, _, _) in enumerate(ORES):
+        cid = 'compresse_' + oid
+        tex_c = compressed_texture(i)
+        tex_c.save(os.path.join(assets, 'textures', 'item', cid + '.png'))
+        write_json(os.path.join(assets, 'models', 'item', cid + '.json'), {'parent': 'minecraft:item/generated', 'textures': {'layer0': f'{MODID}:item/{cid}'}})
+        write_json(os.path.join(assets, 'items', cid + '.json'), {'model': {'type': 'minecraft:model', 'model': f'{MODID}:item/{cid}'}})
+        fr[f'item.{MODID}.{cid}'] = f'{nfr} compressée'
+        en[f'item.{MODID}.{cid}'] = f'Compressed {nen}'
+        sheet.paste(tex_c, ((3 + i) * S, 2 * S), tex_c)
     dep = depleted_texture()
     dep.save(os.path.join(assets, 'textures', 'block', 'veine_epuisee.png'))
     sheet.paste(dep, (5 * S, 0))

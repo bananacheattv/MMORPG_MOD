@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Structures multiblocs d'Aeloria pour Blockbench (format "Modded Entity"), generees entierement par script :
-autel d'invocation, teleporteur, forge arcanique.
+autel d'invocation, teleporteur, forge arcanique, presse de compression.
 
 Usage :
   python generer_structures.py                    toutes les structures, avec apercus et GIF
@@ -30,7 +30,7 @@ sys.path.insert(0, ICI)
 sys.path.insert(0, os.path.join(ICI, '..'))
 import entity_kit as ek  # noqa: E402
 
-STRUCTURES = ['autel_invocation', 'teleporteur', 'forge_arcanique']
+STRUCTURES = ['autel_invocation', 'teleporteur', 'forge_arcanique', 'presse_compression', 'banque_aeloria', 'hdv_aeloria']
 SRC = os.path.join(ICI, '..', '..', 'src', 'main', 'java', 'com', 'mmorpg')
 HEADER = 'art/structures_blockbench/generer_structures.py'
 

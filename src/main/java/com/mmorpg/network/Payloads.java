@@ -108,11 +108,11 @@ public final class Payloads {
     }
 
     /** Mort du joueur : cause et experience perdue, affichees par l'ecran de mort personnalise (l'equipement n'est jamais perdu). */
-    public record DeathInfo(long xpLost, int level, long xpNow, long xpNext, String cause) implements CustomPacketPayload {
+    public record DeathInfo(long xpLost, int level, long xpNow, long xpNext, String cause, String lostLoot) implements CustomPacketPayload {
         public static final Type<DeathInfo> TYPE = new Type<>(MMORPG.id("death_info"));
         public static final StreamCodec<ByteBuf, DeathInfo> CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_LONG, DeathInfo::xpLost, ByteBufCodecs.VAR_INT, DeathInfo::level, ByteBufCodecs.VAR_LONG, DeathInfo::xpNow,
-                ByteBufCodecs.VAR_LONG, DeathInfo::xpNext, ByteBufCodecs.STRING_UTF8, DeathInfo::cause, DeathInfo::new);
+                ByteBufCodecs.VAR_LONG, DeathInfo::xpNext, ByteBufCodecs.STRING_UTF8, DeathInfo::cause, ByteBufCodecs.STRING_UTF8, DeathInfo::lostLoot, DeathInfo::new);
 
         @Override
         public Type<? extends CustomPacketPayload> type() {
@@ -159,6 +159,18 @@ public final class Payloads {
     }
 
     /** Choix du joueur chez le Maitre des donjons : donjon et difficulte (0 normal, 1 heroique, 2 mythique). */
+    /** Choix d'un etage dans le menu des mines (-1 pour le PNJ si le menu vient de la commande /mine). */
+    public record MineEnter(int npc, int sector) implements CustomPacketPayload {
+        public static final Type<MineEnter> TYPE = new Type<>(MMORPG.id("mine_enter"));
+        public static final StreamCodec<ByteBuf, MineEnter> CODEC = StreamCodec.composite(
+                ByteBufCodecs.VAR_INT, MineEnter::npc, ByteBufCodecs.VAR_INT, MineEnter::sector, MineEnter::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
     public record DungeonEnter(int npc, String dungeon, int difficulty) implements CustomPacketPayload {
         public static final Type<DungeonEnter> TYPE = new Type<>(MMORPG.id("dungeon_enter"));
         public static final StreamCodec<ByteBuf, DungeonEnter> CODEC = StreamCodec.composite(
@@ -298,8 +310,53 @@ public final class Payloads {
     }
 
     /** Action a la forge : 0 = fabriquer (recette, quantite), 1 = ameliorer (emplacement d'inventaire). */
+    /** Menu d'administration, client -> serveur : lecture d'un fichier (GET), envoi d'un fichier par morceaux (SAVE), deconnexion (LOGOUT). */
+    public record AdminRequest(int action, String file, int index, int count, String text) implements CustomPacketPayload {
+        public static final int GET = 0, SAVE = 1, LOGOUT = 2;
+        public static final Type<AdminRequest> TYPE = new Type<>(MMORPG.id("admin_request"));
+        public static final StreamCodec<ByteBuf, AdminRequest> CODEC = StreamCodec.composite(
+                ByteBufCodecs.VAR_INT, AdminRequest::action, ByteBufCodecs.STRING_UTF8, AdminRequest::file,
+                ByteBufCodecs.VAR_INT, AdminRequest::index, ByteBufCodecs.VAR_INT, AdminRequest::count,
+                ByteBufCodecs.STRING_UTF8, AdminRequest::text, AdminRequest::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    /** Menu d'administration, serveur -> client : ouverture (liste des fichiers), morceau d'un fichier, message de reussite ou d'erreur. */
+    public record AdminReply(int kind, String file, int index, int count, String text) implements CustomPacketPayload {
+        public static final int OPEN = 0, FILE = 1, OK = 2, ERROR = 3;
+        public static final Type<AdminReply> TYPE = new Type<>(MMORPG.id("admin_reply"));
+        public static final StreamCodec<ByteBuf, AdminReply> CODEC = StreamCodec.composite(
+                ByteBufCodecs.VAR_INT, AdminReply::kind, ByteBufCodecs.STRING_UTF8, AdminReply::file,
+                ByteBufCodecs.VAR_INT, AdminReply::index, ByteBufCodecs.VAR_INT, AdminReply::count,
+                ByteBufCodecs.STRING_UTF8, AdminReply::text, AdminReply::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    /** Action d'un service de la ville : banque (service 0) ou hotel des ventes (service 1). */
+    public record ServiceAction(int service, int action, long amount, String text, int page, BlockPos pos) implements CustomPacketPayload {
+        public static final int BANK = 0, AUCTION = 1;
+        public static final Type<ServiceAction> TYPE = new Type<>(MMORPG.id("service_action"));
+        public static final StreamCodec<ByteBuf, ServiceAction> CODEC = StreamCodec.composite(
+                ByteBufCodecs.VAR_INT, ServiceAction::service, ByteBufCodecs.VAR_INT, ServiceAction::action,
+                ByteBufCodecs.VAR_LONG, ServiceAction::amount, ByteBufCodecs.STRING_UTF8, ServiceAction::text,
+                ByteBufCodecs.VAR_INT, ServiceAction::page, BlockPos.STREAM_CODEC, ServiceAction::pos, ServiceAction::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
     public record ForgeAction(int action, String recipe, int value, BlockPos pos) implements CustomPacketPayload {
-        public static final int CRAFT = 0, UPGRADE = 1;
+        public static final int CRAFT = 0, UPGRADE = 1, COMPRESS = 2;
         public static final Type<ForgeAction> TYPE = new Type<>(MMORPG.id("forge_action"));
         public static final StreamCodec<ByteBuf, ForgeAction> CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, ForgeAction::action, ByteBufCodecs.STRING_UTF8, ForgeAction::recipe,

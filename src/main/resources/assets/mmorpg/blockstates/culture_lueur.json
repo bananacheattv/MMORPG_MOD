@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "age=0": {
+      "model": "mmorpg:block/culture_lueur_s0"
+    },
+    "age=1": {
+      "model": "mmorpg:block/culture_lueur_s0"
+    },
+    "age=2": {
+      "model": "mmorpg:block/culture_lueur_s1"
+    },
+    "age=3": {
+      "model": "mmorpg:block/culture_lueur_s1"
+    },
+    "age=4": {
+      "model": "mmorpg:block/culture_lueur_s2"
+    },
+    "age=5": {
+      "model": "mmorpg:block/culture_lueur_s2"
+    },
+    "age=6": {
+      "model": "mmorpg:block/culture_lueur_s2"
+    },
+    "age=7": {
+      "model": "mmorpg:block/culture_lueur_s3"
+    }
+  }
+}

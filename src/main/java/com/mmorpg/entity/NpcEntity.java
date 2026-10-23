@@ -26,7 +26,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 /** PNJ des villes : Maitre des Quetes ou Marchand. Immobile, invulnerable et persistant. */
 public class NpcEntity extends PathfinderMob {
     public enum Role {
-        QUETES("Maître des Quêtes"), MARCHAND("Marchand"), DONJON("Maître des donjons");
+        QUETES("Maître des Quêtes"), MARCHAND("Marchand"), DONJON("Maître des donjons"), MINES("Maître des mines");
 
         public final String label;
 
@@ -107,6 +107,7 @@ public class NpcEntity extends PathfinderMob {
                 case QUETES -> QuestManager.openGiver(sp, this);
                 case MARCHAND -> ShopManager.open(sp, this);
                 case DONJON -> com.mmorpg.dungeon.DungeonMaster.open(sp, this);
+                case MINES -> com.mmorpg.mine.MineManager.open(sp, this);
             }
         }
         return InteractionResult.SUCCESS;

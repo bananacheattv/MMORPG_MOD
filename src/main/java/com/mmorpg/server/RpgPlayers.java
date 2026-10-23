@@ -416,6 +416,18 @@ public final class RpgPlayers {
                 "Votre aventure commence !", cls.color));
     }
 
+    /** Pioche et houe du debutant : de quoi extraire la Verdite des Mines d'Aeloria et cultiver les premieres graines. */
+    public static void giveStarterTools(ServerPlayer player) {
+        give(player, ModItems.get("pioche_debutant"), 1);
+        give(player, ModItems.get("houe_debutant"), 1);
+        give(player, ModItems.get("graine_lueur"), 12);
+        player.sendSystemMessage(Component.literal("Vous avez reçu une ").withColor(0xE0D8C0)
+                .append(Component.literal("pioche").withColor(0xFFD040))
+                .append(Component.literal(" et une ").withColor(0xE0D8C0))
+                .append(Component.literal("houe du débutant").withColor(0xFFD040))
+                .append(Component.literal(", avec des graines de Lueur : le Maître des mines et les terres labourées vous attendent.").withColor(0xE0D8C0)));
+    }
+
     private static void giveStarterKit(ServerPlayer player, PlayerClass cls) {
         String weapon = switch (cls) {
             case GUERRIER -> "epee_recrue";
@@ -545,6 +557,10 @@ public final class RpgPlayers {
         });
         recompute(player);
         if (d.hp <= 0) d.hp = (float) d.stats.get(Stat.MAX_HP);
+        if (!d.starterTools) {
+            d.starterTools = true;
+            giveStarterTools(player);
+        }
         sync(player);
         BestiaryInfo.sendTo(player);
         PartyManager.sync(player);
@@ -593,11 +609,13 @@ public final class RpgPlayers {
             }
         }
         // l'ecran de mort affiche l'experience perdue ; l'equipement, lui, est conserve (voir ServerEvents.onServerStarted)
-        com.mmorpg.network.Net.toPlayer(player, new Payloads.DeathInfo(Math.max(0, lost), d.level, d.xp, LevelSystem.xpToNext(d.level), cause));
+        String lostLoot = SessionLoot.onDeath(player);          // mines et donjons : le butin de la session est perdu
+        com.mmorpg.network.Net.toPlayer(player, new Payloads.DeathInfo(Math.max(0, lost), d.level, d.xp, LevelSystem.xpToNext(d.level), cause, lostLoot));
         PetManager.despawn(player);
     }
 
     public static void onLogout(ServerPlayer player) {
+        SessionLoot.forget(player);
         PetManager.despawn(player);
         PartyManager.onLogout(player);
         ClickInteractions.forget(player);

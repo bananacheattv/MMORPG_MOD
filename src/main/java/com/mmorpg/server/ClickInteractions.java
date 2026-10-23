@@ -63,6 +63,7 @@ public final class ClickInteractions {
                 case QUETES -> QuestManager.openGiver(sp, npc);
                 case MARCHAND -> ShopManager.open(sp, npc);
                 case DONJON -> com.mmorpg.dungeon.DungeonMaster.open(sp, npc);
+                case MINES -> com.mmorpg.mine.MineManager.open(sp, npc);
             }
         }
     }

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "mmorpg:block/presse_compression"
+    },
+    "facing=east": {
+      "model": "mmorpg:block/presse_compression",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "mmorpg:block/presse_compression",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "mmorpg:block/presse_compression",
+      "y": 270
+    }
+  }
+}

@@ -105,7 +105,16 @@ public final class HubManager {
      * de la Citadelle. La construction definit aussi le point d'apparition du monde sur le hub. @return vrai si le hub vient d'etre construit
      */
     public static boolean ensureHub(net.minecraft.server.MinecraftServer server) {
-        if (HubData.get(server).exists()) return false;
+        HubData existing = HubData.get(server);
+        if (existing.exists()) {
+            ServerLevel hubLevel = existing.level(server);
+            if (existing.layout() < HubBuilder.LAYOUT_VERSION && hubLevel != null && existing.origin() != null) {
+                com.mmorpg.MMORPG.LOGGER.info("[MMORPG] Hub de plan {} : ajout du Marche d'Aeloria (plan {})", existing.layout(), HubBuilder.LAYOUT_VERSION);
+                HubBuilder.build(hubLevel, existing.origin());
+                return true;
+            }
+            return false;
+        }
         ServerLevel level = server.getLevel(HUB_DIM);
         if (level == null) return false;
         com.mmorpg.MMORPG.LOGGER.info("[MMORPG] Aucun hub dans ce monde : construction automatique de la Citadelle");

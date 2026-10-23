@@ -111,9 +111,33 @@ public class RpgDeathScreen extends MmoScreen {
             String none = "Aucune expérience perdue";
             g.text(font, none, cx - font.width(none) / 2, py + 6, Ui.withAlpha(0xB8AC98, Math.round(255 * xin)), true);
         }
+        // butin de la session (mines et donjons) : perdu
+        boolean lostLoot = !info.lostLoot().isEmpty();
+        if (lostLoot) {
+            float lin = Ease.OUT_CUBIC.apply((t - 1.9F) / 0.8F);
+            String head = "BUTIN DE LA SESSION PERDU";
+            g.text(font, head, cx - font.width(head) / 2, Math.round(height * 0.6F), Ui.withAlpha(0xFFB060, Math.round(255 * lin)), true);
+            String[] parts = info.lostLoot().split(";");
+            int n = Math.min(parts.length, 8);
+            int slotW = 34;
+            int startX = cx - n * slotW / 2;
+            for (int i = 0; i < n; i++) {
+                String[] kv = parts[i].split("\\*");
+                var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.getOptional(net.minecraft.resources.Identifier.parse(kv[0])).orElse(null);
+                if (item == null) continue;
+                int sx = startX + i * slotW;
+                int sy = Math.round(height * 0.6F) + 12;
+                g.fill(sx, sy, sx + 28, sy + 28, Ui.withAlpha(0x1A1218, Math.round(220 * lin)));
+                Ui.border(g, sx, sy, 28, 28, Ui.withAlpha(0x7A3A2A, Math.round(255 * lin)));
+                var stack = new net.minecraft.world.item.ItemStack(item, kv.length > 1 ? Integer.parseInt(kv[1]) : 1);
+                g.item(stack, sx + 6, sy + 6);
+                g.itemDecorations(font, stack, sx + 6, sy + 6);
+            }
+        }
         // equipement conserve
         float sin = Ease.OUT_CUBIC.apply((t - 2.0F) / 0.8F);
-        String safe = "Votre équipement est intact : vous ne perdez jamais vos objets à la mort.";
+        String safe = lostLoot ? "Votre équipement est intact : seul le butin récolté pendant cette descente est perdu."
+                : "Votre équipement est intact : vous ne perdez jamais vos objets à la mort.";
         int sw = font.width(safe);
         float ss = Math.min(1F, (width - 24F) / Math.max(1, sw));
         g.pose().pushMatrix();

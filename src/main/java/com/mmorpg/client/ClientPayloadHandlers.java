@@ -24,6 +24,7 @@ public final class ClientPayloadHandlers {
     @SubscribeEvent
     public static void register(RegisterClientPayloadHandlersEvent event) {
         event.register(S2COpenScreen.TYPE, (payload, context) -> openScreen(payload));
+        event.register(Payloads.AdminReply.TYPE, (payload, context) -> com.mmorpg.client.screen.AdminScreen.handle(payload));
         event.register(Payloads.SyncPlayer.TYPE, (payload, context) -> ClientData.load(payload.data()));
         event.register(Payloads.Vitals.TYPE, (payload, context) -> {
             ClientData.hp = payload.hp();
@@ -65,9 +66,19 @@ public final class ClientPayloadHandlers {
             case S2COpenScreen.TELEPORTER -> mc.gui.setScreen(new TeleporterScreen(payload.extra()));
             case S2COpenScreen.TELEPORTER_SETUP -> mc.gui.setScreen(new TeleporterSetupScreen(payload.extra()));
             case S2COpenScreen.FORGE -> mc.gui.setScreen(new ForgeScreen(BlockPos.of(payload.extra().getLongOr("pos", 0))));
+            case S2COpenScreen.BANK -> {
+                if (mc.gui.screen() instanceof com.mmorpg.client.screen.BankScreen screen) screen.receive(payload.extra());
+                else mc.gui.setScreen(new com.mmorpg.client.screen.BankScreen(payload.extra()));
+            }
+            case S2COpenScreen.AUCTION -> {
+                if (mc.gui.screen() instanceof com.mmorpg.client.screen.AuctionScreen screen) screen.receive(payload.extra());
+                else mc.gui.setScreen(new com.mmorpg.client.screen.AuctionScreen(payload.extra()));
+            }
+            case S2COpenScreen.COMPRESSOR -> mc.gui.setScreen(new com.mmorpg.client.screen.CompressorScreen(BlockPos.of(payload.extra().getLongOr("pos", 0))));
             case S2COpenScreen.QUEST_GIVER -> mc.gui.setScreen(new com.mmorpg.client.screen.QuestGiverScreen(payload.extra()));
             case S2COpenScreen.SHOP -> mc.gui.setScreen(new com.mmorpg.client.screen.ShopScreen(payload.extra()));
             case S2COpenScreen.DUNGEON_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.DungeonMasterScreen(payload.extra()));
+            case S2COpenScreen.MINE_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.MineMasterScreen(payload.extra()));
             case S2COpenScreen.CLASS_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.ClassMasterScreen(payload.extra()));
             case S2COpenScreen.TRIAL_STATE -> {
                 ClientData.trialActive = payload.extra().getBooleanOr("active", false);

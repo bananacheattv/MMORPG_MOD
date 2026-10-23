@@ -8,6 +8,10 @@ import com.mmorpg.rpg.PlayerData;
 import com.mmorpg.server.MobSpawner;
 import com.mmorpg.server.RpgPlayers;
 import com.mmorpg.zone.ZoneData;
+import com.mmorpg.entity.NpcEntity;
+import com.mmorpg.network.Net;
+import com.mmorpg.network.Payloads;
+import com.mmorpg.network.S2COpenScreen;
 import com.mmorpg.zone.ZoneManager;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
@@ -15,6 +19,8 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -41,6 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Les Mines d'Aeloria : une immense caverne partagee (dimension des donjons) dont les minerais se mangent a la pioche. Extraire un minerai
@@ -51,7 +58,7 @@ import java.util.Set;
 @EventBusSubscriber(modid = MMORPG.MODID)
 public final class MineManager {
     /** A incrementer quand le plan change : la mine est alors reconstruite au demarrage. */
-    public static final int VERSION = 1;
+    public static final int VERSION = 3;
     private static final int MOB_CAP = 14;
 
     private static MineBuilder job;
@@ -121,11 +128,13 @@ public final class MineManager {
     @SubscribeEvent
     public static void onTick(ServerTickEvent.Post event) {
         MinecraftServer server = event.getServer();
+        transitions(server);
         if (job != null) {
             if (job.step(22_000_000L)) {
                 MineData.get(server).setVersion(VERSION);
                 registerZones(server);
                 MMORPG.LOGGER.info("[MMORPG] Mines d'Aeloria construites : {} blocs en {} s", job.blocksPlaced(), (System.nanoTime() - jobStart) / 1_000_000_000L);
+                MMORPG.LOGGER.info("[MMORPG] Mines d'Aeloria : {} case(s) de caverne au contact du vide (attendu : 0)", MineLayout.get().leaks());
                 job = null;
             } else if (job.percent() / 10 != lastLogged) {
                 lastLogged = job.percent() / 10;
@@ -160,6 +169,13 @@ public final class MineManager {
             p.sendOverlayMessage(Component.literal("Il faut une pioche pour extraire la " + ore.name() + ".").withColor(0xFFC060));
             return false;
         }
+        int pick = MineTools.pickTier(tool);
+        if (pick < ore.tier()) {
+            String need = MineTools.TIER_ID[Math.min(ore.tier(), MineTools.TIER_ID.length - 1)];
+            p.sendOverlayMessage(Component.literal("Votre pioche est trop fragile pour la " + ore.name() + " : il faut une pioche de palier « " + need + " » ou mieux.").withColor(0xFF7060));
+            level.playSound(null, pos, SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, 0.3F, 1.4F);
+            return false;
+        }
         PlayerData d = RpgPlayers.get(p);
         if (d.level < ore.minLevel()) {
             p.sendOverlayMessage(Component.literal("Niveau " + ore.minLevel() + " requis pour extraire la " + ore.name() + ".").withColor(0xFF7060));
@@ -167,12 +183,13 @@ public final class MineManager {
             return false;
         }
         var random = level.getRandom();
-        int count = 1 + (random.nextInt(100) < 12 + ore.tier() * 2 ? 1 : 0);                  // veine riche : un lingot de plus
+        int count = 1 + (random.nextInt(100) < 12 + ore.tier() * 2 + pick * 4 ? 1 : 0);      // veine riche : un lingot de plus (la pioche aide)
         ItemStack ingot = new ItemStack(ModItems.get(ore.ingotId()), count);
         if (!p.getInventory().add(ingot)) level.addFreshEntity(new net.minecraft.world.entity.item.ItemEntity(level, p.getX(), p.getY() + 0.5, p.getZ(), ingot));
         tool.hurtAndBreak(1, p, EquipmentSlot.MAINHAND);
         RpgPlayers.giveXp(p, 3 + ore.minLevel() / 2L, false);
         p.sendOverlayMessage(Component.literal("+" + count + " Lingot de " + ore.name() + (count > 1 ? "  (veine riche !)" : "")).withColor(ore.color()));
+        rareDrop(level, p, pos, ore, pick);
         BlockState old = level.getBlockState(pos);
         level.setBlock(pos, MineBlocks.EPUISE.get().defaultBlockState(), 3);
         level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, old), pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 18, 0.3, 0.3, 0.3, 0.08);
@@ -182,6 +199,32 @@ public final class MineManager {
         long wait = (long) (ore.cooldown() * 20 * (0.8 + random.nextDouble() * 0.4));
         MineData.get(level.getServer()).add(new MineData.Respawn(pos.getX(), pos.getY(), pos.getZ(), ore.tier(), level.getGameTime() + wait));
         return true;
+    }
+
+    /** Chances (en %) par minerai extrait, avant bonus de pioche : {Aelium, Orichalque, Astralium} selon le palier du minerai. */
+    private static final double[][] RARE_CHANCE = {
+            {3.0, 0, 0}, {4.5, 0.5, 0}, {6.0, 1.2, 0.05}, {7.0, 2.0, 0.1}, {8.0, 3.0, 0.35}};
+
+    /** Lingots rares, epiques et legendaires : tirage independant du lingot de base ; la pioche augmente toutes les chances de 25 % par palier. */
+    private static void rareDrop(ServerLevel level, ServerPlayer p, BlockPos pos, MineBlocks.Ore ore, int pick) {
+        double[] chance = RARE_CHANCE[Math.min(ore.tier(), RARE_CHANCE.length - 1)];
+        double mult = 1.0 + 0.25 * pick;
+        String[] ids = {"lingot_aelium", "lingot_orichalque", "lingot_astralium"};
+        String[] names = {"Lingot d'Aelium", "Lingot d'Orichalque", "Lingot d'Astralium"};
+        int[] colors = {0x6EF0E0, 0xFF8A5A, 0xFFE070};
+        var random = level.getRandom();
+        for (int i = 2; i >= 0; i--) {
+            if (chance[i] <= 0 || random.nextDouble() * 100.0 >= chance[i] * mult) continue;
+            ItemStack drop = new ItemStack(ModItems.get(ids[i]));
+            if (!p.getInventory().add(drop)) level.addFreshEntity(new net.minecraft.world.entity.item.ItemEntity(level, p.getX(), p.getY() + 0.5, p.getZ(), drop));
+            level.sendParticles(ParticleTypes.END_ROD, pos.getX() + 0.5, pos.getY() + 0.8, pos.getZ() + 0.5, 12 + i * 14, 0.4, 0.4, 0.4, 0.05 + 0.03 * i);
+            level.playSound(null, pos, i == 0 ? SoundEvents.AMETHYST_CLUSTER_BREAK : SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.8F + 0.2F * i, 1.4F - 0.2F * i);
+            p.sendSystemMessage(Component.literal("✦ Trouvaille " + (i == 0 ? "rare" : i == 1 ? "épique" : "légendaire") + " : " + names[i] + " !").withColor(colors[i]));
+            if (i == 2) {
+                level.getServer().getPlayerList().broadcastSystemMessage(Component.literal("✦ " + p.getName().getString() + " a extrait un Lingot d'Astralium dans les Mines d'Aeloria !").withColor(colors[2]), false);
+            }
+            return;                                                                          // un seul lingot rare par minerai (le plus precieux d'abord)
+        }
     }
 
     private static void respawns(MinecraftServer server, ServerLevel level) {
@@ -246,27 +289,147 @@ public final class MineManager {
         }
     }
 
-    // ================================================================== entree
+    // ================================================================== menu, chargement et arrivee
 
-    /** Envoie le joueur sur la place d'entree de la mine. */
-    public static boolean enter(ServerPlayer p) {
+    /** Temps minimal de l'ecran de chargement (ticks) : assez pour lire le titre et l'ambiance de l'etage. */
+    private static final int LOADING_TICKS = 80;
+    /** Marque des titres de chargement des mines (voir LoadingClient.MINE_MARK : elle n'est jamais affichee). */
+    private static final String MARK = "\u26CF ";
+
+    private record Transition(UUID player, int sector, long teleportAt, String title, String lore, int color) {
+    }
+
+    private static final List<Transition> TRANSITIONS = new ArrayList<>();
+
+    /** Menu du Maitre des mines (ou de la commande /mine quand {@code npc} est nul) : les cinq etages, leurs niveaux et leurs minerais. */
+    public static void open(ServerPlayer p, NpcEntity npc) {
+        ListTag list = new ListTag();
+        for (Sector s : MineLayout.STYLES) {
+            MineBlocks.Ore ore = MineBlocks.ore(s.ore());
+            CompoundTag e = new CompoundTag();
+            e.putInt("index", s.index());
+            e.putString("label", s.name());
+            e.putString("lore", s.lore());
+            e.putInt("color", ore.color());
+            e.putInt("min", s.minLevel());
+            e.putInt("max", s.maxLevel());
+            e.putInt("need", needed(s));
+            e.putString("ore", ore.name());
+            e.putInt("oreLevel", ore.minLevel());
+            e.putInt("cooldown", ore.cooldown());
+            list.add(e);
+        }
+        CompoundTag data = new CompoundTag();
+        data.putInt("npc", npc == null ? -1 : npc.getId());
+        data.putString("name", npc == null ? "Les mines d'Aeloria" : npc.displayName());
+        data.putInt("playerLevel", RpgPlayers.get(p).level);
+        data.putBoolean("built", built(p.level().getServer()) && !building());
+        data.putInt("percent", percent());
+        data.put("sectors", list);
+        Net.toPlayer(p, new S2COpenScreen(S2COpenScreen.MINE_MASTER, data));
+    }
+
+    /** Niveau requis pour rejoindre un etage directement (le premier est ouvert a tous). */
+    public static int needed(Sector s) {
+        return s.index() == 0 ? 1 : s.minLevel();
+    }
+
+    /** Choix du joueur dans le menu : verifications cote serveur puis ecran de chargement et arrivee a l'etage. */
+    public static void enter(ServerPlayer p, Payloads.MineEnter packet) {
+        if (packet.npc() >= 0) {
+            Entity e = p.level().getEntity(packet.npc());
+            if (!(e instanceof NpcEntity npc) || npc.role() != NpcEntity.Role.MINES || npc.distanceToSqr(p) > 100) return;
+        }
+        int k = packet.sector();
+        if (k < 0 || k >= MineLayout.SECTORS) return;
+        Sector s = MineLayout.STYLES.get(k);
+        if (RpgPlayers.get(p).level < needed(s) && !p.hasInfiniteMaterials()) {
+            p.sendOverlayMessage(Component.literal("Niveau " + needed(s) + " requis pour descendre à cet étage.").withColor(0xFF5050));
+            return;
+        }
         MinecraftServer server = p.level().getServer();
-        ServerLevel level = dim(server);
-        if (level == null) return false;
-        if (!built(server)) {
-            if (job == null) start(server);
-            p.sendSystemMessage(Component.literal("Les mines sont en construction (" + percent() + " %) : revenez dans quelques minutes.").withColor(0xFFC060));
-            return false;
+        if (dim(server) == null) return;
+        if (!built(server) && job == null) start(server);
+        MineBlocks.Ore ore = MineBlocks.ore(s.ore());
+        String title = MARK + s.name();
+        long at = server.overworld().getGameTime() + LOADING_TICKS;
+        TRANSITIONS.removeIf(x -> x.player().equals(p.getUUID()));
+        TRANSITIONS.add(new Transition(p.getUUID(), k, at, title, s.lore(), ore.color()));
+        com.mmorpg.dungeon.BossReveal.hold(p, LOADING_TICKS + 400);
+        Net.toPlayer(p, new Payloads.Loading(Payloads.Loading.START, title, s.lore(), ore.color(), built(server) && !building() ? 0 : percent()));
+    }
+
+    private static void transitions(MinecraftServer server) {
+        if (TRANSITIONS.isEmpty()) return;
+        long now = server.overworld().getGameTime();
+        var it = TRANSITIONS.iterator();
+        while (it.hasNext()) {
+            Transition x = it.next();
+            ServerPlayer p = server.getPlayerList().getPlayer(x.player());
+            if (p == null) {
+                it.remove();
+                continue;
+            }
+            com.mmorpg.dungeon.BossReveal.hold(p, 40);
+            boolean ready = built(server) && !building();
+            if (!ready) {
+                if (now % 4 == 0) Net.toPlayer(p, new Payloads.Loading(Payloads.Loading.PROGRESS, x.title(), x.lore(), x.color(), Math.min(99, percent())));
+            } else if (now >= x.teleportAt()) {
+                Net.toPlayer(p, new Payloads.Loading(Payloads.Loading.PROGRESS, x.title(), x.lore(), x.color(), 100));
+                com.mmorpg.dungeon.BossReveal.release(p);
+                arrive(p, x.sector());
+                Net.toPlayer(p, new Payloads.Loading(Payloads.Loading.END, x.title(), x.lore(), x.color(), 100));
+                it.remove();
+            } else if (now % 4 == 0) {
+                int pct = (int) Math.max(0, 100 - 100L * (x.teleportAt() - now) / LOADING_TICKS);
+                Net.toPlayer(p, new Payloads.Loading(Payloads.Loading.PROGRESS, x.title(), x.lore(), x.color(), pct));
+            }
         }
+    }
+
+    /** Point d'arrivee d'un etage : la place d'entree pour le premier, sinon un sol bien plat pres de l'entree de l'etage. */
+    public static double[] spawnPoint(int sector) {
         MineLayout layout = MineLayout.get();
-        double x = MineLayout.X0 + MineLayout.PLAZA_X + 0.5, z = MineLayout.Z0 + MineLayout.PLAZA_Z - 7 + 0.5;
-        double y = layout.floor(MineLayout.PLAZA_X, MineLayout.PLAZA_Z - 7) + 1;
-        for (int dx = -2; dx <= 2; dx++) {
-            for (int dz = -2; dz <= 2; dz++) level.getChunk((int) Math.floor(x + dx * 16) >> 4, (int) Math.floor(z + dz * 16) >> 4);
+        int cx = MineLayout.PLAZA_X, cz = sector == 0 ? MineLayout.PLAZA_Z - 7 : MineLayout.sectorStart(sector) + 16;
+        for (int r = 0; r < 70; r += 2) {
+            int steps = r == 0 ? 1 : 12;
+            for (int i = 0; i < steps; i++) {
+                double a = Math.PI * 2 * i / steps;
+                int lx = cx + (int) Math.round(Math.cos(a) * r), lz = cz + (int) Math.round(Math.sin(a) * r);
+                if (layout.kind(lx, lz) != 1 || layout.isPillar(lx, lz) || layout.liquid(lx, lz) > layout.floor(lx, lz)) continue;
+                boolean flat = true;
+                for (int dx = -2; dx <= 2 && flat; dx++) {
+                    for (int dz = -2; dz <= 2 && flat; dz++) {
+                        flat = layout.kind(lx + dx, lz + dz) == 1 && !layout.isPillar(lx + dx, lz + dz)
+                                && Math.abs(layout.floor(lx + dx, lz + dz) - layout.floor(lx, lz)) <= 1
+                                && layout.liquid(lx + dx, lz + dz) <= layout.floor(lx + dx, lz + dz);
+                    }
+                }
+                if (flat) return new double[]{MineLayout.X0 + lx + 0.5, layout.floor(lx, lz) + 1, MineLayout.Z0 + lz + 0.5};
+            }
         }
-        ZoneManager.forgetAnnouncements(p.getUUID());
-        p.teleportTo(level, x, y, z, Set.of(), 0F, 6F, true);
+        return new double[]{MineLayout.X0 + cx + 0.5, layout.floor(cx, cz) + 1, MineLayout.Z0 + cz + 0.5};
+    }
+
+    private static void arrive(ServerPlayer p, int sector) {
+        ServerLevel level = dim(p.level().getServer());
+        if (level == null) return;
+        double[] at = spawnPoint(sector);
+        for (int dx = -2; dx <= 2; dx++) {
+            for (int dz = -2; dz <= 2; dz++) level.getChunk(((int) at[0] + dx * 16) >> 4, ((int) at[2] + dz * 16) >> 4);
+        }
+        ZoneManager.forgetAnnouncements(p.getUUID());               // l'annonce de l'etage (titre et ambiance) se rejoue a l'arrivee
+        p.teleportTo(level, at[0], at[1], at[2], Set.of(), 0F, 6F, true);
         p.resetFallDistance();
+        level.sendParticles(ParticleTypes.END_ROD, at[0], at[1] + 1, at[2], 30, 0.6, 0.9, 0.6, 0.05);
+        level.playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.RISE.get(), SoundSource.PLAYERS, 0.8F, 1.0F);
+    }
+
+    /** Envoie directement le joueur a un etage, sans menu ni chargement (tests et administration). */
+    public static boolean enterNow(ServerPlayer p, int sector) {
+        MinecraftServer server = p.level().getServer();
+        if (!built(server) || building() || dim(server) == null) return false;
+        arrive(p, sector);
         return true;
     }
 
@@ -274,7 +437,10 @@ public final class MineManager {
 
     public static void register(CommandDispatcher<CommandSourceStack> d) {
         d.register(Commands.literal("mine")
-                .executes(c -> enter(c.getSource().getPlayerOrException()) ? 1 : 0)
+                .executes(c -> {
+                    open(c.getSource().getPlayerOrException(), null);
+                    return 1;
+                })
                 .then(Commands.literal("etat").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).executes(c -> {
                     MinecraftServer s = c.getSource().getServer();
                     String msg = building() ? "Construction en cours : " + percent() + " %" : built(s) ? "Mines construites (plan " + VERSION + "), "

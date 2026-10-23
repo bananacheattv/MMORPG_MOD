@@ -28,6 +28,9 @@ public final class ModCreativeTabs {
             .icon(() -> new ItemStack(ModItems.FRAGMENT_DIVIN.get()))
             .displayItems((params, out) -> {
                 out.accept(ModItems.FORGE_ARCANIQUE.get());
+                out.accept(ModItems.PRESSE_COMPRESSION.get());
+                out.accept(ModItems.BANQUE.get());
+                out.accept(ModItems.HDV.get());
                 out.accept(ModItems.LUCKY_BLOCK.get());
                 ModItems.CRATE_BLOCKS.forEach(i -> out.accept(i.get()));
                 out.accept(ModItems.TELEPORTEUR.get());
@@ -35,6 +38,8 @@ public final class ModCreativeTabs {
                 out.accept(ModItems.BAGUETTE_ZONE.get());
                 out.accept(ModItems.AUTEL_INVOCATION.get());
                 ModItems.MATERIALS.forEach(i -> out.accept(i.get()));
+                com.mmorpg.mine.MineTools.ITEMS.forEach(i -> out.accept(i.get()));
+                com.mmorpg.farm.FarmCrops.SEED_ITEMS.forEach(i -> out.accept(i.get()));
                 out.accept(ModItems.PIECE_OR.get());
                 ModItems.CONSUMABLES.forEach(i -> out.accept(i.get()));
                 ModItems.SUMMONS.forEach(i -> out.accept(i.get()));

@@ -29,6 +29,9 @@ public final class Net {
         r.playToServer(Payloads.DungeonEnter.TYPE, Payloads.DungeonEnter.CODEC, (packet, ctx) -> {
             if (ctx.player() instanceof ServerPlayer p) com.mmorpg.dungeon.DungeonMaster.enter(p, packet);
         });
+        r.playToServer(Payloads.MineEnter.TYPE, Payloads.MineEnter.CODEC, (packet, ctx) -> {
+            if (ctx.player() instanceof ServerPlayer p) com.mmorpg.mine.MineManager.enter(p, packet);
+        });
         r.playToClient(Payloads.MobInfo.TYPE, Payloads.MobInfo.CODEC);
         r.playToClient(Payloads.PartySync.TYPE, Payloads.PartySync.CODEC);
 
@@ -56,6 +59,11 @@ public final class Net {
         r.playToServer(Payloads.Teleport.TYPE, Payloads.Teleport.CODEC, ServerHandlers::teleport);
         r.playToServer(Payloads.TeleporterSetup.TYPE, Payloads.TeleporterSetup.CODEC, ServerHandlers::teleporterSetup);
         r.playToServer(Payloads.ForgeAction.TYPE, Payloads.ForgeAction.CODEC, ServerHandlers::forgeAction);
+        r.playToServer(Payloads.AdminRequest.TYPE, Payloads.AdminRequest.CODEC, (packet, ctx) -> {
+            if (ctx.player() instanceof ServerPlayer p) com.mmorpg.admin.Admin.handle(p, packet);
+        });
+        r.playToClient(Payloads.AdminReply.TYPE, Payloads.AdminReply.CODEC);
+        r.playToServer(Payloads.ServiceAction.TYPE, Payloads.ServiceAction.CODEC, ServerHandlers::serviceAction);
         r.playToServer(Payloads.QuestAction.TYPE, Payloads.QuestAction.CODEC, ServerHandlers::questAction);
         r.playToServer(Payloads.ShopAction.TYPE, Payloads.ShopAction.CODEC, ServerHandlers::shopAction);
         r.playToServer(Payloads.PartyAction.TYPE, Payloads.PartyAction.CODEC, ServerHandlers::partyAction);

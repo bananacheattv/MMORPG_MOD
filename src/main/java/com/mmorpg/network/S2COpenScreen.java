@@ -28,6 +28,13 @@ public record S2COpenScreen(int screen, CompoundTag extra) implements CustomPack
     /** Etat de l'essai de classe (pas d'ecran) : actif, classe, niveau. */
     public static final int TRIAL_STATE = 13;
     public static final int DUNGEON_MASTER = 14;
+    /** Menu du Maitre des mines (etages, niveaux, minerais). */
+    public static final int MINE_MASTER = 15;
+    /** Presse de compression (minerais compresses). */
+    public static final int COMPRESSOR = 16;
+    /** Banque d'Aeloria (solde et coffre) et hotel des ventes. */
+    public static final int BANK = 17;
+    public static final int AUCTION = 18;
 
     public static final Type<S2COpenScreen> TYPE = new Type<>(MMORPG.id("open_screen"));
     public static final StreamCodec<ByteBuf, S2COpenScreen> CODEC = StreamCodec.composite(
@@ -37,6 +44,12 @@ public record S2COpenScreen(int screen, CompoundTag extra) implements CustomPack
 
     public static S2COpenScreen classSelect() {
         return new S2COpenScreen(CLASS_SELECT, new CompoundTag());
+    }
+
+    public static S2COpenScreen compressor(BlockPos pos) {
+        CompoundTag t = new CompoundTag();
+        t.putLong("pos", pos.asLong());
+        return new S2COpenScreen(COMPRESSOR, t);
     }
 
     public static S2COpenScreen forge(BlockPos pos) {
