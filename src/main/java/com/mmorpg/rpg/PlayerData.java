@@ -58,6 +58,9 @@ public class PlayerData implements ValueIOSerializable {
     public boolean classChosenOnce = false;
     /** Pioche et houe du debutant deja remises (une seule fois ; /outils en redonne si elles sont perdues). */
     public boolean starterTools = false;
+    /** Nombre de mines et de plaines ouvertes au joueur : la premiere l'est d'office, les suivantes se debloquent en trouvant le portail cache de la precedente. */
+    public int minesUnlocked = 1;
+    public int plainsUnlocked = 1;
     /** Palier d'evolution debloque aupres du Maitre des classes (quetes) ; -1 = ancien joueur pas encore migre. */
     public int evolution = 0;
 
@@ -191,6 +194,8 @@ public class PlayerData implements ValueIOSerializable {
         t.store("kills", STR_INT_MAP, kills);
         t.putBoolean("chosen", classChosenOnce);
         t.putBoolean("starterTools", starterTools);
+        t.putInt("minesUnlocked", minesUnlocked);
+        t.putInt("plainsUnlocked", plainsUnlocked);
         t.putInt("evolution", evolution);
         t.putLong("gold", gold);
         t.putInt("xpCharmSeconds", xpCharmSeconds);
@@ -246,6 +251,8 @@ public class PlayerData implements ValueIOSerializable {
         kills.putAll(t.read("kills", STR_INT_MAP).orElse(Map.of()));
         classChosenOnce = t.getBooleanOr("chosen", playerClass != PlayerClass.NONE);
         starterTools = t.getBooleanOr("starterTools", false);
+        minesUnlocked = Math.max(1, t.getIntOr("minesUnlocked", 1));
+        plainsUnlocked = Math.max(1, t.getIntOr("plainsUnlocked", 1));
         // joueurs d'avant les quetes d'evolution : ils gardent le palier deja atteint
         evolution = t.getIntOr("evolution", -1);
         if (evolution < 0) evolution = PlayerClass.tier(level);

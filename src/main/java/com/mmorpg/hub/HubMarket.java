@@ -1,6 +1,8 @@
 package com.mmorpg.hub;
 
 import com.mmorpg.block.structure.MultiblockMasterBlock;
+import com.mmorpg.config.ConfigManager;
+import com.mmorpg.config.SpawnConfig;
 import com.mmorpg.entity.NpcEntity;
 import com.mmorpg.registry.ModBlocks;
 import com.mmorpg.registry.ModEntities;
@@ -65,18 +67,7 @@ public final class HubMarket {
         floor(c);
         fountain(c);
         town(c);
-        BlockPos o = c.O;
-        // structures 3D : la Banque au nord (face au sud), l'Hotel des ventes a l'ouest (face a l'est), forges et presse au sud (face au nord)
-        structure(c, ModBlocks.BANQUE.get(), CX, -25, Direction.SOUTH);
-        structure(c, ModBlocks.HDV.get(), CX - 27, 0, Direction.EAST);
-        structure(c, ModBlocks.PRESSE_COMPRESSION.get(), CX, 24, Direction.NORTH);
-        structure(c, ModBlocks.FORGE_ARCANIQUE.get(), CX - 21, 25, Direction.NORTH);
-        structure(c, ModBlocks.FORGE_ARCANIQUE.get(), CX + 22, 25, Direction.NORTH);
-        BlockPos tp = o.offset(CX + 25, 0, 0);
-        c.L.setBlock(tp, ModBlocks.TELEPORTEUR.get().defaultBlockState().setValue(MultiblockMasterBlock.FACING, Direction.WEST), Block.UPDATE_ALL);
-        WaypointData data = WaypointData.get(c.L.getServer());
-        data.removeAt(c.L.dimension(), tp);
-        data.create(c.L.dimension(), tp, "Marché d'Aeloria", WaypointData.CITY, 1, new UUID(0, 0));
+        placeStations(c);                  // banque, hotel des ventes, presse, forges, teleporteur : voir config/mmorpg/spawn.json
         stall(c, CX + 12, -13, 0, 1, 0);
         stall(c, CX + 12, 13, 0, -1, 1);
         stall(c, CX - 12, -13, 0, 1, 2);
@@ -88,9 +79,50 @@ public final class HubMarket {
         plantings(c);
     }
 
-    private static void structure(HubCtx c, Block block, int x, int z, Direction facing) {
-        // la place des cellules de la structure est deja degagee par le terrain (air jusqu'a y = 34)
-        c.L.setBlock(c.O.offset(x, 0, z), block.defaultBlockState().setValue(MultiblockMasterBlock.FACING, facing), Block.UPDATE_ALL);
+    /**
+     * Pose les stations du fichier config/mmorpg/spawn.json (banque, hotel des ventes, presse, forges, teleporteur) a leur place ;
+     * rien si {@code autoStations} est coupe : l'administrateur les pose alors lui-meme. Le teleporteur recoit son point de passage.
+     */
+    static void placeStations(HubCtx c) {
+        SpawnConfig cfg = ConfigManager.spawn();
+        if (!cfg.autoStations) return;
+        for (SpawnConfig.Station s : cfg.stations) {
+            Block block = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getOptional(com.mmorpg.MMORPG.id(s.block)).orElse(null);
+            if (block == null || !block.defaultBlockState().hasProperty(MultiblockMasterBlock.FACING)) continue;
+            Direction facing = Direction.byName(s.facing.toLowerCase(java.util.Locale.ROOT));
+            if (facing == null || facing.getAxis() == Direction.Axis.Y) facing = Direction.NORTH;
+            // la place des cellules de la structure est deja degagee par le terrain (air jusqu'a y = 34)
+            BlockPos pos = c.O.offset(CX + s.x, 0, s.z);
+            c.L.setBlock(pos, block.defaultBlockState().setValue(MultiblockMasterBlock.FACING, facing), Block.UPDATE_ALL);
+            if (block == ModBlocks.TELEPORTEUR.get()) {
+                WaypointData data = WaypointData.get(c.L.getServer());
+                data.removeAt(c.L.dimension(), pos);
+                data.create(c.L.dimension(), pos, "Marché d'Aeloria", WaypointData.CITY, 1, new UUID(0, 0));
+            }
+        }
+    }
+
+    /** PNJ du marche que le constructeur gere (identifiants stables) : ceux du fichier et ceux de la configuration d'origine. */
+    static java.util.Set<UUID> marketNpcIds() {
+        java.util.Set<UUID> ids = new java.util.HashSet<>();
+        for (SpawnConfig.Npc n : ConfigManager.spawn().npcs) ids.add(HubBuilder.stable("npc:marche:" + n.id));
+        for (SpawnConfig.Npc n : SpawnConfig.defaults().npcs) ids.add(HubBuilder.stable("npc:marche:" + n.id));
+        return ids;
+    }
+
+    /** Re-pose les PNJ du fichier spawn.json sans toucher au terrain (commande /spawn pnj). */
+    public static int refreshNpcs(net.minecraft.server.level.ServerLevel level, BlockPos origin) {
+        HubCtx c = new HubCtx(level, origin);
+        var ids = marketNpcIds();
+        for (net.minecraft.world.entity.Entity e : level.getEntities((net.minecraft.world.entity.Entity) null, SpawnBuilder.bounds(origin), x -> x instanceof NpcEntity && ids.contains(x.getUUID()))) e.discard();
+        entities(c);
+        return ConfigManager.spawn().autoNpcs ? ConfigManager.spawn().npcs.size() : 0;
+    }
+
+    /** Re-pose les stations du fichier spawn.json (commande /spawn stations) : l'ancien emplacement d'une station deplacee est a retirer a la main. */
+    public static int refreshStations(net.minecraft.server.level.ServerLevel level, BlockPos origin) {
+        placeStations(new HubCtx(level, origin));
+        return ConfigManager.spawn().autoStations ? ConfigManager.spawn().stations.size() : 0;
     }
 
     // ------------------------------------------------------------------ sol, bordure et allee
@@ -370,13 +402,18 @@ public final class HubMarket {
     }
 
     static void entities(HubCtx c) {
-        // yaw Minecraft : 0 = sud (+z), 90 = ouest (-x), 180 = nord (-z), 270 = est (+x)
-        npc(c, "alchimie", CX + 12, -13, 0F, NpcEntity.Role.MARCHAND, "Alchimiste", 3, "marche:alchimie");
-        npc(c, "graines", CX + 12, 13, 180F, NpcEntity.Role.MARCHAND, "Marchand de graines", 1, "marche:graines");
-        npc(c, "armurerie", CX - 12, -13, 0F, NpcEntity.Role.MARCHAND, "Armurier", 0, "marche:armurerie");
-        npc(c, "minerais", CX - 12, 13, 180F, NpcEntity.Role.MARCHAND, "Marchand de minerais", 2, "marche:minerais");
-        npc(c, "mines", CX + 24 - 1, -18, 90F, NpcEntity.Role.MINES, "Maître des mines", 1, "marche:mines");
-        npc(c, "donjons", CX + 24 - 1, 19, 90F, NpcEntity.Role.DONJON, "Maître des donjons", 3, com.mmorpg.dungeon.DungeonMaster.GROUP_ALL);
-        npc(c, "ferme", CX - 29, 17 + 6, 180F, NpcEntity.Role.MARCHAND, "Fermière d'Aeloria", 2, "marche:ferme");
+        // yaw Minecraft : 0 = sud (+z), 90 = ouest (-x), 180 = nord (-z), 270 = est (+x) ; la liste vient de config/mmorpg/spawn.json
+        SpawnConfig cfg = ConfigManager.spawn();
+        if (!cfg.autoNpcs) return;
+        for (SpawnConfig.Npc n : cfg.npcs) {
+            NpcEntity.Role role;
+            try {
+                role = NpcEntity.Role.valueOf(n.role.toUpperCase(java.util.Locale.ROOT));
+            } catch (IllegalArgumentException e) {
+                com.mmorpg.MMORPG.LOGGER.warn("[MMORPG] spawn.json : role de PNJ inconnu « {} » ({})", n.role, n.id);
+                continue;
+            }
+            npc(c, n.id, CX + n.x, n.z, n.yaw, role, n.name, n.skin, n.group);
+        }
     }
 }

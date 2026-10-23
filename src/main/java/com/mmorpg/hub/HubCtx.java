@@ -34,7 +34,9 @@ public final class HubCtx {
 
     public final ServerLevel L;
     public final BlockPos O;
-    static final int X0 = -146, X1 = 80, Z0 = -112, Z1 = 70;
+    static final int X0 = -240, X1 = 80, Z0 = -140, Z1 = 140;
+    /** Ile plate et mince (le grand spawn) : pas de collines, une epaisseur de roche reduite a l'interieur. */
+    boolean thin;
     boolean[][] foot;
     boolean[][] isle;
     float[][] edge;

@@ -376,7 +376,31 @@ public final class RpgCommands {
                     return 0;
                 }
                 return 1;
-            }));
+            })
+                    .then(Commands.literal("pnj").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).executes(c -> {
+                        var spawn = com.mmorpg.hub.SpawnData.get(c.getSource().getServer());
+                        var level = c.getSource().getServer().getLevel(com.mmorpg.hub.SpawnBuilder.DIM);
+                        if (!spawn.exists() || level == null) return 0;
+                        int n = com.mmorpg.hub.HubMarket.refreshNpcs(level, spawn.origin());
+                        c.getSource().sendSuccess(() -> ok(n + " PNJ du spawn replacés d'après config/mmorpg/spawn.json."), true);
+                        return n;
+                    }))
+                    .then(Commands.literal("stations").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).executes(c -> {
+                        var spawn = com.mmorpg.hub.SpawnData.get(c.getSource().getServer());
+                        var level = c.getSource().getServer().getLevel(com.mmorpg.hub.SpawnBuilder.DIM);
+                        if (!spawn.exists() || level == null) return 0;
+                        int n = com.mmorpg.hub.HubMarket.refreshStations(level, spawn.origin());
+                        c.getSource().sendSuccess(() -> ok(n + " station(s) du spawn posées d'après config/mmorpg/spawn.json (retirez à la main l'ancien emplacement d'une station déplacée)."), true);
+                        return n;
+                    }))
+                    .then(Commands.literal("reconstruire").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).executes(c -> {
+                        var spawn = com.mmorpg.hub.SpawnData.get(c.getSource().getServer());
+                        var level = c.getSource().getServer().getLevel(com.mmorpg.hub.SpawnBuilder.DIM);
+                        if (level == null) return 0;
+                        c.getSource().sendSuccess(() -> ok("Reconstruction de la Cité d'Aeloria (quelques secondes)…"), false);
+                        com.mmorpg.hub.SpawnBuilder.build(level, spawn.exists() ? spawn.origin() : com.mmorpg.hub.HubManager.HUB_ORIGIN);
+                        return 1;
+                    })));
         }
         d.register(Commands.literal("class")
                 .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))

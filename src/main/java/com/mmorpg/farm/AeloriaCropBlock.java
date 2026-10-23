@@ -38,6 +38,7 @@ public class AeloriaCropBlock extends CropBlock {
 
     @Override
     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        if (com.mmorpg.plains.PlainsManager.inPlains(level, pos)) return;                 // dans les plaines, les champs repoussent a heure fixe
         if (crop.slow() > 1 && random.nextInt(crop.slow()) != 0) return;
         super.randomTick(state, level, pos, random);
     }

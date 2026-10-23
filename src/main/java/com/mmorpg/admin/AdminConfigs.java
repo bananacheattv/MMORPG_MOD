@@ -39,7 +39,7 @@ public final class AdminConfigs {
     public static final long MAX_BYTES = 3L * 1024 * 1024;
 
     /** Nom affiche -> fichier. */
-    public static final List<String> FILES = List.of("general", "mobs", "quests", "shop", "butins", "mannequin", "cinematique");
+    public static final List<String> FILES = List.of("general", "mobs", "quests", "shop", "butins", "mannequin", "cinematique", "spawn");
 
     private static Path path(String name) {
         return ConfigManager.dir().resolve(name + ".json");
@@ -80,6 +80,7 @@ public final class AdminConfigs {
                 case "shop" -> require(GSON.fromJson(text, ShopConfig.class));
                 case "butins" -> require(GSON.fromJson(text, LootTables.class));
                 case "mannequin" -> require(GSON.fromJson(text, DummyConfig.class));
+                case "spawn" -> require(GSON.fromJson(text, com.mmorpg.config.SpawnConfig.class));
                 case "cinematique" -> {
                     String problem = CinematicConfig.validate(text);
                     if (problem != null) return problem;

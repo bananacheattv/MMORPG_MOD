@@ -21,12 +21,12 @@ public final class SpawnBuilder {
 
     public static final ResourceKey<Level> DIM = ResourceKey.create(Registries.DIMENSION, MMORPG.id("spawn"));
     /** Version du plan du spawn : un spawn plus ancien est reconstruit au demarrage. */
-    public static final int LAYOUT_VERSION = 2;
+    public static final int LAYOUT_VERSION = 3;
 
     /** Volume du spawn (protection, nettoyage). */
     public static AABB bounds(BlockPos o) {
-        return new AABB(o.getX() + HubMarket.CX - HubMarket.OUTER - 6, o.getY() - 40, o.getZ() - HubMarket.OUTER - 6,
-                o.getX() + HubMarket.CX + HubMarket.OUTER + 6, o.getY() + 90, o.getZ() + HubMarket.OUTER + 6);
+        return new AABB(o.getX() + HubMarket.CX - SpawnCity.R - 14, o.getY() - 40, o.getZ() - SpawnCity.R - 14,
+                o.getX() + HubMarket.CX + SpawnCity.R + 14, o.getY() + 110, o.getZ() + SpawnCity.R + 14);
     }
 
     /** Construit le spawn s'il manque ou s'il date d'un ancien plan. @return vrai si une construction a eu lieu */
@@ -42,15 +42,22 @@ public final class SpawnBuilder {
 
     public static BlockPos build(ServerLevel level, BlockPos feet) {
         HubCtx c = new HubCtx(level, feet.immutable());
+        boolean npcs = com.mmorpg.config.ConfigManager.spawn().autoNpcs;
+        var market = HubMarket.marketNpcIds();
         for (Entity e : level.getEntities((Entity) null, bounds(c.O), x -> x instanceof com.mmorpg.entity.NpcEntity || x instanceof Display.TextDisplay)) {
             if (e instanceof Display.TextDisplay && !e.entityTags().contains(HubBuilder.TAG)) continue;
+            if (e instanceof com.mmorpg.entity.NpcEntity && (!npcs || !market.contains(e.getUUID()))) continue;     // les PNJ poses a la main restent
             e.discard();
         }
-        HubBuilder.computeMasks(c, HubMarket::footprint);
+        HubBuilder.computeMasks(c, SpawnCity::footprint);
+        c.thin = true;
         HubBuilder.terrain(c);
+        SpawnCity.ground(c);
         HubBuilder.textIndex = 0;
         HubMarket.build(c);
+        SpawnCity.build(c);
         HubMarket.texts(c);
+        SpawnCity.texts(c);
         HubMarket.entities(c);
         zones(c);
         SpawnData.get(level.getServer()).set(c.O, LAYOUT_VERSION);
@@ -61,8 +68,8 @@ public final class SpawnBuilder {
         var data = com.mmorpg.zone.ZoneData.get(c.L.getServer());
         int ox = c.O.getX();
         int oz = c.O.getZ();
-        data.add(new com.mmorpg.zone.ZoneData.Zone("spawn_marche", "Marché d'Aeloria", c.L.dimension(), ox + HubMarket.CX - HubMarket.OUTER - 2, oz - HubMarket.OUTER - 2,
-                ox + HubMarket.CX + HubMarket.OUTER + 2, oz + HubMarket.OUTER + 2, false, false, false, com.mmorpg.zone.ZoneData.Zone.STYLE_ZONE,
-                "Banque, hôtel des ventes, forges et marchands"));
+        data.add(new com.mmorpg.zone.ZoneData.Zone("spawn_marche", "Cité d'Aeloria", c.L.dimension(), ox + HubMarket.CX - SpawnCity.R - 6, oz - SpawnCity.R - 6,
+                ox + HubMarket.CX + SpawnCity.R + 6, oz + SpawnCity.R + 6, false, false, false, com.mmorpg.zone.ZoneData.Zone.STYLE_ZONE,
+                "Château, port, marché, banque, forges et marchands"));
     }
 }

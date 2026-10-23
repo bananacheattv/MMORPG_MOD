@@ -182,6 +182,14 @@ public final class DevShowcase {
             adminPhase(mc, me);
             return;
         }
+        if (MODE.equals("sorts")) {          // sorts des monstres 3D : six monstres a la fois attaquent le joueur, on compte les sorts lances
+            sortsPhase(mc, me);
+            return;
+        }
+        if (MODE.equals("attaques")) {          // animations d'attaque des 30 monstres 3D : trois instants de chaque coup, vus de trois quarts
+            attaquesPhase(mc, me);
+            return;
+        }
         if (MODE.equals("plaines")) {          // Plaines d'Aeloria : construction, visite des six regions, monstres, portails
             plainesPhase(mc, me);
             return;
@@ -1323,14 +1331,174 @@ public final class DevShowcase {
         }
     }
 
-    private static int plT0 = -1;
+    /** Les 30 monstres 3D, six par six, autour du joueur invulnerable de la place de la premiere plaine : les sorts doivent partir. */
+    private static void sortsPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) mc.getWindow().setWindowed(960, 600);
+        if (tick == 10) {
+            cmd(mc, "gamemode survival " + me);
+            cmd(mc, "mmorpg niveau " + me + " 100");
+            cmd(mc, "difficulty normal");
+            cmd(mc, "time set day");
+            cmd(mc, "weather clear");
+            if (!mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        }
+        if (tick < 60) return;
+        if (!com.mmorpg.plains.PlainsManager.built(srv, 0)) {
+            if (tick > 12000) stop(mc);
+            return;
+        }
+        var all = com.mmorpg.entity.mob.ImportedMobs.ALL;
+        int batch = 6, per = 330;
+        int t = tick - 60, idx = t / per, rel = t % per;
+        int batches = (all.length + batch - 1) / batch;
+        if (idx >= batches) {
+            if (t == batches * per + 5) {
+                MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+                stop(mc);
+            }
+            return;
+        }
+        if (rel == 0) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var lv = srv.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
+            pl.getAbilities().invulnerable = true;
+            pl.onUpdateAbilities();
+            pl.setHealth(pl.getMaxHealth());
+            var lay = com.mmorpg.plains.PlainsLayout.get(0);
+            int plz = 100, plx = lay.pathX(plz);                         // sur le chemin, hors de la place d'entree (la place est une zone sans monstres)
+            double cx = lay.x0() + plx + 0.5, cz = com.mmorpg.plains.PlainsLayout.Z0 + plz + 0.5, cy = lay.height(plx, plz) + 1;
+            pl.teleportTo(lv, cx, cy, cz, java.util.Set.of(), 0F, 0F, true);
+            for (var old : lv.getEntitiesOfClass(net.minecraft.world.entity.Mob.class, pl.getBoundingBox().inflate(60, 60, 60), m -> m instanceof com.mmorpg.entity.mob.ImportedMobEntity)) old.discard();
+            for (int i = 0; i < batch && idx * batch + i < all.length; i++) {
+                var e = all[idx * batch + i];
+                double a = Math.PI * 2 * i / batch;
+                int mx = (int) (cx + Math.cos(a) * 7), mz = (int) (cz + Math.sin(a) * 7);
+                var pos = new net.minecraft.core.BlockPos(mx, Math.max(lay.height(mx - lay.x0(), mz - com.mmorpg.plains.PlainsLayout.Z0), com.mmorpg.plains.PlainsLayout.BASE) + 1, mz);
+                var mob = com.mmorpg.server.MobSpawner.spawnForCommand(lv, e.key(), pos, 40);
+                if (mob instanceof net.minecraft.world.entity.Mob m) m.setTarget(pl);
+            }
+        });
+        if (rel >= 10 && rel < 20 && rel % 3 == 0) srv.execute(() -> {                    // le joueur est soigne en continu : on garde les monstres sur lui
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            if (pl.isAlive()) pl.setHealth(pl.getMaxHealth());
+            for (var m : pl.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, pl.getBoundingBox().inflate(40), x -> x instanceof com.mmorpg.entity.mob.ImportedMobEntity)) {
+                if (m.getTarget() != pl) m.setTarget(pl);
+            }
+        });
+        if (rel == 120) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var mobs = pl.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, pl.getBoundingBox().inflate(40), m -> m instanceof com.mmorpg.entity.mob.ImportedMobEntity);
+            int targeting = 0;
+            for (var m : mobs) if (m.getTarget() != null) targeting++;
+            MMORPG.LOGGER.info("[MMORPG] SORTS lot {} : {} monstres presents, {} ont une cible, joueur pv {}", idx + 1, mobs.size(), targeting, pl.getHealth());
+        });
+        if (rel == 25) srv.execute(() -> {                                                          // essai direct de chaque sort, joueur protege
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            StringBuilder sb = new StringBuilder();
+            if (!pl.isAlive()) {
+                MMORPG.LOGGER.info("[MMORPG] SORTS lot {} : joueur mort, essai direct ignore", idx + 1);
+                return;
+            }
+            pl.getAbilities().invulnerable = true;
+            pl.onUpdateAbilities();
+            for (var m : pl.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, pl.getBoundingBox().inflate(40), x -> x instanceof com.mmorpg.entity.mob.ImportedMobEntity)) {
+                for (var sp : com.mmorpg.entity.mob.ImportedSpells.of(com.mmorpg.entity.mob.ImportedMobs.ALL.length > 0 ? net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(m.getType()).getPath() : "")) {
+                    try {
+                        com.mmorpg.entity.mob.ImportedSpells.cast(m, sp, pl);
+                        sb.append(sp.id()).append(" ok  ");
+                    } catch (Exception ex) {
+                        sb.append(sp.id()).append(" ERREUR ").append(ex).append("  ");
+                    }
+                }
+            }
+            MMORPG.LOGGER.info("[MMORPG] SORTS lot {} essai direct : {}", idx + 1, sb);
+        });
+        if (rel == 300) srv.execute(() -> {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < batch && idx * batch + i < all.length; i++) {
+                var key = all[idx * batch + i].key();
+                var spells = com.mmorpg.entity.mob.ImportedSpells.of(key);
+                for (var sp : spells) sb.append(key).append('/').append(sp.id()).append('=').append(com.mmorpg.entity.mob.ImportedSpells.CAST_LOG.getOrDefault(key + "/" + sp.id(), 0)).append("  ");
+                if (spells.isEmpty()) sb.append(key).append("(aucun sort)  ");
+            }
+            MMORPG.LOGGER.info("[MMORPG] SORTS lot {} : {}", idx + 1, sb);
+        });
+    }
 
-    /** Plaines d'Aeloria : attend la construction, visite chaque region, compte les monstres apparus, puis traverse les deux portails. */
+    private static net.minecraft.world.entity.Mob atkMob;
+
+    /** Chaque monstre 3D importe est pose seul sur la place de la premiere plaine, fige, puis frappe : captures a 0,25 s, 0,45 s et 0,65 s. */
+    private static void attaquesPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) mc.getWindow().setWindowed(960, 600);
+        if (tick == 10) {
+            cmd(mc, "gamemode spectator " + me);
+            cmd(mc, "time set day");
+            cmd(mc, "weather clear");
+            if (!mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+        }
+        if (tick < 60) return;
+        if (!com.mmorpg.plains.PlainsManager.built(srv, 0)) {
+            if (tick % 100 == 0) MMORPG.LOGGER.info("[MMORPG] ATTAQUES attente de la plaine 1");
+            if (tick > 12000) stop(mc);
+            return;
+        }
+        var all = com.mmorpg.entity.mob.ImportedMobs.ALL;
+        String only = System.getProperty("mmorpg.attaques", "");
+        java.util.List<com.mmorpg.entity.mob.ImportedMobs.Entry> list = new java.util.ArrayList<>();
+        for (var e : all) if (only.isEmpty() || java.util.Arrays.asList(only.split(",")).contains(e.key())) list.add(e);
+        int t = tick - 60, per = 44;
+        int idx = t / per, rel = t % per;
+        if (idx >= list.size()) {
+            if (t == list.size() * per + 5) {
+                MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+                stop(mc);
+            }
+            return;
+        }
+        var entry = list.get(idx);
+        if (rel == 0) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var lv = srv.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
+            if (atkMob != null) atkMob.discard();
+            var lay = com.mmorpg.plains.PlainsLayout.get(0);
+            for (var old : lv.getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new net.minecraft.world.phys.AABB(lay.x0() + com.mmorpg.plains.PlainsLayout.PLAZA_X, 40, com.mmorpg.plains.PlainsLayout.Z0 + com.mmorpg.plains.PlainsLayout.PLAZA_Z, 0, 0, 0).inflate(60, 80, 60),
+                    m -> m instanceof com.mmorpg.entity.mob.ImportedMobEntity)) old.discard();
+            double mx = lay.x0() + com.mmorpg.plains.PlainsLayout.PLAZA_X + 0.5, mz = com.mmorpg.plains.PlainsLayout.Z0 + com.mmorpg.plains.PlainsLayout.PLAZA_Z + 0.5, my = com.mmorpg.plains.PlainsLayout.BASE + 1;
+            var type = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getValue(MMORPG.id(entry.key()));
+            var mob = (net.minecraft.world.entity.Mob) type.create(lv, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            mob.snapTo(mx, my, mz, 0F, 0F);
+            mob.setNoAi(true);
+            mob.setSilent(true);
+            mob.setPersistenceRequired();
+            lv.addFreshEntity(mob);
+            atkMob = mob;
+            double h = entry.scaledHeight(), d = Math.max(3.6, Math.max(h * 2.1, entry.scaledWidth() * 3.2));
+            double dx = d * 0.62, dz = d * 0.78;
+            float yaw = (float) Math.toDegrees(Math.atan2(dx, -dz));
+            double eye = my + h * 0.55 + 0.1;
+            float pitch = (float) Math.toDegrees(Math.atan2(eye - (my + h * 0.5), d)) ;
+            pl.teleportTo(lv, mx + dx, eye - 1.62, mz + dz, java.util.Set.of(), yaw, pitch, true);
+        });
+        if (rel == 14) srv.execute(() -> {
+            if (atkMob != null) atkMob.level().broadcastEntityEvent(atkMob, (byte) 4);
+        });
+        if (rel == 14 + 5) shot(mc, "atk_" + entry.key() + "_a");
+        if (rel == 14 + 9) shot(mc, "atk_" + entry.key() + "_b");
+        if (rel == 14 + 13) shot(mc, "atk_" + entry.key() + "_c");
+    }
+
+    private static int plT0 = -1;
+    private static net.minecraft.core.BlockPos plCrop;
+
+    /** Plaines d'Aeloria : six cartes, menu verrouille, visite, monstres par zones, recolte des champs, portail cache, retour au Spawn. */
     private static void plainesPhase(Minecraft mc, String me) {
         var srv = mc.getSingleplayerServer();
         if (tick == 5) mc.getWindow().setWindowed(1280, 720);
         if (tick == 10) {
-            cmd(mc, "gamemode creative " + me);
+            cmd(mc, "gamemode survival " + me);
             cmd(mc, "mmorpg niveau " + me + " 100");
             cmd(mc, "time set day");
             cmd(mc, "weather clear");
@@ -1339,84 +1507,174 @@ public final class DevShowcase {
         }
         if (plT0 < 0) {
             if (tick > 40 && tick % 100 == 0) {
-                boolean ok = com.mmorpg.plains.PlainsManager.built(srv) && !com.mmorpg.plains.PlainsManager.building()
+                boolean ok = com.mmorpg.plains.PlainsManager.allBuilt(srv) && !com.mmorpg.plains.PlainsManager.building()
                         && com.mmorpg.hub.SpawnData.get(srv).layout() >= com.mmorpg.hub.SpawnBuilder.LAYOUT_VERSION;
-                MMORPG.LOGGER.info("[MMORPG] PLAINES attente : {} % (pret = {}, plan du spawn = {})", com.mmorpg.plains.PlainsManager.percent(), ok, com.mmorpg.hub.SpawnData.get(srv).layout());
+                MMORPG.LOGGER.info("[MMORPG] PLAINES attente : {} % (pret = {})", com.mmorpg.plains.PlainsManager.percent(), ok);
                 if (ok) plT0 = tick + 40;
             }
-            if (tick > 24000) {
+            if (tick > 30000) {
                 MMORPG.LOGGER.info("[MMORPG] PLAINES : construction jamais terminee");
                 stop(mc);
             }
             return;
         }
-        var lay = com.mmorpg.plains.PlainsLayout.get();
-        int S = com.mmorpg.plains.PlainsLayout.SECTOR_LEN;
-        int st2 = com.mmorpg.plains.PlainsLayout.sectorStart(2);
-        // {colonne x (-1 = chemin), colonne z, hauteur au-dessus du sol, yaw, pitch}
+        int t = tick - plT0;
+        // menu : au depart seule la premiere plaine est ouverte
+        if (t == 5) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            MMORPG.LOGGER.info("[MMORPG] PLAINES deblocage de depart = {} (attendu 1)", com.mmorpg.server.RpgPlayers.get(pl).plainsUnlocked);
+            com.mmorpg.plains.PlainsManager.open(pl);
+        });
+        if (t == 40) shot(mc, "121_plaines_menu");
+        if (t == 45) mc.execute(() -> mc.gui.setScreen(null));
+        if (t == 50) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            com.mmorpg.plains.PlainsManager.enterChosen(pl, 2);
+        });
+        if (t == 70) srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] PLAINES plaine verrouillee refusee : plaine ou se trouve le joueur = {} (attendu -1)",
+                com.mmorpg.plains.PlainsManager.regionOf(srv.getPlayerList().getPlayerByName(me))));
+        if (t == 80) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            boolean ok = com.mmorpg.plains.PlainsManager.enter(pl, 0);
+            MMORPG.LOGGER.info("[MMORPG] PLAINES entree dans la plaine 1 = {}", ok);
+        });
+        // {plaine, colonne x (-1 = chemin), colonne z, hauteur, yaw, pitch, nom}
         double[][] views = {
-                {180, 22, 2, 180, 6}, {180, 13, 46, 0, 72}, {-1, 60, 6, 0, 12}, {-1, com.mmorpg.plains.PlainsLayout.sectorStart(1) - 16, 5, 0, 8}, {-1, 150, 7, 0, 14},
-                {-1, st2 + 30, 6, 0, 14}, {-1, com.mmorpg.plains.PlainsLayout.sectorStart(3) + 30, 6, 0, 14}, {-1, com.mmorpg.plains.PlainsLayout.sectorStart(4) + 30, 6, 0, 14},
-                {-1, com.mmorpg.plains.PlainsLayout.sectorStart(5) + 30, 6, 0, 14}, {-1, com.mmorpg.plains.PlainsLayout.sectorStart(0) + 2, 5, 0, 16}};
-        String[] names = {"place", "place_haut", "prairie", "portique", "marais", "os", "givre", "cendres", "astre", "campement"};
-        int t = tick - plT0, per = 70;
-        int idx = t / per;
-        if (idx < views.length && t % per == 5) {
+                {0, 150, 20, 2, 180, 6}, {0, -1, 62, 6, 0, 12}, {0, -1, 82, 8, 270, 22}, {0, -2, 0, 9, 0, 10}, {1, -1, 120, 6, 0, 14}, {2, -1, 120, 6, 0, 14},
+                {3, -1, 120, 6, 0, 14}, {4, -1, 120, 6, 0, 14}, {5, -1, 120, 6, 0, 14}, {0, -3, 0, 12, 0, 6}};
+        String[] names = {"place", "prairie", "champ", "zone", "marais", "os", "givre", "cendres", "astre", "portail_cache"};
+        int t0 = 100, per = 70;
+        int idx = (t - t0) / per;
+        int rel = (t - t0) % per;
+        if (t >= t0 && idx < views.length && rel == 5) {
             double[] v = views[idx];
             srv.execute(() -> {
                 var pl = srv.getPlayerList().getPlayerByName(me);
                 var lv = srv.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
-                int lz = (int) v[1];
-                int lx = v[0] < 0 ? com.mmorpg.plains.PlainsLayout.pathX(lz) : (int) v[0];
-                int y = Math.max(lay.height(lx, lz), com.mmorpg.plains.PlainsLayout.BASE) + (int) v[2];
-                pl.teleportTo(lv, com.mmorpg.plains.PlainsLayout.X0 + lx + 0.5, y, com.mmorpg.plains.PlainsLayout.Z0 + lz + 0.5, java.util.Set.of(), (float) v[3], (float) v[4], true);
+                var lay = com.mmorpg.plains.PlainsLayout.get((int) v[0]);
+                int lz, lx;
+                if (v[1] == -2) {            // une zone de niveau : au pied du premier totem de la plaine
+                    lz = 100;
+                    lx = lay.pathX(lz) + 10;
+                } else if (v[1] == -3) {     // le portail cache, vu de loin par le nord
+                    lx = lay.exitX;
+                    lz = lay.exitZ - 16;
+                } else {
+                    lz = (int) v[2];
+                    lx = v[1] < 0 ? lay.pathX(lz) : (int) v[1];
+                }
+                int y = Math.max(lay.height(lx, lz), com.mmorpg.plains.PlainsLayout.BASE) + (int) v[3];
+                pl.teleportTo(lv, lay.x0() + lx + 0.5, y, com.mmorpg.plains.PlainsLayout.Z0 + lz + 0.5, java.util.Set.of(), (float) v[4], (float) v[5], true);
             });
         }
-        if (idx < views.length && t % per == 60) shot(mc, "120_plaines_" + names[idx]);
-        int end = views.length * per;
-        // monstres : on reste dans les Landes des Ossements et on compte ce qui apparait autour du joueur
+        if (t >= t0 && idx < views.length && rel == 60) shot(mc, "121_plaines_" + names[idx]);
+        int end = t0 + views.length * per;
+        // niveaux par zones : on echantillonne la plaine 3 et on verifie que le niveau ne suit pas la direction nord-sud
         if (t == end + 5) srv.execute(() -> {
+            var lay = com.mmorpg.plains.PlainsLayout.get(2);
+            var r = new java.util.Random(7);
+            int[] sumByThird = new int[3];
+            int[] cnt = new int[3];
+            java.util.TreeSet<Integer> levels = new java.util.TreeSet<>();
+            for (int i = 0; i < 4000; i++) {
+                int lx = 30 + r.nextInt(240), lz = 40 + r.nextInt(280);
+                int lvl = lay.mobLevel(lx, lz, r);
+                levels.add(lvl);
+                int th = Math.min(2, (lz - 40) / 94);
+                sumByThird[th] += lvl;
+                cnt[th]++;
+            }
+            MMORPG.LOGGER.info("[MMORPG] PLAINES niveaux de la plaine 3 (33 a 50) : niveau moyen par tiers nord/centre/sud = {} / {} / {} (attendu : proches, sans progression), niveaux distincts = {}",
+                    sumByThird[0] / cnt[0], sumByThird[1] / cnt[1], sumByThird[2] / cnt[2], levels.size());
+        });
+        // monstres autour du joueur dans la plaine 3
+        if (t == end + 10) srv.execute(() -> {
             var pl = srv.getPlayerList().getPlayerByName(me);
             var lv = srv.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
-            int lz = st2 + 36, lx = com.mmorpg.plains.PlainsLayout.pathX(lz);
-            pl.teleportTo(lv, com.mmorpg.plains.PlainsLayout.X0 + lx + 0.5, lay.height(lx, lz) + 1, com.mmorpg.plains.PlainsLayout.Z0 + lz + 0.5, java.util.Set.of(), 0F, 10F, true);
+            var lay = com.mmorpg.plains.PlainsLayout.get(2);
+            int lz = 150, lx = lay.pathX(lz);
+            pl.teleportTo(lv, lay.x0() + lx + 0.5, lay.height(lx, lz) + 1, com.mmorpg.plains.PlainsLayout.Z0 + lz + 0.5, java.util.Set.of(), 0F, 10F, true);
         });
-        if (t == end + 260) srv.execute(() -> {
+        if (t == end + 270) srv.execute(() -> {
             var pl = srv.getPlayerList().getPlayerByName(me);
             var mobs = pl.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, pl.getBoundingBox().inflate(48, 30, 48), m -> m instanceof com.mmorpg.entity.RpgMob);
             int lo = 999, hi = 0;
             java.util.Set<String> kinds = new java.util.TreeSet<>();
             for (var m : mobs) {
                 var md = m.getData(com.mmorpg.registry.ModAttachments.MOB);
-                int lvl = md.level;
-                lo = Math.min(lo, lvl);
-                hi = Math.max(hi, lvl);
+                lo = Math.min(lo, md.level);
+                hi = Math.max(hi, md.level);
                 kinds.add(md.key);
             }
-            MMORPG.LOGGER.info("[MMORPG] PLAINES monstres autour du joueur (Landes des Ossements) : {} (attendu 12 a 16), niveaux {} a {} (attendu 33 a 50), especes = {}", mobs.size(), lo, hi, kinds);
+            MMORPG.LOGGER.info("[MMORPG] PLAINES monstres autour du joueur (plaine 3) : {} (attendu 12 a 16), niveaux {} a {} (attendu 33 a 50), especes = {}", mobs.size(), lo, hi, kinds);
         });
-        if (t == end + 265) shot(mc, "120_plaines_monstres");
-        // portails : Spawn -> plaines, puis arche des plaines -> Spawn
-        if (t == end + 280) srv.execute(() -> {
+        if (t == end + 275) shot(mc, "121_plaines_monstres");
+        // champs : recolte directe, repousse a heure fixe
+        if (t == end + 290) srv.execute(() -> {
             var pl = srv.getPlayerList().getPlayerByName(me);
-            var o = com.mmorpg.hub.SpawnData.get(srv).origin();
-            pl.teleportTo(srv.getLevel(com.mmorpg.hub.SpawnBuilder.DIM), o.getX() + com.mmorpg.plains.PlainsManager.SPAWN_GATE_X + 2.5, o.getY() + 1,
-                    o.getZ() + com.mmorpg.plains.PlainsManager.SPAWN_GATE_Z + 0.5, java.util.Set.of(), 90F, 6F, true);
-        });
-        if (t == end + 290) shot(mc, "120_plaines_portail_spawn");
-        if (t == end + 330) srv.execute(() -> {
-            var pl = srv.getPlayerList().getPlayerByName(me);
-            MMORPG.LOGGER.info("[MMORPG] PLAINES portail du spawn : monde = {} (attendu mmorpg:donjons), x/z locaux = {}/{} (attendu 180/13)", pl.level().dimension().identifier(),
-                    (int) pl.getX() - com.mmorpg.plains.PlainsLayout.X0, (int) pl.getZ() - com.mmorpg.plains.PlainsLayout.Z0);
             var lv = srv.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
-            pl.teleportTo(lv, com.mmorpg.plains.PlainsLayout.X0 + 180.5, com.mmorpg.plains.PlainsLayout.BASE + 1, com.mmorpg.plains.PlainsLayout.Z0 + com.mmorpg.plains.PlainsBuilder.ARCH_Z + 1.5,
+            var lay = com.mmorpg.plains.PlainsLayout.get(0);
+            int lz = 82, lx = lay.pathX(lz) + 6;
+            pl.teleportTo(lv, lay.x0() + lx + 0.5, lay.height(lx, lz) + 6, com.mmorpg.plains.PlainsLayout.Z0 + lz + 0.5, java.util.Set.of(), 270F, 30F, true);
+            plCrop = null;
+            for (int dx = -2; dx <= 40 && plCrop == null; dx++) {
+                for (int dz = -8; dz <= 8 && plCrop == null; dz++) {
+                    for (int y = com.mmorpg.plains.PlainsLayout.BASE; y <= com.mmorpg.plains.PlainsLayout.BASE + 14; y++) {
+                        var pos = new net.minecraft.core.BlockPos(lay.x0() + lx + dx, y, com.mmorpg.plains.PlainsLayout.Z0 + lz + dz);
+                        if (lv.getBlockState(pos).getBlock() instanceof com.mmorpg.farm.AeloriaCropBlock) {
+                            plCrop = pos;
+                            break;
+                        }
+                    }
+                }
+            }
+            MMORPG.LOGGER.info("[MMORPG] PLAINES champ trouve = {}", plCrop);
+        });
+        if (t == end + 300) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var lv = srv.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
+            var st = lv.getBlockState(plCrop);
+            var block = (com.mmorpg.farm.AeloriaCropBlock) st.getBlock();
+            var item = com.mmorpg.registry.ModItems.get(block.crop().product());
+            int before = pl.getInventory().countItem(item);
+            boolean ok = com.mmorpg.plains.PlainsManager.harvest(lv, pl, plCrop, block, st);
+            var after = lv.getBlockState(plCrop);
+            MMORPG.LOGGER.info("[MMORPG] PLAINES recolte = {}, objets +{}, age apres = {} (attendu 0)", ok, pl.getInventory().countItem(item) - before, after.getValue(com.mmorpg.farm.AeloriaCropBlock.AGE));
+            boolean again = com.mmorpg.plains.PlainsManager.harvest(lv, pl, plCrop, block, after);
+            MMORPG.LOGGER.info("[MMORPG] PLAINES seconde recolte immediate refusee = {} (attendu true)", !again);
+            int n = com.mmorpg.plains.PlainsManager.respawnAllNow(srv);
+            MMORPG.LOGGER.info("[MMORPG] PLAINES cultures en attente de repousse = {}", n);
+        });
+        if (t == end + 340) srv.execute(() -> {
+            var lv = srv.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
+            MMORPG.LOGGER.info("[MMORPG] PLAINES age apres repousse = {} (attendu 7)", lv.getBlockState(plCrop).getValue(com.mmorpg.farm.AeloriaCropBlock.AGE));
+        });
+        // portail cache de la plaine 1 : decouverte, passage a la plaine 2, deblocage
+        if (t == end + 350) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var lv = srv.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
+            var lay = com.mmorpg.plains.PlainsLayout.get(0);
+            int gh = lay.height(lay.exitX, lay.exitZ);
+            pl.teleportTo(lv, lay.x0() + lay.exitX + 0.5, gh + 1, com.mmorpg.plains.PlainsLayout.Z0 + lay.exitZ - 1.2, java.util.Set.of(), 0F, 0F, true);
+        });
+        if (t == end + 380) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            MMORPG.LOGGER.info("[MMORPG] PLAINES portail cache : plaine = {} (attendu 1), deblocage = {} (attendu 2)", com.mmorpg.plains.PlainsManager.regionOf(pl),
+                    com.mmorpg.server.RpgPlayers.get(pl).plainsUnlocked);
+            com.mmorpg.plains.PlainsManager.open(pl);
+        });
+        if (t == end + 410) shot(mc, "121_plaines_menu_debloque");
+        if (t == end + 415) mc.execute(() -> mc.gui.setScreen(null));
+        // arche de retour vers le Spawn
+        if (t == end + 420) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var lv = srv.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
+            var lay = com.mmorpg.plains.PlainsLayout.get(1);
+            pl.teleportTo(lv, lay.x0() + com.mmorpg.plains.PlainsLayout.PLAZA_X + 0.5, com.mmorpg.plains.PlainsLayout.BASE + 1, com.mmorpg.plains.PlainsLayout.Z0 + com.mmorpg.plains.PlainsBuilder.ARCH_Z + 1.5,
                     java.util.Set.of(), 180F, 0F, true);
         });
-        if (t == end + 390) srv.execute(() -> {
-            var pl = srv.getPlayerList().getPlayerByName(me);
-            MMORPG.LOGGER.info("[MMORPG] PLAINES arche de retour : monde = {} (attendu mmorpg:spawn)", pl.level().dimension().identifier());
-        });
-        if (t == end + 400) {
+        if (t == end + 470) {
+            srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] PLAINES arche de retour : monde = {} (attendu mmorpg:spawn)", srv.getPlayerList().getPlayerByName(me).level().dimension().identifier()));
             MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
             stop(mc);
         }
@@ -1465,8 +1723,11 @@ public final class DevShowcase {
         // {x, y, z, yaw, pitch, monde : 0 hub, 1 spawn}
         double[][] views = {
                 {0, 6, 42, 180, 8, 0}, {0, 38, 0, 0, 90, 0}, {-30, 4, 0, 90, 8, 0}, {-44, 5, 0, 90, 8, 0},
-                {cx + 44, 6, 0, 90, 8, 1}, {cx + 14, 64, 0, 90, 58, 1}, {cx + 10, 5, 0, 180, 8, 1}, {cx + 21, 1.6, -44.5, 0, 6, 1}};
-        String[] names = {"hub_entree", "hub_dessus", "hub_pont", "hub_portail", "spawn_portail_citadelle", "spawn_vue_haute", "spawn_banque", "spawn_taverne"};
+                {cx + 44, 6, 0, 90, 8, 1}, {cx + 14, 64, 0, 90, 58, 1}, {cx + 10, 5, 0, 180, 8, 1}, {cx + 21, 1.6, -44.5, 0, 6, 1},
+                {cx, 175, 150, 180, 42, 1}, {cx, 8, -50, 180, 6, 1}, {cx, 8, -72, 180, 10, 1}, {cx, 10, 62, 0, 10, 1}, {cx + 8, 12, 96, 270, 20, 1},
+                {cx - 58, 10, -30, 90, 14, 1}, {cx + 92, 6, 0, 180, 8, 1}, {cx + 92, 6, 0, 0, 8, 1}, {cx + 96, 8, 0, 270, 6, 1}, {cx + 64, 6, 44, 200, 8, 1}, {cx - 24, 6, -20, 270, 6, 1}};
+        String[] names = {"hub_entree", "hub_dessus", "hub_pont", "hub_portail", "spawn_portail_citadelle", "spawn_vue_haute", "spawn_banque", "spawn_taverne",
+                "cite_vue_aerienne", "cite_avenue_chateau", "cite_cour_chateau", "cite_port", "cite_phare", "cite_moulin", "cite_halle_guildes", "cite_auberge", "cite_porte_est", "cite_rue", "cite_portail_plaines"};
         int idx = t / 60;
         if (idx < views.length && t % 60 == 5) {
             double[] v = views[idx];
@@ -2100,12 +2361,13 @@ public final class DevShowcase {
     private static boolean mineIntro;
     private static long mineBuildStart;
 
-    private static void tpMine(net.minecraft.server.MinecraftServer srv, String me, int lx, int lz, float yaw) {
+    private static void tpMine(net.minecraft.server.MinecraftServer srv, String me, int region, int lx, int lz, float yaw) {
         var pl = srv.getPlayerList().getPlayerByName(me);
         var lv = com.mmorpg.mine.MineManager.dim(srv);
-        double x = com.mmorpg.mine.MineLayout.X0 + lx + 0.5, z = com.mmorpg.mine.MineLayout.Z0 + lz + 0.5;
+        var lay = com.mmorpg.mine.MineLayout.get(region);
+        double x = lay.x0() + lx + 0.5, z = com.mmorpg.mine.MineLayout.Z0 + lz + 0.5;
         for (int dx = -2; dx <= 2; dx++) for (int dz = -2; dz <= 2; dz++) lv.getChunk(((int) x >> 4) + dx, ((int) z >> 4) + dz);
-        double y = com.mmorpg.mine.MineLayout.get().floor(lx, lz) + 1.2;
+        double y = lay.floor(lx, lz) + 1.2;
         pl.teleportTo(lv, x, y, z, java.util.Set.of(), yaw, 8F, true);
         pl.resetFallDistance();
     }
@@ -2120,7 +2382,7 @@ public final class DevShowcase {
             mineBuildStart = System.nanoTime();
         }
         if (tick > 20 && mineT < 0 && tick % 40 == 0) srv.execute(() -> {
-            if (com.mmorpg.mine.MineManager.built(srv) && !com.mmorpg.mine.MineManager.building()) {
+            if (com.mmorpg.mine.MineManager.allBuilt(srv) && !com.mmorpg.mine.MineManager.building()) {
                 mineT = 0;
                 MMORPG.LOGGER.info("[MMORPG] MINES construites en {} s", (System.nanoTime() - mineBuildStart) / 1_000_000_000L);
             } else if (tick % 400 == 0) {
@@ -2142,12 +2404,12 @@ public final class DevShowcase {
                 com.mmorpg.server.RpgPlayers.get(pl).level = 100;
                 pl.getAbilities().invulnerable = true;
                 pl.onUpdateAbilities();
-                MMORPG.LOGGER.info("[MMORPG] MINES fuites de la caverne : {}", com.mmorpg.mine.MineLayout.get().leaks());
+                MMORPG.LOGGER.info("[MMORPG] MINES fuites de la caverne : {}", com.mmorpg.mine.MineLayout.get(0).leaks());
                 com.mmorpg.mine.MineManager.open(pl, null);
             });
             if (u == 40) shot(mc, "mine_menu");
             if (u == 45) {
-                com.mmorpg.client.ClientNet.send(new com.mmorpg.network.Payloads.MineEnter(-1, 2));
+                com.mmorpg.client.ClientNet.send(new com.mmorpg.network.Payloads.MineEnter(-1, 0));
                 mc.gui.setScreen(null);
             }
             if (u == 70) shot(mc, "mine_chargement");
@@ -2180,7 +2442,15 @@ public final class DevShowcase {
         for (int k = 0; k < 5; k++) {
             int base = 80 + k * 140;
             final int sk = k;
-            if (t == base) srv.execute(() -> tpMine(srv, me, 220 + (sk % 2 == 0 ? -40 : 50), com.mmorpg.mine.MineLayout.sectorStart(sk) + 50, 0F));
+            if (t == base) srv.execute(() -> {
+                var lay = com.mmorpg.mine.MineLayout.get(sk);
+                int lx = lay.exitX + (sk % 2 == 0 ? -30 : 30), lz = lay.exitZ - 30;
+                if (lay.kind(lx, lz) != 1) {
+                    lx = lay.exitX;
+                    lz = lay.exitZ - 14;
+                }
+                tpMine(srv, me, sk, lx, lz, 0F);
+            });
             if (t == base + 100) srv.execute(() -> {
                 var pl = srv.getPlayerList().getPlayerByName(me);
                 var lv = pl.level();
@@ -2194,13 +2464,13 @@ public final class DevShowcase {
                 var bp = pl.blockPosition();
                 for (int dx = -30; dx <= 30; dx++) for (int dz = -30; dz <= 30; dz++) for (int dy = -6; dy <= 8; dy++)
                     if (lv.getBlockState(bp.offset(dx, dy, dz)).getBlock() instanceof com.mmorpg.mine.MineOreBlock) ores++;
-                MMORPG.LOGGER.info("[MMORPG] MINES etage {} : {} monstres [{}] ; {} minerais autour ; zone = {}", sk, mobs.size(), sb, ores,
+                MMORPG.LOGGER.info("[MMORPG] MINES mine {} : {} monstres [{}] ; {} minerais autour ; zone = {}", sk, mobs.size(), sb, ores,
                         com.mmorpg.zone.ZoneManager.zoneAt(lv, bp) == null ? "aucune" : com.mmorpg.zone.ZoneManager.zoneAt(lv, bp).name());
             });
             if (t == base + 104) shot(mc, "mine_etage" + sk);
         }
         int mt = 80 + 5 * 140 + 20;
-        if (t == mt) srv.execute(() -> tpMine(srv, me, 220, 100, 0F));
+        if (t == mt) srv.execute(() -> tpMine(srv, me, 0, 160, 100, 0F));
         if (t == mt + 20) srv.execute(() -> {
             var pl = srv.getPlayerList().getPlayerByName(me);
             var lv = pl.level();
@@ -2230,7 +2500,25 @@ public final class DevShowcase {
             var lv = com.mmorpg.mine.MineManager.dim(srv);
             MMORPG.LOGGER.info("[MMORPG] MINES apres repousse : bloc = {}", minePos == null ? "?" : lv.getBlockState(minePos).getBlock().getDescriptionId());
         });
-        if (t == mt + 100) {
+        // portail cache de la mine 1 : decouverte, passage a la mine 2, deblocage ; retour au Spawn par l'arche de la place
+        if (t == mt + 100) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var lay = com.mmorpg.mine.MineLayout.get(0);
+            MMORPG.LOGGER.info("[MMORPG] MINES deblocage avant le portail = {} (attendu 1)", com.mmorpg.server.RpgPlayers.get(pl).minesUnlocked);
+            var lv = com.mmorpg.mine.MineManager.dim(srv);
+            double x = lay.x0() + lay.exitX + 0.5, z = com.mmorpg.mine.MineLayout.Z0 + lay.exitZ - 1.2;
+            pl.teleportTo(lv, x, lay.floor(lay.exitX, lay.exitZ) + 1, z, java.util.Set.of(), 0F, 0F, true);
+        });
+        if (t == mt + 140) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            MMORPG.LOGGER.info("[MMORPG] MINES portail cache : mine = {} (attendu 1), deblocage = {} (attendu 2)", com.mmorpg.mine.MineManager.regionOf(pl), com.mmorpg.server.RpgPlayers.get(pl).minesUnlocked);
+            var lay = com.mmorpg.mine.MineLayout.get(1);
+            var lv = com.mmorpg.mine.MineManager.dim(srv);
+            double x = lay.x0() + com.mmorpg.mine.MineLayout.PLAZA_X + 0.5, z = com.mmorpg.mine.MineLayout.Z0 + com.mmorpg.mine.MineLayout.PLAZA_Z - 12.5;
+            pl.teleportTo(lv, x, lay.floor(com.mmorpg.mine.MineLayout.PLAZA_X, com.mmorpg.mine.MineLayout.PLAZA_Z) + 1, z, java.util.Set.of(), 180F, 0F, true);
+        });
+        if (t == mt + 190) srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] MINES arche de retour : monde = {} (attendu mmorpg:spawn)", srv.getPlayerList().getPlayerByName(me).level().dimension().identifier()));
+        if (t == mt + 200) {
             MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
             stop(mc);
         }

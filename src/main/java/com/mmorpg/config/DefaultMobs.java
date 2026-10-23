@@ -273,6 +273,7 @@ public final class DefaultMobs {
             String own = MOB_MATERIAL.get(entry.key());
             if (own != null) drop(c, own, elites.contains(entry.key()) ? .4 : .3, 1, 1);
             drop(c, "piece_or", .6, 2 + z * 3, 5 + z * 5);
+            com.mmorpg.entity.mob.ImportedSpells.seed(entry.key(), c);
             m.put(entry.key(), c);
         }
         return m;

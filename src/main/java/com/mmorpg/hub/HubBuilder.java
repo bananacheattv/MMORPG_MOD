@@ -244,7 +244,8 @@ public final class HubBuilder {
                 float e = c.edge[x - HubCtx.X0][z - HubCtx.Z0];
                 boolean f = c.in(c.foot, x, z);
                 int depth = Mth.clamp(Math.round(3F + 3.8F * (float) Math.sqrt(e) + 7F * (c.noise(x, z, 6F, 1) - 0.5F)), 4, 34);
-                int hill = f ? 0 : Math.round(2.6F * c.noise(x, z, 7F, 2) * Math.min(1F, (e - 1.2F) / 3F));
+                if (c.thin && e > 9F) depth = Math.min(depth, 9);
+                int hill = f || c.thin ? 0 : Math.round(2.6F * c.noise(x, z, 7F, 2) * Math.min(1F, (e - 1.2F) / 3F));
                 int clear = Math.hypot(x, z + 74) <= 26 ? 46 : 34;
                 for (int y = 0; y <= clear; y++) c.set(x, y, z, air);
                 c.set(x, -1 + hill, z, f ? c.state("marbre_poli") : Blocks.GRASS_BLOCK.defaultBlockState());

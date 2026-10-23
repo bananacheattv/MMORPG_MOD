@@ -21,30 +21,44 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.sound.PlaySoundEvent;
 
 /**
- * Musique d'ambiance du hub (assets/mmorpg/sounds/music/aeloria_hub.ogg, generee par tools/gen_hub_music.py ; remplacez le fichier
- * pour utiliser votre propre piece) : jouee en boucle dans la categorie « musique » tant que le joueur est dans la dimension du hub,
- * hors cinematique. Fondus d'entree et de sortie ; les musiques vanilla sont coupees pendant ce temps.
+ * Musiques d'ambiance du hub (assets/mmorpg/sounds/music/aeloria_hub.ogg, generee par tools/gen_hub_music.py) et de la Cite d'Aeloria,
+ * le grand Spawn (aeloria_cite.ogg, tools/gen_cite_music.py) ; remplacez un fichier pour utiliser votre propre piece. Jouee en boucle dans
+ * la categorie « musique » tant que le joueur est dans la dimension correspondante, hors cinematique. Fondus d'entree et de sortie ;
+ * les musiques vanilla sont coupees pendant ce temps.
  */
 @EventBusSubscriber(modid = MMORPG.MODID, value = Dist.CLIENT)
 public final class HubMusicClient {
     private static final ResourceKey<Level> HUB = ResourceKey.create(Registries.DIMENSION, MMORPG.id("hub"));
+    private static final ResourceKey<Level> SPAWN = ResourceKey.create(Registries.DIMENSION, MMORPG.id("spawn"));
     private static HubMusic music;
+    private static String musicEvent = "";
 
     private HubMusicClient() {
     }
 
+    /** Evenement sonore voulu pour la dimension du joueur (vide : aucune musique d'Aeloria). */
+    private static String wantedEvent(Minecraft mc) {
+        if (mc.level == null || mc.player == null || CinematicClient.active()) return "";
+        if (mc.level.dimension().equals(HUB)) return "hub.ambiance";
+        if (mc.level.dimension().equals(SPAWN)) return "cite.ambiance";
+        return "";
+    }
+
     private static boolean wanted(Minecraft mc) {
-        return mc.level != null && mc.player != null && mc.level.dimension().equals(HUB) && !CinematicClient.active();
+        return !wantedEvent(mc).isEmpty();
     }
 
     @SubscribeEvent
     public static void onTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
-        boolean want = wanted(mc);
-        if (want && (music == null || music.isStopped())) {
-            music = new HubMusic();
+        String wantedSound = wantedEvent(mc);
+        boolean want = !wantedSound.isEmpty();
+        if (music != null && want && !wantedSound.equals(musicEvent)) music.fadeOut();                       // autre monde : la piece change
+        if (want && (music == null || music.isStopped()) ) {
+            music = new HubMusic(wantedSound);
+            musicEvent = wantedSound;
             mc.getSoundManager().play(music);
-            MMORPG.LOGGER.info("[MMORPG] Musique du hub : lecture demarree = {}", mc.getSoundManager().isActive(music));
+            MMORPG.LOGGER.info("[MMORPG] Musique {} : lecture demarree = {}", wantedSound, mc.getSoundManager().isActive(music));
         } else if (!want && music != null) {
             music.fadeOut();
             if (music.isStopped()) music = null;
@@ -71,8 +85,8 @@ public final class HubMusicClient {
         private int age;
         private int out = -1;
 
-        HubMusic() {
-            super(SoundEvent.createVariableRangeEvent(MMORPG.id("hub.ambiance")), SoundSource.MUSIC, RandomSource.create());
+        HubMusic(String event) {
+            super(SoundEvent.createVariableRangeEvent(MMORPG.id(event)), SoundSource.MUSIC, RandomSource.create());
             this.looping = true;
             this.delay = 0;
             this.volume = 0.0001F;
