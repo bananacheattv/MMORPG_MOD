@@ -46,7 +46,7 @@ public final class DevShowcase {
         tick++;
         // la vitrine doit continuer meme si la fenetre perd le focus
         mc.options.pauseOnLostFocus = false;
-        if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.PauseScreen) mc.gui.setScreen(null);
+        if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.PauseScreen && !MODE.equals("interface")) mc.gui.setScreen(null);
         String me = mc.player.getName().getString();
         if (MODE.equals("editeur_workflow")) {
             if(tick==0) mc.getSingleplayerServer().execute(()->com.mmorpg.server.DevQuestEditorChecks.beginWorkflow(mc.getSingleplayerServer()));
@@ -436,6 +436,25 @@ public final class DevShowcase {
                         (int) mc.player.getX(), (int) mc.player.getY(), (int) mc.player.getZ(), ClientData.DATA.playerClass);
             }
             if (tick == 520) {
+                MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+                stop(mc);
+            }
+            return;
+        }
+        if (MODE.equals("interface")) {
+            if (tick == 5) cmd(mc, "gamemode creative");
+            if (tick == 20) mc.gui.setScreen(new net.minecraft.client.gui.screens.PauseScreen(true));
+            if (tick == 45) shot(mc, "ui_pause");
+            if (tick == 50) mc.gui.setScreen(new net.minecraft.client.gui.screens.options.OptionsScreen(new net.minecraft.client.gui.screens.PauseScreen(true), mc.options));
+            if (tick == 75) shot(mc, "ui_options");
+            if (tick == 80) mc.gui.setScreen(new net.minecraft.client.gui.screens.options.SoundOptionsScreen(new net.minecraft.client.gui.screens.PauseScreen(true), mc.options));
+            if (tick == 105) shot(mc, "ui_son");
+            if (tick == 110) mc.gui.setScreen(new net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen(mc.player, mc.player.connection.enabledFeatures(), false));
+            if (tick == 135) shot(mc, "ui_creatif");
+            if (tick == 140) mc.gui.setScreen(new net.minecraft.client.gui.screens.TitleScreen());
+            if (tick == 175) shot(mc, "ui_titre");
+            if (tick == 180) {
+                mc.gui.setScreen(null);
                 MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
                 stop(mc);
             }
