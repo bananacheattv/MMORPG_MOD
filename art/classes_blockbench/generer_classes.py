@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Maitres de classe du hub d'Eldoria (Guerrier, Mage, Archer, Tank) et Gardien de l'epreuve : modeles Blockbench "Modded Entity"
+Maitres de classe du hub d'Aeloria (Guerrier, Mage, Archer, Tank) et Gardien de l'epreuve : modeles Blockbench "Modded Entity"
 generes par script, avec animations idle / present, apercus et GIF, et export Java pour le mod.
 
   python generer_classes.py            tous les maitres, avec apercus et GIF

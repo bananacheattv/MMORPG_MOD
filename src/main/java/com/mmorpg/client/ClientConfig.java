@@ -2,7 +2,7 @@ package com.mmorpg.client;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 
-/** Options d'affichage cote client (modifiables depuis Mods > Eldoria MMORPG > Configurer). */
+/** Options d'affichage cote client (modifiables depuis Mods > Aeloria MMORPG > Configurer). */
 public final class ClientConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
@@ -19,7 +19,22 @@ public final class ClientConfig {
             .translation("mmorpg.configuration.showOwnCosmetics")
             .define("showOwnCosmetics", false);
 
+    public static final ModConfigSpec.IntValue AMBIENT_MUSIC_VOLUME = BUILDER
+            .comment("Volume de la musique d'ambiance du hub et des donjons, en pourcentage (0 = coupée)")
+            .translation("mmorpg.configuration.ambientMusicVolume")
+            .defineInRange("ambientMusicVolume", 70, 0, 100);
+
+    public static final ModConfigSpec.ConfigValue<String> MAIN_MENU_SERVER = BUILDER
+            .comment("Adresse du serveur proposee par le bouton « Rejoindre Aeloria » du menu principal (vide : pas de bouton)")
+            .translation("mmorpg.configuration.mainMenuServer")
+            .define("mainMenuServer", "");
+
     public static final ModConfigSpec SPEC = BUILDER.build();
+
+    /** Volume de la musique d'ambiance entre 0 et 1. */
+    public static float ambientMusic() {
+        return AMBIENT_MUSIC_VOLUME.get() / 100F;
+    }
 
     private ClientConfig() {
     }

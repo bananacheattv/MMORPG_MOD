@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/** Zones nommees d'Eldoria (colonnes rectangulaires sur toute la hauteur) avec leurs regles : construction, PvP, monstres hostiles. */
+/** Zones nommees d'Aeloria (colonnes rectangulaires sur toute la hauteur) avec leurs regles : construction, PvP, monstres hostiles. */
 public class ZoneData extends SavedData {
     public record Zone(String id, String name, ResourceKey<Level> dimension, int minX, int minZ, int maxX, int maxZ,
                        boolean noBuild, boolean noPvp, boolean noMobs, String style, String subtitle) {

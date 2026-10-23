@@ -63,7 +63,7 @@ public class TeleporterScreen extends MmoScreen {
         int fw = (pw - 16) / 4;
         for (int i = 0; i < 4; i++) {
             final int f = i - 1;
-            button(g, left + 8 + i * fw, top + 32, fw - 4, 16, filters[i], true, filter == f ? 0xFF6A4A1A : 0xFF2A2420, () -> {
+            button(g, left + 8 + i * fw, top + 32, fw - 4, 16, filters[i], true, filter == f ? 0xFFE2B85A : 0xFF3B3350, () -> {
                 filter = f;
                 offset = 0;
             });

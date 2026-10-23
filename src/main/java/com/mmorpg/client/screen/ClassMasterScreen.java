@@ -172,7 +172,7 @@ public class ClassMasterScreen extends MmoScreen {
         g.pose().pushMatrix();
         g.pose().translate(left + pw / 2F, top + 6);
         g.pose().scale(1.5F, 1.5F);
-        g.centeredText(font, com.mmorpg.client.EldoriaFont.of(title), 0, 0, 0xFF000000 | (kind < 4 ? cls.color : Ui.GOLD_LIGHT));
+        g.centeredText(font, com.mmorpg.client.AeloriaFont.of(title), 0, 0, 0xFF000000 | (kind < 4 ? cls.color : Ui.GOLD_LIGHT));
         g.pose().popMatrix();
         g.fill(left + 8, top + 22, left + pw - 8, top + 23, Ui.GOLD_DARK);
         if (inTrial) {
@@ -368,13 +368,13 @@ public class ClassMasterScreen extends MmoScreen {
         int by = top + (ph - bh) / 2 + (int) ((1F - t) * 12);
         g.pose().pushMatrix();
         Ui.panel(g, bx, by, bw, bh);
-        g.centeredText(font, com.mmorpg.client.EldoriaFont.of("Devenir " + cls.label + " ?"), bx + bw / 2, by + 12, cls.color);
+        g.centeredText(font, com.mmorpg.client.AeloriaFont.of("Devenir " + cls.label + " ?"), bx + bw / 2, by + 12, cls.color);
         g.centeredText(font, Component.literal("Ce choix est définitif."), bx + bw / 2, by + 28, 0xFFFFC060);
         g.centeredText(font, Component.literal("Votre aventure commencera avec l'équipement de départ."), bx + bw / 2, by + 41, Ui.MUTED);
         hits.clear();                                                                        // seuls les boutons de la confirmation sont cliquables
         btn(g, "yes", bx + 14, by + bh - 28, 118, 18, "Oui, devenir " + cls.label, t > 0.9F, 0xFF2A7A2A, () -> {
             ClientNet.send(new Payloads.HubAction(Payloads.HubAction.CHOOSE, selectedClass, 0));
-            sound(SoundEvents.PLAYER_LEVELUP, 1.0F);
+            sound(com.mmorpg.registry.ModSounds.LEVELUP.get(), 1.0F);
             onClose();
         });
         btn(g, "no", bx + bw - 14 - 118, by + bh - 28, 118, 18, "Non, revenir", t > 0.9F, 0xFF5A3A3A, () -> confirming = false);

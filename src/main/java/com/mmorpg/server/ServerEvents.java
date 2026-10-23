@@ -27,6 +27,15 @@ public final class ServerEvents {
         ConfigManager.load();
     }
 
+    /** L'equipement n'est jamais perdu a la mort : seule une part d'experience l'est (voir RpgPlayers.onDeath). */
+    @SubscribeEvent
+    public static void onServerStarted(net.neoforged.neoforge.event.server.ServerStartedEvent event) {
+        event.getServer().getGameRules().set(net.minecraft.world.level.gamerules.GameRules.KEEP_INVENTORY, true, event.getServer());
+        // monde neuf : le hub est construit tout seul (un peu apres le demarrage), la premiere connexion s'y fait toujours
+        var server = event.getServer();
+        Scheduler.later(server.overworld(), 60, () -> com.mmorpg.hub.HubManager.ensureHub(server));
+    }
+
     @SubscribeEvent
     public static void onServerStopped(ServerStoppedEvent event) {
         Scheduler.clear();
@@ -37,6 +46,7 @@ public final class ServerEvents {
     public static void onCommands(RegisterCommandsEvent event) {
         RpgCommands.register(event.getDispatcher());
         RpgCommands.registerHub(event.getDispatcher());
+        com.mmorpg.mine.MineManager.register(event.getDispatcher());
         com.mmorpg.zone.ZoneCommands.register(event.getDispatcher());
         RpgCommands.registerSetDonjon(event.getDispatcher());
         PlayerCommands.register(event.getDispatcher());

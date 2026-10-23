@@ -61,10 +61,39 @@ public final class BossManager {
         return true;
     }
 
+    /** Vrai si un volume de cette taille, pose au sol en (x, y, z), ne touche aucun bloc. */
+    private static boolean fits(ServerLevel level, double x, double y, double z, float w, float h) {
+        AABB box = new AABB(x - w / 2.0, y + 0.01, z - w / 2.0, x + w / 2.0, y + h, z + w / 2.0);
+        if (!level.noCollision(box)) return false;
+        BlockPos below = BlockPos.containing(x, y - 0.5, z);
+        return !level.getBlockState(below).getCollisionShape(level, below).isEmpty();
+    }
+
+    /**
+     * Point libre ou poser un boss : {@code pos} s'il convient, sinon le plus proche autour. L'autel d'invocation est une structure
+     * de 5 x 5 x 4 blocs pleine de collisions : un boss apparu en son centre y restait coince (et y revenait a chaque retour a la base).
+     */
+    public static net.minecraft.world.phys.Vec3 freeSpot(ServerLevel level, BlockPos pos, float w, float h) {
+        double cx = pos.getX() + 0.5, cz = pos.getZ() + 0.5;
+        for (double r = 0; r <= 14; r += r < 3 ? 3 : 1) {
+            int steps = r == 0 ? 1 : (int) Math.max(12, Math.round(r * 6));
+            for (int i = 0; i < steps; i++) {
+                double a = Math.PI * 2 * i / steps;
+                double x = cx + Math.cos(a) * r, z = cz + Math.sin(a) * r;
+                for (int y = pos.getY() + 3; y >= pos.getY() - 2; y--) {
+                    if (fits(level, x, y, z, w, h)) return new net.minecraft.world.phys.Vec3(x, y, z);
+                }
+            }
+        }
+        return new net.minecraft.world.phys.Vec3(cx, pos.getY(), cz);
+    }
+
     public static Mob spawnBoss(ServerLevel level, EntityType<? extends Mob> type, String key, BlockPos pos, String summonerName) {
         Mob boss = type.create(level, EntitySpawnReason.MOB_SUMMONED);
         if (boss == null) return null;
-        boss.snapTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0, 0);
+        var spot = freeSpot(level, pos, boss.getBbWidth(), boss.getBbHeight());
+        pos = BlockPos.containing(spot);
+        boss.snapTo(spot.x, spot.y, spot.z, 0, 0);
         boss.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), EntitySpawnReason.MOB_SUMMONED, null);
         MobConfig cfg = ConfigManager.mob(key);
         MobLevels.forceLevel(boss, key, cfg.minLevel);

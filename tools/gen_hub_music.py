@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Musique d'ambiance du hub d'Eldoria (« Citadelle celeste ») : boucle de ~2 min 20 en re lydien, a 72 mesures/min.
+"""Musique d'ambiance du hub d'Aeloria (« Citadelle celeste ») : boucle de ~2 min 20 en re lydien, a 72 mesures/min.
 
 Instruments synthetises : nappe chaude (saw desaccordees filtrees), harpe (partiels additifs a decroissance propre), celesta, chœur
 « ah » (formants), basse profonde, souffle d'air ; un echo en cascade et une reverberation de salle (reponse impulsionnelle
 bruitee, 3 s) donnent l'espace. Structure : intro de nappes, theme de harpe, melodie de celesta avec chœur, retour au calme.
 
-Dependances : numpy, soundfile. Sortie : assets/mmorpg/sounds/music/eldoria_hub.ogg (declare dans sounds.json par gen_music.py).
+Dependances : numpy, soundfile. Sortie : assets/mmorpg/sounds/music/aeloria_hub.ogg (declare dans sounds.json par gen_music.py).
 Pour utiliser une autre musique : remplacer ce fichier OGG par le votre (meme nom), rien d'autre a changer.
 """
 import os
@@ -213,7 +213,7 @@ def render(path):
 
 
 def generate(assets_dir):
-    path = os.path.join(assets_dir, 'sounds', 'music', 'eldoria_hub.ogg')
+    path = os.path.join(assets_dir, 'sounds', 'music', 'aeloria_hub.ogg')
     secs = render(path)
     print('musique du hub generee : %.1f s' % secs)
 

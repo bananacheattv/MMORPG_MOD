@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 /** Baguette de zone (operateurs) : deux clics droits sur des blocs delimitent un rectangle, /zone creer le valide. */
 public class ZoneWandItem extends RpgMaterialItem {
     public ZoneWandItem(Properties properties) {
-        super(properties.stacksTo(1), Rarity.MYTHIQUE, "Outil d'administration", "Délimite les zones d'Eldoria.");
+        super(properties.stacksTo(1), Rarity.MYTHIQUE, "Outil d'administration", "Délimite les zones d'Aeloria.");
     }
 
     private static boolean allowed(ServerPlayer p) {

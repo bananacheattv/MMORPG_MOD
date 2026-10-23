@@ -135,9 +135,25 @@ public final class ConfigManager {
         c.configVersion = GeneralConfig.CURRENT_VERSION;
     }
 
+    /** Les fichiers JSON d'un serveur existant portent l'ancien nom du jeu : Eldoria devient Aeloria (une seule fois par fichier). */
+    private static void renameBrand() {
+        try (var files = Files.list(dir())) {
+            for (Path p : files.filter(f -> f.toString().endsWith(".json")).toList()) {
+                String s = Files.readString(p, java.nio.charset.StandardCharsets.UTF_8);
+                if (s.contains("Eldoria") || s.contains("ELDORIA")) {
+                    Files.writeString(p, s.replace("Eldoria", "Aeloria").replace("ELDORIA", "AELORIA"), java.nio.charset.StandardCharsets.UTF_8);
+                    MMORPG.LOGGER.info("[MMORPG] {} : le nom Eldoria est devenu Aeloria", p.getFileName());
+                }
+            }
+        } catch (Exception e) {
+            MMORPG.LOGGER.warn("[MMORPG] Renommage Eldoria -> Aeloria impossible dans la configuration", e);
+        }
+    }
+
     public static synchronized void load() {
         try {
             Files.createDirectories(dir());
+            renameBrand();
             Path g = dir().resolve("general.json");
             if (Files.exists(g)) {
                 try (Reader r = Files.newBufferedReader(g, StandardCharsets.UTF_8)) {

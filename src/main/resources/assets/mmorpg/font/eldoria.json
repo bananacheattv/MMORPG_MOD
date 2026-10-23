@@ -8,7 +8,7 @@
     },
     {
       "type": "bitmap",
-      "file": "mmorpg:font/eldoria.png",
+      "file": "mmorpg:font/aeloria.png",
       "ascent": 11,
       "height": 12,
       "chars": [

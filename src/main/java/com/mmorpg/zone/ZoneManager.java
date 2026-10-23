@@ -51,6 +51,8 @@ public final class ZoneManager {
 
     private static final Map<UUID, Selection> SELECTIONS = new HashMap<>();
     private static final Map<UUID, String> CURRENT = new HashMap<>();
+    /** Annonces deja faites pendant la visite en cours d'un donjon (une seule fois par visite, pour le donjon et pour l'antre du boss). */
+    private static final Map<UUID, java.util.Set<String>> ANNOUNCED = new HashMap<>();
 
     private ZoneManager() {
     }
@@ -156,7 +158,12 @@ public final class ZoneManager {
         String before = CURRENT.getOrDefault(p.getUUID(), "");
         if (!now.equals(before)) {
             CURRENT.put(p.getUUID(), now);
-            if (z != null) announce(p, z);
+            // une visite de donjon dure tant qu'on reste dans le donjon ou son antre ; en sortir efface les annonces pour la prochaine fois
+            ZoneData.Zone was = before.isEmpty() ? null : ZoneData.get(level.getServer()).byId(before);
+            String wasVisit = visit(was);
+            if (wasVisit != null && (z == null || !wasVisit.equals(visit(z)))) ANNOUNCED.remove(p.getUUID());
+            if (z != null && (visit(z) == null || ANNOUNCED.computeIfAbsent(p.getUUID(), k -> new java.util.HashSet<>()).add(z.id()))) announce(p, z);
+            com.mmorpg.network.Net.toPlayer(p, new com.mmorpg.network.Payloads.DungeonMusic(musicOf(z)));
         }
         if (p.isHolding(com.mmorpg.registry.ModItems.BAGUETTE_ZONE.get())) outline(p);
     }
@@ -166,6 +173,28 @@ public final class ZoneManager {
         UUID id = event.getEntity().getUUID();
         CURRENT.remove(id);
         SELECTIONS.remove(id);
+        ANNOUNCED.remove(id);
+    }
+
+    /** Identifiant de la visite a laquelle appartient une zone de donjon ou d'antre de boss, ou {@code null} pour une zone ordinaire. */
+    private static String visit(ZoneData.Zone z) {
+        return z == null || !(z.dungeon() || z.boss()) ? null : z.id().replace("_boss", "");
+    }
+
+    /** Piste d'ambiance d'une zone : le nom du donjon (« boss » dans son antre), ou vide hors d'un donjon. */
+    private static String musicOf(ZoneData.Zone z) {
+        if (visit(z) == null) return "";
+        if (z.boss()) return "boss";
+        for (com.mmorpg.world.DungeonBuilder.DungeonType t : com.mmorpg.world.DungeonBuilder.DungeonType.values()) {
+            if (z.id().startsWith(t.id + "_")) return t.id;
+        }
+        return "";
+    }
+
+    /** Un joueur qui entre dans un exemplaire de donjon (nouvelle partie) reverra les annonces d'entree. */
+    public static void forgetAnnouncements(UUID player) {
+        ANNOUNCED.remove(player);
+        CURRENT.remove(player);
     }
 
     public static String describe(ZoneData.Zone z) {

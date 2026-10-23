@@ -48,7 +48,8 @@ public abstract class MmoScreen extends Screen {
 
     @Override
     public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
-        g.fillGradient(0, 0, this.width, this.height, 0xA0080610, 0xD0080610);
+        g.fill(0, 0, this.width, this.height, 0xE609070F);
+        Ui.navBar(g, this.width, this.top);
     }
 
     @Override

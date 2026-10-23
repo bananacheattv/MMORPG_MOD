@@ -48,6 +48,12 @@
     "mmorpg:roche_celeste_slab",
     "mmorpg:fer_noirci",
     "mmorpg:fer_noirci_stairs",
-    "mmorpg:fer_noirci_slab"
+    "mmorpg:fer_noirci_slab",
+    "mmorpg:minerai_verdite",
+    "mmorpg:minerai_argentite",
+    "mmorpg:minerai_ambrasite",
+    "mmorpg:minerai_glacium",
+    "mmorpg:minerai_neantite",
+    "mmorpg:veine_epuisee"
   ]
 }

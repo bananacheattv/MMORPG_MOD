@@ -7,8 +7,8 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 /**
- * Effets sonores originaux d'Eldoria (synthetises par tools/gen_sfx.py, fichiers dans assets/mmorpg/sounds/sfx) : cinematiques du
- * hub, donjons, epreuves et boss. Aucun son de Minecraft n'y est reutilise.
+ * Effets sonores d'Aeloria (enregistrements libres CC0 montes par tools/build_sfx.py, fichiers dans assets/mmorpg/sounds/sfx) :
+ * cinematiques du hub, donjons, epreuves, boss, mort, niveaux et quetes. Aucun son de Minecraft n'y est reutilise.
  */
 public final class ModSounds {
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(Registries.SOUND_EVENT, MMORPG.MODID);
@@ -32,6 +32,10 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> ERROR = reg("error");
     public static final DeferredHolder<SoundEvent, SoundEvent> FIREWORK = reg("firework");
     public static final DeferredHolder<SoundEvent, SoundEvent> TELEPORT = reg("teleport");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DEATH = reg("death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LEVELUP = reg("levelup");
+    public static final DeferredHolder<SoundEvent, SoundEvent> QUEST_ACCEPT = reg("quest_accept");
+    public static final DeferredHolder<SoundEvent, SoundEvent> COINS = reg("coins");
     public static final DeferredHolder<SoundEvent, SoundEvent>[] NOTES = notes();
 
     private ModSounds() {

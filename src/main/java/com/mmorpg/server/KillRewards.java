@@ -53,7 +53,7 @@ public final class KillRewards {
         LivingEntity dead = event.getEntity();
         if (!(dead.level() instanceof ServerLevel level)) return;
         if (dead instanceof ServerPlayer sp) {
-            RpgPlayers.onDeath(sp);
+            RpgPlayers.onDeath(sp, event.getSource().getLocalizedDeathMessage(sp).getString());
             return;
         }
         if (dead instanceof com.mmorpg.entity.dummy.TrainingDummyEntity) return;
@@ -91,7 +91,7 @@ public final class KillRewards {
             d.dirty = true;
         }
         if (md.boss) {
-            level.playSound(null, dead.blockPosition(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.HOSTILE, 2f, 1f);
+            level.playSound(null, dead.blockPosition(), com.mmorpg.registry.ModSounds.SUCCESS.get(), SoundSource.HOSTILE, 1.4f, 0.9f);
             level.sendParticles(ParticleTypes.TOTEM_OF_UNDYING, dead.getX(), dead.getY() + 1, dead.getZ(), 120, 1, 1.5, 1, 0.5);
             if (ConfigManager.general().announceBossKills) {
                 level.getServer().getPlayerList().broadcastSystemMessage(

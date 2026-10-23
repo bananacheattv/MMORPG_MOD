@@ -102,9 +102,9 @@ final class FrostTheme extends Theme {
     }
 
     @Override
-    void roomA() {
-        double cz = A_Z;
-        Kit.ribs(c, 0, cz, A_R, A_R, A_H, 9, 12, Blocks.BLUE_ICE);
+    void roomA(Layout.Room rm) {
+        double cz = rm.z();
+        Kit.ribs(c, 0, cz, rm.r(), rm.r(), rm.h(), 9, 12, Blocks.BLUE_ICE);
         // bassin gele central, tertres de neige et aiguilles
         c.disc(0, 0, (int) cz, 6.0, (x, y, z) -> Math.hypot(x, z - cz) > 4.4 ? c.state(Blocks.PACKED_ICE) : c.state(Blocks.BLUE_ICE));
         crystal(0, (int) cz, 9);
@@ -112,20 +112,20 @@ final class FrostTheme extends Theme {
             double a = Math.PI * 2 * i / 8 + 0.2;
             int x = (int) Math.round(Math.cos(a) * 12.2);
             int z = (int) Math.round(cz + Math.sin(a) * 12.2);
-            for (int y = 1; y <= A_H; y++) c.set(x, y, z, c.state(y == A_H ? "tuile_givre" : y % 4 == 0 ? Blocks.BLUE_ICE : Blocks.PACKED_ICE));
+            for (int y = 1; y <= rm.h(); y++) c.set(x, y, z, c.state(y == rm.h() ? "tuile_givre" : y % 4 == 0 ? Blocks.BLUE_ICE : Blocks.PACKED_ICE));
             if (i % 2 == 0) crystal((int) Math.round(Math.cos(a) * 9.2), (int) Math.round(cz + Math.sin(a) * 9.2), 4);
         }
-        icicles(0, cz, 13, A_H + 8, 36, 2);
+        icicles(0, cz, 13, rm.h() + 8, 36, 2);
         for (int i = 0; i < 4; i++) {
             double a = Math.PI * 2 * i / 4 + 0.78;
-            Kit.chandelier(c, A_H + 7, (int) Math.round(Math.cos(a) * 8), (int) Math.round(cz + Math.sin(a) * 8), 4, Blocks.SOUL_LANTERN);
+            Kit.chandelier(c, rm.h() + 7, (int) Math.round(Math.cos(a) * 8), (int) Math.round(cz + Math.sin(a) * 8), 4, Blocks.SOUL_LANTERN);
         }
     }
 
     @Override
-    void pit() {
+    void pit(int z0, int z1) {
         // crevasse : abime de glace bleue eclairee par des lanternes marines, pont de calcite
-        for (int z = PIT_Z0; z <= PIT_Z1; z++) {
+        for (int z = z0; z <= z1; z++) {
             for (int x = -PIT_HALF; x <= PIT_HALF; x++) {
                 if (Math.abs(x) <= DECK) continue;
                 c.set(x, -PIT_DEPTH, z, c.rnd(x, 0, z, 9) < 0.18F ? c.state(Blocks.SEA_LANTERN) : c.state(Blocks.BLUE_ICE));
@@ -135,22 +135,22 @@ final class FrostTheme extends Theme {
             }
             for (int x = -DECK; x <= DECK; x++) c.set(x, 0, z, c.mix(x, 0, z, 13, "tuile_givre", 45, Blocks.PACKED_ICE, 35, "marbre_poli", 20));
         }
-        for (int z = PIT_Z0; z <= PIT_Z1; z += 4) {
+        for (int z = z0; z <= z1; z += 4) {
             for (int side : new int[]{-2, 2}) {
                 for (int y = 1; y <= 3; y++) c.set(side, y, z, Blocks.BLUE_ICE);
                 c.set(side, 4, z, Blocks.SEA_LANTERN);
             }
         }
-        for (int z = PIT_Z0 + 2; z <= PIT_Z1 - 1; z += 4) {
+        for (int z = z0 + 2; z <= z1 - 1; z += 4) {
             for (int side : new int[]{-2, 2}) c.set(side, 1, z, Blocks.SNOW);
         }
-        icicles(0, (PIT_Z0 + PIT_Z1) / 2.0, 9, 11, 22, 3);
+        icicles(0, (z0 + z1) / 2.0, 9, 11, 22, 3);
     }
 
     @Override
-    void roomB() {
-        double cz = B_Z;
-        Kit.ribs(c, 0, cz, B_R, B_R, B_H, 9, 12, Blocks.BLUE_ICE);
+    void roomB(Layout.Room rm) {
+        double cz = rm.z();
+        Kit.ribs(c, 0, cz, rm.r(), rm.r(), rm.h(), 9, 12, Blocks.BLUE_ICE);
         // sapins givres autour d'un cercle de menhirs
         for (int i = 0; i < 6; i++) {
             double a = Math.PI * 2 * i / 6;
@@ -168,7 +168,7 @@ final class FrostTheme extends Theme {
             c.set(p[0], 6, (int) cz + p[1], "marbre_poli");
         }
         c.disc(0, 0, (int) cz, 4.4, (x, y, z) -> c.state(Blocks.BLUE_ICE));
-        icicles(0, cz, 12, B_H + 8, 36, 4);
+        icicles(0, cz, 12, rm.h() + 8, 36, 4);
         for (int side : new int[]{-1, 1}) {
             for (int i = -2; i <= 2; i++) {
                 c.set(side * 20 + i, 1, (int) cz - 3, Blocks.SNOW);
@@ -177,7 +177,7 @@ final class FrostTheme extends Theme {
         }
         for (int i = 0; i < 4; i++) {
             double a = Math.PI * 2 * i / 4 + 0.78;
-            Kit.chandelier(c, B_H + 7, (int) Math.round(Math.cos(a) * 8), (int) Math.round(cz + Math.sin(a) * 8), 4, Blocks.SOUL_LANTERN);
+            Kit.chandelier(c, rm.h() + 7, (int) Math.round(Math.cos(a) * 8), (int) Math.round(cz + Math.sin(a) * 8), 4, Blocks.SOUL_LANTERN);
         }
     }
 
@@ -254,12 +254,23 @@ final class FrostTheme extends Theme {
     @Override
     Trials.Palette palette() {
         return new Trials.Palette(Blocks.BLUE_ICE, Blocks.SEA_LANTERN, Blocks.BLUE_ICE, Blocks.PACKED_ICE, Blocks.SOUL_LANTERN,
-                java.util.List.of("spectre_givre", "golem_cristal"), java.util.Map.of(TrialData.WAVES, "TEMPÊTE DE GIVRE", TrialData.JUMP, "BANQUISE BRISÉE", TrialData.SIMON, "ÉNIGME DES CRISTAUX"), Blocks.WATER, Blocks.SOUL_LANTERN);
+                java.util.List.of("spectre_givre", "golem_cristal"), java.util.Map.of(TrialData.WAVES, "TEMPÊTE DE GIVRE", TrialData.JUMP, "BANQUISE BRISÉE", TrialData.SIMON, "ÉNIGME DES CRISTAUX", TrialData.ORDER, "RUNES DE GLACE", TrialData.TARGETS, "TIR AUX CRISTAUX", TrialData.ELITE, "WYRM BORÉAL", TrialData.AMBUSH, "BOURRASQUE DE GIVRE"), Blocks.WATER, Blocks.SOUL_LANTERN);
     }
 
     @Override
     Trials.Plan plan() {
-        return new Trials.Plan(TrialData.SIMON, TrialData.JUMP, Trials.JUMPROOM, 1, 1, 1);
+        // salle 1, couloir 1, salle 2, salle 3, couloir 2, salle 4, salle 5, gardien d'elite
+        return Trials.plan(TrialData.TARGETS, 1, TrialData.JUMP, 1, TrialData.SIMON, 1, TrialData.ORDER, 2, TrialData.JUMP, 2, TrialData.WAVES, 1, Trials.JUMPROOM, 1, TrialData.ELITE, 2);
+    }
+
+    @Override
+    String eliteKey() {
+        return "wyrm_boreal";
+    }
+
+    @Override
+    Look look() {
+        return new Look(Blocks.BLUE_ICE, Blocks.PACKED_ICE, Blocks.SMOOTH_QUARTZ_STAIRS, Blocks.SOUL_LANTERN, Blocks.SOUL_CAMPFIRE, Blocks.PACKED_ICE, "tuile_givre", Blocks.SEA_LANTERN);
     }
 
     @Override

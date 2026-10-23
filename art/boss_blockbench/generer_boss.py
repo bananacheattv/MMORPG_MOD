@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Boss d'Eldoria pour Blockbench (format "Modded Entity"), generes entierement par script.
+Boss d'Aeloria pour Blockbench (format "Modded Entity"), generes entierement par script.
 
 Usage :
   python generer_boss.py                      tous les boss, avec apercus et GIF

@@ -231,7 +231,7 @@ def col_plates(m, group, name, y1, y2, wcol, inset, mat, sides='NSEW', light=15,
 
 
 def diamond_plate(m, group, name, c, size, gem, front_z, back_z, frame='argent', gem_mat='gemme', gem_light=12):
-    """Losange (rune d'Eldoria) devant et derriere une piece : cadre metallique + gemme."""
+    """Losange (rune d'Aeloria) devant et derriere une piece : cadre metallique + gemme."""
     cx, cy = c
     for side, z0, sgn in (('avant', front_z, -1), ('arriere', back_z, 1)):
         zc = z0 + sgn * 0.3
@@ -493,7 +493,7 @@ def build_atlas(models, seed_key):
 
 # ============================================================================================ export
 def uid(*key):
-    return str(uuid.uuid5(uuid.NAMESPACE_URL, 'eldoria/' + '/'.join(map(str, key))))
+    return str(uuid.uuid5(uuid.NAMESPACE_URL, 'aeloria/' + '/'.join(map(str, key))))
 
 
 def _rot_vec(p):

@@ -62,12 +62,14 @@ def generate(ga):
     gen_font.generate(ga.ASSETS)
     import gen_decor
     gen_decor.generate(ga)
+    import gen_mine
+    gen_mine.generate(ga)
     import gen_music
     gen_music.generate(ga.ASSETS)
     import gen_hub_music
     gen_hub_music.generate(ga.ASSETS)
-    import gen_sfx
-    gen_sfx.generate(ga.ASSETS)
+    import build_sfx as gen_sfx
+    gen_sfx.generate()
     import gen_quest_wand
     gen_quest_wand.generate(ga)
     import gen_duelliste

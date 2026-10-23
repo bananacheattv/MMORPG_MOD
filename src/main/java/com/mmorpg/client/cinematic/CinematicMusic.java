@@ -9,7 +9,7 @@ import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.util.RandomSource;
 
 /**
- * Musique de la cinematique (assets/mmorpg/sounds/music/eldoria_theme.ogg, generee par tools/gen_music.py) : jouee en flux dans la
+ * Musique de la cinematique (assets/mmorpg/sounds/music/aeloria_theme.ogg, generee par tools/gen_music.py) : jouee en flux dans la
  * categorie « musique » (le volume de musique du joueur s'applique), avec fondu d'entree et fondu de sortie quand la scene se termine
  * ou est sautee.
  */

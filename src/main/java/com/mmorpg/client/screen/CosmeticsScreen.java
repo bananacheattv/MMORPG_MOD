@@ -35,7 +35,7 @@ public class CosmeticsScreen extends MenuScreen {
         for (int i = 0; i < cats.length; i++) {
             Cosmetic.Category c = cats[i];
             int cy = y0 + i * 16;
-            button(g, x0, cy, 80, 15, c.label, true, c == category ? 0xFF6A4A1A : 0xFF2A2420, () -> {
+            button(g, x0, cy, 80, 15, c.label, true, c == category ? 0xFFE2B85A : 0xFF3B3350, () -> {
                 category = c;
                 selected = null;
             });

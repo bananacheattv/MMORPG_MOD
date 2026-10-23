@@ -36,6 +36,8 @@ public final class ClientPayloadHandlers {
         event.register(Payloads.AreaEntry.TYPE, (payload, context) -> com.mmorpg.client.AreaEntryClient.start(payload));
         event.register(Payloads.BossReveal.TYPE, (payload, context) -> com.mmorpg.client.BossRevealClient.start(payload));
         event.register(Payloads.Loading.TYPE, (payload, context) -> com.mmorpg.client.LoadingClient.handle(payload));
+        event.register(Payloads.DeathInfo.TYPE, (payload, context) -> com.mmorpg.client.DeathClient.info(payload));
+        event.register(Payloads.DungeonMusic.TYPE, (payload, context) -> com.mmorpg.client.DungeonMusicClient.set(payload.track()));
         event.register(Payloads.PartySync.TYPE, (payload, context) -> ClientData.party = payload.data().copy());
         event.register(Payloads.CastAnimation.TYPE, (payload, context) ->
                 com.mmorpg.client.fx.CastAnimations.start(payload.entityId(), payload.anim(), payload.duration()));

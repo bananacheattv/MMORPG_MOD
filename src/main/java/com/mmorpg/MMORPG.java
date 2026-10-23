@@ -16,7 +16,7 @@ import net.neoforged.fml.common.Mod;
 import org.slf4j.Logger;
 
 /**
- * Eldoria MMORPG — point d'entree du mod.
+ * Aeloria MMORPG — point d'entree du mod.
  * Classes evolutives, competences, statistiques, equipement, monstres et boss configurables,
  * familiers, teleporteurs, donjons et cosmetiques animes.
  */
@@ -28,6 +28,7 @@ public final class MMORPG {
     public MMORPG(IEventBus modBus, ModContainer container) {
         ModDataComponents.COMPONENTS.register(modBus);
         com.mmorpg.registry.DecorBlocks.init();
+        com.mmorpg.mine.MineBlocks.init();
         ModBlocks.BLOCKS.register(modBus);
         ModBlocks.BLOCK_ENTITIES.register(modBus);
         ModEntities.ENTITIES.register(modBus);

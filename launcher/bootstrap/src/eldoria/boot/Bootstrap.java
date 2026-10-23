@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 
 /**
- * Amorce du launcher Eldoria : telecharge le coeur du launcher (launcher-core.jar) publie a chaque push
+ * Amorce du launcher Aeloria : telecharge le coeur du launcher (launcher-core.jar) publie a chaque push
  * sur GitHub, le met a jour si besoin puis le lance. L'amorce elle-meme ne change (presque) jamais.
  */
 public final class Bootstrap {
@@ -35,8 +35,8 @@ public final class Bootstrap {
             run();
         } catch (Throwable t) {
             t.printStackTrace();
-            if (!java.awt.GraphicsEnvironment.isHeadless()) JOptionPane.showMessageDialog(null, "Impossible de demarrer le launcher Eldoria :\n" + t,
-                    "Eldoria", JOptionPane.ERROR_MESSAGE);
+            if (!java.awt.GraphicsEnvironment.isHeadless()) JOptionPane.showMessageDialog(null, "Impossible de demarrer le launcher Aeloria :\n" + t,
+                    "Aeloria", JOptionPane.ERROR_MESSAGE);
             System.exit(1);
         }
     }

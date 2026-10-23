@@ -86,7 +86,7 @@ public final class ClassTrial {
         PlayerData d = RpgPlayers.get(p);
         boolean fresh = !hd.inTrial;
         if (fresh) {
-            if (p.level() != hubLevel) return "Les essais ont lieu au hub d'Eldoria.";
+            if (p.level() != hubLevel) return "Les essais ont lieu au hub d'Aeloria.";
             save(p, hd, d);
         }
         // l'essai remplace temporairement le personnage ; le familier et la monture sont renvoyes

@@ -126,14 +126,15 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
 
     @Override
     public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
-        g.fillGradient(0, 0, this.width, this.height, 0xA0080610, 0xD0080610);
+        g.fill(0, 0, this.width, this.height, 0xE609070F);
+        Ui.navBar(g, this.width, py);
         hits.clear();
         PlayerData d = ClientData.DATA;
         PlayerClass cls = d.playerClass;
         Ui.panel(g, px, py, pw, ph);
         MenuScreen.drawTabs(g, this.font, px, py, pw, MenuScreen.Tab.PERSONNAGE, mouseX, mouseY,
                 (r, action) -> hits.add(new Hit(r[0], r[1], r[2], r[3], action)));
-        g.fill(px + 6, py + 24, px + pw - 6, py + 25, Ui.GOLD_DARK);
+        g.fill(px + 6, py + 24, px + pw - 6, py + 25, Ui.LINE);
 
         // ------------------------------------------------ inventaire et equipement (emplacements de Minecraft)
         int x = this.leftPos, y = this.topPos;
@@ -145,11 +146,11 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
             if (!s.isActive()) continue;
             boolean equipment = (s.index >= InventoryMenu.ARMOR_SLOT_START && s.index < InventoryMenu.ARMOR_SLOT_END) || s.index == InventoryMenu.SHIELD_SLOT;
             boolean result = s.index == InventoryMenu.RESULT_SLOT;
-            slotBox(g, x + s.x - 1, y + s.y - 1, equipment ? Ui.GOLD_DARK : result ? Ui.GOLD : 0xFF3A2E22, result);
+            slotBox(g, x + s.x - 1, y + s.y - 1, equipment ? Ui.GOLD_DARK : result ? Ui.GOLD : 0xFF2B2538, result);
         }
         g.text(this.font, "Rendez-vous", x + 98, y + 20, Ui.MUTED, false);
         g.text(this.font, "à la Forge", x + 98, y + 32, Ui.GOLD, false);
-        g.fill(x + 8, y + 139, x + 168, y + 140, 0x60B08A40);
+        g.fill(x + 8, y + 139, x + 168, y + 140, Ui.LINE);
 
         // ------------------------------------------------ identite, barres et evolution (sous l'inventaire, selon la place)
         int under = y + 170;
@@ -247,7 +248,7 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
         if (ph >= 258) {
             int ty = py + ph - 24;
             int tx0 = rx + 8, tx1 = px + pw - 16;
-            g.fill(tx0, ty + 4, tx1, ty + 6, 0xFF3A2E22);
+            g.fill(tx0, ty + 4, tx1, ty + 6, Ui.LINE);
             int tier = d.evolutionTier();
             int reachedX = tx0 + (int) ((tx1 - tx0) * Math.min(1f, (d.level - 1) / 99f));
             g.fillGradient(tx0, ty + 4, reachedX, ty + 6, Ui.GOLD_LIGHT, Ui.GOLD_DARK);

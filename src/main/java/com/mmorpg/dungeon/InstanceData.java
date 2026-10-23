@@ -61,7 +61,7 @@ public class InstanceData extends SavedData {
             Slot.CODEC.listOf().optionalFieldOf("slots", List.of()).forGetter(d -> d.slots),
             Codec.unboundedMap(Codec.STRING, Codec.STRING).optionalFieldOf("gates", Map.of()).forGetter(d -> d.gateStrings())
     ).apply(i, InstanceData::new));
-    public static final SavedDataType<InstanceData> TYPE = new SavedDataType<>(MMORPG.id("instances"), InstanceData::new, CODEC);
+    public static final SavedDataType<InstanceData> TYPE = new SavedDataType<>(MMORPG.id("instances_v2"), InstanceData::new, CODEC);
 
     final List<Slot> slots;
     private final Map<UUID, String> gates = new HashMap<>();

@@ -38,6 +38,9 @@ public final class InstanceManager {
     /** Nombre maximal d'exemplaires construits pour un meme donjon et une meme difficulte. */
     public static final int MAX_PER_POOL = 40;
     public static final int RELEASE_TICKS = 20 * 60 * 3;
+    /** Les exemplaires sont alignes en x (un par reservation) et les types/difficultes empiles en z ; au-dela de 9000 : l'ancien plan, plus court, est oublie. */
+    static final int Z_BASE = 10000;
+    static final int Z_STEP = 600;
     private static final DungeonType[] TYPES = DungeonType.values();
 
     private InstanceManager() {
@@ -105,6 +108,11 @@ public final class InstanceManager {
     private record Transition(UUID player, Slot slot, long teleportAt, String title, String lore, int color) {
     }
 
+    /** D'ou chaque joueur est entre dans un donjon : on l'y ramene a la victoire. */
+    private record Return(ResourceKey<Level> dim, double x, double y, double z, float yaw) {
+    }
+
+    private static final java.util.Map<UUID, Return> RETURNS = new java.util.HashMap<>();
     private static final java.util.Map<String, Build> BUILDS = new java.util.HashMap<>();
     private static final List<Transition> TRANSITIONS = new java.util.ArrayList<>();
     /** Duree minimale de l'ecran de chargement (ticks) : meme un exemplaire deja pret laisse le temps de lire. */
@@ -136,6 +144,7 @@ public final class InstanceManager {
         long at = server.overworld().getGameTime() + MIN_LOADING_TICKS;
         for (ServerPlayer m : PartyManager.onlineMembers(player)) {
             if (m != player && (m.level() != player.level() || m.distanceToSqr(player) > 24 * 24)) continue;       // les autres membres rejoignent par le PNJ
+            if (!m.level().dimension().equals(DIM)) RETURNS.put(m.getUUID(), new Return(m.level().dimension(), m.getX(), m.getY(), m.getZ(), m.getYRot()));
             BossReveal.hold(m, MIN_LOADING_TICKS + 400);
             TRANSITIONS.removeIf(x -> x.player().equals(m.getUUID()));
             TRANSITIONS.add(new Transition(m.getUUID(), slot, at, title, lore, color));
@@ -213,7 +222,7 @@ public final class InstanceManager {
                 s.owner = owner;
                 s.lastBusy = server.getTickCount();
                 data.dirty();
-                if (s.ready) DungeonManager.reset(server, group(pool, s));
+                if (s.ready) resetSlot(server, s);
                 return s;
             }
         }
@@ -223,7 +232,7 @@ public final class InstanceManager {
         for (int i = 0; i < TYPES.length; i++) {
             if (TYPES[i] == t) poolIndex = i * 3 + difficultyOf(pool);
         }
-        Slot s = new Slot(pool, slots.size(), 200 + slots.size() * 120, 101, 1000 + poolIndex * 400, owner, server.getTickCount(), false);
+        Slot s = new Slot(pool, slots.size(), 200 + slots.size() * 120, 101, Z_BASE + poolIndex * Z_STEP, owner, server.getTickCount(), false);
         data.slots.add(s);
         data.dirty();
         return s;
@@ -241,6 +250,7 @@ public final class InstanceManager {
         ServerLevel level = p.level().getServer().getLevel(DIM);
         if (level == null) return;
         p.stopRiding();
+        com.mmorpg.zone.ZoneManager.forgetAnnouncements(p.getUUID());           // nouvelle partie : l'annonce d'entree se rejoue une fois
         p.teleportTo(level, slot.x + 0.5, slot.y, slot.z + Theme.HALL_Z - 6 + 0.5, Set.<Relative>of(), 0F, 4F, true);
         level.sendParticles(ParticleTypes.REVERSE_PORTAL, p.getX(), p.getY() + 1, p.getZ(), 50, 0.4, 0.9, 0.4, 0.1);
         slot.lastBusy = level.getServer().getTickCount();
@@ -281,7 +291,7 @@ public final class InstanceManager {
         for (int i = 0; i < TYPES.length; i++) {
             if (TYPES[i] == t) poolIndex = i * 3 + difficultyOf(pool);
         }
-        Slot s = new Slot(pool, slots.size(), 200 + slots.size() * 120, 101, 1000 + poolIndex * 400, owner, server.getTickCount());
+        Slot s = new Slot(pool, slots.size(), 200 + slots.size() * 120, 101, Z_BASE + poolIndex * Z_STEP, owner, server.getTickCount());
         data.slots.add(s);
         data.dirty();
         DungeonBuilder.buildDungeon(level, new BlockPos(s.x, s.y, s.z), t, difficultyOf(pool));
@@ -305,7 +315,7 @@ public final class InstanceManager {
             if (s.owner.isEmpty()) continue;
             boolean occupied = false;
             for (ServerPlayer p : level.players()) {
-                if (!p.isSpectator() && Math.abs(p.getX() - s.x) < 32 && p.getZ() > s.z - 6 && p.getZ() < s.z + 196) {
+                if (!p.isSpectator() && Math.abs(p.getX() - s.x) < 40 && p.getZ() > s.z - 6 && p.getZ() < s.z + Layout.LENGTH + 6) {
                     occupied = true;
                     break;
                 }
@@ -320,16 +330,120 @@ public final class InstanceManager {
         }
     }
 
+    // ================================================================== victoire : retour a l'entree
+
+    /** Delai (secondes) entre la mort du boss et le retour automatique a l'entree. */
+    public static final int EXIT_SECONDS = 15;
+
+    /** Exemplaire dont l'emprise contient la position, ou {@code null}. */
+    static @Nullable Slot slotAt(MinecraftServer server, ServerLevel level, double x, double z) {
+        if (!level.dimension().equals(DIM)) return null;
+        for (Slot s : InstanceData.get(server).slots) {
+            if (Math.abs(x - s.x) < 40 && z > s.z - 6 && z < s.z + Layout.LENGTH + 6) return s;
+        }
+        return null;
+    }
+
+    private static net.minecraft.world.phys.AABB areaOf(Slot s) {
+        return new net.minecraft.world.phys.AABB(s.x - 40, s.y - 20, s.z - 6, s.x + 40, s.y + 80, s.z + Layout.LENGTH + 6);
+    }
+
+    /**
+     * Le boss d'un antre vient de tomber : les joueurs de l'exemplaire (ou du donjon, hors instance) sont ramenes a l'entree apres
+     * {@link #EXIT_SECONDS} secondes avec un compte a rebours, puis l'exemplaire est libere et remis a neuf pour le groupe suivant.
+     *
+     * @param hall point d'arrivee hors instance (hall du donjon)
+     */
+    public static void victoryExit(ServerLevel level, double bossX, double bossZ, net.minecraft.world.phys.Vec3 hall) {
+        MinecraftServer server = level.getServer();
+        Slot slot = slotAt(server, level, bossX, bossZ);
+        java.util.function.Predicate<ServerPlayer> inside = p -> p.level() == level && p.isAlive() && (slot != null
+                ? areaOf(slot).contains(p.position())
+                : Math.abs(p.getX() - hall.x) < 40 && p.getZ() > hall.z - 6 && p.getZ() < hall.z + Layout.LENGTH);
+        for (ServerPlayer p : level.players()) {
+            if (inside.test(p)) {
+                p.sendSystemMessage(Component.literal("✦ Donjon vaincu ! Récupérez votre butin : vous serez ramené à l'entrée dans " + EXIT_SECONDS + " secondes.").withColor(0xFFE080));
+            }
+        }
+        for (int left = EXIT_SECONDS - 3; left >= 1; left--) {
+            int n = left;
+            com.mmorpg.server.Scheduler.later(level, (EXIT_SECONDS - left) * 20, () -> {
+                for (ServerPlayer p : level.players()) {
+                    if (inside.test(p)) p.sendOverlayMessage(Component.literal("Retour à l'entrée du donjon dans " + n + " s").withColor(n <= 5 ? 0xFF9060 : 0xFFE080));
+                }
+            });
+        }
+        com.mmorpg.server.Scheduler.later(level, EXIT_SECONDS * 20, () -> {
+            for (ServerPlayer p : new java.util.ArrayList<>(level.players())) {
+                if (inside.test(p)) bringBack(server, p, hall);
+            }
+            if (slot != null) {
+                slot.owner = "";
+                InstanceData.get(server).dirty();
+                com.mmorpg.server.Scheduler.later(level, 20, () -> resetSlot(server, slot));
+            }
+        });
+    }
+
+    private static void bringBack(MinecraftServer server, ServerPlayer p, net.minecraft.world.phys.Vec3 hall) {
+        Return r = RETURNS.remove(p.getUUID());
+        ServerLevel target = r == null ? null : server.getLevel(r.dim());
+        p.stopRiding();
+        ServerLevel from = p.level();
+        from.sendParticles(ParticleTypes.REVERSE_PORTAL, p.getX(), p.getY() + 1, p.getZ(), 40, 0.4, 0.9, 0.4, 0.1);
+        if (target != null) {
+            p.teleportTo(target, r.x(), r.y(), r.z(), Set.<Relative>of(), r.yaw(), 0F, true);
+        } else if (!from.dimension().equals(DIM)) {
+            p.teleportTo(from, hall.x, hall.y, hall.z, Set.<Relative>of(), 0F, 4F, true);
+        } else {
+            var respawn = server.getRespawnData().globalPos();
+            ServerLevel home = server.getLevel(respawn.dimension());
+            if (home != null) p.teleportTo(home, respawn.pos().getX() + 0.5, respawn.pos().getY(), respawn.pos().getZ() + 0.5, Set.<Relative>of(), 180F, 0F, true);
+        }
+        p.level().sendParticles(ParticleTypes.REVERSE_PORTAL, p.getX(), p.getY() + 1, p.getZ(), 40, 0.4, 0.9, 0.4, 0.1);
+        p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.TELEPORT.get(), net.minecraft.sounds.SoundSource.PLAYERS, 1.0F, 1.0F);
+        p.sendOverlayMessage(Component.literal("Vous êtes de retour à l'entrée du donjon.").withColor(0x80E0A0));
+    }
+
+    /** Remet un exemplaire libre a neuf : epreuves, herses, monstres, objets au sol et coffres. */
+    static void resetSlot(MinecraftServer server, Slot s) {
+        ServerLevel level = server.getLevel(DIM);
+        if (level == null || !s.ready) return;
+        DungeonManager.reset(server, group(s.pool, s));
+        clearEntities(level, s);
+        DungeonType t = typeOf(s.pool);
+        StyledDungeon.refill(level, new BlockPos(s.x, s.y, s.z), t, difficultyOf(s.pool));
+    }
+
+    private static void clearEntities(ServerLevel level, Slot s) {
+        var box = areaOf(s);
+        for (var e : level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class, box, m -> m instanceof net.minecraft.world.entity.monster.Enemy || m instanceof com.mmorpg.entity.RpgMob)) {
+            e.discard();
+        }
+        for (var e : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, box)) e.discard();
+    }
+
+    /** Au demarrage : les exemplaires de l'ancien plan (plus court) sont oublies, avec leurs epreuves et leurs zones. */
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void onServerStarted(net.neoforged.neoforge.event.server.ServerStartedEvent event) {
+        MinecraftServer server = event.getServer();
+        TrialData.get(server).removeInside(DIM, -1_000_000, -1_000_000, 1_000_000, Z_BASE - 1000);
+        for (DungeonType t : TYPES) {
+            com.mmorpg.zone.ZoneData.get(server).removeOverlapping(DIM, t.id + "_", -1_000_000, -1_000_000, 1_000_000, Z_BASE - 1000);
+        }
+    }
+
     // ================================================================== outils d'administration et de verification
 
     /** Un joueur qui se reconnecte dans un exemplaire reserve entre-temps par un autre groupe est renvoye au point d'apparition du monde. */
     @net.neoforged.bus.api.SubscribeEvent
     public static void onLogin(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer p) || !p.level().dimension().equals(DIM)) return;
+        if (com.mmorpg.mine.MineManager.inMine(p)) return;            // les mines sont partagees : on y reste a la reconnexion
         MinecraftServer server = p.level().getServer();
         String mine = ownerKey(p);
         for (Slot s : InstanceData.get(server).slots) {
-            if (Math.abs(p.getX() - s.x) < 32 && p.getZ() > s.z - 6 && p.getZ() < s.z + 196) {
+            if (Math.abs(p.getX() - s.x) < 40 && p.getZ() > s.z - 6 && p.getZ() < s.z + Layout.LENGTH + 6) {
                 if (s.owner.equals(mine)) return;
                 break;
             }
@@ -362,6 +476,14 @@ public final class InstanceManager {
         }
         InstanceData.get(server).dirty();
         return built;
+    }
+
+    /** Test automatique : origine (x, y, z) et proprietaire d'un exemplaire, ou {@code null}. */
+    public static String debugSlot(MinecraftServer server, String pool, int index) {
+        for (Slot s : InstanceData.get(server).slotsOf(pool)) {
+            if (s.index == index) return s.x + "," + s.y + "," + s.z + "," + (s.owner.isEmpty() ? "libre" : "occupe") + "," + s.ready;
+        }
+        return null;
     }
 
     public static int count(MinecraftServer server, String pool) {

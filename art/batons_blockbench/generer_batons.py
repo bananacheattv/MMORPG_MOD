@@ -56,7 +56,7 @@ GLYPHES = [  # runes 3x5 inspirees des futharks (motif commun de la famille)
     ['##.', '#.#', '##.', '#.#', '#.#'],
     ['#.#', '.#.', '#.#', '.#.', '#.#'],
 ]
-EMBLEME = ['..#..', '.###.', '##.##', '.###.', '..#..']   # rune d'Eldoria (losange evide), presente sur les six batons
+EMBLEME = ['..#..', '.###.', '##.##', '.###.', '..#..']   # rune d'Aeloria (losange evide), presente sur les six batons
 
 
 def crc(*key):
@@ -707,7 +707,7 @@ DISPLAY = {
 
 
 def uid(*key):
-    return str(uuid.uuid5(uuid.NAMESPACE_URL, 'eldoria/' + '/'.join(map(str, key))))
+    return str(uuid.uuid5(uuid.NAMESPACE_URL, 'aeloria/' + '/'.join(map(str, key))))
 
 
 def rot_vec(p):
@@ -835,7 +835,7 @@ def java_model(st, atlas):
 
     tex = f'{NS}:item/{st.key}'
     return {
-        'credit': 'Eldoria MMORPG - genere par generer_batons.py (Blockbench, format Java Block/Item)',
+        'credit': 'Aeloria MMORPG - genere par generer_batons.py (Blockbench, format Java Block/Item)',
         'texture_size': [size, size],
         'textures': {'0': tex, 'particle': tex},
         'elements': elements,
@@ -1009,7 +1009,7 @@ def main():
         os.makedirs(os.path.join(mc, *sub.split('/')), exist_ok=True)
     with open(os.path.join(ICI, 'minecraft', 'pack.mcmeta'), 'w', encoding='utf-8') as f:
         # format 97 = Minecraft 26.3 (a ajuster pour une autre version)
-        json.dump({'pack': {'description': 'Batons de mage Eldoria (6 evolutions)', 'min_format': 97, 'max_format': 97}}, f, indent=2)
+        json.dump({'pack': {'description': 'Batons de mage Aeloria (6 evolutions)', 'min_format': 97, 'max_format': 97}}, f, indent=2)
     done = []
     for fn in BATONS:
         st = fn()

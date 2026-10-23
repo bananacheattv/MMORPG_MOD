@@ -667,7 +667,7 @@ public final class CinematicClient {
                 g.pose().pushMatrix();
                 g.pose().translate(w / 2F, h / 2F - 14);
                 g.pose().scale(3F, 3F);
-                g.centeredText(mc.font, com.mmorpg.client.EldoriaFont.of("ELDORIA"), 0, 0, 0xFFFFD060);
+                g.centeredText(mc.font, com.mmorpg.client.AeloriaFont.of("AELORIA"), 0, 0, 0xFFFFD060);
                 g.pose().popMatrix();
                 float progress = warming && !warm.isEmpty() ? Mth.clamp((float) warmIndex / warm.size(), 0F, 1F) : 0F;
                 int bw = Math.min(200, w / 3);
@@ -734,7 +734,7 @@ public final class CinematicClient {
         g.pose().pushMatrix();
         g.pose().translate(x, y);
         g.pose().scale(2.4F, 2.4F);
-        g.text(mc.font, com.mmorpg.client.EldoriaFont.of(t.text), 0, 0, (t.color & 0xFFFFFF) | alpha, true);
+        g.text(mc.font, com.mmorpg.client.AeloriaFont.of(t.text), 0, 0, (t.color & 0xFFFFFF) | alpha, true);
         g.pose().popMatrix();
         g.fill(x, y + 24, x + Math.round(60 * a), y + 25, (t.color & 0xFFFFFF) | alpha);
         g.pose().pushMatrix();

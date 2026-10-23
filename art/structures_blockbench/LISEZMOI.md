@@ -1,4 +1,4 @@
-# Structures multiblocs d'Eldoria — autel, téléporteur, forge
+# Structures multiblocs d'Aeloria — autel, téléporteur, forge
 
 Trois structures **générées par script** d'après vos images : `python generer_structures.py` (Python 3.8+, Pillow, numpy ; `--rapide` sans GIF).
 Code commun : `structure_common.py` (pierre maçonnée, renforts argentés, runes, cristaux) et `../entity_kit.py`.

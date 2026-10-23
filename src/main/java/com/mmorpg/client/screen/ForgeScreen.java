@@ -91,7 +91,7 @@ public class ForgeScreen extends MmoScreen {
         for (int i = 0; i < tabs; i++) {
             final int t = i;
             String label = i < cats.length ? cats[i].label : "Amélioration";
-            button(g, left + 8 + i * tw, top + 24, tw - 3, 16, label, true, tab == i ? 0xFF6A4A1A : 0xFF2A2420, () -> {
+            button(g, left + 8 + i * tw, top + 24, tw - 3, 16, label, true, tab == i ? 0xFFE2B85A : 0xFF3B3350, () -> {
                 tab = t;
                 scroll = 0;
             });
@@ -116,7 +116,7 @@ public class ForgeScreen extends MmoScreen {
         int listTop = top + 70;
         int lw = 156;
         String filterLabel = classOnly ? "Ma classe" : "Toutes";
-        button(g, left + 166, top + 51, 54, 16, filterLabel, true, classOnly ? 0xFF3A5A2A : 0xFF2A2420, () -> classOnly = !classOnly);
+        button(g, left + 166, top + 51, 54, 16, filterLabel, true, classOnly ? 0xFF3A5A2A : 0xFF3B3350, () -> classOnly = !classOnly);
         List<ForgeRecipes.Recipe> list = new ArrayList<>();
         String q = search.getValue().toLowerCase(Locale.ROOT).strip();
         PlayerClass cls = ClientData.DATA.playerClass;

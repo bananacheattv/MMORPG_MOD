@@ -1,4 +1,4 @@
-# Eldoria MMORPG — mod Minecraft 26.3 (NeoForge)
+# Aeloria MMORPG — mod Minecraft 26.3 (NeoForge)
 
 Mod MMORPG complet : 4 classes qui évoluent (niveaux 1 à 100), 28 compétences, un système de statistiques, 24 armes et 17 sets d'armure, des monstres et boss entièrement configurables, de l'artisanat, des familiers, des téléporteurs, des donjons, des quêtes et des PNJ, des marchands et une monnaie, des groupes, des cosmétiques animés et des interfaces sur mesure.
 
@@ -126,17 +126,17 @@ Immobiles un moment, ils se reposent : le loup s'assoit puis s'endort, le golem 
 
 ## Hub d'entrée
 
-Un opérateur construit le hub avec `/hub set` (ou `/mmorpg hub`) dans sa **dimension dédiée** `mmorpg:hub` (vide, cycle jour/nuit du monde principal, sans monstres) : la **Citadelle d'Eldoria**, une grande île céleste (face inférieure rocheuse, cascades, lianes et cristaux lumineux, îlots flottants) avec une place de 31 blocs de rayon, sa **rotonde à dôme vitré** et son bassin annulaire à ponts, **quatre pavillons de classe** à colonnade ronde (chacun avec une grande sculpture : épée du Guerrier, obélisque du Mage, arc de l'Archer, bouclier du Paladin), un **portail à tours rondes**, le Téléporteur vers les villes et donjons, une **arène d'épreuve** à dôme et une **aire d'entraînement** circulaire avec ses mannequins. Le point d'apparition du monde y est placé. Les joueurs reviennent au hub avec `/hub` ; le Téléporteur du hub propose aussi la destination **« Monde principal »** (l'ancien point d'apparition du monde). La nuit, la citadelle reste éclairée : lampadaires, lanternes, cristaux lumineux dans les nervures du dôme et les colonnades, rangées lumineuses au sol des pavillons, palissade éclairée.
+Un opérateur construit le hub avec `/hub set` (ou `/mmorpg hub`) dans sa **dimension dédiée** `mmorpg:hub` (vide, cycle jour/nuit du monde principal, sans monstres) : la **Citadelle d'Aeloria**, une grande île céleste (face inférieure rocheuse, cascades, lianes et cristaux lumineux, îlots flottants) avec une place de 31 blocs de rayon, sa **rotonde à dôme vitré** et son bassin annulaire à ponts, **quatre pavillons de classe** à colonnade ronde (chacun avec une grande sculpture : épée du Guerrier, obélisque du Mage, arc de l'Archer, bouclier du Paladin), un **portail à tours rondes**, le Téléporteur vers les villes et donjons, une **arène d'épreuve** à dôme et une **aire d'entraînement** circulaire avec ses mannequins. Le point d'apparition du monde y est placé. Les joueurs reviennent au hub avec `/hub` ; le Téléporteur du hub propose aussi la destination **« Monde principal »** (l'ancien point d'apparition du monde). La nuit, la citadelle reste éclairée : lampadaires, lanternes, cristaux lumineux dans les nervures du dôme et les colonnades, rangées lumineuses au sol des pavillons, palissade éclairée.
 
 Le hub est **protégé** (réglage `hubProtection`) : on n'y casse ni ne pose de blocs, il n'y a ni PvP ni monstres hostiles (les opérateurs en créatif gardent la main pour l'aménager).
 
 À sa première arrivée dans le hub, un joueur voit une **cinématique** d'environ une minute (un seul mouvement de caméra continu et pré-chauffé pour rester fluide, barres cinéma, titres, sons et particules ; Espace ou Échap pour passer) qui survole le hub et présente les quatre classes. Il parle ensuite aux **Maîtres de classe**, des PNJ au modèle animé propre à chaque classe : il peut **essayer** n'importe quelle classe à un niveau choisi (1, 25, 50, 75 ou 100) dans la salle d'épreuve, avec son équipement et ses compétences, sans rien gagner ni perdre (son personnage est entièrement restauré à la sortie), puis **choisir** définitivement celle qu'il a essayée. Le Téléporteur du hub reste fermé tant qu'aucune classe n'est choisie.
 
-## Blocs de bâtisseur et police Eldoria
+## Blocs de bâtisseur et police Aeloria
 
-L'onglet créatif **« Eldoria : bâtisseur »** propose 19 matériaux décoratifs aux textures peintes pour le mod (marbre d'Eldoria, marbre poli et doré, colonne de marbre, pierre azur, pierre solaire, dalle runique, cristaux azur / arcanique / d'ambre lumineux, tuiles azur / pourpre / écarlate / sylvestre / de givre, bois ancien, or ouvragé, roche céleste, fer noirci), la plupart avec leurs **marches et dalles** pour arrondir les constructions. Ils servent au hub et sont utilisables par tous les bâtisseurs. Textures et modèles : `tools/gen_decor.py`.
+L'onglet créatif **« Aeloria : bâtisseur »** propose 19 matériaux décoratifs aux textures peintes pour le mod (marbre d'Aeloria, marbre poli et doré, colonne de marbre, pierre azur, pierre solaire, dalle runique, cristaux azur / arcanique / d'ambre lumineux, tuiles azur / pourpre / écarlate / sylvestre / de givre, bois ancien, or ouvragé, roche céleste, fer noirci), la plupart avec leurs **marches et dalles** pour arrondir les constructions. Ils servent au hub et sont utilisables par tous les bâtisseurs. Textures et modèles : `tools/gen_decor.py`.
 
-La **police pixel Eldoria** (capitales à empattements, accents français ; `tools/gen_font.py`) habille les titres de la cinématique, du dialogue des Maîtres de classe, de la bannière d'essai et les grands titres 3D du hub.
+La **police pixel Aeloria** (capitales à empattements, accents français ; `tools/gen_font.py`) habille les titres de la cinématique, du dialogue des Maîtres de classe, de la bannière d'essai et les grands titres 3D du hub.
 
 ## Mannequins d'entraînement
 
@@ -232,7 +232,7 @@ La disposition est enregistrée par joueur dans `config/mmorpg-hud.json` ; chaqu
 
 ### Options
 
-Dans Mods > Eldoria MMORPG > Configurer, on peut activer ou désactiver :
+Dans Mods > Aeloria MMORPG > Configurer, on peut activer ou désactiver :
 - les dégâts flottants ;
 - les barres de vie au-dessus des monstres ;
 - l'affichage de ses propres cosmétiques en vue à la première personne.
@@ -250,11 +250,11 @@ Dans Mods > Eldoria MMORPG > Configurer, on peut activer ou désactiver :
 À chaque push sur `main`, le workflow `Release launcher` compile le mod et met à jour la release GitHub
 [`latest`](https://github.com/bananacheattv/MMORPG_MOD/releases/tag/latest).
 
-Joueurs : télécharger `EldoriaLauncher-Windows.zip`, dézipper, lancer `EldoriaLauncher.exe`
-(ou `EldoriaLauncher.jar` avec Java 21+). Le launcher, sans passer par le launcher officiel :
+Joueurs : télécharger `AeloriaLauncher-Windows.zip`, dézipper, lancer `AeloriaLauncher.exe`
+(ou `AeloriaLauncher.jar` avec Java 21+). Le launcher, sans passer par le launcher officiel :
 - se met à jour tout seul (son cœur `launcher-core.jar` est retéléchargé quand il change) ;
 - télécharge Java, Minecraft, NeoForge et les ressources dans `%APPDATA%\.eldoria\minecraft` ;
-- synchronise les mods dans `%APPDATA%\.eldoria\instance\mods` (Eldoria + WorldEdit pour la bonne version,
+- synchronise les mods dans `%APPDATA%\.eldoria\instance\mods` (Aeloria + WorldEdit pour la bonne version,
   résolu sur Modrinth ; liste dans `launcher/extra_mods.json`, les mods ajoutés à la main sont gardés) ;
 - lance le jeu avec un compte Microsoft, ou un pseudo hors ligne (solo / serveur `online-mode=false`).
 

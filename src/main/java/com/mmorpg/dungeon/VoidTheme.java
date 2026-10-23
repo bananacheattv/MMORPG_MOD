@@ -91,9 +91,9 @@ final class VoidTheme extends Theme {
     }
 
     @Override
-    void roomA() {
-        double cz = A_Z;
-        Kit.ribs(c, 0, cz, A_R, A_R, A_H, 9, 12, Blocks.PURPUR_PILLAR);
+    void roomA(Layout.Room rm) {
+        double cz = rm.z();
+        Kit.ribs(c, 0, cz, rm.r(), rm.r(), rm.h(), 9, 12, Blocks.PURPUR_PILLAR);
         // anneaux concentriques d'obsidienne et de cristaux pleurants autour d'une pierre de runes
         c.ring(0, 0, (int) cz, 2.5, 3.5, (x, y, z) -> c.state("cristal_arcane"));
         c.ring(0, 0, (int) cz, 6.5, 7.5, (x, y, z) -> c.state("dalle_runique"));
@@ -103,17 +103,17 @@ final class VoidTheme extends Theme {
             double a = Math.PI * 2 * i / 6;
             floating((int) Math.round(Math.cos(a) * 10.5), (int) Math.round(cz + Math.sin(a) * 10.5), 2 + (i % 3) * 2);
         }
-        Kit.colonnade(c, 0, cz, 13.2, 8, 0.4, 1, A_H, Blocks.PURPUR_BLOCK, Blocks.PURPUR_PILLAR, Blocks.PURPUR_STAIRS);
+        Kit.colonnade(c, 0, cz, 13.2, 8, 0.4, 1, rm.h(), Blocks.PURPUR_BLOCK, Blocks.PURPUR_PILLAR, Blocks.PURPUR_STAIRS);
         for (int i = 0; i < 3; i++) {
             double a = Math.PI * 2 * i / 3 + 0.5;
-            Kit.chandelier(c, A_H + 7, (int) Math.round(Math.cos(a) * 8), (int) Math.round(cz + Math.sin(a) * 8), 4, Blocks.SOUL_LANTERN);
+            Kit.chandelier(c, rm.h() + 7, (int) Math.round(Math.cos(a) * 8), (int) Math.round(cz + Math.sin(a) * 8), 4, Blocks.SOUL_LANTERN);
         }
     }
 
     @Override
-    void pit() {
+    void pit(int z0, int z1) {
         // abime du neant : le sol du fosse est un champ d'etoiles ; le pont lui-meme est de purpur et de cristal
-        for (int z = PIT_Z0; z <= PIT_Z1; z++) {
+        for (int z = z0; z <= z1; z++) {
             for (int x = -PIT_HALF; x <= PIT_HALF; x++) {
                 if (Math.abs(x) <= DECK) continue;
                 c.set(x, -PIT_DEPTH, z, Blocks.CONCRETE.pick(DyeColor.BLACK));
@@ -122,7 +122,7 @@ final class VoidTheme extends Theme {
             }
             for (int x = -DECK; x <= DECK; x++) c.set(x, 0, z, x == 0 ? c.state("dalle_runique") : c.state(Blocks.PURPUR_PILLAR));
         }
-        for (int z = PIT_Z0; z <= PIT_Z1; z += 4) {
+        for (int z = z0; z <= z1; z += 4) {
             for (int side : new int[]{-2, 2}) {
                 c.set(side, 1, z, Blocks.PURPUR_PILLAR);
                 c.set(side, 2, z, Blocks.PURPUR_PILLAR);
@@ -132,9 +132,9 @@ final class VoidTheme extends Theme {
     }
 
     @Override
-    void roomB() {
-        double cz = B_Z;
-        Kit.ribs(c, 0, cz, B_R, B_R, B_H, 9, 12, Blocks.PURPUR_PILLAR);
+    void roomB(Layout.Room rm) {
+        double cz = rm.z();
+        Kit.ribs(c, 0, cz, rm.r(), rm.r(), rm.h(), 9, 12, Blocks.PURPUR_PILLAR);
         // sphere d'etoiles : anneaux d'obelisques flottants sur trois hauteurs autour d'un cristal
         for (int ring = 0; ring < 3; ring++) {
             for (int i = 0; i < 6; i++) {
@@ -150,7 +150,7 @@ final class VoidTheme extends Theme {
         }
         for (int i = 0; i < 3; i++) {
             double a = Math.PI * 2 * i / 3;
-            Kit.chandelier(c, B_H + 7, (int) Math.round(Math.cos(a) * 8), (int) Math.round(cz + Math.sin(a) * 8), 4, Blocks.SOUL_LANTERN);
+            Kit.chandelier(c, rm.h() + 7, (int) Math.round(Math.cos(a) * 8), (int) Math.round(cz + Math.sin(a) * 8), 4, Blocks.SOUL_LANTERN);
         }
     }
 
@@ -225,12 +225,23 @@ final class VoidTheme extends Theme {
     @Override
     Trials.Palette palette() {
         return new Trials.Palette(Blocks.CRYING_OBSIDIAN, Blocks.PEARLESCENT_FROGLIGHT, Blocks.PURPUR_BLOCK, Blocks.OBSIDIAN, Blocks.END_ROD,
-                java.util.List.of("chevalier_neant", "golem_cristal"), java.util.Map.of(TrialData.WAVES, "LÉGION DU NÉANT", TrialData.JUMP, "PARCOURS DU VIDE", TrialData.SIMON, "ÉNIGME DES ÉTOILES", TrialData.TARGETS, "TIR AUX ÉTOILES"), Blocks.OBSIDIAN, Blocks.SOUL_LANTERN);
+                java.util.List.of("chevalier_neant", "golem_cristal"), java.util.Map.of(TrialData.WAVES, "LÉGION DU NÉANT", TrialData.JUMP, "PARCOURS DU VIDE", TrialData.SIMON, "ÉNIGME DES ÉTOILES", TrialData.TARGETS, "TIR AUX ÉTOILES", TrialData.ORDER, "SIGNES DU NÉANT", TrialData.ELITE, "DÉVOREUR D'ÉTOILES", TrialData.AMBUSH, "FAILLE DU NÉANT"), Blocks.OBSIDIAN, Blocks.SOUL_LANTERN);
     }
 
     @Override
     Trials.Plan plan() {
-        return new Trials.Plan(TrialData.TARGETS, TrialData.JUMP, TrialData.SIMON, 1, 2, 3);
+        // salle 1, couloir 1, salle 2, salle 3, couloir 2, salle 4, salle 5, gardien d'elite
+        return Trials.plan(TrialData.SIMON, 2, TrialData.JUMP, 2, TrialData.WAVES, 2, TrialData.ORDER, 2, TrialData.JUMP, 2, TrialData.TARGETS, 2, Trials.JUMPROOM, 2, TrialData.ELITE, 3);
+    }
+
+    @Override
+    String eliteKey() {
+        return "devoreur_etoiles";
+    }
+
+    @Override
+    Look look() {
+        return new Look(Blocks.PURPUR_PILLAR, Blocks.PURPUR_BLOCK, Blocks.PURPUR_STAIRS, Blocks.SOUL_LANTERN, Blocks.SOUL_CAMPFIRE, Blocks.OBSIDIAN, Blocks.PURPUR_BLOCK, Blocks.CRYING_OBSIDIAN);
     }
 
     @Override

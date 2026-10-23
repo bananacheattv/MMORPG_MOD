@@ -61,14 +61,14 @@ C'est le seul format Blockbench qui donne directement un modèle d'item Minecraf
 **Fil conducteur de la famille :**
 - la même poignée en cuir, de y=0 à y=8, avec sa lanière ;
 - le même manche de 2 unités ;
-- la rune d'Eldoria (un losange évidé) :
+- la rune d'Aeloria (un losange évidé) :
   - niveau 1 : gravée dans un nœud du bois ;
   - niveau 20 : incrustée en bleu dans le collier ;
   - niveau 40 et suivants : en argent ou lumineuse.
 
 ## Utiliser les modèles dans Minecraft
 
-**Déjà intégré au mod Eldoria.** `tools/generate_assets.py` (fonction `staff_models_3d`) copie les modèles et associe chaque bâton à son modèle :
+**Déjà intégré au mod Aeloria.** `tools/generate_assets.py` (fonction `staff_models_3d`) copie les modèles et associe chaque bâton à son modèle :
 
 | Objet du mod | Niveau requis | Modèle |
 |---|---|---|

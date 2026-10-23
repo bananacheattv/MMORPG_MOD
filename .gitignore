@@ -42,3 +42,6 @@ repo/
 # Generated Python bytecode
 __pycache__/
 *.pyc
+
+# cache des sources sonores (tools/fetch_sfx_sources.py)
+tools/_sfx_cache/

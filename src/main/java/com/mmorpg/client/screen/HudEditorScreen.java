@@ -149,7 +149,7 @@ public class HudEditorScreen extends Screen {
         int x = panelX;
         int y = panelY;
         Ui.panel(g, x, y, PW, PH);
-        g.fillGradient(x + 2, y + 2, x + PW - 2, y + 14, 0xFF4A3618, 0xFF2A1E10);
+        g.fill(x + 1, y + 1, x + PW - 1, y + 14, 0xFF1E1929);
         Ui.scaledText(g, "Édition de l'interface", x + PW / 2f, y + 4, 0.85f, Ui.GOLD_LIGHT, true);
         String[] help = {
                 "Glisser : déplacer  •  Molette : taille  •  Clic droit : masquer",
@@ -182,8 +182,8 @@ public class HudEditorScreen extends Screen {
 
     private void button(GuiGraphicsExtractor g, int x, int y, int w, int h, String label, int mx, int my, Runnable action) {
         boolean hover = Ui.in(mx, my, x, y, w, h);
-        g.fillGradient(x, y, x + w, y + h, hover ? 0xFF5A4220 : 0xFF2C2218, hover ? 0xFF3A2A14 : 0xFF161012);
-        Ui.border(g, x, y, w, h, hover ? Ui.GOLD : Ui.GOLD_DARK);
+        g.fill(x, y, x + w, y + h, hover ? Ui.CARD_HOVER : Ui.CARD);
+        Ui.border(g, x, y, w, h, hover ? Ui.GOLD : Ui.LINE);
         float sc = Math.min(0.75f, (w - 6) / (float) Math.max(1, font.width(label)));
         Ui.scaledText(g, label, x + w / 2f, y + h / 2f - 4 * sc, sc, hover ? Ui.GOLD_LIGHT : Ui.TEXT, true);
         buttons.add(new Object[]{new int[]{x, y, w, h}, action});

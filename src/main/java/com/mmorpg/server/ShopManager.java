@@ -57,7 +57,7 @@ public final class ShopManager {
             return;
         }
         RpgPlayers.give(p, item, offer.count * times);
-        p.level().playSound(null, p.blockPosition(), SoundEvents.VILLAGER_YES, SoundSource.NEUTRAL, 0.6f, 1.1f);
+        p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.COINS.get(), SoundSource.NEUTRAL, 0.8f, 1f);
         p.sendOverlayMessage(Component.literal("Achat : " + new ItemStack(item).getHoverName().getString() + " x" + offer.count * times
                 + " (-" + cost + " or)").withColor(0xFFD040));
     }

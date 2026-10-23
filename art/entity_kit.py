@@ -561,7 +561,7 @@ def build_texture(model):
 
 # ================================================================================================ export .bbmodel
 def uid(*key):
-    return str(uuid.uuid5(uuid.NAMESPACE_URL, 'eldoria-entite/' + '/'.join(map(str, key))))
+    return str(uuid.uuid5(uuid.NAMESPACE_URL, 'aeloria-entite/' + '/'.join(map(str, key))))
 
 
 def fnum(v):

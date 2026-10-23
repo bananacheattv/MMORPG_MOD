@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Familiers d'Eldoria pour Blockbench (format "Modded Entity"), generes entierement par script.
+Familiers d'Aeloria pour Blockbench (format "Modded Entity"), generes entierement par script.
 
 Usage :
   python generer_familiers.py              tous les familiers, avec apercus et GIF

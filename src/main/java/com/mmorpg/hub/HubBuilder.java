@@ -28,11 +28,11 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Construction du hub d'entree (/mmorpg hub) : la « Citadelle d'Eldoria », une ile celeste a face inferieure rocheuse effilee
+ * Construction du hub d'entree (/mmorpg hub) : la « Citadelle d'Aeloria », une ile celeste a face inferieure rocheuse effilee
  * (cascades, cristaux lumineux, lianes) portant une grande place circulaire, sa rotonde a dome vitre et son bassin annulaire,
  * quatre pavillons de classe, un portail a tours rondes, un teleporteur, une arene d'epreuve coiffee d'un dome et une aire
  * d'entrainement ronde, entoures de jardins et d'ilots flottants. Les blocs viennent de {@link com.mmorpg.registry.DecorBlocks}
- * (textures peintes pour le mod), les titres geants sont des entites d'affichage de texte en police « Eldoria ».
+ * (textures peintes pour le mod), les titres geants sont des entites d'affichage de texte en police « Aeloria ».
  * Reconstruire le hub au meme endroit remplace ses PNJ, mannequins et textes sans les dupliquer.
  */
 public final class HubBuilder {
@@ -47,6 +47,7 @@ public final class HubBuilder {
 
     /** Identifiant stable d'une entite du hub : reconstruire le hub ne cree donc jamais de doublon, meme dans une zone non chargee. */
     static UUID stable(String key) {
+        // la graine garde l'ancien nom du jeu : elle fixe l'identite des PNJ et des textes deja poses dans les hubs existants
         return UUID.nameUUIDFromBytes(("eldoria-hub:" + key).getBytes(StandardCharsets.UTF_8));
     }
 
@@ -107,13 +108,13 @@ public final class HubBuilder {
         int oz = c.O.getZ();
         java.util.function.BiConsumer<String[], int[]> add = (txt, r) -> data.add(new com.mmorpg.zone.ZoneData.Zone("hub_" + txt[0], txt[1], dim,
                 ox + r[0], oz + r[1], ox + r[2], oz + r[3], false, false, false, com.mmorpg.zone.ZoneData.Zone.STYLE_ZONE, txt[2]));
-        add.accept(new String[]{"citadelle", "Citadelle d'Eldoria", "Capitale des héros"}, new int[]{-52, -106, HubLayout.YARD_X1 + 12, 66});
+        add.accept(new String[]{"citadelle", "Citadelle d'Aeloria", "Capitale des héros"}, new int[]{-52, -106, HubLayout.YARD_X1 + 12, 66});
         add.accept(new String[]{"rotonde", "Place des Héros", "Parlez au Maître des classes"}, new int[]{-31, -31, 31, 31});
         add.accept(new String[]{"epreuve", "Épreuve des Héros", "Essayez une classe avant de la choisir"},
                 new int[]{-HubLayout.ROOM_HALF, HubLayout.ROOM_Z0, HubLayout.ROOM_HALF, HubLayout.ROOM_Z1});
         add.accept(new String[]{"entrainement", "Aire d'entraînement", "Mannequins de combat"},
                 new int[]{HubLayout.YARD_X0, -HubLayout.YARD_HALF, HubLayout.YARD_X1, HubLayout.YARD_HALF});
-        add.accept(new String[]{"portail", "Portail d'Eldoria", "Le monde vous attend"}, new int[]{-12, 26, 12, 60});
+        add.accept(new String[]{"portail", "Portail d'Aeloria", "Le monde vous attend"}, new int[]{-12, 26, 12, 60});
         String[][] mottos = {{"Guerrier", "Force et férocité"}, {"Mage", "Intelligence et esprit"}, {"Archer", "Agilité et dextérité"}, {"Paladin", "Vitalité et endurance"}};
         for (int i = 0; i < 4; i++) {
             int[] sp = HubLayout.classSpot(CLASSES[i]);
@@ -400,11 +401,11 @@ public final class HubBuilder {
         }
     }
 
-    // ================================================================== textes en police Eldoria
+    // ================================================================== textes en police Aeloria
 
     static void text(HubCtx c, double x, double y, double z, String text, String color, float scale) {
         UUID id = stable("text:" + textIndex++);
-        String snbt = String.format(Locale.ROOT, "{text:{text:\"%s\",font:\"mmorpg:eldoria\",color:\"%s\"},billboard:\"center\",background:0,shadow:true,"
+        String snbt = String.format(Locale.ROOT, "{text:{text:\"%s\",font:\"mmorpg:aeloria\",color:\"%s\"},billboard:\"center\",background:0,shadow:true,"
                 + "see_through:false,line_width:600,Tags:[\"%s\"],UUID:[I;%d,%d,%d,%d],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],"
                 + "translation:[0f,0f,0f],scale:[%.2ff,%.2ff,%.2ff]}}", text.replace("\"", "\\\""), color, TAG,
                 (int) (id.getMostSignificantBits() >> 32), (int) id.getMostSignificantBits(), (int) (id.getLeastSignificantBits() >> 32),
@@ -414,8 +415,19 @@ public final class HubBuilder {
                 String.format(Locale.ROOT, "summon minecraft:text_display %.2f %.2f %.2f %s", c.O.getX() + x + 0.5, c.O.getY() + y, c.O.getZ() + z + 0.5, snbt));
     }
 
+    /**
+     * Fait reapparaitre les PNJ, mannequins et textes du hub qui manquent (identifiants stables : ceux qui existent deja sont ignores).
+     * Sert a reparer un hub dont les entites ont ete retirees sans le reconstruire.
+     */
+    public static void respawn(ServerLevel level, BlockPos origin) {
+        HubCtx c = new HubCtx(level, origin.immutable());
+        textIndex = 0;
+        texts(c);
+        entities(c);
+    }
+
     private static void texts(HubCtx c) {
-        text(c, 0, 33, 36, "ELDORIA", "#FFD060", 12F);
+        text(c, 0, 33, 36, "AELORIA", "#FFD060", 12F);
         text(c, 0, 28.6, 36, "Citadelle des héros", "#F0E8D8", 3.4F);
         for (PlayerClass cls : CLASSES) {
             int[] s = HubLayout.classSpot(cls);

@@ -117,8 +117,8 @@ public final class MmoHud {
             partyFrames(g, mc);
             HudLayout.end(g);
         }
-        if (HudLayout.begin(g, HudLayout.ELDORIA)) {
-            eldoriaBoard(g, mc);
+        if (HudLayout.begin(g, HudLayout.AELORIA)) {
+            aeloriaBoard(g, mc);
             HudLayout.end(g);
         }
         if (HudLayout.begin(g, HudLayout.QUETES)) {
@@ -148,11 +148,9 @@ public final class MmoHud {
     }
 
     private static void smallPanel(GuiGraphicsExtractor g, int x, int y, int w, int h, int accent) {
-        g.fillGradient(x, y, x + w, y + h, 0xD01C1624, 0xD00C0A12);
-        Ui.border(g, x, y, w, h, Ui.GOLD_DARK);
-        Ui.border(g, x + 1, y + 1, w - 2, h - 2, Ui.withAlpha(accent, 0x50));
-        Ui.diamond(g, x, y, 2, Ui.GOLD);
-        Ui.diamond(g, x + w - 1, y, 2, Ui.GOLD);
+        g.fill(x, y, x + w, y + h, 0xD00D0B14);
+        Ui.border(g, x, y, w, h, Ui.LINE);
+        g.fill(x, y, x + 2, y + h, Ui.withAlpha(accent, 0xE0));
     }
 
     // ------------------------------------------------------------------ tailles (pour l'ancrage et l'editeur)
@@ -361,10 +359,10 @@ public final class MmoHud {
         Ui.bar(g, x + 6, y + 17, w - 12, 8, frac, 0xFFE84040, 0xFF7A1010, hpText);
     }
 
-    private static void eldoriaBoard(GuiGraphicsExtractor g, Minecraft mc) {
+    private static void aeloriaBoard(GuiGraphicsExtractor g, Minecraft mc) {
         var d = ClientData.DATA;
         Ui.frame(g, 0, 0, 153, 44, Ui.GOLD, false);
-        g.text(mc.font, "✦ ELDORIA", 5, 4, Ui.GOLD, false);
+        g.text(mc.font, "✦ AELORIA", 5, 4, Ui.GOLD, false);
         int online = mc.getConnection() == null ? 0 : mc.getConnection().getOnlinePlayers().size();
         String count = online + " en ligne";
         g.text(mc.font, count, 148 - mc.font.width(count), 4, Ui.MUTED, false);
@@ -503,7 +501,7 @@ public final class MmoHud {
         for (int i = 0; i < PlayerData.SKILL_SLOTS; i++) {
             int sx = x + i * (slot + gap);
             g.fill(sx, y, sx + slot, y + slot, 0xFF0C0A10);
-            Ui.border(g, sx, y, slot, slot, 0xFF5A4630);
+            Ui.border(g, sx, y, slot, slot, 0xFF2B2538);
             Skill s = Skills.get(d.skillBar[i]);
             if (s != null) {
                 Ui.icon(g, Ui.skillIcon(s.id), sx + 1, y + 1, slot - 2, 32);
@@ -542,7 +540,7 @@ public final class MmoHud {
         smallPanel(g, 0, 0, w, h, cls.color);
         float pulse = 0.5f + 0.5f * (float) Math.sin(System.currentTimeMillis() / 260.0);
         Ui.diamond(g, 10, 15, 4, Ui.lighter(cls.color, 0.2f + 0.5f * pulse));
-        g.text(f, com.mmorpg.client.EldoriaFont.of("ESSAI — " + cls.label + " niv. " + level), 20, 5, cls.color, true);
+        g.text(f, com.mmorpg.client.AeloriaFont.of("ESSAI — " + cls.label + " niv. " + level), 20, 5, cls.color, true);
         long secs = HudLayout.editing ? 83 : (System.nanoTime() - ClientData.trialSince) / 1_000_000_000L;
         String time = String.format(java.util.Locale.ROOT, "%d:%02d", secs / 60, secs % 60);
         g.text(f, time, w - 8 - f.width(time), 5, Ui.MUTED, false);
@@ -611,10 +609,9 @@ public final class MmoHud {
             // reste dans l'ecran (de pres, la tete du mannequin sort par le haut)
             float top = s[1] + y * scale;
             if (top < 4) g.pose().translate(0, 4 - top);
-            g.fillGradient(x, y, x + bw, y + bh, Ui.alpha(0xD01C1624, fade), Ui.alpha(0xD00C0A12, fade));
-            Ui.border(g, x, y, bw, bh, Ui.alpha(Ui.GOLD_DARK, fade));
-            Ui.diamond(g, x, y, 2, Ui.alpha(Ui.GOLD, fade));
-            Ui.diamond(g, x + bw - 1, y, 2, Ui.alpha(Ui.GOLD, fade));
+            g.fill(x, y, x + bw, y + bh, Ui.alpha(0xD00D0B14, fade));
+            Ui.border(g, x, y, bw, bh, Ui.alpha(Ui.LINE, fade));
+            g.fill(x, y, x + 2, y + bh, Ui.alpha(Ui.GOLD, fade));
             g.centeredText(f, Component.literal(d.config().name), 0, y + 4, Ui.alpha(Ui.GOLD_LIGHT, fade));
             g.fill(x + 6, y + 14, x + bw - 6, y + 15, Ui.alpha(Ui.GOLD_DARK, fade));
             String dps = Ui.fmt(Math.round(shown[0]));

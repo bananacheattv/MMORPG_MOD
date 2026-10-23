@@ -84,10 +84,10 @@ final class InfernalTheme extends Theme {
     }
 
     @Override
-    void roomA() {
-        double cz = A_Z;
-        Kit.ribs(c, 0, cz, A_R, A_R, A_H, 9, 10, Blocks.POLISHED_BLACKSTONE_BRICKS);
-        Kit.band(c, 0, cz, A_R, 4, Blocks.NETHER_BRICKS);
+    void roomA(Layout.Room rm) {
+        double cz = rm.z();
+        Kit.ribs(c, 0, cz, rm.r(), rm.r(), rm.h(), 9, 10, Blocks.POLISHED_BLACKSTONE_BRICKS);
+        Kit.band(c, 0, cz, rm.r(), 4, Blocks.NETHER_BRICKS);
         // fosse de lave centrale avec ilot-brasero, chaussees en croix
         c.disc(0, 0, (int) cz, 7.0, (x, y, z) -> {
             double d = Math.hypot(x, z - cz);
@@ -98,17 +98,17 @@ final class InfernalTheme extends Theme {
         c.set(0, 1, (int) cz, Blocks.NETHER_BRICK_FENCE);
         c.set(0, 2, (int) cz, Blocks.NETHER_BRICK_FENCE);
         c.set(0, 3, (int) cz, Blocks.CAMPFIRE);
-        Kit.colonnade(c, 0, cz, 12.5, 8, Math.PI / 8, 1, A_H, Blocks.POLISHED_BLACKSTONE_BRICKS, Blocks.NETHER_BRICKS, Blocks.NETHER_BRICK_STAIRS);
+        Kit.colonnade(c, 0, cz, 12.5, 8, Math.PI / 8, 1, rm.h(), Blocks.POLISHED_BLACKSTONE_BRICKS, Blocks.NETHER_BRICKS, Blocks.NETHER_BRICK_STAIRS);
         for (int i = 0; i < 4; i++) {
             double a = Math.PI * 2 * i / 4 + Math.PI / 4;
-            Kit.chandelier(c, A_H + 6, (int) Math.round(Math.cos(a) * 9), (int) Math.round(cz + Math.sin(a) * 9), 4, Blocks.LANTERN);
+            Kit.chandelier(c, rm.h() + 6, (int) Math.round(Math.cos(a) * 9), (int) Math.round(cz + Math.sin(a) * 9), 4, Blocks.LANTERN);
         }
     }
 
     @Override
-    void pit() {
+    void pit(int z0, int z1) {
         // lac de lave sous le pont, poutres de basalte, braseros sur les piles
-        for (int z = PIT_Z0; z <= PIT_Z1; z++) {
+        for (int z = z0; z <= z1; z++) {
             for (int x = -PIT_HALF; x <= PIT_HALF; x++) {
                 if (Math.abs(x) <= DECK) continue;
                 c.set(x, -PIT_DEPTH, z, Blocks.OBSIDIAN);
@@ -117,7 +117,7 @@ final class InfernalTheme extends Theme {
             }
             for (int x = -DECK; x <= DECK; x++) c.set(x, 0, z, c.mix(x, 0, z, 13, Blocks.POLISHED_BLACKSTONE_BRICKS, 60, Blocks.NETHER_BRICKS, 40));
         }
-        for (int z = PIT_Z0; z <= PIT_Z1; z += 4) {
+        for (int z = z0; z <= z1; z += 4) {
             for (int side : new int[]{-2, 2}) {
                 c.set(side, 1, z, Blocks.NETHER_BRICK_WALL);
                 c.set(side, 2, z, Blocks.NETHER_BRICK_WALL);
@@ -130,7 +130,7 @@ final class InfernalTheme extends Theme {
                 c.set(0, y, z, Blocks.POLISHED_BLACKSTONE_BRICKS);
             }
         }
-        for (int z = PIT_Z0; z <= PIT_Z1; z++) {
+        for (int z = z0; z <= z1; z++) {
             if (z % 4 == 0) continue;
             c.set(-2, 1, z, Blocks.NETHER_BRICK_FENCE);
             c.set(2, 1, z, Blocks.NETHER_BRICK_FENCE);
@@ -138,9 +138,9 @@ final class InfernalTheme extends Theme {
     }
 
     @Override
-    void roomB() {
-        double cz = B_Z;
-        Kit.ribs(c, 0, cz, B_R, B_R, B_H, 9, 10, Blocks.POLISHED_BLACKSTONE_BRICKS);
+    void roomB(Layout.Room rm) {
+        double cz = rm.z();
+        Kit.ribs(c, 0, cz, rm.r(), rm.r(), rm.h(), 9, 10, Blocks.POLISHED_BLACKSTONE_BRICKS);
         // salle des forges : enclumes, fournaises et chaudrons de lave
         for (int[] p : new int[][]{{-9, -4}, {-9, 4}, {9, -4}, {9, 4}}) {
             c.fill(p[0] - 1, 1, (int) cz + p[1] - 1, p[0] + 1, 1, (int) cz + p[1] + 1, Blocks.POLISHED_BLACKSTONE_BRICKS);
@@ -151,11 +151,11 @@ final class InfernalTheme extends Theme {
             double a = Math.PI * 2 * i / 8;
             int x = (int) Math.round(Math.cos(a) * 12.3);
             int z = (int) Math.round(cz + Math.sin(a) * 12.3);
-            for (int y = 1; y <= B_H; y++) c.set(x, y, z, y % 4 == 0 ? Blocks.CHISELED_POLISHED_BLACKSTONE : Blocks.POLISHED_BLACKSTONE_BRICKS);
+            for (int y = 1; y <= rm.h(); y++) c.set(x, y, z, y % 4 == 0 ? Blocks.CHISELED_POLISHED_BLACKSTONE : Blocks.POLISHED_BLACKSTONE_BRICKS);
         }
         // grande chaine de forge et seaux de lave suspendus
         for (int[] p : new int[][]{{-4, 0}, {4, 0}}) {
-            for (int y = B_H + 6; y > 6; y--) c.set(p[0], y, (int) cz + p[1], Blocks.IRON_CHAIN);
+            for (int y = rm.h() + 6; y > 6; y--) c.set(p[0], y, (int) cz + p[1], Blocks.IRON_CHAIN);
             c.set(p[0], 5, (int) cz + p[1], Blocks.LAVA_CAULDRON);
         }
         for (int side : new int[]{-1, 1}) {
@@ -235,12 +235,23 @@ final class InfernalTheme extends Theme {
     @Override
     Trials.Palette palette() {
         return new Trials.Palette(Blocks.NETHER_BRICK_FENCE, Blocks.GLOWSTONE, Blocks.POLISHED_BLACKSTONE_BRICKS, Blocks.BLACKSTONE, Blocks.LANTERN,
-                java.util.List.of("elementaire_feu", "orc_guerrier"), java.util.Map.of(TrialData.WAVES, "FOURNAISE DES DÉMONS", TrialData.JUMP, "TRAVERSÉE DE LAVE", TrialData.SIMON, "ÉNIGME DES FORGES", TrialData.ORDER, "LEVIERS DE LA FORGE"), Blocks.LAVA, Blocks.LANTERN);
+                java.util.List.of("elementaire_feu", "orc_guerrier"), java.util.Map.of(TrialData.WAVES, "FOURNAISE DES DÉMONS", TrialData.JUMP, "TRAVERSÉE DE LAVE", TrialData.SIMON, "ÉNIGME DES FORGES", TrialData.ORDER, "LEVIERS DE LA FORGE", TrialData.TARGETS, "TIR AUX BRASIERS", TrialData.ELITE, "DJINN DES BRAISES", TrialData.AMBUSH, "EMBUSCADE ARDENTE"), Blocks.LAVA, Blocks.LANTERN);
     }
 
     @Override
     Trials.Plan plan() {
-        return new Trials.Plan(TrialData.WAVES, TrialData.JUMP, TrialData.ORDER, 1, 1, 1);
+        // salle 1, couloir 1, salle 2, salle 3, couloir 2, salle 4, salle 5, gardien d'elite
+        return Trials.plan(TrialData.WAVES, 1, TrialData.JUMP, 1, TrialData.SIMON, 1, TrialData.ORDER, 1, TrialData.JUMP, 2, TrialData.WAVES, 2, Trials.JUMPROOM, 1, TrialData.ELITE, 2);
+    }
+
+    @Override
+    String eliteKey() {
+        return "djinn_braises";
+    }
+
+    @Override
+    Look look() {
+        return new Look(Blocks.POLISHED_BLACKSTONE_BRICKS, Blocks.NETHER_BRICKS, Blocks.NETHER_BRICK_STAIRS, Blocks.LANTERN, Blocks.CAMPFIRE, Blocks.POLISHED_BLACKSTONE_BRICKS, Blocks.NETHER_BRICKS, Blocks.GILDED_BLACKSTONE);
     }
 
     @Override

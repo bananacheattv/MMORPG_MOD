@@ -149,7 +149,7 @@ public final class LoadingClient {
         int cx = w / 2;
         int cy = Math.round(h * 0.34F);
         // titre et filet
-        var comp = EldoriaFont.of(title);
+        var comp = AeloriaFont.of(title);
         int tw = mc.font.width(comp);
         float scale = Math.min(3.4F, w * 0.82F / Math.max(1, tw));
         g.pose().pushMatrix();

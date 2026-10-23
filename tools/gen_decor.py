@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Blocs de decor « Eldoria » (marbre, pierre azur, cristaux, tuiles, bois ancien...) : textures peintes par code dans une palette
+"""Blocs de decor « Aeloria » (marbre, pierre azur, cristaux, tuiles, bois ancien...) : textures peintes par code dans une palette
 douce et coherente, modeles, etats, objets, tables de butin, etiquettes et traductions.
 
 La liste MATERIALS doit rester identique a celle de com.mmorpg.registry.DecorBlocks (Java).
@@ -16,7 +16,7 @@ MODID = 'mmorpg'
 
 # id, nom fr, nom en, variantes (marches + dalle), colonne (axe)
 MATERIALS = [
-    ('marbre', "Marbre d'Eldoria", 'Eldoria Marble', True, False),
+    ('marbre', "Marbre d'Aeloria", 'Aeloria Marble', True, False),
     ('marbre_poli', 'Marbre poli', 'Polished Marble', True, False),
     ('marbre_dore', 'Marbre doré', 'Gilded Marble', False, False),
     ('colonne_marbre', 'Colonne de marbre', 'Marble Column', False, True),
@@ -459,8 +459,8 @@ def generate(ga):
                 ga.LANG_EN[f'block.{MODID}.{bid}'] = en_s
                 mineable.append(f'{MODID}:{bid}')
                 write_loot(ga, data, bid, kind == 'slab')
-    ga.LANG[f'itemGroup.{MODID}.batisseur'] = "Eldoria : bâtisseur"
-    ga.LANG_EN[f'itemGroup.{MODID}.batisseur'] = 'Eldoria: Builder'
+    ga.LANG[f'itemGroup.{MODID}.batisseur'] = "Aeloria : bâtisseur"
+    ga.LANG_EN[f'itemGroup.{MODID}.batisseur'] = 'Aeloria: Builder'
     tag = os.path.join(data, 'minecraft', 'tags', 'block', 'mineable', 'pickaxe.json')
     with open(tag, encoding='utf-8') as f:
         cur = json.load(f)

@@ -100,6 +100,31 @@ public final class HubManager {
         }
     }
 
+    /**
+     * Construit le hub s'il n'existe pas encore (monde neuf) : sans lui, un nouveau joueur apparaitrait dans le monde ordinaire au lieu
+     * de la Citadelle. La construction definit aussi le point d'apparition du monde sur le hub. @return vrai si le hub vient d'etre construit
+     */
+    public static boolean ensureHub(net.minecraft.server.MinecraftServer server) {
+        if (HubData.get(server).exists()) return false;
+        ServerLevel level = server.getLevel(HUB_DIM);
+        if (level == null) return false;
+        com.mmorpg.MMORPG.LOGGER.info("[MMORPG] Aucun hub dans ce monde : construction automatique de la Citadelle");
+        HubBuilder.build(level, HUB_ORIGIN);
+        return true;
+    }
+
+    private static boolean healed;
+
+    /** Une fois par demarrage du serveur, des qu'un joueur arrive dans le hub (ses troncons sont charges) : les PNJ manquants reapparaissent. */
+    public static void healOnce(ServerLevel level) {
+        if (healed) return;
+        HubData hub = HubData.get(level.getServer());
+        if (!hub.exists() || !hub.stableBuild() || hub.origin() == null) return;
+        healed = true;
+        var origin = hub.origin();
+        com.mmorpg.server.Scheduler.later(level, 60, () -> HubBuilder.respawn(level, origin));
+    }
+
     /** /hub : retour au point d'apparition du hub (met fin a un essai en cours). */
     public static boolean goToHub(ServerPlayer p) {
         HubData hub = HubData.get(p.level().getServer());

@@ -109,7 +109,7 @@ public final class CinematicConfig {
                   "duree": 20,
                   "rythme": "linear",
                   "transition": "coupe",
-                  "titre": {"texte": "ELDORIA", "sous": "Le hub des héros", "couleur": "#FFD060", "debut": 0.14, "fin": 0.82},
+                  "titre": {"texte": "AELORIA", "sous": "Le hub des héros", "couleur": "#FFD060", "debut": 0.14, "fin": 0.82},
                   "sons": [
                     {"t": 0.0, "son": "mmorpg:sfx.rise", "volume": 0.7, "hauteur": 0.8},
                     {"t": 0.12, "son": "mmorpg:sfx.chime", "volume": 0.5, "hauteur": 0.7}

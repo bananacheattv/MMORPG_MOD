@@ -228,6 +228,14 @@ public abstract class RpgBoss extends RpgMonster {
     private void keepInBase(ServerLevel level) {
         if (!this.hasHome()) this.setHomeTo(this.blockPosition(), leashRadius());      // boss d'avant cette regle
         BlockPos home = this.getHomePosition();
+        // coince dans un bloc (autel, pilier...) : on le replace au plus proche point libre de sa base
+        if (this.tickCount % 20 == 0 && !level.noCollision(this, this.getBoundingBox().deflate(0.02))) {
+            var spot = BossManager.freeSpot(level, home, this.getBbWidth(), this.getBbHeight());
+            this.teleportTo(spot.x, spot.y, spot.z);
+            this.getNavigation().stop();
+            this.setHomeTo(BlockPos.containing(spot), leashRadius());
+            home = this.getHomePosition();
+        }
         int r = this.getHomeRadius();
         double dx = this.getX() - (home.getX() + 0.5), dz = this.getZ() - (home.getZ() + 0.5);
         double d2 = dx * dx + dz * dz;

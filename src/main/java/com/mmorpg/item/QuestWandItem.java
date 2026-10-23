@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 @EventBusSubscriber(modid = MMORPG.MODID)
 public class QuestWandItem extends RpgMaterialItem {
     public QuestWandItem(Properties properties) {
-        super(properties.stacksTo(1), Rarity.MYTHIQUE, "Outil d'administration", "Forge et corrige les quêtes d'Eldoria.");
+        super(properties.stacksTo(1), Rarity.MYTHIQUE, "Outil d'administration", "Forge et corrige les quêtes d'Aeloria.");
     }
 
     @Override

@@ -50,6 +50,8 @@ public final class TrialManager {
         final List<UUID> mobs = new ArrayList<>();
         long nextAt = -1;
         boolean spawned;
+        /** Apres une apparition, on ne juge pas les monstres absents tout de suite : un troncon qui vient de se charger ne les retrouve pas encore. */
+        long graceUntil;
     }
 
     private static final class Simon {
@@ -88,6 +90,8 @@ public final class TrialManager {
             if (level == null || level.players().isEmpty()) continue;
             switch (t.kind()) {
                 case TrialData.WAVES -> tickWaves(level, data, t);
+                case TrialData.ELITE -> tickElite(level, data, t);
+                case TrialData.AMBUSH -> tickAmbush(level, data, t);
                 case TrialData.JUMP -> tickJump(level, data, t);
                 case TrialData.SIMON, TrialData.ORDER, TrialData.TARGETS -> announceTo(level, t);
                 default -> {
@@ -127,7 +131,7 @@ public final class TrialManager {
         if (w == null) {
             if (in.isEmpty()) return;
             w = new Wave();
-            w.total = 3 + (t.diff() >= 2 ? 1 : 0);
+            w.total = waveCount(t);
             WAVES.put(t.id(), w);
             spawnWave(level, t, w, 1);
             return;
@@ -139,7 +143,7 @@ public final class TrialManager {
             Entity e = level.getEntity(id);
             return e == null || !e.isAlive();
         });
-        if (!w.spawned || !w.mobs.isEmpty()) return;
+        if (level.getGameTime() < w.graceUntil || !w.spawned || !w.mobs.isEmpty()) return;
         long now = level.getGameTime();
         if (w.wave >= w.total) {
             finish(level, data, t);
@@ -152,17 +156,137 @@ public final class TrialManager {
         }
     }
 
+    /** Quatre vagues, cinq aux difficultes elevees. */
+    static int waveCount(Trial t) {
+        return 5 + (t.diff() >= 2 ? 1 : 0);
+    }
+
+    // ================================================================== gardien d'elite et embuscades
+
+    private static void tickElite(ServerLevel level, TrialData data, Trial t) {
+        List<ServerPlayer> in = inside(level, t);
+        for (ServerPlayer p : in) announce(p, t);
+        if (t.done()) {
+            WAVES.remove(t.id());
+            return;
+        }
+        Wave w = WAVES.get(t.id());
+        if (w == null) {
+            if (in.isEmpty()) return;
+            w = new Wave();
+            w.total = 1;
+            WAVES.put(t.id(), w);
+            spawnElite(level, t, w, in.size());
+            return;
+        }
+        int cx = t.pos().get(0), cy = t.pos().get(1), cz = t.pos().get(2);
+        if (level.getNearestPlayer(cx + 0.5, cy, cz + 0.5, 48, false) == null || level.getGameTime() < w.graceUntil) return;
+        w.mobs.removeIf(id -> {
+            Entity e = level.getEntity(id);
+            return e == null || !e.isAlive();
+        });
+        if (w.spawned && w.mobs.isEmpty()) {
+            finish(level, data, t);
+            WAVES.remove(t.id());
+        }
+    }
+
+    private static void spawnElite(ServerLevel level, Trial t, Wave w, int players) {
+        w.spawned = true;
+        w.graceUntil = level.getGameTime() + 40;
+        int cx = t.pos().get(0), cy = t.pos().get(1), cz = t.pos().get(2);
+        var random = level.getRandom();
+        Entity boss = MobSpawner.spawnForCommand(level, t.mobs().get(0), new BlockPos(cx, cy, cz + 5), t.level() + 6 + t.diff() * 2);
+        String name = "GARDIEN";
+        if (boss != null) {
+            w.mobs.add(boss.getUUID());
+            name = boss.getName().getString().toUpperCase(java.util.Locale.ROOT);
+            level.sendParticles(ParticleTypes.PORTAL, boss.getX(), boss.getY() + 2, boss.getZ(), 60, 0.8, 1.6, 0.8, 0.6);
+        }
+        int escorts = Math.min(18, 6 + t.diff() * 3 + Math.max(0, players - 1) * 3);
+        for (int i = 0; i < escorts; i++) {
+            double a = random.nextDouble() * Math.PI * 2;
+            double r = 8 + random.nextDouble() * 4;
+            BlockPos p = new BlockPos((int) Math.round(cx + Math.cos(a) * r), cy, (int) Math.round(cz + Math.sin(a) * r));
+            String key = t.mobs().get(1 + i % Math.max(1, t.mobs().size() - 1));
+            Entity e = MobSpawner.spawnForCommand(level, key, p, t.level() + t.diff());
+            if (e != null) {
+                w.mobs.add(e.getUUID());
+                level.sendParticles(ParticleTypes.PORTAL, e.getX(), e.getY() + 1, e.getZ(), 14, 0.3, 0.6, 0.3, 0.4);
+            }
+        }
+        level.playSound(null, new BlockPos(cx, cy, cz), com.mmorpg.registry.ModSounds.GROWL.get(), SoundSource.HOSTILE, 1.6F, 0.8F);
+        level.playSound(null, new BlockPos(cx, cy, cz), com.mmorpg.registry.ModSounds.HORN.get(), SoundSource.HOSTILE, 1.4F, 0.9F);
+        for (ServerPlayer p : inside(level, t)) {
+            Net.toPlayer(p, new Payloads.AreaEntry(name, "Gardien de l'étage — terrassez-le pour passer", Payloads.AreaEntry.BOSS_ROOM, 0xFF8A30, ""));
+        }
+    }
+
+    private static void tickAmbush(ServerLevel level, TrialData data, Trial t) {
+        if (t.done()) {
+            WAVES.remove(t.id());
+            return;
+        }
+        List<ServerPlayer> in = inside(level, t);
+        Wave w = WAVES.get(t.id());
+        if (w == null) {
+            if (in.isEmpty()) return;
+            w = new Wave();
+            w.total = 1;
+            WAVES.put(t.id(), w);
+            spawnAmbush(level, t, w, in);
+            return;
+        }
+        int cx = t.pos().get(0), cy = t.pos().get(1), cz = t.pos().get(2);
+        if (level.getNearestPlayer(cx + 0.5, cy, cz + 0.5, 64, false) == null || level.getGameTime() < w.graceUntil) return;
+        w.mobs.removeIf(id -> {
+            Entity e = level.getEntity(id);
+            return e == null || !e.isAlive();
+        });
+        if (w.spawned && w.mobs.isEmpty()) {
+            data.markDone(t.id());
+            WAVES.remove(t.id());
+            for (ServerPlayer p : in) p.sendOverlayMessage(Component.literal("Embuscade repoussée.").withColor(0xA0E0A0));
+        }
+    }
+
+    /** Les monstres surgissent plus loin dans le couloir, sur le chemin du joueur. */
+    private static void spawnAmbush(ServerLevel level, Trial t, Wave w, List<ServerPlayer> in) {
+        w.spawned = true;
+        w.graceUntil = level.getGameTime() + 40;
+        int zMax = t.box().get(5) - 2;
+        int ahead = (int) Math.min(zMax - 4, in.stream().mapToDouble(ServerPlayer::getZ).max().orElse(t.box().get(2)) + 9);
+        int cy = t.pos().get(1);
+        int cx = t.pos().get(0);
+        var random = level.getRandom();
+        int count = Math.min(10, 3 + t.diff() * 2 + Math.max(0, in.size() - 1) * 2);
+        for (int i = 0; i < count; i++) {
+            int z = Math.min(zMax, ahead + random.nextInt(Math.max(1, zMax - ahead + 1)));
+            BlockPos p = new BlockPos(cx + random.nextInt(7) - 3, cy, z);
+            Entity e = MobSpawner.spawnForCommand(level, t.mobs().get(i % t.mobs().size()), p, t.level() + t.diff());
+            if (e != null) {
+                w.mobs.add(e.getUUID());
+                level.sendParticles(ParticleTypes.PORTAL, e.getX(), e.getY() + 1, e.getZ(), 10, 0.3, 0.6, 0.3, 0.4);
+            }
+        }
+        level.playSound(null, new BlockPos(cx, cy, ahead), com.mmorpg.registry.ModSounds.GROWL.get(), SoundSource.HOSTILE, 1.0F, 1.1F);
+        for (ServerPlayer p : in) {
+            Net.toPlayer(p, new Payloads.AreaEntry("EMBUSCADE", count + " ennemis surgissent !", Payloads.AreaEntry.WAVE, 0xFF9030, ""));
+        }
+    }
+
     private static void spawnWave(ServerLevel level, Trial t, Wave w, int number) {
         w.wave = number;
         w.nextAt = -1;
         w.spawned = true;
-        int extra = Math.max(0, inside(level, t).size() - 1) * 2;          // le solo reste la reference : on n'ajoute des ennemis que pour les groupes
-        int count = Math.min(16, 3 + number * 2 + t.diff() * 2 + extra);
+        w.graceUntil = level.getGameTime() + 40;
+        int extra = Math.max(0, inside(level, t).size() - 1) * 3;          // le solo reste la reference : on n'ajoute des ennemis que pour les groupes
+        int count = Math.min(30, 6 + number * 3 + t.diff() * 3 + extra);
         int cx = t.pos().get(0), cy = t.pos().get(1), cz = t.pos().get(2);
         var random = level.getRandom();
         for (int i = 0; i < count; i++) {
             double a = random.nextDouble() * Math.PI * 2;
-            double r = 5 + random.nextDouble() * 5;
+            double r = 5 + random.nextDouble() * 7;
             BlockPos p = new BlockPos((int) Math.round(cx + Math.cos(a) * r), cy, (int) Math.round(cz + Math.sin(a) * r));
             String key = t.mobs().get(i % t.mobs().size());
             int lvl = t.level() + (number == w.total ? 3 : 0) + t.diff();
@@ -183,21 +307,95 @@ public final class TrialManager {
 
     // ================================================================== parcours de saut
 
+    /** Longueur d'un jalon du parcours de saut (blocs). */
+    private static final int JUMP_SPAN = 6;
+    /** Jalon atteint par chaque joueur sur chaque parcours de saut : on ne peut pas franchir l'arrivee sans avoir parcouru le trajet. */
+    private static final Map<String, Map<UUID, Integer>> JUMP_PROGRESS = new HashMap<>();
+
+    private static void backToStart(ServerLevel level, Trial t, ServerPlayer p, String message) {
+        p.teleportTo(level, t.pos().get(0) + 0.5, t.pos().get(1), t.pos().get(2) + 0.5, Set.of(), 0F, 5F, true);
+        p.resetFallDistance();
+        p.sendOverlayMessage(Component.literal(message).withColor(0xFFA060));
+        level.playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.TELEPORT.get(), SoundSource.PLAYERS, 0.8F, 1.0F);
+        JUMP_PROGRESS.computeIfAbsent(t.id(), k -> new HashMap<>()).put(p.getUUID(), 0);
+    }
+
+    /** Derniere position (x, z, dans le parcours ?) vue pour chaque joueur, pour detecter les deplacements instantanes. */
+    private static final Map<UUID, double[]> JUMP_LAST = new HashMap<>();
+
+    /** Parcours de saut non termine qui contient ce point (null sinon). */
+    private static Trial jumpAt(ServerLevel level, double x, double y, double z) {
+        for (Trial t : TrialData.get(level.getServer()).all()) {
+            if (!t.kind().equals(TrialData.JUMP) || t.done() || !t.dim().equals(level.dimension())) continue;
+            var b = t.box();
+            if (x >= b.get(0) && x < b.get(3) + 1 && z >= b.get(2) && z < b.get(5) + 1 && y >= b.get(1) - 22 && y < b.get(4) + 1) return t;
+        }
+        return null;
+    }
+
+    /** Pas de perle ni de fruit de chorus dans (ou vers) un parcours de saut. */
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onTeleport(net.neoforged.neoforge.event.entity.EntityTeleportEvent event) {
+        if (!(event instanceof net.neoforged.neoforge.event.entity.EntityTeleportEvent.EnderPearl)
+                && !(event instanceof net.neoforged.neoforge.event.entity.EntityTeleportEvent.ItemConsumption)) return;
+        if (!(event.getEntity() instanceof ServerPlayer p) || !(p.level() instanceof ServerLevel level)) return;
+        if (jumpAt(level, p.getX(), p.getY(), p.getZ()) == null && jumpAt(level, event.getTargetX(), event.getTargetY(), event.getTargetZ()) == null) return;
+        event.setCanceled(true);
+        p.sendOverlayMessage(Component.literal("Impossible de se téléporter ici : traversez à pied.").withColor(0xFFA060));
+    }
+
+    /** Pas de pont de fortune : on ne pose pas de bloc dans un parcours de saut. */
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onPlaceInJump(net.neoforged.neoforge.event.level.BlockEvent.EntityPlaceEvent event) {
+        if (!(event.getLevel() instanceof ServerLevel level) || !(event.getEntity() instanceof ServerPlayer p)) return;
+        if (p.isCreative() && p.permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_GAMEMASTER)) return;
+        BlockPos pos = event.getPos();
+        if (jumpAt(level, pos.getX(), pos.getY(), pos.getZ()) == null) return;
+        event.setCanceled(true);
+        p.sendOverlayMessage(Component.literal("On ne construit pas dans cette épreuve.").withColor(0xFFA060));
+    }
+
     private static void tickJump(ServerLevel level, TrialData data, Trial t) {
         int x0 = t.box().get(0), z0 = t.box().get(2), x1 = t.box().get(3), z1 = t.box().get(5);
         double fallY = t.box().get(1);
+        int last = (z1 - z0) / JUMP_SPAN;
+        Map<UUID, Integer> progress = JUMP_PROGRESS.computeIfAbsent(t.id(), k -> new HashMap<>());
         for (ServerPlayer p : level.players()) {
             if (!p.isAlive() || p.isSpectator() || p.getAbilities().flying) continue;
+            int reached = progress.getOrDefault(p.getUUID(), 0);
+            boolean inBox = p.getX() >= x0 && p.getX() < x1 + 1 && p.getZ() >= z0 && p.getZ() < z1 + 1;
+            double[] before = JUMP_LAST.get(p.getUUID());
+            JUMP_LAST.put(p.getUUID(), new double[]{p.getX(), p.getZ(), inBox ? 1 : 0});
+            // deplacement impossible a pied en 0,25 s (perle, fruit de chorus, commande...) : on ne gagne pas de terrain ainsi
+            if (!t.done() && inBox && before != null && before[2] == 1 && Math.hypot(p.getX() - before[0], p.getZ() - before[1]) > 7) {
+                backToStart(level, t, p, "Le parcours doit être traversé à pied : retour au départ.");
+                continue;
+            }
             if (p.getX() >= x0 && p.getX() < x1 + 1 && p.getZ() >= z0 && p.getZ() < z1 + 1) {
-                if (p.getY() >= fallY && p.getY() < t.box().get(4) + 1) announce(p, t);
-                if (p.getY() < fallY && p.getY() > fallY - 22) {
-                    p.teleportTo(level, t.pos().get(0) + 0.5, t.pos().get(1), t.pos().get(2) + 0.5, Set.of(), 0F, 5F, true);
-                    p.resetFallDistance();
-                    p.sendOverlayMessage(Component.literal("Vous avez chuté : retour au départ du parcours.").withColor(0xFFA060));
-                    level.playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.TELEPORT.get(), SoundSource.PLAYERS, 0.8F, 1.0F);
+                if (p.getY() >= fallY && p.getY() < t.box().get(4) + 1) {
+                    announce(p, t);
+                    int idx = (int) ((p.getZ() - z0) / JUMP_SPAN);
+                    if (!t.done() && idx > reached + 1) {                    // teleportation, bond demesure... : on ne saute pas une partie du parcours
+                        backToStart(level, t, p, "Le parcours doit être traversé en entier : retour au départ.");
+                        continue;
+                    }
+                    if (idx > reached) progress.put(p.getUUID(), idx);
+                }
+                if (p.getY() < fallY) {
+                    backToStart(level, t, p, "Vous avez chuté : retour au départ du parcours.");
+                    continue;
+                }
+            } else if (p.getZ() < z0 - 1) {
+                progress.remove(p.getUUID());                                  // revenu en arriere : on repart de zero
+            }
+            if (!t.done() && t.inGate(p.getX(), p.getY(), p.getZ())) {
+                if (progress.getOrDefault(p.getUUID(), 0) >= last - 2) {
+                    progress.remove(p.getUUID());
+                    complete(level, data, t, p, false);
+                } else {
+                    backToStart(level, t, p, "Le parcours doit être traversé en entier : retour au départ.");
                 }
             }
-            if (!t.done() && t.inGate(p.getX(), p.getY(), p.getZ())) complete(level, data, t, p, false);
         }
     }
 
@@ -214,6 +412,21 @@ public final class TrialManager {
         handleClick(event.getLevel(), event.getPos(), event.getEntity(), event);
     }
 
+    /** Dernier clic pris en compte pour chaque joueur (temps de jeu). */
+    private static final Map<UUID, long[]> LAST_CLICK = new HashMap<>();
+    /** Un clic droit arrive deux fois au serveur (main puis main secondaire), et un clic gauche peut s'y ajouter : on ignore tout clic qui suit le precedent de moins de 0,3 s. */
+    private static final int CLICK_COOLDOWN_TICKS = 6;
+
+    private static boolean freshClick(ServerLevel level, ServerPlayer sp, BlockPos pos) {
+        long now = level.getGameTime();
+        long key = pos.asLong();
+        long[] last = LAST_CLICK.get(sp.getUUID());
+        // seul un second clic sur le MEME bloc est ignore : deux dalles touchees coup sur coup comptent toutes les deux
+        if (last != null && last[1] == key && now - last[0] < CLICK_COOLDOWN_TICKS && now >= last[0]) return false;
+        LAST_CLICK.put(sp.getUUID(), new long[]{now, key});
+        return true;
+    }
+
     private static void handleClick(net.minecraft.world.level.Level lv, BlockPos pos, net.minecraft.world.entity.player.Player player, net.neoforged.bus.api.Event ev) {
         if (!(lv instanceof ServerLevel level) || !(player instanceof ServerPlayer sp)) return;
         TrialData data = TrialData.get(level.getServer());
@@ -222,6 +435,7 @@ public final class TrialManager {
             if ((!t.kind().equals(TrialData.SIMON) && !order) || !t.dim().equals(level.dimension())) continue;
             if (!order && t.pos().get(0) == pos.getX() && t.pos().get(1) == pos.getY() && t.pos().get(2) == pos.getZ()) {
                 cancel(ev);
+                if (!freshClick(level, sp, pos)) return;
                 if (t.done()) sp.sendOverlayMessage(Component.literal("Cette énigme est déjà résolue.").withColor(0xA0E0A0));
                 else startSimon(level, t, sp);
                 return;
@@ -229,6 +443,7 @@ public final class TrialManager {
             for (int k = 0; k * 3 + 2 < t.pads().size(); k++) {
                 if (t.pads().get(k * 3) == pos.getX() && t.pads().get(k * 3 + 1) == pos.getY() && t.pads().get(k * 3 + 2) == pos.getZ()) {
                     cancel(ev);
+                    if (!freshClick(level, sp, pos)) return;
                     padPressed(level, data, t, sp, k);
                     return;
                 }
@@ -250,6 +465,10 @@ public final class TrialManager {
 
     private static void light(ServerLevel level, Trial t, int k, boolean on) {
         level.setBlock(padPos(t, k), state(t.states().get(k * 2 + (on ? 1 : 0))), 3);
+        // une dalle allumee eclaire la salle (bloc de lumiere au-dessus)
+        BlockPos above = padPos(t, k).above();
+        if (on) level.setBlock(above, Blocks.LIGHT.defaultBlockState(), 3);
+        else if (level.getBlockState(above).is(Blocks.LIGHT)) level.setBlock(above, Blocks.AIR.defaultBlockState(), 3);
     }
 
     private static void note(ServerLevel level, Trial t, int k, float volume) {
@@ -336,6 +555,7 @@ public final class TrialManager {
 
     /** Oublie l'etat en cours d'une epreuve (remise a zero du donjon). */
     static void forget(String id) {
+        JUMP_PROGRESS.remove(id);
         WAVES.remove(id);
         SIMON.remove(id);
         ORDER.remove(id);
@@ -415,6 +635,11 @@ public final class TrialManager {
         return s == null ? List.of() : List.copyOf(s.seq);
     }
 
+    public static String debugSimon(String id) {
+        Simon s = SIMON.get(id);
+        return s == null ? "aucune" : "progression " + s.progress + "/" + s.seq.size() + " saisie " + s.input + " generation " + s.generation;
+    }
+
     public static boolean debugInputReady(String id) {
         Simon s = SIMON.get(id);
         return s != null && s.input;
@@ -453,7 +678,7 @@ public final class TrialManager {
                 }
             }
         }
-        var group = data.inGroup(TrialData.group(t.id()));
+        var group = data.inGroup(TrialData.group(t.id())).stream().filter(x -> !x.kind().equals(TrialData.AMBUSH)).toList();
         long doneCount = group.stream().filter(Trial::done).count();
         if (!group.isEmpty() && doneCount == group.size()) ArenaEvents.dropKey(level, TrialData.group(t.id()), t.pos().get(1));
         if (p != null && !group.isEmpty()) {

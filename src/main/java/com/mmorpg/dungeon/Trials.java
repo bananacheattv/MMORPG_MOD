@@ -26,8 +26,36 @@ final class Trials {
     static final String NONE = "none";
     static final String JUMPROOM = "jumproom";
 
-    /** Quelle epreuve dans la salle de combat A, le couloir a fosse et la salle B (« waves », « simon », « jump » ou « none »). */
-    record Plan(String a, String pit, String b, int diffA, int diffPit, int diffB) {
+    /** Une etape du donjon : type d'epreuve (« waves », « simon », « order », « targets », « jumproom », « jump », « elite » ou « none ») et difficulte 0 a 3. */
+    record Stage(String kind, int diff) {
+    }
+
+    /**
+     * Les huit etapes dans l'ordre du parcours : salle 1, couloir a fosse 1, salle 2, salle 3, couloir a fosse 2, salle 4, salle 5,
+     * gardien d'elite (voir {@link Layout}).
+     */
+    record Plan(List<Stage> stages) {
+        static final int[] ROOM_STAGE = {0, 2, 3, 5, 6, 7};
+        static final int[] PIT_STAGE = {1, 4};
+
+        String roomKind(int room) {
+            return stages.get(ROOM_STAGE[room]).kind();
+        }
+
+        Stage room(int room) {
+            return stages.get(ROOM_STAGE[room]);
+        }
+
+        Stage pit(int pit) {
+            return stages.get(PIT_STAGE[pit]);
+        }
+    }
+
+    /** @param kindsAndDiffs huit paires (type, difficulte) */
+    static Plan plan(Object... kindsAndDiffs) {
+        List<Stage> out = new ArrayList<>();
+        for (int i = 0; i < kindsAndDiffs.length; i += 2) out.add(new Stage((String) kindsAndDiffs[i], (Integer) kindsAndDiffs[i + 1]));
+        return new Plan(List.copyOf(out));
     }
 
     /**
@@ -42,7 +70,12 @@ final class Trials {
     record Palette(Block gate, Block padOn, Object platform, Object edge, Block lamp, List<String> mobs, Map<String, String> titles,
                    Block hazard, Block lantern) {
         String title(String kind) {
-            return titles.getOrDefault(kind, "ÉPREUVE");
+            return titles.getOrDefault(kind, switch (kind) {
+                case TrialData.TARGETS -> "TIR AUX CIBLES";
+                case TrialData.ELITE -> "GARDIEN D'ÉLITE";
+                case TrialData.AMBUSH -> "EMBUSCADE";
+                default -> "ÉPREUVE";
+            });
         }
     }
 
@@ -84,7 +117,7 @@ final class Trials {
     static void waves(HubCtx c, ServerLevel level, TrialData data, Palette pal, String id, int cz, int gateZ0, int gateZ1, int diff, int lvl) {
         int[] g = gate(c, gateZ0, gateZ1, pal.gate());
         BlockPos o = c.O;
-        int waves = 3 + (diff >= 2 ? 1 : 0);
+        int waves = 4 + (diff >= 2 ? 1 : 0);
         data.add(new Trial(id, TrialData.WAVES, level.dimension(), box(o, -13, 1, cz - 13, 13, 9, cz + 13), abs(o, g), id(pal.gate()),
                 List.of(o.getX(), o.getY() + 1, o.getZ() + cz), List.of(), List.of(), lvl, diff, pal.mobs(),
                 pal.title(TrialData.WAVES), "Survivez à " + waves + " vagues : la herse s'ouvrira", false));
@@ -97,6 +130,8 @@ final class Trials {
         BlockPos o = c.O;
         DyeColor[] colors = {DyeColor.RED, DyeColor.BLUE, DyeColor.LIME, DyeColor.YELLOW};
         int[][] spots = {{-6, -6}, {6, -6}, {-6, 6}, {6, 6}};
+        // allumee, une dalle prend la teinte vive de sa couleur (et non un bloc lumineux identique pour toutes)
+        Block[] lit = {Blocks.REDSTONE_BLOCK, Blocks.LAPIS_BLOCK, Blocks.EMERALD_BLOCK, Blocks.GOLD_BLOCK};
         for (int k = 0; k < 4; k++) {
             int px = spots[k][0];
             int pz = cz + spots[k][1];
@@ -108,7 +143,7 @@ final class Trials {
             pads.add(o.getY() + 1);
             pads.add(o.getZ() + pz);
             states.add(id(Blocks.CONCRETE.pick(colors[k])));
-            states.add(id(pal.padOn()));
+            states.add(id(lit[k]));
         }
     }
 
@@ -154,8 +189,8 @@ final class Trials {
 
     // ================================================================== enigme d'ordre
 
-    /** Les couleurs de la sequence sont gravees dans le mur du couloir d'entree (z = 26..32) ; les dalles se touchent dans cet ordre. */
-    static void order(HubCtx c, ServerLevel level, TrialData data, Palette pal, String id, int cz, int gateZ0, int gateZ1, int diff, int lvl, long seed) {
+    /** Les couleurs de la sequence sont gravees dans le mur du couloir qui precede la salle (quatre plaques a partir de {@code clueZ}) ; les dalles se touchent dans cet ordre. */
+    static void order(HubCtx c, ServerLevel level, TrialData data, Palette pal, String id, int cz, int clueZ, int gateZ0, int gateZ1, int diff, int lvl, long seed) {
         int[] g = gate(c, gateZ0, gateZ1, pal.gate());
         BlockPos o = c.O;
         List<Integer> pads = new ArrayList<>();
@@ -165,7 +200,7 @@ final class Trials {
         java.util.Collections.shuffle(seq, new Random(seed));
         DyeColor[] colors = {DyeColor.RED, DyeColor.BLUE, DyeColor.LIME, DyeColor.YELLOW};
         for (int i = 0; i < 4; i++) {
-            int z = 26 + i * 2;
+            int z = clueZ + i * 2;
             for (int side : new int[]{-4, 4}) {
                 c.set(side, 2, z, Blocks.CONCRETE.pick(DyeColor.BLACK));
                 c.set(side, 4, z, Blocks.CONCRETE.pick(DyeColor.BLACK));
@@ -177,53 +212,77 @@ final class Trials {
         for (int k : seq) order.add(String.valueOf(k));
         data.add(new Trial(id, TrialData.ORDER, level.dimension(), box(o, -14, 1, cz - 14, 14, 9, cz + 14), abs(o, g), id(pal.gate()),
                 List.of(o.getX(), o.getY() + 1, o.getZ() + cz), pads, states, lvl, diff, order,
-                pal.title(TrialData.ORDER), "Les couleurs gravées dans le couloir d'entrée donnent l'ordre des dalles", false));
+                pal.title(TrialData.ORDER), "Les couleurs gravées dans le couloir juste avant la salle donnent l'ordre des dalles", false));
+    }
+
+    // ================================================================== gardien d'elite
+
+    /** Combat contre un monstre d'elite et son escorte, dans la grande salle avant l'antre du boss ; la herse du couloir de sortie reste fermee tant qu'ils vivent. */
+    static void elite(HubCtx c, ServerLevel level, TrialData data, Palette pal, String id, Layout.Room rm, String eliteKey, int gateZ0, int gateZ1, int diff, int lvl) {
+        int[] g = gate(c, gateZ0, gateZ1, pal.gate());
+        BlockPos o = c.O;
+        List<String> mobs = new ArrayList<>();
+        mobs.add(eliteKey);
+        mobs.addAll(pal.mobs());
+        data.add(new Trial(id, TrialData.ELITE, level.dimension(), box(o, -(rm.r() - 2), 1, rm.z() - (rm.r() - 2), rm.r() - 2, 12, rm.z() + (rm.r() - 2)), abs(o, g), id(pal.gate()),
+                List.of(o.getX(), o.getY() + 1, o.getZ() + rm.z()), List.of(), List.of(), lvl, diff, mobs,
+                pal.title(TrialData.ELITE), "Terrassez le gardien et son escorte : la herse s'ouvrira", false));
+    }
+
+    // ================================================================== embuscade
+
+    /** Embuscade dans un couloir : des monstres surgissent devant le joueur quand il y entre ; n'ouvre ni ne ferme rien. */
+    static void ambush(HubCtx c, ServerLevel level, TrialData data, Palette pal, String id, Layout.Corridor cor, int diff, int lvl) {
+        BlockPos o = c.O;
+        data.add(new Trial(id, TrialData.AMBUSH, level.dimension(), box(o, -5, 1, cor.z0() + 2, 5, 8, cor.z1()), List.of(), "",
+                List.of(o.getX(), o.getY() + 1, o.getZ() + (cor.z0() + cor.z1()) / 2), List.of(), List.of(), lvl, diff, pal.mobs(),
+                pal.title(TrialData.AMBUSH), "Des ennemis vous attendent", false));
     }
 
     // ================================================================== parcours de saut dans une salle ronde
 
-    /** Lampes sur le pourtour et lustres, pour une salle dont le decor habituel est remplace par un lac de danger. */
-    static void roomLamps(HubCtx c, Palette pal, int cz, int height, int r) {
-        for (int i = 0; i < 10; i++) {
-            double a = Math.PI * 2 * i / 10 + 0.3;
-            int x = (int) Math.round(Math.cos(a) * (r - 1.2));
-            int z = cz + (int) Math.round(Math.sin(a) * (r - 1.2));
-            if (c.air(x, 1, z)) c.set(x, 1, z, pal.lantern());
-        }
-        for (int i = 0; i < 3; i++) {
-            double a = Math.PI * 2 * i / 3 + 0.5;
-            Kit.chandelier(c, height + 5, (int) Math.round(Math.cos(a) * 6), cz + (int) Math.round(Math.sin(a) * 6), 3, pal.lantern());
+    /** Lustres au-dessus d'un lac de saut (le sol est creuse jusqu'aux murs : rien ne peut y etre pose). */
+    static void roomLamps(HubCtx c, Palette pal, Layout.Room rm) {
+        for (int i = 0; i < 6; i++) {
+            double a = Math.PI * 2 * i / 6 + 0.3;
+            int ring = i % 2 == 0 ? 5 : 9;
+            Kit.chandelier(c, rm.h() + 5, (int) Math.round(Math.cos(a) * ring), rm.z() + (int) Math.round(Math.sin(a) * ring), 3, pal.lantern());
         }
     }
 
-    /** Le sol central de la salle est creuse (voir StyledDungeon) : on y met le danger et un chemin de plateformes, de l'entree a la sortie. */
-    static void jumpRoom(HubCtx c, ServerLevel level, TrialData data, Palette pal, String id, int cz, int r, int diff, int lvl, long seed) {
+    /**
+     * Le lac occupe toute la salle, de mur a mur : seuls le couloir d'entree et celui de sortie ont un sol. Le seul chemin est la suite de
+     * plateformes (aucun rebord a longer, aucune corniche) ; l'ecart maximal reste franchissable en courant (3 blocs vides).
+     */
+    static void jumpRoom(HubCtx c, ServerLevel level, TrialData data, Palette pal, String id, Layout.Room rm, int diff, int lvl, long seed) {
         BlockPos o = c.O;
-        int pr = r - 3;
-        c.disc(0, -8, cz, pr - 0.5, (x, y, z) -> c.state(pal.hazard() == Blocks.MUD ? Blocks.MUD : pal.hazard()));
+        int cz = rm.z();
+        int r = rm.r();
+        c.disc(0, -8, cz, r + 0.4, (x, y, z) -> c.state(pal.hazard()));
         if (pal.hazard() == Blocks.LAVA || pal.hazard() == Blocks.WATER) {
-            for (int y = -7; y <= -5; y++) c.disc(0, y, cz, pr - 0.5, (x, yy, z) -> c.state(pal.hazard()));
+            for (int y = -7; y <= -5; y++) c.disc(0, y, cz, r + 0.4, (x, yy, z) -> c.state(pal.hazard()));
         }
         Random rnd = new Random(seed);
         if (pal.hazard() == Blocks.MUD) {
-            for (int i = 0; i < 70; i++) {
-                int x = rnd.nextInt(2 * pr + 1) - pr;
-                int z = cz + rnd.nextInt(2 * pr + 1) - pr;
-                if (Math.hypot(x, z - cz) < pr - 1 && c.air(x, -7, z)) c.set(x, -7, z, Blocks.POINTED_DRIPSTONE);
+            for (int i = 0; i < 90; i++) {
+                int x = rnd.nextInt(2 * r + 1) - r;
+                int z = cz + rnd.nextInt(2 * r + 1) - r;
+                if (Math.hypot(x, z - cz) < r - 1 && c.air(x, -7, z)) c.set(x, -7, z, Blocks.POINTED_DRIPSTONE);
             }
         }
-        int cursor = cz - pr;
+        int maxGap = diff <= 0 ? 2 : 3;
+        int cursor = cz - r - 1;                    // dernier bloc solide du couloir d'entree
+        int exitFloor = cz + r + 1;                 // premier bloc solide du couloir de sortie
         int prevX = 0;
         int count = 0;
-        int end = cz + pr;
-        while (true) {
-            int gap = diff <= 0 ? 2 : 3;
-            int len = diff <= 0 ? 3 : diff == 1 ? 2 : 1 + rnd.nextInt(2);
+        while (exitFloor - cursor - 1 > maxGap) {
+            int gap = diff <= 0 ? 2 : diff == 1 ? 2 + rnd.nextInt(2) : 3;
+            int len = diff <= 0 ? 3 : diff == 1 ? 2 + rnd.nextInt(2) : 1 + rnd.nextInt(2);
             int wid = diff <= 0 ? 3 : 2;
             int zs = cursor + gap + 1;
-            if (zs + len - 1 > end - 1) break;
+            if (zs + len - 1 >= exitFloor - 1) len = Math.max(1, exitFloor - 1 - zs);
             double zc = zs + len / 2.0 - cz;
-            int lim = (int) Math.max(0, Math.sqrt(Math.max(0, (pr - 1.5) * (pr - 1.5) - zc * zc)) - wid / 2.0);
+            int lim = (int) Math.max(0, Math.sqrt(Math.max(0, (r - 2.0) * (r - 2.0) - zc * zc)) - wid / 2.0);
             int cx = Math.max(-lim, Math.min(lim, prevX + rnd.nextInt(7) - 3));
             for (int dx = 0; dx < wid; dx++) {
                 for (int dz = 0; dz < len; dz++) {
@@ -236,10 +295,9 @@ final class Trials {
             cursor = zs + len - 1;
             prevX = cx;
             count++;
-            if (cursor >= end - 3) break;
         }
-        data.add(new Trial(id, TrialData.JUMP, level.dimension(), box(o, -pr, -3, cz - pr, pr, 8, cz + pr), box(o, -6, 1, cz + pr, 6, 6, cz + r),
-                "", List.of(o.getX(), o.getY() + 1, o.getZ() + cz - pr - 1), List.of(), List.of(), lvl, diff, List.of(),
+        data.add(new Trial(id, TrialData.JUMP, level.dimension(), box(o, -r, -3, cz - r, r, 8, cz + r), box(o, -6, 1, exitFloor + 1, 6, 6, exitFloor + 3),
+                "", List.of(o.getX(), o.getY() + 1, o.getZ() + cz - r - 2), List.of(), List.of(), lvl, diff, List.of(),
                 pal.title(TrialData.JUMP), "Traversez le lac de plateforme en plateforme : une chute vous ramène au départ", false));
     }
 
@@ -250,11 +308,14 @@ final class Trials {
         int from = z0 + 3;
         int to = z1 - 3;
         // le pont disparait : il ne reste que le depart et l'arrivee
+        // (de mur a mur : contreforts sous le pont, rebords, decors... rien ne doit permettre de longer ou de contourner les plateformes)
         for (int z = from; z <= to; z++) {
-            for (int x = -2; x <= 2; x++) {
+            for (int x = -4; x <= 4; x++) {
+                for (int y = -6; y <= 6; y++) {
+                    if (y == 0 || y > -1 && y < 1) continue;
+                    c.set(x, y, z, Blocks.AIR);
+                }
                 c.set(x, 0, z, Blocks.AIR);
-                c.set(x, -1, z, Blocks.AIR);
-                for (int y = 1; y <= 4; y++) c.set(x, y, z, Blocks.AIR);
             }
         }
         Random r = new Random(seed);

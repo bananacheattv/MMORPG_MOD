@@ -27,7 +27,7 @@ public final class PlayerListDisplay {
         var server = p.level().getServer();
         var d = RpgPlayers.get(p);
         int online = server.getPlayerList().getPlayerCount();
-        var header = Component.literal("✦ ELDORIA ✦").withColor(0xFFD040)
+        var header = Component.literal("✦ AELORIA ✦").withColor(0xFFD040)
             .append(Component.literal("\n" + online + " aventurier(s) en ligne").withColor(0xDDD5BF));
         int members = PartyManager.onlineMembers(p).size();
         var footer = Component.literal("Niveau " + d.level + " • " + d.playerClass.label).withColor(d.playerClass.color)

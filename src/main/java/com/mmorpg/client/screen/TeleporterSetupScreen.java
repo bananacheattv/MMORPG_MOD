@@ -56,7 +56,7 @@ public class TeleporterSetupScreen extends MmoScreen {
         int bw = (pw - 32) / 3;
         for (int i = 0; i < 3; i++) {
             final int c = i;
-            button(g, left + 16 + i * bw, top + 80, bw - 4, 16, WaypointData.CATEGORY_NAMES[i], true, category == i ? 0xFF6A4A1A : 0xFF2A2420, () -> category = c);
+            button(g, left + 16 + i * bw, top + 80, bw - 4, 16, WaypointData.CATEGORY_NAMES[i], true, category == i ? 0xFFE2B85A : 0xFF3B3350, () -> category = c);
         }
         g.text(font, "Niveau minimum : ", left + 16, top + 106, Ui.TEXT, false);
         int lx = left + 16 + font.width("Niveau minimum : ");

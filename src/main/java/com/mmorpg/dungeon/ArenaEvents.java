@@ -36,6 +36,58 @@ public final class ArenaEvents {
 
     static void forgetKey(String group) {
         KEYS_DROPPED.remove(group);
+        SUMMONED.remove(group);
+        DWELL.remove(group);
+    }
+
+    /** Exemplaires de donjon dont le boss a deja ete invoque (une fois par partie ; remis a zero avec l'exemplaire). */
+    private static final java.util.Set<String> SUMMONED = new java.util.HashSet<>();
+    /** Temps de jeu auquel un joueur est entre au fond de l'arene, par exemplaire. */
+    private static final Map<String, Long> DWELL = new java.util.HashMap<>();
+    /** Delai (ticks) entre l'entree dans l'arene et le reveil du boss : le temps de decouvrir la salle. */
+    private static final int WAKE_DELAY = 70;
+
+    /**
+     * Le boss se reveille tout seul quand un joueur entre au fond de son arene (le rituel de l'autel se joue comme avant) : plus besoin
+     * de l'objet d'invocation, qui reste utilisable pour rappeler un boss apres une remise a zero.
+     */
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void onServerTick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) {
+        var server = event.getServer();
+        if (server.getTickCount() % 10 != 0) return;
+        for (ServerLevel level : server.getAllLevels()) {
+            for (ServerPlayer p : level.players()) {
+                if (!p.isAlive() || p.isSpectator()) continue;
+                var zone = ZoneManager.zoneAt(level, p.blockPosition());
+                if (zone == null || !zone.boss()) continue;
+                String group = zone.id().replace("_boss", "");
+                if (SUMMONED.contains(group)) continue;
+                double ax = zone.minX() + 23 + 0.5, az = zone.minZ() + 23 + 0.5;
+                if (Math.hypot(p.getX() - ax, p.getZ() - az) > Theme.ARENA_R - 4) continue;       // au fond de la salle, pas sur le seuil
+                long now = level.getGameTime();
+                long since = DWELL.computeIfAbsent(group, k -> now);
+                if (now - since < WAKE_DELAY) continue;
+                for (com.mmorpg.world.DungeonBuilder.DungeonType t : com.mmorpg.world.DungeonBuilder.DungeonType.values()) {
+                    if (!group.startsWith(t.id + "_")) continue;
+                    BlockPos altar = null;
+                    for (int y = p.getBlockY() + 8; y >= p.getBlockY() - 40 && altar == null; y--) {
+                        BlockPos at = BlockPos.containing(ax, y, az);
+                        if (level.getBlockState(at).getBlock() instanceof com.mmorpg.block.AltarBlock) altar = at;
+                    }
+                    if (altar == null) {
+                        com.mmorpg.MMORPG.LOGGER.debug("[MMORPG] boss auto : autel introuvable pres de {} {}", ax, az);
+                        break;
+                    }
+                    SUMMONED.add(group);
+                    com.mmorpg.MMORPG.LOGGER.info("[MMORPG] Boss de {} : reveil automatique (autel {})", group, altar.toShortString());
+                    DWELL.remove(group);
+                    if (com.mmorpg.registry.ModItems.get(t.bossKey) instanceof com.mmorpg.item.SummonKeyItem summonKey) {          // t.bossKey = objet d'invocation, d'ou l'on tire le boss
+                        com.mmorpg.entity.boss.BossManager.summon(level, altar, summonKey.bossKey(), p);
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     /**
@@ -60,7 +112,7 @@ public final class ArenaEvents {
             level.sendParticles(ParticleTypes.END_ROD, drop.getX(), drop.getY() + 0.5, drop.getZ(), 40, 0.4, 0.6, 0.4, 0.05);
             level.playSound(null, altar, com.mmorpg.registry.ModSounds.CHIME.get(), SoundSource.PLAYERS, 1.2F, 1.0F);
             for (ServerPlayer p : level.players()) {
-                if (Math.abs(p.getX() - altar.getX()) < 40 && p.getZ() > altar.getZ() - 170 && p.getZ() < altar.getZ() + 50) {
+                if (Math.abs(p.getX() - altar.getX()) < 40 && p.getZ() > altar.getZ() - (Theme.ARENA_Z + 10) && p.getZ() < altar.getZ() + 50) {
                     p.sendSystemMessage(net.minecraft.network.chat.Component.literal("✦ L'objet d'invocation est apparu près de l'autel de l'antre : "
                             + key.getName(new net.minecraft.world.item.ItemStack(key)).getString() + ".").withColor(0xFFE080));
                 }
@@ -127,6 +179,10 @@ public final class ArenaEvents {
             }
         }
         level.playSound(null, boss.blockPosition(), com.mmorpg.registry.ModSounds.FANFARE.get(), SoundSource.PLAYERS, 1.6F, 1.0F);
+        // retour automatique a l'entree du donjon apres quinze secondes (hors instance : le hall du donjon)
+        net.minecraft.world.phys.Vec3 hall = dungeonZone == null ? boss.position()
+                : new net.minecraft.world.phys.Vec3(dungeonZone.minX() + 33 + 0.5, boss.getY(), dungeonZone.minZ() + 2 + Theme.HALL_Z - 6 + 0.5);
+        InstanceManager.victoryExit(level, boss.getX(), boss.getZ(), hall);
         for (int i = 0; i < 10; i++) {
             int step = i;
             com.mmorpg.server.Scheduler.later(level, 10 + i * 14, () -> {
