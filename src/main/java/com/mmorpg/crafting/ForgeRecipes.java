@@ -96,8 +96,8 @@ public final class ForgeRecipes {
         add(Category.CONSOMMABLES, "mannequin_magique", 1, 100, 1, N, "mannequin_entrainement", 1, "cristal_arcanique", 2, "tissu_enchante", 4);
         add(Category.FAMILIERS, "nourriture_familier", 4, 5, 1, N, "minecraft:wheat", 4, "minecraft:carrot", 2);
         // ---------------------------------------------------------------- materiaux intermediaires
-        add(Category.MATERIAUX, "lingot_mithril", 1, 5, 20, N, "minecraft:iron_ingot", 2, "acier_orc", 2, "poussiere_ame", 1);
-        add(Category.MATERIAUX, "lingot_adamantite", 1, 20, 55, N, "lingot_mithril", 1, "noyau_flamme", 2, "eclat_givre", 1, "minecraft:diamond", 1);
+        add(Category.MATERIAUX, "lingot_mithril", 1, 5, 20, N, "lingot_argentite", 2, "acier_orc", 2, "poussiere_ame", 1);
+        add(Category.MATERIAUX, "lingot_adamantite", 1, 20, 55, N, "lingot_mithril", 1, "lingot_ambrasite", 2, "lingot_glacium", 1, "noyau_flamme", 2, "eclat_givre", 1, "minecraft:diamond", 1);
         add(Category.MATERIAUX, "tissu_enchante", 2, 4, 15, N, "minecraft:string", 4, "poussiere_ame", 2, "minecraft:lapis_lazuli", 1);
         add(Category.MATERIAUX, "cuir_renforce", 2, 2, 5, N, "minecraft:leather", 3, "fourrure_sombre", 1);
         add(Category.MATERIAUX, "pierre_amelioration", 1, 10, 1, N, "ferraille_gobeline", 4, "minecraft:iron_ingot", 2, "minecraft:lapis_lazuli", 2);
@@ -109,19 +109,19 @@ public final class ForgeRecipes {
         add(Category.MATERIAUX, "trefle_celeste", 1, 1500, 70, N, "trefle_dore", 2, "essence_neant", 1, "minecraft:diamond", 2);
         add(Category.MATERIAUX, "trefle_divin", 1, 4000, 90, N, "trefle_celeste", 2, "essence_neant", 2, "minecraft:netherite_ingot", 1);
 
-        add(Category.MATERIAUX, "alliage_celeste", 2, 200, 90, N, "lingot_adamantite", 3, "cristal_arcanique", 2, "fragment_divin", 1, "eclat_fracture", 1);
+        add(Category.MATERIAUX, "alliage_celeste", 2, 200, 90, N, "lingot_adamantite", 3, "lingot_neantite", 3, "cristal_arcanique", 2, "fragment_divin", 1, "eclat_fracture", 1);
         add(Category.MATERIAUX, "bois_enchante", 2, 4, 10, N, "ecorce_ancienne", 3, "seve_lumineuse", 1);
-        add(Category.MATERIAUX, "bronze_runique", 2, 20, 30, N, "carapace_cuivre", 3, "minecraft:copper_ingot", 2, "minecraft:lapis_lazuli", 2);
+        add(Category.MATERIAUX, "bronze_runique", 2, 20, 30, N, "carapace_cuivre", 3, "minecraft:copper_ingot", 2, "lingot_argentite", 1, "minecraft:lapis_lazuli", 2);
         add(Category.MATERIAUX, "tissu_spectral", 2, 25, 35, N, "soie_araignee", 3, "voile_spectral", 1, "tissu_enchante", 1);
         add(Category.MATERIAUX, "cuir_polaire", 2, 30, 45, N, "fourrure_polaire", 3, "cuir_renforce", 1, "carapace_givree", 1);
-        add(Category.MATERIAUX, "acier_stellaire", 1, 120, 75, N, "lingot_adamantite", 1, "poussiere_etoile", 2, "plaque_neant", 1);
+        add(Category.MATERIAUX, "acier_stellaire", 1, 120, 75, N, "lingot_adamantite", 1, "lingot_neantite", 2, "poussiere_etoile", 2, "plaque_neant", 1);
         // recettes alternatives avec les materiaux propres aux monstres
         add(Category.MATERIAUX, "bois_enchante", 2, 4, 10, N, "noeud_racine", 1, "roseau_enchante", 2, "mousse_vivante", 2);
         add(Category.MATERIAUX, "cuir_renforce", 2, 2, 5, N, "peau_crapaud", 3, "crin_cendre", 1);
         add(Category.MATERIAUX, "cuir_polaire", 2, 30, 45, N, "queue_renard", 2, "crin_cendre", 2, "cuir_renforce", 1);
         add(Category.MATERIAUX, "tissu_spectral", 2, 25, 35, N, "maillon_spectral", 1, "soie_araignee", 2, "plume_harpie", 1);
         add(Category.MATERIAUX, "bronze_runique", 2, 20, 30, N, "dard_scorpion", 2, "carapace_cuivre", 2, "minecraft:copper_ingot", 1);
-        add(Category.MATERIAUX, "acier_stellaire", 1, 120, 75, N, "coeur_etoile", 1, "lingot_adamantite", 1, "poudre_astrale", 2);
+        add(Category.MATERIAUX, "acier_stellaire", 1, 120, 75, N, "coeur_etoile", 1, "lingot_adamantite", 1, "lingot_neantite", 2, "poudre_astrale", 2);
         add(Category.MATERIAUX, "pierre_amelioration", 1, 10, 1, N, "phalange_osselet", 4, "ecusson_funeraire", 1, "minecraft:lapis_lazuli", 1);
         add(Category.MATERIAUX, "pierre_amelioration_sup", 1, 60, 40, N, "pierre_amelioration", 2, "joyau_cryptes", 1, "noyau_glace", 1);
         add(Category.MATERIAUX, "trefle_quatre_feuilles", 1, 150, 30, N, "trefle_chance", 2, "chapeau_luisant", 2, "perle_acide", 1);
@@ -132,17 +132,17 @@ public final class ForgeRecipes {
         add(Category.FAMILIERS, "nourriture_familier", 4, 5, 1, N, "defense_ronce", 1, "plume_sylvestre", 1, "minecraft:wheat", 2);
         add(Category.MATERIAUX, "lingot_mithril", 1, 5, 20, N, "minecraft:iron_ingot", 2, "carapace_volcanique", 1, "patte_araignee", 1);
         // ---------------------------------------------------------------- armes : Guerrier
-        weapon("epee_recrue", 3, "minecraft:iron_ingot", 3, "minecraft:stick", 1);
-        weapon("lame_runique", 20, "ferraille_gobeline", 4, "oreille_gobelin", 3, "minecraft:iron_ingot", 2, "minecraft:lapis_lazuli", 4);
+        weapon("epee_recrue", 3, "lingot_verdite", 3, "minecraft:stick", 1);
+        weapon("lame_runique", 20, "ferraille_gobeline", 4, "oreille_gobelin", 3, "lingot_verdite", 3, "minecraft:lapis_lazuli", 4);
         weapon("epee_berserker", 60, "acier_orc", 4, "defense_orc", 3, "couronne_roi_gobelin", 1);
-        weapon("epee_milicien", 8, "minecraft:iron_ingot", 4, "griffe_loup", 2, "minecraft:leather", 1);
-        weapon("lame_acier_trempe", 35, "minecraft:iron_ingot", 4, "bois_enchante", 2, "ferraille_gobeline", 4, "insigne_bandit", 1);
+        weapon("epee_milicien", 8, "lingot_verdite", 4, "griffe_loup", 2, "minecraft:leather", 1);
+        weapon("lame_acier_trempe", 35, "lingot_argentite", 3, "bois_enchante", 2, "ferraille_gobeline", 4, "insigne_bandit", 1);
         weapon("epee_croise", 110, "lingot_mithril", 3, "relique_funeraire", 3, "fragment_ossuaire", 4, "couronne_roi_gobelin", 1);
         weapon("epee_seigneur_guerre", 150, "lingot_mithril", 4, "os_maudit", 4, "phylactere_liche", 1);
         weapon("lame_tempetes", 280, "bronze_runique", 4, "cendre_ardente", 4, "braise_djinn", 1, "phylactere_liche", 1);
-        weapon("lame_demoniaque", 400, "lingot_adamantite", 4, "noyau_flamme", 3, "coeur_infernal", 1);
+        weapon("lame_demoniaque", 400, "lingot_adamantite", 4, "lingot_ambrasite", 3, "noyau_flamme", 3, "coeur_infernal", 1);
         weapon("epee_roi_dragon", 650, "acier_stellaire", 3, "croc_wyrm", 2, "ecaille_hydre", 2, "coeur_infernal", 1);
-        weapon("excalibur_celeste", 1000, "fragment_divin", 3, "lingot_adamantite", 4, "essence_neant", 2, "coeur_glace_eternelle", 1);
+        weapon("excalibur_celeste", 1000, "fragment_divin", 3, "lingot_adamantite", 4, "lingot_neantite", 4, "essence_neant", 2, "coeur_glace_eternelle", 1);
         // Mage
         weapon("baton_apprenti", 3, "minecraft:stick", 3, "minecraft:lapis_lazuli", 2, "minecraft:glowstone_dust", 1);
         weapon("baton_saule", 8, "minecraft:stick", 3, "ecorce_ancienne", 3, "minecraft:lapis_lazuli", 2);
@@ -168,23 +168,23 @@ public final class ForgeRecipes {
         weapon("arc_dragon", 650, "acier_stellaire", 2, "croc_wyrm", 3, "ecaille_hydre", 2, "coeur_infernal", 1);
         weapon("arc_aube_divine", 1000, "fragment_divin", 3, "lingot_adamantite", 2, "essence_neant", 2, "coeur_glace_eternelle", 1);
         // Tank
-        weapon("masse_garde", 3, "minecraft:iron_ingot", 3, "minecraft:stick", 2, "minecraft:cobblestone", 2);
-        weapon("masse_cloutee", 8, "minecraft:iron_ingot", 4, "ferraille_gobeline", 2, "minecraft:stick", 1);
-        weapon("marteau_bastion", 20, "ferraille_gobeline", 4, "minecraft:iron_ingot", 3, "croc_loup", 2);
-        weapon("marteau_forgeron", 35, "minecraft:iron_ingot", 5, "bois_enchante", 2, "sang_orc", 1, "insigne_bandit", 1);
+        weapon("masse_garde", 3, "lingot_verdite", 3, "minecraft:stick", 2, "minecraft:cobblestone", 2);
+        weapon("masse_cloutee", 8, "lingot_verdite", 4, "ferraille_gobeline", 2, "minecraft:stick", 1);
+        weapon("marteau_bastion", 20, "ferraille_gobeline", 4, "lingot_verdite", 4, "croc_loup", 2);
+        weapon("marteau_forgeron", 35, "lingot_argentite", 4, "bois_enchante", 2, "sang_orc", 1, "insigne_bandit", 1);
         weapon("marteau_colosse", 60, "acier_orc", 5, "defense_orc", 2, "couronne_roi_gobelin", 1);
         weapon("masse_templier", 110, "lingot_mithril", 3, "relique_funeraire", 3, "fragment_ossuaire", 4, "couronne_roi_gobelin", 1);
         weapon("masse_gardien", 150, "lingot_mithril", 4, "minecraft:gold_block", 2, "phylactere_liche", 1);
         weapon("marteau_runique", 280, "bronze_runique", 5, "gemme_brute", 2, "carapace_givree", 3, "phylactere_liche", 1);
-        weapon("marteau_titan", 400, "lingot_adamantite", 4, "noyau_flamme", 2, "coeur_infernal", 1);
+        weapon("marteau_titan", 400, "lingot_adamantite", 4, "lingot_glacium", 3, "noyau_flamme", 2, "coeur_infernal", 1);
         weapon("marteau_rois_anciens", 650, "acier_stellaire", 3, "couronne_cryptes", 1, "coeur_racine", 2, "coeur_infernal", 1);
         weapon("marteau_egide", 1000, "fragment_divin", 3, "lingot_adamantite", 4, "coeur_glace_eternelle", 1, "essence_neant", 2);
 
         // ---------------------------------------------------------------- armures
-        armorSet("acier_soldat", 10, "minecraft:iron_ingot", 3, "ferraille_gobeline", 2, null);
+        armorSet("acier_soldat", 10, "lingot_verdite", 3, "ferraille_gobeline", 2, null);
         armorSet("berserker", 40, "acier_orc", 3, "defense_orc", 1, "couronne_roi_gobelin");
-        armorSet("seigneur_guerre", 100, "lingot_mithril", 3, "noyau_flamme", 1, "phylactere_liche");
-        armorSet("dieu_guerre", 300, "lingot_adamantite", 3, "essence_neant", 1, "coeur_infernal");
+        armorSet("seigneur_guerre", 100, "lingot_mithril", 3, "lingot_ambrasite", 2, "phylactere_liche");
+        armorSet("dieu_guerre", 300, "lingot_adamantite", 3, "lingot_neantite", 2, "coeur_infernal");
         armorSet("apprenti", 10, "minecraft:white_wool", 3, "oreille_gobelin", 2, null);
         armorSet("sorcier", 40, "tissu_enchante", 3, "os_maudit", 1, "couronne_roi_gobelin");
         armorSet("archimage", 100, "tissu_enchante", 3, "eclat_givre", 1, "phylactere_liche");
@@ -193,11 +193,11 @@ public final class ForgeRecipes {
         armorSet("rodeur", 40, "cuir_renforce", 3, "os_maudit", 1, "couronne_roi_gobelin");
         armorSet("tireur_elite", 100, "cuir_renforce", 3, "lingot_mithril", 1, "phylactere_liche");
         armorSet("sylvestre", 300, "cuir_renforce", 3, "cristal_arcanique", 1, "coeur_infernal");
-        armorSet("garde", 10, "minecraft:iron_ingot", 3, "minecraft:cobblestone", 3, null);
+        armorSet("garde", 10, "lingot_verdite", 3, "minecraft:cobblestone", 3, null);
         armorSet("gardien", 40, "acier_orc", 3, "minecraft:iron_block", 1, "couronne_roi_gobelin");
         armorSet("paladin", 100, "lingot_mithril", 3, "minecraft:gold_ingot", 2, "phylactere_liche");
-        armorSet("titan", 300, "lingot_adamantite", 3, "noyau_flamme", 1, "coeur_infernal");
-        armorSet("veteran", 25, "minecraft:iron_ingot", 3, "griffe_loup", 2, "insigne_bandit");
+        armorSet("titan", 300, "lingot_adamantite", 3, "lingot_glacium", 2, "coeur_infernal");
+        armorSet("veteran", 25, "lingot_argentite", 3, "griffe_loup", 2, "insigne_bandit");
         armorSet("croise", 70, "lingot_mithril", 2, "relique_funeraire", 2, "couronne_roi_gobelin");
         armorSet("conquerant", 180, "bronze_runique", 3, "sang_orc", 2, "braise_djinn");
         armorSet("seigneur_dragon", 240, "acier_stellaire", 2, "ecaille_hydre", 1, "croc_wyrm");
@@ -209,7 +209,7 @@ public final class ForgeRecipes {
         armorSet("traqueur", 70, "cuir_renforce", 3, "venin_marais", 2, "couronne_roi_gobelin");
         armorSet("lame_ombre", 180, "cuir_polaire", 3, "voile_spectral", 1, "braise_djinn");
         armorSet("chasseur_lunaire", 240, "cuir_polaire", 3, "eclat_astral", 2, "croc_wyrm");
-        armorSet("sentinelle_fer", 25, "minecraft:iron_ingot", 4, "ecorce_ancienne", 2, "insigne_bandit");
+        armorSet("sentinelle_fer", 25, "lingot_argentite", 4, "ecorce_ancienne", 2, "insigne_bandit");
         armorSet("rempart", 70, "lingot_mithril", 3, "fragment_ossuaire", 3, "couronne_roi_gobelin");
         armorSet("croise_sacre", 180, "bronze_runique", 3, "gemme_brute", 1, "coeur_racine");
         armorSet("bastion_eternel", 240, "acier_stellaire", 2, "carapace_givree", 2, "couronne_cryptes");

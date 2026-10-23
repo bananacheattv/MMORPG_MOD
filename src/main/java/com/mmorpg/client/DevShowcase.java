@@ -487,6 +487,45 @@ public final class DevShowcase {
             }
             return;
         }
+        if (MODE.equals("mines")) {          // construction de la mine, visite de chaque etage, minage et repousse
+            minePhase(mc, me);
+            return;
+        }
+        if (MODE.equals("combat")) {          // un monstre et un boss collent au joueur : perd-il des PV ?
+            var srv = mc.getSingleplayerServer();
+            if (tick == 5) {
+                cmd(mc, "gamemode survival");
+                cmd(mc, "difficulty normal");
+            }
+            if (tick == 8) srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                pl.getAbilities().invulnerable = false;
+                pl.onUpdateAbilities();
+                MMORPG.LOGGER.info("[MMORPG] COMBAT joueur : mode {} invulnerable {} difficulte {}", pl.gameMode(), pl.getAbilities().invulnerable, pl.level().getDifficulty());
+            });
+            if (tick == 20) srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                var lv = pl.level();
+                var pos = pl.blockPosition();
+                var gob = com.mmorpg.server.MobSpawner.spawnForCommand(lv, "gobelin", pos.offset(2, 0, 0), 10);
+                var orc = com.mmorpg.server.MobSpawner.spawnForCommand(lv, "orc_guerrier", pos.offset(-2, 0, 0), 30);
+                var boss = com.mmorpg.server.MobSpawner.spawnForCommand(lv, "roi_gobelin", pos.offset(0, 0, 3), 20);
+                MMORPG.LOGGER.info("[MMORPG] COMBAT spawn : gobelin {} orc {} boss {}", gob != null, orc != null, boss != null);
+            });
+            if (tick >= 20 && tick <= 200 && tick % 20 == 0) srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                var d = com.mmorpg.server.RpgPlayers.get(pl);
+                var near = pl.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, pl.getBoundingBox().inflate(12));
+                StringBuilder sb = new StringBuilder();
+                for (var m : near) sb.append(m.getType().builtInRegistryHolder().key().identifier().getPath()).append("(cible=").append(m.getTarget() == null ? "aucune" : m.getTarget().getName().getString()).append(",pv=").append((int) m.getHealth()).append(") ");
+                MMORPG.LOGGER.info("[MMORPG] COMBAT tick {} : PV joueur rpg {} / vanilla {} ; monstres : {}", tick, d.hp, pl.getHealth(), sb);
+            });
+            if (tick == 210) {
+                MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+                stop(mc);
+            }
+            return;
+        }
         if (MODE.equals("bossauto")) {          // le boss se reveille tout seul quand on entre au fond de l'arene
             var srv = mc.getSingleplayerServer();
             if (tick == 5) {
@@ -1346,6 +1385,116 @@ public final class DevShowcase {
         mc.mouseHandler.onButton(mc.getWindow().handle(), new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT, 0),
                 down ? com.mojang.blaze3d.platform.InputConstants.PRESS : com.mojang.blaze3d.platform.InputConstants.RELEASE);
     }
+
+    private static int mineT = -1;
+    private static long mineBuildStart;
+
+    private static void tpMine(net.minecraft.server.MinecraftServer srv, String me, int lx, int lz, float yaw) {
+        var pl = srv.getPlayerList().getPlayerByName(me);
+        var lv = com.mmorpg.mine.MineManager.dim(srv);
+        double x = com.mmorpg.mine.MineLayout.X0 + lx + 0.5, z = com.mmorpg.mine.MineLayout.Z0 + lz + 0.5;
+        for (int dx = -2; dx <= 2; dx++) for (int dz = -2; dz <= 2; dz++) lv.getChunk(((int) x >> 4) + dx, ((int) z >> 4) + dz);
+        double y = com.mmorpg.mine.MineLayout.get().floor(lx, lz) + 1.2;
+        pl.teleportTo(lv, x, y, z, java.util.Set.of(), yaw, 8F, true);
+        pl.resetFallDistance();
+    }
+
+    private static void minePhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) {
+            cmd(mc, "gamemode survival");
+            cmd(mc, "difficulty normal");
+            mineT = -1;
+            mineBuildStart = System.nanoTime();
+        }
+        if (tick > 20 && mineT < 0 && tick % 40 == 0) srv.execute(() -> {
+            if (com.mmorpg.mine.MineManager.built(srv) && !com.mmorpg.mine.MineManager.building()) {
+                mineT = 0;
+                MMORPG.LOGGER.info("[MMORPG] MINES construites en {} s", (System.nanoTime() - mineBuildStart) / 1_000_000_000L);
+            } else if (tick % 400 == 0) {
+                MMORPG.LOGGER.info("[MMORPG] MINES construction : {} %", com.mmorpg.mine.MineManager.percent());
+            }
+        });
+        if (mineT < 0) {
+            if (tick > 24000) {
+                MMORPG.LOGGER.info("[MMORPG] MINES abandon : construction trop longue");
+                stop(mc);
+            }
+            return;
+        }
+        mineT++;
+        int t = mineT;
+        if (t == 5) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var d = com.mmorpg.server.RpgPlayers.get(pl);
+            d.level = 100;
+            pl.getAbilities().invulnerable = true;
+            pl.onUpdateAbilities();
+            pl.getInventory().setItem(0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_PICKAXE));
+            pl.getInventory().setSelectedSlot(0);
+            MMORPG.LOGGER.info("[MMORPG] MINES entree : {}", com.mmorpg.mine.MineManager.enter(pl));
+        });
+        if (t == 60) shot(mc, "mine_place");
+        // un etage toutes les 140 ticks
+        for (int k = 0; k < 5; k++) {
+            int base = 80 + k * 140;
+            final int sk = k;
+            if (t == base) srv.execute(() -> tpMine(srv, me, 220 + (sk % 2 == 0 ? -40 : 50), com.mmorpg.mine.MineLayout.sectorStart(sk) + 50, 0F));
+            if (t == base + 100) srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                var lv = pl.level();
+                var mobs = lv.getEntitiesOfClass(net.minecraft.world.entity.Mob.class, pl.getBoundingBox().inflate(45, 30, 45), m -> m instanceof com.mmorpg.entity.RpgMob);
+                StringBuilder sb = new StringBuilder();
+                for (var m : mobs) {
+                    var md = m.getExistingDataOrNull(com.mmorpg.registry.ModAttachments.MOB);
+                    sb.append(md == null ? "?" : md.key + " niv " + md.level).append("; ");
+                }
+                int ores = 0;
+                var bp = pl.blockPosition();
+                for (int dx = -30; dx <= 30; dx++) for (int dz = -30; dz <= 30; dz++) for (int dy = -6; dy <= 8; dy++)
+                    if (lv.getBlockState(bp.offset(dx, dy, dz)).getBlock() instanceof com.mmorpg.mine.MineOreBlock) ores++;
+                MMORPG.LOGGER.info("[MMORPG] MINES etage {} : {} monstres [{}] ; {} minerais autour ; zone = {}", sk, mobs.size(), sb, ores,
+                        com.mmorpg.zone.ZoneManager.zoneAt(lv, bp) == null ? "aucune" : com.mmorpg.zone.ZoneManager.zoneAt(lv, bp).name());
+            });
+            if (t == base + 104) shot(mc, "mine_etage" + sk);
+        }
+        int mt = 80 + 5 * 140 + 20;
+        if (t == mt) srv.execute(() -> tpMine(srv, me, 220, 100, 0F));
+        if (t == mt + 20) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var lv = pl.level();
+            var bp = pl.blockPosition();
+            net.minecraft.core.BlockPos found = null;
+            for (int r = 1; r <= 40 && found == null; r++)
+                for (int dx = -r; dx <= r && found == null; dx++) for (int dz = -r; dz <= r && found == null; dz++) for (int dy = -8; dy <= 10 && found == null; dy++)
+                    if (lv.getBlockState(bp.offset(dx, dy, dz)).getBlock() instanceof com.mmorpg.mine.MineOreBlock) found = bp.offset(dx, dy, dz);
+            if (found == null) {
+                MMORPG.LOGGER.info("[MMORPG] MINES minage : aucun minerai trouve");
+                return;
+            }
+            var ore = ((com.mmorpg.mine.MineOreBlock) lv.getBlockState(found).getBlock()).ore();
+            int before = pl.getInventory().countItem(com.mmorpg.registry.ModItems.get(ore.ingotId()));
+            boolean ok = com.mmorpg.mine.MineManager.mine(lv, pl, found, ore);
+            int after = pl.getInventory().countItem(com.mmorpg.registry.ModItems.get(ore.ingotId()));
+            MMORPG.LOGGER.info("[MMORPG] MINES minage {} : extrait = {} ; lingots {} -> {} ; bloc devenu {} ; repousses en attente = {}", ore.name(), ok, before, after,
+                    lv.getBlockState(found).getBlock().getDescriptionId(), com.mmorpg.mine.MineData.get(srv).respawns().size());
+            minePos = found;
+        });
+        if (t == mt + 40) srv.execute(() -> {
+            int n = com.mmorpg.mine.MineManager.respawnAllNow(srv);
+            MMORPG.LOGGER.info("[MMORPG] MINES repousse forcee de {} minerai(s)", n);
+        });
+        if (t == mt + 80) srv.execute(() -> {
+            var lv = com.mmorpg.mine.MineManager.dim(srv);
+            MMORPG.LOGGER.info("[MMORPG] MINES apres repousse : bloc = {}", minePos == null ? "?" : lv.getBlockState(minePos).getBlock().getDescriptionId());
+        });
+        if (t == mt + 100) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        }
+    }
+
+    private static net.minecraft.core.BlockPos minePos;
 
     private static int[] bossTp;
     private static int[] dragFrom;

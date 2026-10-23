@@ -110,6 +110,10 @@ public class AeloriaPauseScreen extends PauseScreen {
             mc.gui.setScreen(null);
             mc.player.connection.sendCommand("hub");
         }));
+        l.add(new Card(Cat.TRAVEL, new ItemStack(Items.IRON_PICKAXE), "Les mines", "Descendez extraire des lingots rares.", () -> {
+            mc.gui.setScreen(null);
+            mc.player.connection.sendCommand("mine");
+        }));
         l.add(new Card(Cat.TRAVEL, new ItemStack(Items.GOLDEN_APPLE), "Progrès", "Les succès de Minecraft.",
                 () -> mc.gui.setScreen(new AdvancementsScreen(mc.player.connection.getAdvancements(), this))));
         l.add(new Card(Cat.TRAVEL, new ItemStack(Items.COMPASS), "Statistiques", "Vos chiffres de jeu, objet par objet.",

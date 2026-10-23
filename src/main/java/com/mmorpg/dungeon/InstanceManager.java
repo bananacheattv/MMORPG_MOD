@@ -439,6 +439,7 @@ public final class InstanceManager {
     @net.neoforged.bus.api.SubscribeEvent
     public static void onLogin(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer p) || !p.level().dimension().equals(DIM)) return;
+        if (com.mmorpg.mine.MineManager.inMine(p)) return;            // les mines sont partagees : on y reste a la reconnexion
         MinecraftServer server = p.level().getServer();
         String mine = ownerKey(p);
         for (Slot s : InstanceData.get(server).slots) {
