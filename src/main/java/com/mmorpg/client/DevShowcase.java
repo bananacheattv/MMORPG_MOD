@@ -1233,6 +1233,20 @@ public final class DevShowcase {
             path.add(0);
         }
         if (tick == 160) shot(mc, "121_admin_article");
+        if (tick == 162) {
+            // liste deroulante : modification du champ « item » d'un article (propose tous les objets avec leur icone)
+            var sc = mc.gui.screen();
+            var root0 = (com.google.gson.JsonObject) adminField(sc, "root");
+            var item = root0.getAsJsonArray("buy").get(0).getAsJsonObject().get("item");
+            adminCall(sc, "startEdit", new Class<?>[]{Object.class, com.google.gson.JsonElement.class, int.class, int.class, int.class}, "item", item, 400, 300, 200);
+            ((net.minecraft.client.gui.components.EditBox) adminField(sc, "edit")).setValue("potion");
+        }
+        if (tick == 164) {
+            var sc = mc.gui.screen();
+            shot(mc, "121b_admin_liste_objets");
+            MMORPG.LOGGER.info("[MMORPG] ADMIN liste deroulante : {} propositions pour le champ item (attendu > 100), objets = {}", ((java.util.List<?>) adminField(sc, "options")).size(), adminField(sc, "optionsAreItems"));
+            adminCall(sc, "stopEdit", new Class<?>[]{});
+        }
         if (tick == 165) {
             var sc = mc.gui.screen();
             @SuppressWarnings("unchecked") var path = (java.util.List<Object>) adminField(sc, "path");
@@ -1341,10 +1355,11 @@ public final class DevShowcase {
         int cx = com.mmorpg.hub.HubMarket.CX;
         // {x, y, z, yaw, pitch, nom}
         double[][] views = {
+                {0, 6, 42, 180, 8}, {0, 38, 0, 0, 90}, {0, 9, -27, 0, 6}, {-24, 4, -6, 270, 8}, {6, 3, 17, 180, 12}, {18, 12, 18, 225, 20},
                 {cx + 40, 8, 0, 90, 12}, {cx + 20, 7, 0, 90, 20}, {cx + 4, 4, -9, 180, 8}, {cx - 4, 4, 3, 90, 8}, {cx + 4, 5, 8, 0, 8},
                 {cx + 8, 3, -6, 180, 10}, {cx + 20, 4, -9, 270, 8}, {cx - 22, 4, 12, 180, 12}, {cx - 16, 5, 14, 90, 14}, {cx, 50, 0, 90, 80},
                 {cx, 32, -46, 0, 36}, {-20, 10, 0, 90, 8}};
-        String[] names = {"entree", "teleporteur_fontaine", "banque", "hdv", "forges", "etal_alchimie", "portail_mines", "ferme", "hdv_ferme", "vue_du_ciel", "vue_nord", "avenue"};
+        String[] names = {"hall_entree", "hall_dessus", "hall_nord", "hall_colonnade", "hall_centre", "hall_pavillon", "entree", "teleporteur_fontaine", "banque", "hdv", "forges", "etal_alchimie", "portail_mines", "ferme", "hdv_ferme", "vue_du_ciel", "vue_nord", "avenue"};
         int idx = t / 60;
         if (idx < views.length && t % 60 == 5) {
             double[] v = views[idx];

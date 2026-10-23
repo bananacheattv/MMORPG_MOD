@@ -105,8 +105,11 @@ public final class Admin {
         Net.toPlayer(p, new Payloads.AdminReply(kind, file, index, count, text));
     }
 
+    /** Liste des fichiers, puis le catalogue des identifiants (monstres, quetes) qui alimente les listes deroulantes du menu. */
     public static void open(ServerPlayer p) {
-        send(p, Payloads.AdminReply.OPEN, "", 0, 1, String.join("\n", AdminConfigs.FILES));
+        String mobs = String.join(",", com.mmorpg.config.ConfigManager.mobs().keySet());
+        String quests = String.join(",", com.mmorpg.config.ConfigManager.quests().keySet());
+        send(p, Payloads.AdminReply.OPEN, "", 0, 1, String.join("\n", AdminConfigs.FILES) + "\n\u0001mobs=" + mobs + "\n\u0001quests=" + quests);
     }
 
     private static void message(ServerPlayer p, boolean ok, String text) {

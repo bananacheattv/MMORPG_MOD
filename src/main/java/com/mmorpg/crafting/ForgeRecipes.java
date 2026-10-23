@@ -66,8 +66,16 @@ public final class ForgeRecipes {
     /** Minerais des mines par rang (voir MineBlocks) et niveau a partir duquel ils sont extraits. */
     private static final String[] MINE_ORES = {"verdite", "argentite", "ambrasite", "glacium", "neantite"};
     private static final int[] MINE_LEVEL = {1, 18, 38, 55, 75};
-    /** Quantite de minerai compresse (et de lingot rare) par piece : casque, plastron, jambieres, bottes. */
+    /** Quantite de lingot rare par piece : casque, plastron, jambieres, bottes. */
     private static final int[] MINE_WEIGHT = {1, 2, 2, 1};
+    /**
+     * Minerais compresses par piece : une panoplie complete en demande 250 (600 pour les panoplies de niveau 90 et plus). Un mineur actif
+     * obtient environ 400 lingots par heure, soit 25 minerais compresses (16 lingots chacun) : 10 heures de minage au minimum par panoplie.
+     */
+    private static final int[] COMPRESSED_PER_SET_PIECE = {42, 83, 83, 42};
+    /** Outils : 20 minerais compresses + 80 lingots = 400 lingots, une heure de minage. */
+    private static final int TOOL_COMPRESSED = 20;
+    private static final int TOOL_INGOTS = 80;
 
     private static int oreTier(int level) {
         int t = 0;
@@ -85,14 +93,12 @@ public final class ForgeRecipes {
             String ore = MINE_ORES[t - 1];
             int lvl = MINE_LEVEL[t - 1];
             String[] kinds = {"pioche", "hache", "pelle", "houe"};
-            int[] compressed = {3, 3, 1, 2};
-            int[] ingots = {6, 6, 3, 4};
             for (int k = 0; k < kinds.length; k++) {
                 List<Object> ing = new ArrayList<>();
                 ing.add("compresse_" + ore);
-                ing.add(compressed[k]);
+                ing.add(TOOL_COMPRESSED);
                 ing.add("lingot_" + ore);
-                ing.add(ingots[k]);
+                ing.add(TOOL_INGOTS);
                 ing.add("minecraft:stick");
                 ing.add(2);
                 if (rare[t] != null) {
@@ -122,7 +128,7 @@ public final class ForgeRecipes {
             }
             // metallurgie des mines : minerai compresse du rang de la panoplie, et lingot rare des panoplies de niveau 25+
             ing.add("compresse_" + MINE_ORES[oreTier(set.level())]);
-            ing.add(MINE_WEIGHT[i]);
+            ing.add(COMPRESSED_PER_SET_PIECE[i] * (set.level() >= 90 ? 16 : 10) / 10);
             String rare = set.level() >= 75 ? "lingot_astralium" : set.level() >= 50 ? "lingot_orichalque" : set.level() >= 25 ? "lingot_aelium" : null;
             if (rare != null) {
                 ing.add(rare);
