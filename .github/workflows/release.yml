@@ -41,7 +41,7 @@ jobs:
         run: |
           mkdir dist
           cp $(ls build/libs/*.jar | grep -v -- '-sources\|-javadoc') dist/
-          cp launcher/build/launcher-core.jar launcher/build/EldoriaLauncher.jar dist/
+          cp launcher/build/launcher-core.jar launcher/build/AeloriaLauncher.jar dist/
           NEO=$(grep '^neo_version=' gradle.properties | cut -d= -f2)
           MC=$(grep '^minecraft_version=' gradle.properties | cut -d= -f2)
           mapfile -t NOTES < <(git log -5 --no-merges --format='%s')
@@ -72,16 +72,16 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory in | Out-Null
-          Copy-Item dist/EldoriaLauncher.jar in/
-          jpackage --type app-image --name EldoriaLauncher --input in --main-jar EldoriaLauncher.jar `
+          Copy-Item dist/AeloriaLauncher.jar in/
+          jpackage --type app-image --name AeloriaLauncher --input in --main-jar AeloriaLauncher.jar `
             --main-class eldoria.boot.Bootstrap --app-version 1.0.0 --vendor Aeloria `
             --add-modules java.se,jdk.zipfs,jdk.charsets,jdk.unsupported,jdk.localedata --dest out
-          Compress-Archive -Path out/EldoriaLauncher -DestinationPath EldoriaLauncher-Windows.zip
+          Compress-Archive -Path out/AeloriaLauncher -DestinationPath AeloriaLauncher-Windows.zip
 
       - uses: actions/upload-artifact@v4
         with:
           name: windows
-          path: EldoriaLauncher-Windows.zip
+          path: AeloriaLauncher-Windows.zip
 
   publish:
     needs: [build, windows]
@@ -99,9 +99,9 @@ jobs:
           cat > notes.md <<'NOTES'
           Build automatique du dernier push sur main.
 
-          **Joueurs** : telechargez `EldoriaLauncher-Windows.zip`, dezippez puis lancez `EldoriaLauncher.exe`
-          (ou `EldoriaLauncher.jar` si Java est installe). Le launcher se met a jour tout seul a chaque push.
+          **Joueurs** : telechargez `AeloriaLauncher-Windows.zip`, dezippez puis lancez `AeloriaLauncher.exe`
+          (ou `AeloriaLauncher.jar` si Java est installe). Le launcher se met a jour tout seul a chaque push.
           NOTES
           gh release delete latest --cleanup-tag -y || true
-          gh release create latest art/dist/* art/windows/EldoriaLauncher-Windows.zip \
+          gh release create latest art/dist/* art/windows/AeloriaLauncher-Windows.zip \
             --target "$GITHUB_SHA" --title "Aeloria MMORPG - build ${{ github.run_number }}" --notes-file notes.md --latest

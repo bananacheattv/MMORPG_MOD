@@ -70,7 +70,7 @@ def modrinth(slug, mc, neoforge):
 
 dist, base, version, mc, neoforge, *notes = sys.argv[1:]
 mods = [{'file': f, 'url': f'{base}/{f}', 'sha256': sha(os.path.join(dist, f))}
-        for f in sorted(os.listdir(dist)) if f.endswith('.jar') and f not in ('launcher-core.jar', 'EldoriaLauncher.jar')]
+        for f in sorted(os.listdir(dist)) if f.endswith('.jar') and f not in ('launcher-core.jar', 'EldoriaLauncher.jar', 'AeloriaLauncher.jar')]
 with open(os.path.join(HERE, '..', 'extra_mods.json'), encoding='utf-8') as f:
     for extra in json.load(f):
         try:
