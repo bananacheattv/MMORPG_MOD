@@ -51,6 +51,7 @@ public final class PlainsBuilder {
     private final Sector style;
     private final int ox;
     private final Set<Long> forced = new HashSet<>();
+    private final java.util.ArrayDeque<Long> pending = new java.util.ArrayDeque<>();
     private final List<LevelZones.Cell> totems = new ArrayList<>();
     private int row = 0;
     private int slabEnd = 0;
@@ -97,6 +98,7 @@ public final class PlainsBuilder {
         if (row == 0 && slabEnd == 0) clearTexts();
         while (row < L) {
             if (row >= slabEnd) nextSlab();
+            if (!drainChunks(start, nanos)) return false;
             for (int lx = 0; lx < W; lx++) column(lx, row);
             row++;
             if (!plazaDone && row >= PLAZA_Z + 16) {
@@ -123,10 +125,7 @@ public final class PlainsBuilder {
         int cz0 = (Z0 + slabStart - 16) >> 4, cz1 = (Z0 + slabEnd + 16) >> 4;
         for (int cx = cx0; cx <= cx1; cx++) {
             for (int cz = cz0; cz <= cz1; cz++) {
-                if (forced.add(key(cx, cz))) {
-                    level.setChunkForced(cx, cz, true);
-                    level.getChunk(cx, cz);
-                }
+                if (forced.add(key(cx, cz))) pending.add(key(cx, cz));
             }
         }
         int keep = (Z0 + slabStart - 48) >> 4;
@@ -136,6 +135,20 @@ public final class PlainsBuilder {
             level.setChunkForced((int) (k >> 32), cz, false);
             return true;
         });
+    }
+
+    /**
+     * Charge de force les chunks de la tranche, quelques-uns par passage : attendre des centaines de chunks d'un coup bloquerait le tick
+     * (et le chien de garde du serveur le prendrait pour un plantage au premier demarrage). @return vrai quand tout est charge
+     */
+    private boolean drainChunks(long start, long nanos) {
+        while (!pending.isEmpty()) {
+            long k = pending.pollFirst();
+            level.setChunkForced((int) (k >> 32), (int) k, true);
+            level.getChunk((int) (k >> 32), (int) k);
+            if (System.nanoTime() - start > nanos) break;
+        }
+        return pending.isEmpty();
     }
 
     /** Libere les chunks charges de force (fin de construction ou abandon). */

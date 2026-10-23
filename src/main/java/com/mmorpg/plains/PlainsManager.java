@@ -175,7 +175,7 @@ public final class PlainsManager {
             }
             return;
         }
-        for (int r = 0; r < REGIONS && job == null; r++) {
+        for (int r = 0; r < REGIONS && job == null && !com.mmorpg.mine.MineManager.building(); r++) {          // une construction a la fois dans la dimension
             if (!built(server, r)) start(server, r);
         }
         if (job != null) return;
