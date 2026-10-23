@@ -420,11 +420,12 @@ public final class RpgPlayers {
     public static void giveStarterTools(ServerPlayer player) {
         give(player, ModItems.get("pioche_debutant"), 1);
         give(player, ModItems.get("houe_debutant"), 1);
+        give(player, ModItems.get("graine_lueur"), 12);
         player.sendSystemMessage(Component.literal("Vous avez reçu une ").withColor(0xE0D8C0)
                 .append(Component.literal("pioche").withColor(0xFFD040))
                 .append(Component.literal(" et une ").withColor(0xE0D8C0))
                 .append(Component.literal("houe du débutant").withColor(0xFFD040))
-                .append(Component.literal(" : le Maître des mines vous attend.").withColor(0xE0D8C0)));
+                .append(Component.literal(", avec des graines de Lueur : le Maître des mines et les terres labourées vous attendent.").withColor(0xE0D8C0)));
     }
 
     private static void giveStarterKit(ServerPlayer player, PlayerClass cls) {

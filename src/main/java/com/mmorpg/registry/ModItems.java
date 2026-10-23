@@ -108,6 +108,16 @@ public final class ModItems {
     public static final DeferredItem<RpgMaterialItem> COMPRESSE_AMBRASITE = material("compresse_ambrasite", Rarity.EPIQUE, "Ambrasite comprimée à la Presse de compression.");
     public static final DeferredItem<RpgMaterialItem> COMPRESSE_GLACIUM = material("compresse_glacium", Rarity.LEGENDAIRE, "Glacium comprimé à la Presse de compression.");
     public static final DeferredItem<RpgMaterialItem> COMPRESSE_NEANTITE = material("compresse_neantite", Rarity.MYTHIQUE, "Néantite comprimée à la Presse de compression : le sommet de la métallurgie d'Aeloria.");
+    // cultures d'Aeloria (voir farm/FarmCrops) : recoltes et aliments
+    public static final DeferredItem<RpgMaterialItem> RACINE_LUEUR = material("racine_lueur", Rarity.COMMUN, "Racine qui luit doucement dans l'obscurité. Entre dans les potions de mana.");
+    public static final DeferredItem<RpgMaterialItem> BLE_ARGENT = material("ble_argent", Rarity.PEU_COMMUN, "Épis argentés cultivés par les fermiers d'Aeloria. Se cuisent en pain d'argent.");
+    public static final DeferredItem<RpgMaterialItem> BAIE_AMBREE = material("baie_ambree", Rarity.RARE, "Baie gorgée de soleil. Se cuisine en confiture ambrée.");
+    public static final DeferredItem<RpgMaterialItem> FLEUR_GIVRE = material("fleur_givre", Rarity.EPIQUE, "Fleur qui ne fane jamais. Distillée en élixir de givre.");
+    public static final DeferredItem<RpgMaterialItem> ORCHIDEE_NEANT = material("orchidee_neant", Rarity.LEGENDAIRE, "Orchidée née du Néant. Son nectar guérit les pires blessures.");
+    public static final DeferredItem<RpgConsumableItem> PAIN_ARGENT = potion("pain_argent", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.HEAL, 700, "Rend 700 PV.");
+    public static final DeferredItem<RpgConsumableItem> CONFITURE_AMBREE = potion("confiture_ambree", Rarity.RARE, RpgConsumableItem.Kind.HEAL, 1800, "Rend 1800 PV.");
+    public static final DeferredItem<RpgConsumableItem> ELIXIR_GIVRE = potion("elixir_givre", Rarity.EPIQUE, RpgConsumableItem.Kind.MANA, 1300, "Rend 1300 points de mana.");
+    public static final DeferredItem<RpgConsumableItem> NECTAR_NEANT = potion("nectar_neant", Rarity.LEGENDAIRE, RpgConsumableItem.Kind.HEAL, 4000, "Rend 4000 PV.");
     public static final DeferredItem<RpgMaterialItem> TISSU_ENCHANTE = material("tissu_enchante", Rarity.RARE, "Étoffe tissée de poussière d'âme.");
     public static final DeferredItem<RpgMaterialItem> CUIR_RENFORCE = material("cuir_renforce", Rarity.PEU_COMMUN, "Cuir renforcé de fourrure sombre.");
     // ---- materiaux de butin supplementaires (monstres, zones des monstres importes) et intermediaires de la Forge

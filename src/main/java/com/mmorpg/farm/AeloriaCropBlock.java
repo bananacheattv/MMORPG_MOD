@@ -1,0 +1,62 @@
+package com.mmorpg.farm;
+
+import com.mmorpg.mine.MineTools;
+import com.mmorpg.registry.ModItems;
+import com.mmorpg.server.RpgPlayers;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+
+/**
+ * Plante d'Aeloria : pousse comme une culture normale mais plus lentement selon son rang. A la recolte d'une plante mure, une houe de
+ * palier superieur donne des recoltes supplementaires (20 % par palier) et un peu d'experience.
+ */
+public class AeloriaCropBlock extends CropBlock {
+    private final FarmCrops.Crop crop;
+
+    public AeloriaCropBlock(Properties properties, FarmCrops.Crop crop) {
+        super(properties);
+        this.crop = crop;
+    }
+
+    public FarmCrops.Crop crop() {
+        return crop;
+    }
+
+    @Override
+    protected ItemLike getBaseSeedId() {
+        return FarmCrops.SEEDS.get(crop.id()).get();
+    }
+
+    @Override
+    protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        if (crop.slow() > 1 && random.nextInt(crop.slow()) != 0) return;
+        super.randomTick(state, level, pos, random);
+    }
+
+    @Override
+    public void playerDestroy(ServerLevel level, ServerPlayer player, BlockPos pos, BlockState state, BlockEntity blockEntity, ItemStack tool) {
+        super.playerDestroy(level, player, pos, state, blockEntity, tool);
+        if (!isMaxAge(state)) return;
+        int hoe = MineTools.hoeTier(tool);
+        int rank = FarmCrops.CROPS.indexOf(crop);
+        RpgPlayers.giveXp(player, 2 + rank * 3L, false);
+        level.sendParticles(ParticleTypes.HAPPY_VILLAGER, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 4, 0.3, 0.3, 0.3, 0.0);
+        if (hoe <= 0) return;
+        int extra = 0;
+        for (int i = 0; i < 2; i++) {
+            if (level.getRandom().nextInt(100) < hoe * 10) extra++;
+        }
+        if (extra > 0) {
+            level.addFreshEntity(new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 0.3, pos.getZ() + 0.5, new ItemStack(ModItems.get(crop.product()), extra)));
+        }
+    }
+}

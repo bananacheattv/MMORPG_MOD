@@ -269,6 +269,18 @@ public final class ForgeRecipes {
 
         tools();
 
+        // ---------------------------------------------------------------- cultures : greffes de graines et cuisine des recoltes
+        add(Category.MATERIAUX, "graine_lueur", 4, 0, 1, N, "minecraft:wheat_seeds", 4, "lingot_verdite", 1);
+        add(Category.MATERIAUX, "graine_argent", 3, 20, 18, N, "graine_lueur", 4, "lingot_argentite", 1);
+        add(Category.MATERIAUX, "graine_ambre", 3, 60, 38, N, "graine_argent", 4, "lingot_ambrasite", 1);
+        add(Category.MATERIAUX, "graine_givre", 3, 150, 55, N, "graine_ambre", 4, "lingot_glacium", 1);
+        add(Category.MATERIAUX, "graine_neant", 3, 400, 75, N, "graine_givre", 4, "lingot_neantite", 1);
+        add(Category.CONSOMMABLES, "pain_argent", 2, 5, 18, N, "ble_argent", 3);
+        add(Category.CONSOMMABLES, "confiture_ambree", 2, 15, 38, N, "baie_ambree", 4, "minecraft:sugar", 1);
+        add(Category.CONSOMMABLES, "elixir_givre", 1, 40, 55, N, "fleur_givre", 3, "minecraft:glass_bottle", 1);
+        add(Category.CONSOMMABLES, "nectar_neant", 1, 100, 75, N, "orchidee_neant", 3, "minecraft:glass_bottle", 1);
+        add(Category.CONSOMMABLES, "potion_mana", 2, 10, 5, N, "minecraft:glass_bottle", 2, "racine_lueur", 3);
+
         // ---------------------------------------------------------------- consommables
         add(Category.CONSOMMABLES, "potion_soin_mineure", 2, 2, 1, N, "minecraft:glass_bottle", 2, "minecraft:apple", 1, "oreille_gobelin", 1);
         add(Category.CONSOMMABLES, "potion_soin", 2, 10, 20, N, "minecraft:glass_bottle", 2, "minecraft:glistering_melon_slice", 1, "os_maudit", 1);

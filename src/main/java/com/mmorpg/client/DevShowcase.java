@@ -178,6 +178,10 @@ public final class DevShowcase {
             structuresPhase(mc, me);
             return;
         }
+        if (MODE.equals("cultures")) {          // cultures d'Aeloria : stades, recolte a la houe, niveau de semis
+            culturesPhase(mc, me);
+            return;
+        }
         if (MODE.equals("metallurgie")) {      // presse de compression, outils des mines, lingots rares, recettes de la forge
             metallurgiePhase(mc, me);
             return;
@@ -1164,6 +1168,84 @@ public final class DevShowcase {
     }
 
     private static net.minecraft.core.BlockPos structOrigin;
+
+    /** Cultures : une rangee par plante (stades 0, 3, 5 et 7), recolte a la houe de Neantite, refus de semis sous le niveau requis. */
+    private static void culturesPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        String[] ids = {"lueur", "argent", "ambre", "givre", "neant"};
+        int[] stages = {0, 3, 5, 7};
+        if (tick == 5) mc.getWindow().setWindowed(1280, 720);
+        if (tick == 20) {
+            cmd(mc, "difficulty peaceful");
+            cmd(mc, "time set day");
+            cmd(mc, "weather clear");
+            cmd(mc, "gamemode creative " + me);
+            cmd(mc, "mmorpg niveau " + me + " 100");
+            cmd(mc, "clear " + me);
+            cmd(mc, "fill ~-30 180 ~-30 ~30 180 ~30 minecraft:smooth_stone");
+            cmd(mc, "fill ~-30 181 ~-30 ~30 195 ~30 minecraft:air");
+            cmd(mc, "tp " + me + " ~ 181 ~ 180 0");
+        }
+        if (tick == 28) cmd(mc, "kill @e[type=!minecraft:player,distance=..80]");
+        if (tick == 30) {
+            structOrigin = mc.player.blockPosition();
+            for (int r = 0; r < ids.length; r++) {
+                cmd(mc, "fill ~-2 ~-1 ~" + (r * 2 - 4) + " ~2 ~-1 ~" + (r * 2 - 4) + " minecraft:farmland[moisture=7]");
+                for (int c = 0; c < stages.length; c++) {
+                    cmd(mc, "setblock ~" + (c - 2) + " ~ ~" + (r * 2 - 4) + " mmorpg:culture_" + ids[r] + "[age=" + stages[c] + "]");
+                }
+            }
+        }
+        if (structOrigin == null) return;
+        if (tick == 45) {
+            look(mc, me, 6, 4, 2, 0, 0, 40);
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+            if (!mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        }
+        if (tick == 75) shot(mc, "90_cultures_stades");
+        if (tick == 80) look(mc, me, 1, 2.2, -1, 0.5, 2, 50);
+        if (tick == 110) shot(mc, "91_cultures_gros_plan");
+        if (tick == 120) {
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                var lv = pl.level();
+                pl.getInventory().setItem(0, new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("houe_neantite")));
+                pl.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+                int[] tot = new int[2];
+                for (int i = 0; i < 40; i++) {
+                    var pos = structOrigin.offset(1, 0, -4);
+                    lv.setBlock(pos, com.mmorpg.farm.FarmCrops.BLOCKS.get("lueur").get().defaultBlockState().setValue(com.mmorpg.farm.AeloriaCropBlock.AGE, 7), 3);
+                    var st = lv.getBlockState(pos);
+                    st.getBlock().playerDestroy(lv, pl, pos, st, null, pl.getMainHandItem());
+                }
+                for (var e : lv.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, pl.getBoundingBox().inflate(30))) {
+                    if (e.getItem().is(com.mmorpg.registry.ModItems.get("racine_lueur"))) tot[0] += e.getItem().getCount();
+                    if (e.getItem().is(com.mmorpg.registry.ModItems.get("graine_lueur"))) tot[1] += e.getItem().getCount();
+                }
+                MMORPG.LOGGER.info("[MMORPG] CULTURES 40 recoltes a la houe de Neantite : {} racines de Lueur (attendu entre 40 et 80, ~52), {} graines", tot[0], tot[1]);
+            });
+        }
+        if (tick == 150) {
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                com.mmorpg.rpg.PlayerData d = com.mmorpg.server.RpgPlayers.get(pl);
+                int old = d.level;
+                d.level = 1;
+                pl.getInventory().setItem(1, new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("graine_neant"), 3));
+                var item = (com.mmorpg.farm.SeedItem) com.mmorpg.registry.ModItems.get("graine_neant");
+                var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(structOrigin.offset(0, -1, 7)), net.minecraft.core.Direction.UP, structOrigin.offset(0, -1, 7), false);
+                var lv = pl.level();
+                lv.setBlock(structOrigin.offset(0, -1, 7), net.minecraft.world.level.block.Blocks.FARMLAND.defaultBlockState(), 3);
+                var res = item.useOn(new net.minecraft.world.item.context.UseOnContext(lv, pl, net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.item.ItemStack(item), hit));
+                MMORPG.LOGGER.info("[MMORPG] CULTURES semis niveau 1 de l'Orchidee du Neant : {} (attendu FAIL)", res);
+                d.level = old;
+            });
+        }
+        if (tick == 180) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        }
+    }
 
     /** Presse de compression en action, ecran de compression, onglet Outils de la forge, pioche en main, tirages de lingots rares. */
     private static void metallurgiePhase(Minecraft mc, String me) {
