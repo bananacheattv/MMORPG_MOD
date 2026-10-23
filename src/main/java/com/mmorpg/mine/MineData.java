@@ -29,22 +29,22 @@ public class MineData extends SavedData {
     }
 
     private static final Codec<MineData> CODEC = RecordCodecBuilder.create(i -> i.group(
-            Codec.INT.optionalFieldOf("version", 0).forGetter(d -> d.version),
+            Codec.INT.listOf().optionalFieldOf("versions", List.of()).forGetter(d -> d.versions),
             Respawn.CODEC.listOf().optionalFieldOf("respawns", List.of()).forGetter(d -> d.respawns)
     ).apply(i, MineData::new));
     public static final SavedDataType<MineData> TYPE = new SavedDataType<>(MMORPG.id("mines"), MineData::new, CODEC);
 
-    /** Version du plan avec laquelle la mine a ete construite (0 = pas construite) ; si le plan change, la mine est reconstruite. */
-    private int version;
+    /** Version du plan avec laquelle chaque mine a ete construite (0 = pas construite) ; si le plan change, la mine est reconstruite. */
+    private final List<Integer> versions;
     private final List<Respawn> respawns;
 
     public MineData() {
-        this.version = 0;
-        this.respawns = new ArrayList<>();
+        this(List.of(), List.of());
     }
 
-    private MineData(int version, List<Respawn> respawns) {
-        this.version = version;
+    private MineData(List<Integer> versions, List<Respawn> respawns) {
+        this.versions = new ArrayList<>(versions);
+        while (this.versions.size() < MineLayout.SECTORS) this.versions.add(0);
         this.respawns = new ArrayList<>(respawns);
     }
 
@@ -52,12 +52,12 @@ public class MineData extends SavedData {
         return server.overworld().getDataStorage().computeIfAbsent(TYPE);
     }
 
-    public int version() {
-        return version;
+    public int version(int region) {
+        return versions.get(region);
     }
 
-    public void setVersion(int v) {
-        version = v;
+    public void setVersion(int region, int v) {
+        versions.set(region, v);
         setDirty();
     }
 

@@ -8,6 +8,15 @@
       }
     ]
   },
+  "cite.ambiance": {
+    "category": "music",
+    "sounds": [
+      {
+        "name": "mmorpg:music/aeloria_cite",
+        "stream": true
+      }
+    ]
+  },
   "hub.ambiance": {
     "category": "music",
     "sounds": [

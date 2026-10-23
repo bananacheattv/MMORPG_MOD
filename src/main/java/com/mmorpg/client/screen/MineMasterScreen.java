@@ -15,48 +15,57 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/** Menu du Maitre des mines : les cinq etages, leur minerai et leurs monstres ; on descend derriere un ecran de chargement. */
+/**
+ * Menu de selection des mines (Maitre des mines, /mine) et des plaines (portail du Spawn, /plaines) : une entree par palier de niveau, avec
+ * ses informations ; une zone verrouillee se debloque en trouvant le portail cache de la precedente.
+ */
 public class MineMasterScreen extends MmoScreen {
     private final int npc;
     private final String npcName;
+    private final String tagline;
+    private final String unit;
     private final int playerLevel;
     private final boolean built;
     private final int percent;
+    private final int base;
     private final List<CompoundTag> sectors = new ArrayList<>();
     private int selected;
 
     public MineMasterScreen(CompoundTag data) {
-        super("Maître des mines");
+        super(data.getStringOr("name", "Maître des mines"));
         this.npc = data.getIntOr("npc", -1);
         this.npcName = data.getStringOr("name", "Maître des mines");
+        this.tagline = data.getStringOr("tagline", "Une mine par palier de niveau : les suivantes se débloquent en trouvant leur portail caché");
+        this.unit = data.getStringOr("unit", "Mine");
+        this.base = data.getIntOr("base", 0);
         this.playerLevel = data.getIntOr("playerLevel", 1);
         this.built = data.getBooleanOr("built", true);
         this.percent = data.getIntOr("percent", 100);
         ListTag list = data.getListOrEmpty("sectors");
         for (int i = 0; i < list.size(); i++) sectors.add(list.getCompoundOrEmpty(i));
-        // l'etage le plus profond que le joueur peut rejoindre est propose d'office
-        for (int i = 0; i < sectors.size(); i++) if (playerLevel >= sectors.get(i).getIntOr("need", 1)) selected = i;
+        // la zone la plus avancee que le joueur a ouverte est proposee d'office
+        for (int i = 0; i < sectors.size(); i++) if (!sectors.get(i).getBooleanOr("locked", false)) selected = i;
     }
 
     @Override
     protected void renderContent(GuiGraphicsExtractor g, int mx, int my, float a) {
         Ui.panel(g, left, top, pw, ph);
         Ui.title(g, left + pw / 2, top + 8, npcName.toUpperCase(Locale.ROOT), Ui.GOLD_LIGHT);
-        g.centeredText(font, net.minecraft.network.chat.Component.literal("Cinq étages, cinq minerais : plus on descend, plus les monstres sont forts"), left + pw / 2, top + 19, Ui.MUTED);
+        g.centeredText(font, net.minecraft.network.chat.Component.literal(font.plainSubstrByWidth(tagline, pw - 16)), left + pw / 2, top + 19, Ui.MUTED);
         int x0 = left + 8;
         int y0 = top + 32;
         int lw = 160;
-        int rowH = 36;
+        int rowH = Math.min(36, (ph - 40) / Math.max(1, sectors.size()));
         for (int i = 0; i < sectors.size(); i++) {
             CompoundTag s = sectors.get(i);
             int ry = y0 + i * rowH;
             int color = 0xFF000000 | s.getIntOr("color", 0xFFC868);
-            boolean open = playerLevel >= s.getIntOr("need", 1);
-            Ui.frame(g, x0, ry, lw, rowH - 3, color, i == selected || hovered(x0, ry, lw, rowH - 3));
-            g.item(new ItemStack(ModItems.get(MineBlocks.ORES.get(i).ingotId())), x0 + 5, ry + 8);
-            g.text(font, font.plainSubstrByWidth("Étage " + (i + 1), lw - 30), x0 + 28, ry + 5, color, false);
-            g.text(font, font.plainSubstrByWidth(s.getStringOr("label", "?"), lw - 32), x0 + 28, ry + 15, open ? Ui.TEXT : Ui.MUTED, false);
-            g.text(font, "niv. " + s.getIntOr("min", 1) + " à " + s.getIntOr("max", 1), x0 + 28, ry + 24, open ? Ui.GREEN : 0xFFB05050, false);
+            boolean open = !s.getBooleanOr("locked", false);
+            Ui.frame(g, x0, ry, lw, rowH - 3, open ? color : 0xFF50505A, i == selected || hovered(x0, ry, lw, rowH - 3));
+            g.item(new ItemStack(ModItems.get(s.getStringOr("icon", "lingot_verdite"))), x0 + 5, ry + Math.max(1, (rowH - 19) / 2));
+            g.text(font, font.plainSubstrByWidth(unit + " " + (i + 1) + (open ? "" : "  (verrouillée)"), lw - 30), x0 + 28, ry + 5, open ? color : Ui.MUTED, false);
+            g.text(font, font.plainSubstrByWidth(open ? s.getStringOr("label", "?") : "???", lw - 32), x0 + 28, ry + 15, open ? Ui.TEXT : Ui.MUTED, false);
+            g.text(font, "niv. " + s.getIntOr("min", 1) + " à " + s.getIntOr("max", 1), x0 + 28, ry + 24, open ? (playerLevel >= s.getIntOr("min", 1) ? Ui.GREEN : 0xFFC0A050) : 0xFFB05050, false);
             int idx = i;
             click(x0, ry, lw, rowH - 3, () -> selected = idx);
         }
@@ -66,33 +75,25 @@ public class MineMasterScreen extends MmoScreen {
         Ui.inset(g, dx, y0, dw, dh);
         if (selected < 0 || selected >= sectors.size()) return;
         CompoundTag s = sectors.get(selected);
+        boolean open = !s.getBooleanOr("locked", false);
         int color = 0xFF000000 | s.getIntOr("color", 0xFFC868);
-        g.item(new ItemStack(ModItems.get(MineBlocks.ORES.get(selected).ingotId())), dx + 8, y0 + 6);
-        g.text(font, s.getStringOr("label", "?").toUpperCase(Locale.ROOT), dx + 30, y0 + 10, color, true);
-        int ty = y0 + 28 + Ui.wrap(g, s.getStringOr("lore", ""), dx + 8, y0 + 28, dw - 16, Ui.MUTED);
+        g.item(new ItemStack(ModItems.get(s.getStringOr("icon", "lingot_verdite"))), dx + 8, y0 + 6);
+        g.text(font, (open ? s.getStringOr("label", "?") : "Zone inconnue").toUpperCase(Locale.ROOT), dx + 30, y0 + 10, open ? color : Ui.MUTED, true);
+        int ty = y0 + 28 + Ui.wrap(g, open ? s.getStringOr("lore", "") : s.getStringOr("lockedHint", "Trouvez le portail caché de la zone précédente."), dx + 8, y0 + 28, dw - 16, Ui.MUTED);
         ty += 6;
-        Ui.header(g, dx + 8, ty, dw - 16, "CE QUE VOUS Y TROUVEZ");
-        ty += 18;
-        String ore = s.getStringOr("ore", "?");
-        g.text(font, "Minerai : " + ore, dx + 8, ty, color, false);
-        ty += 11;
-        int oreLevel = s.getIntOr("oreLevel", 1);
-        g.text(font, "Extraction à partir du niveau " + oreLevel + " (pioche en main)", dx + 8, ty, playerLevel >= oreLevel ? Ui.TEXT : 0xFFB05050, false);
-        ty += 11;
-        g.text(font, "Le minerai repousse après " + s.getIntOr("cooldown", 60) + " secondes", dx + 8, ty, Ui.MUTED, false);
-        ty += 11;
-        g.text(font, "Monstres de niveau " + s.getIntOr("min", 1) + " à " + s.getIntOr("max", 1) + " : plus forts en profondeur", dx + 8, ty, Ui.MUTED, false);
-        ty += 11;
-        Ui.wrap(g, "Le lingot arrive directement dans votre sac. Il sert à forger armes et armures à la Forge Arcanique.", dx + 8, ty + 4, dw - 16, Ui.TEXT);
-        if (!built) {
-            Ui.wrap(g, "Les mines sont en construction (" + percent + " %) : le chargement durera un peu plus longtemps.", dx + 8, y0 + dh - 62, dw - 16, 0xFFFFC060);
+        if (open) {
+            Ui.header(g, dx + 8, ty, dw - 16, "CE QUE VOUS Y TROUVEZ");
+            ty += 18;
+            ListTag info = s.getListOrEmpty("info");
+            for (int i = 0; i < info.size(); i++) ty += Ui.wrap(g, info.getStringOr(i, ""), dx + 8, ty, dw - 16, i == 0 ? color : Ui.TEXT) + 3;
         }
-        int need = s.getIntOr("need", 1);
-        boolean ok = playerLevel >= need;
+        if (!built) {
+            Ui.wrap(g, "Cette zone est en construction (" + percent + " %) : le chargement durera un peu plus longtemps.", dx + 8, y0 + dh - 62, dw - 16, 0xFFFFC060);
+        }
         int sel = selected;
-        String label = selected == 0 ? "Entrer dans les mines" : "Descendre à l'étage " + (selected + 1);
-        button(g, dx + 8, y0 + dh - 26, dw - 16, 20, ok ? label : "Niveau " + need + " requis", ok, 0xFF000000 | s.getIntOr("color", 0xFF7A5A1A), () -> {
-            ClientNet.send(new Payloads.MineEnter(npc, sel));
+        String label = open ? (selected == 0 ? "Y aller : " + s.getStringOr("label", "?") : "Se rendre : " + s.getStringOr("label", "?")) : "Verrouillée";
+        button(g, dx + 8, y0 + dh - 26, dw - 16, 20, font.plainSubstrByWidth(label, dw - 24), open, open ? color : 0xFF50505A, () -> {
+            ClientNet.send(new Payloads.MineEnter(npc, base + sel));
             minecraft.gui.setScreen(null);
         });
     }

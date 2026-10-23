@@ -16,11 +16,11 @@ import java.util.Random;
  * <p>Cinq etages se suivent du nord au sud, chacun avec sa roche, son minerai, sa lumiere et ses monstres.
  */
 public final class MineLayout {
-    public static final int X0 = 22000, Z0 = 22000;      // coin nord-ouest de la mine (dimension des donjons)
+    public static final int X0 = 22000, Z0 = 22000, STEP = 1000;      // coin nord-ouest de la premiere mine ; la suivante est STEP blocs plus a l'est
     public static final int Y0 = 12;                      // fond de la mine
-    public static final int SIZE = 440;                   // largeur et longueur du cadre
+    public static final int SIZE = 320;                   // largeur et longueur du cadre
     public static final int HEIGHT = 100;
-    public static final int PLAZA_X = 220, PLAZA_Z = 34;
+    public static final int PLAZA_X = SIZE / 2, PLAZA_Z = 34;
     public static final int WALL = 4;                     // epaisseur de la paroi au bord de la caverne
     public static final long SEED = 0xAE10A1AL;
 
@@ -30,7 +30,6 @@ public final class MineLayout {
     }
 
     public static final int SECTORS = 5;
-    private static final double SECTOR_LEN = (SIZE - 12) / (double) SECTORS;
 
     public static final List<Sector> STYLES = List.of(
             new Sector(0, "mine_verdelune", "Veines de Verdelune", "Une mousse tiède recouvre la roche… quelque chose brille dans l'ombre.", 1, 20, "verdite",
@@ -68,11 +67,30 @@ public final class MineLayout {
     public record Feature(int x, int z, int r, int depth) {
     }
 
-    private static MineLayout instance;
+    private static final MineLayout[] INSTANCES = new MineLayout[SECTORS];
 
-    public static synchronized MineLayout get() {
-        if (instance == null) instance = new MineLayout();
-        return instance;
+    /** Plan de la mine numero {@code region} (0 a 4) : chaque palier de niveau a sa propre mine. */
+    public static synchronized MineLayout get(int region) {
+        if (INSTANCES[region] == null) INSTANCES[region] = new MineLayout(region);
+        return INSTANCES[region];
+    }
+
+    public final int region;
+    public final Sector style;
+    /** Position (colonne locale) du portail cache vers la mine suivante, dans un recoin au fond de la caverne. */
+    public int exitX, exitZ;
+    private final int regionSalt;
+
+    public int x0() {
+        return X0 + region * STEP;
+    }
+
+    /** Mine qui contient la colonne du monde (x, z), ou -1. */
+    public static int regionAt(double x, double z) {
+        if (z < Z0 - 8 || z > Z0 + SIZE + 8 || x < X0 - 8) return -1;
+        int r = (int) Math.floor((x - X0 + 8) / STEP);
+        if (r < 0 || r >= SECTORS || x > X0 + r * STEP + SIZE + 8) return -1;
+        return r;
     }
 
     /** 0 = vide, 1 = interieur de la caverne, 2 = paroi. */
@@ -86,8 +104,11 @@ public final class MineLayout {
     public final List<Feature> pools = new ArrayList<>();
     public final List<Feature> chasms = new ArrayList<>();
 
-    private MineLayout() {
-        Random r = new Random(SEED);
+    private MineLayout(int region) {
+        this.region = region;
+        this.style = STYLES.get(region);
+        this.regionSalt = region * 1013;
+        Random r = new Random(SEED + region * 7919L);
         // ---- emprise : une ellipse irreguliere, un peu plus de 420 blocs dans les deux sens
         for (int x = 0; x < SIZE; x++) {
             for (int z = 0; z < SIZE; z++) {
@@ -144,11 +165,10 @@ public final class MineLayout {
         }
 
         // ---- bassins (de l'eau ou de la lave selon l'etage) : le sol est aplati puis creuse en cuvette
-        for (int i = 0; i < 26; i++) {
+        for (int i = 0; i < 14; i++) {
             Feature f = place(r, 8 + r.nextInt(8), 5, 0);
             if (f == null) continue;
-            Sector s = styleAt(f.z());
-            if (s.index() == 4 && r.nextInt(3) != 0) continue;
+            if (style.index() == 4 && r.nextInt(3) != 0) continue;
             pools.add(f);
         }
         for (Feature f : pools) {
@@ -183,9 +203,9 @@ public final class MineLayout {
             }
         }
         // ---- gouffres : falaises verticales a descendre par des echelles
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 4; i++) {
             Feature f = place(r, 9 + r.nextInt(8), 8, 16 + r.nextInt(14));
-            if (f == null || f.z() < 120) continue;
+            if (f == null || f.z() < 110) continue;
             chasms.add(f);
             for (int x = f.x() - f.r() - 1; x <= f.x() + f.r() + 1; x++) {
                 for (int z = f.z() - f.r() - 1; z <= f.z() + f.r() + 1; z++) {
@@ -193,6 +213,17 @@ public final class MineLayout {
                     double d = Math.hypot(x - f.x(), z - f.z());
                     if (d < f.r() + 0.3 * fbm(x / 6.0, z / 6.0, 31, 2)) h[x][z] -= f.depth() - 2.2 * (1 - d / f.r());
                 }
+            }
+        }
+        // ---- recoin du portail cache : un replat sec dans la moitie sud, loin de la place, des bassins et des gouffres
+        pickExit(r, h);
+        double exitY = Math.round(h[exitX][exitZ]);
+        for (int x = exitX - 11; x <= exitX + 11; x++) {
+            for (int z = exitZ - 11; z <= exitZ + 11; z++) {
+                double d = Math.hypot(x - exitX, z - exitZ);
+                double w = 1 - smooth(Mth.clamp((d - 7) / 4.0, 0, 1));
+                h[x][z] = Mth.lerp(w, h[x][z], exitY);
+                if (d < 12) liquid[x][z] = 0;
             }
         }
         for (int x = 0; x < SIZE; x++) {
@@ -203,10 +234,10 @@ public final class MineLayout {
             }
         }
         // ---- piliers naturels (du sol au plafond), hors entree, bassins et gouffres
-        for (int i = 0; i < 520; i++) {
+        for (int i = 0; i < 300; i++) {
             Feature f = place(r, 2 + r.nextInt(4), 0, 0);
             if (f == null || kind[f.x()][f.z()] != 1) continue;
-            if (Math.hypot(f.x() - PLAZA_X, f.z() - PLAZA_Z) < 38) continue;
+            if (Math.hypot(f.x() - PLAZA_X, f.z() - PLAZA_Z) < 38 || Math.hypot(f.x() - exitX, f.z() - exitZ) < 14) continue;
             boolean clash = false;
             for (Feature p : pools) clash |= Math.hypot(f.x() - p.x(), f.z() - p.z()) < p.r() + f.r() + 3;
             for (Feature p : chasms) clash |= Math.hypot(f.x() - p.x(), f.z() - p.z()) < p.r() + f.r() + 4;
@@ -288,35 +319,52 @@ public final class MineLayout {
         return in(lx, lz) && pillar[lx][lz];
     }
 
-    /** Etage d'une position (0 a 4), avec une frontiere irreguliere. */
-    public int sector(int lx, int lz) {
-        double z = lz + 12 * fbm(lx / 40.0, lz / 40.0, 61, 2);
-        return Mth.clamp((int) ((z - 6) / SECTOR_LEN), 0, SECTORS - 1);
-    }
-
     public Sector style(int lx, int lz) {
-        return STYLES.get(sector(lx, lz));
+        return style;
     }
 
-    private static Sector styleAt(int lz) {
-        return STYLES.get(Mth.clamp((int) ((lz - 6) / SECTOR_LEN), 0, SECTORS - 1));
+    /** Choisit le recoin du portail : un carre de 25 x 25 cases libres, de sol presque plat, dans le tiers sud-ouest ou sud-est. */
+    private void pickExit(Random r, double[][] h) {
+        for (int tries = 0; tries < 4000; tries++) {
+            int x = 40 + r.nextInt(SIZE - 80), z = (int) (SIZE * 0.58) + r.nextInt((int) (SIZE * 0.34));
+            if (Math.abs(x - PLAZA_X) < 50 && tries < 3000) continue;
+            if (okExit(x, z, h)) {
+                exitX = x;
+                exitZ = z;
+                return;
+            }
+        }
+        for (int x = 40; x < SIZE - 40; x += 4) {                    // repli : premier endroit convenable en balayant
+            for (int z = SIZE - 50; z > SIZE / 2; z -= 4) {
+                if (okExit(x, z, h)) {
+                    exitX = x;
+                    exitZ = z;
+                    return;
+                }
+            }
+        }
+        exitX = PLAZA_X;
+        exitZ = SIZE - 60;
     }
 
-    /** Premier z (local) de l'etage {@code index}. */
-    public static int sectorStart(int index) {
-        return index == 0 ? 0 : (int) Math.round(6 + index * SECTOR_LEN);
+    private boolean okExit(int x, int z, double[][] h) {
+        for (int dx = -12; dx <= 12; dx += 3) {
+            for (int dz = -12; dz <= 12; dz += 3) {
+                int nx = x + dx, nz = z + dz;
+                if (nx < 0 || nz < 0 || nx >= SIZE || nz >= SIZE || kind[nx][nz] != 1 || liquid[nx][nz] > 0 || Math.abs(h[nx][nz] - h[x][z]) > 3) return false;
+            }
+        }
+        for (Feature f : pools) if (Math.hypot(f.x() - x, f.z() - z) < f.r() + 16) return false;
+        for (Feature f : chasms) if (Math.hypot(f.x() - x, f.z() - z) < f.r() + 16) return false;
+        return true;
     }
 
-    public static int sectorEnd(int index) {
-        return index == SECTORS - 1 ? SIZE : (int) Math.round(6 + (index + 1) * SECTOR_LEN) - 1;
-    }
+    /** Pas de la grille des zones de niveau (voir {@link com.mmorpg.world.LevelZones}). */
+    public static final int ZONE_SIZE = 46;
 
-    /** Niveau des monstres de l'etage a cette profondeur (z local) : plus on descend dans l'etage, plus ils sont forts. */
-    public int mobLevel(int lz, Random r) {
-        Sector s = STYLES.get(Mth.clamp((int) ((lz - 6) / SECTOR_LEN), 0, SECTORS - 1));
-        double t = Mth.clamp((lz - sectorStart(s.index())) / (double) (sectorEnd(s.index()) - sectorStart(s.index())), 0, 1);
-        int lvl = (int) Math.round(Mth.lerp(t, s.minLevel(), s.maxLevel())) + r.nextInt(5) - 2;
-        return Mth.clamp(lvl, 1, 100);
+    /** Niveau des monstres a cet endroit : l'etage donne la fourchette, la zone (cellule irreguliere) donne le palier dans cette fourchette. */
+    public int mobLevel(int lx, int lz, Random r) {
+        return Mth.clamp(com.mmorpg.world.LevelZones.level(SEED + region, lx, lz, ZONE_SIZE, style.minLevel(), style.maxLevel(), r), 1, 100);
     }
 
     // ------------------------------------------------------------------------------------------------ bruit
@@ -339,14 +387,15 @@ public final class MineLayout {
         return t * t * (3 - 2 * t);
     }
 
-    static double value(double x, double z, int salt) {
+    double value(double x, double z, int salt) {
+        salt += regionSalt;
         int xi = (int) Math.floor(x), zi = (int) Math.floor(z);
         double fx = smooth(x - xi), fz = smooth(z - zi);
         double a = hash(xi, zi, salt), b = hash(xi + 1, zi, salt), c = hash(xi, zi + 1, salt), d = hash(xi + 1, zi + 1, salt);
         return Mth.lerp(fz, Mth.lerp(fx, a, b), Mth.lerp(fx, c, d));
     }
 
-    static double fbm(double x, double z, int salt, int octaves) {
+    double fbm(double x, double z, int salt, int octaves) {
         double sum = 0, amp = 1, norm = 0, f = 1;
         for (int i = 0; i < octaves; i++) {
             sum += amp * value(x * f, z * f, salt + i * 17);
