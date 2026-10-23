@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Pack d'interface « Aeloria » : habille tous les ecrans de Minecraft (menu Echap, options, inventaires, coffres, tooltips, barre
-d'action, ecran-titre...) aux couleurs du mod : violet nuit, filets d'or.
+d'action, ecran-titre...) aux couleurs du mod : violet nuit, style plat.
 
 Boutons, curseurs, champs de texte, tooltips, fonds de menus et logo sont dessines ici. Les autres textures de l'interface (conteneurs,
 onglets, livre de recettes, toasts, succes, etc.) sont les textures de Minecraft recolorees : les pixels gris sont remappes sur une rampe
@@ -28,8 +28,10 @@ GOLD = (226, 184, 90)
 GOLD_LIGHT = (255, 232, 160)
 GOLD_DARK = (122, 90, 34)
 NIGHT = (10, 7, 18)
-RAMP = [(0.0, (4, 3, 8)), (0.20, (12, 8, 20)), (0.40, (20, 14, 30)), (0.55, (26, 19, 40)), (0.776, (46, 35, 64)),
-        (0.90, (122, 94, 62)), (1.0, (232, 190, 96))]
+RAMP = [(0.0, (4, 3, 7)), (0.20, (9, 7, 13)), (0.40, (14, 11, 20)), (0.55, (17, 14, 24)), (0.776, (27, 23, 37)),
+        (0.90, (62, 54, 82)), (1.0, (122, 110, 152))]
+BORDER = (43, 37, 56)
+BORDER_HI = (226, 184, 90)
 
 # textures du jeu recolorees (chemins relatifs a assets/minecraft/textures/gui/, motifs de prefixe)
 RECOLOR = ['container/', 'recipe_book.png', 'tab_header_background.png', 'sprites/container/', 'sprites/recipe_book/', 'sprites/toast/',
@@ -65,89 +67,62 @@ def lerp(a, b, t):
     return tuple(int(round(a[i] + (b[i] - a[i]) * t)) for i in range(3))
 
 
-def box(w, h, border, body_top, body_bottom, rim, rim_light, glow=None, alpha=255):
-    """Cadre a filet d'or : liseré exterieur sombre, filet d'or, reflet interieur, corps degrade."""
+def flat(w, h, top, bottom, border, accent_bar=None, alpha=255):
+    """Rectangle plat : bordure d'un pixel, fond a leger degrade (aucun biseau)."""
     im = Image.new('RGBA', (w, h), (0, 0, 0, 0))
     px = im.load()
     for y in range(h):
-        t = y / max(1, h - 1)
-        body = lerp(body_top, body_bottom, t)
+        c = lerp(top, bottom, y / max(1, h - 1))
         for x in range(w):
             edge = min(x, y, w - 1 - x, h - 1 - y)
-            if edge == 0:
-                c = (6, 4, 12)
-            elif edge == 1:
-                c = lerp(rim_light, rim, t)
-            elif edge == 2 and border >= 3:
-                c = lerp(tuple(min(255, v + 18) for v in body), body, 0.4)
-            else:
-                c = body
-            px[x, y] = (*c, alpha)
-    if glow:
-        # coins coupes : petit ornement dore
-        for (x, y) in ((1, 1), (w - 2, 1), (1, h - 2), (w - 2, h - 2)):
-            px[x, y] = (*glow, alpha)
+            px[x, y] = (*(border if edge == 0 else c), alpha)
+    if accent_bar:
+        for y in range(1, h - 1):
+            px[1, y] = (*accent_bar, alpha)
     return im
 
 
 def make_widgets(out):
     d = os.path.join(out, GUI, 'sprites/widget')
     os.makedirs(d, exist_ok=True)
-    box(200, 20, 3, (66, 50, 92), (34, 26, 50), GOLD_DARK, GOLD, GOLD_LIGHT).save(d + '/button.png')
-    box(200, 20, 3, (104, 80, 138), (56, 42, 82), GOLD, GOLD_LIGHT, (255, 250, 210)).save(d + '/button_highlighted.png')
-    box(200, 20, 3, (30, 24, 40), (22, 17, 30), (64, 54, 48), (90, 78, 66)).save(d + '/button_disabled.png')
-    box(200, 20, 3, (20, 14, 30), (14, 10, 22), GOLD_DARK, (170, 130, 60)).save(d + '/slider.png')
-    box(200, 20, 3, (28, 20, 42), (18, 13, 28), GOLD, GOLD_LIGHT).save(d + '/slider_highlighted.png')
-    box(8, 20, 2, (240, 204, 120), (176, 132, 52), (70, 46, 14), (255, 240, 180)).save(d + '/slider_handle.png')
-    box(8, 20, 2, (255, 236, 160), (210, 160, 70), (110, 74, 24), (255, 252, 220)).save(d + '/slider_handle_highlighted.png')
-    box(200, 20, 1, (8, 5, 14), (8, 5, 14), GOLD_DARK, GOLD_DARK).save(d + '/text_field.png')
-    box(200, 20, 1, (8, 5, 14), (8, 5, 14), GOLD, GOLD_LIGHT).save(d + '/text_field_highlighted.png')
-    box(6, 32, 1, (210, 170, 80), (150, 110, 44), (60, 40, 12), (250, 220, 140)).save(d + '/scroller.png')
-    box(6, 32, 1, (10, 7, 16), (10, 7, 16), (40, 30, 20), (40, 30, 20)).save(d + '/scroller_background.png')
+    flat(200, 20, (22, 18, 31), (15, 12, 22), BORDER).save(d + '/button.png')
+    flat(200, 20, (34, 27, 48), (24, 19, 35), BORDER_HI).save(d + '/button_highlighted.png')
+    flat(200, 20, (12, 10, 17), (10, 8, 14), (28, 24, 38)).save(d + '/button_disabled.png')
+    flat(200, 20, (11, 9, 16), (9, 7, 13), BORDER).save(d + '/slider.png')
+    flat(200, 20, (14, 11, 20), (11, 9, 16), BORDER_HI).save(d + '/slider_highlighted.png')
+    flat(8, 20, (226, 184, 90), (190, 150, 66), (226, 184, 90)).save(d + '/slider_handle.png')
+    flat(8, 20, (255, 224, 140), (226, 184, 90), (255, 224, 140)).save(d + '/slider_handle_highlighted.png')
+    flat(200, 20, (7, 5, 11), (7, 5, 11), BORDER).save(d + '/text_field.png')
+    flat(200, 20, (7, 5, 11), (7, 5, 11), BORDER_HI).save(d + '/text_field_highlighted.png')
+    flat(6, 32, (226, 184, 90), (190, 150, 66), (226, 184, 90)).save(d + '/scroller.png')
+    flat(6, 32, (9, 7, 13), (9, 7, 13), (22, 18, 30)).save(d + '/scroller_background.png')
 
 
 def make_tooltip(out):
     d = os.path.join(out, GUI, 'sprites/tooltip')
     os.makedirs(d, exist_ok=True)
-    bg = Image.new('RGBA', (100, 100), (14, 10, 24, 244))
-    bg.save(d + '/background.png')
+    Image.new('RGBA', (100, 100), (10, 8, 15, 246)).save(d + '/background.png')
     fr = Image.new('RGBA', (100, 100), (0, 0, 0, 0))
     px = fr.load()
     for y in range(100):
-        t = y / 99
-        c = lerp(GOLD_LIGHT, GOLD_DARK, t)
         for x in range(100):
-            edge = min(x, y, 99 - x, 99 - y)
-            # le cadre occupe les 9 pixels du bord, mais le trait ne fait que deux pixels, a 6 pixels du bord exterieur
-            if edge in (6, 7):
-                px[x, y] = (*(c if edge == 6 else lerp(c, NIGHT, 0.5)), 255)
-            elif edge in (4, 5):
-                px[x, y] = (*lerp(NIGHT, GOLD_DARK, 0.35), 90)
+            if min(x, y, 99 - x, 99 - y) == 7:
+                px[x, y] = (62, 54, 84, 255)
     fr.save(d + '/frame.png')
 
 
 def make_backgrounds(out):
     d = os.path.join(out, GUI)
     os.makedirs(d, exist_ok=True)
-    tiles = {'menu_background.png': (12, 8, 22, 245), 'menu_list_background.png': (8, 5, 15, 235),
-             'inworld_menu_background.png': (12, 8, 22, 200), 'inworld_menu_list_background.png': (8, 5, 15, 190)}
-    rng = np.random.default_rng(5)
+    tiles = {'menu_background.png': (8, 6, 12, 248), 'menu_list_background.png': (6, 4, 10, 240),
+             'inworld_menu_background.png': (8, 6, 12, 215), 'inworld_menu_list_background.png': (6, 4, 10, 205)}
     for name, c in tiles.items():
-        a = np.zeros((16, 16, 4), np.uint8)
-        a[..., :] = c
-        noise = rng.integers(-3, 4, (16, 16))
-        a[..., :3] = np.clip(a[..., :3].astype(int) + noise[..., None], 0, 255)
-        # rhombes tres discrets
-        for i in range(16):
-            for j in range(16):
-                if (i + j) % 8 == 0 or (i - j) % 8 == 0:
-                    a[i, j, :3] = np.clip(a[i, j, :3].astype(int) + 4, 0, 255)
-        Image.fromarray(a, 'RGBA').save(os.path.join(d, name))
+        Image.new('RGBA', (16, 16), c).save(os.path.join(d, name))
     for name, top in (('header_separator.png', True), ('inworld_header_separator.png', True), ('footer_separator.png', False),
                       ('inworld_footer_separator.png', False)):
         a = np.zeros((2, 32, 4), np.uint8)
-        a[0 if top else 1, :, :] = (*GOLD_DARK, 255)
-        a[1 if top else 0, :, :] = (*NIGHT, 255)
+        a[0 if top else 1, :, :] = (*BORDER, 255)
+        a[1 if top else 0, :, :] = (0, 0, 0, 0)
         Image.fromarray(a, 'RGBA').save(os.path.join(d, name))
 
 
@@ -263,7 +238,7 @@ def main():
         d = os.path.join(OUT, 'assets', 'minecraft', 'lang')
         os.makedirs(d, exist_ok=True)
         json.dump(tr, open(os.path.join(d, lang + '.json'), 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=2)
-    json.dump({'pack': {'description': 'Aeloria : interface MMORPG (violet nuit et filets d\'or)', 'pack_format': 97, 'min_format': 97, 'max_format': 97}},
+    json.dump({'pack': {'description': 'Aeloria : interface MMORPG (plate, violet nuit)', 'pack_format': 97, 'min_format': 97, 'max_format': 97}},
               open(os.path.join(OUT, 'pack.mcmeta'), 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=2)
     print(count, 'textures recolorees ; pack ecrit dans', OUT)
 
