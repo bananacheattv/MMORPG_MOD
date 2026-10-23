@@ -250,8 +250,8 @@ Dans Mods > Eldoria MMORPG > Configurer, on peut activer ou désactiver :
 À chaque push sur `main`, le workflow `Release launcher` compile le mod et met à jour la release GitHub
 [`latest`](https://github.com/bananacheattv/MMORPG_MOD/releases/tag/latest).
 
-Joueurs : télécharger `EldoriaLauncher-Windows.zip`, dézipper, lancer `EldoriaLauncher.exe`
-(ou `EldoriaLauncher.jar` avec Java 21+). Le launcher, sans passer par le launcher officiel :
+Joueurs : télécharger `AeloriaLauncher-Windows.zip`, dézipper, lancer `AeloriaLauncher.exe`
+(ou `AeloriaLauncher.jar` avec Java 21+). Le launcher, sans passer par le launcher officiel :
 - se met à jour tout seul (son cœur `launcher-core.jar` est retéléchargé quand il change) ;
 - télécharge Java, Minecraft, NeoForge et les ressources dans `%APPDATA%\.eldoria\minecraft` ;
 - synchronise les mods dans `%APPDATA%\.eldoria\instance\mods` (Eldoria + WorldEdit pour la bonne version,
