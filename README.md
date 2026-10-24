@@ -7,6 +7,7 @@ Mod MMORPG complet : 4 classes qui évoluent (niveaux 1 à 100), 28 compétences
 1. Installer **NeoForge 26.3.0.39-beta** (ou plus récent) pour **Minecraft 26.3**. Minecraft 26.3 utilise Java 25.
 2. Copier `build/libs/mmorpg-1.0.0.jar` dans le dossier `mods`.
 3. Le mod doit être installé **sur le serveur et sur chaque client**.
+4. Pour un serveur public (sauvegardes, sécurité, mises à jour) : voir `GUIDE_SERVEUR.md`.
 
 ## Touches (modifiables dans Options > Commandes > MMORPG)
 
