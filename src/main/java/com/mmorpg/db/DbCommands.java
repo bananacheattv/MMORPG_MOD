@@ -57,7 +57,7 @@ public final class DbCommands {
         }
         src.sendSuccess(() -> Component.literal("Base de données : " + (Database.ready() ? "connectée" : "NON connectée") + " — " + cfg.host + ":" + cfg.port + "/" + cfg.database
                 + " — serveur « " + cfg.serverId + " » — file : " + Database.pending() + " — abandonnées : " + Database.dropped()
-                + (Database.lastError().isEmpty() ? "" : " — dernière erreur : " + Database.lastError())), false);
+                + (Database.lastError().isEmpty() ? "" : " — dernière erreur : " + Database.lastError()) + " — " + com.mmorpg.cluster.Cluster.describe()), false);
         Database.fire("etat", conn -> {
             List<String> out = new ArrayList<>();
             try (var st = conn.createStatement(); ResultSet rs = st.executeQuery("SELECT (SELECT COUNT(*) FROM players), (SELECT COUNT(*) FROM players WHERE online = 1), "

@@ -34,7 +34,7 @@ public final class Database {
     }
 
     private static final int QUEUE_LIMIT = 20_000;
-    private static final long SCHEMA_VERSION = 1;
+    private static final long SCHEMA_VERSION = 2;
 
     private static volatile DbConfig config = new DbConfig();
     private static volatile boolean ready;
@@ -133,7 +133,12 @@ public final class Database {
                         + "uuid CHAR(36) NULL, name VARCHAR(32) NULL, kind VARCHAR(32) NOT NULL, amount BIGINT NULL, detail VARCHAR(512) NULL, "
                         + "KEY idx_events_player (uuid, ts), KEY idx_events_kind (kind, ts)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
             }
-            // les prochaines evolutions du schema s'ajoutent ici : if (have < 2) { ... }
+            if (have < 2) {                                           // v2 : inventaire dans le profil et transferts entre serveurs
+                s.execute("ALTER TABLE players ADD COLUMN IF NOT EXISTS inventory MEDIUMTEXT NULL AFTER data");
+                s.execute("CREATE TABLE IF NOT EXISTS transfers (uuid CHAR(36) NOT NULL PRIMARY KEY, dest_server VARCHAR(32) NOT NULL, kind VARCHAR(16) NOT NULL, "
+                        + "arg INT NOT NULL DEFAULT 0, created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+            }
+            // les prochaines evolutions du schema s'ajoutent ici : if (have < 3) { ... }
             s.execute("REPLACE INTO aeloria_meta (k, v) VALUES ('schema_version', '" + SCHEMA_VERSION + "')");
             // reprise apres plantage : les joueurs que CE serveur avait en ligne ne le sont plus
             s.executeUpdate("UPDATE players SET online = 0 WHERE server_id = '" + config.serverId.replace("'", "''") + "' AND online = 1");

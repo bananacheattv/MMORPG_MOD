@@ -30,6 +30,7 @@ public final class DevDbChecks {
     private static PlayerData saved;
     private static long v1;
     private static boolean failed;
+    private static String invSnapshot;
 
     private static void check(boolean ok, String what) {
         if (!ok) failed = true;
@@ -80,6 +81,7 @@ public final class DevDbChecks {
                 saved = new PlayerData();
                 saved.load(d.save());
                 saved.dbVersion = d.dbVersion;
+                invSnapshot = com.mmorpg.db.InventorySync.encode(p);
                 exec("DELETE FROM players WHERE uuid = ?", id);
                 exec("DELETE FROM bank_accounts WHERE uuid = ?", id);
                 d.playerClass = PlayerClass.GUERRIER;
@@ -166,13 +168,60 @@ public final class DevDbChecks {
                 Database.await("barriere", 5000, c -> null);
                 check(scalar("SELECT online FROM players WHERE uuid = ?", id) == 0, "joueur libere a la sortie");
                 step = 2;
-            } else if (step == 2) {
+            } else if (step == 2) {                                   // inventaire et coffre de l'Ender : aller-retour par la base
+                p.getInventory().clearContent();
+                p.getEnderChestInventory().clearContent();
+                p.getInventory().setItem(5, new ItemStack(Items.DIAMOND, 7));
+                p.getInventory().setItem(39, new ItemStack(Items.IRON_HELMET));
+                p.getEnderChestInventory().setItem(2, new ItemStack(Items.EMERALD, 4));
+                d.dbVersion = 0;
+                PlayerSync.push(p, false);
+                Database.await("barriere", 5000, c -> null);
+                String inv = text("SELECT inventory FROM players WHERE uuid = ?", id);
+                check(inv != null && inv.contains("diamond") && inv.contains("iron_helmet") && inv.contains("emerald"), "inventaire, armure et coffre de l'Ender ecrits");
+                // un autre serveur change l'inventaire (diamants -> pommes d'or), le joueur arrive ici
+                String inv2 = inv.replace("minecraft:diamond", "minecraft:golden_apple");
+                long vNow = scalar("SELECT version FROM players WHERE uuid = ?", id);
+                exec("UPDATE players SET inventory = ?, version = ?, server_id = 'hub', online = 0 WHERE uuid = ?", inv2, vNow + 3, id);
+                p.getInventory().setItem(8, new ItemStack(Items.STICK, 1));            // objet local qui doit disparaitre au profit de la base
+                d.dbVersion = vNow;
+                PlayerSync.onLogin(new PlayerEvent.PlayerLoggedInEvent(p));
+                check(p.getInventory().getItem(5).is(Items.GOLDEN_APPLE) && p.getInventory().getItem(5).getCount() == 7, "inventaire de la base applique");
+                check(p.getInventory().getItem(8).isEmpty(), "objet local remplace (pas de doublon)");
+                check(p.getInventory().getItem(39).is(Items.IRON_HELMET), "armure appliquee");
+                check(p.getEnderChestInventory().getItem(2).is(Items.EMERALD) && p.getEnderChestInventory().getItem(2).getCount() == 4, "coffre de l'Ender applique");
+                // transfert vers un lieu qui n'est pas ici : profil ecrit, joueur libere, arrivee notee, message au proxy
+                var cfg = com.mmorpg.cluster.Cluster.config();
+                cfg.enabled = true;
+                cfg.hosts = java.util.List.of("hub");
+                cfg.servers = new java.util.LinkedHashMap<>(java.util.Map.of("hub", "serveur", "spawn", "serveur", "mines", "mines", "plains", "mines"));
+                cfg.giveUpSeconds = 5;
+                check(com.mmorpg.cluster.Cluster.active() && !com.mmorpg.cluster.Cluster.hosts(com.mmorpg.cluster.Cluster.Place.MINES), "reseau actif, les mines sont ailleurs");
+                check(!com.mmorpg.cluster.Cluster.transfer(p, com.mmorpg.cluster.Cluster.Place.HUB, 0), "lieu local : pas de transfert");
+                check(com.mmorpg.cluster.Cluster.transfer(p, com.mmorpg.cluster.Cluster.Place.MINES, 2), "transfert vers les mines lance");
+                Database.await("barriere", 5000, c -> null);
+                check("mines".equals(text("SELECT dest_server FROM transfers WHERE uuid = ?", id)) && scalar("SELECT arg FROM transfers WHERE uuid = ?", id) == 2, "arrivee notee (mines, numero 2)");
+                check(scalar("SELECT online FROM players WHERE uuid = ?", id) == 0, "joueur libere pour le serveur d'arrivee");
+                check(scalar("SELECT COUNT(*) FROM events WHERE uuid = ? AND kind = 'transfer'", id) >= 1, "transfert journalise");
+                // le serveur d'arrivee lit l'arrivee et l'efface (connexion separee : ici on simule en changeant le serveur local)
+                waitTicks = 0;
+                step = 3;
+            } else if (step == 3) {                                   // le proxy n'a rien fait : au bout de 5 s le joueur est repris
+                if (++waitTicks < 140) return;
+                check(scalar("SELECT online FROM players WHERE uuid = ?", id) == 1 && "serveur".equals(text("SELECT server_id FROM players WHERE uuid = ?", id)), "transfert sans effet : joueur repris par ce serveur");
+                check(scalar("SELECT COUNT(*) FROM transfers WHERE uuid = ?", id) == 0, "arrivee annulee");
+                var cfg = com.mmorpg.cluster.Cluster.config();
+                cfg.enabled = false;
+                step = 4;
+            } else if (step == 4) {
                 // nettoyage : etat du joueur de test et lignes de test retirees
                 d.load(saved.save());
                 d.dbVersion = saved.dbVersion;
                 BankData.Account a = BankData.get(server).account(p.getUUID());
                 a.gold = 0;
                 a.items.set(0, ItemStack.EMPTY);
+                if (invSnapshot != null) com.mmorpg.db.InventorySync.apply(p, invSnapshot);
+                exec("DELETE FROM transfers WHERE uuid = ?", id);
                 exec("DELETE FROM events WHERE uuid = ?", id);
                 exec("DELETE FROM bank_accounts WHERE uuid = ?", id);
                 exec("DELETE FROM players WHERE uuid = ?", id);

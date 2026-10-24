@@ -126,6 +126,8 @@ Si la base est arrêtée ou injoignable, le jeu continue normalement avec les do
 | --- | --- |
 | `players` | un profil par joueur : classe, niveau, XP, or, compétences, quêtes, montures, familiers, cosmétiques, mines/plaines débloquées, kills… (colonnes de recherche + profil complet) |
 | `bank_accounts` | or en banque et coffre de 3 pages |
+| `players.inventory` | sac, armure, main secondaire et coffre de l'Ender (suivent le joueur d'un serveur à l'autre) |
+| `transfers` | arrivée en attente d'un joueur envoyé vers un autre serveur (effacée à son arrivée) |
 | `events` | journal : connexion, sortie, niveau, mort, boss tué, donjon vaincu, dépôt/retrait de banque, ventes et achats (hôtel des ventes, marchands), quêtes, déblocages, montures |
 
 Écriture : à chaque sortie, puis toutes les `autosaveSeconds` secondes, seulement si le profil a changé. Lecture : à l'arrivée d'un joueur, **la base fait foi si sa version est plus récente** que celle du serveur ; si un autre serveur tient encore le joueur (il vient de partir), on attend jusqu'à 3 s qu'il ait fini de sauvegarder. Un serveur qui ne tient plus un joueur ne peut plus l'écraser.
@@ -136,12 +138,51 @@ Statistiques, classement, or en circulation, historique d'un joueur : voir les r
 
 ### Ce qui n'est pas (encore) partagé
 
-- **Inventaire, coffre de l'Ender, armure portée, position** : propres à chaque serveur. Un joueur qui change de serveur garde sa progression mais pas les objets qu'il porte.
+- **Position** : chaque serveur place le joueur lui-même (voir §11).
 - **Hôtel des ventes, mines/plaines épuisées, donjons, zones, PNJ** : restent dans le monde de chaque serveur (seule la banque, qui est personnelle, suit le joueur).
-- **Le passage d'un serveur à l'autre** : les portails du jeu (Maître des mines, plaines, donjons) téléportent aujourd'hui **à l'intérieur d'un même serveur** (autres dimensions). Les envoyer vers le serveur « mines » ou « plaines » du réseau demande d'ajouter le transfert par le proxy. Tant que ce n'est pas fait, chaque serveur construit tout seul son hub, sa Cité, ses mines et ses plaines.
+- **Un jeu en plusieurs serveurs** : voir §11 ; sans `network.json`, un serveur construit et sert tout lui-même, comme avant.
 
 ### Sécurité du réseau (à régler dans le panel avant l'ouverture)
 
 - Le proxy Velocity du panel est en `online-mode = false` et `player-info-forwarding-mode = "none"` : **n'importe qui peut se connecter avec le pseudo d'un autre**, donc prendre son profil, son or et sa banque (les profils sont rangés par identifiant de joueur, qui en mode hors-ligne se déduit du pseudo). Pour un serveur public : `online-mode = true` sur le proxy, transfert d'identité sécurisé (`modern`) avec le secret partagé, et serveurs de jeu en `online-mode=false` **uniquement** joignables depuis la machine du proxy (pare-feu : seul le port 25565 du proxy est ouvert).
 - Le mot de passe de la base est en clair dans `servers/db/IDENTIFIANTS.txt`, `servers/db/init.sql` et `servers/db/my.ini` (compte root) : gardez ces fichiers hors de tout dépôt et de toute capture, et changez les mots de passe avant la mise en ligne.
 - La base n'écoute que sur `127.0.0.1` : laissez-la ainsi.
+
+## 11. Plusieurs serveurs derrière un proxy (hub, spawn, mines, plaines)
+
+Le mod peut répartir ses lieux sur des serveurs différents (comme dans le panel : `serveur`, `hub`, `mines`, `plaines`). Chaque serveur ne construit et ne sert que **ses** lieux ; quand un joueur doit aller ailleurs, il est **transféré** : le proxy le connecte au bon serveur, où il retrouve son profil, sa banque, son inventaire et son coffre de l'Ender (voir §10), et arrive au bon endroit.
+
+### Réglages
+
+1. La base de données (§10) doit être active sur **tous** les serveurs, avec un `serverId` égal au **nom du serveur dans Velocity** (`velocity.toml`, section `[servers]`).
+2. Sur chaque serveur, `config/mmorpg/network.json` (créé au premier démarrage, désactivé) :
+
+```json
+{
+  "enabled": true,
+  "hosts": ["mines"],
+  "servers": { "hub": "hub", "spawn": "serveur", "mines": "mines", "plains": "plaines" },
+  "giveUpSeconds": 8
+}
+```
+
+   - `hosts` : les lieux **de ce serveur** parmi `hub`, `spawn` (la Cité, ses portails et ses donjons), `mines`, `plains`.
+   - `servers` : pour chaque lieu, le nom Velocity du serveur qui l'héberge (identique sur tous les serveurs).
+   - Exemple pour le panel : `serveur` → `hosts: ["spawn"]`, `hub` → `["hub"]`, `mines` → `["mines"]`, `plaines` → `["plains"]`.
+3. Le proxy : `bungee-plugin-message-channel = true` (c'est le cas dans le panel), et **une version de Velocity qui gère votre version de Minecraft**. Le Velocity 3.5.1 livré avec le panel annonce le protocole 776 (Minecraft 26.2) alors que les serveurs sont en 26.3 (protocole 777) : il refuse les joueurs. Mettez à jour Velocity (la ligne 4.x est la plus récente au 24/10/2026) ou attendez qu'une version 3.x le gère.
+4. Le **même jar du mod** sur tous les serveurs et chez les joueurs.
+
+### Ce qui change
+
+- Les portails du Spawn et du Hub, le Maître des mines, le menu des plaines, le portail caché des mines et des plaines, les arches de retour, `/hub`, `/spawn` : si le lieu est sur un autre serveur, le joueur est transféré (message « Départ vers… »).
+- `/reseau etat` (état du réseau) et `/reseau aller hub|spawn|mines|plains [numéro]` (opérateurs).
+- Avant le départ, le profil, la banque et l'inventaire sont écrits dans la base et l'arrivée est notée ; le serveur d'arrivée les relit, place le joueur (mine ou plaine choisie, spawn, hub) et efface la note.
+- Si le proxy ne fait rien (connexion directe sans proxy, mauvais nom de serveur), au bout de `giveUpSeconds` le joueur est repris par le serveur d'origine avec un message.
+- La règle de connexion habituelle passe aussi par le transfert : un joueur sans classe est envoyé au hub, un joueur qui a sa classe et se retrouve dans le hub est envoyé au spawn, donc transférés si ces lieux sont sur un autre serveur. Un joueur qui rejoint un serveur sans lieu à lui (ex. : reconnexion directe dans les mines) y reste.
+- La base est obligatoire : si elle est injoignable, le joueur reste où il est (message « Réseau indisponible »).
+
+### Limites
+
+- Un serveur ne sert que ses lieux : prévoyez au moins un serveur pour chacun, sinon les portails correspondants affichent « lieu indisponible ».
+- L'hôtel des ventes reste propre à chaque serveur ; les donjons vivent sur le serveur qui héberge le spawn.
+- Une sauvegarde automatique toutes les `autosaveSeconds` secondes : un plantage peut faire perdre au plus ce délai de progression (et d'objets).

@@ -576,7 +576,9 @@ public final class RpgPlayers {
         sync(player);
         BestiaryInfo.sendTo(player);
         PartyManager.sync(player);
-        if (!d.playerClass.isPlayable() && !com.mmorpg.hub.ClassTrial.active(player)) {
+        if (com.mmorpg.cluster.Cluster.arrivalPending(player)) {
+            // le joueur vient d'etre transfere ici depuis un autre serveur : le reseau le place (Cluster.onJoinedLate), pas de redirection habituelle
+        } else if (!d.playerClass.isPlayable() && !com.mmorpg.hub.ClassTrial.active(player)) {
             // hub construit : cinematique a la premiere arrivee, puis choix aupres des Maitres de classe ; sinon ecran de choix classique
             if (com.mmorpg.hub.HubData.get(player.level().getServer()).exists()) {
                 var hubData = com.mmorpg.hub.ClassTrial.data(player);
