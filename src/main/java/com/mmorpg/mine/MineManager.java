@@ -299,7 +299,7 @@ public final class MineManager {
         ItemStack ingot = new ItemStack(ModItems.get(ore.ingotId()), count);
         if (!p.getInventory().add(ingot)) level.addFreshEntity(new net.minecraft.world.entity.item.ItemEntity(level, p.getX(), p.getY() + 0.5, p.getZ(), ingot));
         tool.hurtAndBreak(1, p, EquipmentSlot.MAINHAND);
-        RpgPlayers.giveXp(p, 3 + ore.minLevel() / 2L, false);
+        RpgPlayers.giveGatherXp(p, 3 + ore.minLevel() / 2L);
         p.sendOverlayMessage(Component.literal("+" + count + " Lingot de " + ore.name() + (count > 1 ? "  (veine riche !)" : "")).withColor(ore.color()));
         rareDrop(level, p, pos, ore, pick);
         BlockState old = level.getBlockState(pos);

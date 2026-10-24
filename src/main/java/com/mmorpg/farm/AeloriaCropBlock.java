@@ -49,7 +49,7 @@ public class AeloriaCropBlock extends CropBlock {
         if (!isMaxAge(state)) return;
         int hoe = MineTools.hoeTier(tool);
         int rank = FarmCrops.CROPS.indexOf(crop);
-        RpgPlayers.giveXp(player, 2 + rank * 3L, false);
+        RpgPlayers.giveGatherXp(player, 2 + rank * 3L);
         level.sendParticles(ParticleTypes.HAPPY_VILLAGER, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 4, 0.3, 0.3, 0.3, 0.0);
         if (hoe <= 0) return;
         bonus(level, pos, hoe);
@@ -67,7 +67,7 @@ public class AeloriaCropBlock extends CropBlock {
                 net.minecraft.world.level.block.Block.dropResources(st, level, at, null, player, tool);
                 cb.bonus(level, at, hoe);
                 level.setBlock(at, cb.getStateForAge(0), 3);
-                RpgPlayers.giveXp(player, 2 + FarmCrops.CROPS.indexOf(cb.crop) * 3L, false);
+                RpgPlayers.giveGatherXp(player, 2 + FarmCrops.CROPS.indexOf(cb.crop) * 3L);
                 n++;
             }
         }

@@ -8,6 +8,11 @@ import net.minecraft.network.chat.Component;
 
 public final class MountManager {
     private static boolean playable(ServerPlayer p) { return p.isAlive() && !p.isSpectator() && RpgPlayers.get(p).playerClass.isPlayable(); }
+    /** Les donjons (et leurs antres de boss) partagent leur dimension avec les mines et les plaines, ou les montures restent permises. */
+    public static boolean inDungeon(ServerPlayer p) {
+        return p.level().dimension().equals(com.mmorpg.dungeon.InstanceManager.DIM)
+                && com.mmorpg.mine.MineManager.regionOf(p) < 0 && com.mmorpg.plains.PlainsManager.regionOf(p) < 0;
+    }
     /** Les montures ne s'achetent plus : elles s'obtiennent dans les caisses et les Lucky Blocks (sceaux de monture). */
     public static boolean unlock(ServerPlayer p, String id) {
         message(p, "Les montures s’obtiennent dans les caisses et les Lucky Blocks.");
@@ -29,6 +34,7 @@ public final class MountManager {
         long now = p.level().getServer().getTickCount();
         if (now < d.pvpUntilTick) { message(p, "Montures indisponibles en combat contre un joueur (" + (d.pvpUntilTick - now) / 20 + " s)."); return false; }
         if (now < d.nextMountTick) { message(p, "Patientez quelques secondes avant de réinvoquer."); return false; }
+        if (inDungeon(p)) { message(p, "Les montures sont interdites dans les donjons."); return false; }
         if (p.isPassenger() || p.isInWater()) { message(p, "Impossible d’invoquer une monture ici."); return false; }
         var mount = new MountEntity(ModEntities.MOUNTS.get(type).get(), p.level());
         mount.setup(p, type);
@@ -76,6 +82,12 @@ public final class MountManager {
     }
     public static void maintain(ServerPlayer p) {
         var d = RpgPlayers.get(p);
+        if (d.mountEntity != null && inDungeon(p)) {                       // entree dans un donjon (ou mort/teleport sur monture) : on descend
+            despawn(p);
+            RpgPlayers.sync(p);
+            message(p, "Les montures sont interdites dans les donjons.");
+            return;
+        }
         // les monstres qui visent le cavalier attaquent la monture (les coups sont redirigés sur le cavalier)
         if (p.getVehicle() instanceof MountEntity m) {
             for (var mob : p.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, p.getBoundingBox().inflate(24), e -> e.getTarget() == p))

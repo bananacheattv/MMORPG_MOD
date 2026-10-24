@@ -32,8 +32,18 @@ public final class HubMusicClient {
     private static final ResourceKey<Level> SPAWN = ResourceKey.create(Registries.DIMENSION, MMORPG.id("spawn"));
     private static HubMusic music;
     private static String musicEvent = "";
+    /** Ticks consecutifs ou le moteur de son ne joue plus la piste : Minecraft coupe tous les sons au changement de dimension. */
+    private static int silent;
 
     private HubMusicClient() {
+    }
+
+    /** Test automatique : piste voulue et piste qui joue. */
+    public static String debugState() {
+        Minecraft mc = Minecraft.getInstance();
+        return "voulue « " + wantedEvent(mc) + " » ; joue « " + (music == null || music.isStopped() ? "" : musicEvent) + " » ; actif = " + (music != null && mc.getSoundManager().isActive(music))
+                + " ; volume instance = " + (music == null ? "-" : String.valueOf(music.getVolume())) + " ; reglage = " + ClientConfig.AMBIENT_MUSIC_VOLUME.get()
+                + " ; musique MC = " + mc.options.getSoundSourceVolume(SoundSource.MUSIC) + " ; general = " + mc.options.getSoundSourceVolume(SoundSource.MASTER);
     }
 
     /** Evenement sonore voulu pour la dimension du joueur (vide : aucune musique d'Aeloria). */
@@ -51,6 +61,13 @@ public final class HubMusicClient {
     @SubscribeEvent
     public static void onTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
+        if (music != null && !music.isStopped()) {                              // le moteur a coupe la piste sans qu'elle le sache (changement de dimension) : on la relance
+            if (mc.getSoundManager().isActive(music)) silent = 0;
+            else if (++silent > 20) {
+                music = null;
+                silent = 0;
+            }
+        }
         String wantedSound = wantedEvent(mc);
         boolean want = !wantedSound.isEmpty();
         if (music != null && want && !wantedSound.equals(musicEvent)) music.fadeOut();                       // autre monde : la piece change

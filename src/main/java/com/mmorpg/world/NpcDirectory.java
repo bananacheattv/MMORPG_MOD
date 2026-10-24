@@ -27,6 +27,7 @@ public final class NpcDirectory extends SavedData {
     public CompoundTag entry(String id) {return entries.get(id);}
     public ListTag snapshot() {var list=new ListTag();entries.values().forEach(t->list.add(t.copy()));return list;}
     public void record(NpcEntity npc) {
+        if(npc.role()==NpcEntity.Role.SORTIE) return;                        // le Passeur d'un donjon est ephemere
         var tag=new CompoundTag();String id=npc.getUUID().toString();
         tag.putString("id",id);tag.putString("name",npc.displayName());tag.putString("zone",npc.zone());
         tag.putString("group",npc.group());tag.putInt("skin",npc.skin());tag.putInt("role",npc.role().ordinal());

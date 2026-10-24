@@ -362,7 +362,7 @@ public final class InstanceManager {
                 : Math.abs(p.getX() - hall.x) < 40 && p.getZ() > hall.z - 6 && p.getZ() < hall.z + Layout.LENGTH);
         for (ServerPlayer p : level.players()) {
             if (inside.test(p)) {
-                p.sendSystemMessage(Component.literal("✦ Donjon vaincu ! Récupérez votre butin : vous serez ramené à l'entrée dans " + EXIT_SECONDS + " secondes.").withColor(0xFFE080));
+                p.sendSystemMessage(Component.literal("✦ Donjon vaincu ! Récupérez votre butin : vous serez ramené à l'entrée dans " + EXIT_SECONDS + " secondes, ou parlez tout de suite au Passeur.").withColor(0xFFE080));
             }
         }
         for (int left = EXIT_SECONDS - 3; left >= 1; left--) {
@@ -382,6 +382,37 @@ public final class InstanceManager {
                 InstanceData.get(server).dirty();
                 com.mmorpg.server.Scheduler.later(level, 20, () -> resetSlot(server, slot));
             }
+        });
+    }
+
+    /**
+     * Le Passeur apparu a la mort du boss : ramene tout de suite le joueur a l'entree, sans attendre le compte a rebours.
+     *
+     * @param hall point d'arrivee hors instance, « x,y,z » (celui du compte a rebours)
+     */
+    public static void leaveNow(ServerPlayer p, String hall) {
+        String[] c = hall.split(",");
+        if (c.length != 3) return;
+        net.minecraft.world.phys.Vec3 v;
+        try {
+            v = new net.minecraft.world.phys.Vec3(Double.parseDouble(c[0]), Double.parseDouble(c[1]), Double.parseDouble(c[2]));
+        } catch (NumberFormatException e) {
+            return;
+        }
+        bringBack(p.level().getServer(), p, v);
+    }
+
+    /** Cree le Passeur pres de l'endroit ou le boss est tombe ; il disparait quand le compte a rebours ramene tout le monde. */
+    public static void spawnPasseur(ServerLevel level, net.minecraft.core.BlockPos pos, net.minecraft.world.phys.Vec3 hall) {
+        com.mmorpg.entity.NpcEntity npc = com.mmorpg.registry.ModEntities.NPC.get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        if (npc == null) return;
+        npc.snapTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0F, 0F);
+        npc.setup(com.mmorpg.entity.NpcEntity.Role.SORTIE, "Passeur", 2, hall.x + "," + hall.y + "," + hall.z);
+        level.addFreshEntity(npc);
+        level.sendParticles(ParticleTypes.REVERSE_PORTAL, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 60, 0.5, 1.0, 0.5, 0.1);
+        level.playSound(null, pos, com.mmorpg.registry.ModSounds.CHIME.get(), net.minecraft.sounds.SoundSource.NEUTRAL, 1.0F, 1.0F);
+        com.mmorpg.server.Scheduler.later(level, EXIT_SECONDS * 20 + 10, () -> {
+            if (npc.isAlive()) npc.discard();
         });
     }
 
@@ -421,6 +452,7 @@ public final class InstanceManager {
             e.discard();
         }
         for (var e : level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, box)) e.discard();
+        for (var e : level.getEntitiesOfClass(com.mmorpg.entity.NpcEntity.class, box, n -> n.role() == com.mmorpg.entity.NpcEntity.Role.SORTIE)) e.discard();
     }
 
     /** Au demarrage : les exemplaires de l'ancien plan (plus court) sont oublies, avec leurs epreuves et leurs zones. */

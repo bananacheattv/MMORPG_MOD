@@ -183,6 +183,8 @@ public final class ArenaEvents {
         net.minecraft.world.phys.Vec3 hall = dungeonZone == null ? boss.position()
                 : new net.minecraft.world.phys.Vec3(dungeonZone.minX() + 33 + 0.5, boss.getY(), dungeonZone.minZ() + 2 + Theme.HALL_Z - 6 + 0.5);
         InstanceManager.victoryExit(level, boss.getX(), boss.getZ(), hall);
+        var bossPos = boss.blockPosition();
+        com.mmorpg.server.Scheduler.later(level, 60, () -> InstanceManager.spawnPasseur(level, bossPos, hall));         // apres la fanfare : sortie immediate
         for (int i = 0; i < 10; i++) {
             int step = i;
             com.mmorpg.server.Scheduler.later(level, 10 + i * 14, () -> {

@@ -18,7 +18,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.sound.PlaySoundEvent;
 
 /**
- * Musique d'ambiance des donjons (assets/mmorpg/sounds/music/donjon_*.ogg, voir tools/build_music.py) : le serveur indique la piste
+ * Musique d'ambiance des donjons, des mines et des plaines (assets/mmorpg/sounds/music/donjon_*.ogg, voir tools/build_music.py) : le serveur indique la piste
  * quand le joueur entre dans un donjon, dans l'antre d'un boss, ou en sort (piste vide). Les pistes se succedent en fondu, et les
  * musiques de Minecraft sont coupees tant qu'une piste joue.
  */
@@ -26,11 +26,13 @@ import net.neoforged.neoforge.client.event.sound.PlaySoundEvent;
 public final class DungeonMusicClient {
     private static String wanted = "";
     private static Track music;
+    /** Ticks consecutifs ou le moteur de son ne joue plus la piste (Minecraft coupe tous les sons au changement de dimension). */
+    private static int silent;
 
     private DungeonMusicClient() {
     }
 
-    /** Piste demandee par le serveur (nom d'un donjon, « boss », ou vide pour arreter). */
+    /** Piste demandee par le serveur (nom d'un donjon, « boss », « mines », « plaines », ou vide pour arreter). */
     public static void set(String track) {
         wanted = track == null ? "" : track;
     }
@@ -49,6 +51,13 @@ public final class DungeonMusicClient {
         Minecraft mc = Minecraft.getInstance();
         boolean want = active(mc);
         if (music != null && music.isStopped()) music = null;
+        if (music != null) {
+            if (mc.getSoundManager().isActive(music)) silent = 0;
+            else if (++silent > 20) {
+                music = null;
+                silent = 0;
+            }
+        }
         if (music != null && (!want || !music.track.equals(wanted))) music.fadeOut();
         if (want && (music == null || music.leaving())) {
             if (music == null || !music.track.equals(wanted)) {
@@ -83,7 +92,7 @@ public final class DungeonMusicClient {
         private int out = -1;
 
         Track(String track) {
-            super(SoundEvent.createVariableRangeEvent(MMORPG.id("dungeon." + track)), SoundSource.MUSIC, RandomSource.create());
+            super(SoundEvent.createVariableRangeEvent(MMORPG.id(track.equals("mines") || track.equals("plaines") ? track + ".ambiance" : "dungeon." + track)), SoundSource.MUSIC, RandomSource.create());
             this.track = track;
             this.looping = true;
             this.delay = 0;

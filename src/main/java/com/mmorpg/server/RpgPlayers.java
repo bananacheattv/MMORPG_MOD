@@ -279,6 +279,15 @@ public final class RpgPlayers {
 
     // ================================================================== experience
 
+    /**
+     * Experience de la recolte (minerais, cultures) : un dixieme seulement de la valeur de base, le reste tire au sort (3 donne 1 fois sur
+     * 3,3 une unite) ; l'essentiel de l'experience vient du combat contre les monstres.
+     */
+    public static void giveGatherXp(ServerPlayer player, long base) {
+        long xp = base / 10 + (player.getRandom().nextInt(10) < base % 10 ? 1 : 0);
+        if (xp > 0) giveXp(player, xp, false);
+    }
+
     public static void giveXp(ServerPlayer player, long amount, boolean fromKill) {
         if (com.mmorpg.hub.ClassTrial.active(player)) return;          // essai de classe : aucune recompense
         PlayerData d = get(player);
