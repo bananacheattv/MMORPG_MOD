@@ -17,6 +17,24 @@
       }
     ]
   },
+  "mines.ambiance": {
+    "category": "music",
+    "sounds": [
+      {
+        "name": "mmorpg:music/aeloria_mines",
+        "stream": true
+      }
+    ]
+  },
+  "plaines.ambiance": {
+    "category": "music",
+    "sounds": [
+      {
+        "name": "mmorpg:music/aeloria_plaines",
+        "stream": true
+      }
+    ]
+  },
   "hub.ambiance": {
     "category": "music",
     "sounds": [

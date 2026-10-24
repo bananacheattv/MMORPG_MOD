@@ -51,6 +51,8 @@ public final class ZoneManager {
 
     private static final Map<UUID, Selection> SELECTIONS = new HashMap<>();
     private static final Map<UUID, String> CURRENT = new HashMap<>();
+    /** Derniere piste d'ambiance envoyee a chaque joueur (vide : aucune). */
+    private static final Map<UUID, String> MUSIC = new HashMap<>();
     /** Annonces deja faites pendant la visite en cours d'un donjon (une seule fois par visite, pour le donjon et pour l'antre du boss). */
     private static final Map<UUID, java.util.Set<String>> ANNOUNCED = new HashMap<>();
 
@@ -163,7 +165,11 @@ public final class ZoneManager {
             String wasVisit = visit(was);
             if (wasVisit != null && (z == null || !wasVisit.equals(visit(z)))) ANNOUNCED.remove(p.getUUID());
             if (z != null && (visit(z) == null || ANNOUNCED.computeIfAbsent(p.getUUID(), k -> new java.util.HashSet<>()).add(z.id()))) announce(p, z);
-            com.mmorpg.network.Net.toPlayer(p, new com.mmorpg.network.Payloads.DungeonMusic(musicOf(z)));
+        }
+        String track = trackOf(p, z);
+        if (!track.equals(MUSIC.getOrDefault(p.getUUID(), ""))) {
+            MUSIC.put(p.getUUID(), track);
+            com.mmorpg.network.Net.toPlayer(p, new com.mmorpg.network.Payloads.DungeonMusic(track));
         }
         if (p.isHolding(com.mmorpg.registry.ModItems.BAGUETTE_ZONE.get())) outline(p);
     }
@@ -172,6 +178,7 @@ public final class ZoneManager {
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         UUID id = event.getEntity().getUUID();
         CURRENT.remove(id);
+        MUSIC.remove(id);
         SELECTIONS.remove(id);
         ANNOUNCED.remove(id);
     }
@@ -179,6 +186,15 @@ public final class ZoneManager {
     /** Identifiant de la visite a laquelle appartient une zone de donjon ou d'antre de boss, ou {@code null} pour une zone ordinaire. */
     private static String visit(ZoneData.Zone z) {
         return z == null || !(z.dungeon() || z.boss()) ? null : z.id().replace("_boss", "");
+    }
+
+    /** Piste du joueur : celle de son donjon ou de son antre, « mines » ou « plaines » dans ces grandes cartes, sinon vide (la musique du hub et de la Cite est geree par le client). */
+    private static String trackOf(ServerPlayer p, ZoneData.Zone z) {
+        String t = musicOf(z);
+        if (!t.isEmpty()) return t;
+        if (com.mmorpg.mine.MineManager.regionOf(p) >= 0) return "mines";
+        if (com.mmorpg.plains.PlainsManager.regionOf(p) >= 0) return "plaines";
+        return "";
     }
 
     /** Piste d'ambiance d'une zone : le nom du donjon (« boss » dans son antre), ou vide hors d'un donjon. */
@@ -195,6 +211,7 @@ public final class ZoneManager {
     public static void forgetAnnouncements(UUID player) {
         ANNOUNCED.remove(player);
         CURRENT.remove(player);
+        MUSIC.remove(player);
     }
 
     public static String describe(ZoneData.Zone z) {

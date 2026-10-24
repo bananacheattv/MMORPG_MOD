@@ -477,7 +477,7 @@ public final class PlainsManager {
         for (int i = 0; i < 2; i++) if (random.nextInt(100) < hoe * 10) count++;
         ItemStack drop = new ItemStack(ModItems.get(crop.product()), count);
         if (!p.getInventory().add(drop)) level.addFreshEntity(new ItemEntity(level, p.getX(), p.getY() + 0.5, p.getZ(), drop));
-        RpgPlayers.giveXp(p, 2 + rank * 3L, false);
+        RpgPlayers.giveGatherXp(p, 2 + rank * 3L);
         p.sendOverlayMessage(Component.literal("+" + count + " " + crop.name()).withColor(crop.color()));
         level.setBlock(pos, block.getStateForAge(0), 3);
         level.sendParticles(ParticleTypes.HAPPY_VILLAGER, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 6, 0.3, 0.3, 0.3, 0.0);

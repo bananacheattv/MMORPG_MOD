@@ -60,7 +60,21 @@ public final class ForgeRecipes {
 
     private static void weapon(String id, int gold, Object... ingredients) {
         ItemDefs.WeaponDef def = ItemDefs.WEAPONS.stream().filter(w -> w.id().equals(id)).findFirst().orElseThrow();
-        add(Category.ARMES, id, 1, gold, def.level(), def.cls(), ingredients);
+        // metallurgie des mines : comme un outil, une arme demande du minerai compresse et des lingots du rang de son niveau
+        int lvl = def.level();
+        double m = lvl <= 5 ? 0.25 : lvl <= 40 ? 1.0 : lvl <= 65 ? 1.5 : lvl <= 85 ? 2.0 : 3.0;
+        String ore = MINE_ORES[oreTier(lvl)];
+        List<Object> ing = new ArrayList<>(List.of(ingredients));
+        ing.add("compresse_" + ore);
+        ing.add((int) Math.round(TOOL_COMPRESSED * m));
+        int ingots = (int) Math.round(TOOL_INGOTS * m);
+        int at = ing.indexOf("lingot_" + ore);                                                   // l'arme en demandait deja un peu : on additionne
+        if (at >= 0 && at % 2 == 0) ing.set(at + 1, (Integer) ing.get(at + 1) + ingots);
+        else {
+            ing.add("lingot_" + ore);
+            ing.add(ingots);
+        }
+        add(Category.ARMES, id, 1, gold, lvl, def.cls(), ing.toArray());
     }
 
     /** Minerais des mines par rang (voir MineBlocks) et niveau a partir duquel ils sont extraits. */
@@ -129,6 +143,14 @@ public final class ForgeRecipes {
             // metallurgie des mines : minerai compresse du rang de la panoplie, et lingot rare des panoplies de niveau 25+
             ing.add("compresse_" + MINE_ORES[oreTier(set.level())]);
             ing.add(COMPRESSED_PER_SET_PIECE[i] * (set.level() >= 90 ? 16 : 10) / 10);
+            String ingot = "lingot_" + MINE_ORES[oreTier(set.level())];                                  // et, comme les outils, des lingots bruts (additionnes si la panoplie en demande deja)
+            int ingots = COMPRESSED_PER_SET_PIECE[i] * (set.level() >= 90 ? 16 : 10) / 10 * 2;
+            int at = ing.indexOf(ingot);
+            if (at >= 0 && at % 2 == 0) ing.set(at + 1, (Integer) ing.get(at + 1) + ingots);
+            else {
+                ing.add(ingot);
+                ing.add(ingots);
+            }
             String rare = set.level() >= 75 ? "lingot_astralium" : set.level() >= 50 ? "lingot_orichalque" : set.level() >= 25 ? "lingot_aelium" : null;
             if (rare != null) {
                 ing.add(rare);

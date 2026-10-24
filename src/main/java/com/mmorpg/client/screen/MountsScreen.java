@@ -15,6 +15,11 @@ public class MountsScreen extends MenuScreen {
     private boolean confirm;
     private final java.util.Map<MountType, MountEntity> previews = new java.util.EnumMap<>(MountType.class);
     public MountsScreen() { super(Tab.MONTURES); }
+
+    /** Selection d'une monture (tests de la vitrine). */
+    public void select(MountType type) {
+        selected = type;
+    }
     @Override protected void renderTab(GuiGraphicsExtractor g, int mx, int my, float a) {
         var d = ClientData.DATA;
         int x = left + 8, y = contentTop, lw = 165;
@@ -44,7 +49,8 @@ public class MountsScreen extends MenuScreen {
             });
             var state = minecraft.getEntityRenderDispatcher().getRenderer(entity).createRenderState(entity, 1f);
             state.shadowPieces.clear();
-            g.entity(state, 34 / Math.max(1f, Math.max(selected.width, selected.height) * .8f), new org.joml.Vector3f(0, selected.height / 2, 0), new org.joml.Quaternionf().rotateZ((float) Math.PI).rotateY(-.7f), null, dx + 5, y + 18, dx + dw - 5, y + 94);
+            float ew = selected.width * ModEntities.MOUNT_SCALE, eh = selected.height * ModEntities.MOUNT_SCALE;           // la monture est affichee a son echelle reelle (x2)
+            g.entity(state, 34 / Math.max(1f, Math.max(ew, eh) * .8f), new org.joml.Vector3f(0, eh / 2, 0), new org.joml.Quaternionf().rotateZ((float) Math.PI).rotateY(-.7f), null, dx + 5, y + 18, dx + dw - 5, y + 94);
         }
         int ty = y + 100;
         g.text(font, selected.rarity.label + " • Vitesse : " + Math.round(selected.speed / .225 * 100) + " %", dx + 7, ty, selected.rarity.color, false);

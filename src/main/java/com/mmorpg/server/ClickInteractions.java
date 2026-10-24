@@ -64,6 +64,7 @@ public final class ClickInteractions {
                 case MARCHAND -> ShopManager.open(sp, npc);
                 case DONJON -> com.mmorpg.dungeon.DungeonMaster.open(sp, npc);
                 case MINES -> com.mmorpg.mine.MineManager.open(sp, npc);
+                case SORTIE -> com.mmorpg.dungeon.InstanceManager.leaveNow(sp, npc.group());
             }
         }
     }

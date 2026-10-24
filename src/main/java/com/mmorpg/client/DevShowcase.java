@@ -182,6 +182,14 @@ public final class DevShowcase {
             adminPhase(mc, me);
             return;
         }
+        if (MODE.equals("musique")) {          // musique d'ambiance : hub, spawn (cite), plaines
+            musiquePhase(mc, me);
+            return;
+        }
+        if (MODE.equals("montures")) {          // apercu du menu des montures et vue a la 3e personne en selle, pour les 12 montures
+            monturesPhase(mc, me);
+            return;
+        }
         if (MODE.equals("residus")) {          // restes de l'ancien marche dans le hub : un texte et un PNJ poses a l'ouest doivent disparaitre tout seuls
             residusPhase(mc, me);
             return;
@@ -1333,6 +1341,76 @@ public final class DevShowcase {
         } catch (java.io.IOException e) {
             return -1;
         }
+    }
+
+    private static void musiquePhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 10) cmd(mc, "gamemode survival " + me);
+        if (tick < 100 || !com.mmorpg.plains.PlainsManager.built(srv, 0)) return;
+        int t = tick - 100;
+        if (t == 0) srv.execute(() -> com.mmorpg.hub.HubManager.goToHub(srv.getPlayerList().getPlayerByName(me), 0));
+        if (t == 300) MMORPG.LOGGER.info("[MMORPG] MUSIQUE dans le hub : {}", com.mmorpg.client.HubMusicClient.debugState());
+        if (t == 310) srv.execute(() -> com.mmorpg.hub.HubManager.goToSpawn(srv.getPlayerList().getPlayerByName(me)));
+        if (t == 700) MMORPG.LOGGER.info("[MMORPG] MUSIQUE dans le spawn : {}", com.mmorpg.client.HubMusicClient.debugState());
+        if (t == 710) srv.execute(() -> com.mmorpg.plains.PlainsManager.enter(srv.getPlayerList().getPlayerByName(me), 0));
+        if (t == 1000) MMORPG.LOGGER.info("[MMORPG] MUSIQUE dans la plaine : {}", com.mmorpg.client.HubMusicClient.debugState() + " ; " + com.mmorpg.client.DungeonMusicClient.debugState());
+        if (t == 1010) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        }
+    }
+
+    private static void monturesPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        var all = com.mmorpg.mount.MountType.values();
+        if (tick == 5) mc.getWindow().setWindowed(960, 600);
+        if (tick == 10) {
+            cmd(mc, "gamemode survival " + me);
+            cmd(mc, "mmorpg classe " + me + " guerrier");
+            cmd(mc, "time set day");
+            cmd(mc, "weather clear");
+            if (!mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        }
+        if (tick < 80 || !com.mmorpg.plains.PlainsManager.built(srv, 0)) return;
+        int t = tick - 80, per = 90, idx = t / per, rel = t % per;
+        if (idx >= all.length) {
+            if (t == all.length * per + 5) {
+                MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+                stop(mc);
+            }
+            return;
+        }
+        var type = all[idx];
+        if (rel == 0) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            var lv = srv.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
+            var lay = com.mmorpg.plains.PlainsLayout.get(0);
+            com.mmorpg.server.MountManager.despawn(pl);
+            pl.getAbilities().invulnerable = true;
+            pl.onUpdateAbilities();
+            pl.teleportTo(lv, lay.x0() + com.mmorpg.plains.PlainsLayout.PLAZA_X + 0.5, com.mmorpg.plains.PlainsLayout.BASE + 1, com.mmorpg.plains.PlainsLayout.Z0 + com.mmorpg.plains.PlainsLayout.PLAZA_Z + 4.5, java.util.Set.of(), 0F, 0F, true);
+            var d = com.mmorpg.server.RpgPlayers.get(pl);
+            d.mounts.add(type.id);
+            d.nextMountTick = 0;
+            d.pvpUntilTick = 0;
+            com.mmorpg.server.RpgPlayers.sync(pl);
+        });
+        if (rel == 6) mc.execute(() -> com.mmorpg.client.screen.MenuScreen.open(com.mmorpg.client.screen.MenuScreen.Tab.MONTURES));
+        if (rel == 8) mc.execute(() -> {
+            if (mc.gui.screen() instanceof com.mmorpg.client.screen.MountsScreen ms) ms.select(type);
+        });
+        if (rel == 14) shot(mc, "mont_menu_" + type.id);
+        if (rel == 16) mc.execute(() -> mc.gui.setScreen(null));
+        if (rel == 20) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            boolean ok = com.mmorpg.server.MountManager.summon(pl, type.id);
+            MMORPG.LOGGER.info("[MMORPG] MONTURES {} : invoquee = {}, en selle = {}", type.id, ok, pl.isPassenger());
+        });
+        if (rel == 26) mc.execute(() -> mc.options.setCameraType(CameraType.THIRD_PERSON_BACK));
+        if (rel == 44) shot(mc, "mont_selle_dos_" + type.id);
+        if (rel == 48) mc.execute(() -> mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT));
+        if (rel == 66) shot(mc, "mont_selle_face_" + type.id);
+        if (rel == 70) mc.execute(() -> mc.options.setCameraType(CameraType.FIRST_PERSON));
     }
 
     private static void residusPhase(Minecraft mc, String me) {
@@ -4260,6 +4338,24 @@ public final class DevShowcase {
             trialAt(40, () -> shot(mc, id + "_cine_victoire_1"));
             trialAt(70, () -> shot(mc, id + "_cine_victoire_2"));
             trialAt(70, () -> shot(mc, id + "_cine_victoire_3"));
+            trialAt(5, () -> srv.execute(() -> {                                                       // le Passeur de sortie est apparu : on lui parle
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                var npcs = pl.level().getEntitiesOfClass(com.mmorpg.entity.NpcEntity.class, pl.getBoundingBox().inflate(60),
+                        n -> n.role() == com.mmorpg.entity.NpcEntity.Role.SORTIE);
+                MMORPG.LOGGER.info("[MMORPG] PASSEUR : {} present(s) apres la victoire ; joueur en {}", npcs.size(), pl.blockPosition());
+                if (!npcs.isEmpty()) {
+                    var n = npcs.get(0);
+                    cmd(mc, "tp " + me + " " + n.getX() + " " + n.getY() + " " + (n.getZ() - 4) + " 0 0");
+                    sortieNpc = n;
+                }
+            }));
+            trialAt(10, () -> shot(mc, id + "_cine_passeur"));
+            trialAt(5, () -> srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                if (sortieNpc != null) com.mmorpg.dungeon.InstanceManager.leaveNow(pl, sortieNpc.group());
+                MMORPG.LOGGER.info("[MMORPG] PASSEUR : joueur apres le clic en {} (avant : {})", pl.blockPosition(), sortieNpc == null ? "-" : sortieNpc.blockPosition());
+            }));
+            trialAt(20, () -> shot(mc, id + "_cine_sortie"));
             trialAt(60, () -> {
                 MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
                 stop(mc);
@@ -4278,6 +4374,7 @@ public final class DevShowcase {
     }
 
     private static net.minecraft.world.entity.Mob bossRef;
+    private static com.mmorpg.entity.NpcEntity sortieNpc;
 
     private static void setBossHp(float fraction) {
         if (bossRef == null) return;
