@@ -427,7 +427,7 @@ public final class MineManager {
             e.putInt("color", ore.color());
             e.putInt("min", s.minLevel());
             e.putInt("max", s.maxLevel());
-            e.putBoolean("locked", s.index() >= d.minesUnlocked && !p.hasInfiniteMaterials());
+            e.putBoolean("locked", s.index() >= d.minesUnlocked);
             e.putString("icon", ore.ingotId());
             e.putString("lockedHint", s.index() == 0 ? "" : "Trouvez le portail caché de « " + MineLayout.STYLES.get(s.index() - 1).name() + " » : il se cache au fond de la caverne.");
             ListTag info = new ListTag();
@@ -464,7 +464,7 @@ public final class MineManager {
         int k = packet.sector();
         if (k < 0 || k >= MineLayout.SECTORS) return;
         Sector s = MineLayout.STYLES.get(k);
-        if (k >= RpgPlayers.get(p).minesUnlocked && !p.hasInfiniteMaterials()) {
+        if (k >= RpgPlayers.get(p).minesUnlocked) {
             p.sendOverlayMessage(Component.literal("Cette mine n'est pas encore découverte : trouvez le portail caché de la précédente.").withColor(0xFF5050));
             return;
         }

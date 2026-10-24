@@ -328,6 +328,29 @@ public final class HubBuilder {
     }
 
     /**
+     * Retire les restes de l'ancien marche (textes flottants et PNJ) a l'ouest de la place, la ou il se trouvait avant d'avoir sa propre
+     * dimension : le hub n'a plus rien a l'ouest du pont, au-dela de 52 blocs. Les entites ne sont trouvees que dans les troncons charges ;
+     * l'appel est donc repete tant que des joueurs sont dans le hub. @return le nombre d'entites retirees
+     */
+    static int cleanLegacyMarket(net.minecraft.server.MinecraftServer server) {
+        HubData hub = HubData.get(server);
+        ServerLevel level = hub.exists() ? hub.level(server) : null;
+        if (level == null) return 0;
+        int n = 0;
+        for (int i = 0; i < hub.count(); i++) {
+            BlockPos o = hub.origin(i);
+            AABB box = new AABB(o.getX() - 170, o.getY() - 80, o.getZ() - 140, o.getX() - 52.5, o.getY() + 90, o.getZ() + 140);
+            for (Entity e : level.getEntities((Entity) null, box, x -> x instanceof com.mmorpg.entity.NpcEntity
+                    || (x instanceof net.minecraft.world.entity.Display.TextDisplay && x.entityTags().contains(TAG)))) {
+                e.discard();
+                n++;
+            }
+        }
+        if (n > 0) com.mmorpg.MMORPG.LOGGER.info("[MMORPG] Hub : {} reste(s) de l'ancien marche retire(s) (textes et PNJ)", n);
+        return n;
+    }
+
+    /**
      * Fait reapparaitre les PNJ, mannequins et textes du hub qui manquent (identifiants stables : ceux qui existent deja sont ignores).
      * Sert a reparer un hub dont les entites ont ete retirees sans le reconstruire.
      */

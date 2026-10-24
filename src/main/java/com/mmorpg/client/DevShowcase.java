@@ -182,6 +182,10 @@ public final class DevShowcase {
             adminPhase(mc, me);
             return;
         }
+        if (MODE.equals("residus")) {          // restes de l'ancien marche dans le hub : un texte et un PNJ poses a l'ouest doivent disparaitre tout seuls
+            residusPhase(mc, me);
+            return;
+        }
         if (MODE.equals("sorts")) {          // sorts des monstres 3D : six monstres a la fois attaquent le joueur, on compte les sorts lances
             sortsPhase(mc, me);
             return;
@@ -1329,6 +1333,41 @@ public final class DevShowcase {
         } catch (java.io.IOException e) {
             return -1;
         }
+    }
+
+    private static void residusPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 10) cmd(mc, "gamemode spectator " + me);
+        if (tick < 60 || com.mmorpg.hub.HubData.get(srv).origin() == null) return;
+        int t = tick - 60;
+        if (t == 0) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            com.mmorpg.hub.HubManager.goToHub(pl, 0);
+        });
+        if (t == 20) srv.execute(() -> {
+            var hub = com.mmorpg.hub.HubData.get(srv);
+            var lv = hub.level(srv);
+            var o = hub.origin();
+            var src = srv.createCommandSourceStack().withLevel(lv).withSuppressedOutput();
+            srv.getCommands().performPrefixedCommand(src, String.format(java.util.Locale.ROOT,
+                    "summon minecraft:text_display %d %d %d {Tags:[\"mmorpg_hub\"],text:{text:\"RESIDU\"}}", o.getX() - 100, o.getY() + 5, o.getZ()));
+            var npc = com.mmorpg.registry.ModEntities.NPC.get().create(lv, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            npc.snapTo(o.getX() - 96, o.getY(), o.getZ() + 4, 0F, 0F);
+            lv.addFreshEntity(npc);
+            int n = lv.getEntities((net.minecraft.world.entity.Entity) null, new net.minecraft.world.phys.AABB(o.getX() - 170, o.getY() - 80, o.getZ() - 140, o.getX() - 52.5, o.getY() + 90, o.getZ() + 140),
+                    e -> e instanceof com.mmorpg.entity.NpcEntity || e instanceof net.minecraft.world.entity.Display.TextDisplay).size();
+            MMORPG.LOGGER.info("[MMORPG] RESIDUS poses : {} entite(s) a l'ouest du hub (attendu 2 au moins)", n);
+        });
+        if (t == 300) srv.execute(() -> {
+            var hub = com.mmorpg.hub.HubData.get(srv);
+            var lv = hub.level(srv);
+            var o = hub.origin();
+            int n = lv.getEntities((net.minecraft.world.entity.Entity) null, new net.minecraft.world.phys.AABB(o.getX() - 170, o.getY() - 80, o.getZ() - 140, o.getX() - 52.5, o.getY() + 90, o.getZ() + 140),
+                    e -> e instanceof com.mmorpg.entity.NpcEntity || e instanceof net.minecraft.world.entity.Display.TextDisplay).size();
+            MMORPG.LOGGER.info("[MMORPG] RESIDUS apres nettoyage : {} (attendu 0)", n);
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
+            stop(mc);
+        });
     }
 
     /** Les 30 monstres 3D, six par six, autour du joueur invulnerable de la place de la premiere plaine : les sorts doivent partir. */

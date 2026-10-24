@@ -195,7 +195,7 @@ public final class PlainsManager {
         MinecraftServer server = p.level().getServer();
         ListTag list = new ListTag();
         for (Sector s : STYLES) {
-            boolean locked = s.index() >= d.plainsUnlocked && !p.hasInfiniteMaterials();
+            boolean locked = s.index() >= d.plainsUnlocked;
             CompoundTag e = new CompoundTag();
             e.putInt("index", s.index());
             e.putString("label", s.name());
@@ -231,7 +231,7 @@ public final class PlainsManager {
     /** Choix du joueur dans le menu : verifications cote serveur puis arrivee sur la place d'entree de la plaine. */
     public static void enterChosen(ServerPlayer p, int region) {
         if (region < 0 || region >= REGIONS) return;
-        if (region >= RpgPlayers.get(p).plainsUnlocked && !p.hasInfiniteMaterials()) {
+        if (region >= RpgPlayers.get(p).plainsUnlocked) {
             p.sendOverlayMessage(Component.literal("Cette plaine n'est pas encore découverte : trouvez le portail caché de la précédente.").withColor(0xFF7060));
             return;
         }
