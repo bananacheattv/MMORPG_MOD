@@ -173,7 +173,7 @@ public final class MineManager {
 
     private static AABB returnArch(MineLayout lay) {
         int f = lay.floor(MineLayout.PLAZA_X, MineLayout.PLAZA_Z);
-        return new AABB(lay.x0() + MineLayout.PLAZA_X - 5, f + 1, MineLayout.Z0 + MineLayout.PLAZA_Z - 14.5, lay.x0() + MineLayout.PLAZA_X + 6, f + 10, MineLayout.Z0 + MineLayout.PLAZA_Z - 10.8);
+        return new AABB(lay.x0() + MineLayout.PLAZA_X - 5, f + 1, MineLayout.Z0 + MineLayout.PLAZA_Z - 14.5, lay.x0() + MineLayout.PLAZA_X + 6, f + 10, MineLayout.Z0 + MineLayout.PLAZA_Z - 8.6);
     }
 
     private static AABB exitGate(MineLayout lay) {
@@ -197,10 +197,10 @@ public final class MineManager {
             if (region < MineLayout.SECTORS - 1) {
                 double ex = lay.x0() + lay.exitX + 0.5, ez = MineLayout.Z0 + lay.exitZ + 0.5, ey = lay.floor(lay.exitX, lay.exitZ) + 4;
                 if (p.distanceToSqr(ex, ey, ez) < 40 * 40) level.sendParticles(ParticleTypes.PORTAL, ex, ey, ez, 8, 2.5, 3.5, 0.3, 0.2);
-                if (exitGate(lay).contains(p.getX(), p.getY(), p.getZ()) && !cooling(p, now)) {
+                if (exitGate(lay).contains(p.getX(), p.getY(), p.getZ()) && !transitioning(p) && !cooling(p, now)) {
                     level.playSound(null, p.blockPosition(), SoundEvents.PORTAL_TRAVEL, SoundSource.PLAYERS, 0.5f, 1.2f);
                     discover(p, region + 1);
-                    enterNow(p, region + 1);
+                    startTransition(p, region + 1);
                     continue;
                 }
             }
@@ -344,8 +344,8 @@ public final class MineManager {
         if (data.respawns().isEmpty()) return;
         long now = level.getGameTime();
         List<MineData.Respawn> due = new ArrayList<>();
-        for (MineData.Respawn r : data.respawns()) {
-            if (r.due() <= now) due.add(r);
+        for (MineData.Respawn r : data.respawns()) {                         // seules les entrees dont le chunk est charge comptent : les autres n'en bloquent pas d'autres
+            if (r.due() <= now && level.hasChunkAt(r.pos())) due.add(r);
             if (due.size() >= 120) break;
         }
         for (MineData.Respawn r : due) {
@@ -468,8 +468,14 @@ public final class MineManager {
             p.sendOverlayMessage(Component.literal("Cette mine n'est pas encore découverte : trouvez le portail caché de la précédente.").withColor(0xFF5050));
             return;
         }
+        startTransition(p, k);
+    }
+
+    /** Ecran de chargement puis arrivee a la mine (menu, portail cache). */
+    public static void startTransition(ServerPlayer p, int k) {
         MinecraftServer server = p.level().getServer();
-        if (dim(server) == null) return;
+        if (dim(server) == null || k < 0 || k >= MineLayout.SECTORS) return;
+        Sector s = MineLayout.STYLES.get(k);
         MineBlocks.Ore ore = MineBlocks.ore(s.ore());
         String title = MARK + s.name();
         long at = server.overworld().getGameTime() + LOADING_TICKS;
@@ -477,6 +483,11 @@ public final class MineManager {
         TRANSITIONS.add(new Transition(p.getUUID(), k, at, title, s.lore(), ore.color()));
         com.mmorpg.dungeon.BossReveal.hold(p, LOADING_TICKS + 400);
         Net.toPlayer(p, new Payloads.Loading(Payloads.Loading.START, title, s.lore(), ore.color(), built(server, k) ? 0 : (job != null && job.region() == k ? percent() : 0)));
+    }
+
+    private static boolean transitioning(ServerPlayer p) {
+        for (Transition x : TRANSITIONS) if (x.player().equals(p.getUUID())) return true;
+        return false;
     }
 
     private static void transitions(MinecraftServer server) {
@@ -518,6 +529,7 @@ public final class MineManager {
                 double a = Math.PI * 2 * i / steps;
                 int lx = cx + (int) Math.round(Math.cos(a) * r), lz = cz + (int) Math.round(Math.sin(a) * r);
                 if (layout.kind(lx, lz) != 1 || layout.isPillar(lx, lz) || layout.liquid(lx, lz) > layout.floor(lx, lz)) continue;
+                if (lz < MineLayout.PLAZA_Z - 6) continue;                                   // jamais devant l'arche du retour (elle ramene au Spawn)
                 boolean flat = true;
                 for (int dx = -2; dx <= 2 && flat; dx++) {
                     for (int dz = -2; dz <= 2 && flat; dz++) {
