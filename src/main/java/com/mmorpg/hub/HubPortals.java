@@ -101,6 +101,7 @@ public final class HubPortals {
     @SubscribeEvent
     public static void onTick(ServerTickEvent.Post event) {
         var server = event.getServer();
+        if (server.getTickCount() % 200 == 100) HubBuilder.cleanLegacyMarket(server);
         if (server.getTickCount() % 8 != 0) return;
         HubData hub = HubData.get(server);
         SpawnData spawn = SpawnData.get(server);
