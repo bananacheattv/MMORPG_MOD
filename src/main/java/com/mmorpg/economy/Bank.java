@@ -59,6 +59,7 @@ public final class Bank {
                     RpgPlayers.takeGold(p, n);
                     a.gold += n;
                     data.setDirty();
+                    com.mmorpg.db.Audit.log(p, com.mmorpg.db.Audit.BANK_DEPOSIT, n, "solde " + a.gold);
                     level.playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.COINS.get(), SoundSource.NEUTRAL, 0.8f, 0.9f);
                     p.sendOverlayMessage(Component.literal("Dépôt de " + n + " or. Solde en banque : " + a.gold).withColor(0xFFD040));
                 }
@@ -71,6 +72,7 @@ public final class Bank {
                 } else {
                     a.gold -= n;
                     data.setDirty();
+                    com.mmorpg.db.Audit.log(p, com.mmorpg.db.Audit.BANK_WITHDRAW, n, "solde " + a.gold);
                     RpgPlayers.addGold(p, n, false);
                     level.playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.COINS.get(), SoundSource.NEUTRAL, 0.8f, 1.1f);
                     p.sendOverlayMessage(Component.literal("Retrait de " + n + " or. Solde en banque : " + a.gold).withColor(0xFFD040));

@@ -105,8 +105,8 @@ public final class HubManager {
      * ordinaire au lieu de la Citadelle. Un hub ou un spawn construit avec un ancien plan est reconstruit. @return vrai si quelque chose a ete construit
      */
     public static boolean ensureHub(net.minecraft.server.MinecraftServer server) {
-        boolean built = ensureHubOnly(server);
-        boolean spawn = SpawnBuilder.ensure(server);
+        boolean built = com.mmorpg.cluster.Cluster.hosts(com.mmorpg.cluster.Cluster.Place.HUB) && ensureHubOnly(server);          // en reseau, seul le serveur qui l'heberge le construit
+        boolean spawn = com.mmorpg.cluster.Cluster.hosts(com.mmorpg.cluster.Cluster.Place.SPAWN) && SpawnBuilder.ensure(server);
         return built || spawn;
     }
 
@@ -191,6 +191,7 @@ public final class HubManager {
 
     /** /hub n : va dans la copie n (1, 2...) si elle existe et n'est pas pleine ; -1 pour sa copie habituelle. */
     public static boolean goToHub(ServerPlayer p, int wanted) {
+        if (com.mmorpg.cluster.Cluster.transfer(p, com.mmorpg.cluster.Cluster.Place.HUB, 0)) return true;          // le hub est sur un autre serveur
         HubData hub = HubData.get(p.level().getServer());
         ServerLevel level = hub.level(p.level().getServer());
         if (!hub.exists() || level == null) return false;
@@ -218,6 +219,7 @@ public final class HubManager {
 
     /** Retour du spawn vers sa copie du hub, au bout du pont (cote portail). */
     public static boolean goToHubFromSpawn(ServerPlayer p) {
+        if (com.mmorpg.cluster.Cluster.transfer(p, com.mmorpg.cluster.Cluster.Place.HUB, 0)) return true;
         HubData hub = HubData.get(p.level().getServer());
         ServerLevel level = hub.level(p.level().getServer());
         if (!hub.exists() || level == null) return false;
@@ -232,6 +234,7 @@ public final class HubManager {
 
     /** /spawn et /marche : le Spawn d'Aeloria, monde commun a tous les joueurs (cote est de la fontaine, face au portail de la Citadelle). */
     public static boolean goToSpawn(ServerPlayer p) {
+        if (com.mmorpg.cluster.Cluster.transfer(p, com.mmorpg.cluster.Cluster.Place.SPAWN, 0)) return true;        // le spawn est sur un autre serveur
         SpawnData spawn = SpawnData.get(p.level().getServer());
         ServerLevel level = p.level().getServer().getLevel(SpawnBuilder.DIM);
         if (!spawn.exists() || level == null) return false;

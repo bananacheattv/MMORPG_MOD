@@ -143,6 +143,8 @@ public final class Auction {
         long payout = Math.max(1, l.price() - Math.round(l.price() * TAX));
         data.addEarnings(l.seller(), payout);
         ItemStack bought = l.stack().copy();
+        com.mmorpg.db.Audit.log(p, com.mmorpg.db.Audit.AUCTION_BUY, l.price(), bought.getHoverName().getString() + " x" + bought.getCount() + " (vendeur " + l.seller() + ")");
+        com.mmorpg.db.Audit.log(l.seller(), null, com.mmorpg.db.Audit.AUCTION_SALE, payout, bought.getHoverName().getString() + " x" + bought.getCount() + " (acheteur " + p.getGameProfile().name() + ", prix " + l.price() + ")");
         if (!p.getInventory().add(bought)) p.drop(bought, false, net.minecraft.util.Prediction.SERVER_ONLY);
         p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.COINS.get(), SoundSource.NEUTRAL, 0.9f, 1f);
         p.sendOverlayMessage(Component.literal("Achat : " + bought.getHoverName().getString() + " x" + bought.getCount() + " (-" + l.price() + " or)").withColor(0xFFD040));
@@ -176,6 +178,7 @@ public final class Auction {
         ItemStack sold = held.copy();
         p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
         data.add(new AuctionData.Listing(data.nextId(), p.getUUID(), p.getGameProfile().name(), sold, price, System.currentTimeMillis() + DURATION_MS));
+        com.mmorpg.db.Audit.log(p, com.mmorpg.db.Audit.AUCTION_LIST, price, sold.getHoverName().getString() + " x" + sold.getCount());
         p.level().playSound(null, p.blockPosition(), SoundEvents.VILLAGER_YES, SoundSource.NEUTRAL, 0.8f, 1.1f);
         p.sendOverlayMessage(Component.literal("Mis en vente : " + sold.getHoverName().getString() + " x" + sold.getCount() + " pour " + price + " or (48 h).").withColor(0xFFD040));
     }

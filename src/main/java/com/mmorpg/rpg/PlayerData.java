@@ -98,6 +98,8 @@ public class PlayerData implements ValueIOSerializable {
     public long nextMountTick;
     public UUID petEntity;
     public boolean dirty = true;
+    /** Version du profil dans la base de donnees du reseau a la derniere synchronisation (0 : jamais synchronise ; voir db/PlayerSync). */
+    public long dbVersion;
     public float regenAccumulatorHp;
     public float regenAccumulatorMana;
 
@@ -198,6 +200,7 @@ public class PlayerData implements ValueIOSerializable {
         t.putInt("plainsUnlocked", plainsUnlocked);
         t.putInt("evolution", evolution);
         t.putLong("gold", gold);
+        t.putLong("dbVersion", dbVersion);
         t.putInt("xpCharmSeconds", xpCharmSeconds);
         t.putInt("luckCharmSeconds", luckCharmSeconds);
         Map<String, List<Integer>> aq = new LinkedHashMap<>();
@@ -257,6 +260,7 @@ public class PlayerData implements ValueIOSerializable {
         evolution = t.getIntOr("evolution", -1);
         if (evolution < 0) evolution = PlayerClass.tier(level);
         gold = t.getLongOr("gold", 0);
+        dbVersion = t.getLongOr("dbVersion", 0);
         xpCharmSeconds = Math.clamp(t.getIntOr("xpCharmSeconds", 0), 0, 1800);
         luckCharmSeconds = Math.clamp(t.getIntOr("luckCharmSeconds", 0), 0, 1800);
         trackedQuest = t.getStringOr("trackedQuest", "");

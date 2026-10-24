@@ -170,6 +170,7 @@ public final class PlainsManager {
 
     @SubscribeEvent
     public static void onTick(ServerTickEvent.Post event) {
+        if (!com.mmorpg.cluster.Cluster.hosts(com.mmorpg.cluster.Cluster.Place.PLAINS)) return;                  // en reseau : un autre serveur heberge les plaines
         MinecraftServer server = event.getServer();
         transitions(server);
         if (job != null) {
@@ -239,6 +240,7 @@ public final class PlainsManager {
 
     /** Ecran de chargement (comme les mines) puis arrivee sur la place d'entree de la plaine : menu, portail cache. */
     public static void startTransition(ServerPlayer p, int region) {
+        if (com.mmorpg.cluster.Cluster.transfer(p, com.mmorpg.cluster.Cluster.Place.PLAINS, region)) return;
         MinecraftServer server = p.level().getServer();
         if (dim(server) == null || region < 0 || region >= REGIONS) return;
         Sector s = STYLES.get(region);
@@ -360,6 +362,7 @@ public final class PlainsManager {
         if (d.plainsUnlocked > region) return;
         d.plainsUnlocked = region + 1;
         d.dirty = true;
+        com.mmorpg.db.Audit.log(p, com.mmorpg.db.Audit.UNLOCK, region + 1, "plaine " + (region + 1));
         Sector s = STYLES.get(region);
         p.sendSystemMessage(Component.literal("✦ Nouvelle plaine découverte : " + s.name() + " (niveaux " + s.minLevel() + " à " + s.maxLevel() + ")").withColor(COLORS[region]));
         p.level().playSound(null, p.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.8F, 1.1F);

@@ -140,6 +140,7 @@ public final class MineManager {
 
     @SubscribeEvent
     public static void onTick(ServerTickEvent.Post event) {
+        if (!com.mmorpg.cluster.Cluster.hosts(com.mmorpg.cluster.Cluster.Place.MINES)) return;                   // en reseau : un autre serveur heberge les mines
         MinecraftServer server = event.getServer();
         transitions(server);
         if (job != null) {
@@ -217,6 +218,7 @@ public final class MineManager {
         if (d.minesUnlocked > region) return;
         d.minesUnlocked = region + 1;
         d.dirty = true;
+        com.mmorpg.db.Audit.log(p, com.mmorpg.db.Audit.UNLOCK, region + 1, "mine " + (region + 1));
         Sector s = MineLayout.STYLES.get(region);
         p.sendSystemMessage(Component.literal("✦ Nouvelle mine découverte : " + s.name() + " (niveaux " + s.minLevel() + " à " + s.maxLevel() + ")").withColor(MineBlocks.ore(s.ore()).color()));
         p.level().playSound(null, p.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.8F, 1.1F);
@@ -473,6 +475,7 @@ public final class MineManager {
 
     /** Ecran de chargement puis arrivee a la mine (menu, portail cache). */
     public static void startTransition(ServerPlayer p, int k) {
+        if (com.mmorpg.cluster.Cluster.transfer(p, com.mmorpg.cluster.Cluster.Place.MINES, k)) return;
         MinecraftServer server = p.level().getServer();
         if (dim(server) == null || k < 0 || k >= MineLayout.SECTORS) return;
         Sector s = MineLayout.STYLES.get(k);

@@ -26,6 +26,7 @@ public final class Net {
         r.playToClient(Payloads.Loading.TYPE, Payloads.Loading.CODEC);
         r.playToClient(Payloads.DeathInfo.TYPE, Payloads.DeathInfo.CODEC);
         r.playToClient(Payloads.DungeonMusic.TYPE, Payloads.DungeonMusic.CODEC);
+        r.playToClient(com.mmorpg.cluster.ProxyConnect.TYPE, com.mmorpg.cluster.ProxyConnect.CODEC);       // message au proxy (jamais recu par le client)
         r.playToServer(Payloads.DungeonEnter.TYPE, Payloads.DungeonEnter.CODEC, (packet, ctx) -> {
             if (ctx.player() instanceof ServerPlayer p) com.mmorpg.dungeon.DungeonMaster.enter(p, packet);
         });
