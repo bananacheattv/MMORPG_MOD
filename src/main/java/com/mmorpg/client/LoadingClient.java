@@ -29,13 +29,26 @@ public final class LoadingClient {
     private static final float TIMEOUT = 60F;
     /** Les titres de chargement des mines commencent par cette marque (le texte n'est pas affiche). */
     public static final String MINE_MARK = "\u26CF ";
+    /** Idem pour les plaines. */
+    public static final String PLAIN_MARK = "\u2698 ";
+    private static final String[] PLAIN_TIPS = {
+            "Chaque plaine cache un portail vers la suivante : promenez-vous loin des chemins pour le trouver.",
+            "Les totems de pierre annoncent le niveau des monstres de la zone où vous vous trouvez.",
+            "Les champs de cultures se récoltent d'un coup : la plante arrive dans votre sac puis repousse toute seule.",
+            "Une houe de palier supérieur donne des récoltes en plus et récolte les plantes voisines.",
+            "Les campements au bord du chemin sont de bons points de repère.",
+            "Le menu des plaines (commande /plaines) permet de rejoindre une plaine déjà découverte.",
+            "Les monstres reviennent sans cesse : c'est l'endroit idéal pour gagner de l'or et de l'expérience.",
+            "L'arche de quartz de la place d'entrée ramène au Spawn.",
+    };
     private static final String[] MINE_TIPS = {
             "Il faut une pioche pour extraire un minerai : le lingot arrive directement dans votre sac.",
             "Un minerai épuisé repousse tout seul au bout de quelques dizaines de secondes.",
-            "Plus on descend, plus les monstres sont forts : chaque étage a son propre minerai.",
+            "Chaque mine a son propre minerai, et les monstres y sont de plus en plus forts d'une mine à l'autre.",
+            "Chaque mine cache au fond de sa caverne un portail vers la suivante : à vous de le trouver.",
             "Les lingots des mines servent à forger les armes et armures à la Forge Arcanique.",
             "Les gouffres se descendent par des échelles : cherchez-les sur les bords.",
-            "Le menu des mines (commande /mine) permet de rejoindre un étage déjà atteint.",
+            "Le menu des mines (commande /mine) permet de rejoindre une mine déjà découverte.",
             "Les lanternes et les campements des mineurs éclairent les passages sûrs.",
             "Une veine riche donne parfois deux lingots d'un coup.",
     };
@@ -55,6 +68,7 @@ public final class LoadingClient {
     private static boolean fading;
     private static long fadeNanos;
     private static boolean mine;
+    private static boolean plain;
     private static String title = "";
     private static String lore = "";
     private static int color = 0xFFC868;
@@ -75,7 +89,8 @@ public final class LoadingClient {
         switch (p.mode()) {
             case Payloads.Loading.START -> {
                 mine = p.title().startsWith(MINE_MARK);
-                title = (mine ? p.title().substring(MINE_MARK.length()) : p.title()).toUpperCase(java.util.Locale.ROOT);
+                plain = p.title().startsWith(PLAIN_MARK);
+                title = (mine || plain ? p.title().substring(MINE_MARK.length()) : p.title()).toUpperCase(java.util.Locale.ROOT);
                 lore = p.lore();
                 color = p.color() & 0xFFFFFF;
                 target = p.percent();
@@ -198,6 +213,7 @@ public final class LoadingClient {
         String pct = Math.round(shown) + " %";
         g.text(mc.font, pct, cx - mc.font.width(pct) / 2, by + 10, 0xC8C0B0 | alpha(k), true);
         String label = mine ? (shown >= 99.5F ? "Arrivée dans la mine…" : "Descente dans les mines…")
+                : plain ? (shown >= 99.5F ? "Arrivée dans la plaine…" : "Départ vers les plaines…")
                 : shown >= 99.5F ? "Entrée dans le donjon…" : "Construction de votre donjon…";
         g.text(mc.font, label, cx - mc.font.width(label) / 2, by - 12, 0xA8A090 | alpha(k), true);
         // sablier : quatre losanges qui tournent
@@ -210,7 +226,7 @@ public final class LoadingClient {
             diamond(g, sx + ox, sy + oy, i == (int) (t * 4F) % 4 ? 3 : 2, color | alpha((i == (int) (t * 4F) % 4 ? 1F : 0.45F) * k));
         }
         // conseil
-        String[] tips0 = mine ? MINE_TIPS : TIPS;
+        String[] tips0 = mine ? MINE_TIPS : plain ? PLAIN_TIPS : TIPS;
         String tip = "Astuce : " + tips0[(int) (t / 4.5F) % tips0.length].replaceFirst("^Astuce : ", "");
         float tipFade = Mth.clamp(Math.min(((t % 4.5F) / 0.4F), (4.5F - (t % 4.5F)) / 0.4F), 0F, 1F);
         int tipw = mc.font.width(tip);

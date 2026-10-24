@@ -1572,17 +1572,21 @@ public final class DevShowcase {
         });
         if (t == 70) srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] PLAINES plaine verrouillee refusee : plaine ou se trouve le joueur = {} (attendu -1)",
                 com.mmorpg.plains.PlainsManager.regionOf(srv.getPlayerList().getPlayerByName(me))));
-        if (t == 80) srv.execute(() -> {
+        if (t == 80) srv.execute(() -> {                                                              // par le menu : ecran de chargement, puis arrivee sur la place
             var pl = srv.getPlayerList().getPlayerByName(me);
-            boolean ok = com.mmorpg.plains.PlainsManager.enter(pl, 0);
-            MMORPG.LOGGER.info("[MMORPG] PLAINES entree dans la plaine 1 = {}", ok);
+            com.mmorpg.plains.PlainsManager.enterChosen(pl, 0);
         });
+        if (t == 110) shot(mc, "121_plaines_chargement");
+        if (t == 130) srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] PLAINES pendant le chargement : plaine = {} (attendu -1), ecran actif = {}",
+                com.mmorpg.plains.PlainsManager.regionOf(srv.getPlayerList().getPlayerByName(me)), com.mmorpg.client.LoadingClient.active()));
+        if (t == 200) srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] PLAINES apres le chargement : plaine = {} (attendu 0), ecran actif = {}",
+                com.mmorpg.plains.PlainsManager.regionOf(srv.getPlayerList().getPlayerByName(me)), com.mmorpg.client.LoadingClient.active()));
         // {plaine, colonne x (-1 = chemin), colonne z, hauteur, yaw, pitch, nom}
         double[][] views = {
                 {0, 150, 20, 2, 180, 6}, {0, -1, 62, 6, 0, 12}, {0, -1, 82, 8, 270, 22}, {0, -2, 0, 9, 0, 10}, {1, -1, 120, 6, 0, 14}, {2, -1, 120, 6, 0, 14},
                 {3, -1, 120, 6, 0, 14}, {4, -1, 120, 6, 0, 14}, {5, -1, 120, 6, 0, 14}, {0, -3, 0, 12, 0, 6}};
         String[] names = {"place", "prairie", "champ", "zone", "marais", "os", "givre", "cendres", "astre", "portail_cache"};
-        int t0 = 100, per = 70;
+        int t0 = 230, per = 70;
         int idx = (t - t0) / per;
         int rel = (t - t0) % per;
         if (t >= t0 && idx < views.length && rel == 5) {
@@ -1632,6 +1636,8 @@ public final class DevShowcase {
             var lv = srv.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
             var lay = com.mmorpg.plains.PlainsLayout.get(2);
             int lz = 150, lx = lay.pathX(lz);
+            pl.getAbilities().invulnerable = true;                       // on ne regarde que l'apparition : les monstres ne doivent pas tuer le joueur d'essai
+            pl.onUpdateAbilities();
             pl.teleportTo(lv, lay.x0() + lx + 0.5, lay.height(lx, lz) + 1, com.mmorpg.plains.PlainsLayout.Z0 + lz + 0.5, java.util.Set.of(), 0F, 10F, true);
         });
         if (t == end + 270) srv.execute(() -> {
@@ -1646,6 +1652,8 @@ public final class DevShowcase {
                 kinds.add(md.key);
             }
             MMORPG.LOGGER.info("[MMORPG] PLAINES monstres autour du joueur (plaine 3) : {} (attendu 12 a 16), niveaux {} a {} (attendu 33 a 50), especes = {}", mobs.size(), lo, hi, kinds);
+            MMORPG.LOGGER.info("[MMORPG] PLAINES diagnostic : plaine = {}, monde = {}, fige = {}, construction = {}, pos = {}", com.mmorpg.plains.PlainsManager.regionOf(pl), pl.level().dimension().identifier(),
+                    com.mmorpg.dungeon.BossReveal.isLocked(pl), com.mmorpg.plains.PlainsManager.building(), pl.blockPosition());
         });
         if (t == end + 275) shot(mc, "121_plaines_monstres");
         // champs : recolte directe, repousse a heure fixe
@@ -1684,35 +1692,35 @@ public final class DevShowcase {
             int n = com.mmorpg.plains.PlainsManager.respawnAllNow(srv);
             MMORPG.LOGGER.info("[MMORPG] PLAINES cultures en attente de repousse = {}", n);
         });
-        if (t == end + 340) srv.execute(() -> {
+        if (t == end + 400) srv.execute(() -> {
             var lv = srv.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
             MMORPG.LOGGER.info("[MMORPG] PLAINES age apres repousse = {} (attendu 7)", lv.getBlockState(plCrop).getValue(com.mmorpg.farm.AeloriaCropBlock.AGE));
         });
         // portail cache de la plaine 1 : decouverte, passage a la plaine 2, deblocage
-        if (t == end + 350) srv.execute(() -> {
+        if (t == end + 430) srv.execute(() -> {
             var pl = srv.getPlayerList().getPlayerByName(me);
             var lv = srv.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
             var lay = com.mmorpg.plains.PlainsLayout.get(0);
             int gh = lay.height(lay.exitX, lay.exitZ);
             pl.teleportTo(lv, lay.x0() + lay.exitX + 0.5, gh + 1, com.mmorpg.plains.PlainsLayout.Z0 + lay.exitZ - 1.2, java.util.Set.of(), 0F, 0F, true);
         });
-        if (t == end + 380) srv.execute(() -> {
+        if (t == end + 520) srv.execute(() -> {
             var pl = srv.getPlayerList().getPlayerByName(me);
             MMORPG.LOGGER.info("[MMORPG] PLAINES portail cache : plaine = {} (attendu 1), deblocage = {} (attendu 2)", com.mmorpg.plains.PlainsManager.regionOf(pl),
                     com.mmorpg.server.RpgPlayers.get(pl).plainsUnlocked);
             com.mmorpg.plains.PlainsManager.open(pl);
         });
-        if (t == end + 410) shot(mc, "121_plaines_menu_debloque");
-        if (t == end + 415) mc.execute(() -> mc.gui.setScreen(null));
+        if (t == end + 560) shot(mc, "121_plaines_menu_debloque");
+        if (t == end + 565) mc.execute(() -> mc.gui.setScreen(null));
         // arche de retour vers le Spawn
-        if (t == end + 420) srv.execute(() -> {
+        if (t == end + 600) srv.execute(() -> {
             var pl = srv.getPlayerList().getPlayerByName(me);
             var lv = srv.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
             var lay = com.mmorpg.plains.PlainsLayout.get(1);
             pl.teleportTo(lv, lay.x0() + com.mmorpg.plains.PlainsLayout.PLAZA_X + 0.5, com.mmorpg.plains.PlainsLayout.BASE + 1, com.mmorpg.plains.PlainsLayout.Z0 + com.mmorpg.plains.PlainsBuilder.ARCH_Z + 1.5,
                     java.util.Set.of(), 180F, 0F, true);
         });
-        if (t == end + 470) {
+        if (t == end + 650) {
             srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] PLAINES arche de retour : monde = {} (attendu mmorpg:spawn)", srv.getPlayerList().getPlayerByName(me).level().dimension().identifier()));
             MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
             stop(mc);
@@ -2548,16 +2556,16 @@ public final class DevShowcase {
             double x = lay.x0() + lay.exitX + 0.5, z = com.mmorpg.mine.MineLayout.Z0 + lay.exitZ - 1.2;
             pl.teleportTo(lv, x, lay.floor(lay.exitX, lay.exitZ) + 1, z, java.util.Set.of(), 0F, 0F, true);
         });
-        if (t == mt + 140) srv.execute(() -> {
+        if (t == mt + 230) srv.execute(() -> {
             var pl = srv.getPlayerList().getPlayerByName(me);
             MMORPG.LOGGER.info("[MMORPG] MINES portail cache : mine = {} (attendu 1), deblocage = {} (attendu 2)", com.mmorpg.mine.MineManager.regionOf(pl), com.mmorpg.server.RpgPlayers.get(pl).minesUnlocked);
             var lay = com.mmorpg.mine.MineLayout.get(1);
             var lv = com.mmorpg.mine.MineManager.dim(srv);
-            double x = lay.x0() + com.mmorpg.mine.MineLayout.PLAZA_X + 0.5, z = com.mmorpg.mine.MineLayout.Z0 + com.mmorpg.mine.MineLayout.PLAZA_Z - 12.5;
+            double x = lay.x0() + com.mmorpg.mine.MineLayout.PLAZA_X + 0.5, z = com.mmorpg.mine.MineLayout.Z0 + com.mmorpg.mine.MineLayout.PLAZA_Z - 9.4;     // devant le voile, comme un joueur qui s'en approche
             pl.teleportTo(lv, x, lay.floor(com.mmorpg.mine.MineLayout.PLAZA_X, com.mmorpg.mine.MineLayout.PLAZA_Z) + 1, z, java.util.Set.of(), 180F, 0F, true);
         });
-        if (t == mt + 190) srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] MINES arche de retour : monde = {} (attendu mmorpg:spawn)", srv.getPlayerList().getPlayerByName(me).level().dimension().identifier()));
-        if (t == mt + 200) {
+        if (t == mt + 300) srv.execute(() -> MMORPG.LOGGER.info("[MMORPG] MINES arche de retour : monde = {} (attendu mmorpg:spawn)", srv.getPlayerList().getPlayerByName(me).level().dimension().identifier()));
+        if (t == mt + 310) {
             MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE");
             stop(mc);
         }

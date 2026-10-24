@@ -78,6 +78,14 @@ public final class PlainsManager {
     /** Secondes avant qu'une culture recoltee soit de nouveau mure, par rang de plante (Lueur a Neant). */
     private static final int[] CROP_COOLDOWN = {40, 55, 75, 95, 120};
 
+    /** Temps minimal de l'ecran de chargement (ticks) et marque de ses titres (voir LoadingClient.PLAIN_MARK : elle n'est jamais affichee). */
+    private static final int LOADING_TICKS = 80;
+    private static final String MARK = "\u2698 ";
+
+    private record Transition(UUID player, int region, long teleportAt, String title, String lore, int color) {
+    }
+
+    private static final java.util.List<Transition> TRANSITIONS = new ArrayList<>();
     private static PlainsBuilder job;
     private static long jobStart;
     private static int lastLogged = -1;
@@ -163,6 +171,7 @@ public final class PlainsManager {
     @SubscribeEvent
     public static void onTick(ServerTickEvent.Post event) {
         MinecraftServer server = event.getServer();
+        transitions(server);
         if (job != null) {
             if (job.step(22_000_000L)) {
                 int r = job.region();
@@ -228,6 +237,52 @@ public final class PlainsManager {
         Net.toPlayer(p, new S2COpenScreen(S2COpenScreen.MINE_MASTER, data));
     }
 
+    /** Ecran de chargement (comme les mines) puis arrivee sur la place d'entree de la plaine : menu, portail cache. */
+    public static void startTransition(ServerPlayer p, int region) {
+        MinecraftServer server = p.level().getServer();
+        if (dim(server) == null || region < 0 || region >= REGIONS) return;
+        Sector s = STYLES.get(region);
+        String title = MARK + s.name();
+        long at = server.overworld().getGameTime() + LOADING_TICKS;
+        TRANSITIONS.removeIf(x -> x.player().equals(p.getUUID()));
+        TRANSITIONS.add(new Transition(p.getUUID(), region, at, title, s.lore(), COLORS[region]));
+        com.mmorpg.dungeon.BossReveal.hold(p, LOADING_TICKS + 400);
+        Net.toPlayer(p, new com.mmorpg.network.Payloads.Loading(com.mmorpg.network.Payloads.Loading.START, title, s.lore(), COLORS[region], 0));
+    }
+
+    private static boolean transitioning(ServerPlayer p) {
+        for (Transition x : TRANSITIONS) if (x.player().equals(p.getUUID())) return true;
+        return false;
+    }
+
+    private static void transitions(MinecraftServer server) {
+        if (TRANSITIONS.isEmpty()) return;
+        long now = server.overworld().getGameTime();
+        var it = TRANSITIONS.iterator();
+        while (it.hasNext()) {
+            Transition x = it.next();
+            ServerPlayer p = server.getPlayerList().getPlayer(x.player());
+            if (p == null) {
+                it.remove();
+                continue;
+            }
+            com.mmorpg.dungeon.BossReveal.hold(p, 40);
+            if (!built(server, x.region())) {                                                    // carte pas encore construite : la barre suit la construction
+                if (now % 4 == 0) Net.toPlayer(p, new com.mmorpg.network.Payloads.Loading(com.mmorpg.network.Payloads.Loading.PROGRESS, x.title(), x.lore(), x.color(),
+                        job != null && job.region() == x.region() ? Math.min(99, percent()) : 0));
+            } else if (now >= x.teleportAt()) {
+                Net.toPlayer(p, new com.mmorpg.network.Payloads.Loading(com.mmorpg.network.Payloads.Loading.PROGRESS, x.title(), x.lore(), x.color(), 100));
+                com.mmorpg.dungeon.BossReveal.release(p);
+                enter(p, x.region());
+                Net.toPlayer(p, new com.mmorpg.network.Payloads.Loading(com.mmorpg.network.Payloads.Loading.END, x.title(), x.lore(), x.color(), 100));
+                it.remove();
+            } else if (now % 4 == 0) {
+                int pct = (int) Math.max(0, 100 - 100L * (x.teleportAt() - now) / LOADING_TICKS);
+                Net.toPlayer(p, new com.mmorpg.network.Payloads.Loading(com.mmorpg.network.Payloads.Loading.PROGRESS, x.title(), x.lore(), x.color(), pct));
+            }
+        }
+    }
+
     /** Choix du joueur dans le menu : verifications cote serveur puis arrivee sur la place d'entree de la plaine. */
     public static void enterChosen(ServerPlayer p, int region) {
         if (region < 0 || region >= REGIONS) return;
@@ -235,7 +290,7 @@ public final class PlainsManager {
             p.sendOverlayMessage(Component.literal("Cette plaine n'est pas encore découverte : trouvez le portail caché de la précédente.").withColor(0xFF7060));
             return;
         }
-        enter(p, region);
+        startTransition(p, region);
     }
 
     private static AABB spawnGate(BlockPos o) {
@@ -278,10 +333,10 @@ public final class PlainsManager {
             if (region < REGIONS - 1) {
                 double ex = lay.x0() + lay.exitX + 0.5, ez = Z0 + lay.exitZ + 0.5, ey = lay.height(lay.exitX, lay.exitZ) + 4;
                 if (p.distanceToSqr(ex, ey, ez) < 46 * 46) level.sendParticles(ParticleTypes.PORTAL, ex, ey, ez, 8, 2.5, 3.5, 0.3, 0.2);
-                if (exitGate(lay).contains(p.getX(), p.getY(), p.getZ()) && !cooling(p, now)) {
+                if (exitGate(lay).contains(p.getX(), p.getY(), p.getZ()) && !transitioning(p) && !cooling(p, now)) {
                     level.playSound(null, p.blockPosition(), SoundEvents.PORTAL_TRAVEL, SoundSource.PLAYERS, 0.5f, 1.2f);
                     discover(p, region + 1);
-                    enter(p, region + 1);
+                    startTransition(p, region + 1);
                     continue;
                 }
             }
@@ -437,8 +492,8 @@ public final class PlainsManager {
         if (data.respawns().isEmpty()) return;
         long now = level.getGameTime();
         List<PlainsData.Respawn> due = new ArrayList<>();
-        for (PlainsData.Respawn r : data.respawns()) {
-            if (r.due() <= now) due.add(r);
+        for (PlainsData.Respawn r : data.respawns()) {                       // seules les entrees dont le chunk est charge comptent : les autres n'en bloquent pas d'autres
+            if (r.due() <= now && level.hasChunkAt(r.pos())) due.add(r);
             if (due.size() >= 120) break;
         }
         for (PlainsData.Respawn r : due) {
