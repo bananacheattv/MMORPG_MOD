@@ -360,6 +360,7 @@ public final class PlainsManager {
         if (d.plainsUnlocked > region) return;
         d.plainsUnlocked = region + 1;
         d.dirty = true;
+        com.mmorpg.db.Audit.log(p, com.mmorpg.db.Audit.UNLOCK, region + 1, "plaine " + (region + 1));
         Sector s = STYLES.get(region);
         p.sendSystemMessage(Component.literal("✦ Nouvelle plaine découverte : " + s.name() + " (niveaux " + s.minLevel() + " à " + s.maxLevel() + ")").withColor(COLORS[region]));
         p.level().playSound(null, p.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.8F, 1.1F);

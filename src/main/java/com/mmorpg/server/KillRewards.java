@@ -53,6 +53,7 @@ public final class KillRewards {
         LivingEntity dead = event.getEntity();
         if (!(dead.level() instanceof ServerLevel level)) return;
         if (dead instanceof ServerPlayer sp) {
+            com.mmorpg.db.Audit.log(sp, com.mmorpg.db.Audit.DEATH, 0, event.getSource().getLocalizedDeathMessage(sp).getString());
             RpgPlayers.onDeath(sp, event.getSource().getLocalizedDeathMessage(sp).getString());
             return;
         }
@@ -62,6 +63,7 @@ public final class KillRewards {
         if (md == null || !md.initialized()) return;
         ServerPlayer killer = killer(dead, event.getSource().getEntity());
         if (killer == null) return;
+        if (md.boss) com.mmorpg.db.Audit.log(killer, com.mmorpg.db.Audit.BOSS_KILL, md.level, md.key);
 
         // beneficiaires : le tueur et les membres de son groupe a portee ; pour un boss, tous les joueurs proches
         List<ServerPlayer> receivers = new ArrayList<>();

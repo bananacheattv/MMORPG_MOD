@@ -217,6 +217,7 @@ public final class MineManager {
         if (d.minesUnlocked > region) return;
         d.minesUnlocked = region + 1;
         d.dirty = true;
+        com.mmorpg.db.Audit.log(p, com.mmorpg.db.Audit.UNLOCK, region + 1, "mine " + (region + 1));
         Sector s = MineLayout.STYLES.get(region);
         p.sendSystemMessage(Component.literal("✦ Nouvelle mine découverte : " + s.name() + " (niveaux " + s.minLevel() + " à " + s.maxLevel() + ")").withColor(MineBlocks.ore(s.ore()).color()));
         p.level().playSound(null, p.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.8F, 1.1F);

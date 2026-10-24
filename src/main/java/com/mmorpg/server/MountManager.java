@@ -25,6 +25,7 @@ public final class MountManager {
         if (d.mounts.contains(type.id)) { message(p, "Vous possédez déjà " + type.label + "."); return false; }
         d.mounts.add(type.id); RpgPlayers.sync(p);
         message(p, type.label + " débloqué définitivement !");
+        com.mmorpg.db.Audit.log(p, com.mmorpg.db.Audit.MOUNT, 0, type.id);
         return true;
     }
     /** Invoque la monture et place directement le joueur dessus. */

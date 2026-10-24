@@ -304,7 +304,10 @@ public final class RpgPlayers {
             leveled = true;
         }
         if (d.level >= LevelSystem.MAX_LEVEL) d.xp = 0;
-        if (leveled) onLevelUp(player, oldLevel, d.level);
+        if (leveled) {
+            com.mmorpg.db.Audit.log(player, com.mmorpg.db.Audit.LEVEL_UP, d.level, "depuis le niveau " + oldLevel);
+            onLevelUp(player, oldLevel, d.level);
+        }
         d.dirty = true;
     }
 

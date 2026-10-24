@@ -1,6 +1,6 @@
 # Guide de mise en production d'un serveur Aeloria
 
-Le mod n'utilise **aucune base de données** : tout est dans le dossier du serveur. Ce guide liste ce qu'il faut régler et surveiller avant d'ouvrir au public. Les points marqués *(non mesuré)* n'ont pas été vérifiés en charge réelle.
+Le mod fonctionne **sans base de données** (tout est dans le dossier du serveur) et peut **en plus** envoyer les profils des joueurs, la banque et un journal d'événements dans une base MariaDB/MySQL (voir §10, désactivée par défaut). Ce guide liste ce qu'il faut régler et surveiller avant d'ouvrir au public. Les points marqués *(non mesuré)* n'ont pas été vérifiés en charge réelle.
 
 ## 1. Où sont les données
 
@@ -92,5 +92,56 @@ Restaurer : serveur arrêté, remplacer `world/` et `config/mmorpg/` par ceux de
 
 ## 9. Ce qui n'est pas prévu
 
-- Plusieurs serveurs reliés (économie, banque ou progression partagées) : non, il faudrait une vraie base de données.
 - Sauvegarde automatique intégrée au mod : non, utiliser les scripts ci-dessus.
+- Voir §10 pour ce que la base partage entre serveurs et ce qui reste à faire pour un réseau complet.
+
+## 10. Base de données (réseau de serveurs)
+
+Le panel (`Desktop\serveur manager`) installe MariaDB (base `aeloria`, utilisateur `aeloria`, écoute sur `127.0.0.1:3306`). Le mod sait s'y connecter : le pilote est embarqué dans son jar, rien à installer.
+
+### Activer
+
+1. Démarrer la base depuis le panel.
+2. Sur **chaque serveur de jeu**, éditer `config/mmorpg/database.json` (créé au premier démarrage, désactivé) :
+
+```json
+{
+  "enabled": true,
+  "host": "127.0.0.1", "port": 3306, "database": "aeloria", "user": "aeloria",
+  "password": "",
+  "serverId": "serveur",
+  "autosaveSeconds": 120, "syncPlayers": true, "audit": true
+}
+```
+
+   - `serverId` : un nom **différent sur chaque serveur** (`serveur`, `hub`, `mines`, `plaines`). Il sert à savoir quel serveur tient un joueur.
+   - Mot de passe : de préférence dans la variable d'environnement `AELORIA_DB_PASSWORD` du service (elle prime sur le fichier), sinon dans `password`. Le fichier n'est pas dans le menu admin, mais restez prudent : ne le partagez pas.
+3. Redémarrer. Le journal affiche « Base de données : connectée » et les tables sont créées toutes seules (`tools/serveur/schema.sql` les décrit). `/db etat` (opérateurs) confirme.
+
+Si la base est arrêtée ou injoignable, le jeu continue normalement avec les données locales ; les écritures sont mises en file (20 000 au plus) et le mod se reconnecte tout seul.
+
+### Ce qui est enregistré
+
+| Table | Contenu |
+| --- | --- |
+| `players` | un profil par joueur : classe, niveau, XP, or, compétences, quêtes, montures, familiers, cosmétiques, mines/plaines débloquées, kills… (colonnes de recherche + profil complet) |
+| `bank_accounts` | or en banque et coffre de 3 pages |
+| `events` | journal : connexion, sortie, niveau, mort, boss tué, donjon vaincu, dépôt/retrait de banque, ventes et achats (hôtel des ventes, marchands), quêtes, déblocages, montures |
+
+Écriture : à chaque sortie, puis toutes les `autosaveSeconds` secondes, seulement si le profil a changé. Lecture : à l'arrivée d'un joueur, **la base fait foi si sa version est plus récente** que celle du serveur ; si un autre serveur tient encore le joueur (il vient de partir), on attend jusqu'à 3 s qu'il ait fini de sauvegarder. Un serveur qui ne tient plus un joueur ne peut plus l'écraser.
+
+Commandes (opérateurs) : `/db etat`, `/db sauvegarder` (écrit tout de suite), `/db joueur <pseudo>`, `/db evenements [n]`.
+
+Statistiques, classement, or en circulation, historique d'un joueur : voir les requêtes en bas de `tools/serveur/schema.sql`. Purgez le journal de temps en temps (`DELETE FROM events WHERE ts < NOW() - INTERVAL 90 DAY`). La base fait partie des **sauvegardes** : `mariadb-dump -u aeloria -p aeloria > aeloria.sql` (ou copie du dossier `servers/db/data` base arrêtée).
+
+### Ce qui n'est pas (encore) partagé
+
+- **Inventaire, coffre de l'Ender, armure portée, position** : propres à chaque serveur. Un joueur qui change de serveur garde sa progression mais pas les objets qu'il porte.
+- **Hôtel des ventes, mines/plaines épuisées, donjons, zones, PNJ** : restent dans le monde de chaque serveur (seule la banque, qui est personnelle, suit le joueur).
+- **Le passage d'un serveur à l'autre** : les portails du jeu (Maître des mines, plaines, donjons) téléportent aujourd'hui **à l'intérieur d'un même serveur** (autres dimensions). Les envoyer vers le serveur « mines » ou « plaines » du réseau demande d'ajouter le transfert par le proxy. Tant que ce n'est pas fait, chaque serveur construit tout seul son hub, sa Cité, ses mines et ses plaines.
+
+### Sécurité du réseau (à régler dans le panel avant l'ouverture)
+
+- Le proxy Velocity du panel est en `online-mode = false` et `player-info-forwarding-mode = "none"` : **n'importe qui peut se connecter avec le pseudo d'un autre**, donc prendre son profil, son or et sa banque (les profils sont rangés par identifiant de joueur, qui en mode hors-ligne se déduit du pseudo). Pour un serveur public : `online-mode = true` sur le proxy, transfert d'identité sécurisé (`modern`) avec le secret partagé, et serveurs de jeu en `online-mode=false` **uniquement** joignables depuis la machine du proxy (pare-feu : seul le port 25565 du proxy est ouvert).
+- Le mot de passe de la base est en clair dans `servers/db/IDENTIFIANTS.txt`, `servers/db/init.sql` et `servers/db/my.ini` (compte root) : gardez ces fichiers hors de tout dépôt et de toute capture, et changez les mots de passe avant la mise en ligne.
+- La base n'écoute que sur `127.0.0.1` : laissez-la ainsi.
