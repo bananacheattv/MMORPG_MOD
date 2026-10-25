@@ -54,8 +54,15 @@ public final class InstanceManager {
         return DungeonType.byId(pool.substring(0, pool.indexOf(':')));
     }
 
-    private static int difficultyOf(String pool) {
+    public static int difficultyOf(String pool) {
         return Integer.parseInt(pool.substring(pool.indexOf(':') + 1));
+    }
+    public static boolean validPool(String pool) {
+        try { return pool != null && typeOf(pool) != null && difficultyOf(pool) >= 0 && difficultyOf(pool) <= 2; }
+        catch (RuntimeException e) { return false; }
+    }
+    public static int capacity() {
+        return com.mmorpg.network.NetworkConfig.current.enabled ? Math.clamp(com.mmorpg.network.NetworkConfig.current.dungeonMaxInstancesPerPool, 1, MAX_PER_POOL) : MAX_PER_POOL;
     }
 
     /** Cle du proprietaire d'une reservation : le chef de groupe, ou le joueur seul. */
@@ -113,7 +120,7 @@ public final class InstanceManager {
     }
 
     private static final java.util.Map<UUID, Return> RETURNS = new java.util.HashMap<>();
-    private static final java.util.Map<String, Build> BUILDS = new java.util.HashMap<>();
+    private static final java.util.Map<String, Build> BUILDS = new java.util.LinkedHashMap<>();
     private static final List<Transition> TRANSITIONS = new java.util.ArrayList<>();
     /** Duree minimale de l'ecran de chargement (ticks) : meme un exemplaire deja pret laisse le temps de lire. */
     private static final int MIN_LOADING_TICKS = 70;
@@ -129,7 +136,17 @@ public final class InstanceManager {
      * etapes s'il n'existe pas encore. @return vrai si le chargement a commence
      */
     public static boolean enterPool(ServerPlayer player, String pool) {
-        if (com.mmorpg.network.NetworkPlayers.route(player, com.mmorpg.network.NetworkConfig.Role.MAIN, "dungeon:" + pool)) return true;
+        if (!validPool(pool)) return false;
+        if (com.mmorpg.network.DungeonTravel.enterRemote(player, pool)) return true;
+        return enterLocal(player, pool, true);
+    }
+    /** Each proxy arrival joins the same owner reservation without teleporting teammates already inside. */
+    public static boolean enterArriving(ServerPlayer player, String pool) {
+        if (!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.DUNGEONS) || !validPool(pool)) return false;
+        return enterLocal(player, pool, false);
+    }
+    private static boolean enterLocal(ServerPlayer player, String pool, boolean groupEntry) {
+        if (RpgPlayers.get(player).level < com.mmorpg.dungeon.DungeonMaster.requiredLevel(typeOf(pool), difficultyOf(pool))) return false;
         MinecraftServer server = player.level().getServer();
         ServerLevel dim = server.getLevel(DIM);
         if (dim == null) return false;
@@ -143,8 +160,9 @@ public final class InstanceManager {
         String lore = StyledDungeon.loreOf(t);
         int color = StyledDungeon.colorOf(t);
         long at = server.overworld().getGameTime() + MIN_LOADING_TICKS;
-        for (ServerPlayer m : PartyManager.onlineMembers(player)) {
+        for (ServerPlayer m : groupEntry ? PartyManager.onlineMembers(player) : java.util.List.of(player)) {
             if (m != player && (m.level() != player.level() || m.distanceToSqr(player) > 24 * 24)) continue;       // les autres membres rejoignent par le PNJ
+            if (RpgPlayers.get(m).level < com.mmorpg.dungeon.DungeonMaster.requiredLevel(typeOf(pool), difficultyOf(pool))) continue;
             if (!m.level().dimension().equals(DIM)) RETURNS.put(m.getUUID(), new Return(m.level().dimension(), m.getX(), m.getY(), m.getZ(), m.getYRot()));
             BossReveal.hold(m, MIN_LOADING_TICKS + 400);
             TRANSITIONS.removeIf(x -> x.player().equals(m.getUUID()));
@@ -160,12 +178,14 @@ public final class InstanceManager {
 
     @net.neoforged.bus.api.SubscribeEvent
     public static void onServerTick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) {
+        if (!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.DUNGEONS)) return;
         MinecraftServer server = event.getServer();
         if (BUILDS.isEmpty() && TRANSITIONS.isEmpty()) return;
         long now = server.overworld().getGameTime();
-        var it = BUILDS.entrySet().iterator();
-        while (it.hasNext()) {
-            Build b = it.next().getValue();
+        long deadline = System.nanoTime() + Math.clamp(com.mmorpg.network.NetworkConfig.current.dungeonBuildBudgetMs, 1, 25) * 1_000_000L;
+        for (String key : new java.util.ArrayList<>(BUILDS.keySet())) {
+            if (System.nanoTime() >= deadline) break;
+            Build b = BUILDS.get(key);
             if (now < b.nextAt) continue;
             b.nextAt = now + STEP_INTERVAL;
             long t0 = System.nanoTime();
@@ -173,14 +193,30 @@ public final class InstanceManager {
                 b.job.run(b.next++);
             } catch (RuntimeException e) {
                 MMORPG.LOGGER.error("[MMORPG] Construction d'un exemplaire de donjon interrompue", e);
-                b.next = b.job.size();
+                b.slot.ready = false; b.slot.owner = "";
+                BUILDS.remove(key); InstanceData.get(server).dirty();
+                TRANSITIONS.removeIf(transition -> {
+                    if (transition.slot() != b.slot) return false;
+                    ServerPlayer p = server.getPlayerList().getPlayer(transition.player());
+                    if (p != null) {
+                        BossReveal.release(p);
+                        Net.toPlayer(p, new Payloads.Loading(Payloads.Loading.END, transition.title(), transition.lore(), transition.color(), 0));
+                        p.sendSystemMessage(Component.literal("Construction du donjon impossible. Retour à l'entrée ; réessayez plus tard.").withColor(0xFF6060));
+                        com.mmorpg.network.DungeonTravel.returnToSource(p);
+                    }
+                    return true;
+                });
+                continue;
             }
             b.worstNanos = Math.max(b.worstNanos, System.nanoTime() - t0);
             if (b.next >= b.job.size()) {
                 b.slot.ready = true;
                 InstanceData.get(server).dirty();
                 MMORPG.LOGGER.info("[MMORPG] Donjon {} : exemplaire {} construit en {} etapes, la plus longue a pris {} ms", b.slot.pool, b.slot.index, b.job.size(), b.worstNanos / 1_000_000);
-                it.remove();
+                BUILDS.remove(key);
+            } else {
+                // Rotate jobs so a slow stage cannot starve another group's construction.
+                BUILDS.remove(key); BUILDS.put(key, b);
             }
         }
         var tr = TRANSITIONS.iterator();
@@ -209,6 +245,7 @@ public final class InstanceManager {
 
     /** Exemplaire du proprietaire, sinon un exemplaire libre (remis a zero), sinon un nouveau (marque « en construction »). */
     static @Nullable Slot reserve(MinecraftServer server, String pool, String owner) {
+        if (!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.DUNGEONS) || !validPool(pool)) return null;
         InstanceData data = InstanceData.get(server);
         List<Slot> slots = data.slotsOf(pool);
         for (Slot s : slots) {
@@ -227,7 +264,7 @@ public final class InstanceManager {
                 return s;
             }
         }
-        if (slots.size() >= MAX_PER_POOL) return null;
+        if (slots.size() >= capacity()) return null;
         DungeonType t = typeOf(pool);
         int poolIndex = 0;
         for (int i = 0; i < TYPES.length; i++) {
@@ -241,6 +278,7 @@ public final class InstanceManager {
 
     /** Le groupe du joueur a-t-il deja un exemplaire de ce donjon (pour afficher « Reprendre ») ? */
     public static boolean hasInstance(MinecraftServer server, String pool, String owner) {
+        if (!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.DUNGEONS)) return false;
         for (Slot s : InstanceData.get(server).slotsOf(pool)) {
             if (s.owner.equals(owner)) return true;
         }
@@ -262,6 +300,14 @@ public final class InstanceManager {
 
     /** Exemplaire du proprietaire, sinon un exemplaire libre (remis a zero), sinon un nouveau ; {@code null} si tout est occupe. */
     public static @Nullable Slot allocate(MinecraftServer server, String pool, String owner) {
+        if (!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.DUNGEONS) || !validPool(pool)) return null;
+        if (com.mmorpg.network.NetworkConfig.current.enabled) {
+            Slot slot = reserve(server, pool, owner);
+            if (slot != null && !slot.ready && !BUILDS.containsKey(slotKey(slot))) {
+                BUILDS.put(slotKey(slot), new Build(slot, StyledDungeon.prepare(server.getLevel(DIM), new BlockPos(slot.x, slot.y, slot.z), typeOf(pool), difficultyOf(pool))));
+            }
+            return slot;
+        }
         InstanceData data = InstanceData.get(server);
         List<Slot> slots = data.slotsOf(pool);
         for (Slot s : slots) {
@@ -284,7 +330,7 @@ public final class InstanceManager {
                 return s;
             }
         }
-        if (slots.size() >= MAX_PER_POOL) return null;
+        if (slots.size() >= capacity()) return null;
         ServerLevel level = server.getLevel(DIM);
         if (level == null) return null;
         DungeonType t = typeOf(pool);
@@ -308,6 +354,7 @@ public final class InstanceManager {
 
     /** Libere les exemplaires abandonnes depuis plus de trois minutes ; appelee regulierement. */
     static void releaseTick(MinecraftServer server) {
+        if (!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.DUNGEONS)) return;
         ServerLevel level = server.getLevel(DIM);
         if (level == null) return;
         InstanceData data = InstanceData.get(server);
@@ -418,6 +465,7 @@ public final class InstanceManager {
     }
 
     private static void bringBack(MinecraftServer server, ServerPlayer p, net.minecraft.world.phys.Vec3 hall) {
+        if (com.mmorpg.network.DungeonTravel.returnToSource(p)) return;
         Return r = RETURNS.remove(p.getUUID());
         ServerLevel target = r == null ? null : server.getLevel(r.dim());
         p.stopRiding();
@@ -459,11 +507,15 @@ public final class InstanceManager {
     /** Au demarrage : les exemplaires de l'ancien plan (plus court) sont oublies, avec leurs epreuves et leurs zones. */
     @net.neoforged.bus.api.SubscribeEvent
     public static void onServerStarted(net.neoforged.neoforge.event.server.ServerStartedEvent event) {
+        if (!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.DUNGEONS)) return;
         MinecraftServer server = event.getServer();
+        DungeonLobby.ensure(server);
         TrialData.get(server).removeInside(DIM, -1_000_000, -1_000_000, 1_000_000, Z_BASE - 1000);
         for (DungeonType t : TYPES) {
             com.mmorpg.zone.ZoneData.get(server).removeOverlapping(DIM, t.id + "_", -1_000_000, -1_000_000, 1_000_000, Z_BASE - 1000);
         }
+        // Tick counters restart at zero; keep the normal reconnect grace period after a restart.
+        for (Slot slot : InstanceData.get(server).slots) slot.lastBusy = server.getTickCount();
     }
 
     // ================================================================== outils d'administration et de verification
@@ -472,6 +524,11 @@ public final class InstanceManager {
     @net.neoforged.bus.api.SubscribeEvent
     public static void onLogin(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer p) || !p.level().dimension().equals(DIM)) return;
+        if (!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.DUNGEONS)) {
+            if (com.mmorpg.network.NetworkConfig.current.role == com.mmorpg.network.NetworkConfig.Role.MAIN && p.getZ() >= Z_BASE - 100) com.mmorpg.hub.HubManager.goToSpawn(p);
+            return;
+        }
+        if (com.mmorpg.network.NetworkPlayers.isArriving(p)) return;
         if (com.mmorpg.mine.MineManager.inMine(p)) return;            // les mines sont partagees : on y reste a la reconnexion
         MinecraftServer server = p.level().getServer();
         String mine = ownerKey(p);
@@ -481,6 +538,7 @@ public final class InstanceManager {
                 break;
             }
         }
+        if (com.mmorpg.network.DungeonTravel.returnToSource(p)) return;
         var respawn = server.getRespawnData().globalPos();
         ServerLevel target = server.getLevel(respawn.dimension());
         if (target == null) return;
@@ -497,18 +555,29 @@ public final class InstanceManager {
 
     /** Construit {@code count} exemplaires libres d'avance (la premiere construction d'un exemplaire prend un moment). */
     public static int prewarm(MinecraftServer server, DungeonType t, int difficulty, int count) {
+        if (!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.DUNGEONS)) return 0;
         String pool = pool(t, difficulty);
         int built = 0;
+        java.util.List<Slot> warming = new java.util.ArrayList<>();
         for (int i = 0; i < count; i++) {
             String tmp = "prechauffage-" + i;
             Slot s = allocate(server, pool, tmp);
             if (s != null && s.owner.equals(tmp)) {
-                s.owner = "";
+                warming.add(s);
                 built++;
             }
         }
+        for (Slot slot : warming) slot.owner = "";
         InstanceData.get(server).dirty();
         return built;
+    }
+    public static boolean returnToEntrance(ServerPlayer player) {
+        TRANSITIONS.removeIf(t -> t.player().equals(player.getUUID()));
+        BossReveal.release(player);
+        if (com.mmorpg.network.DungeonTravel.returnToSource(player)) return true;
+        if (!player.level().dimension().equals(DIM)) return false;
+        bringBack(player.level().getServer(), player, player.position());
+        return true;
     }
 
     /** Test automatique : origine (x, y, z) et proprietaire d'un exemplaire, ou {@code null}. */

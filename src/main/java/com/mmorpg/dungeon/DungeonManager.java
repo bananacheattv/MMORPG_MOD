@@ -35,6 +35,7 @@ public final class DungeonManager {
 
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
+        if (!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.DUNGEONS)) return;
         MinecraftServer server = event.getServer();
         if (server.getTickCount() % 200 != 0) return;
         InstanceManager.releaseTick(server);
