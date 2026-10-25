@@ -89,3 +89,9 @@ Dans un checkout de développement, créer `run/eula.txt` après avoir accepté 
 ```
 
 La suite utilise de faux joueurs dans le monde de développement, puis arrête le serveur. **Ne jamais activer `networkChecks` sur un monde de production.** Les résultats attendus incluent `[CODEX CHECKS] NETWORK_FORGE PASS`, `[CODEX CHECKS] PORTALS PASS`, `[CODEX CHECKS] DEDICATED_DUNGEONS PASS` et `build/reports/network-checks.txt` contenant `PASS`. Elle vérifie aussi l'isolation du rôle, les groupes durables, le propriétaire commun des instances, la capacité et la réutilisation, les caches périmés, la salle d'attente protégée et la persistance/sélection du point de retour. Les téléportations sont enregistrées par un faux joueur de test, sans connexion réseau réelle. Une connexion réelle avec des comptes officiels reste nécessaire pour vérifier de bout en bout le départ et le retour d'un groupe via Velocity.
+
+## Cles de chat et identifiants internes
+
+Le proxy reste en `online-mode=true` et `force-key-authentication=true`. Les backends lies exclusivement a `127.0.0.1` conservent les UUID hors ligne pour les sauvegardes existantes. Une cle de chat signee pour le compte officiel ne correspond pas a cet UUID interne : le mod ignore donc la mise a jour de session de chat sur ces seuls backends, lorsque le reseau est active, l authentification locale et `enforce-secure-profile` sont desactives. Le decodeur de chat non signe reste actif. Le chat entre backends ne beneficie pas de signatures officielles ; les joueurs sont toujours authentifies par Velocity. Aucune modification pour les mondes solo, les serveurs autonomes ou ceux lies a une adresse publique. Ne jamais exposer directement les ports des backends.
+
+Le chargement initial affiche le logo et un message unique, sans statistiques ni barres NeoForge. F1 masque les calques personnalises Aeloria.
