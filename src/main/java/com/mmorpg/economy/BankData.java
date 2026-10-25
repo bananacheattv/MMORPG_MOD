@@ -35,7 +35,7 @@ public class BankData extends SavedData {
             for (int i = 0; i < Math.min(saved.size(), items.size()); i++) items.set(i, saved.get(i));
         }
 
-        static final Codec<Account> CODEC = RecordCodecBuilder.create(i -> i.group(
+        public static final Codec<Account> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Codec.LONG.optionalFieldOf("gold", 0L).forGetter(a -> a.gold),
                 ItemStack.OPTIONAL_CODEC.listOf().optionalFieldOf("items", List.of()).forGetter(a -> a.items)
         ).apply(i, Account::new));
@@ -62,5 +62,10 @@ public class BankData extends SavedData {
 
     public Account account(UUID player) {
         return accounts.computeIfAbsent(player, k -> new Account());
+    }
+
+    public void replaceAccount(UUID player, Account account) {
+        accounts.put(player, account);
+        setDirty();
     }
 }

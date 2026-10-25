@@ -102,6 +102,7 @@ public final class MineManager {
 
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
+        if (!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.MINES)) return;
         MinecraftServer server = event.getServer();
         job = null;
         ZoneData zones = ZoneData.get(server);
@@ -111,6 +112,7 @@ public final class MineManager {
 
     /** Lance la construction d'une mine (la zone et les minerais existants sont remplaces). */
     public static boolean start(MinecraftServer server, int region) {
+        if (!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.MINES)) return false;
         ServerLevel level = dim(server);
         if (level == null || job != null) return false;
         MineData data = MineData.get(server);
@@ -140,6 +142,7 @@ public final class MineManager {
 
     @SubscribeEvent
     public static void onTick(ServerTickEvent.Post event) {
+        if (!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.MINES)) return;
         MinecraftServer server = event.getServer();
         transitions(server);
         if (job != null) {
@@ -473,6 +476,8 @@ public final class MineManager {
 
     /** Ecran de chargement puis arrivee a la mine (menu, portail cache). */
     public static void startTransition(ServerPlayer p, int k) {
+        if (k < 0 || k >= MineLayout.SECTORS || k >= RpgPlayers.get(p).minesUnlocked) return;
+        if (com.mmorpg.network.NetworkPlayers.route(p, com.mmorpg.network.NetworkConfig.Role.MINES, "mine:" + k)) return;
         MinecraftServer server = p.level().getServer();
         if (dim(server) == null || k < 0 || k >= MineLayout.SECTORS) return;
         Sector s = MineLayout.STYLES.get(k);

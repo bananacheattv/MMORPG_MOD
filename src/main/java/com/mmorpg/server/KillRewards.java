@@ -88,6 +88,10 @@ public final class KillRewards {
             if (!d.activePet.isEmpty()) PetManager.addPetXp(p, d.activePet, (int) Math.max(1, xp * 0.05));
             d.kills.merge(md.key, 1, Integer::sum);
             QuestManager.onKill(p, md.key, typeId, md.boss);
+            if (md.boss && !com.mmorpg.hub.ClassTrial.active(p)) {
+                // Personal reward: each eligible participant gets a scroll, not a shared ground drop.
+                RpgPlayers.give(p, ModItems.get(com.mmorpg.crafting.ForgeProgression.scroll(com.mmorpg.crafting.ForgeProgression.tier(md.level))), 1);
+            }
             d.dirty = true;
         }
         if (md.boss) {

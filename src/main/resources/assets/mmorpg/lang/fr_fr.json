@@ -609,5 +609,11 @@
   "item.mmorpg.elixir_givre": "Élixir de givre",
   "item.mmorpg.nectar_neant": "Nectar du Néant",
   "block.mmorpg.banque_aeloria": "Banque d'Aeloria",
-  "block.mmorpg.hdv_aeloria": "Hôtel des ventes"
+  "block.mmorpg.hdv_aeloria": "Hôtel des ventes",
+  "item.mmorpg.parchemin_forge_1": "Parchemin de forge I",
+  "item.mmorpg.parchemin_forge_2": "Parchemin de forge II",
+  "item.mmorpg.parchemin_forge_3": "Parchemin de forge III",
+  "item.mmorpg.parchemin_forge_4": "Parchemin de forge IV",
+  "item.mmorpg.parchemin_forge_5": "Parchemin de forge V",
+  "item.mmorpg.fiole_runique": "Fiole runique"
 }

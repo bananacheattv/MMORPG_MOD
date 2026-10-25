@@ -130,6 +130,17 @@ public final class DefaultQuests {
         m.put("evolution_4", req(evolution(obj(obj(q("Épreuve de la Légende", 100,
                 "L'ultime évolution n'appartient qu'aux légendes. Abattez l'Avatar du Néant et revenez auprès du Maître."),
                 "level", "niveau", 100), "kill", "avatar_neant", 1), 4, 1500000, 10000), "evolution_3"));
+        // Alternative to boss drops: a non-repeatable crafting license at every progression tier.
+        for (int tier = 1; tier <= com.mmorpg.crafting.ForgeProgression.TIERS; tier++) {
+            int level = (tier - 1) * 20 + 1;
+            String[] targets = {"gobelin", "orc_guerrier", "squelette_maudit", "spectre_givre", "chevalier_neant"};
+            QuestDef license = reward(obj(q("Le savoir du forgeron " + tier, level,
+                    "Aidez les artisans : éliminez " + (tier * 10) + " monstres pour recevoir un parchemin de forge. Utilisez-le pour apprendre les recettes du palier " + tier + "."),
+                    "kill", targets[tier - 1], tier * 10), tier * 200L, tier * 25L,
+                    com.mmorpg.crafting.ForgeProgression.scroll(tier), 1);
+            if (tier > 1) license.requires.add("parchemin_forge_" + (tier - 1));
+            m.put("parchemin_forge_" + tier, license);
+        }
         return m;
     }
 

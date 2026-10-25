@@ -97,7 +97,7 @@ public final class ItemDefs {
         w("marteau_egide", T, WeaponKind.HAMMER, 95, Y, null, "Aucune force ne peut briser l'Égide.", ATK, 240, DEF, 200, MAX_HP, 1200, VITALITE, 25);
 
         // ---------------- Sets d'armure (totaux pour les 4 pieces)
-        set("acier_soldat", "Acier du Soldat", G, 5, U, "plate", StatBlock.of(MAX_HP, 80, DEF, 12, ATK, 5, FORCE, 4),
+        set("acier_soldat", "Acier du Soldat", G, 1, U, "plate", StatBlock.of(MAX_HP, 80, DEF, 12, ATK, 5, FORCE, 4),
                 StatBlock.of(ATK, 5), StatBlock.of(ATK, 0.05), "+5 % d'Attaque");
         set("berserker", "Berserker", G, 25, R, "plate", StatBlock.of(MAX_HP, 300, DEF, 40, ATK, 20, CRIT, 2, FORCE, 10),
                 StatBlock.of(ATK, 15), StatBlock.of(ATK, 0.08, CRIT_DMG, 0.10), "+8 % d'Attaque, +10 % de dégâts critiques");
@@ -106,7 +106,7 @@ public final class ItemDefs {
         set("dieu_guerre", "Dieu de la Guerre", G, 85, L, "plate", StatBlock.of(MAX_HP, 1500, DEF, 180, ATK, 100, CRIT, 6, FORCE, 35),
                 StatBlock.of(ATK, 50), StatBlock.of(ATK, 0.15, CRIT_DMG, 0.20, MAX_HP, 0.08), "+15 % d'Attaque, +20 % de dégâts critiques, +8 % de PV");
 
-        set("apprenti", "Apprenti", M, 5, U, "robe", StatBlock.of(MAX_HP, 50, MAX_MANA, 60, MAG, 8, DEF, 5, INTELLIGENCE, 4),
+        set("apprenti", "Apprenti", M, 1, U, "robe", StatBlock.of(MAX_HP, 50, MAX_MANA, 60, MAG, 8, DEF, 5, INTELLIGENCE, 4),
                 StatBlock.of(MAG, 6), StatBlock.of(MAG, 0.05), "+5 % de Puissance magique");
         set("sorcier", "Sorcier", M, 25, R, "robe", StatBlock.of(MAX_HP, 180, MAX_MANA, 200, MAG, 30, DEF, 18, MANA_REGEN, 1.5, INTELLIGENCE, 10),
                 StatBlock.of(MAG, 18), StatBlock.of(MAG, 0.08, MAX_MANA, 0.10), "+8 % de Puissance magique, +10 % de mana");
@@ -115,7 +115,7 @@ public final class ItemDefs {
         set("avatar_arcanique", "Avatar Arcanique", M, 85, L, "robe", StatBlock.of(MAX_HP, 900, MAX_MANA, 900, MAG, 140, DEF, 80, MANA_REGEN, 5, CDR, 10, INTELLIGENCE, 35),
                 StatBlock.of(MAG, 60), StatBlock.of(MAG, 0.15, MAX_MANA, 0.15, MAX_HP, 0.08), "+15 % de Puissance magique, +15 % de mana, +8 % de PV");
 
-        set("chasseur", "Chasseur", A, 5, U, "leather", StatBlock.of(MAX_HP, 60, DEF, 7, ATK, 5, CRIT, 2, ESQ, 1, SPEED, 2, AGILITE, 4),
+        set("chasseur", "Chasseur", A, 1, U, "leather", StatBlock.of(MAX_HP, 60, DEF, 7, ATK, 5, CRIT, 2, ESQ, 1, SPEED, 2, AGILITE, 4),
                 StatBlock.of(CRIT, 2), StatBlock.of(ATK, 0.05), "+5 % d'Attaque");
         set("rodeur", "Rôdeur", A, 25, R, "leather", StatBlock.of(MAX_HP, 220, DEF, 25, ATK, 18, CRIT, 5, ESQ, 3, SPEED, 4, AGILITE, 10),
                 StatBlock.of(CRIT, 3), StatBlock.of(ATK, 0.08, ESQ, 0.10), "+8 % d'Attaque, +10 % d'esquive");
@@ -124,7 +124,7 @@ public final class ItemDefs {
         set("sylvestre", "Sylvestre Divine", A, 85, L, "leather", StatBlock.of(MAX_HP, 1100, DEF, 120, ATK, 90, CRIT, 12, ESQ, 8, SPEED, 10, AGILITE, 35),
                 StatBlock.of(CRIT, 5), StatBlock.of(ATK, 0.15, CRIT_DMG, 0.25, SPEED, 0.10), "+15 % d'Attaque, +25 % de dégâts critiques, +10 % de vitesse");
 
-        set("garde", "Garde", T, 5, U, "plate", StatBlock.of(MAX_HP, 120, DEF, 18, ATK, 2, HP_REGEN, 0.5, VITALITE, 4),
+        set("garde", "Garde", T, 1, U, "plate", StatBlock.of(MAX_HP, 120, DEF, 18, ATK, 2, HP_REGEN, 0.5, VITALITE, 4),
                 StatBlock.of(DEF, 8), StatBlock.of(DEF, 0.08), "+8 % de Défense");
         set("gardien", "Gardien", T, 25, R, "plate", StatBlock.of(MAX_HP, 450, DEF, 70, ATK, 8, HP_REGEN, 2, VITALITE, 10),
                 StatBlock.of(DEF, 25), StatBlock.of(DEF, 0.12, MAX_HP, 0.05), "+12 % de Défense, +5 % de PV");
