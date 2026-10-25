@@ -115,6 +115,9 @@ public final class PartyManager {
     }
 
     public static void accept(ServerPlayer p) {
+        com.mmorpg.network.SharedParties.mutate(p, () -> acceptLocal(p));
+    }
+    private static void acceptLocal(ServerPlayer p) {
         Invite inv = INVITES.remove(p.getUUID());
         if (inv == null || inv.expires < System.currentTimeMillis()) {
             msg(p, "Aucune invitation en attente.", 0xFF6060);
@@ -157,6 +160,9 @@ public final class PartyManager {
     }
 
     public static void leave(ServerPlayer p) {
+        com.mmorpg.network.SharedParties.mutate(p, () -> leaveLocal(p));
+    }
+    private static void leaveLocal(ServerPlayer p) {
         Party party = BY_PLAYER.remove(p.getUUID());
         if (party == null) {
             sync(p);
@@ -184,6 +190,9 @@ public final class PartyManager {
     }
 
     public static void kick(ServerPlayer leader, String name) {
+        com.mmorpg.network.SharedParties.mutate(leader, () -> kickLocal(leader, name));
+    }
+    private static void kickLocal(ServerPlayer leader, String name) {
         Party party = partyOf(leader);
         if (party == null || !party.leader.equals(leader.getUUID())) {
             msg(leader, "Seul le chef du groupe peut exclure un membre.", 0xFF6060);
@@ -199,6 +208,9 @@ public final class PartyManager {
     }
 
     public static void promote(ServerPlayer leader, String name) {
+        com.mmorpg.network.SharedParties.mutate(leader, () -> promoteLocal(leader, name));
+    }
+    private static void promoteLocal(ServerPlayer leader, String name) {
         Party party = partyOf(leader);
         if (party == null || !party.leader.equals(leader.getUUID())) return;
         ServerPlayer target = leader.level().getServer().getPlayerList().getPlayerByName(name);
@@ -279,6 +291,7 @@ public final class PartyManager {
     /** Appele toutes les 10 ticks : met a jour les barres de vie des coequipiers. */
     public static void tick(MinecraftServer server) {
         if (server.getTickCount() % 10 != 0) return;
+        com.mmorpg.network.SharedParties.poll();
         for (Party party : new LinkedHashSet<>(BY_PLAYER.values())) {
             syncParty(party, server);
         }
@@ -287,7 +300,21 @@ public final class PartyManager {
 
     public static void onLogout(ServerPlayer p) {
         INVITES.remove(p.getUUID());
+        // A proxy switch is not a departure from the group. Network groups also survive disconnects/restarts.
+        if (com.mmorpg.network.NetworkConfig.current.enabled) return;
         if (partyOf(p) != null) leave(p);
+    }
+
+    public static List<Party> sharedSnapshot() {
+        List<Party> groups = new ArrayList<>();
+        for (Party group : new LinkedHashSet<>(BY_PLAYER.values())) {
+            Party copy = new Party(); copy.leader = group.leader; copy.members.addAll(group.members); groups.add(copy);
+        }
+        return groups;
+    }
+    public static void installShared(List<Party> groups) {
+        BY_PLAYER.clear();
+        for (Party group : groups) for (UUID id : group.members) BY_PLAYER.put(id, group);
     }
 
     public static void clear() {

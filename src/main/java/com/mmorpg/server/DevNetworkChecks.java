@@ -116,7 +116,7 @@ public final class DevNetworkChecks {
             var malformed = saved.copy(); malformed.remove("inventory");
             try { NetworkPlayers.restore(p, malformed); throw new AssertionError("Malformed profile accepted"); }
             catch (java.io.IOException expected) { check(ForgeManager.count(p.getInventory(), recipe.resultItem()) == 1, "bad profile leaves inventory intact"); }
-            var network = new NetworkConfig(); network.enabled = true; network.role = NetworkConfig.Role.MAIN; network.sharedDirectory = directory.toString();
+            var network = new NetworkConfig(); network.enabled = true; network.role = NetworkConfig.Role.MAIN; network.sharedDirectory = directory.resolve("players").toString();
             NetworkConfig.current = network;
             check(NetworkPlayers.login(p), "source login acquires session");
             check(NetworkPlayers.save(p), "source snapshot saved");
@@ -132,6 +132,7 @@ public final class DevNetworkChecks {
             KillRewards.onDeath(new net.neoforged.neoforge.event.entity.living.LivingDeathEvent(boss, p.damageSources().playerAttack(p)));
             check(ForgeManager.count(p.getInventory(), ModItems.get(ForgeProgression.scroll(1))) == scrolls + 1, "boss grants a personal crafting scroll");
             DevPortalChecks.run(p);
+            com.mmorpg.dungeon.DevDedicatedDungeonChecks.run(p);
             MMORPG.LOGGER.info("[CODEX CHECKS] NETWORK_FORGE PASS: session locks, backup, proxy format, recipes, starters, scrolls, crafting, quests, shared inventory/bank, corruption refusal, handoff");
             Files.createDirectories(Path.of("../build/reports"));
             Files.writeString(Path.of("../build/reports/network-checks.txt"), "PASS\n");

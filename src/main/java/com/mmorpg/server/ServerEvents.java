@@ -41,6 +41,7 @@ public final class ServerEvents {
     public static void onServerStopped(ServerStoppedEvent event) {
         Scheduler.clear();
         PartyManager.clear();
+        com.mmorpg.network.DungeonTravel.clear();
     }
 
     @SubscribeEvent
@@ -82,6 +83,7 @@ public final class ServerEvents {
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
             if (!com.mmorpg.network.NetworkPlayers.login(sp)) return;
+            com.mmorpg.dungeon.DungeonLobby.arriveIfNeeded(sp);
             RpgPlayers.onLogin(sp);
         }
     }
@@ -99,6 +101,9 @@ public final class ServerEvents {
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
             RpgPlayers.onRespawn(sp);
+            if (com.mmorpg.network.NetworkConfig.current.enabled && com.mmorpg.network.NetworkConfig.current.role == com.mmorpg.network.NetworkConfig.Role.DUNGEONS) {
+                Scheduler.later(sp.level(), 5, () -> com.mmorpg.network.DungeonTravel.returnToSource(sp));
+            }
         }
     }
 

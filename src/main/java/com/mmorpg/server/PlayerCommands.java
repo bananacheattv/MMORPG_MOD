@@ -16,6 +16,7 @@ public final class PlayerCommands {
     }
 
     public static void register(CommandDispatcher<CommandSourceStack> d) {
+        d.register(Commands.literal("retourdonjon").executes(c -> com.mmorpg.dungeon.InstanceManager.returnToEntrance(c.getSource().getPlayerOrException()) ? 1 : 0));
         d.register(Commands.literal("reseau")
                 .then(Commands.literal("hub").executes(c -> com.mmorpg.hub.HubManager.goToHub(c.getSource().getPlayerOrException()) ? 1 : 0))
                 .then(Commands.literal("spawn").executes(c -> com.mmorpg.hub.HubManager.goToSpawn(c.getSource().getPlayerOrException()) ? 1 : 0))

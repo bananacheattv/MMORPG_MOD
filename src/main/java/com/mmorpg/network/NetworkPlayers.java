@@ -21,10 +21,11 @@ public final class NetworkPlayers {
     private static final Map<UUID, ProfileStore> SESSIONS = new HashMap<>();
     private static final Map<UUID, String> TRAVEL = new HashMap<>();
     private static final Map<UUID, Long> TRANSFERRING = new HashMap<>();
+    private static final Map<UUID, String> ARRIVALS = new HashMap<>();
     private static final EquipmentSlot[] EQUIPMENT = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.OFFHAND};
 
     public static void start() {
-        try { NetworkConfig.load(); }
+        try { NetworkConfig.load(); SharedParties.refresh(); }
         catch (Exception e) { throw new IllegalStateException("Cannot load Aeloria network configuration", e); }
     }
 
@@ -32,6 +33,7 @@ public final class NetworkPlayers {
         if (!NetworkConfig.current.enabled) return true;
         ProfileStore store = null;
         try {
+            SharedParties.refresh();
             // Source JVM releases its lock at logout. Never steal a live session or load stale data.
             long deadline = System.nanoTime() + 2_000_000_000L;
             do {
@@ -50,6 +52,7 @@ public final class NetworkPlayers {
             }
             SESSIONS.put(p.getUUID(), store);
             final String arrival = destination;
+            if (!arrival.isEmpty()) ARRIVALS.put(p.getUUID(), arrival);
             Scheduler.later(p.level(), 5, () -> { if (!p.isRemoved()) arrive(p, arrival); });
             return true;
         } catch (Exception e) {
@@ -125,10 +128,12 @@ public final class NetworkPlayers {
         tag.putBoolean("cinematic", hd.cinematicSeen);
         tag.putInt("tried", hd.triedMask);
         tag.putString("destination", TRAVEL.getOrDefault(p.getUUID(), ""));
+        if (DungeonTravel.point(p) != null) tag.put("dungeonReturn", DungeonTravel.point(p).save());
         return tag;
     }
 
     public static void restore(ServerPlayer p, CompoundTag tag) throws IOException {
+        var returnPoint = tag.getCompound("dungeonReturn").map(DungeonTravel.ReturnPoint::read).orElse(null);
         // Decode everything before clearing a single slot. Invalid/missing items fail the login.
         CompoundTag rpg = tag.getCompound("rpg").orElseThrow(() -> new IOException("Missing RPG data"));
         var inventory = decode(tag.getList("inventory").orElseThrow(() -> new IOException("Missing inventory")), p.getInventory().getContainerSize(), p);
@@ -170,6 +175,7 @@ public final class NetworkPlayers {
         if (!cursor.isEmpty() && !p.getInventory().add(cursor)) throw new IOException("Cannot restore held inventory item");
         p.getInventory().setSelectedSlot(Math.clamp(tag.getIntOr("selected", 0), 0, 8));
         p.setData(ModAttachments.PLAYER, parsed);
+        DungeonTravel.restore(p, returnPoint);
         com.mmorpg.economy.BankData.get(p.level().getServer()).replaceAccount(p.getUUID(), bank);
         var hd = ClassTrial.data(p);
         hd.inTrial = false; hd.snapshot = null; hd.inventory = null;
@@ -203,6 +209,8 @@ public final class NetworkPlayers {
         ProfileStore store = SESSIONS.remove(p.getUUID());
         try { store.close(); } catch (IOException e) { MMORPG.LOGGER.error("[Aeloria] Session release", e); }
         TRAVEL.remove(p.getUUID()); TRANSFERRING.remove(p.getUUID());
+        ARRIVALS.remove(p.getUUID());
+        DungeonTravel.forget(p);
     }
 
     public static void tick(net.minecraft.server.MinecraftServer server) {
@@ -213,32 +221,14 @@ public final class NetworkPlayers {
     /** True means this destination belongs to another server, including a refused/failed transfer. */
     public static boolean route(ServerPlayer p, NetworkConfig.Role role, String destination) {
         if (NetworkConfig.hosts(role)) return false;
-        if (!SESSIONS.containsKey(p.getUUID())) return true;
-        if (role != NetworkConfig.Role.HUB && !RpgPlayers.get(p).playerClass.isPlayable()) {
-            p.sendSystemMessage(Component.literal("Choisissez votre classe au hub avant de voyager."));
-            return true;
-        }
-        if (ClassTrial.active(p) || com.mmorpg.hub.CinematicManager.isLocked(p)) {
-            p.sendSystemMessage(Component.literal("Terminez votre essai ou votre cinématique avant de changer de serveur."));
-            return true;
-        }
-        if (RpgPlayers.get(p).pvpUntilTick > p.level().getServer().getTickCount()) {
-            p.sendSystemMessage(Component.literal("Impossible de changer de serveur pendant un combat contre un joueur."));
-            return true;
-        }
-        long now = System.currentTimeMillis();
-        if (TRANSFERRING.getOrDefault(p.getUUID(), 0L) > now) return true;
-        String target = switch (role) {
-            case HUB -> NetworkConfig.current.hub; case MAIN -> NetworkConfig.current.main;
-            case MINES -> NetworkConfig.current.mines; case PLAINS -> NetworkConfig.current.plains;
-            default -> throw new IllegalArgumentException("Invalid destination role");
-        };
+        if (!canTransfer(p, role)) return true;
+        String target = NetworkConfig.serverFor(role);
         p.closeContainer();
         com.mmorpg.server.MountManager.despawn(p);
         com.mmorpg.server.PetManager.despawn(p);
         TRAVEL.put(p.getUUID(), destination);
         if (!save(p)) { TRAVEL.remove(p.getUUID()); return true; }
-        TRANSFERRING.put(p.getUUID(), now + 10_000);
+        TRANSFERRING.put(p.getUUID(), System.currentTimeMillis() + 10_000);
         Net.toPlayer(p, ProxyConnect.to(target));
         Scheduler.later(p.level(), 200, () -> {
             if (p.level().getServer().getPlayerList().getPlayer(p.getUUID()) == p) {
@@ -249,20 +239,46 @@ public final class NetworkPlayers {
         return true;
     }
 
+    public static boolean canTransfer(ServerPlayer p, NetworkConfig.Role role) {
+        if (!SESSIONS.containsKey(p.getUUID())) return false;
+        if (role != NetworkConfig.Role.HUB && !RpgPlayers.get(p).playerClass.isPlayable()) {
+            p.sendSystemMessage(Component.literal("Choisissez votre classe au hub avant de voyager."));
+            return false;
+        }
+        if (ClassTrial.active(p) || com.mmorpg.hub.CinematicManager.isLocked(p)) {
+            p.sendSystemMessage(Component.literal("Terminez votre essai ou votre cinématique avant de changer de serveur."));
+            return false;
+        }
+        if (RpgPlayers.get(p).pvpUntilTick > p.level().getServer().getTickCount()) {
+            p.sendSystemMessage(Component.literal("Impossible de changer de serveur pendant un combat contre un joueur."));
+            return false;
+        }
+        long now = System.currentTimeMillis();
+        return TRANSFERRING.getOrDefault(p.getUUID(), 0L) <= now;
+    }
+    public static boolean inTransit(ServerPlayer p) { return TRANSFERRING.getOrDefault(p.getUUID(), 0L) > System.currentTimeMillis(); }
+    public static boolean isArriving(ServerPlayer p) { return ARRIVALS.containsKey(p.getUUID()); }
+
     private static void arrive(ServerPlayer p, String destination) {
+        ARRIVALS.remove(p.getUUID());
         try {
             if (!RpgPlayers.get(p).playerClass.isPlayable() && NetworkConfig.current.role != NetworkConfig.Role.HUB) {
                 route(p, NetworkConfig.Role.HUB, "hub");
                 return;
             }
-            if (destination.startsWith("mine:") && NetworkConfig.hosts(NetworkConfig.Role.MINES)) {
+            if (destination.equals("dungeon-return")) {
+                DungeonTravel.arriveHome(p);
+            } else if (destination.startsWith("mine:") && NetworkConfig.hosts(NetworkConfig.Role.MINES)) {
                 int region = Integer.parseInt(destination.substring(5));
                 if (region >= 0 && region < com.mmorpg.mine.MineLayout.SECTORS && region < RpgPlayers.get(p).minesUnlocked) com.mmorpg.mine.MineManager.startTransition(p, region);
             } else if (destination.startsWith("plains:") && NetworkConfig.hosts(NetworkConfig.Role.PLAINS)) {
                 com.mmorpg.plains.PlainsManager.enterChosen(p, Integer.parseInt(destination.substring(7)));
-            } else if (destination.startsWith("dungeon:") && NetworkConfig.hosts(NetworkConfig.Role.MAIN)) {
+            } else if (destination.startsWith("dungeon:") && NetworkConfig.hosts(NetworkConfig.Role.DUNGEONS)) {
                 String pool = destination.substring(8);
-                if (com.mmorpg.dungeon.InstanceManager.typeOf(pool) != null) com.mmorpg.dungeon.InstanceManager.enterPool(p, pool);
+                if (!com.mmorpg.dungeon.InstanceManager.validPool(pool) || !com.mmorpg.dungeon.InstanceManager.enterArriving(p, pool)) {
+                    p.sendSystemMessage(Component.literal("Aucune instance disponible ou niveau insuffisant : retour à votre entrée."));
+                    DungeonTravel.returnToSource(p);
+                }
             } else if (destination.equals("hub") && NetworkConfig.hosts(NetworkConfig.Role.HUB)) com.mmorpg.hub.HubManager.goToHub(p);
             else if (destination.equals("spawn") && NetworkConfig.hosts(NetworkConfig.Role.MAIN)) com.mmorpg.hub.HubManager.goToSpawn(p);
             save(p); // consume the travel instruction; later reconnects retain their local position
