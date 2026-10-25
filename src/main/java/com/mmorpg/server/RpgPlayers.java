@@ -428,6 +428,8 @@ public final class RpgPlayers {
     /** Pioche et houe du debutant : de quoi extraire la Verdite des Mines d'Aeloria et cultiver les premieres graines. */
     public static void giveStarterTools(ServerPlayer player) {
         give(player, ModItems.get("pioche_debutant"), 1);
+        give(player, ModItems.get("hache_debutant"), 1);
+        give(player, ModItems.get("pelle_debutant"), 1);
         give(player, ModItems.get("houe_debutant"), 1);
         give(player, ModItems.get("graine_lueur"), 12);
         player.sendSystemMessage(Component.literal("Vous avez reçu une ").withColor(0xE0D8C0)
@@ -445,6 +447,18 @@ public final class RpgPlayers {
             default -> "masse_garde";
         };
         give(player, ModItems.get(weapon), 1);
+        String set = switch (cls) {
+            case GUERRIER -> "acier_soldat"; case MAGE -> "apprenti";
+            case ARCHER -> "chasseur"; default -> "garde";
+        };
+        net.minecraft.world.entity.EquipmentSlot[] slots = {
+                net.minecraft.world.entity.EquipmentSlot.HEAD, net.minecraft.world.entity.EquipmentSlot.CHEST,
+                net.minecraft.world.entity.EquipmentSlot.LEGS, net.minecraft.world.entity.EquipmentSlot.FEET};
+        for (int i = 0; i < com.mmorpg.item.ItemDefs.PIECES.length; i++) {
+            var item = ModItems.get(set + "_" + com.mmorpg.item.ItemDefs.PIECES[i]);
+            if (player.getItemBySlot(slots[i]).isEmpty()) player.setItemSlot(slots[i], new ItemStack(item));
+            else give(player, item, 1);
+        }
         give(player, ModItems.POTION_SOIN_MINEURE.get(), 5);
         give(player, ModItems.POTION_MANA_MINEURE.get(), 3);
         give(player, ModItems.PARCHEMIN_TELEPORTATION.get(), 2);
@@ -573,6 +587,7 @@ public final class RpgPlayers {
         sync(player);
         BestiaryInfo.sendTo(player);
         PartyManager.sync(player);
+        if (!com.mmorpg.network.NetworkConfig.town()) return;
         if (!d.playerClass.isPlayable() && !com.mmorpg.hub.ClassTrial.active(player)) {
             // hub construit : cinematique a la premiere arrivee, puis choix aupres des Maitres de classe ; sinon ecran de choix classique
             if (com.mmorpg.hub.HubData.get(player.level().getServer()).exists()) {

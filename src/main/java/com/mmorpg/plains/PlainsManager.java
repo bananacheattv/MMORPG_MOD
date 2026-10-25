@@ -133,6 +133,7 @@ public final class PlainsManager {
 
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
+        if (!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.PLAINS)) return;
         MinecraftServer server = event.getServer();
         job = null;
         ZoneData zones = ZoneData.get(server);
@@ -142,6 +143,7 @@ public final class PlainsManager {
 
     /** Lance la construction d'une plaine (quelques secondes a quelques minutes). */
     public static boolean start(MinecraftServer server, int region) {
+        if (!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.PLAINS)) return false;
         ServerLevel level = dim(server);
         if (level == null || job != null) return false;
         PlainsData data = PlainsData.get(server);
@@ -170,6 +172,7 @@ public final class PlainsManager {
 
     @SubscribeEvent
     public static void onTick(ServerTickEvent.Post event) {
+        if (!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.PLAINS)) return;
         MinecraftServer server = event.getServer();
         transitions(server);
         if (job != null) {
@@ -290,6 +293,7 @@ public final class PlainsManager {
             p.sendOverlayMessage(Component.literal("Cette plaine n'est pas encore découverte : trouvez le portail caché de la précédente.").withColor(0xFF7060));
             return;
         }
+        if (com.mmorpg.network.NetworkPlayers.route(p, com.mmorpg.network.NetworkConfig.Role.PLAINS, "plains:" + region)) return;
         startTransition(p, region);
     }
 

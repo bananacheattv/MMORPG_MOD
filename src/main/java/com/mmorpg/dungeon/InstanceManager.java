@@ -50,7 +50,7 @@ public final class InstanceManager {
         return t.id + ":" + difficulty;
     }
 
-    private static DungeonType typeOf(String pool) {
+    public static DungeonType typeOf(String pool) {
         return DungeonType.byId(pool.substring(0, pool.indexOf(':')));
     }
 
@@ -129,6 +129,7 @@ public final class InstanceManager {
      * etapes s'il n'existe pas encore. @return vrai si le chargement a commence
      */
     public static boolean enterPool(ServerPlayer player, String pool) {
+        if (com.mmorpg.network.NetworkPlayers.route(player, com.mmorpg.network.NetworkConfig.Role.MAIN, "dungeon:" + pool)) return true;
         MinecraftServer server = player.level().getServer();
         ServerLevel dim = server.getLevel(DIM);
         if (dim == null) return false;

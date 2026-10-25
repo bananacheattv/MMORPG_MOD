@@ -53,6 +53,10 @@ public final class ForgeManager {
         ForgeRecipes.Recipe r = ForgeRecipes.get(recipeId);
         if (r == null) return;
         PlayerData d = RpgPlayers.get(player);
+        if (!com.mmorpg.crafting.ForgeProgression.unlocked(d, r)) {
+            player.sendOverlayMessage(Component.literal("Apprenez le parchemin de forge du palier " + com.mmorpg.crafting.ForgeProgression.required(r) + " (boss ou quêtes).").withColor(0xFF5050));
+            return;
+        }
         if (d.level < r.level()) {
             player.sendOverlayMessage(Component.literal("Niveau " + r.level() + " requis.").withColor(0xFF5050));
             return;

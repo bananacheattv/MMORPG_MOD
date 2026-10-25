@@ -58,6 +58,8 @@ public class PlayerData implements ValueIOSerializable {
     public boolean classChosenOnce = false;
     /** Pioche et houe du debutant deja remises (une seule fois ; /outils en redonne si elles sont perdues). */
     public boolean starterTools = false;
+    /** Permanent forge scroll licenses (bits 0..4); preserved by save/load, death and network travel. */
+    public int forgeBlueprints = 0;
     /** Nombre de mines et de plaines ouvertes au joueur : la premiere l'est d'office, les suivantes se debloquent en trouvant le portail cache de la precedente. */
     public int minesUnlocked = 1;
     public int plainsUnlocked = 1;
@@ -194,6 +196,7 @@ public class PlayerData implements ValueIOSerializable {
         t.store("kills", STR_INT_MAP, kills);
         t.putBoolean("chosen", classChosenOnce);
         t.putBoolean("starterTools", starterTools);
+        t.putInt("forgeBlueprints", forgeBlueprints);
         t.putInt("minesUnlocked", minesUnlocked);
         t.putInt("plainsUnlocked", plainsUnlocked);
         t.putInt("evolution", evolution);
@@ -251,6 +254,7 @@ public class PlayerData implements ValueIOSerializable {
         kills.putAll(t.read("kills", STR_INT_MAP).orElse(Map.of()));
         classChosenOnce = t.getBooleanOr("chosen", playerClass != PlayerClass.NONE);
         starterTools = t.getBooleanOr("starterTools", false);
+        forgeBlueprints = t.getIntOr("forgeBlueprints", 0) & 31;
         minesUnlocked = Math.max(1, t.getIntOr("minesUnlocked", 1));
         plainsUnlocked = Math.max(1, t.getIntOr("plainsUnlocked", 1));
         // joueurs d'avant les quetes d'evolution : ils gardent le palier deja atteint

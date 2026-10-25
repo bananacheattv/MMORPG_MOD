@@ -25,6 +25,7 @@ public final class ServerEvents {
     @SubscribeEvent
     public static void onServerStarting(ServerAboutToStartEvent event) {
         ConfigManager.load();
+        com.mmorpg.network.NetworkPlayers.start();
     }
 
     /** L'equipement n'est jamais perdu a la mort : seule une part d'experience l'est (voir RpgPlayers.onDeath). */
@@ -59,6 +60,7 @@ public final class ServerEvents {
     public static void onServerTick(ServerTickEvent.Post event) {
         Scheduler.tick();
         PartyManager.tick(event.getServer());
+        com.mmorpg.network.NetworkPlayers.tick(event.getServer());
     }
 
     @SubscribeEvent
@@ -76,9 +78,10 @@ public final class ServerEvents {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.HIGHEST)
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
+            if (!com.mmorpg.network.NetworkPlayers.login(sp)) return;
             RpgPlayers.onLogin(sp);
         }
     }
@@ -86,6 +89,7 @@ public final class ServerEvents {
     @SubscribeEvent
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
+            com.mmorpg.network.NetworkPlayers.logout(sp);
             MountManager.despawn(sp);
             RpgPlayers.onLogout(sp);
         }

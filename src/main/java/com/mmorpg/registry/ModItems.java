@@ -42,6 +42,16 @@ public final class ModItems {
     public static final List<DeferredItem<? extends Item>> SUMMONS = new ArrayList<>();
     public static final List<DeferredItem<? extends Item>> SPAWN_EGGS = new ArrayList<>();
     public static final Map<String, DeferredItem<? extends Item>> BY_ID = new LinkedHashMap<>();
+    static {
+        for (int tier = 1; tier <= com.mmorpg.crafting.ForgeProgression.TIERS; tier++) {
+            final int t = tier;
+            String id = com.mmorpg.crafting.ForgeProgression.scroll(t);
+            var item = ITEMS.registerItem(id, p -> new com.mmorpg.item.ForgeScrollItem(p, t));
+            CONSUMABLES.add(item);
+            BY_ID.put(id, item);
+        }
+    }
+    public static final DeferredItem<RpgMaterialItem> FIOLE_RUNIQUE = material("fiole_runique", Rarity.COMMUN, "Récipient alchimique façonné à partir de Verdite et de poussière d'âme.");
     public static final Map<PetType, DeferredItem<PetEggItem>> PET_EGGS = new EnumMap<>(PetType.class);
     /** Mannequins d'entrainement (objets de placement), par variante. */
     public static final Map<String, DeferredItem<com.mmorpg.item.TrainingDummyItem>> DUMMY_ITEMS = new java.util.LinkedHashMap<>();

@@ -94,8 +94,38 @@ public class MountEntity extends Horse {
 
     @Override public void openCustomInventoryScreen(Player player) { }
     // pas de hennissements : ce ne sont plus des chevaux
-    @Override protected net.minecraft.sounds.SoundEvent getAmbientSound() { return null; }
-    @Override protected net.minecraft.sounds.SoundEvent getAngrySound() { return null; }
+    @Override protected net.minecraft.sounds.SoundEvent getAmbientSound() { return com.mmorpg.registry.ModSounds.GROWL.get(); }
+    @Override protected net.minecraft.sounds.SoundEvent getAngrySound() { return com.mmorpg.registry.ModSounds.GROWL.get(); }
+    @Override protected net.minecraft.sounds.SoundEvent getDeathSound() { return com.mmorpg.registry.ModSounds.GROWL.get(); }
+    @Override protected net.minecraft.sounds.SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return com.mmorpg.registry.ModSounds.GROWL.get(); }
+    @Override protected net.minecraft.sounds.SoundEvent getEatingSound() { return null; }
+    @Override protected void playJumpSound() { playSound(com.mmorpg.registry.ModSounds.WHOOSH.get(), .25f, 1.3f); }
+    @Override protected void playStepSound(BlockPos pos, BlockState state) {
+        if (!state.liquid()) {
+            var sound = state.getSoundType(level(), pos, this);
+            playSound(sound.getStepSound(), .18f, mountType == MountType.TORTUE_CRISTAL ? .7f : 1.1f);
+        }
+    }
+    @Override protected void playGallopSound(net.minecraft.world.level.block.SoundType type) {
+        playSound(type.getStepSound(), .22f, 1f);
+    }
+    @Override protected net.minecraft.core.Holder<net.minecraft.sounds.SoundEvent> getEquipSound(EquipmentSlot slot, ItemStack stack, net.minecraft.world.item.equipment.Equippable equippable) {
+        return com.mmorpg.registry.ModSounds.CHIME;
+    }
+    /** Also catches inherited landing and breathing effects: no horse samples can leak through. */
+    @Override public void playSound(net.minecraft.sounds.SoundEvent sound, float volume, float pitch) {
+        sound = mountSound(sound);
+        if (sound == com.mmorpg.registry.ModSounds.WHOOSH.get()) volume = Math.min(volume, .3f);
+        if (sound == com.mmorpg.registry.ModSounds.GROWL.get()) pitch *= .75f + mountType.ordinal() * .045f;
+        super.playSound(sound, volume, pitch);
+    }
+    public static net.minecraft.sounds.SoundEvent mountSound(net.minecraft.sounds.SoundEvent sound) {
+        var id = BuiltInRegistries.SOUND_EVENT.getKey(sound);
+        if (id != null && id.getNamespace().equals("minecraft") && id.getPath().startsWith("entity.horse")) {
+            return com.mmorpg.registry.ModSounds.WHOOSH.get();
+        }
+        return sound;
+    }
     @Override public boolean canDispenserEquipIntoSlot(EquipmentSlot slot) { return false; }
 
     // ---------------------------------------------------------------- vol (Hippogriffe)
