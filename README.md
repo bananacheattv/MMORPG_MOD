@@ -9,6 +9,7 @@ Mod MMORPG complet : 4 classes qui évoluent (niveaux 1 à 100), 28 compétences
 3. Le mod doit être installé **sur le serveur et sur chaque client**.
 4. Pour un serveur public (sauvegardes, sécurité, mises à jour) : voir `GUIDE_SERVEUR.md`.
 5. Pour le réseau hub / serveur principal / mines / plaines, le partage des personnages et les parchemins de forge : voir `RESEAU_AELORIA.md`.
+6. Pour créer des portails de mines, plaines et donjons avec `/portail`, et annuler avec `/undoportail` ou `/undo` : voir `PORTAILS_ET_UNDO.md`.
 
 ## Touches (modifiables dans Options > Commandes > MMORPG)
 

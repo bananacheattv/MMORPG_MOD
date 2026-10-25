@@ -46,6 +46,8 @@ foreach ($service in $panelConfig.services) {
     $network | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $modConfig 'network.json') -Encoding utf8
     Copy-Item -LiteralPath $jarPath -Destination (Join-Path $serverPath 'mods/mmorpg-1.0.0.jar')
 }
-Copy-Item -LiteralPath (Join-Path $PSScriptRoot '../RESEAU_AELORIA.md') -Destination (Join-Path $panelPath 'RESEAU_AELORIA.md')
+foreach ($guide in @('RESEAU_AELORIA.md', 'PORTAILS_ET_UNDO.md')) {
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot "../$guide") -Destination (Join-Path $panelPath $guide)
+}
 Write-Output "Installation terminee : quatre serveurs configures. Sauvegarde : $backupPath"
 Write-Output 'Rechargez le panel puis demarrez les serveurs. Installez aussi le nouveau JAR sur les clients.'
