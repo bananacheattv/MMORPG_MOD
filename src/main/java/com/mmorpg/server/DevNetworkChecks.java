@@ -131,6 +131,7 @@ public final class DevNetworkChecks {
             int scrolls = ForgeManager.count(p.getInventory(), ModItems.get(ForgeProgression.scroll(1)));
             KillRewards.onDeath(new net.neoforged.neoforge.event.entity.living.LivingDeathEvent(boss, p.damageSources().playerAttack(p)));
             check(ForgeManager.count(p.getInventory(), ModItems.get(ForgeProgression.scroll(1))) == scrolls + 1, "boss grants a personal crafting scroll");
+            DevPortalChecks.run(p);
             MMORPG.LOGGER.info("[CODEX CHECKS] NETWORK_FORGE PASS: session locks, backup, proxy format, recipes, starters, scrolls, crafting, quests, shared inventory/bank, corruption refusal, handoff");
             Files.createDirectories(Path.of("../build/reports"));
             Files.writeString(Path.of("../build/reports/network-checks.txt"), "PASS\n");
