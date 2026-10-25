@@ -44,6 +44,10 @@ public final class ClientEvents {
     /** Elements vanilla personnalises (barre d'objets, faim, effets...) : masques ou deplaces par transformation. */
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onLayerPre(RenderGuiLayerEvent.Pre event) {
+        if (Minecraft.getInstance().gui.hud.isHidden() && MMORPG.MODID.equals(event.getName().getNamespace())) {
+            event.setCanceled(true);
+            return;
+        }
         HudLayout.Element e = HudLayout.forLayer(event.getName());
         if (e == null) return;
         if (!e.visible() && !HudLayout.editing) {
