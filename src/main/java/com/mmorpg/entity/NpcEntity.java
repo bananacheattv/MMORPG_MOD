@@ -44,6 +44,9 @@ public class NpcEntity extends PathfinderMob {
     private static final EntityDataAccessor<Integer> ROLE = SynchedEntityData.defineId(NpcEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> SKIN = SynchedEntityData.defineId(NpcEntity.class, EntityDataSerializers.INT);
     private String group = "";
+    private String merchantShop = "";
+    public String merchantShop() {return merchantShop;}
+    public void setMerchantShop(String json) {merchantShop=json;}
     private String zone = "Sans zone";
 
     public String zone() { return zone; }
@@ -105,7 +108,7 @@ public class NpcEntity extends PathfinderMob {
         if (player instanceof ServerPlayer sp && hand == InteractionHand.MAIN_HAND) {
             switch (role()) {
                 case QUETES -> QuestManager.openGiver(sp, this);
-                case MARCHAND -> ShopManager.open(sp, this);
+                case MARCHAND -> {if(sp.isShiftKeyDown()&&com.mmorpg.server.QuestEditor.allowed(sp))com.mmorpg.server.MerchantEditor.open(sp,this);else ShopManager.open(sp,this);}
                 case DONJON -> com.mmorpg.dungeon.DungeonMaster.open(sp, this);
                 case MINES -> com.mmorpg.mine.MineManager.open(sp, this);
                 case SORTIE -> com.mmorpg.dungeon.InstanceManager.leaveNow(sp, this.group());
@@ -138,6 +141,7 @@ public class NpcEntity extends PathfinderMob {
         output.putInt("NpcRole", this.entityData.get(ROLE));
         output.putInt("NpcSkin", this.entityData.get(SKIN));
         output.putString("NpcGroup", group);
+        output.putString("MerchantShop",merchantShop);
         output.putString("NpcZone", zone);
     }
 
@@ -147,6 +151,7 @@ public class NpcEntity extends PathfinderMob {
         this.entityData.set(ROLE, input.getIntOr("NpcRole", 0));
         this.entityData.set(SKIN, input.getIntOr("NpcSkin", 0));
         this.group = input.getStringOr("NpcGroup", "");
+        this.merchantShop = input.getStringOr("MerchantShop", "");
         this.zone = input.getStringOr("NpcZone", "Sans zone");
     }
 }

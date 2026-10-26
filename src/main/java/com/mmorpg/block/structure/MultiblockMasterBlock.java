@@ -27,14 +27,15 @@ public abstract class MultiblockMasterBlock extends Block implements EntityBlock
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     protected MultiblockMasterBlock(Properties properties) {
-        super(properties);
+        super(properties.dynamicShape());
+        registerDefaultState(stateDefinition.any().setValue(FACING,Direction.NORTH).setValue(FreeOrientation.FREE,false));
     }
 
     public abstract MultiblockKind kind();
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
+        builder.add(FACING,FreeOrientation.FREE);
     }
 
     @Override
@@ -50,7 +51,7 @@ public abstract class MultiblockMasterBlock extends Block implements EntityBlock
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         super.onPlace(state, level, pos, oldState, movedByPiston);
-        if (!level.isClientSide() && !oldState.is(state.getBlock())) {
+        if (!level.isClientSide() && !oldState.is(state.getBlock()) && !state.getValue(FreeOrientation.FREE)) {
             Multiblocks.placeParts(level, pos, kind(), state.getValue(FACING));
         }
     }
@@ -65,6 +66,7 @@ public abstract class MultiblockMasterBlock extends Block implements EntityBlock
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        if(level.getBlockEntity(pos) instanceof OrientedBlockEntity be && Float.isFinite(be.yaw)) return be.shapes().getOrDefault(BlockPos.ZERO,net.minecraft.world.phys.shapes.Shapes.empty());
         return kind().masterShape(state.getValue(FACING));
     }
 

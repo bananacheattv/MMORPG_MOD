@@ -52,6 +52,10 @@ public final class Multiblocks {
 
     /** Pose les parties invisibles autour du bloc fonctionnel (sans remplacer de bloc existant). */
     public static void placeParts(Level level, BlockPos master, MultiblockKind kind, Direction facing) {
+        if(level.getBlockEntity(master) instanceof OrientedBlockEntity be && Float.isFinite(be.yaw)) {
+            for(var cell:be.shapes().keySet())if(!cell.equals(BlockPos.ZERO)) {var at=master.offset(cell);if(level.getBlockState(at).canBeReplaced())level.setBlock(at,StructurePartBlock.freeStateFor(kind,cell),3);}
+            return;
+        }
         for (int[] c : kind.cells()) {
             BlockPos p = kind.cellPos(master, c, facing);
             if (level.isOutsideBuildHeight(p)) continue;
@@ -64,8 +68,8 @@ public final class Multiblocks {
 
     /** Retire les parties de la structure dont le bloc fonctionnel etait en {@code master}. */
     public static void removeParts(Level level, BlockPos master, MultiblockKind kind, Direction facing) {
-        for (int[] c : kind.cells()) {
-            BlockPos p = kind.cellPos(master, c, facing);
+        for(int x=-5;x<=5;x++)for(int y=0;y<=MultiblockKind.RANGE_Y;y++)for(int z=-5;z<=5;z++) {
+            BlockPos p = master.offset(x,y,z);
             if (StructurePartBlock.belongsTo(level.getBlockState(p), p, master, kind)) level.removeBlock(p, false);
         }
     }
@@ -110,7 +114,7 @@ public final class Multiblocks {
             Scheduler.later(level, 1, () -> {
                 BlockState st = level.getBlockState(pos);
                 MultiblockKind kind = MultiblockKind.of(st.getBlock());
-                if (kind == null || kind.cells().isEmpty()) return;
+                if (kind == null || kind.cells().isEmpty() || st.getValue(FreeOrientation.FREE)) return;
                 Direction facing = st.getValue(BlockStateProperties.HORIZONTAL_FACING);
                 int[] first = kind.cells().get(0);
                 BlockPos p = kind.cellPos(pos, first, facing);

@@ -7,6 +7,7 @@ import java.util.Map;
 
 /** Boutique des marchands (config/mmorpg/shop.json) : articles en vente et prix de rachat. */
 public class ShopConfig {
+    public boolean automaticBuyback = true;
     public List<Offer> buy = new ArrayList<>();
     /** Prix de rachat explicites (identifiant d'objet -> or par unite). */
     public Map<String, Integer> sellPrices = new LinkedHashMap<>();

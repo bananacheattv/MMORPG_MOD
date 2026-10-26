@@ -31,11 +31,13 @@ public class ShopScreen extends MmoScreen {
     private final String npcName;
     private final ShopConfig shop;
     private boolean sellTab;
+    private final boolean canEdit;
     private int scroll;
 
     public ShopScreen(CompoundTag data) {
         super("Marchand");
         this.npc = data.getIntOr("npc", -1);
+        this.canEdit=data.getBooleanOr("canEdit",false);
         this.npcName = data.getStringOr("name", "Marchand");
         this.shop = ConfigManager.parseShop(data.getStringOr("shop", "{}"));
     }
@@ -73,6 +75,9 @@ public class ShopScreen extends MmoScreen {
         button(g, left + pw / 2 + 2, top + 22, tw, 16, "Vendre", true, sellTab ? 0xFFE2B85A : 0xFF3B3350, () -> {
             sellTab = true;
             scroll = 0;
+        });
+        if(canEdit)button(g,left+pw-67,top+22,59,16,"Configurer",true,Ui.GOLD,()->{
+            var data=new CompoundTag();data.putInt("npc",npc);data.putString("action","open");ClientNet.send(new Payloads.MerchantEdit(data));
         });
         if (sellTab) renderSell(g);
         else renderBuy(g);

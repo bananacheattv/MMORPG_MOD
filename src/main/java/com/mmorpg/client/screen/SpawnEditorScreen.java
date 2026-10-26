@@ -14,7 +14,8 @@ import java.util.List;
 public final class SpawnEditorScreen extends MmoScreen {
     private final String position;
     private int tab, page, facing, size=2, height=2;
-    private EditBox text;
+    private EditBox text, angle;
+    private boolean faceMe=true;
     private static final String[] DIRECTIONS={"north","east","south","west"};
     private static final String[] FACES={"Nord","Est","Sud","Ouest"};
     private static final float[] SIZES={.5f,1f,2f,3f,4f};
@@ -23,8 +24,14 @@ public final class SpawnEditorScreen extends MmoScreen {
     @Override protected void init() {
         super.init();
         String value=text==null?"Bienvenue à Aeloria":text.getValue();
-        text=new EditBox(font,left+12,top+81,pw-24,20,Component.literal("Texte flottant"));
+        text=new EditBox(font,left+12,top+101,pw-24,20,Component.literal("Texte flottant"));
         text.setMaxLength(240);text.setValue(value);addRenderableWidget(text);
+        String degrees=angle==null?"0":angle.getValue();angle=new EditBox(font,left+pw-88,top+61,76,18,Component.literal("Angle en degrés"));
+        angle.setMaxLength(10);angle.setValue(degrees);addRenderableWidget(angle);
+    }
+    private String orientation() {
+        if(faceMe)return "moi";
+        try {float v=Float.parseFloat(angle.getValue());return Float.isFinite(v)?Float.toString(v):null;}catch(NumberFormatException e){return null;}
     }
     private void action(String command) {
         var mc=Minecraft.getInstance();
@@ -38,24 +45,25 @@ public final class SpawnEditorScreen extends MmoScreen {
         String[] tabs={"Structures","Portails","PNJ","Textes"};
         int tw=(pw-24)/4;
         for(int i=0;i<4;i++) {final int selected=i;button(g,left+12+i*tw,top+37,tw-3,18,tabs[i],true,tab==i?Ui.GOLD:Ui.MUTED,()->{tab=selected;page=0;});}
-        text.visible=tab==3;text.active=tab==3;
+        text.visible=tab==3;text.active=tab==3;angle.visible=tab!=1&&!faceMe;angle.active=angle.visible;
+        if(tab!=1)button(g,left+12,top+61,faceMe?pw-24:pw-108,18,faceMe?"Orientation : face à moi  ›":"Angle libre (degrés)  ›",true,Ui.GOLD,()->faceMe=!faceMe);
         int bottom=top+ph;
         if(tab==3) {
-            g.text(font,"Texte libre (240 caractères maximum)",left+12,top+65,Ui.TEXT,false);
-            button(g,left+12,top+111,140,20,"Taille : "+SIZES[size],true,Ui.GOLD,()->size=(size+1)%SIZES.length);
-            button(g,left+160,top+111,pw-172,20,"Hauteur : "+height+" blocs",true,Ui.GOLD,()->height=(height+1)%9);
-            button(g,left+12,top+141,pw-24,22,"Placer le texte à la cible",!text.getValue().isBlank(),Ui.GREEN,
-                    ()->action("amenagement texte "+SIZES[size]+" "+height+" "+text.getValue().replace('\n',' ')));
-            button(g,left+12,top+171,pw-24,20,"Retirer le texte le plus proche (10 blocs)",true,Ui.RED,()->action("amenagement supprimertexte"));
+            g.text(font,"Texte libre (240 caractères maximum)",left+12,top+85,Ui.TEXT,false);
+            button(g,left+12,top+131,140,20,"Taille : "+SIZES[size],true,Ui.GOLD,()->size=(size+1)%SIZES.length);
+            button(g,left+160,top+131,pw-172,20,"Hauteur : "+height+" blocs",true,Ui.GOLD,()->height=(height+1)%9);
+            button(g,left+12,top+159,pw-24,20,"Placer le texte à la cible",!text.getValue().isBlank()&&orientation()!=null,Ui.GREEN,
+                    ()->action("amenagement texteoriente "+SIZES[size]+" "+height+" "+orientation()+" "+text.getValue().replace('\n',' ')));
+            button(g,left+12,top+182,pw-24,16,"Retirer le texte le plus proche (10 blocs)",true,Ui.RED,()->action("amenagement supprimertexte"));
         } else {
-            button(g,left+12,top+61,pw-24,18,"Orientation : "+FACES[facing]+"  ›",true,Ui.GOLD,()->facing=(facing+1)%4);
+            if(tab==1)button(g,left+12,top+61,pw-24,18,"Orientation : "+FACES[facing]+"  ›",true,Ui.GOLD,()->facing=(facing+1)%4);
             List<SpawnEditor.Entry> entries=SpawnEditor.catalogue().stream().filter(e->e.tab()==tab).toList();
             int rows=Math.max(1,(ph-143)/22), perPage=rows*2, pages=Math.max(1,(entries.size()+perPage-1)/perPage);
             page=Math.min(page,pages-1);int cw=(pw-28)/2;
             for(int i=0;i<perPage&&page*perPage+i<entries.size();i++) {
                 var entry=entries.get(page*perPage+i);int x=left+12+(i%2)*(cw+4),y=top+86+(i/2)*22;
                 String label=font.plainSubstrByWidth(entry.label(),cw-10);
-                button(g,x,y,cw,19,label,true,Ui.GOLD,()->action("amenagement poser "+entry.id()+" "+DIRECTIONS[facing]));
+                button(g,x,y,cw,19,label,tab==1||orientation()!=null,Ui.GOLD,()->action("amenagement poser "+entry.id()+" "+(tab==1?DIRECTIONS[facing]:orientation())));
             }
             button(g,left+12,bottom-52,50,17,"‹",page>0,Ui.GOLD,()->page--);
             g.centeredText(font,Component.literal((page+1)+" / "+pages),left+pw/2,bottom-48,Ui.MUTED);

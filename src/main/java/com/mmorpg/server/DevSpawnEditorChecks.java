@@ -69,6 +69,29 @@ public final class DevSpawnEditorChecks {
                 check(level.getBlockState(at).isAir(),"restore master air");
                 for(int[] cell:k.cells())check(level.getBlockState(k.cellPos(at,cell,Direction.EAST)).isAir(),"restore all parts");
             }
+            for(var kind:MultiblockKind.values()) for(float yaw:new float[]{45F,123.5F,-37.2F}) {
+                SpawnEditor.open(p,at);check(SpawnEditor.placeOriented(p,kind.key(),Float.toString(yaw)),"free placement "+kind+" "+yaw);
+                var be=(com.mmorpg.block.structure.OrientedBlockEntity)level.getBlockEntity(at);
+                check(Math.abs(be.yaw-yaw)<.001,"exact yaw retained");
+                var tag=be.getUpdateTag(level.registryAccess());check(Math.abs(tag.getFloatOr("placementYaw",999)-yaw)<.001,"yaw saved and synchronized");
+                var loaded=new com.mmorpg.block.structure.StructureBlockEntity(at,level.getBlockState(at));
+                loaded.loadWithComponents(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING,level.registryAccess(),tag));
+                check(Math.abs(loaded.yaw-yaw)<.001&&loaded.shapes().keySet().equals(be.shapes().keySet()),"reloaded yaw rebuilds the same collision footprint");
+                for(var cell:be.shapes().keySet())if(!cell.equals(BlockPos.ZERO)) {
+                    var part=level.getBlockState(at.offset(cell));
+                    check(com.mmorpg.block.structure.StructurePartBlock.masterPos(at.offset(cell),part).equals(at),"diagonal part points to its own master");
+                    check(!part.getShape(level,at.offset(cell)).isEmpty(),"diagonal part collision");
+                }
+                var footprint=java.util.List.copyOf(be.shapes().keySet());check(AdventurePortals.undo(p),"free placement undo");
+                for(var cell:footprint)check(level.getBlockState(at.offset(cell)).isAir(),"free footprint restored exactly");
+            }
+            SpawnEditor.open(p,at);check(SpawnEditor.placeOriented(p,"caisse_commune_bloc","moi"),"crate faces placer");
+            var crate=(com.mmorpg.block.structure.OrientedBlockEntity)level.getBlockEntity(at);
+            check(Math.abs(crate.yaw-90)<.001,"crate front faces west towards player");check(AdventurePortals.undo(p),"diagonal crate undo");
+            SpawnEditor.open(p,at);check(!SpawnEditor.placeOriented(p,"portail:mine","45"),"free rotation never changes portals");
+            check(SpawnEditor.textOriented(p,"Angle fixe",2,3,"123.5"),"fixed text orientation");
+            var fixed=level.getEntitiesOfClass(net.minecraft.world.entity.Display.TextDisplay.class,new net.minecraft.world.phys.AABB(at).inflate(8),e->e.entityTags().contains("aeloria_editor")).getFirst();
+            check(Math.abs(fixed.getYRot()-123.5)<.001,"text angle applied");check(AdventurePortals.undo(p),"fixed text undo");
             SpawnEditor.open(p,at);
             level.setBlockAndUpdate(at,Blocks.CHEST.defaultBlockState());
             check(!SpawnEditor.place(p,"forge_arcanique",Direction.NORTH),"never replace existing inventory block");level.removeBlock(at,false);

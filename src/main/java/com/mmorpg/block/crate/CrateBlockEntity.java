@@ -20,7 +20,7 @@ import java.util.UUID;
  * Etat d'ouverture d'une caisse, synchronise aux clients pour la roue animee au-dessus du bloc :
  * liste d'objets qui defilent, index du gain (la roue s'arrete dessus) et instant de depart.
  */
-public class CrateBlockEntity extends BlockEntity {
+public class CrateBlockEntity extends com.mmorpg.block.structure.OrientedBlockEntity {
     public static final int SPIN_TICKS = 80;
     public static final int SHOW_TICKS = 50;
 
