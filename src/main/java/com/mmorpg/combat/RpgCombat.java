@@ -119,6 +119,7 @@ public final class RpgCombat {
         if (target instanceof Player p) {
             if (p.isCreative() || p.isSpectator()) return false;
             if (attacker instanceof Player ap) {
+                if(com.mmorpg.competition.ArenaManager.session(ap.getUUID())!=null||com.mmorpg.competition.ArenaManager.session(p.getUUID())!=null)return com.mmorpg.competition.ArenaManager.enemies(ap,p);
                 if (com.mmorpg.server.PartyManager.sameParty(ap, p)) return false;
                 return ConfigManager.general().skillsHitPlayers && p.level() instanceof net.minecraft.server.level.ServerLevel psl && psl.isPvpAllowed();
             }
@@ -219,7 +220,7 @@ public final class RpgCombat {
             return;
         }
         if (target instanceof ServerPlayer tp && attacker instanceof ServerPlayer ap && tp != ap
-                && com.mmorpg.server.PartyManager.sameParty(tp, ap)) {
+                && com.mmorpg.server.PartyManager.sameParty(tp, ap)&&!com.mmorpg.competition.ArenaManager.enemies(tp,ap)) {
             event.setCanceled(true);
             return;
         }
@@ -341,6 +342,7 @@ public final class RpgCombat {
             return;
         }
         double newHp = h.hp() - damage;
+        if(newHp<=.01&&target instanceof ServerPlayer arenaPlayer&&com.mmorpg.competition.ArenaManager.lethal(arenaPlayer,attacker)){event.setNewDamage(0F);return;}
         if (newHp <= 0.01) {
             h.setHp(0);
             event.setNewDamage(target.getHealth() + 1000F);

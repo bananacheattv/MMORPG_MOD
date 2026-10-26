@@ -31,7 +31,7 @@ repositories {
 }
 
 base {
-    archivesName = mod_id
+    archivesName = 'aeloria'
 }
 
 // Mojang ships Java 25 to end users in 26.3, so mods should target Java 25.
@@ -75,6 +75,7 @@ neoForge {
             programArgument '--nogui'
             if (project.hasProperty('networkChecks')) systemProperty 'mmorpg.checkNetwork', 'true'
             if (project.hasProperty('visualChecks')) systemProperty 'mmorpg.visualChecks', 'true'
+            if (project.hasProperty('socialVisual')) systemProperty 'mmorpg.socialVisual', 'true'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 

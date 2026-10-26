@@ -18,10 +18,11 @@ import java.util.*;
 public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
     private final Map<String, KeyframeAnimation> animations = new HashMap<>();
     public final Identifier texture;
-    public ImportedModel(String kind, String key) { this(kind, key, read(kind, key)); }
-    private ImportedModel(String kind, String key, JsonObject data) {
-        super(root(data, kind.equals("cosmetics") ? 0 : 24), RenderTypes::entityTranslucent);
-        texture = MMORPG.id("textures/imported/" + kind + "/" + key + ".png");
+    public ImportedModel(String kind, String key) { this(kind, key, read(kind, key),false); }
+    public ImportedModel(String kind,String key,boolean emissiveOnly){this(kind,key,read(kind,key),emissiveOnly);}
+    private ImportedModel(String kind, String key, JsonObject data,boolean emissiveOnly) {
+        super(root(data, kind.equals("cosmetics") ? 0 : 24,emissiveOnly), RenderTypes::entityTranslucent);
+        texture = data.has("texture")?Identifier.parse(data.get("texture").getAsString()):MMORPG.id("textures/imported/" + kind + "/" + key + ".png");
         for (var value : data.getAsJsonArray("animations")) {
             var a = value.getAsJsonObject();
             var def = BlockbenchAnimations.parse(new String[]{a.get("tracks").getAsString()},
@@ -40,25 +41,28 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
         if (j.has(key)) for (int i = 0; i < 3; i++) v[i] = j.getAsJsonArray(key).get(i).getAsFloat();
         return v;
     }
-    private static ModelPart root(JsonObject data, float y) {
+    private static ModelPart root(JsonObject data, float y,boolean emissiveOnly) {
         Map<String, ModelPart> children = new LinkedHashMap<>();
         var res = data.getAsJsonObject("resolution");
         for (var e : data.getAsJsonArray("parts")) {
             var n = e.getAsJsonObject();
-            children.put(n.get("uuid").getAsString(), part(n, new float[3], res, y));
+            children.put(n.get("uuid").getAsString(), part(n, new float[3], res, y,emissiveOnly));
         }
         return new ModelPart(List.of(), children);
     }
-    private static ModelPart part(JsonObject n, float[] parent, JsonObject res, float rootY) {
+    private static ModelPart part(JsonObject n, float[] parent, JsonObject res, float rootY,boolean emissiveOnly) {
         float[] origin = vec(n, "origin"), rotation = vec(n, "rotation");
         Map<String, ModelPart> children = new LinkedHashMap<>();
         List<ModelPart.Cube> cubes = new ArrayList<>();
         if (n.has("children")) {
             for (var e : n.getAsJsonArray("children")) {
                 var c = e.getAsJsonObject();
-                children.put(c.get("uuid").getAsString(), part(c, origin, res, 0));
+                children.put(c.get("uuid").getAsString(), part(c, origin, res, 0,emissiveOnly));
             }
-        } else cubes.add(cube(n, origin, res));
+        } else if(!emissiveOnly||(n.has("emissive")&&n.get("emissive").getAsBoolean())) {
+            if(n.has("vertices"))for(var face:n.getAsJsonObject("faces").entrySet())cubes.add(meshFace(n,face.getValue().getAsJsonObject(),origin,res));
+            else cubes.add(cube(n,origin,res));
+        }
         ModelPart part = new ModelPart(cubes, children);
         var pose = PartPose.offsetAndRotation(parent[0] - origin[0], parent[1] - origin[1] + rootY,
                 origin[2] - parent[2], (float)Math.toRadians(-rotation[0]),
@@ -101,6 +105,17 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
         }
         return cube;
     }
+    /** Native polygon faces: triangulated/quadrilateral Blockbench meshes, with their own UVs and true normals. */
+    private static ModelPart.Cube meshFace(JsonObject mesh,JsonObject face,float[] origin,JsonObject resolution){
+        var names=face.getAsJsonArray("vertices");if(names.size()<3||names.size()>4)throw new IllegalStateException("Aeloria mesh face must have three or four vertices");
+        var vertices=new ModelPart.Vertex[4];var positions=new org.joml.Vector3f[3];
+        for(int i=0;i<4;i++){int index=Math.min(i,names.size()-1);String key=names.get(index).getAsString();var p=mesh.getAsJsonObject("vertices").getAsJsonArray(key);var uv=face.getAsJsonObject("uv").getAsJsonArray(key);
+            float x=origin[0]-p.get(0).getAsFloat(),y=origin[1]-p.get(1).getAsFloat(),z=p.get(2).getAsFloat()-origin[2];
+            vertices[i]=new ModelPart.Vertex(x,y,z,uv.get(0).getAsFloat()/resolution.get("width").getAsFloat(),uv.get(1).getAsFloat()/resolution.get("height").getAsFloat());if(i<3)positions[i]=new org.joml.Vector3f(x,y,z);
+        }
+        var normal=new org.joml.Vector3f(positions[1]).sub(positions[0]).cross(new org.joml.Vector3f(positions[2]).sub(positions[0]));if(normal.lengthSquared()<1e-10f)normal.set(0,1,0);else normal.normalize();
+        var cube=new ModelPart.Cube(0,0,0,0,0,1,1,1,0,0,0,false,64,64,java.util.Set.of(Direction.NORTH));cube.polygons[0]=new ModelPart.Polygon(vertices,normal);return cube;
+    }
     private static float ratio(float v,float a,float b) { return b==a?0:(v-a)/(b-a); }
     private static String originalFace(Direction d) {
         return switch(d) { case UP -> "down";case DOWN -> "up";case EAST -> "west";case WEST -> "east";default -> d.getName(); };
@@ -120,5 +135,7 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
         String move=animations.containsKey("walk")?"walk":animations.containsKey("fly")?"fly":"slither";
         animate(move,state.ageInTicks,moving);
         if(state instanceof ImportedMobRenderer.State s && s.attackTicks>=0) animate("attack",s.attackTicks,1);
+        if(state instanceof com.mmorpg.client.model.YggdrasilRenderer.State s){if(s.attackTicks>=0)animate("attack",s.attackTicks,1);if(s.castTicks>=0)animate("cast",s.castTicks,1);}
+        if(state.deathTime>0)animate("death",state.deathTime,1);
     }
 }

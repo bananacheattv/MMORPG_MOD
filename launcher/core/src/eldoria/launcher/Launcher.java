@@ -130,7 +130,7 @@ public final class Launcher {
             l.manifest.put("date", "2026-10-23");
             l.manifest.put("notes", List.of("Donjons de 20 minutes : 6 epreuves, 2 parcours de saut et 4 embuscades",
                     "Le boss se reveille tout seul a l'entree de son arene", "Nouvelle interface plate dans tout le jeu", "Bestiaire verrouille jusqu'a la premiere victoire"));
-            l.manifest.put("mods", List.of(Map.of("file", "mmorpg-1.0.0.jar"), Map.of("file", "worldedit-neoforge.jar"), Map.of("file", "geckolib.jar")));
+            l.manifest.put("mods", List.of(Map.of("file", "aeloria-0.0.0.jar"), Map.of("file", "worldedit-neoforge.jar"), Map.of("file", "geckolib.jar")));
             l.fillNews();
             l.refreshHomeStats();
             l.frame.setLocation(40, 40);
@@ -397,9 +397,9 @@ public final class Launcher {
             @Override
             protected void paintComponent(Graphics g0) {
                 Graphics2D g = Theme.smooth(g0);
-                String v = manifest == null ? "-" : Json.str(manifest.get("version"), "-");
+                String v = manifest == null ? "-" : Json.str(manifest.get("gameVersion"), "0.0");
                 int mods = manifest == null ? 0 : Json.arr(manifest.get("mods")).size();
-                stat(g, 70, "Version du modpack", v, Theme.GREEN);
+                stat(g, 70, "Version du jeu", v, Theme.GREEN);
                 stat(g, 250, "Mods installes", String.valueOf(mods), Theme.GOLD);
                 g.dispose();
             }
@@ -501,7 +501,7 @@ public final class Launcher {
     private void fillNews() {
         newsBox.removeAll();
         changeBox.removeAll();
-        String version = Json.str(manifest.get("version"), "?");
+        String version = Json.str(manifest.get("gameVersion"), "0.0");
         String date = Json.str(manifest.get("date"), "");
         List<Object> notes = Json.arr(manifest.get("notes"));
         if (notes.isEmpty()) {

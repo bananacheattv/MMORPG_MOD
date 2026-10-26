@@ -143,6 +143,7 @@ public final class StatCalculator {
         }
         out.set(Stat.MAX_HP, Math.max(1, out.get(Stat.MAX_HP)));
         out.set(Stat.MAX_MANA, Math.max(1, out.get(Stat.MAX_MANA)));
+        com.mmorpg.guild.GuildBuffs.apply(data,out);
         return out;
     }
 

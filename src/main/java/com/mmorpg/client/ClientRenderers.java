@@ -37,6 +37,8 @@ public final class ClientRenderers {
 
     @SubscribeEvent
     public static void register(EntityRenderersEvent.RegisterRenderers event) {
+        for(int i=0;i<10;i++){final int tier=i;event.registerEntityRenderer(ModEntities.GUILD_GUARDIANS.get(i).get(),c->new com.mmorpg.client.model.YggdrasilRenderer(c,tier));}
+        event.registerEntityRenderer(ModEntities.ARENA_CRYSTAL.get(),com.mmorpg.client.model.ArenaCrystalRenderer::new);
         ModEntities.IMPORTED.forEach((key, type) -> event.registerEntityRenderer(type.get(), c -> new com.mmorpg.client.model.imported.ImportedMobRenderer(c, key)));
         event.registerEntityRenderer(ModEntities.CRYPT_ZOMBIE.get(), net.minecraft.client.renderer.entity.ZombieRenderer::new);
         event.registerEntityRenderer(ModEntities.VENOM_SPIDER.get(), net.minecraft.client.renderer.entity.CaveSpiderRenderer::new);

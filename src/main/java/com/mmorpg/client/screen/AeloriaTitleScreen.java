@@ -5,35 +5,17 @@ import com.mmorpg.client.ClientConfig;
 import com.mmorpg.client.cinematic.Ease;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.CommonButtons;
-import net.minecraft.client.gui.components.PlainTextButton;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.screens.CreditsAndAttributionScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
-import net.minecraft.client.gui.screens.multiplayer.SafetyScreen;
-import net.minecraft.client.gui.screens.options.AccessibilityOptionsScreen;
-import net.minecraft.client.gui.screens.options.LanguageSelectScreen;
 import net.minecraft.client.gui.screens.options.OptionsScreen;
-import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
-import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
 /**
  * Menu principal d'Aeloria : remplace celui de Minecraft (voir {@link com.mmorpg.client.TitleClient}). Panorama assombri, braises
- * dorees qui montent, logo, accroche, boutons Jouer / Multijoueur (et « Rejoindre Aeloria » si une adresse est configuree), options,
- * mods, langue, accessibilite et quitter.
+ * dorees qui montent, logo, accroche et trois boutons : connexion au serveur, options et quitter.
  */
 public class AeloriaTitleScreen extends Screen {
-    private static final Component CREDITS = Component.translatable("title.credits");
-    private static final String[] TIPS = {
-            "Choisissez votre classe dans la Citadelle : Guerrier, Mage, Archer ou Paladin.",
-            "Les donjons sont instanciés : le vôtre, rien que pour vous et votre groupe.",
-            "La touche M ouvre votre personnage, vos quêtes et votre groupe.",
-            "Cinq boss vous attendent, du Roi Gobelin à l'Avatar du Néant.",
-            "On ne perd jamais son équipement en mourant, seulement un peu d'expérience.",
-    };
     private long openedAt;
 
     public AeloriaTitleScreen() {
@@ -57,38 +39,18 @@ public class AeloriaTitleScreen extends Screen {
         int cx = this.width / 2;
         int bw = 220;
         int y = Math.max(158, this.height / 4 + 70);
-        this.addRenderableWidget(Button.builder(Component.literal("JOUER"), b -> this.minecraft.gui.setScreen(new SelectWorldScreen(this)))
-                .bounds(cx - bw / 2, y, bw, 24).build());
-        y += 28;
         boolean multi = this.minecraft.allowsMultiplayer();
-        Button online = this.addRenderableWidget(Button.builder(Component.literal("MULTIJOUEUR"), b -> this.minecraft.gui.setScreen(
-                        this.minecraft.options.skipMultiplayerWarning ? new JoinMultiplayerScreen(this) : new SafetyScreen(this)))
+        Button online = this.addRenderableWidget(Button.builder(Component.literal("JOUER"), b -> join(serverAddress()))
                 .bounds(cx - bw / 2, y, bw, 24).build());
         online.active = multi;
         if (!multi) online.setTooltip(Tooltip.create(Component.translatable("title.multiplayer.disabled")));
         y += 28;
-        String server = ClientConfig.MAIN_MENU_SERVER.get().trim();
-        if (!server.isEmpty() && multi) {
-            this.addRenderableWidget(Button.builder(Component.literal("REJOINDRE AELORIA"), b -> join(server)).bounds(cx - bw / 2, y, bw, 24).build());
-            y += 28;
-        }
         this.addRenderableWidget(Button.builder(Component.literal("OPTIONS"), b -> this.minecraft.gui.setScreen(new OptionsScreen(this, this.minecraft.options)))
                 .bounds(cx - bw / 2, y, bw / 2 - 2, 20).build());
         this.addRenderableWidget(Button.builder(Component.literal("QUITTER"), b -> this.minecraft.stop()).bounds(cx + 2, y, bw / 2 - 2, 20).build());
-        y += 24;
-        // rangee d'icones : mods, langue, accessibilite
-        int ix = cx - (3 * 20 + 2 * 4) / 2;
-        this.addRenderableWidget(net.neoforged.neoforge.client.gui.widget.ModsButton.create(this)).setPosition(ix, y);
-        SpriteIconButton lang = this.addRenderableWidget(CommonButtons.language(20,
-                b -> this.minecraft.gui.setScreen(new LanguageSelectScreen(this, this.minecraft.options, this.minecraft.getLanguageManager())), true));
-        lang.setPosition(ix + 24, y);
-        SpriteIconButton access = this.addRenderableWidget(CommonButtons.accessibility(20,
-                b -> this.minecraft.gui.setScreen(new AccessibilityOptionsScreen(this, this.minecraft.options)), true));
-        access.setPosition(ix + 48, y);
-        int cw = this.font.width(CREDITS);
-        this.addRenderableWidget(new PlainTextButton(this.width - cw - 4, this.height - 12, cw, 10, CREDITS,
-                b -> this.minecraft.gui.setScreen(new CreditsAndAttributionScreen(this)), this.font));
     }
+
+    public static String serverAddress(){String server=System.getProperty("aeloria.server","").trim();if(server.isEmpty())server=ClientConfig.MAIN_MENU_SERVER.get().trim();return server.isEmpty()?"192.168.0.249:25565":server;}
 
     /** Connexion directe au serveur configure (config client : mainMenuServer). */
     private void join(String address) {
@@ -124,15 +86,6 @@ public class AeloriaTitleScreen extends Screen {
         for (int sx : new int[]{cx - half, cx + half}) {
             for (int i = -3; i <= 3; i++) g.fill(sx - (3 - Math.abs(i)), ty + 12 + i, sx + (3 - Math.abs(i)) + 1, ty + 13 + i, argb(fade, 0xE2B85A));
         }
-        // astuce qui change toutes les 8 s
-        String tip = TIPS[(int) (t / 8F) % TIPS.length];
-        float tf = Mth.clamp(Math.min((t % 8F) / 0.5F, (8F - (t % 8F)) / 0.5F), 0F, 1F);
-        int pw = font.width(tip);
-        g.text(font, tip, cx - pw / 2, height - 30, argb(0.85F * tf * fade, 0xB8A98A), true);
-        // pied de page
-        g.text(font, "Aeloria MMORPG", 4, height - 12, argb(0.7F * fade, 0x9C8A6A), true);
-        String mc = "Minecraft " + net.minecraft.SharedConstants.getCurrentVersion().name() + " · NeoForge";
-        g.text(font, mc, 4, height - 22, argb(0.45F * fade, 0x9C8A6A), true);
     }
 
     /** Braises dorees qui montent lentement, deterministes (pas d'etat). */

@@ -27,7 +27,8 @@ public final class DungeonLobby {
     }
     public static void arriveIfNeeded(ServerPlayer p) {
         if (NetworkConfig.current.enabled && NetworkConfig.current.role == NetworkConfig.Role.DUNGEONS
-                && (com.mmorpg.network.NetworkPlayers.isArriving(p) || !p.level().dimension().equals(InstanceManager.DIM))) {
+                && (com.mmorpg.network.NetworkPlayers.isArriving(p) || (!p.level().dimension().equals(InstanceManager.DIM)
+                    && !com.mmorpg.competition.CompetitionTravel.inside(p)))) {
             p.teleportTo(p.level().getServer().overworld(), .5, 100, .5, java.util.Set.of(), 0, 0, true); p.resetFallDistance();
         }
     }

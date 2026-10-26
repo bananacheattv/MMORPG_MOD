@@ -10,7 +10,7 @@ import net.minecraft.client.input.KeyEvent;
 /** Menu principal a onglets du mod. */
 public abstract class MenuScreen extends MmoScreen {
     public enum Tab {
-        PERSONNAGE("Personnage"), COMPETENCES("Compétences"), QUETES("Quêtes"), GROUPE("Groupe"), FAMILIERS("Familiers"), MONTURES("Montures"), COSMETIQUES("Cosmétiques"), BESTIAIRE("Bestiaire");
+        PERSONNAGE("Personnage"), COMPETENCES("Compétences"), QUETES("Quêtes"), GROUPE("Groupe"), GUILDE("Guilde"), ARENE("Arène"), FAMILIERS("Familiers"), MONTURES("Montures"), COSMETIQUES("Cosmétiques"), BESTIAIRE("Bestiaire");
 
         public final String label;
 
@@ -29,6 +29,7 @@ public abstract class MenuScreen extends MmoScreen {
     }
 
     public static void open(Tab tab) {
+        if(tab==Tab.GUILDE||tab==Tab.ARENE){var t=new net.minecraft.nbt.CompoundTag();t.putString("action","open");com.mmorpg.client.ClientNet.send(new com.mmorpg.network.Payloads.SocialAction(tab==Tab.GUILDE?"guild":"arena",t));return;}
         if (tab == Tab.PERSONNAGE) {             // personnage + inventaire + equipement (aussi sans classe)
             lastTab = tab;
             Minecraft.getInstance().gui.setScreen(new CharacterScreen(Minecraft.getInstance().player));
@@ -48,6 +49,7 @@ public abstract class MenuScreen extends MmoScreen {
             case MONTURES -> new MountsScreen();
             case COSMETIQUES -> new CosmeticsScreen();
             case BESTIAIRE -> new BestiaryScreen();
+            case GUILDE,ARENE -> throw new IllegalStateException("Server-backed screen");
         });
     }
 
