@@ -1,6 +1,6 @@
 # Spawn manuel, WorldEdit et aventures
 
-Le spawn est un terrain plat en herbe, sans bâtiments, dans `mmorpg:spawn`. Le hub des classes reste dans `mmorpg:hub`. Le point de départ est à `0 96 0`. La configuration `spawn.json` utilise `manualBuild: true`, `flatPlatform: true`, `autoNpcs: false` et `autoStations: false` : les constructions manuelles ne sont jamais remplacées par la ville automatique.
+Le spawn est un monde entièrement vide, sans aucun bloc ni plateforme, dans `mmorpg:spawn`. Le hub des classes reste dans `mmorpg:hub`. Le point de départ est à `0 96 0`. La configuration `spawn.json` utilise `manualBuild: true`, `flatPlatform: false`, `autoNpcs: false` et `autoStations: false` : les constructions manuelles ne sont jamais remplacées par la ville automatique.
 
 ## Outil de construction (opérateur)
 
@@ -9,7 +9,7 @@ Le spawn est un terrain plat en herbe, sans bâtiments, dans `mmorpg:spawn`. Le 
 3. Clic droit sur un bloc avec la baguette : la face cliquée désigne l'emplacement. Clic droit dans l'air : bloc visé à huit blocs au maximum, sinon quatre blocs devant soi.
 4. Choisir une structure, un coffre, un PNJ ou un portail, puis son orientation. Les structures refusent les emplacements occupés. Les portails demandent cinq blocs de large et cinq de haut sur un sol solide.
 5. Onglet Textes : saisir le texte, sa taille et sa hauteur, puis le poser. Le bouton de retrait supprime le texte de cet outil le plus proche à dix blocs au maximum.
-6. Le bouton « Point /spawn ici » déplace l'arrivée des joueurs vers sa position actuelle.
+6. Le bouton « Définir le spawn ici » ou `/spawn set` enregistre la position exacte et l’orientation pour les arrivées `/spawn`.
 
 Le bouton Annuler et `/amenagement annuler` annulent les vingt dernières opérations de l'outil et des portails, dans l'ordre, pendant la session du serveur. `/undoportail` utilise aussi cet historique. Les modifications ultérieures d'un autre constructeur sont conservées : l'annulation refuse les conflits. Les coffres et structures qui contiennent des objets ne sont pas effacés par une annulation. Les historiques ne survivent pas à un redémarrage ; les constructions, portails et textes, eux, sont sauvegardés.
 

@@ -49,10 +49,15 @@ public final class DevSpawnEditorChecks {
             var config=com.mmorpg.config.ConfigManager.spawn();boolean manual=config.manualBuild,flat=config.flatPlatform;
             var spawnData=com.mmorpg.hub.SpawnData.get(server);var oldOrigin=spawnData.origin();int oldLayout=spawnData.layout();
             try {
-                config.manualBuild=true;config.flatPlatform=true;
-                check(spawnLevel.getBlockState(new BlockPos(512,95,512)).is(Blocks.GRASS_BLOCK),"new spawn terrain is flat grass at y95");
+                config.manualBuild=true;config.flatPlatform=false;
+                for(int y=0;y<256;y++)check(spawnLevel.getBlockState(new BlockPos(2048,y,2048)).isAir(),"new spawn chunks contain only air");
                 com.mmorpg.hub.SpawnBuilder.ensure(server);
                 check(spawnData.origin().equals(new BlockPos(0,96,0)),"manual spawn arrival point");
+                var sample=new com.mmorpg.hub.SpawnData();sample.set(new BlockPos(0,96,0),Integer.MAX_VALUE);
+                var exact=new net.minecraft.world.phys.Vec3(12.25,111.5,-8.75);sample.setArrival(exact,-45F,12F);
+                var encoded=com.mmorpg.hub.SpawnData.CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE,sample).getOrThrow();
+                var decoded=com.mmorpg.hub.SpawnData.CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE,encoded).getOrThrow();
+                check(decoded.arrival().equals(exact)&&decoded.yaw()==-45F&&decoded.pitch()==12F,"exact arrival coordinates and orientation persist");
                 spawnLevel.setBlockAndUpdate(new BlockPos(1,96,0),Blocks.DIAMOND_BLOCK.defaultBlockState());
                 check(!com.mmorpg.hub.SpawnBuilder.ensure(server)&&spawnLevel.getBlockState(new BlockPos(1,96,0)).is(Blocks.DIAMOND_BLOCK),"manual buildings survive ensure/restart path");
             } finally {config.manualBuild=manual;config.flatPlatform=flat;if(oldOrigin!=null)spawnData.set(oldOrigin,oldLayout);}

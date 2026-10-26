@@ -3,24 +3,12 @@
   "generator": {
     "type": "minecraft:flat",
     "settings": {
-      "biome": "minecraft:plains",
+      "biome": "minecraft:the_void",
       "features": false,
       "lakes": false,
       "layers": [
         {
-          "block": "minecraft:bedrock",
-          "height": 1
-        },
-        {
-          "block": "minecraft:stone",
-          "height": 90
-        },
-        {
-          "block": "minecraft:dirt",
-          "height": 4
-        },
-        {
-          "block": "minecraft:grass_block",
+          "block": "minecraft:air",
           "height": 1
         }
       ],

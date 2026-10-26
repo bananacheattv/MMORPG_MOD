@@ -377,6 +377,7 @@ public final class RpgCommands {
                 }
                 return 1;
             })
+                    .then(Commands.literal("set").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).executes(c -> SpawnEditor.setArrival(c.getSource().getPlayerOrException())))
                     .then(Commands.literal("pnj").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).executes(c -> {
                         var spawn = com.mmorpg.hub.SpawnData.get(c.getSource().getServer());
                         var level = c.getSource().getServer().getLevel(com.mmorpg.hub.SpawnBuilder.DIM);
