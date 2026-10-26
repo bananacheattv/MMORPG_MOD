@@ -43,3 +43,7 @@ Tous les serveurs de jeu doivent être arrêtés. `tools/Reset-ManualSpawn.ps1 -
 188 parchemins nominatifs débloquent chacun une seule recette d'armure, d'arme ou d'outil. Les boss donnent un plan du palier adapté, en privilégiant la classe du joueur et les recettes inconnues. Les quêtes d'artisan donnent un parchemin d'armure précis. Les doublons ne sont pas consommés. Les anciens parchemins génériques encore présents dans un inventaire s'échangent par clic droit contre un plan nominatif ; les anciens déblocages déjà appris sont conservés par migration.
 
 Validation : `gradlew.bat runServer -PnetworkChecks build` sur le monde de développement uniquement, `node --test tools/panel-worldedit/worldedit.test.cjs`, et `gradlew.bat runClient -Pshowcase=spawn_editor_ui` pour les captures de l'interface.
+
+## Consommation dans le tableau de bord
+
+Chaque carte de service affiche CPU et RAM du processus, ainsi que leur part dans la capacité totale de la machine. Actualisation toutes les quatre secondes. Le CPU est calculé entre deux mesures : 100 % signifie tous les cœurs de la machine occupés. Une première mesure ou une mesure indisponible est affichée explicitement. L’installateur Windows `node tools/panel-metrics/install.cjs "CHEMIN_DU_PANEL"` sauvegarde les sources avant modification ; redémarrer ensuite le panel.
