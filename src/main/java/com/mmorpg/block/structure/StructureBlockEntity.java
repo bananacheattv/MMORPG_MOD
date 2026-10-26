@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 /** Entite du bloc fonctionnel d'une structure multibloc : sert au rendu du modele 3D (etat d'animation cote client). */
-public class StructureBlockEntity extends BlockEntity {
+public class StructureBlockEntity extends OrientedBlockEntity {
     /** Client : etat actif vu a la derniere image et instant (s) du dernier changement, pour l'animation d'activation. */
     public boolean clientActive;
     public float clientActiveSince = -100.0F;

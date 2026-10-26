@@ -67,6 +67,7 @@ public final class Net {
         r.playToServer(Payloads.ServiceAction.TYPE, Payloads.ServiceAction.CODEC, ServerHandlers::serviceAction);
         r.playToServer(Payloads.QuestAction.TYPE, Payloads.QuestAction.CODEC, ServerHandlers::questAction);
         r.playToServer(Payloads.ShopAction.TYPE, Payloads.ShopAction.CODEC, ServerHandlers::shopAction);
+        r.playToServer(Payloads.MerchantEdit.TYPE,Payloads.MerchantEdit.CODEC,(packet,ctx)->{if(ctx.player() instanceof ServerPlayer p)com.mmorpg.server.MerchantEditor.action(p,packet.data());});
         r.playToServer(Payloads.PartyAction.TYPE, Payloads.PartyAction.CODEC, ServerHandlers::partyAction);
     }
 

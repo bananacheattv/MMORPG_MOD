@@ -37,6 +37,20 @@ public final class DevShowcase {
     public static void onTick(ClientTickEvent.Post event) {
         if (!ENABLED) return;
         Minecraft mc = Minecraft.getInstance();
+        if(MODE.equals("merchant_preview")) {
+            if(mc.gui.screen() instanceof com.mmorpg.client.screen.MerchantEditorScreen screen) {
+                tick++;
+                if(tick==1){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(3);mc.resizeGui();}
+                if(tick==175)editorClick(screen,20,85);
+                if(tick==180)shot(mc,"merchant_catalogue");
+                if(tick==185)screen.showTab(2);
+                if(tick==200)shot(mc,"merchant_appearances");
+                if(tick==205)mc.gui.setScreen(null);
+            } else if(tick>=205) {
+                tick++;if(tick==220)shot(mc,"orientation_scene");if(tick==230)stop(mc);
+            }
+            return;
+        }
         if (MODE.equals("spawn_editor_ui")) {
             // GUI verification without a live world or an authenticated account.
             if (mc.gui.screen() == null) return;
@@ -71,6 +85,22 @@ public final class DevShowcase {
         mc.options.pauseOnLostFocus = false;
         if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.PauseScreen && !MODE.equals("interface")) mc.gui.setScreen(null);
         String me = mc.player.getName().getString();
+        if (MODE.equals("orientation_scene")) {
+            if(tick==0)mc.getSingleplayerServer().execute(()->{
+                var server=mc.getSingleplayerServer();var p=server.getPlayerList().getPlayerByName(me);var level=server.overworld();
+                com.mmorpg.hub.CinematicManager.finish(p);p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+                com.mmorpg.server.RpgPlayers.get(p).playerClass=com.mmorpg.rpg.PlayerClass.GUERRIER;
+                for(int x=-15;x<=15;x++)for(int z=-10;z<=16;z++)level.setBlockAndUpdate(new net.minecraft.core.BlockPos(x,99,z),net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState());
+                p.teleportTo(level,8.5,102,11.5,java.util.Set.of(),145F,10F,true);
+                com.mmorpg.server.SpawnEditor.open(p,new net.minecraft.core.BlockPos(2,100,0));com.mmorpg.server.SpawnEditor.placeOriented(p,"forge_arcanique","moi");
+                com.mmorpg.server.SpawnEditor.open(p,new net.minecraft.core.BlockPos(-4,100,4));com.mmorpg.server.SpawnEditor.placeOriented(p,"caisse_commune_bloc","moi");
+                com.mmorpg.server.SpawnEditor.open(p,new net.minecraft.core.BlockPos(-4,100,4));com.mmorpg.server.SpawnEditor.textOriented(p,"Angle libre",1.5f,3,"moi");
+            });
+            if(tick==25){mc.gui.setScreen(null);mc.getWindow().setWindowed(1280,720);}
+            if(tick==70)shot(mc,"orientation_scene");
+            if(tick==95)stop(mc);
+            return;
+        }
         if (MODE.equals("editeur_workflow")) {
             if(tick==0) mc.getSingleplayerServer().execute(()->com.mmorpg.server.DevQuestEditorChecks.beginWorkflow(mc.getSingleplayerServer()));
             if(tick==5) {mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(3);mc.resizeGui();cmd(mc,"mmorpg editeurquetes");}

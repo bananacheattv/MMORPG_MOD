@@ -30,19 +30,19 @@ import org.jspecify.annotations.Nullable;
 public class StructurePartBlock extends Block {
     public static final EnumProperty<MultiblockKind> KIND = EnumProperty.create("structure", MultiblockKind.class);
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
-    public static final IntegerProperty OX = IntegerProperty.create("ox", 0, 2 * MultiblockKind.RANGE_XZ);
+    public static final IntegerProperty OX = IntegerProperty.create("ox", 0, 10);
     public static final IntegerProperty OY = IntegerProperty.create("oy", 0, MultiblockKind.RANGE_Y);
-    public static final IntegerProperty OZ = IntegerProperty.create("oz", 0, 2 * MultiblockKind.RANGE_XZ);
+    public static final IntegerProperty OZ = IntegerProperty.create("oz", 0, 10);
 
     public StructurePartBlock(Properties properties) {
-        super(properties);
+        super(properties.dynamicShape());
         this.registerDefaultState(this.stateDefinition.any().setValue(KIND, MultiblockKind.FORGE).setValue(FACING, Direction.NORTH)
-                .setValue(OX, MultiblockKind.RANGE_XZ).setValue(OY, 1).setValue(OZ, MultiblockKind.RANGE_XZ));
+                .setValue(OX, MultiblockKind.RANGE_XZ).setValue(OY, 1).setValue(OZ, MultiblockKind.RANGE_XZ).setValue(FreeOrientation.FREE,false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(KIND, FACING, OX, OY, OZ);
+        builder.add(KIND, FACING, OX, OY, OZ, FreeOrientation.FREE);
     }
 
     public static BlockState stateFor(Block part, MultiblockKind kind, Direction facing, int[] cell) {
@@ -50,8 +50,13 @@ public class StructurePartBlock extends Block {
                 .setValue(OX, cell[0] + MultiblockKind.RANGE_XZ).setValue(OY, cell[1]).setValue(OZ, cell[2] + MultiblockKind.RANGE_XZ);
     }
 
+    public static BlockState freeStateFor(MultiblockKind kind, BlockPos cell) {
+        return com.mmorpg.registry.ModBlocks.STRUCTURE_PART.get().defaultBlockState().setValue(KIND,kind).setValue(FACING,Direction.NORTH)
+                .setValue(FreeOrientation.FREE,true).setValue(OX,cell.getX()+5).setValue(OY,cell.getY()).setValue(OZ,cell.getZ()+5);
+    }
     private static int[] cell(BlockState state) {
-        return new int[]{state.getValue(OX) - MultiblockKind.RANGE_XZ, state.getValue(OY), state.getValue(OZ) - MultiblockKind.RANGE_XZ};
+        int offset=state.getValue(FreeOrientation.FREE)?5:MultiblockKind.RANGE_XZ;
+        return new int[]{state.getValue(OX) - offset, state.getValue(OY), state.getValue(OZ) - offset};
     }
 
     /** Position du bloc fonctionnel dont depend cette partie. */
@@ -72,6 +77,8 @@ public class StructurePartBlock extends Block {
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        var masterPos=masterPos(pos,state);
+        if(level.getBlockEntity(masterPos) instanceof OrientedBlockEntity be && Float.isFinite(be.yaw))return be.shapes().getOrDefault(pos.subtract(masterPos),net.minecraft.world.phys.shapes.Shapes.empty());
         int[] c = cell(state);
         return state.getValue(KIND).shape(c[0], c[1], c[2], state.getValue(FACING));
     }

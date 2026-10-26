@@ -23,6 +23,7 @@ public final class ShopPricing {
         String id = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
         Integer explicit = cfg.sellPrices.get(id);
         if (explicit != null) return Math.max(0, explicit);
+        if (!cfg.automaticBuyback) return 0;
         if (stack.getItem() instanceof RpgEquipment eq) {
             double base = rarityPrice(cfg, eq.rpgDef().rarity()) * cfg.equipmentMultiplier;
             return (int) Math.max(1, Math.round(base * (1 + 0.25 * RpgEquipment.upgrade(stack))));

@@ -28,7 +28,8 @@ public final class ShopManager {
         CompoundTag t = new CompoundTag();
         t.putInt("npc", npc.getId());
         t.putString("name", npc.displayName());
-        t.putString("shop", ConfigManager.shopJson());
+        t.putString("shop",new com.google.gson.Gson().toJson(MerchantEditor.config(npc)));
+        t.putBoolean("canEdit",QuestEditor.allowed(p));
         Net.toPlayer(p, new S2COpenScreen(S2COpenScreen.SHOP, t));
         p.level().playSound(null, npc.blockPosition(), SoundEvents.VILLAGER_TRADE, SoundSource.NEUTRAL, 0.8f, 1.0f);
     }
@@ -40,7 +41,7 @@ public final class ShopManager {
 
     public static void buy(ServerPlayer p, int npcId, int index, int times) {
         if (!nearMerchant(p, npcId)) return;
-        ShopConfig cfg = ConfigManager.shop();
+        ShopConfig cfg = MerchantEditor.config((NpcEntity)p.level().getEntity(npcId));
         if (index < 0 || index >= cfg.buy.size()) return;
         ShopConfig.Offer offer = cfg.buy.get(index);
         PlayerData d = RpgPlayers.get(p);
@@ -67,7 +68,7 @@ public final class ShopManager {
         Inventory inv = p.getInventory();
         if (slot < 0 || slot >= inv.getContainerSize()) return;
         ItemStack stack = inv.getItem(slot);
-        ShopConfig cfg = ConfigManager.shop();
+        ShopConfig cfg = MerchantEditor.config((NpcEntity)p.level().getEntity(npcId));
         int price = ShopPricing.sellPrice(stack, cfg);
         if (price <= 0) {
             p.sendOverlayMessage(Component.literal("Le marchand n'achète pas cet objet.").withColor(0xFF5050));

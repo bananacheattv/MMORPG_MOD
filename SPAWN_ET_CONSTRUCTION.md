@@ -47,3 +47,17 @@ Validation : `gradlew.bat runServer -PnetworkChecks build` sur le monde de déve
 ## Consommation dans le tableau de bord
 
 Chaque carte de service affiche CPU et RAM du processus, ainsi que leur part dans la capacité totale de la machine. Actualisation toutes les quatre secondes. Le CPU est calculé entre deux mesures : 100 % signifie tous les cœurs de la machine occupés. Une première mesure ou une mesure indisponible est affichée explicitement. L’installateur Windows `node tools/panel-metrics/install.cjs "CHEMIN_DU_PANEL"` sauvegarde les sources avant modification ; redémarrer ensuite le panel.
+
+## Orientation libre de l’outil
+
+Pour les structures, coffres, PNJ et textes, le réglage « Face à moi » oriente l’élément vers le joueur au moment de la pose, même en diagonale. La rotation reste fixe ensuite. Cliquer sur ce réglage donne accès à un angle libre en degrés (0 = sud, 90 = ouest, 180 = nord, -90 = est). Les textes de l’outil utilisent cette même orientation fixe ; les titres des coffres restent des étiquettes lisibles face à chaque joueur. Les portails gardent Nord/Est/Sud/Ouest. Les anciennes poses conservent leur orientation.
+
+L’angle est sauvegardé avec le bloc et synchronisé aux clients. Les collisions des structures sont réparties sur leur emprise tournée ; les boîtes de collision tournées utilisent une enveloppe conservatrice, qui peut laisser une petite marge dans les coins. L’outil refuse toute emprise occupée et l’annulation restaure toutes ses cellules.
+
+## Marchands
+
+Créer avec `/amenagement outil` > PNJ > Marchand, ou `/mmorpg pnj marchand Nom`. Un opérateur ouvre l’éditeur avec Maj + clic droit sur le marchand, ou avec le bouton « Configurer » de sa boutique.
+
+Le catalogue présente directement les icônes des objets, avec recherche et pagination. Cliquer sur un objet pour régler quantité, prix de vente, prix de rachat et niveau minimum ; les boutons Vente et Rachat activent les échanges souhaités. L’onglet « Articles du marchand » retrouve les articles configurés. « Boutique vide (brouillon) » permet de repartir d’un catalogue vide, sans rachats automatiques. Les modifications restent un brouillon jusqu’au bouton « Enregistrer ».
+
+L’onglet « Apparence » affiche les quatre modèles existants : cliquer sur un aperçu et modifier le nom si besoin, puis enregistrer. Chaque marchand conserve ses propres articles, prix et apparence après redémarrage. Un marchand jamais personnalisé utilise encore la boutique générale `shop.json`. Deux éditeurs simultanés ne peuvent pas écraser silencieusement les modifications de l’autre. L’import de textures et de modèles 3D personnalisés reste une évolution future.

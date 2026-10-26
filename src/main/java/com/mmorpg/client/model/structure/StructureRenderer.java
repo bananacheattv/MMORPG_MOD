@@ -42,6 +42,7 @@ public class StructureRenderer implements BlockEntityRenderer<StructureBlockEnti
     public static class State extends BlockEntityRenderState {
         public MultiblockKind kind = MultiblockKind.FORGE;
         public Direction facing = Direction.NORTH;
+        public float yaw=Float.NaN;
         public boolean active;
         public float time;
         public float sinceActive;
@@ -91,6 +92,7 @@ public class StructureRenderer implements BlockEntityRenderer<StructureBlockEnti
         MultiblockKind kind = MultiblockKind.of(bs.getBlock());
         if (kind == null) return;
         state.kind = kind;
+        state.yaw = be.yaw;
         state.facing = bs.hasProperty(MultiblockMasterBlock.FACING) ? bs.getValue(MultiblockMasterBlock.FACING) : Direction.NORTH;
         boolean active;
         if (kind == MultiblockKind.AUTEL) {
@@ -114,7 +116,7 @@ public class StructureRenderer implements BlockEntityRenderer<StructureBlockEnti
         Models m = models.get(state.kind);
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.0F, 0.5F);
-        poseStack.rotateDegrees(Axis.YP, switch (state.facing) {
+        poseStack.rotateDegrees(Axis.YP, Float.isFinite(state.yaw)?180-state.yaw:switch (state.facing) {
             case EAST -> -90.0F;
             case SOUTH -> 180.0F;
             case WEST -> 90.0F;
@@ -136,7 +138,7 @@ public class StructureRenderer implements BlockEntityRenderer<StructureBlockEnti
     /** Toute l'emprise de la structure (sinon elle disparaitrait quand le bloc fonctionnel sort de l'ecran). */
     @Override
     public AABB getRenderBoundingBox(StructureBlockEntity be) {
-        return new AABB(be.getBlockPos()).inflate(4.0, 0.0, 4.0).expandTowards(0.0, 5.0, 0.0);
+        return new AABB(be.getBlockPos()).inflate(Float.isFinite(be.yaw)?6:4, 0.0, Float.isFinite(be.yaw)?6:4).expandTowards(0.0, 5.0, 0.0);
     }
 
     @Override

@@ -79,7 +79,19 @@ public final class SpawnEditor {
         if(t==null||!t.dim().equals(p.level().dimension())||t.pos().distSqr(p.blockPosition())>256) return null;
         return t.pos();
     }
-    public static boolean place(ServerPlayer p,String id,Direction facing) {
+    public static boolean placeOriented(ServerPlayer p,String id,String orientation) {
+        Direction cardinal=Direction.byName(orientation);
+        if(cardinal!=null&&cardinal.getAxis()!=Direction.Axis.Y)return place(p,id,cardinal);
+        if(id.startsWith("portail:"))return fail(p,"Les portails gardent une orientation cardinale.");
+        BlockPos at=target(p);if(at==null)return fail(p,"Rouvre l’outil près du point de placement.");
+        float yaw;
+        try {yaw=orientation.equals("moi")?FreeOrientation.towards(Vec3.atCenterOf(at),p.position()):Float.parseFloat(orientation);}
+        catch(NumberFormatException e){return fail(p,"Orientation inconnue.");}
+        if(!Float.isFinite(yaw))return false;
+        return place(p,id,Direction.NORTH,net.minecraft.util.Mth.wrapDegrees(yaw));
+    }
+    public static boolean place(ServerPlayer p,String id,Direction facing) {return place(p,id,facing,Float.NaN);}
+    private static boolean place(ServerPlayer p,String id,Direction facing,float yaw) {
         if(!HubManager.isOperator(p)) return false;
         BlockPos at=target(p); if(at==null) return fail(p,"Rouvre l'outil près du point de placement.");
         if(catalogue().stream().noneMatch(e->e.id().equals(id))) return fail(p,"Élément inconnu.");
@@ -94,17 +106,22 @@ public final class SpawnEditor {
             Entity npc;
             if(id.equals("maitre")) {
                 var master=com.mmorpg.registry.ModEntities.CLASS_MASTER.get().create(level,EntitySpawnReason.COMMAND);
-                if(master==null) return false; npc=master; npc.snapTo(at.getX()+.5,at.getY(),at.getZ()+.5,facing.toYRot(),0);level.addFreshEntity(npc);
+                if(master==null) return false; npc=master; npc.snapTo(at.getX()+.5,at.getY(),at.getZ()+.5,(Float.isFinite(yaw)?yaw:facing.toYRot()),0);level.addFreshEntity(npc);
             } else {
                 var role=com.mmorpg.entity.NpcEntity.Role.valueOf(id.substring(4));
-                npc=com.mmorpg.world.DungeonBuilder.spawnNpc(level,at,role,"PNJ "+id.substring(4).toLowerCase(Locale.ROOT),0,facing.toYRot());
+                npc=com.mmorpg.world.DungeonBuilder.spawnNpc(level,at,role,"PNJ "+id.substring(4).toLowerCase(Locale.ROOT),0,Float.isFinite(yaw)?yaw:facing.toYRot());
             }
             if(npc==null) return false; npc.addTag("aeloria_editor"); rememberEntity(p,level,npc); return true;
         }
         Block block=BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath("mmorpg",id));
         if(block==null||block==Blocks.AIR) return false;
         var kind=MultiblockKind.of(block); List<BlockPos> cells=new ArrayList<>();cells.add(at);
-        if(kind!=null) for(int[] c:kind.cells()) cells.add(kind.cellPos(at,c,facing));
+        if(Float.isFinite(yaw)) {
+            for(BlockPos cell:FreeOrientation.shapes(block,yaw).keySet())if(!cell.equals(BlockPos.ZERO)) {
+                if(Math.abs(cell.getX())>5||Math.abs(cell.getZ())>5||cell.getY()<0||cell.getY()>MultiblockKind.RANGE_Y)return fail(p,"Emprise hors limites.");
+                cells.add(at.offset(cell));
+            }
+        } else if(kind!=null) for(int[] c:kind.cells()) cells.add(kind.cellPos(at,c,facing));
         Map<BlockPos,BlockState> before=new LinkedHashMap<>();
         for(BlockPos pos:cells) {
             if(level.isOutsideBuildHeight(pos)||!level.getWorldBorder().isWithinBounds(pos)||!level.hasChunkAt(pos)||!level.getBlockState(pos).isAir())
@@ -114,9 +131,13 @@ public final class SpawnEditor {
         if(level.getBlockState(at.below()).getCollisionShape(level,at.below()).isEmpty()) return fail(p,"Pose la structure sur un sol solide.");
         BlockState state=block.defaultBlockState();
         if(state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) state=state.setValue(BlockStateProperties.HORIZONTAL_FACING,facing);
-        level.setBlockAndUpdate(at,state); if(kind!=null) Multiblocks.placeParts(level,at,kind,facing);
+        if(state.hasProperty(FreeOrientation.FREE))state=state.setValue(FreeOrientation.FREE,Float.isFinite(yaw));
+        level.setBlockAndUpdate(at,state);
+        if(Float.isFinite(yaw)&&level.getBlockEntity(at) instanceof OrientedBlockEntity be)be.setYaw(yaw);
+        if(kind!=null) Multiblocks.placeParts(level,at,kind,facing);
         Map<BlockPos,BlockState> after=new LinkedHashMap<>();for(BlockPos pos:cells) after.put(pos,level.getBlockState(pos));
         remember(p, player->{
+            if(Float.isFinite(yaw)&&(!(level.getBlockEntity(at) instanceof OrientedBlockEntity be)||Float.compare(be.yaw,net.minecraft.util.Mth.wrapDegrees(yaw))!=0))return false;
             for(var e:after.entrySet()) if(!level.hasChunkAt(e.getKey())||!level.getBlockState(e.getKey()).equals(e.getValue())) return false;
             for(BlockPos pos:cells) if(level.getBlockEntity(pos) instanceof net.minecraft.world.Container c&&!c.isEmpty()) return false;
             // Restore peripheral cells before the master, whose removal also clears its parts.
@@ -133,11 +154,19 @@ public final class SpawnEditor {
         return p.level().getEntitiesOfClass(Display.TextDisplay.class,p.getBoundingBox().inflate(10),e->e.entityTags().contains("aeloria_editor"))
                 .stream().min(Comparator.comparingDouble(p::distanceToSqr)).orElse(null);
     }
-    public static boolean text(ServerPlayer p,String text,float scale,float height) {
+    public static boolean text(ServerPlayer p,String text,float scale,float height) {return textOriented(p,text,scale,height,"mobile");}
+    public static boolean textOriented(ServerPlayer p,String text,float scale,float height,String orientation) {
         BlockPos at=target(p);if(at==null||text.isBlank()||text.length()>240)return fail(p,"Texte vide, trop long ou point de placement périmé.");
         UUID id=UUID.randomUUID();
         String tag="{text:{text:"+new com.google.gson.Gson().toJson(text)+",color:\"gold\"},billboard:\"center\",background:0,shadow:true,line_width:600,Tags:[\"aeloria_editor\"],UUID:[I;"
-                +(int)(id.getMostSignificantBits()>>32)+","+(int)id.getMostSignificantBits()+","+(int)(id.getLeastSignificantBits()>>32)+","+(int)id.getLeastSignificantBits()+"],transformation:{scale:["+scale+"f,"+scale+"f,"+scale+"f]}}";
+                +(int)(id.getMostSignificantBits()>>32)+","+(int)id.getMostSignificantBits()+","+(int)(id.getLeastSignificantBits()>>32)+","+(int)id.getLeastSignificantBits()+"],transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:["+scale+"f,"+scale+"f,"+scale+"f]}}";
+        if(!orientation.equals("mobile")) {
+            float yaw;
+            try {yaw=orientation.equals("moi")?FreeOrientation.towards(Vec3.atCenterOf(at),p.position()):Float.parseFloat(orientation);}catch(NumberFormatException e){return false;}
+            if(!Float.isFinite(yaw))return false;
+            tag=tag.replace("billboard:\"center\"","billboard:\"fixed\"");
+            tag=tag.substring(0,tag.length()-1)+",Rotation:["+net.minecraft.util.Mth.wrapDegrees(yaw)+"f,0f]}";
+        }
         ServerLevel level=p.level();
         level.getServer().getCommands().performPrefixedCommand(level.getServer().createCommandSourceStack().withLevel(level).withSuppressedOutput(),
                 "summon minecraft:text_display "+(at.getX()+.5)+" "+(at.getY()+height)+" "+(at.getZ()+.5)+" "+tag);
@@ -164,9 +193,9 @@ public final class SpawnEditor {
                 .executes(c->{open(c.getSource().getPlayerOrException(),null);return 1;});
         root.then(Commands.literal("outil").executes(c->{var p=c.getSource().getPlayerOrException();if(!p.getInventory().add(new ItemStack(ModItems.SPAWN_EDITOR.get())))return 0;return 1;}));
         root.then(Commands.literal("poser").then(Commands.argument("element",StringArgumentType.word()).then(Commands.argument("orientation",StringArgumentType.word()).executes(c->{
-            String dir=StringArgumentType.getString(c,"orientation");Direction facing=Direction.byName(dir);if(facing==null||facing.getAxis()==Direction.Axis.Y)return 0;
-            return place(c.getSource().getPlayerOrException(),StringArgumentType.getString(c,"element"),facing)?1:0;}))));
+            return placeOriented(c.getSource().getPlayerOrException(),StringArgumentType.getString(c,"element"),StringArgumentType.getString(c,"orientation"))?1:0;}))));
         root.then(Commands.literal("texte").then(Commands.argument("taille",FloatArgumentType.floatArg(.25f,8)).then(Commands.argument("hauteur",FloatArgumentType.floatArg(0,12)).then(Commands.argument("texte",StringArgumentType.greedyString()).executes(c->text(c.getSource().getPlayerOrException(),StringArgumentType.getString(c,"texte"),FloatArgumentType.getFloat(c,"taille"),FloatArgumentType.getFloat(c,"hauteur"))?1:0)))));
+        root.then(Commands.literal("texteoriente").then(Commands.argument("taille",FloatArgumentType.floatArg(.25f,8)).then(Commands.argument("hauteur",FloatArgumentType.floatArg(0,12)).then(Commands.argument("orientation",StringArgumentType.word()).then(Commands.argument("texte",StringArgumentType.greedyString()).executes(c->textOriented(c.getSource().getPlayerOrException(),StringArgumentType.getString(c,"texte"),FloatArgumentType.getFloat(c,"taille"),FloatArgumentType.getFloat(c,"hauteur"),StringArgumentType.getString(c,"orientation"))?1:0))))));
         root.then(Commands.literal("supprimertexte").executes(c->removeText(c.getSource().getPlayerOrException())?1:0));
         root.then(Commands.literal("annuler").executes(c->AdventurePortals.undo(c.getSource().getPlayerOrException())?1:0));
         root.then(Commands.literal("pointspawn").executes(c->setArrival(c.getSource().getPlayerOrException())));

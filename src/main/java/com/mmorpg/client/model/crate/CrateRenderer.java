@@ -38,6 +38,8 @@ public class CrateRenderer implements BlockEntityRenderer<CrateBlockEntity, Crat
 
     public static class State extends BlockEntityRenderState {
         public String label = "";
+        public float yaw=Float.NaN;
+        public final net.minecraft.client.renderer.block.BlockModelRenderState model = new net.minecraft.client.renderer.block.BlockModelRenderState();
         public int color = 0xFFFFFF;
         public boolean spinning, showing;
         public float position, showTime, time;
@@ -70,6 +72,10 @@ public class CrateRenderer implements BlockEntityRenderer<CrateBlockEntity, Crat
             state.label = block.tier.label;
             state.color = block.tier.color;
         }
+        state.yaw=be.yaw;
+        if(Float.isFinite(state.yaw))net.minecraft.client.Minecraft.getInstance().getBlockModelResolver().update(state.model,
+                be.getBlockState().setValue(com.mmorpg.block.structure.FreeOrientation.FREE,false).setValue(CrateBlock.FACING,net.minecraft.core.Direction.NORTH),
+                net.minecraft.client.renderer.block.model.BlockDisplayContext.create());
         long now = be.getLevel() == null ? 0 : be.getLevel().getGameTime();
         float elapsed = now - be.startTick + partial;
         state.time = (now + partial) / 20f;
@@ -104,6 +110,10 @@ public class CrateRenderer implements BlockEntityRenderer<CrateBlockEntity, Crat
 
     @Override
     public void submit(State state, PoseStack pose, SubmitNodeCollector collector, CameraRenderState camera) {
+        if(Float.isFinite(state.yaw)) {
+            pose.pushPose();pose.translate(.5,0,.5);pose.rotateDegrees(Axis.YP,180-state.yaw);pose.translate(-.5,0,-.5);
+            state.model.submitMultiLayer(pose,collector,state.lightCoords,OverlayTexture.NO_OVERLAY,0);pose.popPose();
+        }
         // ---- nom de la caisse
         if (net.minecraft.client.Minecraft.getInstance().gui.hud.isHidden()) return;
         float labelY = state.spinning || state.showing ? 3.7f : 2.65f;

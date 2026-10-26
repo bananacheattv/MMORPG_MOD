@@ -36,14 +36,14 @@ public class CrateBlock extends Block implements net.minecraft.world.level.block
     public final CrateTier tier;
 
     public CrateBlock(Properties properties, CrateTier tier) {
-        super(properties);
+        super(properties.dynamicShape());
         this.tier = tier;
-        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(OPEN, false));
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(OPEN, false).setValue(com.mmorpg.block.structure.FreeOrientation.FREE,false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> b) {
-        b.add(FACING, OPEN);
+        b.add(FACING, OPEN, com.mmorpg.block.structure.FreeOrientation.FREE);
     }
 
     @Override
@@ -63,7 +63,12 @@ public class CrateBlock extends Block implements net.minecraft.world.level.block
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext ctx) {
+        if(level.getBlockEntity(pos) instanceof com.mmorpg.block.structure.OrientedBlockEntity be && Float.isFinite(be.yaw)) {var shape=net.minecraft.world.phys.shapes.Shapes.empty();for(var e:be.shapes().entrySet())shape=net.minecraft.world.phys.shapes.Shapes.or(shape,e.getValue().move(e.getKey().getX(),e.getKey().getY(),e.getKey().getZ()));return shape;}
         return SHAPE;
+    }
+
+    @Override protected net.minecraft.world.level.block.RenderShape getRenderShape(BlockState state) {
+        return state.getValue(com.mmorpg.block.structure.FreeOrientation.FREE)?net.minecraft.world.level.block.RenderShape.INVISIBLE:net.minecraft.world.level.block.RenderShape.MODEL;
     }
 
     @Override
