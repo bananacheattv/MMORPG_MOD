@@ -32,6 +32,35 @@ public final class DevArenaChecks {
             check(!session.crystal.hurtServer(world,p.damageSources().playerAttack(p),1),"protected player cannot capture");session.protectedUntil.put(p.getUUID(),0L);
             check(session.crystal.hurtServer(world,p.damageSources().playerAttack(p),1)&&session.crystal.team()==0&&session.match.owner==0,"real attack captures custom crystal");
             ArenaManager.leave(p);check(p.level()==oldLevel&&Math.abs(p.getX()-x)<.01,"leaving restores original position");
+            ArenaManager.SESSIONS.remove(key);
+            var identity=new net.minecraft.server.players.NameAndId(p.getGameProfile());
+            var dispatcher=server.getCommands().getDispatcher();
+            server.getPlayerList().deop(identity);
+            try{ArenaManager.test(p,ArenaRules.Kind.FEU);throw new AssertionError("non-operator started test");}catch(IllegalArgumentException expected){}
+            var denied=dispatcher.parse("aeloriatest boss 1",p.createCommandSourceStack());check(denied.getReader().canRead(),"non-operator command unavailable");
+            server.getPlayerList().op(identity);
+            try{
+                for(var kind:ArenaRules.Kind.values()){
+                    check(dispatcher.execute("aeloriatest arene "+kind.name().toLowerCase(java.util.Locale.ROOT),p.createCommandSourceStack())==1,"admin arena command");
+                    var solo=ArenaManager.session(p.getUUID());check(solo!=null&&solo.test&&solo.readyToBuild()&&!solo.forfeited(),"solo starts immediately and does not forfeit");
+                    check(solo.center().getX()>=CompetitionWorld.center(10).getX()&&!ArenaManager.queued(p.getUUID()),"test separate from public matchmaking");
+                    solo.active=true;ArenaManager.testTeam(p,1);solo.match.capture(p.getUUID(),0);solo.match.tick(40);check(solo.match.blue==1,"solo blue capture scores");
+                    solo.returns.put(p.getUUID(),new ArenaManager.Return(oldLevel.dimension(),x,y,z,yaw,pitch));CompetitionAdmin.stop(p);ArenaManager.tick(server);check(ArenaManager.session(p.getUUID())==null,"empty test disposed");
+                }
+                for(int tier:new int[]{0,9}){
+                    check(dispatcher.execute("aeloriatest boss "+(tier+1),p.createCommandSourceStack())==1,"admin boss command");
+                    var raid=GuildRaids.of(p.getUUID());check(raid!=null&&raid.test&&raid.tier==tier,"any boss without guild or level requirement");
+                    while(!raid.build.done())raid.build.tick(world);
+                    raid.boss=com.mmorpg.registry.ModEntities.GUILD_GUARDIANS.get(tier).get().create(world,net.minecraft.world.entity.EntitySpawnReason.COMMAND);raid.boss.testing=true;raid.boss.guild=raid.guild;raid.boss.initialize();
+                    long savedGold=playerData.gold,savedXp=playerData.xp;
+                    com.mmorpg.server.KillRewards.onDeath(new net.neoforged.neoforge.event.entity.living.LivingDeathEvent(raid.boss,p.damageSources().playerAttack(p)));
+                    GuildRaids.killed(raid.boss,p);check(raid.rewarded&&playerData.gold==savedGold&&playerData.xp==savedXp,"test boss completes without rewards or guild");
+                    check(GuildRaids.testDeath(p)&&playerData.gold==savedGold&&playerData.xp==savedXp,"boss test respawn preserves progression");
+                    CompetitionAdmin.stop(p);GuildRaids.tick(server);check(GuildRaids.of(p.getUUID())==null,"boss test stop restores player");
+                }
+                check(dispatcher.parse("aeloriatest boss 11",p.createCommandSourceStack()).getReader().canRead(),"boss bounds enforced");
+            }catch(com.mojang.brigadier.exceptions.CommandSyntaxException ex){throw new AssertionError(ex);}finally{server.getPlayerList().deop(identity);}
+            com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] ADMIN_SOLO PASS: permissions, commands, isolated solo arena, both teams, guardians 1 and 10, no rewards, respawn and exit");
             com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] ARENA_WORLD PASS: decorated geometry, clear crystal orbit, contained lava, real capture, enemy score, protected respawn, no XP/gold loss and return");
         }finally{ArenaManager.SESSIONS.remove(key);if(session.crystal!=null)session.crystal.discard();if(p.level()!=oldLevel)p.teleportTo(oldLevel,x,y,z,Set.of(),yaw,pitch,true);com.mmorpg.network.NetworkConfig.current=cfg;}
     }

@@ -14,7 +14,10 @@ public final class ArenaManager {
     private static final Map<Key,LinkedHashSet<UUID>> QUEUES=new HashMap<>();
     public static final class Session {
         public final Key key;public final ArenaRules.Match match;public final Set<UUID> accepted=new HashSet<>();public final Map<UUID,Long> missing=new HashMap<>(),protectedUntil=new HashMap<>();
-        public final Map<UUID,Return> returns=new HashMap<>();public long deadline;public boolean active;public CompetitionWorld.Job build;public ArenaCrystal crystal;
+        public final Map<UUID,Return> returns=new HashMap<>();public long deadline;public boolean active,test;public CompetitionWorld.Job build;public ArenaCrystal crystal;
+        boolean readyToBuild(){return test||accepted.size()==key.kind.size*2;}
+        boolean forfeited(){return match.teams.isEmpty()||(!test&&(!match.teams.containsValue(0)||!match.teams.containsValue(1)));}
+        BlockPos center(){return CompetitionWorld.center(test?10+key.kind.ordinal()*8+key.bracket-5:key.pool());}
         Session(Key key,long tick){this.key=key;match=new ArenaRules.Match(key.kind,key.bracket);deadline=tick+600;}
     }
     public record Return(net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dim,double x,double y,double z,float yaw,float pitch){}
@@ -38,16 +41,29 @@ public final class ArenaManager {
         if(CompetitionTravel.route(p,"arena:"+kind.name()+":"+bracket))return;
         current=p.level().getServer();QUEUES.computeIfAbsent(new Key(kind,bracket),k->new LinkedHashSet<>()).add(p.getUUID());open(p,"Inscription confirmée : attente des autres joueurs.");
     }
+    public static void test(ServerPlayer p,ArenaRules.Kind kind){
+        CompetitionAdmin.require(p);CompetitionAdmin.available(p);
+        if(CompetitionTravel.route(p,"admin-test:arena:"+kind.name()))return;
+        current=p.level().getServer();int slot=5;while(slot<13&&SESSIONS.containsKey(new Key(kind,slot)))slot++;
+        if(slot==13)throw new IllegalArgumentException("Les instances de test sont occupées.");
+        var s=new Session(new Key(kind,slot),current.getTickCount());s.test=true;s.returns.put(p.getUUID(),new Return(p.level().dimension(),p.getX(),p.getY(),p.getZ(),p.getYRot(),p.getXRot()));s.match.teams.put(p.getUUID(),0);s.accepted.add(p.getUUID());SESSIONS.put(s.key,s);
+        p.sendSystemMessage(Component.literal("Préparation du test solo : "+kind.label+". /aeloriatest equipe rouge|bleu ; /aeloriatest stop pour revenir."));
+    }
+    public static void testTeam(ServerPlayer p,int team){
+        CompetitionAdmin.require(p);var s=session(p.getUUID());
+        if(s==null||!s.test||!s.active)throw new IllegalArgumentException("Lance d’abord une arène de test et attends sa préparation.");
+        s.match.teams.put(p.getUUID(),team);p.sendSystemMessage(Component.literal("Équipe de test : "+(team==0?"rouge":"bleue")+". Frappe le cristal pour le capturer."));
+    }
     public static void leave(ServerPlayer p){QUEUES.values().forEach(q->q.remove(p.getUUID()));var s=session(p.getUUID());if(s==null){if(CompetitionTravel.inside(p))CompetitionTravel.home(p);return;}s.match.teams.remove(p.getUUID());s.accepted.remove(p.getUUID());restore(p,s);if(!s.active)cancel(s,p.level().getServer(),p.getUUID());}
     private static void popup(ServerPlayer p,Session s){var t=new CompoundTag();t.putString("match",s.match.id.toString());t.putString("arena",s.key.kind.label);t.putInt("seconds",30);Net.toPlayer(p,new S2COpenScreen(S2COpenScreen.ARENA_READY,t));}
-    private static void cancel(Session s,MinecraftServer server,UUID excluded){SESSIONS.remove(s.key);for(UUID id:s.match.teams.keySet()){var p=server.getPlayerList().getPlayer(id);if(p!=null){if(!id.equals(excluded)&&s.accepted.contains(id))QUEUES.computeIfAbsent(s.key,k->new LinkedHashSet<>()).add(id);else if(NetworkConfig.current.enabled)CompetitionTravel.home(p);p.sendSystemMessage(Component.literal("Arène annulée : un joueur n’a pas confirmé. Les joueurs prêts sont réinscrits."));}}}
+    private static void cancel(Session s,MinecraftServer server,UUID excluded){SESSIONS.remove(s.key);for(UUID id:s.match.teams.keySet()){var p=server.getPlayerList().getPlayer(id);if(p!=null){if(!s.test&&!id.equals(excluded)&&s.accepted.contains(id))QUEUES.computeIfAbsent(s.key,k->new LinkedHashSet<>()).add(id);else if(NetworkConfig.current.enabled)CompetitionTravel.home(p);p.sendSystemMessage(Component.literal("Arène annulée : un joueur n’a pas confirmé. Les joueurs prêts sont réinscrits."));}}}
     private static void start(Session s,MinecraftServer server){
-        var level=CompetitionWorld.level(server);s.active=true;s.match.started=server.getTickCount();var c=CompetitionWorld.center(s.key.pool());
-        for(UUID id:s.match.teams.keySet()){var p=server.getPlayerList().getPlayer(id);if(p==null||ArenaRules.bracket(RpgPlayers.get(p).level)!=s.key.bracket||p.isCreative()||p.isSpectator()){s.active=false;cancel(s,server,id);return;}}
+        var level=CompetitionWorld.level(server);s.active=true;s.match.started=server.getTickCount();var c=s.center();
+        for(UUID id:s.match.teams.keySet()){var p=server.getPlayerList().getPlayer(id);if(p==null||(!s.test&&(ArenaRules.bracket(RpgPlayers.get(p).level)!=s.key.bracket||p.isCreative()||p.isSpectator()))){s.active=false;cancel(s,server,id);return;}}
         for(UUID id:s.match.teams.keySet()){var p=server.getPlayerList().getPlayer(id);s.returns.put(id,new Return(p.level().dimension(),p.getX(),p.getY(),p.getZ(),p.getYRot(),p.getXRot()));spawn(p,s);}
         s.crystal=com.mmorpg.registry.ModEntities.ARENA_CRYSTAL.get().create(level,net.minecraft.world.entity.EntitySpawnReason.COMMAND);if(s.crystal==null)throw new IllegalStateException("Cristal indisponible");s.crystal.match=s.match.id;s.crystal.snapTo(c.getX()+18.5,101,c.getZ()+.5,0,0);level.addFreshEntity(s.crystal);
     }
-    private static void spawn(ServerPlayer p,Session s){int team=s.match.teams.get(p.getUUID());CompetitionWorld.teleport(p,CompetitionWorld.center(s.key.pool()).offset(team==0?-33:33,1,(int)(p.getUUID().getLeastSignificantBits()%7)),team==0?-90:90);RpgPlayers.fullRestore(p);p.setHealth(p.getMaxHealth());p.clearFire();p.removeAllEffects();s.protectedUntil.put(p.getUUID(),(long)p.level().getServer().getTickCount()+60);com.mmorpg.server.MountManager.despawn(p);}
+    private static void spawn(ServerPlayer p,Session s){int team=s.match.teams.get(p.getUUID());CompetitionWorld.teleport(p,s.center().offset(team==0?-33:33,1,(int)(p.getUUID().getLeastSignificantBits()%7)),team==0?-90:90);RpgPlayers.fullRestore(p);p.setHealth(p.getMaxHealth());p.clearFire();p.removeAllEffects();s.protectedUntil.put(p.getUUID(),(long)p.level().getServer().getTickCount()+60);com.mmorpg.server.MountManager.despawn(p);}
     public static boolean lethal(ServerPlayer victim,net.minecraft.world.entity.Entity attacker){var s=session(victim.getUUID());if(s==null||!s.active)return false;if(attacker==null&&victim.getLastHurtByPlayer() instanceof ServerPlayer recent)attacker=recent;if(attacker instanceof ServerPlayer killer)s.match.kill(killer.getUUID(),victim.getUUID());spawn(victim,s);return true;}
     public static boolean capture(ArenaCrystal crystal,ServerPlayer p){var s=session(p.getUUID());if(s==null||!s.active||s.crystal!=crystal||protectedPlayer(p))return false;s.match.capture(p.getUUID(),p.level().getServer().getTickCount());crystal.setTeam(s.match.owner);return true;}
     private static void restore(ServerPlayer p,Session s){RpgPlayers.fullRestore(p);p.clearFire();p.removeAllEffects();var r=s.returns.remove(p.getUUID());if(NetworkConfig.current.enabled){CompetitionTravel.home(p);return;}if(r!=null){var l=p.level().getServer().getLevel(r.dim);if(l!=null){p.teleportTo(l,r.x,r.y,r.z,Set.of(),r.yaw,r.pitch,true);return;}}CompetitionTravel.home(p);}
@@ -57,12 +73,12 @@ public final class ArenaManager {
         for(var key:new ArrayList<>(QUEUES.keySet())){var q=QUEUES.get(key);q.removeIf(id->{var p=server.getPlayerList().getPlayer(id);return p==null||ArenaRules.bracket(RpgPlayers.get(p).level)!=key.bracket;});
             if(!SESSIONS.containsKey(key)&&q.size()>=key.kind.size*2){Session s=new Session(key,tick);List<ServerPlayer> players=new ArrayList<>();for(UUID id:new ArrayList<>(q)){players.add(server.getPlayerList().getPlayer(id));q.remove(id);if(players.size()==key.kind.size*2)break;}var levels=new LinkedHashMap<UUID,Integer>();for(var p:players)levels.put(p.getUUID(),RpgPlayers.get(p).level);s.match.teams.putAll(ArenaRules.balance(key.kind,key.bracket,levels));SESSIONS.put(key,s);for(var p:players)popup(p,s);}}
         for(Session s:new ArrayList<>(SESSIONS.values())){
-            if(!s.active){if(s.match.teams.keySet().stream().anyMatch(id->server.getPlayerList().getPlayer(id)==null)){cancel(s,server,null);continue;}if(s.accepted.size()==s.key.kind.size*2){if(s.build==null)s.build=CompetitionWorld.arena(CompetitionWorld.center(s.key.pool()),s.key.kind);s.build.tick(CompetitionWorld.level(server));if(s.build.done())start(s,server);}else if(tick>s.deadline)cancel(s,server,null);continue;}
-            for(UUID id:new ArrayList<>(s.match.teams.keySet())){var p=server.getPlayerList().getPlayer(id);if(p==null){s.missing.putIfAbsent(id,tick);if(tick-s.missing.get(id)>600)s.match.teams.remove(id);}else{s.missing.remove(id);if(!CompetitionTravel.inside(p)||Math.abs(p.getX()-CompetitionWorld.center(s.key.pool()).getX())>47||Math.abs(p.getZ())>35||p.getY()<97)spawn(p,s);}}
-            boolean red=s.match.teams.containsValue(0),blue=s.match.teams.containsValue(1);if(!red||!blue){s.match.red=red?500:0;s.match.blue=blue?500:0;s.match.ended=true;}
+            if(!s.active){if(s.match.teams.keySet().stream().anyMatch(id->server.getPlayerList().getPlayer(id)==null)){cancel(s,server,null);continue;}if(s.readyToBuild()){if(s.build==null)s.build=CompetitionWorld.arena(s.center(),s.key.kind);s.build.tick(CompetitionWorld.level(server));if(s.build.done())start(s,server);}else if(tick>s.deadline)cancel(s,server,null);continue;}
+            for(UUID id:new ArrayList<>(s.match.teams.keySet())){var p=server.getPlayerList().getPlayer(id);if(p==null){s.missing.putIfAbsent(id,tick);if(tick-s.missing.get(id)>600)s.match.teams.remove(id);}else{s.missing.remove(id);if(!CompetitionTravel.inside(p)||Math.abs(p.getX()-s.center().getX())>47||Math.abs(p.getZ())>35||p.getY()<97)spawn(p,s);}}
+            boolean red=s.match.teams.containsValue(0),blue=s.match.teams.containsValue(1);if(s.forfeited()){s.match.red=red?500:0;s.match.blue=blue?500:0;s.match.ended=true;}
             s.match.tick(tick);if(tick-s.match.started>36000)s.match.ended=true;
-            if(s.crystal!=null&&!s.crystal.isRemoved()){var c=CompetitionWorld.center(s.key.pool());double angle=(tick-s.match.started)*.009;s.crystal.setPos(c.getX()+Math.cos(angle)*18+.5,101.2+Math.sin(angle*2)*.35,c.getZ()+Math.sin(angle)*12+.5);}
-            if(tick%20==0)for(UUID id:s.match.teams.keySet()){var p=server.getPlayerList().getPlayer(id);if(p!=null)p.sendOverlayMessage(Component.literal("Rouge "+s.match.red+" / 500   ♦   Bleu "+s.match.blue+" / 500   | Cristal : "+(s.match.owner<0?"neutre":s.match.owner==0?"rouge":"bleu")));}
+            if(s.crystal!=null&&!s.crystal.isRemoved()){var c=s.center();double angle=(tick-s.match.started)*.009;s.crystal.setPos(c.getX()+Math.cos(angle)*18+.5,101.2+Math.sin(angle*2)*.35,c.getZ()+Math.sin(angle)*12+.5);}
+            if(tick%20==0)for(UUID id:s.match.teams.keySet()){var p=server.getPlayerList().getPlayer(id);if(p!=null)p.sendOverlayMessage(Component.literal((s.test?"TEST SOLO · ":"")+"Rouge "+s.match.red+" / 500   ♦   Bleu "+s.match.blue+" / 500   | Cristal : "+(s.match.owner<0?"neutre":s.match.owner==0?"rouge":"bleu")));}
             if(s.match.ended)finish(s,server);
         }
     }

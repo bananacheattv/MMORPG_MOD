@@ -61,3 +61,14 @@ La dimension de compétition est protégée contre la construction et les explos
 ## Vérification
 
 `gradlew.bat runServer -PnetworkChecks build` vérifie les permissions, la banque et sa reprise après interruption, les évolutions, les tranches de niveau, les scores et les dix types de gardiens. `gradlew.bat runClient -Pshowcase=social_ui` génère les captures des interfaces et vérifie les trois boutons du menu d’accueil. Les scènes de galerie privées nécessitent les options explicites `visualChecks` et `socialVisual`, absentes des commandes des serveurs de jeu.
+
+## Tests administrateur en solo
+
+Commandes réservées aux opérateurs de niveau 2 minimum, après le choix de classe. Elles fonctionnent depuis les serveurs du réseau et dirigent le joueur vers le serveur donjons. Les permissions sont revérifiées à l’arrivée.
+
+- `/aeloriatest boss 1` à `/aeloriatest boss 10` : affronter le gardien choisi sans guilde, sans coût et sans condition de palier. La victoire ne donne pas de butin ni de progression de guilde. Un coup mortel ramène dans l’instance, sans perte.
+- `/aeloriatest arene feu` ou `/aeloriatest arene dunes` : lancer immédiatement une instance solo, indépendante des files publiques, avec le vrai cristal mobile et le score. Le mode créatif est accepté pour visiter.
+- `/aeloriatest equipe rouge` ou `/aeloriatest equipe bleu` : changer d’équipe pendant un test ; frapper le cristal pour vérifier la capture dans cette couleur.
+- `/aeloriatest stop` : quitter le test et revenir au point de départ. Quitter d’abord un test avant d’en lancer un autre.
+
+En survie, les boss attaquent normalement ; en créatif, ils peuvent être observés. Les délais de préparation correspondent à la construction progressive du décor. Les matchs publics conservent leurs exigences de joueurs et leurs restrictions de niveaux.

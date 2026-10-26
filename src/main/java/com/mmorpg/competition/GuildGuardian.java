@@ -8,7 +8,7 @@ import net.minecraft.world.level.Level;
 import java.util.UUID;
 
 public final class GuildGuardian extends com.mmorpg.entity.boss.RpgBoss {
-    public final int tier;public UUID guild;private int windup;private net.minecraft.world.phys.Vec3 aim;
+    public boolean testing;public final int tier;public UUID guild;private int windup;private net.minecraft.world.phys.Vec3 aim;
     public int attackStarted=-100,castStarted=-100;private boolean attackQueued;
     public GuildGuardian(EntityType<? extends Monster> type,Level level,int tier){super(type,level,"yggdrasil_"+Yggdrasil.ALL[tier].id());this.tier=tier;setCustomName(net.minecraft.network.chat.Component.literal(Yggdrasil.ALL[tier].name()));}
     @Override protected void registerGoals(){goalSelector.addGoal(3,new net.minecraft.world.entity.ai.goal.MeleeAttackGoal(this,.8,false));}
