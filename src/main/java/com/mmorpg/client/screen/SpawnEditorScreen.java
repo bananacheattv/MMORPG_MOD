@@ -62,7 +62,7 @@ public final class SpawnEditorScreen extends MmoScreen {
             button(g,left+pw-62,bottom-52,50,17,"›",page+1<pages,Ui.GOLD,()->page++);
         }
         button(g,left+12,bottom-26,96,18,"Annuler /undo",true,Ui.GOLD,()->action("amenagement annuler"));
-        button(g,left+114,bottom-26,118,18,"Point /spawn ici",true,Ui.GOLD,()->action("amenagement pointspawn"));
+        button(g,left+114,bottom-26,118,18,"Définir le spawn ici",true,Ui.GOLD,()->action("amenagement pointspawn"));
         button(g,left+238,bottom-26,pw-250,18,"Retirer portail",true,Ui.RED,()->action("portail supprimer"));
     }
 }

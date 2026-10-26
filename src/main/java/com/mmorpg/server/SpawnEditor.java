@@ -151,6 +151,14 @@ public final class SpawnEditor {
             level.getServer().getCommands().performPrefixedCommand(level.getServer().createCommandSourceStack().withLevel(level).withSuppressedOutput(),"summon minecraft:text_display "+at.x+" "+at.y+" "+at.z+" "+tag);
             return level.getEntity(id)!=null;});return true;
     }
+    public static int setArrival(ServerPlayer p) {
+        if(!HubManager.isOperator(p))return 0;
+        if(!p.level().dimension().equals(com.mmorpg.hub.SpawnBuilder.DIM)) {fail(p,"Place-toi dans le monde du spawn avant de définir son arrivée.");return 0;}
+        var data=com.mmorpg.hub.SpawnData.get(p.level().getServer());
+        if(!data.exists()){fail(p,"Le monde du spawn n’est pas initialisé.");return 0;}
+        data.setArrival(p.position(),p.getYRot(),p.getXRot());
+        p.sendSystemMessage(Component.literal("Point du spawn enregistré ici, avec ton orientation."));return 1;
+    }
     @SubscribeEvent public static void commands(RegisterCommandsEvent event) {
         var root=Commands.literal("amenagement").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .executes(c->{open(c.getSource().getPlayerOrException(),null);return 1;});
@@ -161,7 +169,7 @@ public final class SpawnEditor {
         root.then(Commands.literal("texte").then(Commands.argument("taille",FloatArgumentType.floatArg(.25f,8)).then(Commands.argument("hauteur",FloatArgumentType.floatArg(0,12)).then(Commands.argument("texte",StringArgumentType.greedyString()).executes(c->text(c.getSource().getPlayerOrException(),StringArgumentType.getString(c,"texte"),FloatArgumentType.getFloat(c,"taille"),FloatArgumentType.getFloat(c,"hauteur"))?1:0)))));
         root.then(Commands.literal("supprimertexte").executes(c->removeText(c.getSource().getPlayerOrException())?1:0));
         root.then(Commands.literal("annuler").executes(c->AdventurePortals.undo(c.getSource().getPlayerOrException())?1:0));
-        root.then(Commands.literal("pointspawn").executes(c->{var p=c.getSource().getPlayerOrException();if(!p.level().dimension().equals(com.mmorpg.hub.SpawnBuilder.DIM))return 0;com.mmorpg.hub.SpawnData.get(p.level().getServer()).set(p.blockPosition(),Integer.MAX_VALUE);p.sendSystemMessage(Component.literal("Point /spawn déplacé ici."));return 1;}));
+        root.then(Commands.literal("pointspawn").executes(c->setArrival(c.getSource().getPlayerOrException())));
         event.getDispatcher().register(root);
     }
     @SubscribeEvent public static void stopped(ServerStoppedEvent event) { TARGETS.clear();HISTORY.clear();sequence=0; }

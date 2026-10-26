@@ -45,11 +45,6 @@ public final class SpawnBuilder {
             var zones = com.mmorpg.zone.ZoneData.get(server);
             for (var zone : zones.all()) if (zone.dimension().equals(DIM)) zones.remove(zone.id());
             BlockPos at = new BlockPos(0, 96, 0);
-            int radius = com.mmorpg.config.ConfigManager.spawn().flatPlatform ? 64 : 2;
-            for (int x = -radius; x <= radius; x++) for (int z = -radius; z <= radius; z++) {
-                BlockPos ground = at.offset(x, -1, z);
-                if (level.getBlockState(ground).isAir()) level.setBlockAndUpdate(ground, net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState());
-            }
             data.set(at, Integer.MAX_VALUE);
             return true;
         }

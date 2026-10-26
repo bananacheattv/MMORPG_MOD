@@ -19,7 +19,7 @@ foreach($service in $games) {
     Copy-Item -LiteralPath $spawnConfig -Destination (Join-Path $roleBackup 'spawn.json')
     $settings=Get-Content -LiteralPath $spawnConfig -Raw | ConvertFrom-Json
     $settings | Add-Member -NotePropertyName manualBuild -NotePropertyValue $true -Force
-    $settings | Add-Member -NotePropertyName flatPlatform -NotePropertyValue $true -Force
+    $settings | Add-Member -NotePropertyName flatPlatform -NotePropertyValue $false -Force
     $settings.autoNpcs=$false;$settings.autoStations=$false
     $settings | ConvertTo-Json -Depth 30 | Set-Content -LiteralPath $spawnConfig -Encoding utf8
     if($service.id -notin @('serveur','hub')){continue}
