@@ -30,8 +30,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class CrateBlock extends Block implements net.minecraft.world.level.block.EntityBlock {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
-    /** Modele 2x plus grand que un bloc (deborde de 7 px de chaque cote). */
-    private static final VoxelShape SHAPE = Block.box(-7, 0, -7, 23, 27, 23);
+    /** Modele compact : dimensions et collisions reduites de moitie. */
+    private static final VoxelShape SHAPE = Block.box(0.5, 0, 0.5, 15.5, 13.5, 15.5);
 
     public final CrateTier tier;
 

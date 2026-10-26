@@ -34,6 +34,25 @@ public final class SpawnBuilder {
         SpawnData data = SpawnData.get(server);
         ServerLevel level = server.getLevel(DIM);
         if (level == null) return false;
+        if (com.mmorpg.config.ConfigManager.spawn().manualBuild) {
+            if (data.exists() && data.layout() == Integer.MAX_VALUE) return false;
+            var portals = com.mmorpg.world.AdventurePortalData.get(server);
+            for (var portal : java.util.List.copyOf(portals.all())) if (portal.dimension().equals(DIM)) portals.remove(portal.id());
+            var waypoints = com.mmorpg.world.WaypointData.get(server);
+            for (var waypoint : java.util.List.copyOf(waypoints.all())) if (waypoint.dimension.equals(DIM)) waypoints.remove(waypoint.id);
+            var directory = com.mmorpg.world.NpcDirectory.get(server);
+            for (var entry : directory.snapshot()) if (entry instanceof net.minecraft.nbt.CompoundTag tag && tag.getStringOr("dimension", "").equals(DIM.identifier().toString())) directory.remove(tag.getStringOr("id", ""));
+            var zones = com.mmorpg.zone.ZoneData.get(server);
+            for (var zone : zones.all()) if (zone.dimension().equals(DIM)) zones.remove(zone.id());
+            BlockPos at = new BlockPos(0, 96, 0);
+            int radius = com.mmorpg.config.ConfigManager.spawn().flatPlatform ? 64 : 2;
+            for (int x = -radius; x <= radius; x++) for (int z = -radius; z <= radius; z++) {
+                BlockPos ground = at.offset(x, -1, z);
+                if (level.getBlockState(ground).isAir()) level.setBlockAndUpdate(ground, net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState());
+            }
+            data.set(at, Integer.MAX_VALUE);
+            return true;
+        }
         if (data.exists() && data.layout() >= LAYOUT_VERSION) return false;
         MMORPG.LOGGER.info("[MMORPG] Construction du Spawn d'Aeloria (dimension {})", DIM.identifier());
         build(level, data.exists() ? data.origin() : HubManager.HUB_ORIGIN);
@@ -41,6 +60,7 @@ public final class SpawnBuilder {
     }
 
     public static BlockPos build(ServerLevel level, BlockPos feet) {
+        if (com.mmorpg.config.ConfigManager.spawn().manualBuild) return feet;
         HubCtx c = new HubCtx(level, feet.immutable());
         boolean npcs = com.mmorpg.config.ConfigManager.spawn().autoNpcs;
         var market = HubMarket.marketNpcIds();

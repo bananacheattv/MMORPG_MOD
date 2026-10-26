@@ -27,6 +27,8 @@ import java.util.UUID;
  * Les champs "transients" (statistiques calculees, recharges, effets) ne sont pas sauvegardes.
  */
 public class PlayerData implements ValueIOSerializable {
+    public CompoundTag adventureSummary = new CompoundTag();
+    public final Set<String> forgeRecipes = new HashSet<>();
     public static final int SKILL_SLOTS = 6;
     private static final Codec<Map<String, Integer>> STR_INT_MAP = Codec.unboundedMap(Codec.STRING, Codec.INT);
     private static final Codec<Map<String, String>> STR_STR_MAP = Codec.unboundedMap(Codec.STRING, Codec.STRING);
@@ -174,6 +176,8 @@ public class PlayerData implements ValueIOSerializable {
 
     public CompoundTag save() {
         CompoundTag t = new CompoundTag();
+        t.put("adventure_summary", adventureSummary.copy());
+        t.store("forgeRecipes",Codec.STRING.listOf(),new ArrayList<>(forgeRecipes));
         t.putString("class", playerClass.name());
         t.putInt("level", level);
         t.putLong("xp", xp);
@@ -217,6 +221,8 @@ public class PlayerData implements ValueIOSerializable {
     }
 
     public void load(CompoundTag t) {
+        adventureSummary = t.getCompoundOrEmpty("adventure_summary").copy();
+        forgeRecipes.clear();forgeRecipes.addAll(t.read("forgeRecipes",Codec.STRING.listOf()).orElse(List.of()));
         playerClass = PlayerClass.byName(t.getStringOr("class", "NONE"));
         level = Math.max(1, Math.min(LevelSystem.MAX_LEVEL, t.getIntOr("level", 1)));
         xp = t.getLongOr("xp", 0);
@@ -255,6 +261,10 @@ public class PlayerData implements ValueIOSerializable {
         classChosenOnce = t.getBooleanOr("chosen", playerClass != PlayerClass.NONE);
         starterTools = t.getBooleanOr("starterTools", false);
         forgeBlueprints = t.getIntOr("forgeBlueprints", 0) & 31;
+        if (forgeBlueprints != 0) {
+            for (var recipe : com.mmorpg.crafting.ForgeRecipes.all()) {int tier=com.mmorpg.crafting.ForgeProgression.required(recipe);if(tier>0&&(forgeBlueprints&(1<<(tier-1)))!=0)forgeRecipes.add(recipe.id());}
+            forgeBlueprints=0;
+        }
         minesUnlocked = Math.max(1, t.getIntOr("minesUnlocked", 1));
         plainsUnlocked = Math.max(1, t.getIntOr("plainsUnlocked", 1));
         // joueurs d'avant les quetes d'evolution : ils gardent le palier deja atteint

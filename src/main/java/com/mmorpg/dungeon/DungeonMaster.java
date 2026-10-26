@@ -33,6 +33,7 @@ public final class DungeonMaster {
     }
 
     public static void open(ServerPlayer p, NpcEntity npc) {
+        if (!com.mmorpg.server.PortalAccess.require(p,"donjon")) return;
         var server = p.level().getServer();
         int level = RpgPlayers.get(p).level;
         String owner = InstanceManager.ownerKey(p);

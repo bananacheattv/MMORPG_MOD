@@ -614,5 +614,6 @@
   "item.mmorpg.parchemin_forge_3": "Forging Scroll III",
   "item.mmorpg.parchemin_forge_4": "Forging Scroll IV",
   "item.mmorpg.parchemin_forge_5": "Forging Scroll V",
-  "item.mmorpg.fiole_runique": "Runic Vial"
+  "item.mmorpg.fiole_runique": "Runic Vial",
+  "item.mmorpg.outil_spawn": "Spawn editor"
 }

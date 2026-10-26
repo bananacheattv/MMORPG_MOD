@@ -135,7 +135,7 @@ public final class DefaultQuests {
             int level = (tier - 1) * 20 + 1;
             String[] targets = {"gobelin", "orc_guerrier", "squelette_maudit", "spectre_givre", "chevalier_neant"};
             QuestDef license = reward(obj(q("Le savoir du forgeron " + tier, level,
-                    "Aidez les artisans : éliminez " + (tier * 10) + " monstres pour recevoir un parchemin de forge. Utilisez-le pour apprendre les recettes du palier " + tier + "."),
+                    "Aidez les artisans : éliminez " + (tier * 10) + " monstres pour recevoir le parchemin d’une pièce d’armure. Il débloque uniquement cette recette."),
                     "kill", targets[tier - 1], tier * 10), tier * 200L, tier * 25L,
                     com.mmorpg.crafting.ForgeProgression.scroll(tier), 1);
             if (tier > 1) license.requires.add("parchemin_forge_" + (tier - 1));

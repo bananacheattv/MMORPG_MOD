@@ -23,6 +23,11 @@ import java.util.UUID;
 /** Headless integration suite: ./gradlew runServer -PnetworkChecks (isolated run/ world only). */
 @EventBusSubscriber(modid = MMORPG.MODID)
 public final class DevNetworkChecks {
+    private static int countPlans(ServerPlayer p) {
+        int result=0;for(int i=0;i<p.getInventory().getContainerSize();i++) {
+            var stack=p.getInventory().getItem(i);if(stack.getItem() instanceof com.mmorpg.item.ForgeScrollItem plan&&!plan.recipe().isEmpty())result+=stack.getCount();
+        }return result;
+    }
     private static void check(boolean condition, String message) { if (!condition) throw new AssertionError(message); }
     @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.HIGHEST)
     public static void run(ServerStartedEvent event) throws Exception {
@@ -82,7 +87,7 @@ public final class DevNetworkChecks {
             BlockPos forge = new BlockPos(0, 80, 0);
             p.level().setBlockAndUpdate(forge, ModBlocks.FORGE_ARCANIQUE.get().defaultBlockState());
             p.setPos(.5, 81, .5);
-            var recipe = ForgeRecipes.get("lame_runique");
+            var recipe = ForgeProgression.recipes(1).stream().filter(r->r.category()==ForgeRecipes.Category.ARMURES).findFirst().orElseThrow();
             for (var ing : recipe.ingredients()) RpgPlayers.give(p, ing.resolve(), ing.count() * 2);
             long before = d.gold;
             ForgeManager.craft(p, forge, recipe.id(), 1);
@@ -90,26 +95,26 @@ public final class DevNetworkChecks {
             p.getInventory().setSelectedSlot(8);
             p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.get(ForgeProgression.scroll(1)), 2));
             p.getMainHandItem().getItem().use(p.level(), p, InteractionHand.MAIN_HAND);
-            check(d.forgeBlueprints == 1 && p.getMainHandItem().getCount() == 1, "scroll consumed on first learning");
+            check(d.forgeRecipes.contains(recipe.id()) && p.getMainHandItem().getCount() == 1, "scroll consumed on first learning");
             p.getMainHandItem().getItem().use(p.level(), p, InteractionHand.MAIN_HAND);
             check(p.getMainHandItem().getCount() == 1, "duplicate scroll preserved");
             ForgeManager.craft(p, forge, recipe.id(), 1);
             check(d.gold == before - recipe.gold() && ForgeManager.count(p.getInventory(), recipe.resultItem()) == 1, "unlocked craft consumes correct cost: gold=" + d.gold + ", output=" + ForgeManager.count(p.getInventory(), recipe.resultItem()));
             check(!ForgeProgression.unlocked(d, ForgeRecipes.get("epee_berserker")), "higher tier still locked");
             var copy = new PlayerData(); copy.load(d.save());
-            check(copy.forgeBlueprints == 1, "scroll unlock persistence");
+            check(copy.forgeRecipes.contains(recipe.id()), "scroll unlock persistence");
             for (int tier = 1; tier <= 5; tier++) {
                 final String scrollId = ForgeProgression.scroll(tier);
-                var q = com.mmorpg.config.ConfigManager.quests().get(ForgeProgression.scroll(tier));
+                var q = com.mmorpg.config.ConfigManager.quests().get("parchemin_forge_" + tier);
                 check(q != null && q.rewards.items.stream().anyMatch(i -> i.item.endsWith(scrollId)), "quest scroll reward " + tier);
             }
             var bank = com.mmorpg.economy.BankData.get(server).account(p.getUUID()); bank.gold = 999;
             bank.items.set(0, new ItemStack(ModItems.PIECE_OR.get(), 23));
             d.cooldowns.put("test", p.level().getGameTime() + 200);
             var saved = NetworkPlayers.snapshot(p);
-            d.gold = 0; d.forgeBlueprints = 0; p.getInventory().clearContent(); bank.gold = 0;
+            d.gold = 0; d.forgeBlueprints = 0; d.forgeRecipes.clear(); p.getInventory().clearContent(); bank.gold = 0;
             NetworkPlayers.restore(p, saved);
-            check(RpgPlayers.get(p).gold == before - recipe.gold() && RpgPlayers.get(p).forgeBlueprints == 1, "shared RPG restore");
+            check(RpgPlayers.get(p).gold == before - recipe.gold() && RpgPlayers.get(p).forgeRecipes.contains(recipe.id()), "shared RPG restore");
             check(RpgPlayers.get(p).cooldowns.getOrDefault("test", 0L) > p.level().getGameTime(), "server travel preserves skill cooldown");
             check(ForgeManager.count(p.getInventory(), recipe.resultItem()) == 1, "shared inventory restore");
             check(com.mmorpg.economy.BankData.get(server).account(p.getUUID()).gold == 999 && com.mmorpg.economy.BankData.get(server).account(p.getUUID()).items.get(0).getCount() == 23, "shared bank restore");
@@ -128,11 +133,13 @@ public final class DevNetworkChecks {
             var boss = com.mmorpg.registry.ModEntities.GOBLIN_KING.get().create(p.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
             var md = boss.getData(com.mmorpg.registry.ModAttachments.MOB);
             md.level = 20; md.key = "roi_gobelin"; md.boss = true;
-            int scrolls = ForgeManager.count(p.getInventory(), ModItems.get(ForgeProgression.scroll(1)));
+            int scrolls = countPlans(p);
             KillRewards.onDeath(new net.neoforged.neoforge.event.entity.living.LivingDeathEvent(boss, p.damageSources().playerAttack(p)));
-            check(ForgeManager.count(p.getInventory(), ModItems.get(ForgeProgression.scroll(1))) == scrolls + 1, "boss grants a personal crafting scroll");
+            check(countPlans(p) == scrolls + 1, "boss grants a personal crafting scroll");
             DevPortalChecks.run(p);
             com.mmorpg.dungeon.DevDedicatedDungeonChecks.run(p);
+            DevSpawnEditorChecks.run(p);
+            java.nio.file.Files.writeString(java.nio.file.Path.of("../build/reports/blueprints.json"),new com.google.gson.Gson().toJson(ForgeRecipes.all().stream().filter(r->ForgeProgression.required(r)>0).map(ForgeProgression::blueprint).toList()));
             MMORPG.LOGGER.info("[CODEX CHECKS] NETWORK_FORGE PASS: session locks, backup, proxy format, recipes, starters, scrolls, crafting, quests, shared inventory/bank, corruption refusal, handoff");
             Files.createDirectories(Path.of("../build/reports"));
             Files.writeString(Path.of("../build/reports/network-checks.txt"), "PASS\n");

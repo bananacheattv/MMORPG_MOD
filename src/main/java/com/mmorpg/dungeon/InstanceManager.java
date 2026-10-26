@@ -61,6 +61,9 @@ public final class InstanceManager {
         try { return pool != null && typeOf(pool) != null && difficultyOf(pool) >= 0 && difficultyOf(pool) <= 2; }
         catch (RuntimeException e) { return false; }
     }
+    public static boolean containsPlayer(ServerPlayer player) {
+        return slotAt(player.level().getServer(),player.level(),player.getX(),player.getZ())!=null;
+    }
     public static int capacity() {
         return com.mmorpg.network.NetworkConfig.current.enabled ? Math.clamp(com.mmorpg.network.NetworkConfig.current.dungeonMaxInstancesPerPool, 1, MAX_PER_POOL) : MAX_PER_POOL;
     }
@@ -137,6 +140,7 @@ public final class InstanceManager {
      */
     public static boolean enterPool(ServerPlayer player, String pool) {
         if (!validPool(pool)) return false;
+        if (!com.mmorpg.server.PortalAccess.consume(player,"donjon")) return false;
         if (com.mmorpg.network.DungeonTravel.enterRemote(player, pool)) return true;
         return enterLocal(player, pool, true);
     }
@@ -164,6 +168,7 @@ public final class InstanceManager {
             if (m != player && (m.level() != player.level() || m.distanceToSqr(player) > 24 * 24)) continue;       // les autres membres rejoignent par le PNJ
             if (RpgPlayers.get(m).level < com.mmorpg.dungeon.DungeonMaster.requiredLevel(typeOf(pool), difficultyOf(pool))) continue;
             if (!m.level().dimension().equals(DIM)) RETURNS.put(m.getUUID(), new Return(m.level().dimension(), m.getX(), m.getY(), m.getZ(), m.getYRot()));
+            com.mmorpg.server.AdventureSummary.begin(m,"donjon");
             BossReveal.hold(m, MIN_LOADING_TICKS + 400);
             TRANSITIONS.removeIf(x -> x.player().equals(m.getUUID()));
             TRANSITIONS.add(new Transition(m.getUUID(), slot, at, title, lore, color));

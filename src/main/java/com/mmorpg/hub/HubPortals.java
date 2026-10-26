@@ -110,6 +110,7 @@ public final class HubPortals {
             ServerLevel level = p.level();
             boolean inHub = hub.exists() && level.dimension().equals(hub.dimension());
             boolean inSpawn = spawn.exists() && level.dimension().equals(SpawnBuilder.DIM);
+            if (inSpawn && com.mmorpg.config.ConfigManager.spawn().manualBuild) continue;
             if (!inHub && !inSpawn) continue;
             AABB gate = inHub ? hubGate(hub.origin()) : spawnGate(spawn.origin());
             double planeX = inHub ? hub.origin().getX() + HUB_GATE_X + 0.5 : spawn.origin().getX() + HubMarket.CX + 37.5;

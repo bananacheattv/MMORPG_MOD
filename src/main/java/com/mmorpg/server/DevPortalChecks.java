@@ -23,6 +23,7 @@ public final class DevPortalChecks {
             for (int y = 100; y <= 106; y++) level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
         }
         var data = AdventurePortalData.get(level.getServer());
+        for (Portal old : java.util.List.copyOf(data.all())) if (old.dimension().equals(level.dimension()) && old.pos().getX()>=42 && old.pos().getX()<=54 && old.pos().getZ()>=42 && old.pos().getZ()<=54) data.remove(old.id());
         int baseline = data.all().size();
         Map<BlockPos, BlockState> original = new LinkedHashMap<>();
         for (int x = 45; x <= 51; x++) for (int z = 45; z <= 51; z++) for (int y = 99; y <= 105; y++) {
@@ -90,11 +91,12 @@ public final class DevPortalChecks {
         var commands = level.getServer().getCommands().getDispatcher();
         var source = level.getServer().createCommandSourceStack().withLevel(level).withEntity(p).withPosition(p.position()).withSuppressedOutput();
         check(commands.execute("portail mine", source) == 1, "operator placement command");
-        check(commands.execute("undo", source) == 1 && data.all().size() == baseline, "bare /undo alias executes");
+        String undoCommand = net.neoforged.fml.ModList.get().isLoaded("worldedit") ? "undoportail" : "undo";
+        check(commands.execute(undoCommand, source) == 1 && data.all().size() == baseline, "bare /undo alias executes");
         check(AdventurePortals.place(p, mine), "first placement for multi undo");
         Portal second = new Portal(UUID.randomUUID(), level.dimension(), new BlockPos(48, 100, 52), true, "plaines", -1, "", 0);
         check(AdventurePortals.place(p, second), "second placement for multi undo");
-        check(commands.execute("undo 2", source) == 2 && data.all().size() == baseline, "/undo count traverses alias arguments");
+        check(commands.execute(undoCommand + " 2", source) == 2 && data.all().size() == baseline, "/undo count traverses alias arguments");
         check(commands.execute("portail donjon crypte_gobeline heroique", source) == 1, "dungeon difficulty command");
         check(data.all().stream().anyMatch(g -> g.kind().equals("donjon") && g.difficulty() == 1), "selected dungeon difficulty saved");
         check(commands.execute("undoportail", source) == 1, "dedicated undo command");

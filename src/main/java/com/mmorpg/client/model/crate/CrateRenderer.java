@@ -105,10 +105,11 @@ public class CrateRenderer implements BlockEntityRenderer<CrateBlockEntity, Crat
     @Override
     public void submit(State state, PoseStack pose, SubmitNodeCollector collector, CameraRenderState camera) {
         // ---- nom de la caisse
-        float labelY = state.spinning || state.showing ? 3.25f : 2.05f;
-        text(pose, collector, camera, labelY, Component.literal("✦ " + state.label + " ✦"), 0xFF000000 | state.color, 0.03f);
+        if (net.minecraft.client.Minecraft.getInstance().gui.hud.isHidden()) return;
+        float labelY = state.spinning || state.showing ? 3.7f : 2.65f;
+        text(pose, collector, camera, labelY, Component.literal("✦ " + state.label + " ✦"), 0xFF000000 | state.color, 0.05f);
         if (!state.spinning && !state.showing) {
-            text(pose, collector, camera, labelY - .28f, Component.literal("Clic droit pour ouvrir"), 0xFFD8D0C0, 0.018f);
+            text(pose, collector, camera, labelY - .45f, Component.literal("Clic droit pour ouvrir"), 0xFFD8D0C0, 0.03f);
             return;
         }
         // ---- roue

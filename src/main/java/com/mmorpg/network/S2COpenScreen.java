@@ -35,6 +35,8 @@ public record S2COpenScreen(int screen, CompoundTag extra) implements CustomPack
     /** Banque d'Aeloria (solde et coffre) et hotel des ventes. */
     public static final int BANK = 17;
     public static final int AUCTION = 18;
+    public static final int SPAWN_EDITOR = 19;
+    public static final int ADVENTURE_SUMMARY = 20;
 
     public static final Type<S2COpenScreen> TYPE = new Type<>(MMORPG.id("open_screen"));
     public static final StreamCodec<ByteBuf, S2COpenScreen> CODEC = StreamCodec.composite(

@@ -69,7 +69,7 @@ import static com.mmorpg.plains.PlainsLayout.*;
 public final class PlainsManager {
     /** A incrementer quand le plan change : les plaines sont alors reconstruites au demarrage. */
     public static final int VERSION = 2;
-    private static final int MOB_CAP = 16;
+    private static final int MOB_CAP = 48;
     /** Portail du Spawn : colonne locale (relative a l'origine du spawn) du voile vert, face a l'est. */
     public static final int SPAWN_GATE_X = HubMarket.CX - 24, SPAWN_GATE_Z = -18;
     /** Decalage ajoute au numero de plaine dans le paquet {@code MineEnter} (les mines gardent 0 a 4). */
@@ -203,6 +203,7 @@ public final class PlainsManager {
 
     /** Menu de selection des six plaines (portail du Spawn, /plaines). */
     public static void open(ServerPlayer p) {
+        if (!com.mmorpg.server.PortalAccess.require(p,"plaines")) return;
         PlayerData d = RpgPlayers.get(p);
         MinecraftServer server = p.level().getServer();
         ListTag list = new ListTag();
@@ -288,6 +289,8 @@ public final class PlainsManager {
 
     /** Choix du joueur dans le menu : verifications cote serveur puis arrivee sur la place d'entree de la plaine. */
     public static void enterChosen(ServerPlayer p, int region) {
+        if (!com.mmorpg.server.PortalAccess.consume(p,"plaines")) return;
+        com.mmorpg.server.AdventureSummary.begin(p,"plaines");
         if (region < 0 || region >= REGIONS) return;
         if (region >= RpgPlayers.get(p).plainsUnlocked) {
             p.sendOverlayMessage(Component.literal("Cette plaine n'est pas encore découverte : trouvez le portail caché de la précédente.").withColor(0xFF7060));
@@ -329,6 +332,8 @@ public final class PlainsManager {
                 }
                 if (!spawnGate(o).contains(p.getX(), p.getY(), p.getZ()) || cooling(p, now)) continue;
                 level.playSound(null, p.blockPosition(), SoundEvents.PORTAL_TRAVEL, SoundSource.PLAYERS, 0.4f, 1.5f);
+                if (com.mmorpg.config.ConfigManager.spawn().manualBuild) continue;
+                com.mmorpg.server.PortalAccess.grant(p,"plaines");
                 open(p);
                 continue;
             }
@@ -407,7 +412,7 @@ public final class PlainsManager {
             if (lz0 < ENTRY + 4) continue;                                                           // la place d'entree est sure
             AABB area = p.getBoundingBox().inflate(40, 26, 40);
             int near = level.getEntitiesOfClass(Mob.class, area, m -> m instanceof com.mmorpg.entity.RpgMob).size();
-            for (int i = 0; i < 3 && near < MOB_CAP; i++) {
+            for (int i = 0; i < 9 && near < MOB_CAP; i++) {
                 double a = random.nextDouble() * Math.PI * 2;
                 double dist = 16 + random.nextDouble() * 20;
                 int x = (int) (p.getX() + Math.cos(a) * dist), z = (int) (p.getZ() + Math.sin(a) * dist);
@@ -481,6 +486,7 @@ public final class PlainsManager {
         for (int i = 0; i < 2; i++) if (random.nextInt(100) < hoe * 10) count++;
         ItemStack drop = new ItemStack(ModItems.get(crop.product()), count);
         if (!p.getInventory().add(drop)) level.addFreshEntity(new ItemEntity(level, p.getX(), p.getY() + 0.5, p.getZ(), drop));
+        com.mmorpg.server.AdventureSummary.item(p,ModItems.get(crop.product()),count-drop.getCount());
         RpgPlayers.giveGatherXp(p, 2 + rank * 3L);
         p.sendOverlayMessage(Component.literal("+" + count + " " + crop.name()).withColor(crop.color()));
         level.setBlock(pos, block.getStateForAge(0), 3);

@@ -83,14 +83,15 @@ public final class KillRewards {
             PlayerData d = RpgPlayers.get(p);
             boolean inGroup = p == killer || PartyManager.sameParty(killer, p);
             double share = inGroup ? groupFactor : 1.0;
-            long xp = Math.max(1, Math.round(LevelSystem.xpForKill(md.level, md.xpMultiplier, d.level) * share));
+            long xp = Math.max(1, Math.round(LevelSystem.xpForKill(md.level, md.xpMultiplier, d.level) * share * 0.5));
             RpgPlayers.giveXp(p, xp, true);
             if (!d.activePet.isEmpty()) PetManager.addPetXp(p, d.activePet, (int) Math.max(1, xp * 0.05));
+            AdventureSummary.count(p,"kills",1);
             d.kills.merge(md.key, 1, Integer::sum);
             QuestManager.onKill(p, md.key, typeId, md.boss);
             if (md.boss && !com.mmorpg.hub.ClassTrial.active(p)) {
                 // Personal reward: each eligible participant gets a scroll, not a shared ground drop.
-                RpgPlayers.give(p, ModItems.get(com.mmorpg.crafting.ForgeProgression.scroll(com.mmorpg.crafting.ForgeProgression.tier(md.level))), 1);
+                RpgPlayers.give(p, ModItems.get(com.mmorpg.crafting.ForgeProgression.reward(d,com.mmorpg.crafting.ForgeProgression.tier(md.level),new java.util.Random())), 1);
             }
             d.dirty = true;
         }

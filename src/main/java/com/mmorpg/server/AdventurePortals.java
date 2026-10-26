@@ -31,7 +31,11 @@ public final class AdventurePortals {
     private static final Map<UUID, UUID> INSIDE = new HashMap<>();
     private static final Map<UUID, Deque<Change>> HISTORY = new HashMap<>();
     private static final int MAX_HISTORY = 20;
-    private record Change(Portal portal, boolean placed, Map<BlockPos, BlockState> before, Map<BlockPos, BlockState> after) { }
+    private record Change(Portal portal, boolean placed, Map<BlockPos, BlockState> before, Map<BlockPos, BlockState> after, long order) {
+        Change(Portal portal, boolean placed, Map<BlockPos, BlockState> before, Map<BlockPos, BlockState> after) {
+            this(portal, placed, before, after, SpawnEditor.nextOrder());
+        }
+    }
     private AdventurePortals() { }
 
     public static AABB passage(Portal portal) {
@@ -44,6 +48,8 @@ public final class AdventurePortals {
             case "mine" -> portal.region() < 0 ? "Mines : choix de la région" : com.mmorpg.mine.MineLayout.STYLES.get(portal.region()).name();
             case "plaines" -> portal.region() < 0 ? "Plaines : choix de la région" : com.mmorpg.plains.PlainsLayout.STYLES.get(portal.region()).name();
             case "donjon" -> DungeonType.byId(portal.dungeon()).label + " · " + new String[]{"normal", "héroïque", "mythique"}[portal.difficulty()];
+            case "hub" -> "Hub : choix de classe";
+            case "spawn" -> "Spawn d'Aeloria";
             default -> "Portail inconnu";
         };
     }
@@ -52,6 +58,7 @@ public final class AdventurePortals {
             case "mine" -> p.region() >= -1 && p.region() < com.mmorpg.mine.MineLayout.SECTORS;
             case "plaines" -> p.region() >= -1 && p.region() < com.mmorpg.plains.PlainsLayout.REGIONS;
             case "donjon" -> DungeonType.byId(p.dungeon()) != null && p.difficulty() >= 0 && p.difficulty() <= 2;
+            case "hub", "spawn" -> true;
             default -> false;
         };
     }
@@ -116,6 +123,7 @@ public final class AdventurePortals {
     }
     public static boolean undo(ServerPlayer player) {
         Deque<Change> history = HISTORY.get(player.getUUID());
+        if (SpawnEditor.lastOrder(player) > (history == null || history.isEmpty() ? 0 : history.peek().order())) return SpawnEditor.undoOwn(player);
         if (history == null || history.isEmpty()) return fail(player, "Aucune modification de portail à annuler dans cette session.");
         Change change = history.peek();
         var server = player.level().getServer();
@@ -136,6 +144,9 @@ public final class AdventurePortals {
     private static boolean fail(ServerPlayer p, String message) { p.sendSystemMessage(Component.literal(message).withColor(0xFF8080)); return false; }
 
     public static boolean allowed(ServerPlayer p, Portal portal) {
+        if (valid(portal) && (portal.kind().equals("hub") || portal.kind().equals("spawn")))
+            return p.isAlive() && !com.mmorpg.hub.ClassTrial.active(p) && !com.mmorpg.hub.CinematicManager.isLocked(p)
+                    && RpgPlayers.get(p).pvpUntilTick <= p.level().getServer().getTickCount();
         if (!valid(portal) || !p.isAlive() || p.isSpectator() || !RpgPlayers.get(p).playerClass.isPlayable()) return false;
         if (com.mmorpg.hub.ClassTrial.active(p) || com.mmorpg.hub.CinematicManager.isLocked(p)) return false;
         if (RpgPlayers.get(p).pvpUntilTick > p.level().getServer().getTickCount()) return false;
@@ -148,7 +159,10 @@ public final class AdventurePortals {
     }
     public static void enter(ServerPlayer p, Portal portal) {
         if (!allowed(p, portal)) { fail(p, "Accès refusé : choisissez votre classe, respectez le niveau et découvrez d'abord cette région. Terminez aussi tout essai, cinématique ou combat PvP."); return; }
+        PortalAccess.grant(p, portal.kind());
         switch (portal.kind()) {
+            case "hub" -> com.mmorpg.hub.HubManager.goToHub(p);
+            case "spawn" -> com.mmorpg.hub.HubManager.goToSpawn(p);
             case "mine" -> { if (portal.region() < 0) com.mmorpg.mine.MineManager.open(p, null); else com.mmorpg.mine.MineManager.startTransition(p, portal.region()); }
             case "plaines" -> { if (portal.region() < 0) com.mmorpg.plains.PlainsManager.open(p); else com.mmorpg.plains.PlainsManager.enterChosen(p, portal.region()); }
             case "donjon" -> com.mmorpg.dungeon.InstanceManager.enterPool(p, com.mmorpg.dungeon.InstanceManager.pool(DungeonType.byId(portal.dungeon()), portal.difficulty()));
@@ -198,6 +212,8 @@ public final class AdventurePortals {
     public static void commands(RegisterCommandsEvent event) {
         var dispatcher = event.getDispatcher();
         var root = Commands.literal("portail").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS));
+        root.then(Commands.literal("hub").executes(c -> create(c.getSource(), "hub", -1, "", 0)));
+        root.then(Commands.literal("spawn").executes(c -> create(c.getSource(), "spawn", -1, "", 0)));
         root.then(Commands.literal("mine").executes(c -> create(c.getSource(), "mine", -1, "", 0))
                 .then(Commands.argument("region", IntegerArgumentType.integer(1, com.mmorpg.mine.MineLayout.SECTORS)).executes(c -> create(c.getSource(), "mine", IntegerArgumentType.getInteger(c, "region") - 1, "", 0))));
         root.then(Commands.literal("plaines").executes(c -> create(c.getSource(), "plaines", -1, "", 0))
@@ -226,7 +242,7 @@ public final class AdventurePortals {
         }));
         dispatcher.register(root);
         var undo = dispatcher.register(Commands.literal("undoportail").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-                .executes(c -> { boolean ok = undo(c.getSource().getPlayerOrException()); if (ok) c.getSource().sendSuccess(() -> Component.literal("Dernière modification de portail annulée ; blocs précédents restaurés."), true); return ok ? 1 : 0; })
+                .executes(c -> { boolean ok = undo(c.getSource().getPlayerOrException()); if (ok) c.getSource().sendSuccess(() -> Component.literal("Dernier aménagement annulé ; état précédent restauré."), true); return ok ? 1 : 0; })
                 .then(Commands.argument("nombre", IntegerArgumentType.integer(1, MAX_HISTORY)).executes(c -> {
                     int count = 0;
                     for (int i = 0; i < IntegerArgumentType.getInteger(c, "nombre") && undo(c.getSource().getPlayerOrException()); i++) count++;

@@ -75,6 +75,9 @@ public final class ServerEvents {
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
             RpgPlayers.tick(sp);
+            AdventureSummary.tick(sp);
+            sp.getFoodData().setFoodLevel(20);
+            sp.getFoodData().setSaturation(5);
             if (sp.tickCount % 20 == 0) MountManager.maintain(sp);
         }
     }

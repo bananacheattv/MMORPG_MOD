@@ -55,7 +55,7 @@ public final class DungeonTravel {
         }
         // Prepare every return ticket before issuing any proxy connection request.
         Map<UUID, ReturnPoint> old = new HashMap<>();
-        for (ServerPlayer p : members) { old.put(p.getUUID(), point(p)); capture(p); }
+        for (ServerPlayer p : members) { old.put(p.getUUID(), point(p)); com.mmorpg.server.AdventureSummary.begin(p,"donjon"); capture(p); }
         for (ServerPlayer p : members) if (!NetworkPlayers.save(p)) {
             for (ServerPlayer member : members) { restore(member, old.get(member.getUUID())); NetworkPlayers.save(member); }
             player.sendSystemMessage(Component.literal("Départ annulé : sauvegarde d'un membre impossible.")); return true;
