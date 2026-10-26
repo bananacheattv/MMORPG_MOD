@@ -240,6 +240,7 @@ public final class NetworkPlayers {
     }
 
     public static boolean canTransfer(ServerPlayer p, NetworkConfig.Role role) {
+        if(com.mmorpg.competition.ArenaManager.active(p)||com.mmorpg.competition.GuildRaids.of(p.getUUID())!=null){p.sendSystemMessage(Component.literal("Quitte ton arène ou ton épreuve de guilde avant de voyager."));return false;}
         if (!SESSIONS.containsKey(p.getUUID())) return false;
         if (role != NetworkConfig.Role.HUB && !RpgPlayers.get(p).playerClass.isPlayable()) {
             p.sendSystemMessage(Component.literal("Choisissez votre classe au hub avant de voyager."));
@@ -268,6 +269,8 @@ public final class NetworkPlayers {
             }
             if (destination.equals("dungeon-return")) {
                 DungeonTravel.arriveHome(p);
+            } else if ((destination.startsWith("arena:")||destination.equals("guild-raid")) && NetworkConfig.hosts(NetworkConfig.Role.DUNGEONS)) {
+                com.mmorpg.competition.CompetitionTravel.arrive(p,destination);
             } else if (destination.startsWith("mine:") && NetworkConfig.hosts(NetworkConfig.Role.MINES)) {
                 int region = Integer.parseInt(destination.substring(5));
                 com.mmorpg.server.PortalAccess.grant(p,"mine");

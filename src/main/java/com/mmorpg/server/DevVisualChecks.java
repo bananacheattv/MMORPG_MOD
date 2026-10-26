@@ -15,6 +15,23 @@ public final class DevVisualChecks {
             var server=p.level().getServer();var level=server.overworld();
             server.getPlayerList().op(new net.minecraft.server.players.NameAndId(p.getGameProfile()));
             com.mmorpg.hub.CinematicManager.finish(p);p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+            if(Boolean.getBoolean("mmorpg.socialVisual")){
+                com.mmorpg.config.ConfigManager.general().customSpawning=false;
+                RpgPlayers.get(p).playerClass=com.mmorpg.rpg.PlayerClass.GUERRIER;
+                for(int i=0;i<10;i++){
+                    for(int cx=-1;cx<=1;cx++)for(int cz=-1;cz<=1;cz++)level.setChunkForced(((5000+i*50)>>4)+cx,cz,true);
+                    for(int x=-13;x<=13;x++)for(int z=-13;z<=13;z++)level.setBlockAndUpdate(new BlockPos(5000+i*50+x,219,z),net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState());
+                    var boss=com.mmorpg.registry.ModEntities.GUILD_GUARDIANS.get(i).get().create(level,net.minecraft.world.entity.EntitySpawnReason.COMMAND);boss.guild=java.util.UUID.randomUUID();boss.initialize();boss.setNoAi(true);boss.snapTo(5000+i*50+.5,220,.5,0,0);level.addFreshEntity(boss);
+                }
+                for(int i=0;i<3;i++){
+                    int x0=5550+i*50;for(int cx=-1;cx<=1;cx++)for(int cz=-1;cz<=1;cz++)level.setChunkForced((x0>>4)+cx,cz,true);
+                    for(int x=-10;x<=10;x++)for(int z=-10;z<=10;z++)level.setBlockAndUpdate(new BlockPos(x0+x,219,z),net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState());
+                    var crystal=com.mmorpg.registry.ModEntities.ARENA_CRYSTAL.get().create(level,net.minecraft.world.entity.EntitySpawnReason.COMMAND);crystal.setTeam(i-1);crystal.snapTo(x0+.5,220,.5,0,0);level.addFreshEntity(crystal);
+                }
+                var arenaLevel=com.mmorpg.competition.CompetitionWorld.level(server);
+                for(int i=0;i<2;i++){var job=com.mmorpg.competition.CompetitionWorld.arena(com.mmorpg.competition.CompetitionWorld.center(i),com.mmorpg.competition.ArenaRules.Kind.values()[i]);while(!job.done())job.tick(arenaLevel);}
+                p.teleportTo(level,5015,226,18,java.util.Set.of(),140F,8F,true);p.getAbilities().flying=true;p.onUpdateAbilities();return;
+            }
             RpgPlayers.get(p).playerClass=com.mmorpg.rpg.PlayerClass.GUERRIER;
             for(int x=-15;x<=15;x++)for(int z=-10;z<=16;z++)level.setBlockAndUpdate(new BlockPos(x,219,z),net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState());
             p.teleportTo(level,8.5,222,11.5,java.util.Set.of(),145F,10F,true);

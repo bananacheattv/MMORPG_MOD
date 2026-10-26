@@ -103,6 +103,9 @@ public final class ModEntities {
 
     private ModEntities() {
     }
+    public static final java.util.List<DeferredHolder<EntityType<?>,EntityType<com.mmorpg.competition.GuildGuardian>>> GUILD_GUARDIANS=new java.util.ArrayList<>();
+    static {for(int i=0;i<10;i++){final int tier=i;var def=com.mmorpg.guild.Yggdrasil.ALL[i];GUILD_GUARDIANS.add(ENTITIES.registerEntityType("yggdrasil_"+def.id(),(type,level)->new com.mmorpg.competition.GuildGuardian(type,level,tier),MobCategory.MONSTER,b->b.sized(def.width(),def.height()).fireImmune().noSave().clientTrackingRange(16)));}}
+    public static final DeferredHolder<EntityType<?>,EntityType<com.mmorpg.competition.ArenaCrystal>> ARENA_CRYSTAL=ENTITIES.registerEntityType("cristal_arene",com.mmorpg.competition.ArenaCrystal::new,MobCategory.MISC,b->b.sized(2.4F,3.5F).fireImmune().noSave().clientTrackingRange(14).updateInterval(1));
 
     public static final Map<String, DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.mob.ImportedMobEntity>>> IMPORTED = new LinkedHashMap<>();
     static {
@@ -138,6 +141,8 @@ public final class ModEntities {
         event.put(IGNIS.get(), RpgBoss.createBossAttributes().build());
         event.put(FROST_TITAN.get(), RpgBoss.createBossAttributes().build());
         event.put(VOID_AVATAR.get(), RpgBoss.createBossAttributes().build());
+        GUILD_GUARDIANS.forEach(t->event.put(t.get(),RpgBoss.createBossAttributes().build()));
+        event.put(ARENA_CRYSTAL.get(),RpgMonster.createAttributes().build());
         for (var mount : MOUNTS.values()) event.put(mount.get(), net.minecraft.world.entity.animal.equine.AbstractHorse.createBaseHorseAttributes()
                 .add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH, 20).build());
         event.put(NPC.get(), com.mmorpg.entity.NpcEntity.createAttributes().build());

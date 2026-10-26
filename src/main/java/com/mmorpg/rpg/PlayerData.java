@@ -28,6 +28,9 @@ import java.util.UUID;
  */
 public class PlayerData implements ValueIOSerializable {
     public CompoundTag adventureSummary = new CompoundTag();
+    public CompoundTag guildReceipts = new CompoundTag();
+    public int guildLevel;
+    public long[] guildBuffs=new long[4];
     public final Set<String> forgeRecipes = new HashSet<>();
     public static final int SKILL_SLOTS = 6;
     private static final Codec<Map<String, Integer>> STR_INT_MAP = Codec.unboundedMap(Codec.STRING, Codec.INT);
@@ -177,6 +180,8 @@ public class PlayerData implements ValueIOSerializable {
     public CompoundTag save() {
         CompoundTag t = new CompoundTag();
         t.put("adventure_summary", adventureSummary.copy());
+        t.put("guild_receipts",guildReceipts.copy());t.putInt("guild_level",guildLevel);
+        t.putLongArray("guild_buffs",guildBuffs);
         t.store("forgeRecipes",Codec.STRING.listOf(),new ArrayList<>(forgeRecipes));
         t.putString("class", playerClass.name());
         t.putInt("level", level);
@@ -222,6 +227,8 @@ public class PlayerData implements ValueIOSerializable {
 
     public void load(CompoundTag t) {
         adventureSummary = t.getCompoundOrEmpty("adventure_summary").copy();
+        guildReceipts=t.getCompoundOrEmpty("guild_receipts").copy();guildLevel=Math.clamp(t.getIntOr("guild_level",0),0,10);
+        guildBuffs=t.getLongArray("guild_buffs").orElse(new long[4]);if(guildBuffs.length!=4)guildBuffs=new long[4];
         forgeRecipes.clear();forgeRecipes.addAll(t.read("forgeRecipes",Codec.STRING.listOf()).orElse(List.of()));
         playerClass = PlayerClass.byName(t.getStringOr("class", "NONE"));
         level = Math.max(1, Math.min(LevelSystem.MAX_LEVEL, t.getIntOr("level", 1)));

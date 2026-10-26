@@ -396,6 +396,11 @@ public final class Payloads {
     }
 
     /** Action de boutique : 0 = acheter (index d'offre, quantite), 1 = vendre (emplacement, quantite), 2 = tout vendre (emplacement). */
+    public record SocialAction(String system,CompoundTag data) implements CustomPacketPayload {
+        public static final Type<SocialAction> TYPE=new Type<>(MMORPG.id("social_action"));
+        public static final StreamCodec<ByteBuf,SocialAction> CODEC=StreamCodec.composite(ByteBufCodecs.STRING_UTF8,SocialAction::system,ByteBufCodecs.COMPOUND_TAG,SocialAction::data,SocialAction::new);
+        @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
+    }
     public record MerchantEdit(CompoundTag data) implements CustomPacketPayload {
         public static final Type<MerchantEdit> TYPE=new Type<>(MMORPG.id("merchant_edit"));
         public static final StreamCodec<ByteBuf,MerchantEdit> CODEC=StreamCodec.composite(ByteBufCodecs.COMPOUND_TAG,MerchantEdit::data,MerchantEdit::new);

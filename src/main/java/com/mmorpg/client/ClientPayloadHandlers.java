@@ -81,6 +81,9 @@ public final class ClientPayloadHandlers {
             case S2COpenScreen.DUNGEON_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.DungeonMasterScreen(payload.extra()));
             case S2COpenScreen.MINE_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.MineMasterScreen(payload.extra()));
             case S2COpenScreen.SPAWN_EDITOR -> mc.gui.setScreen(new com.mmorpg.client.screen.SpawnEditorScreen(payload.extra()));
+            case S2COpenScreen.GUILD -> mc.gui.setScreen(new com.mmorpg.client.screen.GuildScreen(payload.extra()));
+            case S2COpenScreen.ARENA -> mc.gui.setScreen(new com.mmorpg.client.screen.ArenaScreen(payload.extra()));
+            case S2COpenScreen.ARENA_READY -> mc.gui.setScreen(new com.mmorpg.client.screen.ArenaReadyScreen(payload.extra()));
             case S2COpenScreen.ADVENTURE_SUMMARY -> mc.gui.setScreen(new com.mmorpg.client.screen.AdventureSummaryScreen(payload.extra()));
             case S2COpenScreen.MERCHANT_EDITOR -> mc.gui.setScreen(new com.mmorpg.client.screen.MerchantEditorScreen(payload.extra()));
             case S2COpenScreen.CLASS_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.ClassMasterScreen(payload.extra()));

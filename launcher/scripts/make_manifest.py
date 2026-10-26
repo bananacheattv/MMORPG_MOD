@@ -83,6 +83,7 @@ with open(os.path.join(HERE, '..', 'extra_mods.json'), encoding='utf-8') as f:
         else:
             print(f"::warning::{extra['modrinth']} introuvable pour NeoForge {mc}")
 manifest = {
+    'gameVersion': next((line.split('=', 1)[1].strip() for line in open(os.path.join(HERE, '..', '..', 'gradle.properties'), encoding='utf-8') if line.startswith('game_version=')), '0.0'),
     'version': version,
     'date': datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC'),
     'notes': [n for n in notes if n.strip()],

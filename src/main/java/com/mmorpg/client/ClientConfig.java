@@ -25,7 +25,7 @@ public final class ClientConfig {
             .defineInRange("ambientMusicVolume", 70, 0, 100);
 
     public static final ModConfigSpec.ConfigValue<String> MAIN_MENU_SERVER = BUILDER
-            .comment("Adresse du serveur proposee par le bouton « Rejoindre Aeloria » du menu principal (vide : pas de bouton)")
+            .comment("Adresse de connexion du bouton Jouer ; le launcher peut fournir l'adresse via aeloria.server.")
             .translation("mmorpg.configuration.mainMenuServer")
             .define("mainMenuServer", "");
 

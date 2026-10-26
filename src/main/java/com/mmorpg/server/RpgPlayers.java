@@ -290,9 +290,10 @@ public final class RpgPlayers {
 
     public static void giveXp(ServerPlayer player, long amount, boolean fromKill) {
         if (com.mmorpg.hub.ClassTrial.active(player)) return;          // essai de classe : aucune recompense
+        if(amount>0&&get(player).playerClass.isPlayable())com.mmorpg.guild.GuildService.earned(player,amount);
         PlayerData d = get(player);
         if (!d.playerClass.isPlayable() || d.level >= LevelSystem.MAX_LEVEL || amount <= 0) return;
-        amount = Math.max(1, Math.round(amount * ConfigManager.general().xpMultiplier * (d.xpCharmSeconds > 0 ? 1.25 : 1.0)));
+        amount = Math.max(1, Math.round(amount * ConfigManager.general().xpMultiplier * (d.xpCharmSeconds > 0 ? 1.25 : 1.0)*(1+(com.mmorpg.guild.GuildBuffs.active(d,com.mmorpg.guild.GuildBuffs.Kind.SAVOIR)?d.guildLevel*.01:0))));
         AdventureSummary.count(player,"xp",amount);
         d.xp += amount;
         CombatTexts.send(player, player.getX(), player.getY() + player.getBbHeight() + 0.6, player.getZ(), amount, Payloads.CombatText.XP);
