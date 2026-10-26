@@ -270,8 +270,10 @@ public final class NetworkPlayers {
                 DungeonTravel.arriveHome(p);
             } else if (destination.startsWith("mine:") && NetworkConfig.hosts(NetworkConfig.Role.MINES)) {
                 int region = Integer.parseInt(destination.substring(5));
+                com.mmorpg.server.PortalAccess.grant(p,"mine");
                 if (region >= 0 && region < com.mmorpg.mine.MineLayout.SECTORS && region < RpgPlayers.get(p).minesUnlocked) com.mmorpg.mine.MineManager.startTransition(p, region);
             } else if (destination.startsWith("plains:") && NetworkConfig.hosts(NetworkConfig.Role.PLAINS)) {
+                com.mmorpg.server.PortalAccess.grant(p,"plaines");
                 com.mmorpg.plains.PlainsManager.enterChosen(p, Integer.parseInt(destination.substring(7)));
             } else if (destination.startsWith("dungeon:") && NetworkConfig.hosts(NetworkConfig.Role.DUNGEONS)) {
                 String pool = destination.substring(8);

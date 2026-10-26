@@ -172,7 +172,9 @@ public final class MineBuilder {
     // ------------------------------------------------------------------------------------------------ ecriture
 
     private void put(int lx, int y, int lz, BlockState s) {
-        level.setBlock(new BlockPos(ox + lx, y, MineLayout.Z0 + lz), s, FLAGS);
+        BlockPos at = new BlockPos(ox + lx, y, MineLayout.Z0 + lz);
+        if (s.getBlock() instanceof MineOreBlock && !MineDensity.keep(at)) return;
+        level.setBlock(at, s, FLAGS);
         placed++;
     }
 

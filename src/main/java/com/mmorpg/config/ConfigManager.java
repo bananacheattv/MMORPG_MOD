@@ -215,6 +215,9 @@ public final class ConfigManager {
                 if (d.giver == null) d.giver = "";
                 if (d.npc == null) d.npc = "";
             }
+            for (var definition : qres.values()) if (definition.rewards != null && definition.rewards.items != null)
+                for (var reward : definition.rewards.items) if (reward.item != null && reward.item.matches("(?:mmorpg:)?parchemin_forge_[1-5]"))
+                    reward.item = com.mmorpg.crafting.ForgeProgression.scroll(Integer.parseInt(reward.item.substring(reward.item.length()-1)));
             quests = qres;
             write(q, quests);
 

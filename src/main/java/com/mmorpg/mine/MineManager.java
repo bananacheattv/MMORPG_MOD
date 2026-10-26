@@ -59,7 +59,7 @@ import java.util.UUID;
 public final class MineManager {
     /** A incrementer quand le plan change : la mine est alors reconstruite au demarrage. */
     public static final int VERSION = 4;
-    private static final int MOB_CAP = 14;
+    private static final int MOB_CAP = 42;
 
     private static MineBuilder job;
     private static long jobStart;
@@ -203,6 +203,7 @@ public final class MineManager {
                 if (exitGate(lay).contains(p.getX(), p.getY(), p.getZ()) && !transitioning(p) && !cooling(p, now)) {
                     level.playSound(null, p.blockPosition(), SoundEvents.PORTAL_TRAVEL, SoundSource.PLAYERS, 0.5f, 1.2f);
                     discover(p, region + 1);
+                    com.mmorpg.server.PortalAccess.grant(p,"mine");
                     startTransition(p, region + 1);
                     continue;
                 }
@@ -303,6 +304,7 @@ public final class MineManager {
         if (!p.getInventory().add(ingot)) level.addFreshEntity(new net.minecraft.world.entity.item.ItemEntity(level, p.getX(), p.getY() + 0.5, p.getZ(), ingot));
         tool.hurtAndBreak(1, p, EquipmentSlot.MAINHAND);
         RpgPlayers.giveGatherXp(p, 3 + ore.minLevel() / 2L);
+        com.mmorpg.server.AdventureSummary.item(p,ModItems.get(ore.ingotId()),count-ingot.getCount());
         p.sendOverlayMessage(Component.literal("+" + count + " Lingot de " + ore.name() + (count > 1 ? "  (veine riche !)" : "")).withColor(ore.color()));
         rareDrop(level, p, pos, ore, pick);
         BlockState old = level.getBlockState(pos);
@@ -356,6 +358,7 @@ public final class MineManager {
             if (!level.hasChunkAt(pos)) continue;                          // il repoussera au prochain passage dans le secteur
             data.remove(r);
             if (!level.getBlockState(pos).is(MineBlocks.EPUISE.get())) continue;
+            if (!MineDensity.keep(pos)) { level.removeBlock(pos, false); continue; }
             MineBlocks.Ore ore = MineBlocks.ORES.get(Math.min(MineBlocks.ORES.size() - 1, r.tier()));
             level.setBlock(pos, MineBlocks.block(ore).defaultBlockState(), 3);
             if (level.getNearestPlayer(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 24, false) != null) {
@@ -388,7 +391,7 @@ public final class MineManager {
             if (Math.hypot(px - MineLayout.PLAZA_X, pz - MineLayout.PLAZA_Z) < 42) continue;           // la place d'entree est sure
             AABB area = p.getBoundingBox().inflate(36, 30, 36);
             if (level.getEntitiesOfClass(Mob.class, area, m -> m instanceof com.mmorpg.entity.RpgMob).size() >= MOB_CAP) continue;
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < 6; i++) {
                 double a = random.nextDouble() * Math.PI * 2;
                 double dist = 16 + random.nextDouble() * 18;
                 int x = (int) (p.getX() + Math.cos(a) * dist), z = (int) (p.getZ() + Math.sin(a) * dist);
@@ -419,6 +422,7 @@ public final class MineManager {
 
     /** Menu du Maitre des mines (ou de la commande /mine quand {@code npc} est nul) : les cinq mines, leurs niveaux et leurs minerais ; celles qu'on n'a pas decouvertes sont verrouillees. */
     public static void open(ServerPlayer p, NpcEntity npc) {
+        if (!com.mmorpg.server.PortalAccess.require(p,"mine")) return;
         PlayerData d = RpgPlayers.get(p);
         ListTag list = new ListTag();
         for (Sector s : MineLayout.STYLES) {
@@ -477,6 +481,8 @@ public final class MineManager {
     /** Ecran de chargement puis arrivee a la mine (menu, portail cache). */
     public static void startTransition(ServerPlayer p, int k) {
         if (k < 0 || k >= MineLayout.SECTORS || k >= RpgPlayers.get(p).minesUnlocked) return;
+        if (!com.mmorpg.server.PortalAccess.consume(p,"mine")) return;
+        com.mmorpg.server.AdventureSummary.begin(p,"mine");
         if (com.mmorpg.network.NetworkPlayers.route(p, com.mmorpg.network.NetworkConfig.Role.MINES, "mine:" + k)) return;
         MinecraftServer server = p.level().getServer();
         if (dim(server) == null || k < 0 || k >= MineLayout.SECTORS) return;

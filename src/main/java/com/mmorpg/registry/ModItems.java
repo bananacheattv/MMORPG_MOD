@@ -34,6 +34,7 @@ import java.util.function.Supplier;
 
 public final class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MMORPG.MODID);
+    public static final DeferredItem<com.mmorpg.item.SpawnEditorItem> SPAWN_EDITOR = ITEMS.registerItem("outil_spawn", com.mmorpg.item.SpawnEditorItem::new);
 
     public static final List<DeferredItem<? extends Item>> WEAPONS = new ArrayList<>();
     public static final List<DeferredItem<? extends Item>> ARMORS = new ArrayList<>();
@@ -45,10 +46,15 @@ public final class ModItems {
     static {
         for (int tier = 1; tier <= com.mmorpg.crafting.ForgeProgression.TIERS; tier++) {
             final int t = tier;
-            String id = com.mmorpg.crafting.ForgeProgression.scroll(t);
+            String id = "parchemin_forge_" + t;
             var item = ITEMS.registerItem(id, p -> new com.mmorpg.item.ForgeScrollItem(p, t));
-            CONSUMABLES.add(item);
             BY_ID.put(id, item);
+        }
+        for (var recipe : com.mmorpg.crafting.ForgeRecipes.all()) {
+            int tier=com.mmorpg.crafting.ForgeProgression.required(recipe);if(tier==0)continue;
+            String id=com.mmorpg.crafting.ForgeProgression.blueprint(recipe);
+            var item=ITEMS.registerItem(id,p->new com.mmorpg.item.ForgeScrollItem(p,recipe.id(),tier));
+            CONSUMABLES.add(item);BY_ID.put(id,item);
         }
     }
     public static final DeferredItem<RpgMaterialItem> FIOLE_RUNIQUE = material("fiole_runique", Rarity.COMMUN, "Récipient alchimique façonné à partir de Verdite et de poussière d'âme.");

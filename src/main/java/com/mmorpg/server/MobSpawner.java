@@ -49,7 +49,7 @@ public final class MobSpawner {
         if (level.getGameTime() % Math.max(20, g.spawnIntervalTicks) != 0) return;
         for (ServerPlayer player : level.players()) {
             if (player.isSpectator()) continue;
-            trySpawnNear(level, player, g);
+            for (int attempt = 0; attempt < 3; attempt++) trySpawnNear(level, player, g);
         }
     }
 
@@ -57,7 +57,7 @@ public final class MobSpawner {
         if (com.mmorpg.hub.HubProtection.inHub(level, player.blockPosition())) return;      // pas de monstres dans le hub
         AABB area = player.getBoundingBox().inflate(48, 24, 48);
         int nearby = level.getEntitiesOfClass(Mob.class, area, m -> m instanceof RpgMob).size();
-        if (nearby >= g.maxCustomMobsNearPlayer) return;
+        if (nearby >= g.maxCustomMobsNearPlayer * 3) return;
         var random = level.getRandom();
         double angle = random.nextDouble() * Math.PI * 2;
         double dist = 24 + random.nextDouble() * 20;

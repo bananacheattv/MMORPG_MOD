@@ -23,6 +23,8 @@ import java.util.function.Consumer;
 
 /** Arc RPG : ne consomme pas de fleches, les degats dependent de l'Attaque du joueur et de la tension de l'arc. */
 public class RpgBowItem extends BowItem implements RpgEquipment {
+    /** Full draw in 10 ticks (0.5 seconds), twice as fast as a vanilla bow. */
+    public static float rpgPowerForTime(int ticks) { return BowItem.getPowerForTime(Math.clamp(ticks, 0, 10) * 2); }
     private final RpgItemDef def;
 
     public RpgBowItem(Properties properties, RpgItemDef def) {
@@ -47,7 +49,7 @@ public class RpgBowItem extends BowItem implements RpgEquipment {
             return false;
         }
         int held = this.getUseDuration(stack, entity) - remainingTime;
-        float pow = getPowerForTime(held);
+        float pow = rpgPowerForTime(held);
         if (pow < 0.1F) {
             return false;
         }
@@ -76,6 +78,7 @@ public class RpgBowItem extends BowItem implements RpgEquipment {
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> out, TooltipFlag flag) {
         ItemTooltips.equipment(stack, def, "Arc", out);
         out.accept(Component.literal("Ne nécessite pas de flèches").withColor(0x80C0FF));
+        out.accept(Component.literal("Charge complète : 0,5 seconde").withColor(0x80C0FF));
     }
 
     @Override

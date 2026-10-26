@@ -9,7 +9,7 @@
     "on_true": {
       "type": "minecraft:range_dispatch",
       "property": "minecraft:use_duration",
-      "scale": 0.05,
+      "scale": 0.1,
       "fallback": {
         "type": "minecraft:model",
         "model": "mmorpg:item/arc_niv_40_pulling_0"

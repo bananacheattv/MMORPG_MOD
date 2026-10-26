@@ -615,5 +615,6 @@
   "item.mmorpg.parchemin_forge_3": "Parchemin de forge III",
   "item.mmorpg.parchemin_forge_4": "Parchemin de forge IV",
   "item.mmorpg.parchemin_forge_5": "Parchemin de forge V",
-  "item.mmorpg.fiole_runique": "Fiole runique"
+  "item.mmorpg.fiole_runique": "Fiole runique",
+  "item.mmorpg.outil_spawn": "Outil d’aménagement du spawn"
 }

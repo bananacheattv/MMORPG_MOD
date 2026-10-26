@@ -203,7 +203,7 @@ public final class TrialManager {
             name = boss.getName().getString().toUpperCase(java.util.Locale.ROOT);
             level.sendParticles(ParticleTypes.PORTAL, boss.getX(), boss.getY() + 2, boss.getZ(), 60, 0.8, 1.6, 0.8, 0.6);
         }
-        int escorts = Math.min(18, 6 + t.diff() * 3 + Math.max(0, players - 1) * 3);
+        int escorts = 3 * Math.min(18, 6 + t.diff() * 3 + Math.max(0, players - 1) * 3);
         for (int i = 0; i < escorts; i++) {
             double a = random.nextDouble() * Math.PI * 2;
             double r = 8 + random.nextDouble() * 4;
@@ -259,7 +259,7 @@ public final class TrialManager {
         int cy = t.pos().get(1);
         int cx = t.pos().get(0);
         var random = level.getRandom();
-        int count = Math.min(10, 3 + t.diff() * 2 + Math.max(0, in.size() - 1) * 2);
+        int count = 3 * Math.min(10, 3 + t.diff() * 2 + Math.max(0, in.size() - 1) * 2);
         for (int i = 0; i < count; i++) {
             int z = Math.min(zMax, ahead + random.nextInt(Math.max(1, zMax - ahead + 1)));
             BlockPos p = new BlockPos(cx + random.nextInt(7) - 3, cy, z);
@@ -281,7 +281,7 @@ public final class TrialManager {
         w.spawned = true;
         w.graceUntil = level.getGameTime() + 40;
         int extra = Math.max(0, inside(level, t).size() - 1) * 3;          // le solo reste la reference : on n'ajoute des ennemis que pour les groupes
-        int count = Math.min(30, 6 + number * 3 + t.diff() * 3 + extra);
+        int count = 3 * Math.min(30, 6 + number * 3 + t.diff() * 3 + extra);
         int cx = t.pos().get(0), cy = t.pos().get(1), cz = t.pos().get(2);
         var random = level.getRandom();
         for (int i = 0; i < count; i++) {

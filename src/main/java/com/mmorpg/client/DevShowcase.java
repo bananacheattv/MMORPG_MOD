@@ -37,6 +37,29 @@ public final class DevShowcase {
     public static void onTick(ClientTickEvent.Post event) {
         if (!ENABLED) return;
         Minecraft mc = Minecraft.getInstance();
+        if (MODE.equals("spawn_editor_ui")) {
+            // GUI verification without a live world or an authenticated account.
+            if (mc.gui.screen() == null) return;
+            tick++;
+            if(tick==30) {
+                mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(3);mc.resizeGui();
+                CompoundTag data=new CompoundTag();data.putString("position","0, 96, 0");
+                mc.gui.setScreen(new com.mmorpg.client.screen.SpawnEditorScreen(data));
+            }
+            if(tick==50) shot(mc,"spawn_editor_structures");
+            if(tick==55 && mc.gui.screen() instanceof com.mmorpg.client.screen.SpawnEditorScreen s) s.showTab(1);
+            if(tick==65) shot(mc,"spawn_editor_portals");
+            if(tick==70 && mc.gui.screen() instanceof com.mmorpg.client.screen.SpawnEditorScreen s) s.showTab(3);
+            if(tick==80) shot(mc,"spawn_editor_text");
+            if(tick==90) {
+                CompoundTag data=new CompoundTag();data.putString("kind","mine");data.putLong("duration",754000);data.putLong("kills",27);data.putLong("xp",1350);data.putLong("gold",82);
+                data.put("items",new CompoundTag()); // No item registries are bound on this menu-only preview.
+                mc.gui.setScreen(new com.mmorpg.client.screen.AdventureSummaryScreen(data));
+            }
+            if(tick==105) shot(mc,"adventure_summary");
+            if(tick==115) stop(mc);
+            return;
+        }
         if (mc.player == null || mc.level == null) return;
         if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.DeathScreen) {
             mc.player.respawn();

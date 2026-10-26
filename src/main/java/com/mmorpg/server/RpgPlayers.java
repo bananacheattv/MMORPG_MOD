@@ -293,6 +293,7 @@ public final class RpgPlayers {
         PlayerData d = get(player);
         if (!d.playerClass.isPlayable() || d.level >= LevelSystem.MAX_LEVEL || amount <= 0) return;
         amount = Math.max(1, Math.round(amount * ConfigManager.general().xpMultiplier * (d.xpCharmSeconds > 0 ? 1.25 : 1.0)));
+        AdventureSummary.count(player,"xp",amount);
         d.xp += amount;
         CombatTexts.send(player, player.getX(), player.getY() + player.getBbHeight() + 0.6, player.getZ(), amount, Payloads.CombatText.XP);
         boolean leveled = false;
@@ -471,7 +472,10 @@ public final class RpgPlayers {
     public static void give(ServerPlayer player, Item item, int count) {
         if (item == null) return;
         ItemStack stack = new ItemStack(item, count);
-        if (!player.getInventory().add(stack)) {
+        int before = stack.getCount();
+        boolean accepted = player.getInventory().add(stack);
+        AdventureSummary.item(player,item,before-stack.getCount());
+        if (!accepted) {
             player.drop(stack, false, net.minecraft.util.Prediction.SERVER_ONLY);
         }
     }
@@ -655,6 +659,7 @@ public final class RpgPlayers {
     public static void addGold(ServerPlayer player, long amount, boolean showText) {
         if (amount <= 0) return;
         PlayerData d = get(player);
+        AdventureSummary.count(player,"gold",amount);
         d.gold += amount;
         d.dirty = true;
         if (showText) {

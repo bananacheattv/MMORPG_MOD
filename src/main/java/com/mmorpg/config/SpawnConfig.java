@@ -11,6 +11,9 @@ import java.util.List;
  * reconstruire le terrain.
  */
 public class SpawnConfig {
+    /** Manual construction: never generate or upgrade the automatic market. */
+    public boolean manualBuild = false;
+    public boolean flatPlatform = false;
     /** Pose (et remplace) les PNJ de la liste a la construction du spawn ; faux : aucun PNJ n'est pose, aucun n'est retire. */
     public boolean autoNpcs = true;
     /** Pose les stations de la liste a la construction du spawn ; faux : aucune n'est posee (a placer a la main, onglet Objets). */

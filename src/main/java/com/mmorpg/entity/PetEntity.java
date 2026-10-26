@@ -26,6 +26,7 @@ import net.minecraft.world.phys.Vec3;
 public class PetEntity extends Entity implements ItemSupplier {
     private static final EntityDataAccessor<String> PET = SynchedEntityData.defineId(PetEntity.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Integer> OWNER = SynchedEntityData.defineId(PetEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> LOOT_TARGET = SynchedEntityData.defineId(PetEntity.class, EntityDataSerializers.INT);
     private ItemStack cachedStack = ItemStack.EMPTY;
     private String cachedId = "";
 
@@ -39,6 +40,7 @@ public class PetEntity extends Entity implements ItemSupplier {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(PET, "");
         builder.define(OWNER, -1);
+        builder.define(LOOT_TARGET, -1);
     }
 
     public void setup(Player owner, PetType type) {
@@ -159,6 +161,14 @@ public class PetEntity extends Entity implements ItemSupplier {
         } else {
             target = ground;
         }
+        net.minecraft.world.entity.item.ItemEntity loot = null;
+        if (owner instanceof net.minecraft.server.level.ServerPlayer sp) {
+            loot = com.mmorpg.server.PetLoot.target(this, sp);
+            this.entityData.set(LOOT_TARGET,loot==null?-1:loot.getId());
+        } else if (this.level().getEntity(this.entityData.get(LOOT_TARGET)) instanceof net.minecraft.world.entity.item.ItemEntity item) {
+            loot=item;
+        }
+        if (loot != null) target = loot.position().add(0, .2, 0);
         Vec3 pos = this.position();
         Vec3 next;
         if (pos.distanceToSqr(target) > 16 * 16) {
@@ -175,6 +185,8 @@ public class PetEntity extends Entity implements ItemSupplier {
         double dx = next.x - pos.x;
         double dz = next.z - pos.z;
         this.setPos(next.x, next.y, next.z);
+        if (loot != null && owner instanceof net.minecraft.server.level.ServerPlayer sp && this.distanceToSqr(loot) < 2.25)
+            com.mmorpg.server.PetLoot.collect(sp, loot);
         float want = dx * dx + dz * dz > 0.0004 ? (float) (Math.toDegrees(Math.atan2(dz, dx)) - 90.0) : owner.yBodyRot;
         this.setYRot(this.getYRot() + net.minecraft.util.Mth.clamp(net.minecraft.util.Mth.wrapDegrees(want - this.getYRot()), -20.0F, 20.0F));
         if (this.level().isClientSide()) {

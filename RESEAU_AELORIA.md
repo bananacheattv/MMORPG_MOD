@@ -72,10 +72,7 @@ Commandes supplémentaires : `/reseau hub`, `/reseau spawn`, `/reseau mines`, `/
 - Première arrivée : pioche, hache, pelle et houe du débutant, ainsi que les graines de Lueur.
 - Premier choix de classe : arme et quatre pièces d'armure de niveau 1, potions et provisions habituelles. Le kit ne peut pas être réclamé deux fois.
 - Armes et armures de départ restent fabricables. Tous les outils avancés et les autres armes/armures demandent un parchemin appris.
-- Cinq parchemins : I (niveaux 1–20), II (21–40), III (41–60), IV (61–80), V (81–100). Chaque parchemin débloque les trois catégories de son palier, sans débloquer les autres paliers ni supprimer les exigences de niveau et de matériaux.
-- Clic droit pour apprendre ; l'objet est consommé seulement si le palier est nouveau. Un doublon reste échangeable. L'apprentissage est sauvegardé et synchronisé entre serveurs.
-- Chaque boss remet un parchemin de son palier à chaque bénéficiaire admissible de la récompense. Les essais de classe ne donnent pas de parchemins.
-- Les cinq quêtes « Le savoir du forgeron » donnent les mêmes objets ; elles sont ajoutées aux configurations existantes sans remplacer les quêtes personnalisées. Les objectifs portent sur des monstres du palier et les quêtes se suivent.
+- Plans nominatifs : un parchemin par recette précise d’arme, d’armure ou d’outil. Chaque boss donne un plan adapté au palier et les quêtes d’artisan donnent un plan d’armure. Les anciens déblocages sont conservés ; les anciens parchemins s’échangent contre un plan précis. Voir `SPAWN_ET_CONSTRUCTION.md` pour les règles actuelles.
 - Toutes les recettes de la forge emploient les ressources du mod. La fiole runique se fabrique avec de la Verdite et de la poussière d'âme. Les ingrédients identiques sont additionnés avant le contrôle serveur.
 - La catégorie et les cinq recettes d'invocation ont été retirées de la forge. Les objets d'invocation restent disponibles aux autres systèmes existants.
 - Les montures utilisent les effets d'Aeloria et les sons de pas du sol. Les effets hérités des chevaux, y compris leurs variantes bébé, sont remplacés.

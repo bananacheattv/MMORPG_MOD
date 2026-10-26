@@ -36,6 +36,7 @@ public final class HubProtection {
     public static boolean inHub(Level level, BlockPos pos) {
         if (!(level instanceof ServerLevel sl) || !ConfigManager.general().hubProtection) return false;
         if (sl.dimension().equals(SpawnBuilder.DIM)) {                                      // le spawn est protege comme le hub
+            if (ConfigManager.spawn().manualBuild) return true;
             SpawnData sp = SpawnData.get(sl.getServer());
             return sp.exists() && SpawnBuilder.bounds(sp.origin()).contains(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
         }

@@ -176,7 +176,7 @@ public class ForgeScreen extends MmoScreen {
         g.text(font, rar.label + " — Niveau " + r.level(), dx + 42, dy + 19, ClientData.DATA.level >= r.level() ? Ui.MUTED : Ui.RED, false);
         int ty = dy + 42;
         if (!com.mmorpg.crafting.ForgeProgression.unlocked(ClientData.DATA, r)) {
-            g.text(font, "Parchemin de forge " + com.mmorpg.crafting.ForgeProgression.required(r) + " requis (boss / quêtes)", dx + 6, ty, Ui.RED, false);
+            g.text(font, font.plainSubstrByWidth("Parchemin : " + new ItemStack(item).getHoverName().getString(), dw - 12), dx + 6, ty, Ui.RED, false);
             ty += 12;
         }
         if (item instanceof RpgEquipment eq) {

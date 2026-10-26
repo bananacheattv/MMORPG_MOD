@@ -241,7 +241,8 @@ public final class HubManager {
         if (CinematicManager.isLocked(p)) return true;
         if (ClassTrial.active(p)) ClassTrial.end(p, false, null);
         p.stopRiding();
-        Vec3 at = HubLayout.center(spawn.origin(), new int[]{HubMarket.CX + 31, 0, 0});
+        Vec3 at = com.mmorpg.config.ConfigManager.spawn().manualBuild ? Vec3.atBottomCenterOf(spawn.origin())
+                : HubLayout.center(spawn.origin(), new int[]{HubMarket.CX + 31, 0, 0});
         p.teleportTo(level, at.x, at.y, at.z, Set.of(), 90F, 0F, true);
         p.sendOverlayMessage(Component.literal("Spawn d'Aeloria").withColor(0xFFD060));
         return true;

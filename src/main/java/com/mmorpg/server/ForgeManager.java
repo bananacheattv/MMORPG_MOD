@@ -54,7 +54,7 @@ public final class ForgeManager {
         if (r == null) return;
         PlayerData d = RpgPlayers.get(player);
         if (!com.mmorpg.crafting.ForgeProgression.unlocked(d, r)) {
-            player.sendOverlayMessage(Component.literal("Apprenez le parchemin de forge du palier " + com.mmorpg.crafting.ForgeProgression.required(r) + " (boss ou quêtes).").withColor(0xFF5050));
+            player.sendOverlayMessage(Component.literal("Apprenez le parchemin : ").append(new net.minecraft.world.item.ItemStack(r.resultItem()).getHoverName()).withColor(0xFF5050));
             return;
         }
         if (d.level < r.level()) {

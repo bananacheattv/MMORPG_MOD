@@ -12,6 +12,8 @@ import java.util.function.Supplier;
 
 public final class ModAttachments {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENTS = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, MMORPG.MODID);
+    public static final Supplier<AttachmentType<Integer>> MINE_DENSITY = ATTACHMENTS.register("mine_density",
+            () -> AttachmentType.builder(() -> 0).serialize(com.mojang.serialization.Codec.INT.fieldOf("version")).build());
 
     /** Donnees RPG du joueur : persistantes et conservees a la mort. */
     public static final Supplier<AttachmentType<PlayerData>> PLAYER = ATTACHMENTS.register("player_data",
