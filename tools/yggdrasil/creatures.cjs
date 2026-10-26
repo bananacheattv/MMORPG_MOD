@@ -40,7 +40,7 @@ function ray(r){
 }
 function hydra(r){
  r.ellipsoid('Coral_body',[0,29,9],29,21,35,3);r.ellipsoid('Scaled_belly',[0,19,6],23,11,31,10);
- for(let side of[-1,1])for(let i=0;i<2;i++){let a=[side*22,28,i*37-6],b=[side*35,14,i*43-12],c=[side*36,4,i*49-14];insectLeg(r,'Reef_leg_'+side+i,side,a,b,c,3,side*(i?1:-1));for(let t=0;t<3;t++)r.tooth('Reef_claw_'+side+i+t,add(c,[(t-1)*3,1,-1]),add(c,[(t-1)*3,-1,-9]),2);}
+ for(let side of[-1,1])for(let i=0;i<2;i++){let a=[side*22,28,i*37-6],b=[side*35,14,i*43-12],c=[side*36,4,i*49-14];const leg=insectLeg(r,'Reef_leg_'+side+i,side,a,b,c,3,side*(i?1:-1));for(let t=0;t<3;t++)r.tooth('Reef_claw_'+side+i+t,add(c,[(t-1)*3,1,-1]),add(c,[(t-1)*3,-1,-9]),2,leg);}
  for(let i=-1;i<=1;i++){
   const start=[i*15,42,-4],headPos=[i*32,107+(i===0?13:0),-29+(Math.abs(i)*5)],neck=r.group('Neck_'+i,start,'body');const points=bezier(start,[i*24,61,-10],[i*35,86,-18],headPos,14);r.tube('Muscular_neck_'+i,points,points.map((_,n)=>10-n*.22),3,neck,10);
   for(let n=2;n<points.length;n+=2){let p=points[n];r.plate('Neck_armor_'+i+n,add(p,[0,0,6]),10,4,5,9,neck);}

@@ -48,9 +48,9 @@ public final class DevShowcase {
             if(frame==160){CompoundTag data=new CompoundTag();data.putString("arena","Arène de feu · 5 contre 5");mc.gui.setScreen(new com.mmorpg.client.screen.ArenaReadyScreen(data));}
             if(frame==175)shot(mc,"arena_ready");if(frame==180)stop(mc);return;
         }
-        if(MODE.equals("social_gallery")){
+        if(MODE.equals("social_gallery")||MODE.equals("crystal_gallery")){
             if(mc.level==null||mc.player==null||mc.gui.screen()!=null)return;tick++;
-            if(tick==5){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();if(!mc.gui.hud.isHidden())mc.gui.hud.toggle();mc.gui.setScreen(null);}
+            if(tick==5){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();if(!mc.gui.hud.isHidden())mc.gui.hud.toggle();mc.gui.setScreen(null);if(MODE.equals("crystal_gallery"))tick=995;}
             for(int i=0;i<10;i++){if(tick==100+i*75){double[] heights={5.56,9.1,6.01,9.82,4.12,9.82,5.32,10.07,13.5,13.71};double h=heights[i],d=Math.max(12.5,h*1.75);mc.player.connection.sendCommand("tp @s "+(5000+i*50+.5+d*.5)+" "+(220+h*.55)+" "+(.5+d*.866)+" 150 10");}if(tick==145+i*75)shot(mc,"guardian_"+(i+1));}
             if(tick==860)mc.player.connection.sendCommand("execute in mmorpg:competitions run tp @s 525 125 32 142 31");if(tick==910)shot(mc,"arena_fire_decor");
             if(tick==930)mc.player.connection.sendCommand("execute in mmorpg:competitions run tp @s 765 125 32 142 31");if(tick==980)shot(mc,"arena_dunes_decor");for(int i=0;i<3;i++){if(tick==1000+i*80)mc.player.connection.sendCommand("execute in minecraft:overworld run tp @s "+(5558.5+i*50)+" 223 12.5 145 8");if(tick==1055+i*80)shot(mc,"arena_crystal_"+i);}if(tick==1240)stop(mc);return;

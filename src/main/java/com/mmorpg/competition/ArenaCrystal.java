@@ -10,7 +10,7 @@ import java.util.UUID;
 public final class ArenaCrystal extends Monster {
     private static final EntityDataAccessor<Integer> TEAM=SynchedEntityData.defineId(ArenaCrystal.class,EntityDataSerializers.INT);
     public UUID match;
-    public ArenaCrystal(EntityType<? extends Monster> type,Level level){super(type,level);setNoAi(true);setNoGravity(true);}
+    public ArenaCrystal(EntityType<? extends Monster> type,Level level){super(type,level);setNoAi(true);setNoGravity(true);setPersistenceRequired();}
     @Override protected void defineSynchedData(SynchedEntityData.Builder b){super.defineSynchedData(b);b.define(TEAM,-1);}
     public int team(){return entityData.get(TEAM);}public void setTeam(int team){entityData.set(TEAM,team);}
     @Override public boolean hurtServer(ServerLevel level,net.minecraft.world.damagesource.DamageSource source,float amount){return source.getEntity() instanceof ServerPlayer p&&ArenaManager.capture(this,p);}
