@@ -192,6 +192,7 @@ public final class SpawnEditor {
         var root=Commands.literal("amenagement").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .executes(c->{open(c.getSource().getPlayerOrException(),null);return 1;});
         root.then(Commands.literal("outil").executes(c->{var p=c.getSource().getPlayerOrException();if(!p.getInventory().add(new ItemStack(ModItems.SPAWN_EDITOR.get())))return 0;return 1;}));
+        root.then(Commands.literal("outilpnj").executes(c->{var p=c.getSource().getPlayerOrException();return p.getInventory().add(new ItemStack(ModItems.NPC_EDITOR.get()))?1:0;}));
         root.then(Commands.literal("poser").then(Commands.argument("element",StringArgumentType.word()).then(Commands.argument("orientation",StringArgumentType.word()).executes(c->{
             return placeOriented(c.getSource().getPlayerOrException(),StringArgumentType.getString(c,"element"),StringArgumentType.getString(c,"orientation"))?1:0;}))));
         root.then(Commands.literal("texte").then(Commands.argument("taille",FloatArgumentType.floatArg(.25f,8)).then(Commands.argument("hauteur",FloatArgumentType.floatArg(0,12)).then(Commands.argument("texte",StringArgumentType.greedyString()).executes(c->text(c.getSource().getPlayerOrException(),StringArgumentType.getString(c,"texte"),FloatArgumentType.getFloat(c,"taille"),FloatArgumentType.getFloat(c,"hauteur"))?1:0)))));

@@ -10,7 +10,10 @@ import net.minecraft.network.chat.Component;
 /** Visual per-merchant catalogue; only nearby operators may change it. */
 public final class MerchantEditor {
     private static final com.google.gson.Gson JSON=new com.google.gson.Gson();
-    public static ShopConfig config(NpcEntity npc) {return npc.merchantShop().isEmpty()?ConfigManager.shop():JSON.fromJson(npc.merchantShop(),ShopConfig.class);}
+    public static ShopConfig config(NpcEntity npc) {
+        var cfg=JSON.fromJson(npc.merchantShop().isEmpty()?ConfigManager.shopJson():npc.merchantShop(),ShopConfig.class);
+        com.mmorpg.economy.ShopSorting.sort(cfg);return cfg;
+    }
     public static String revision(NpcEntity npc) {
         try {return java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest((JSON.toJson(config(npc))+npc.skin()+npc.displayName()).getBytes(java.nio.charset.StandardCharsets.UTF_8)));}
         catch(java.security.NoSuchAlgorithmException e){throw new IllegalStateException(e);}
@@ -42,7 +45,7 @@ public final class MerchantEditor {
         try {
             if(!revision(npc).equals(data.getStringOr("revision","")))throw new IllegalArgumentException("Marchand modifié entre-temps : recharge effectuée.");
             String json=data.getStringOr("shop","");if(json.length()>22000)throw new IllegalArgumentException("Boutique trop grande.");
-            var cfg=JSON.fromJson(json,ShopConfig.class);validate(cfg);
+            var cfg=JSON.fromJson(json,ShopConfig.class);validate(cfg);com.mmorpg.economy.ShopSorting.sort(cfg);
             int skin=data.getIntOr("skin",-1);String name=data.getStringOr("name","").trim();
             if(skin<0||skin>=NpcEntity.SKINS||name.isBlank()||name.length()>80)throw new IllegalArgumentException("Nom ou apparence invalide.");
             npc.setMerchantShop(JSON.toJson(cfg));npc.setup(NpcEntity.Role.MARCHAND,name,skin,npc.group());

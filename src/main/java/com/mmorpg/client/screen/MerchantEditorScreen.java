@@ -49,10 +49,11 @@ public final class MerchantEditorScreen extends MmoScreen {
         if(entries==null) {
             var list=new ArrayList<Entry>();for(Item item:BuiltInRegistries.ITEM)if(item!=Items.AIR) {
                 String id=BuiltInRegistries.ITEM.getKey(item).toString(),label=new ItemStack(item).getHoverName().getString();
-                if(com.mmorpg.server.CrateOnly.is(item))continue;
+                if(com.mmorpg.server.CrateOnly.is(item)||item instanceof com.mmorpg.item.NpcEditorItem||item instanceof com.mmorpg.item.SpawnEditorItem)continue;
                 list.add(new Entry(item,id,label,(label+" "+id).toLowerCase(Locale.ROOT)));
             }
-            list.sort(Comparator.comparing((Entry e)->!e.id().startsWith("mmorpg:")).thenComparing(Entry::label));entries=List.copyOf(list);
+            list.sort(Comparator.comparingInt((Entry e)->com.mmorpg.economy.ShopSorting.category(e.item()))
+                .thenComparingInt(e->com.mmorpg.economy.ShopSorting.level(e.item())).thenComparing(Entry::label));entries=List.copyOf(list);
         }
         String filter=search.getValue().toLowerCase(Locale.ROOT);
         return entries.stream().filter(e->e.match().contains(filter)&&(tab==0||shop.buy.stream().anyMatch(o->o.item.equals(e.id()))||shop.sellPrices.containsKey(e.id()))).toList();

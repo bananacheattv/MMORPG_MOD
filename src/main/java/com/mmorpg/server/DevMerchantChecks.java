@@ -20,6 +20,16 @@ public final class DevMerchantChecks {
         var identity=new net.minecraft.server.players.NameAndId(p.getGameProfile());level.getServer().getPlayerList().op(identity);
         long gold=RpgPlayers.get(p).gold;
         try {
+            check(com.mmorpg.item.NpcEditorItem.edit(p,npc),"operator tool opens nearby merchant");
+            var obstruction=new BlockPos(81,101,80);var previous=level.getBlockState(obstruction);
+            level.setBlockAndUpdate(obstruction,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+            try{check(!com.mmorpg.item.NpcEditorItem.edit(p,npc),"editor tool refuses NPC behind solid block");}finally{level.setBlockAndUpdate(obstruction,previous);}
+            p.setPos(100.5,100,80.5);check(!com.mmorpg.item.NpcEditorItem.edit(p,npc),"editor tool refuses distant NPC");p.setPos(80.5,100,80.5);
+            var sorted=new ShopConfig();var registry=net.minecraft.core.registries.BuiltInRegistries.ITEM;
+            String weapon=registry.getKey(ModItems.WEAPONS.getFirst().get()).toString(),weapon2=registry.getKey(ModItems.WEAPONS.get(1).get()).toString(),armor=registry.getKey(ModItems.ARMORS.getFirst().get()).toString();
+            sorted.buy.add(new ShopConfig.Offer(armor,1,3,1));sorted.buy.add(new ShopConfig.Offer(weapon,1,29,90));sorted.buy.add(new ShopConfig.Offer("oreille_gobelin",1,4,1));sorted.buy.add(new ShopConfig.Offer(weapon2,1,7,1));
+            com.mmorpg.economy.ShopSorting.sort(sorted);
+            check(sorted.buy.get(0).item.equals(weapon2)&&sorted.buy.get(1).item.equals(weapon)&&sorted.buy.get(2).item.equals(armor)&&sorted.buy.get(0).price==7,"category then level sorting retains offer prices");
             MerchantEditor.action(p,packet);
             check(!MerchantEditor.config(npc).automaticBuyback&&com.mmorpg.economy.ShopPricing.sellPrice(new net.minecraft.world.item.ItemStack(ModItems.OREILLE_GOBELIN.get()),MerchantEditor.config(npc))==4,"explicit buyback works without automatic buyback");
             var emptyShop=new ShopConfig();emptyShop.automaticBuyback=false;check(com.mmorpg.economy.ShopPricing.sellPrice(new net.minecraft.world.item.ItemStack(ModItems.OREILLE_GOBELIN.get()),emptyShop)==0,"empty merchant refuses unconfigured buybacks");
@@ -32,7 +42,7 @@ public final class DevMerchantChecks {
             int slot=-1;for(int i=0;i<p.getInventory().getContainerSize();i++)if(p.getInventory().getItem(i).is(ModItems.OREILLE_GOBELIN.get())){slot=i;break;}
             ShopManager.sell(p,npc.getId(),slot,1,false);check(RpgPlayers.get(p).gold==987,"sell uses this merchant's buyback price");
             var stale=packet.copy();stale.putString("name","STALE");MerchantEditor.action(p,stale);check(!npc.displayName().equals("STALE"),"stale editor cannot overwrite newer changes");
-            level.getServer().getPlayerList().deop(identity);var denied=packet.copy();denied.putString("revision",MerchantEditor.revision(npc));denied.putString("name","DENIED");MerchantEditor.action(p,denied);check(!npc.displayName().equals("DENIED"),"non operator denied");
+            level.getServer().getPlayerList().deop(identity);check(!com.mmorpg.item.NpcEditorItem.edit(p,npc),"non operator cannot use editor tool");var denied=packet.copy();denied.putString("revision",MerchantEditor.revision(npc));denied.putString("name","DENIED");MerchantEditor.action(p,denied);check(!npc.displayName().equals("DENIED"),"non operator denied");
             var invalid=new ShopConfig();invalid.buy.add(new ShopConfig.Offer("minecraft:air",1,1,1));try{MerchantEditor.validate(invalid);throw new AssertionError("air accepted");}catch(IllegalArgumentException expected){}
             com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] MERCHANT_EDITOR PASS: permissions, appearance, per-NPC persistence, actual buy/sell prices, isolation, stale changes and invalid items");
         } finally {RpgPlayers.get(p).gold=gold;npc.discard();other.discard();level.getServer().getPlayerList().deop(identity);}

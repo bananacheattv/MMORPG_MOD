@@ -29,7 +29,6 @@ public final class ShopManager {
         t.putInt("npc", npc.getId());
         t.putString("name", npc.displayName());
         t.putString("shop",new com.google.gson.Gson().toJson(MerchantEditor.config(npc)));
-        t.putBoolean("canEdit",QuestEditor.allowed(p));
         Net.toPlayer(p, new S2COpenScreen(S2COpenScreen.SHOP, t));
         p.level().playSound(null, npc.blockPosition(), SoundEvents.VILLAGER_TRADE, SoundSource.NEUTRAL, 0.8f, 1.0f);
     }
