@@ -21,6 +21,19 @@ public final class DevSpawnEditorChecks {
         check(!SpawnEditor.place(p,"forge_arcanique",Direction.NORTH),"non operator denied");
         server.getPlayerList().op(identity);
         try {
+            // Exercise the actual UI command, including colon-separated destinations and NPC IDs.
+            for(var entry:SpawnEditor.catalogue())if(entry.id().startsWith("portail:")||entry.id().startsWith("pnj:")){
+                for(String face:new String[]{"north","east"}){
+                    SpawnEditor.open(p,at);
+                    String command="amenagement poser "+entry.id()+" "+face;
+                    var source=p.createCommandSourceStack();
+                    var parsed=server.getCommands().getDispatcher().parse(command,source);
+                    check(!parsed.getReader().canRead(),"UI command fully parses: "+command);
+                    try{check(server.getCommands().getDispatcher().execute(parsed)==1,"UI command places "+entry.id());}
+                    catch(com.mojang.brigadier.exceptions.CommandSyntaxException e){throw new AssertionError(command,e);}
+                    check(AdventurePortals.undo(p),"UI command placement can undo: "+entry.id());
+                }
+            }
             check(!PortalAccess.consume(p,"mine"),"direct entry denied without portal");PortalAccess.grant(p,"mine");
             check(!PortalAccess.consume(p,"plaines"),"portal permission cannot open another activity");
             check(PortalAccess.consume(p,"mine")&&!PortalAccess.consume(p,"mine"),"portal pass single use");
