@@ -342,7 +342,7 @@ public final class RpgCombat {
             return;
         }
         double newHp = h.hp() - damage;
-        if(newHp<=.01&&target instanceof ServerPlayer arenaPlayer&&com.mmorpg.competition.ArenaManager.lethal(arenaPlayer,attacker)){event.setNewDamage(0F);return;}
+        if(newHp<=.01&&target instanceof ServerPlayer arenaPlayer&&(com.mmorpg.competition.ArenaManager.lethal(arenaPlayer,attacker)||com.mmorpg.competition.GuildRaids.testDeath(arenaPlayer))){event.setNewDamage(0F);return;}
         if (newHp <= 0.01) {
             h.setHp(0);
             event.setNewDamage(target.getHealth() + 1000F);

@@ -51,6 +51,7 @@ public final class KillRewards {
     @SubscribeEvent
     public static void onDeath(LivingDeathEvent event) {
         LivingEntity dead = event.getEntity();
+        if(dead instanceof com.mmorpg.competition.GuildGuardian guardian && guardian.testing)return;
         if (!(dead.level() instanceof ServerLevel level)) return;
         if (dead instanceof ServerPlayer sp) {
             RpgPlayers.onDeath(sp, event.getSource().getLocalizedDeathMessage(sp).getString());
@@ -112,6 +113,7 @@ public final class KillRewards {
     @SubscribeEvent
     public static void onDrops(LivingDropsEvent event) {
         LivingEntity dead = event.getEntity();
+        if(dead instanceof com.mmorpg.competition.GuildGuardian guardian && guardian.testing)return;
         if (!(dead.level() instanceof ServerLevel level) || dead instanceof Player) return;
         MobData md = dead.getExistingDataOrNull(ModAttachments.MOB);
         if (md == null || !md.initialized()) return;
