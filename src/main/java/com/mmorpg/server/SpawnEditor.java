@@ -159,7 +159,7 @@ public final class SpawnEditor {
         BlockPos at=target(p);if(at==null||text.isBlank()||text.length()>240)return fail(p,"Texte vide, trop long ou point de placement périmé.");
         UUID id=UUID.randomUUID();
         String tag="{text:{text:"+new com.google.gson.Gson().toJson(text)+",color:\"gold\"},billboard:\"center\",background:0,shadow:true,line_width:600,Tags:[\"aeloria_editor\"],UUID:[I;"
-                +(int)(id.getMostSignificantBits()>>32)+","+(int)id.getMostSignificantBits()+","+(int)(id.getLeastSignificantBits()>>32)+","+(int)id.getLeastSignificantBits()+"],transformation:{scale:["+scale+"f,"+scale+"f,"+scale+"f]}}";
+                +(int)(id.getMostSignificantBits()>>32)+","+(int)id.getMostSignificantBits()+","+(int)(id.getLeastSignificantBits()>>32)+","+(int)id.getLeastSignificantBits()+"],transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:["+scale+"f,"+scale+"f,"+scale+"f]}}";
         if(!orientation.equals("mobile")) {
             float yaw;
             try {yaw=orientation.equals("moi")?FreeOrientation.towards(Vec3.atCenterOf(at),p.position()):Float.parseFloat(orientation);}catch(NumberFormatException e){return false;}

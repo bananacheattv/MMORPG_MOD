@@ -91,7 +91,11 @@ public final class DevSpawnEditorChecks {
             SpawnEditor.open(p,at);check(!SpawnEditor.placeOriented(p,"portail:mine","45"),"free rotation never changes portals");
             check(SpawnEditor.textOriented(p,"Angle fixe",2,3,"123.5"),"fixed text orientation");
             var fixed=level.getEntitiesOfClass(net.minecraft.world.entity.Display.TextDisplay.class,new net.minecraft.world.phys.AABB(at).inflate(8),e->e.entityTags().contains("aeloria_editor")).getFirst();
-            check(Math.abs(fixed.getYRot()-123.5)<.001,"text angle applied");check(AdventurePortals.undo(p),"fixed text undo");
+            check(Math.abs(fixed.getYRot()-123.5)<.001,"text angle applied");
+            var textSaved=net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING,level.registryAccess());fixed.saveWithoutId(textSaved);
+            var textScale=textSaved.buildResult().getCompoundOrEmpty("transformation").getListOrEmpty("scale");
+            check(textScale.size()==3&&Math.abs(textScale.getFloat(0).orElse(0F)-2)<.001,"text size survives entity codec");
+            check(AdventurePortals.undo(p),"fixed text undo");
             SpawnEditor.open(p,at);
             level.setBlockAndUpdate(at,Blocks.CHEST.defaultBlockState());
             check(!SpawnEditor.place(p,"forge_arcanique",Direction.NORTH),"never replace existing inventory block");level.removeBlock(at,false);
