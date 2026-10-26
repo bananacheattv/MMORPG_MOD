@@ -106,9 +106,12 @@ public class NpcEntity extends PathfinderMob {
     @Override
     protected InteractionResult mobInteract(Player player, InteractionHand hand) {
         if (player instanceof ServerPlayer sp && hand == InteractionHand.MAIN_HAND) {
+            if(player.getItemInHand(hand).is(com.mmorpg.registry.ModItems.NPC_EDITOR.get())){
+                com.mmorpg.item.NpcEditorItem.edit(sp,this);return InteractionResult.SUCCESS;
+            }
             switch (role()) {
                 case QUETES -> QuestManager.openGiver(sp, this);
-                case MARCHAND -> {if(sp.isShiftKeyDown()&&com.mmorpg.server.QuestEditor.allowed(sp))com.mmorpg.server.MerchantEditor.open(sp,this);else ShopManager.open(sp,this);}
+                case MARCHAND -> ShopManager.open(sp,this);
                 case DONJON -> com.mmorpg.dungeon.DungeonMaster.open(sp, this);
                 case MINES -> com.mmorpg.mine.MineManager.open(sp, this);
                 case SORTIE -> com.mmorpg.dungeon.InstanceManager.leaveNow(sp, this.group());

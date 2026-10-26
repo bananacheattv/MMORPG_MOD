@@ -35,6 +35,7 @@ import java.util.function.Supplier;
 public final class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MMORPG.MODID);
     public static final DeferredItem<com.mmorpg.item.SpawnEditorItem> SPAWN_EDITOR = ITEMS.registerItem("outil_spawn", com.mmorpg.item.SpawnEditorItem::new);
+    public static final DeferredItem<com.mmorpg.item.NpcEditorItem> NPC_EDITOR = ITEMS.registerItem("outil_pnj", com.mmorpg.item.NpcEditorItem::new);
 
     public static final List<DeferredItem<? extends Item>> WEAPONS = new ArrayList<>();
     public static final List<DeferredItem<? extends Item>> ARMORS = new ArrayList<>();

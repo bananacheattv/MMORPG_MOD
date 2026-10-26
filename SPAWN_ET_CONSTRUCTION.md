@@ -56,8 +56,10 @@ L’angle est sauvegardé avec le bloc et synchronisé aux clients. Les collisio
 
 ## Marchands
 
-Créer avec `/amenagement outil` > PNJ > Marchand, ou `/mmorpg pnj marchand Nom`. Un opérateur ouvre l’éditeur avec Maj + clic droit sur le marchand, ou avec le bouton « Configurer » de sa boutique.
+Créer avec `/amenagement outil` > PNJ > Marchand, ou `/mmorpg pnj marchand Nom`. Un opérateur obtient l’item d’édition avec `/amenagement outilpnj`, ou « Obtenir l’outil PNJ » dans l’onglet PNJ de l’outil d’aménagement. Tenir cet item et faire un clic droit sur le PNJ visé (huit blocs maximum, sans mur entre les deux) ouvre son éditeur : boutique pour un marchand, fiche du personnage pour les autres PNJ. Le clic droit ordinaire garde la boutique habituelle ; aucun bouton de configuration n’apparaît dans les boutiques.
 
 Le catalogue présente directement les icônes des objets, avec recherche et pagination. Cliquer sur un objet pour régler quantité, prix de vente, prix de rachat et niveau minimum ; les boutons Vente et Rachat activent les échanges souhaités. L’onglet « Articles du marchand » retrouve les articles configurés. « Boutique vide (brouillon) » permet de repartir d’un catalogue vide, sans rachats automatiques. Les modifications restent un brouillon jusqu’au bouton « Enregistrer ».
 
 L’onglet « Apparence » affiche les quatre modèles existants : cliquer sur un aperçu et modifier le nom si besoin, puis enregistrer. Chaque marchand conserve ses propres articles, prix et apparence après redémarrage. Un marchand jamais personnalisé utilise encore la boutique générale `shop.json`. Deux éditeurs simultanés ne peuvent pas écraser silencieusement les modifications de l’autre. L’import de textures et de modèles 3D personnalisés reste une évolution future.
+
+Les boutiques sont triées automatiquement par catégorie (armes, armures, outils, consommables, matériaux, autres), puis par niveau croissant et identifiant stable. Le tri est appliqué aux anciens marchands aussi, sans changer leurs articles ni leurs prix. Le catalogue visuel de l’éditeur utilise les mêmes catégories.
