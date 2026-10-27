@@ -31,6 +31,7 @@ public final class ClientData {
     /** Etat du groupe (membres, invitation en attente). */
     public static CompoundTag party = new CompoundTag();
     public static boolean received = false;
+    public static String backend="";
     /** Essai de classe en cours (indicateur du HUD). */
     public static boolean trialActive;
     public static int trialClass;
@@ -47,6 +48,7 @@ public final class ClientData {
 
     public static void load(CompoundTag t) {
         DATA.load(t);
+        backend=t.getStringOr("backend","");
         List<Double> raw = t.read("stats", Codec.DOUBLE.listOf()).orElse(List.of());
         double[] arr = new double[raw.size()];
         for (int i = 0; i < arr.length; i++) arr[i] = raw.get(i);
@@ -98,6 +100,7 @@ public final class ClientData {
     }
 
     public static void reset() {
+        backend="";
         DATA.load(new PlayerData().save());
         stats = new StatBlock();
         COOLDOWNS.clear();

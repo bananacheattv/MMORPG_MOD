@@ -204,7 +204,7 @@ public final class QuestManager {
     private static NpcEntity nearGiver(ServerPlayer p, int npcId) {
         if (!p.isAlive() || p.isSpectator()) return null;
         Entity e = p.level().getEntity(npcId);
-        if (e instanceof NpcEntity npc && npc.role() == NpcEntity.Role.QUETES && npc.distanceToSqr(p) < 64) return npc;
+        if (e instanceof NpcEntity npc && !(npc instanceof com.mmorpg.entity.hub.HubGuideEntity) && npc.role() == NpcEntity.Role.QUETES && npc.distanceToSqr(p) < 64) return npc;
         return null;
     }
 
@@ -220,6 +220,8 @@ public final class QuestManager {
             return;
         }
         d.activeQuests.put(id, new int[q.objectives.size()]);
+        d.trackedQuest=id;d.questGuidanceMuted=false;
+        var giver=new CompoundTag();giver.putString("backend",com.mmorpg.network.NetworkConfig.current.role.name());giver.putString("id",npc.getUUID().toString());giver.putString("name",npc.displayName());giver.putString("dimension",npc.level().dimension().identifier().toString());giver.putLong("pos",npc.blockPosition().asLong());d.questGivers.put(id,giver);
         Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "QUÊTE ACCEPTÉE", q.name, 0xFFD040));
         p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.QUEST_ACCEPT.get(), SoundSource.PLAYERS, 1f, 1f);
         d.dirty = true;
@@ -230,6 +232,8 @@ public final class QuestManager {
         PlayerData d = RpgPlayers.get(p);
         if (!id.isEmpty() && !d.activeQuests.containsKey(id)) return;
         d.trackedQuest = id;
+        d.questGuidanceMuted=id.isEmpty();
+        GuidanceManager.refresh(p);
         d.dirty = true;
     }
 
@@ -237,6 +241,7 @@ public final class QuestManager {
         PlayerData d = RpgPlayers.get(p);
         QuestDef q = def(id);
         if (d.activeQuests.remove(id) != null) {
+            d.questGivers.remove(id);
             if (id.equals(d.trackedQuest)) d.trackedQuest = "";
             p.sendSystemMessage(Component.literal("Quête abandonnée : " + (q != null ? q.name : id)).withColor(0xFF9070));
             d.dirty = true;
@@ -264,6 +269,7 @@ public final class QuestManager {
             }
         }
         d.activeQuests.remove(id);
+        d.questGivers.remove(id);
         if (id.equals(d.trackedQuest)) d.trackedQuest = "";
         if (q.daily) d.dailyQuests.put(id, today());
         else d.completedQuests.add(id);

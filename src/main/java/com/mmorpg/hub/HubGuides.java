@@ -40,7 +40,9 @@ public final class HubGuides {
     }
     public static void complete(ServerPlayer p,int entity){
         if(!(p.level().getEntity(entity) instanceof HubGuideEntity npc)||!near(p,npc)||CinematicManager.isLocked(p))return;
-        ClassTrial.data(p).tutorialMask|=1<<npc.guide();point(p);
+        int before=ClassTrial.data(p).tutorialMask;ClassTrial.data(p).tutorialMask|=1<<npc.guide();
+        if((before&31)!=31&&(ClassTrial.data(p).tutorialMask&31)==31)Net.toPlayer(p,new Payloads.Notify(Payloads.Notify.QUEST,"TUTORIEL TERMINÉ","Les guides restent disponibles. Bonne aventure !",0xFFD040));
+        com.mmorpg.server.GuidanceManager.refresh(p);
     }
     public static void point(ServerPlayer p){
         var hub=HubData.get(p.level().getServer());if(!hub.exists()){p.sendSystemMessage(Component.literal("Le tutoriel se trouve à la Citadelle des héros."));return;}

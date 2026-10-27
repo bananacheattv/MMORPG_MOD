@@ -17,6 +17,7 @@ public final class Net {
         event.registrar("1").optional().playToClient(ProxyConnect.TYPE, ProxyConnect.CODEC);
         PayloadRegistrar r = event.registrar("1");
         r.playToClient(S2COpenScreen.TYPE, S2COpenScreen.CODEC);
+        r.playToClient(Payloads.Guidance.TYPE,Payloads.Guidance.CODEC);
         r.playToClient(Payloads.SyncPlayer.TYPE, Payloads.SyncPlayer.CODEC);
         r.playToClient(Payloads.Vitals.TYPE, Payloads.Vitals.CODEC);
         r.playToClient(Payloads.CombatText.TYPE, Payloads.CombatText.CODEC);

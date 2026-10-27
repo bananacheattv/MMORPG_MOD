@@ -29,7 +29,15 @@ public class QuestDef {
     public List<Objective> objectives = new ArrayList<>();
     public Rewards rewards = new Rewards();
 
+    public static class Navigation {
+        public String dimension="minecraft:overworld";
+        public String backend="";
+        public double x,y,z;
+    }
     public static class Objective {
+        /** Optional authored waypoint; missing values keep automatic mob/resource guidance. */
+        public Navigation navigation;
+
         public String type = "kill";
         public String target = "*";
         public int count = 1;

@@ -431,4 +431,10 @@ public final class Payloads {
             return TYPE;
         }
     }
+    public record Guidance(CompoundTag data) implements CustomPacketPayload {
+        public static final Type<Guidance> TYPE=new Type<>(MMORPG.id("guidance"));
+        public static final StreamCodec<ByteBuf,Guidance> CODEC=StreamCodec.composite(ByteBufCodecs.COMPOUND_TAG,Guidance::data,Guidance::new);
+        @Override public Type<? extends CustomPacketPayload> type(){return TYPE;}
+    }
+
 }

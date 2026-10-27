@@ -29,3 +29,11 @@ test('paladin shields use the vanilla handedness transform in all five tiers',()
  }
  for(const file of fs.readdirSync(path.join(RES,'models/item')).filter(f=>f.startsWith('bouclier_paladin_'))){const d=JSON.parse(fs.readFileSync(path.join(RES,'models/item',file)));for(const value of Object.values(d.textures)){assert.ok(value.startsWith('mmorpg:block/'));const bytes=fs.readFileSync(path.join(RES,'textures',value.replace('mmorpg:','')+'.png'));const width=bytes.readUInt32BE(16),height=bytes.readUInt32BE(20);assert.equal(width&(width-1),0);assert.equal(height&(height-1),0);}}
 });
+
+test('guidance arrow is a horizontal solid purple 3D model',()=>{
+ const d=JSON.parse(fs.readFileSync(path.join(RES,'models/item/guidance_arrow.json'))),item=JSON.parse(fs.readFileSync(path.join(RES,'items/guidance_arrow.json')));
+ assert.equal(item.model.model,'mmorpg:item/guidance_arrow');assert.equal(item.model.type,'minecraft:model');assert.ok(d.elements.length>=10);assert.ok(Object.values(d.textures).every(t=>/purple|magenta|cristal_arcane/.test(t)));
+ const lower=[0,1,2].map(i=>Math.min(...d.elements.map(e=>e.from[i]))),upper=[0,1,2].map(i=>Math.max(...d.elements.map(e=>e.to[i])));
+ assert.ok(upper[1]-lower[1]<(upper[2]-lower[2])*.55,'horizontal main axis and a genuinely volumetric arrowhead');
+ for(const e of d.elements){assert.ok(e.to.every((n,i)=>n>e.from[i]));assert.equal(Object.keys(e.faces).length,6);}
+});

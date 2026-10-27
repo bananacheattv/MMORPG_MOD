@@ -85,6 +85,8 @@ public class PlayerData implements ValueIOSerializable {
     public int luckCharmSeconds;
     /** Quetes en cours : progression de chaque objectif. */
     public String trackedQuest = "";
+    public boolean questGuidanceMuted;
+    public final Map<String,CompoundTag> questGivers=new LinkedHashMap<>();
     public final Map<String, int[]> activeQuests = new LinkedHashMap<>();
     public final Set<String> completedQuests = new HashSet<>();
     /** Quetes journalieres : jour (numero de jour du monde) de la derniere realisation. */
@@ -219,6 +221,8 @@ public class PlayerData implements ValueIOSerializable {
             aq.put(k, l);
         });
         t.putString("trackedQuest", trackedQuest);
+        t.putBoolean("questGuidanceMuted",questGuidanceMuted);
+        t.store("questGivers",Codec.unboundedMap(Codec.STRING,CompoundTag.CODEC),questGivers);
         t.store("activeQuests", Codec.unboundedMap(Codec.STRING, Codec.INT.listOf()), aq);
         t.store("completedQuests", Codec.STRING.listOf(), new ArrayList<>(completedQuests));
         t.store("dailyQuests", Codec.unboundedMap(Codec.STRING, Codec.LONG), dailyQuests);
@@ -281,6 +285,8 @@ public class PlayerData implements ValueIOSerializable {
         xpCharmSeconds = Math.clamp(t.getIntOr("xpCharmSeconds", 0), 0, 1800);
         luckCharmSeconds = Math.clamp(t.getIntOr("luckCharmSeconds", 0), 0, 1800);
         trackedQuest = t.getStringOr("trackedQuest", "");
+        questGuidanceMuted=t.getBooleanOr("questGuidanceMuted",false);
+        questGivers.clear();questGivers.putAll(t.read("questGivers",Codec.unboundedMap(Codec.STRING,CompoundTag.CODEC)).orElse(Map.of()));
         mounts.clear();
         for (String m : t.read("mounts", Codec.STRING.listOf()).orElse(List.of())) mounts.add(com.mmorpg.mount.MountType.migrate(m));
         lastMount = t.getStringOr("lastMount", "");
