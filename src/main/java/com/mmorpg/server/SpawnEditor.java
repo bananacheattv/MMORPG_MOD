@@ -44,6 +44,7 @@ public final class SpawnEditor {
             for (int i=0;i<3;i++) all.add(new Entry("portail:donjon:"+d.id+":"+i, d.label+" · "+new String[]{"normal","héroïque","mythique"}[i], 1));
         for (String role : new String[]{"MARCHAND","QUETES","MINES","DONJON"}) all.add(new Entry("pnj:"+role, "PNJ · "+role.toLowerCase(Locale.ROOT), 2));
         all.add(new Entry("maitre", "Maître des classes", 2));
+        all.add(new Entry("porte_armure","Porte-armure de scène",0));
         return List.copyOf(all);
     }
     private record Target(net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dim, BlockPos pos) { }
@@ -100,6 +101,11 @@ public final class SpawnEditor {
             String[] a=id.split(":"); int region=a.length>2&&!a[1].equals("donjon")?Integer.parseInt(a[2]):-1;
             return AdventurePortals.place(p,new com.mmorpg.world.AdventurePortalData.Portal(UUID.randomUUID(),level.dimension(),at,
                     facing.getAxis()==Direction.Axis.Z,a[1],region,a[1].equals("donjon")?a[2]:"",a[1].equals("donjon")?Integer.parseInt(a[3]):0));
+        }
+        if(id.equals("porte_armure")){
+            if(!level.getBlockState(at).isAir()||!level.getBlockState(at.above()).isAir())return fail(p,"Il faut deux blocs d’air.");
+            var stand=net.minecraft.world.entity.EntityTypes.ARMOR_STAND.create(level,EntitySpawnReason.COMMAND);if(stand==null)return false;
+            stand.setShowArms(true);stand.setNoGravity(true);stand.snapTo(at.getX()+.5,at.getY(),at.getZ()+.5,Float.isFinite(yaw)?yaw:facing.toYRot(),0);stand.addTag("aeloria_editor");level.addFreshEntity(stand);rememberEntity(p,level,stand);return true;
         }
         if(id.startsWith("pnj:")||id.equals("maitre")) {
             if(!level.getBlockState(at).isAir()||!level.getBlockState(at.above()).isAir()) return fail(p,"Il faut deux blocs d'air.");
@@ -158,7 +164,7 @@ public final class SpawnEditor {
     public static boolean textOriented(ServerPlayer p,String text,float scale,float height,String orientation) {
         BlockPos at=target(p);if(at==null||text.isBlank()||text.length()>240)return fail(p,"Texte vide, trop long ou point de placement périmé.");
         UUID id=UUID.randomUUID();
-        String tag="{text:{text:"+new com.google.gson.Gson().toJson(text)+",color:\"gold\"},billboard:\"center\",background:0,shadow:true,line_width:600,Tags:[\"aeloria_editor\"],UUID:[I;"
+        String tag="{text:{text:"+new com.google.gson.Gson().toJson(text)+",color:\"gold\"},billboard:\"center\",view_range:3.0f,background:0,shadow:true,line_width:600,Tags:[\"aeloria_editor\"],UUID:[I;"
                 +(int)(id.getMostSignificantBits()>>32)+","+(int)id.getMostSignificantBits()+","+(int)(id.getLeastSignificantBits()>>32)+","+(int)id.getLeastSignificantBits()+"],transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],scale:["+scale+"f,"+scale+"f,"+scale+"f]}}";
         if(!orientation.equals("mobile")) {
             float yaw;
@@ -192,6 +198,7 @@ public final class SpawnEditor {
         var root=Commands.literal("amenagement").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .executes(c->{open(c.getSource().getPlayerOrException(),null);return 1;});
         root.then(Commands.literal("outil").executes(c->{var p=c.getSource().getPlayerOrException();if(!p.getInventory().add(new ItemStack(ModItems.SPAWN_EDITOR.get())))return 0;return 1;}));
+        root.then(Commands.literal("outilarmure").executes(c->{RpgPlayers.give(c.getSource().getPlayerOrException(),com.mmorpg.registry.ModItems.ARMOR_STAND_EDITOR.get(),1);return 1;}));
         root.then(Commands.literal("outilpnj").executes(c->{var p=c.getSource().getPlayerOrException();return p.getInventory().add(new ItemStack(ModItems.NPC_EDITOR.get()))?1:0;}));
         // Namespaced catalogue IDs contain ':'; Brigadier's word() stops at the colon.
         root.then(Commands.literal("poser").then(Commands.argument("placement",StringArgumentType.greedyString()).executes(c->{

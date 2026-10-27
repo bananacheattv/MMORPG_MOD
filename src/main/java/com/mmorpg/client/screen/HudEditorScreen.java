@@ -45,7 +45,7 @@ public class HudEditorScreen extends Screen {
     }
 
     private static final int PW = 268;
-    private static final int PH = 86;
+    private static final int PH = 108;
 
     @Override
     protected void init() {
@@ -166,6 +166,8 @@ public class HudEditorScreen extends Screen {
         String sel = selected == null ? "Aucun élément sélectionné"
                 : selected.label + " — " + Math.round(selected.scale() * 100) + " %" + (selected.visible() ? "" : " — masqué");
         Ui.scaledText(g, sel, x + PW / 2f, y + 45, 0.75f, selected == null ? Ui.MUTED : Ui.GOLD, true);
+        button(g, x + 8, y + 59, 120, 16, "Réduire la sélection −", mx, my, () -> { if (selected != null) selected.setScale(selected.scale() - .1f, width, height); });
+        button(g, x + 140, y + 59, 120, 16, "Agrandir la sélection +", mx, my, () -> { if (selected != null) selected.setScale(selected.scale() + .1f, width, height); });
         int by = y + PH - 24;
         int bw = (PW - 16 - 9) / 4;
         button(g, x + 8, by, bw, 16, (grid ? "☑" : "☐") + " Grille", mx, my, () -> grid = !grid);

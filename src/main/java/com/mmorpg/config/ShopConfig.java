@@ -38,6 +38,7 @@ public class ShopConfig {
      * minerais compresses, recoltes et aliments. Ajoute au chargement ce qui manque a une boutique existante (les prix modifies sont conserves).
      */
     public void addNewContent() {
+        buy.removeIf(o->com.mmorpg.server.RetiredItems.id(o.item));sellPrices.keySet().removeIf(com.mmorpg.server.RetiredItems::id);
         Object[][] offers = {{"graine_lueur", 4, 16, 1}, {"graine_argent", 3, 60, 18}, {"graine_ambre", 3, 180, 38}, {"graine_givre", 3, 480, 55},
                 {"graine_neant", 3, 1400, 75}, {"pioche_debutant", 1, 80, 1}, {"houe_debutant", 1, 60, 1}};
         for (Object[] o : offers) {

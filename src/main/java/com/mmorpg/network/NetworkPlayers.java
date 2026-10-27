@@ -22,6 +22,7 @@ public final class NetworkPlayers {
     private static final Map<UUID, String> TRAVEL = new HashMap<>();
     private static final Map<UUID, Long> TRANSFERRING = new HashMap<>();
     private static final Map<UUID, String> ARRIVALS = new HashMap<>();
+    private static final Map<UUID, Long> PORTAL_GRACE = new HashMap<>();
     private static final EquipmentSlot[] EQUIPMENT = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.OFFHAND};
 
     public static void start() {
@@ -51,6 +52,8 @@ public final class NetworkPlayers {
                 destination = tag.getStringOr("destination", "");
             }
             SESSIONS.put(p.getUUID(), store);
+            PORTAL_GRACE.put(p.getUUID(), (long) p.level().getServer().getTickCount() + 100);
+            MMORPG.LOGGER.info("[Aeloria voyage] Arrivée {} sur {} : {}", p.getUUID(), NetworkConfig.current.role, destination);
             final String arrival = destination;
             if (!arrival.isEmpty()) ARRIVALS.put(p.getUUID(), arrival);
             Scheduler.later(p.level(), 5, () -> { if (!p.isRemoved()) arrive(p, arrival); });
@@ -210,6 +213,7 @@ public final class NetworkPlayers {
         try { store.close(); } catch (IOException e) { MMORPG.LOGGER.error("[Aeloria] Session release", e); }
         TRAVEL.remove(p.getUUID()); TRANSFERRING.remove(p.getUUID());
         ARRIVALS.remove(p.getUUID());
+        PORTAL_GRACE.remove(p.getUUID());
         DungeonTravel.forget(p);
     }
 
@@ -221,8 +225,10 @@ public final class NetworkPlayers {
     /** True means this destination belongs to another server, including a refused/failed transfer. */
     public static boolean route(ServerPlayer p, NetworkConfig.Role role, String destination) {
         if (NetworkConfig.hosts(role)) return false;
-        if (!canTransfer(p, role)) return true;
+        boolean admin = destination.startsWith("admin-") && p.permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_GAMEMASTER);
+        if (!canTransfer(p, role, admin)) return true;
         String target = NetworkConfig.serverFor(role);
+        MMORPG.LOGGER.info("[Aeloria voyage] Départ {} : {} -> {} ({})", p.getUUID(), NetworkConfig.current.role, role, destination);
         p.closeContainer();
         com.mmorpg.server.MountManager.despawn(p);
         com.mmorpg.server.PetManager.despawn(p);
@@ -239,10 +245,11 @@ public final class NetworkPlayers {
         return true;
     }
 
-    public static boolean canTransfer(ServerPlayer p, NetworkConfig.Role role) {
+    public static boolean canTransfer(ServerPlayer p, NetworkConfig.Role role) { return canTransfer(p,role,false); }
+    private static boolean canTransfer(ServerPlayer p, NetworkConfig.Role role, boolean admin) {
         if(com.mmorpg.competition.ArenaManager.active(p)||com.mmorpg.competition.GuildRaids.of(p.getUUID())!=null){p.sendSystemMessage(Component.literal("Quitte ton arène ou ton épreuve de guilde avant de voyager."));return false;}
         if (!SESSIONS.containsKey(p.getUUID())) return false;
-        if (role != NetworkConfig.Role.HUB && !RpgPlayers.get(p).playerClass.isPlayable()) {
+        if (!admin && role != NetworkConfig.Role.HUB && !RpgPlayers.get(p).playerClass.isPlayable()) {
             p.sendSystemMessage(Component.literal("Choisissez votre classe au hub avant de voyager."));
             return false;
         }
@@ -258,18 +265,25 @@ public final class NetworkPlayers {
         return TRANSFERRING.getOrDefault(p.getUUID(), 0L) <= now;
     }
     public static boolean inTransit(ServerPlayer p) { return TRANSFERRING.getOrDefault(p.getUUID(), 0L) > System.currentTimeMillis(); }
+    /** Automatic portals must not interpret the backend's old saved position as a fresh entry. */
+    public static boolean portalBlocked(ServerPlayer p) {
+        return isArriving(p) || inTransit(p)
+                || PORTAL_GRACE.getOrDefault(p.getUUID(), 0L) > p.level().getServer().getTickCount()
+                || com.mmorpg.mine.MineManager.transitioning(p) || com.mmorpg.plains.PlainsManager.transitioning(p);
+    }
     public static boolean isArriving(ServerPlayer p) { return ARRIVALS.containsKey(p.getUUID()); }
 
     private static void arrive(ServerPlayer p, String destination) {
-        ARRIVALS.remove(p.getUUID());
         try {
-            if (!RpgPlayers.get(p).playerClass.isPlayable() && NetworkConfig.current.role != NetworkConfig.Role.HUB) {
+            if (!destination.startsWith("admin-") && !RpgPlayers.get(p).playerClass.isPlayable() && NetworkConfig.current.role != NetworkConfig.Role.HUB) {
                 route(p, NetworkConfig.Role.HUB, "hub");
                 return;
             }
-            if (destination.equals("dungeon-return")) {
+            if (destination.startsWith("admin-tp:")) {
+                AdminTravel.arrive(p, destination.substring(9));
+            } else if (destination.equals("dungeon-return")) {
                 DungeonTravel.arriveHome(p);
-            } else if ((destination.startsWith("arena:")||destination.equals("guild-raid")||destination.startsWith("admin-test:")) && NetworkConfig.hosts(NetworkConfig.Role.DUNGEONS)) {
+            } else if (((destination.startsWith("arena:")||destination.startsWith("arena-match:"))||destination.startsWith("guild-raid")||destination.startsWith("admin-test:")) && NetworkConfig.hosts(NetworkConfig.Role.DUNGEONS)) {
                 com.mmorpg.competition.CompetitionTravel.arrive(p,destination);
             } else if (destination.startsWith("mine:") && NetworkConfig.hosts(NetworkConfig.Role.MINES)) {
                 int region = Integer.parseInt(destination.substring(5));
@@ -288,5 +302,6 @@ public final class NetworkPlayers {
             else if (destination.equals("spawn") && NetworkConfig.hosts(NetworkConfig.Role.MAIN)) com.mmorpg.hub.HubManager.goToSpawn(p);
             save(p); // consume the travel instruction; later reconnects retain their local position
         } catch (Exception e) { MMORPG.LOGGER.error("[Aeloria] Invalid travel instruction {}", destination, e); }
+        finally { ARRIVALS.remove(p.getUUID()); }
     }
 }

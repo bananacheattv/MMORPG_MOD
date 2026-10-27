@@ -33,6 +33,8 @@ public class ForgeScreen extends MmoScreen {
     private final BlockPos pos;
     private EditBox search;
     private int scroll;
+    private int detailScroll, detailMaxScroll;
+    private String detailRecipe;
     private int upgradeSlot = -1;
     /** Utiliser le trefle du palier (reussite garantie) lors de la prochaine amelioration. */
     private static boolean useClover = true;
@@ -54,7 +56,10 @@ public class ForgeScreen extends MmoScreen {
 
     @Override
     public boolean mouseScrolled(double x, double y, double sx, double sy) {
-        scroll = Math.max(0, scroll - (int) Math.signum(sy));
+        if (tab < ForgeRecipes.Category.values().length && x >= left + 232 && x < left + pw - 8
+                && y >= top + 46 && y < top + ph - 30) {
+            detailScroll = Math.clamp(detailScroll - (int) Math.signum(sy) * 18, 0, detailMaxScroll);
+        } else scroll = Math.max(0, scroll - (int) Math.signum(sy));
         return true;
     }
 
@@ -128,6 +133,7 @@ public class ForgeScreen extends MmoScreen {
             if (!q.isEmpty() && !name.contains(q)) continue;
             list.add(r);
         }
+        list.sort(java.util.Comparator.comparingInt(ForgeRecipes.Recipe::level).thenComparing(ForgeRecipes.Recipe::id));
         int rowH = 20;
         int visible = (top + ph - 10 - listTop) / rowH;
         scroll = Math.min(scroll, Math.max(0, list.size() - visible));
@@ -174,7 +180,10 @@ public class ForgeScreen extends MmoScreen {
         Rarity rar = rarityOf(item);
         g.text(font, font.plainSubstrByWidth(stack.getHoverName().getString() + (r.count() > 1 ? " x" + r.count() : ""), dw - 48), dx + 42, dy + 8, rar.color, true);
         g.text(font, rar.label + " — Niveau " + r.level(), dx + 42, dy + 19, ClientData.DATA.level >= r.level() ? Ui.MUTED : Ui.RED, false);
-        int ty = dy + 42;
+        if (!r.id().equals(detailRecipe)) { detailRecipe = r.id(); detailScroll = 0; }
+        int contentTop = dy + 40, contentBottom = dy + dh - 27;
+        g.enableScissor(dx + 1, contentTop, dx + dw - 1, contentBottom);
+        int ty = dy + 44 - detailScroll;
         if (!com.mmorpg.crafting.ForgeProgression.unlocked(ClientData.DATA, r)) {
             g.text(font, font.plainSubstrByWidth("Parchemin : " + new ItemStack(item).getHoverName().getString(), dw - 12), dx + 6, ty, Ui.RED, false);
             ty += 12;
@@ -202,7 +211,7 @@ public class ForgeScreen extends MmoScreen {
             g.text(font, font.plainSubstrByWidth(is.getHoverName().getString(), dw - 70), dx + 26, ty, Ui.TEXT, false);
             String c = have + "/" + ing.count();
             g.text(font, c, dx + dw - 6 - font.width(c), ty, have >= ing.count() ? Ui.GREEN : Ui.RED, true);
-            if (hovered(dx + 6, ty - 4, 16, 16)) g.setTooltipForNextFrame(font, is, mouseX, mouseY);
+            if (mouseY >= contentTop && mouseY < contentBottom && hovered(dx + 6, ty - 4, 16, 16)) g.setTooltipForNextFrame(font, is, mouseX, mouseY);
             ty += 17;
         }
         if (r.gold() > 0) {
@@ -211,6 +220,15 @@ public class ForgeScreen extends MmoScreen {
             long have = ClientData.DATA.gold;
             String c = have + "/" + r.gold();
             g.text(font, c, dx + dw - 6 - font.width(c), ty, have >= r.gold() ? Ui.GREEN : Ui.RED, true);
+        }
+        detailMaxScroll = Math.max(0, ty + detailScroll + (r.gold() > 0 ? 16 : 0) - contentBottom);
+        detailScroll = Math.min(detailScroll, detailMaxScroll);
+        g.disableScissor();
+        if (detailMaxScroll > 0) {
+            int track = contentBottom - contentTop;
+            int thumb = Math.max(14, track * track / (track + detailMaxScroll));
+            int offset = (track - thumb) * detailScroll / detailMaxScroll;
+            g.fill(dx + dw - 3, contentTop + offset, dx + dw - 1, contentTop + offset + thumb, Ui.GOLD);
         }
         boolean ok = canCraft(inv, r);
         int by = dy + dh - 22;
@@ -228,7 +246,7 @@ public class ForgeScreen extends MmoScreen {
         int lw = 212;
         List<Integer> slots = new ArrayList<>();
         for (int i = 0; i < inv.getContainerSize(); i++) {
-            if (inv.getItem(i).getItem() instanceof RpgEquipment) slots.add(i);
+            if (inv.getItem(i).getItem() instanceof RpgEquipment || com.mmorpg.mine.ToolRunes.tool(inv.getItem(i))) slots.add(i);
         }
         g.text(font, "Équipements de votre inventaire :", x0, listTop - 2, Ui.GOLD, false);
         int rowH = 20;
@@ -238,11 +256,11 @@ public class ForgeScreen extends MmoScreen {
         for (int i = 0; i < Math.min(visible, slots.size() - scroll); i++) {
             int slot = slots.get(i + scroll);
             ItemStack s = inv.getItem(slot);
-            RpgEquipment eq = (RpgEquipment) s.getItem();
+            int color=s.getItem() instanceof RpgEquipment equipment?equipment.rpgDef().rarity().color:Ui.GOLD;
             int ry = listTop + 10 + i * rowH;
-            Ui.frame(g, x0, ry, lw, rowH - 2, eq.rpgDef().rarity().color, slot == upgradeSlot || hovered(x0, ry, lw, rowH - 2));
+            Ui.frame(g, x0, ry, lw, rowH - 2, color, slot == upgradeSlot || hovered(x0, ry, lw, rowH - 2));
             g.item(s, x0 + 2, ry + 1);
-            g.text(font, font.plainSubstrByWidth(s.getHoverName().getString(), lw - 30), x0 + 21, ry + 5, eq.rpgDef().rarity().color, false);
+            g.text(font, font.plainSubstrByWidth(s.getHoverName().getString(), lw - 30), x0 + 21, ry + 5, color, false);
             click(x0, ry, lw, rowH - 2, () -> upgradeSlot = slot);
         }
         if (slots.isEmpty()) g.text(font, "Aucun équipement RPG dans l'inventaire.", x0, listTop + 14, Ui.MUTED, false);
@@ -254,6 +272,7 @@ public class ForgeScreen extends MmoScreen {
         Ui.inset(g, dx, dy, dw, dh);
         if (upgradeSlot < 0) return;
         ItemStack s = inv.getItem(upgradeSlot);
+        if (com.mmorpg.mine.ToolRunes.tool(s)) {renderRunes(g,inv,s,dx,dy,dw,dh);return;}
         if (!(s.getItem() instanceof RpgEquipment eq)) return;
         int cur = RpgEquipment.upgrade(s);
         g.pose().pushMatrix();
@@ -321,4 +340,18 @@ public class ForgeScreen extends MmoScreen {
         button(g, dx + 6, dy + dh - 22, dw - 12, 16, "Améliorer", ok, 0xFF7A5A1A,
                 () -> ClientNet.send(new Payloads.ForgeAction(Payloads.ForgeAction.UPGRADE, cloverId, slot, pos)));
     }
+    private void renderRunes(GuiGraphicsExtractor g,Inventory inv,ItemStack tool,int x,int y,int w,int h){
+        g.item(tool,x+6,y+6);g.text(font,font.plainSubstrByWidth(tool.getHoverName().getString(),w-32),x+27,y+9,Ui.GOLD,false);
+        g.text(font,"Runes d’outil · 5 rangs par rune",x+6,y+28,Ui.TEXT,false);
+        int rowHeight=Math.min(39,(h-45)/4);
+        for(int i=0;i<com.mmorpg.mine.ToolRunes.IDS.length;i++){
+            int rune=i,ry=y+45+i*rowHeight,rank=com.mmorpg.mine.ToolRunes.rank(tool,i);String id=com.mmorpg.mine.ToolRunes.IDS[i];
+            g.item(new ItemStack(ModItems.get(id)),x+6,ry);g.text(font,font.plainSubstrByWidth(com.mmorpg.mine.ToolRunes.NAMES[i],w-108),x+26,ry+2,Ui.GOLD,false);
+            int cost=com.mmorpg.mine.ToolRunes.cost(tool,i);boolean ok=rank<5&&(i!=1||tool.getItem() instanceof com.mmorpg.mine.MineTools.Pickaxe)&&count(inv,ModItems.get(id))>0&&ClientData.DATA.gold>=cost;
+            button(g,x+w-76,ry,70,16,rank==5?"Maximum":cost+" or",ok,Ui.GREEN,()->ClientNet.send(new Payloads.ForgeAction(Payloads.ForgeAction.UPGRADE,"rune:"+id,upgradeSlot,pos)));
+            String effect="Rang "+rank+"/5 · "+(i==3?"−":"+")+(rank*(i==0?10:15))+" % "+new String[]{"rendement","rares","vitesse","usure"}[i];Ui.scaledText(g,effect,x+w/2f,ry+20,Math.min(.85f,(w-12f)/font.width(effect)),Ui.MUTED,true);
+            if(hovered(x+4,ry,w-8,rowHeight))g.setTooltipForNextFrame(font,Component.literal(com.mmorpg.mine.ToolRunes.EFFECTS[i]+(i==1?" · Pioche uniquement":i==2?" · Houe : zone +1 tous les 2 rangs":"")),mouseX,mouseY);
+        }
+    }
+
 }

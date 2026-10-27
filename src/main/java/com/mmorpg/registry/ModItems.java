@@ -37,6 +37,10 @@ public final class ModItems {
     public static final DeferredItem<com.mmorpg.item.SpawnEditorItem> SPAWN_EDITOR = ITEMS.registerItem("outil_spawn", com.mmorpg.item.SpawnEditorItem::new);
     public static final DeferredItem<com.mmorpg.item.NpcEditorItem> NPC_EDITOR = ITEMS.registerItem("outil_pnj", com.mmorpg.item.NpcEditorItem::new);
 
+    public static final DeferredItem<com.mmorpg.item.ArmorStandEditorItem> ARMOR_STAND_EDITOR=ITEMS.registerItem("outil_armure",com.mmorpg.item.ArmorStandEditorItem::new);
+    public static final List<DeferredItem<Item>> PALADIN_SHIELDS=new ArrayList<>();
+    static {for(int tier=0;tier<5;tier++)PALADIN_SHIELDS.add(ITEMS.registerSimpleItem("bouclier_paladin_"+tier,p -> p.stacksTo(1)));}
+
     public static final List<DeferredItem<? extends Item>> WEAPONS = new ArrayList<>();
     public static final List<DeferredItem<? extends Item>> ARMORS = new ArrayList<>();
     public static final List<DeferredItem<? extends Item>> MATERIALS = new ArrayList<>();
@@ -57,8 +61,15 @@ public final class ModItems {
             var item=ITEMS.registerItem(id,p->new com.mmorpg.item.ForgeScrollItem(p,recipe.id(),tier));
             CONSUMABLES.add(item);BY_ID.put(id,item);
         }
+        // Registry tombstones keep existing character snapshots readable during removal of old tool plans.
+        String[] tiers={"verdite","argentite","ambrasite","glacium","neantite"};int[] levels={1,18,38,55,75};
+        for(String kind:new String[]{"hache","pelle"})for(int i=0;i<tiers.length;i++){
+            String recipe=kind+"_"+tiers[i],id="parchemin_plan_"+recipe;int tier=com.mmorpg.crafting.ForgeProgression.tier(levels[i]);
+            var item=ITEMS.registerItem(id,p->new com.mmorpg.item.ForgeScrollItem(p,recipe,tier));BY_ID.put(id,item);
+        }
     }
     public static final DeferredItem<RpgMaterialItem> FIOLE_RUNIQUE = material("fiole_runique", Rarity.COMMUN, "Récipient alchimique façonné à partir de Verdite et de poussière d'âme.");
+    static {for(int i=0;i<com.mmorpg.mine.ToolRunes.IDS.length;i++)material(com.mmorpg.mine.ToolRunes.IDS[i],Rarity.RARE,com.mmorpg.mine.ToolRunes.EFFECTS[i]+". À sertir dans un outil à la forge, cinq rangs maximum.");}
     public static final Map<PetType, DeferredItem<PetEggItem>> PET_EGGS = new EnumMap<>(PetType.class);
     /** Mannequins d'entrainement (objets de placement), par variante. */
     public static final Map<String, DeferredItem<com.mmorpg.item.TrainingDummyItem>> DUMMY_ITEMS = new java.util.LinkedHashMap<>();
@@ -231,7 +242,7 @@ public final class ModItems {
     public static final DeferredItem<RpgConsumableItem> ELIXIR_EXPERIENCE = consumable("elixir_experience", Rarity.EPIQUE, RpgConsumableItem.Kind.ELIXIR, 0.25, "Octroie 25 % de l'expérience du niveau en cours.");
     public static final DeferredItem<RpgConsumableItem> PARCHEMIN_TELEPORTATION = consumable("parchemin_teleportation", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.TELEPORT_SCROLL, 0, "Ouvre le réseau de téléportation depuis n'importe où.\nConsommé lors du voyage.");
     public static final DeferredItem<RpgConsumableItem> PARCHEMIN_OUBLI = consumable("parchemin_oubli", Rarity.RARE, RpgConsumableItem.Kind.FORGET_SCROLL, 0, "Réinitialise vos points d'attribut.");
-    public static final DeferredItem<RpgConsumableItem> ORBE_RENAISSANCE = consumable("orbe_renaissance", Rarity.LEGENDAIRE, RpgConsumableItem.Kind.REBIRTH_ORB, 0, "Permet de choisir une nouvelle classe.\nVotre niveau est conservé.");
+    public static final DeferredItem<RpgConsumableItem> ORBE_RENAISSANCE = consumable("orbe_renaissance", Rarity.LEGENDAIRE, RpgConsumableItem.Kind.REBIRTH_ORB, 0, "Permet de choisir une nouvelle classe.\nVotre niveau et votre expérience sont remis à zéro (niveau 1).");
     public static final DeferredItem<RpgConsumableItem> COFFRE_COSMETIQUE = consumable("coffre_cosmetique", Rarity.EPIQUE, RpgConsumableItem.Kind.COSMETIC_CHEST, 0, "Débloque un cosmétique animé aléatoire.");
 
     public static final DeferredItem<RpgConsumableItem> NOURRITURE_FAMILIER = consumable("nourriture_familier", Rarity.PEU_COMMUN,

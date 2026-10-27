@@ -254,6 +254,23 @@ public final class CinematicConfig {
         }
     }
 
+    public static String shortened(String json) {
+        JsonObject root=JsonParser.parseString(json).getAsJsonObject();
+        if(root.has("aeloriaShortClasses"))return json;
+        double start=0;var intervals=new java.util.ArrayList<double[]>();
+        for(var element:root.getAsJsonArray("plans")){
+            var plan=element.getAsJsonObject();double duration=plan.get("duree").getAsDouble();
+            if(plan.has("classe")){intervals.add(new double[]{start,start+duration});plan.addProperty("duree",duration*.4);}
+            start+=duration;
+        }
+        if(root.has("parcours"))for(var element:root.getAsJsonArray("parcours")){
+            var key=element.getAsJsonObject();double time=key.get("t").getAsDouble(),removed=0;
+            for(var interval:intervals)removed+=Math.max(0,Math.min(time,interval[1])-interval[0])*.6;
+            key.addProperty("t",time-removed);
+        }
+        root.addProperty("aeloriaShortClasses",true);return root.toString();
+    }
+
     /** Charge (ou cree) config/mmorpg/cinematique.json ; en cas d'erreur, la definition par defaut est utilisee. */
     public static String load() {
         Path file = ConfigManager.dir().resolve("cinematique.json");

@@ -47,7 +47,7 @@ public final class MerchantEditorScreen extends MmoScreen {
     }
     private List<Entry> catalogue() {
         if(entries==null) {
-            var list=new ArrayList<Entry>();for(Item item:BuiltInRegistries.ITEM)if(item!=Items.AIR) {
+            var list=new ArrayList<Entry>();for(Item item:BuiltInRegistries.ITEM)if(item!=Items.AIR&&!com.mmorpg.server.RetiredItems.item(item)) {
                 String id=BuiltInRegistries.ITEM.getKey(item).toString(),label=new ItemStack(item).getHoverName().getString();
                 if(com.mmorpg.server.CrateOnly.is(item)||item instanceof com.mmorpg.item.NpcEditorItem||item instanceof com.mmorpg.item.SpawnEditorItem)continue;
                 list.add(new Entry(item,id,label,(label+" "+id).toLowerCase(Locale.ROOT)));

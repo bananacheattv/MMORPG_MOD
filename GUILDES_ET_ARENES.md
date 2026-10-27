@@ -72,3 +72,27 @@ Commandes réservées aux opérateurs de niveau 2 minimum, après le choix de cl
 - `/aeloriatest stop` : quitter le test et revenir au point de départ. Quitter d’abord un test avant d’en lancer un autre.
 
 En survie, les boss attaquent normalement ; en créatif, ils peuvent être observés. Les délais de préparation correspondent à la construction progressive du décor. Les matchs publics conservent leurs exigences de joueurs et leurs restrictions de niveaux.
+
+
+## Ajustements bêta 0.0 — 27 octobre
+
+- Inscription réseau depuis le serveur courant : aucun transfert dans une salle d’attente. Feu : 10 inscrits, dunes : 6 ; chaque joueur confirme la proposition avant le transfert collectif.
+- Tous les gardiens débloqués sont rejouables. Une victoire déclenche une recharge persistante de 6 heures pour ce gardien et cette guilde. Retour au point de départ après 30 secondes.
+- Épreuves d’Yggdrasil dans une grotte fermée : voûte rocheuse, racines géantes, minéraux lumineux et piste de combat dégagée.
+- `/aeloriatest boss 1` à `/aeloriatest boss 10`, `/aeloriatest arene feu|dunes` : instances admin solo, sans condition de guilde, niveau, or, recharge ou nombre de joueurs. Aucun gain ni progression. Une activité déjà en cours doit être quittée auparavant. `/aeloriatest stop` ramène au départ.
+- `/atp <joueur>` (alias `/tpreseau`) : commande OP de téléportation entre dimensions et serveurs. Le joueur visé doit être connecté. Les changements de serveur utilisent une autorisation temporaire créée côté serveur.
+- Régénération passive : 1 % des PV max par cinq secondes, sans régénération alimentaire vanilla. Réapparition PvE automatique au spawn ; les morts d’arène restent dans le camp de l’équipe.
+- XP des monstres de donjon divisée par cinq supplémentaires ; quantité moyenne de leurs butins divisée par dix. Les mines et plaines ne sont pas concernées par ces deux réductions.
+- U : boutons agrandir/réduire l’élément sélectionné, échelle jusqu’à 300 %. Page précédente / Page suivante : rapprocher/éloigner la caméra à la troisième personne, sans changer la FOV ; touches reconfigurables.
+- Forge : détails défilants et pied de panneau fixe pour conserver les boutons de fabrication à l’intérieur.
+
+## Équipement et construction — bêta 0.0
+
+- Paladin avec un marteau : bouclier visuel de classe automatique, cinq apparences selon le niveau. La seconde main ne reçoit pas d’objets manuellement.
+- `/tuto` : revoir le guide du hub. Les séquences de présentation des classes sont raccourcies.
+- `/outilarmure` : outil administrateur pour équiper et poser les porte-armures, déplacer leurs membres, choisir une posture et régler leur position. Également accessible dans l’outil d’aménagement.
+- Forge : recettes classées par niveau ; mannequins retirés des consommables ; anciennes haches, pelles, caisse et clé d’aventure retirées de la progression. Les anciens identifiants restent réservés pour charger les sauvegardes.
+- Orbe de renaissance : choisir à nouveau sa classe en repartant au niveau 1.
+- Outils : quatre runes, cinq rangs chacune, dans Amélioration. Abondance augmente le rendement, Prospection les chances rares de la pioche, Célérité la vitesse et la zone de récolte de la houe, Ténacité économise la durabilité. Chaque rang consomme sa rune et de l’or ; le coût est affiché avant l’amélioration.
+- Tables de craft, fours, enclumes et tables d’enchantement vanilla désactivés, y compris la cuisson automatisée.
+- Les PNJ personnalisés du marché ne sont plus supprimés par le nettoyage des anciens marchands. Les textes ont une portée accrue ; les PNJ et mannequins ne tombent plus dans le vide.

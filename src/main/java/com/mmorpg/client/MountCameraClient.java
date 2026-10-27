@@ -18,9 +18,17 @@ public final class MountCameraClient {
     private MountCameraClient() {
     }
 
+    private static float zoomOffset;
+    public static void zoom(int direction) {
+        zoomOffset = Math.clamp(zoomOffset + direction, -3f, 28f);
+        var mc = Minecraft.getInstance();
+        if (mc.player != null) mc.player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Distance caméra : " + (int)(4 + zoomOffset) + " blocs · vue troisième personne (F5)"));
+    }
+
     @SubscribeEvent
     public static void onDistance(CalculateDetachedCameraDistanceEvent event) {
         var player = Minecraft.getInstance().player;
+        event.setDistance(Math.max(1f, event.getDistance() + zoomOffset));
         if (player == null || !(player.getVehicle() instanceof MountEntity mount)) return;
         float size = Math.max(Math.max(mount.mountType().width, mount.mountType().height), mount.mountType().seat) * ModEntities.MOUNT_SCALE;
         event.setDistance(Math.max(event.getDistance(), event.getDistance() + size * 1.5F));

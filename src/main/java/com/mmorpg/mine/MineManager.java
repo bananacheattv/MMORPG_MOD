@@ -194,6 +194,7 @@ public final class MineManager {
     private static void portals(MinecraftServer server, ServerLevel level) {
         long now = server.getTickCount();
         for (ServerPlayer p : new ArrayList<>(level.players())) {                  // copie : un portail deplace le joueur pendant le parcours
+            if (com.mmorpg.network.NetworkPlayers.portalBlocked(p)) continue;
             int region = regionOf(p);
             if (region < 0 || p.isSpectator() || p.isPassenger()) continue;
             MineLayout lay = MineLayout.get(region);
@@ -299,7 +300,7 @@ public final class MineManager {
             return false;
         }
         var random = level.getRandom();
-        int count = 1 + (random.nextInt(100) < 12 + ore.tier() * 2 + pick * 4 ? 1 : 0);      // veine riche : un lingot de plus (la pioche aide)
+        int count = 1 + (random.nextInt(100) < 12 + ore.tier() * 2 + pick * 4 + com.mmorpg.mine.ToolRunes.rank(tool,0)*10 ? 1 : 0);      // veine riche : un lingot de plus (la pioche aide)
         ItemStack ingot = new ItemStack(ModItems.get(ore.ingotId()), count);
         if (!p.getInventory().add(ingot)) level.addFreshEntity(new net.minecraft.world.entity.item.ItemEntity(level, p.getX(), p.getY() + 0.5, p.getZ(), ingot));
         tool.hurtAndBreak(1, p, EquipmentSlot.MAINHAND);
@@ -325,7 +326,7 @@ public final class MineManager {
     /** Lingots rares, epiques et legendaires : tirage independant du lingot de base ; la pioche augmente toutes les chances de 25 % par palier. */
     private static void rareDrop(ServerLevel level, ServerPlayer p, BlockPos pos, MineBlocks.Ore ore, int pick) {
         double[] chance = RARE_CHANCE[Math.min(ore.tier(), RARE_CHANCE.length - 1)];
-        double mult = 1.0 + 0.25 * pick;
+        double mult = (1.0 + 0.25 * pick)*(1+ToolRunes.rank(p.getMainHandItem(),1)*.15);
         String[] ids = {"lingot_aelium", "lingot_orichalque", "lingot_astralium"};
         String[] names = {"Lingot d'Aelium", "Lingot d'Orichalque", "Lingot d'Astralium"};
         int[] colors = {0x6EF0E0, 0xFF8A5A, 0xFFE070};
@@ -384,6 +385,7 @@ public final class MineManager {
     private static void spawnMobs(ServerLevel level) {
         var random = level.getRandom();
         for (ServerPlayer p : level.players()) {
+            if (com.mmorpg.network.NetworkPlayers.portalBlocked(p)) continue;
             int region = regionOf(p);
             if (region < 0 || p.isSpectator()) continue;
             MineLayout layout = MineLayout.get(region);
@@ -482,10 +484,16 @@ public final class MineManager {
     public static void startTransition(ServerPlayer p, int k) {
         if (k < 0 || k >= MineLayout.SECTORS || k >= RpgPlayers.get(p).minesUnlocked) return;
         if (!com.mmorpg.server.PortalAccess.consume(p,"mine")) return;
+        if (com.mmorpg.network.GroupTravel.begin(p,"mine",Integer.toString(k))) return;
         com.mmorpg.server.AdventureSummary.begin(p,"mine");
         if (com.mmorpg.network.NetworkPlayers.route(p, com.mmorpg.network.NetworkConfig.Role.MINES, "mine:" + k)) return;
         MinecraftServer server = p.level().getServer();
         if (dim(server) == null || k < 0 || k >= MineLayout.SECTORS) return;
+        if (built(server,k)) {
+            double[] entry=spawnPoint(k);var point=BlockPos.containing(entry[0],entry[1]-1,entry[2]);var world=dim(server);world.getChunkAt(point);
+            int missing=0;for(int dx=-2;dx<=2;dx++)for(int dz=-2;dz<=2;dz++)if(world.getBlockState(point.offset(dx,0,dz)).isAir())missing++;
+            if(missing==25){MineData.get(server).setVersion(k,0);com.mmorpg.MMORPG.LOGGER.warn("Mine {} marked built but entry terrain missing: scheduling reconstruction",k);}
+        }
         Sector s = MineLayout.STYLES.get(k);
         MineBlocks.Ore ore = MineBlocks.ore(s.ore());
         String title = MARK + s.name();
@@ -496,7 +504,7 @@ public final class MineManager {
         Net.toPlayer(p, new Payloads.Loading(Payloads.Loading.START, title, s.lore(), ore.color(), built(server, k) ? 0 : (job != null && job.region() == k ? percent() : 0)));
     }
 
-    private static boolean transitioning(ServerPlayer p) {
+    public static boolean transitioning(ServerPlayer p) {
         for (Transition x : TRANSITIONS) if (x.player().equals(p.getUUID())) return true;
         return false;
     }

@@ -194,7 +194,8 @@ public final class AdventurePortals {
                 if (p.distanceToSqr(portal.pos().getX() + .5, portal.pos().getY(), portal.pos().getZ() + .5) < 36 && server.getTickCount() % 40 == 0) p.sendOverlayMessage(Component.literal(label(portal)).withColor(color));
                 if (passage(portal).contains(p.position())) inside = portal;
             }
-            if (visit(p, inside)) enter(p, inside);
+            boolean entered = visit(p, inside);
+            if (entered && !com.mmorpg.network.NetworkPlayers.portalBlocked(p)) enter(p, inside);
         }
     }
     @SubscribeEvent public static void logout(PlayerEvent.PlayerLoggedOutEvent event) { INSIDE.remove(event.getEntity().getUUID()); }

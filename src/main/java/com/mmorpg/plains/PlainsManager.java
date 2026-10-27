@@ -245,6 +245,11 @@ public final class PlainsManager {
     public static void startTransition(ServerPlayer p, int region) {
         MinecraftServer server = p.level().getServer();
         if (dim(server) == null || region < 0 || region >= REGIONS) return;
+        if (built(server,region)) {
+            var point=new BlockPos(PlainsLayout.get(region).x0()+PLAZA_X,BASE,Z0+PLAZA_Z);var world=dim(server);world.getChunkAt(point);
+            int missing=0;for(int dx=-2;dx<=2;dx++)for(int dz=-2;dz<=2;dz++)if(world.getBlockState(point.offset(dx,0,dz)).isAir())missing++;
+            if(missing==25){PlainsData.get(server).setVersion(region,0);com.mmorpg.MMORPG.LOGGER.warn("Plain {} marked built but entry terrain missing: scheduling reconstruction",region);}
+        }
         Sector s = STYLES.get(region);
         String title = MARK + s.name();
         long at = server.overworld().getGameTime() + LOADING_TICKS;
@@ -254,7 +259,7 @@ public final class PlainsManager {
         Net.toPlayer(p, new com.mmorpg.network.Payloads.Loading(com.mmorpg.network.Payloads.Loading.START, title, s.lore(), COLORS[region], 0));
     }
 
-    private static boolean transitioning(ServerPlayer p) {
+    public static boolean transitioning(ServerPlayer p) {
         for (Transition x : TRANSITIONS) if (x.player().equals(p.getUUID())) return true;
         return false;
     }
@@ -290,6 +295,7 @@ public final class PlainsManager {
     /** Choix du joueur dans le menu : verifications cote serveur puis arrivee sur la place d'entree de la plaine. */
     public static void enterChosen(ServerPlayer p, int region) {
         if (!com.mmorpg.server.PortalAccess.consume(p,"plaines")) return;
+        if (com.mmorpg.network.GroupTravel.begin(p,"plaines",Integer.toString(region))) return;
         com.mmorpg.server.AdventureSummary.begin(p,"plaines");
         if (region < 0 || region >= REGIONS) return;
         if (region >= RpgPlayers.get(p).plainsUnlocked) {
@@ -319,7 +325,7 @@ public final class PlainsManager {
     private static void portals(MinecraftServer server) {
         SpawnData spawn = SpawnData.get(server);
         for (ServerPlayer p : new ArrayList<>(server.getPlayerList().getPlayers())) {     // copie : un portail deplace le joueur pendant le parcours
-            if (p.isSpectator() || p.isPassenger()) continue;
+            if (p.isSpectator() || p.isPassenger() || com.mmorpg.network.NetworkPlayers.portalBlocked(p)) continue;
             ServerLevel level = p.level();
             boolean inSpawn = spawn.exists() && level.dimension().equals(SpawnBuilder.DIM);
             int region = inSpawn ? -1 : regionOf(p);
@@ -345,7 +351,8 @@ public final class PlainsManager {
                 if (exitGate(lay).contains(p.getX(), p.getY(), p.getZ()) && !transitioning(p) && !cooling(p, now)) {
                     level.playSound(null, p.blockPosition(), SoundEvents.PORTAL_TRAVEL, SoundSource.PLAYERS, 0.5f, 1.2f);
                     discover(p, region + 1);
-                    startTransition(p, region + 1);
+                    com.mmorpg.server.PortalAccess.grant(p,"plaines");
+                    enterChosen(p, region + 1);
                     continue;
                 }
             }
@@ -455,7 +462,7 @@ public final class PlainsManager {
         if (!gather(level, p, pos, block, st, hoe)) return false;
         if (hoe >= 1) tool.hurtAndBreak(1, p, EquipmentSlot.MAINHAND);
         if (hoe < 2) return true;
-        int r = hoe >= 4 ? 2 : 1;
+        int r = Math.min(4,(hoe >= 4 ? 2 : 1)+com.mmorpg.mine.ToolRunes.rank(p.getMainHandItem(),2)/2);
         int n = 0;
         for (int dx = -r; dx <= r; dx++) {
             for (int dz = -r; dz <= r; dz++) {
@@ -482,7 +489,7 @@ public final class PlainsManager {
         }
         var random = level.getRandom();
         int rank = FarmCrops.CROPS.indexOf(crop);
-        int count = 1 + (random.nextInt(100) < 12 + rank * 2 + hoe * 4 ? 1 : 0);
+        int count = 1 + (random.nextInt(100) < 12 + rank * 2 + hoe * 4 + com.mmorpg.mine.ToolRunes.rank(p.getMainHandItem(),0)*10 ? 1 : 0);
         for (int i = 0; i < 2; i++) if (random.nextInt(100) < hoe * 10) count++;
         ItemStack drop = new ItemStack(ModItems.get(crop.product()), count);
         if (!p.getInventory().add(drop)) level.addFreshEntity(new ItemEntity(level, p.getX(), p.getY() + 0.5, p.getZ(), drop));

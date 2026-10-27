@@ -17,8 +17,8 @@ public final class ModCreativeTabs {
             .withTabsBefore(CreativeModeTabs.SPAWN_EGGS)
             .icon(() -> new ItemStack(ModItems.get("excalibur_celeste")))
             .displayItems((params, out) -> {
-                ModItems.WEAPONS.forEach(i -> out.accept(i.get()));
-                ModItems.ARMORS.forEach(i -> out.accept(i.get()));
+                ModItems.WEAPONS.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
+                ModItems.ARMORS.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
             })
             .build());
 
@@ -32,23 +32,23 @@ public final class ModCreativeTabs {
                 out.accept(ModItems.BANQUE.get());
                 out.accept(ModItems.HDV.get());
                 out.accept(ModItems.LUCKY_BLOCK.get());
-                ModItems.CRATE_BLOCKS.forEach(i -> out.accept(i.get()));
+                ModItems.CRATE_BLOCKS.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
                 out.accept(ModItems.TELEPORTEUR.get());
                 out.accept(ModItems.SCEPTRE_QUETES.get());
                 out.accept(ModItems.BAGUETTE_ZONE.get());
                 out.accept(ModItems.AUTEL_INVOCATION.get());
-                ModItems.MATERIALS.forEach(i -> out.accept(i.get()));
-                com.mmorpg.mine.MineTools.ITEMS.forEach(i -> out.accept(i.get()));
-                com.mmorpg.farm.FarmCrops.SEED_ITEMS.forEach(i -> out.accept(i.get()));
+                ModItems.MATERIALS.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
+                com.mmorpg.mine.MineTools.ITEMS.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
+                com.mmorpg.farm.FarmCrops.SEED_ITEMS.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
                 out.accept(ModItems.PIECE_OR.get());
-                ModItems.CONSUMABLES.forEach(i -> out.accept(i.get()));
-                ModItems.SUMMONS.forEach(i -> out.accept(i.get()));
-                ModItems.DUMMY_ITEMS.values().forEach(i -> out.accept(i.get()));
-                ModItems.PET_EGGS.values().forEach(i -> out.accept(i.get()));
-                ModItems.MOUNT_SEALS.values().forEach(i -> out.accept(i.get()));
+                ModItems.CONSUMABLES.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
+                ModItems.SUMMONS.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
+                ModItems.DUMMY_ITEMS.values().forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
+                ModItems.PET_EGGS.values().forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
+                ModItems.MOUNT_SEALS.values().forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
                 out.accept(ModItems.OEUF_MYSTERE.get());
                 out.accept(ModItems.SCEAU_MYSTERE.get());
-                ModItems.SPAWN_EGGS.forEach(i -> out.accept(i.get()));
+                ModItems.SPAWN_EGGS.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
             })
             .build());
 
@@ -57,8 +57,8 @@ public final class ModCreativeTabs {
             .withTabsBefore(OBJECTS.getKey())
             .icon(() -> new ItemStack(DecorBlocks.get("marbre_dore")))
             .displayItems((params, out) -> {
-                DecorBlocks.ITEMS.forEach(i -> out.accept(i.get()));
-                com.mmorpg.mine.MineBlocks.ITEMS.forEach(i -> out.accept(i.get()));
+                DecorBlocks.ITEMS.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
+                com.mmorpg.mine.MineBlocks.ITEMS.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
             })
             .build());
 

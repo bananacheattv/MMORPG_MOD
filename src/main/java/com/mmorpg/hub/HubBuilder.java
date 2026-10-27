@@ -317,7 +317,7 @@ public final class HubBuilder {
 
     static void text(HubCtx c, double x, double y, double z, String text, String color, float scale) {
         UUID id = stable("text:" + textIndex++);
-        String snbt = String.format(Locale.ROOT, "{text:{text:\"%s\",font:\"mmorpg:aeloria\",color:\"%s\"},billboard:\"center\",background:0,shadow:true,"
+        String snbt = String.format(Locale.ROOT, "{text:{text:\"%s\",font:\"mmorpg:aeloria\",color:\"%s\"},billboard:\"center\",view_range:3.0f,background:0,shadow:true,"
                 + "see_through:false,line_width:600,Tags:[\"%s\"],UUID:[I;%d,%d,%d,%d],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],"
                 + "translation:[0f,0f,0f],scale:[%.2ff,%.2ff,%.2ff]}}", text.replace("\"", "\\\""), color, TAG,
                 (int) (id.getMostSignificantBits() >> 32), (int) id.getMostSignificantBits(), (int) (id.getLeastSignificantBits() >> 32),
@@ -340,7 +340,7 @@ public final class HubBuilder {
         for (int i = 0; i < hub.count(); i++) {
             BlockPos o = hub.origin(i);
             AABB box = new AABB(o.getX() - 170, o.getY() - 80, o.getZ() - 140, o.getX() - 52.5, o.getY() + 90, o.getZ() + 140);
-            for (Entity e : level.getEntities((Entity) null, box, x -> x instanceof com.mmorpg.entity.NpcEntity
+            for (Entity e : level.getEntities((Entity) null, box, x -> (x instanceof com.mmorpg.entity.NpcEntity && isLegacyMarketNpc(x.getUUID()))
                     || (x instanceof net.minecraft.world.entity.Display.TextDisplay && x.entityTags().contains(TAG)))) {
                 e.discard();
                 n++;
@@ -380,6 +380,10 @@ public final class HubBuilder {
         text(c, 0, 12, 24, "TÉLÉPORTEUR", "#9FD8FF", 3.4F);
         text(c, 0, 17, HubLayout.ROOM_Z1 - 1, "ÉPREUVE DES HÉROS", "#FFC060", 5F);
         text(c, HubLayout.YARD_CENTER_X - 17, 11, 0, "AIRE D'ENTRAÎNEMENT", "#FFB070", 4F);
+        text(c,0,4.8,43,"BIENVENUE DANS AELORIA", "#FFD060",1.6F);
+        text(c,0,3.9,43,"1. Parle aux Maîtres et essaie une classe", "#F0E8D8",1.0F);
+        text(c,0,3.1,43,"2. Confirme ton choix puis rejoins le spawn", "#F0E8D8",1.0F);
+        text(c,0,2.3,43,"Guide complet : /tuto · Menu : M", "#9FD8FF",1.0F);
     }
 
     // ================================================================== PNJ et mannequins

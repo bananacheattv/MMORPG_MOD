@@ -201,9 +201,8 @@ public final class RpgPlayers {
         if (player.isAlive()) {
             double maxHp = d.stats.get(Stat.MAX_HP);
             double maxMana = d.stats.get(Stat.MAX_MANA);
-            boolean inCombat = player.getLastHurtByMobTimestamp() > 0 && player.tickCount - player.getLastHurtByMobTimestamp() < 100;
-            double hpRegen = d.stats.get(Stat.HP_REGEN) * (inCombat ? 0.5 : 1.0) / 20.0;
-            d.hp = (float) Math.min(maxHp, d.hp + hpRegen);
+            // One discrete pulse every five seconds, independent of food and the old base regen stat.
+            if (player.tickCount % 100 == 0) d.hp = (float) Math.min(maxHp, d.hp + maxHp * 0.01);
             d.mana = (float) Math.min(maxMana, d.mana + d.stats.get(Stat.MANA_REGEN) / 20.0);
             syncVanillaHealth(player);
         }
@@ -430,15 +429,12 @@ public final class RpgPlayers {
     /** Pioche et houe du debutant : de quoi extraire la Verdite des Mines d'Aeloria et cultiver les premieres graines. */
     public static void giveStarterTools(ServerPlayer player) {
         give(player, ModItems.get("pioche_debutant"), 1);
-        give(player, ModItems.get("hache_debutant"), 1);
-        give(player, ModItems.get("pelle_debutant"), 1);
         give(player, ModItems.get("houe_debutant"), 1);
-        give(player, ModItems.get("graine_lueur"), 12);
         player.sendSystemMessage(Component.literal("Vous avez reçu une ").withColor(0xE0D8C0)
                 .append(Component.literal("pioche").withColor(0xFFD040))
                 .append(Component.literal(" et une ").withColor(0xE0D8C0))
                 .append(Component.literal("houe du débutant").withColor(0xFFD040))
-                .append(Component.literal(", avec des graines de Lueur : le Maître des mines et les terres labourées vous attendent.").withColor(0xE0D8C0)));
+                .append(Component.literal(" : les mines et les terres labourées vous attendent.").withColor(0xE0D8C0)));
     }
 
     private static void giveStarterKit(ServerPlayer player, PlayerClass cls) {
@@ -592,7 +588,7 @@ public final class RpgPlayers {
         sync(player);
         BestiaryInfo.sendTo(player);
         PartyManager.sync(player);
-        if (!com.mmorpg.network.NetworkConfig.town()) return;
+        if (com.mmorpg.network.NetworkPlayers.isArriving(player) || !com.mmorpg.network.NetworkConfig.town()) return;
         if (!d.playerClass.isPlayable() && !com.mmorpg.hub.ClassTrial.active(player)) {
             // hub construit : cinematique a la premiere arrivee, puis choix aupres des Maitres de classe ; sinon ecran de choix classique
             if (com.mmorpg.hub.HubData.get(player.level().getServer()).exists()) {

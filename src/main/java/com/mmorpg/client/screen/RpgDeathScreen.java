@@ -17,6 +17,16 @@ public class RpgDeathScreen extends MmoScreen {
     private static final float DELAY = 1.6F;
     private final Payloads.DeathInfo info;
     private long openedAt;
+    private boolean respawnSent;
+
+    @Override public void tick() {
+        super.tick();
+        if (!respawnSent && seconds() >= DELAY && minecraft != null && minecraft.player != null) {
+            respawnSent = true;
+            if (!minecraft.player.isAlive()) minecraft.player.respawn();
+            minecraft.gui.setScreen(null);
+        }
+    }
 
     public RpgDeathScreen(Payloads.DeathInfo info) {
         super("Vous êtes mort");
@@ -148,7 +158,7 @@ public class RpgDeathScreen extends MmoScreen {
         // renaitre
         int bw2 = Math.min(width - 40, 180);
         boolean ready = t >= DELAY;
-        String label = ready ? "RENAÎTRE" : "RENAÎTRE  (" + Math.max(1, (int) Math.ceil(DELAY - t)) + ")";
+        String label = ready ? "RETOUR AU SPAWN" : "RETOUR AU SPAWN  (" + Math.max(1, (int) Math.ceil(DELAY - t)) + ")";
         float bin = Ease.OUT_CUBIC.apply((t - 1.8F) / 0.6F);
         if (bin > 0.02F) {
             button(g, cx - bw2 / 2, Math.round(height * 0.8F), bw2, 22, label, ready, 0xFF8A2A2A, () -> {

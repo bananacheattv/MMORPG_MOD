@@ -14,7 +14,7 @@ public final class ArenaManager {
     private static final Map<Key,LinkedHashSet<UUID>> QUEUES=new HashMap<>();
     public static final class Session {
         public final Key key;public final ArenaRules.Match match;public final Set<UUID> accepted=new HashSet<>();public final Map<UUID,Long> missing=new HashMap<>(),protectedUntil=new HashMap<>();
-        public final Map<UUID,Return> returns=new HashMap<>();public long deadline;public boolean active,test;public CompetitionWorld.Job build;public ArenaCrystal crystal;
+        public final Map<UUID,Return> returns=new HashMap<>();public long deadline;public boolean active,test;public UUID sharedId;public CompetitionWorld.Job build;public ArenaCrystal crystal;
         boolean readyToBuild(){return test||accepted.size()==key.kind.size*2;}
         boolean forfeited(){return match.teams.isEmpty()||(!test&&(!match.teams.containsValue(0)||!match.teams.containsValue(1)));}
         BlockPos center(){return CompetitionWorld.center(test?10+key.kind.ordinal()*8+key.bracket-5:key.pool());}
@@ -22,24 +22,30 @@ public final class ArenaManager {
     }
     public record Return(net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dim,double x,double y,double z,float yaw,float pitch){}
     static final Map<Key,Session> SESSIONS=new HashMap<>();private static MinecraftServer current;
+    public static boolean hasShared(UUID id){return SESSIONS.values().stream().anyMatch(s->id.equals(s.sharedId));}
     public static Session session(UUID id){return SESSIONS.values().stream().filter(s->s.match.teams.containsKey(id)).findFirst().orElse(null);}
-    public static boolean queued(UUID id){return QUEUES.values().stream().anyMatch(q->q.contains(id));}
+    public static boolean queued(UUID id){return SharedArenaQueue.queued(id)||QUEUES.values().stream().anyMatch(q->q.contains(id));}
     public static boolean active(ServerPlayer p){var s=session(p.getUUID());return s!=null&&s.active;}
     public static boolean enemies(net.minecraft.world.entity.player.Player a,net.minecraft.world.entity.player.Player b){var s=session(a.getUUID());return s!=null&&s.active&&s==session(b.getUUID())&&s.match.enemy(a.getUUID(),b.getUUID());}
     public static boolean protectedPlayer(ServerPlayer p){var s=session(p.getUUID());return s!=null&&(!s.active||s.protectedUntil.getOrDefault(p.getUUID(),0L)>p.level().getServer().getTickCount());}
-    public static void open(ServerPlayer p,String status){var t=new CompoundTag();t.putInt("bracket",ArenaRules.bracket(RpgPlayers.get(p).level));t.putString("status",status);var s=session(p.getUUID());t.putBoolean("active",s!=null&&s.active);t.putBoolean("queued",QUEUES.values().stream().anyMatch(q->q.contains(p.getUUID()))||s!=null);t.putString("match",s==null?"":s.match.id.toString());
-        for(var kind:ArenaRules.Kind.values()){int count=QUEUES.getOrDefault(new Key(kind,ArenaRules.bracket(RpgPlayers.get(p).level)),new LinkedHashSet<>()).size();t.putInt(kind.name(),count);}Net.toPlayer(p,new S2COpenScreen(S2COpenScreen.ARENA,t));}
+    public static void open(ServerPlayer p,String status){var t=new CompoundTag();t.putInt("bracket",ArenaRules.bracket(RpgPlayers.get(p).level));t.putString("status",status.isBlank()?SharedArenaQueue.status(p.getUUID()):status);t.putString("queueKind",SharedArenaQueue.kind(p.getUUID()));var s=session(p.getUUID());t.putBoolean("active",s!=null&&s.active);t.putBoolean("queued",queued(p.getUUID())||s!=null);t.putString("match",s==null?"":s.match.id.toString());
+        for(var kind:ArenaRules.Kind.values()){int count=NetworkConfig.current.enabled?SharedArenaQueue.count(kind,ArenaRules.bracket(RpgPlayers.get(p).level),p.getUUID()):QUEUES.getOrDefault(new Key(kind,ArenaRules.bracket(RpgPlayers.get(p).level)),new LinkedHashSet<>()).size();t.putInt(kind.name(),count);}Net.toPlayer(p,new S2COpenScreen(S2COpenScreen.ARENA,t));}
     public static void action(ServerPlayer p,CompoundTag t){try{switch(t.getStringOr("action","")){
         case "open"->open(p,"");case "join"->join(p,ArenaRules.Kind.valueOf(t.getStringOr("kind","")),t.getIntOr("bracket",-1));
-        case "ready"->{var s=session(p.getUUID());if(s!=null&&!s.active&&s.match.id.toString().equals(t.getStringOr("match",""))&&p.level().getServer().getTickCount()<=s.deadline){s.accepted.add(p.getUUID());open(p,"Prêt : "+s.accepted.size()+" / "+s.match.teams.size());}}
+        case "ready"->{if(NetworkConfig.current.enabled&&SharedArenaQueue.ready(p,t.getStringOr("match",""))){open(p,"Prêt : en attente des confirmations. Tu restes sur place.");return;}var s=session(p.getUUID());if(s!=null&&!s.active&&s.match.id.toString().equals(t.getStringOr("match",""))&&p.level().getServer().getTickCount()<=s.deadline){s.accepted.add(p.getUUID());open(p,"Prêt : "+s.accepted.size()+" / "+s.match.teams.size());}}
         case "leave"->{leave(p);open(p,"Inscription annulée / arène quittée.");}default->throw new IllegalArgumentException("Action inconnue.");}}catch(Exception e){open(p,e.getMessage());}}
     public static void join(ServerPlayer p,ArenaRules.Kind kind,int bracket){
         if(!RpgPlayers.get(p).playerClass.isPlayable())throw new IllegalArgumentException("Choisis d’abord ta classe.");
         if(p.isCreative()||p.isSpectator())throw new IllegalArgumentException("Passe en mode survie pour participer à une arène.");
         if(ArenaRules.bracket(RpgPlayers.get(p).level)!=bracket)throw new IllegalArgumentException("Cette arène ne correspond pas à ton niveau.");
         if(com.mmorpg.hub.ClassTrial.active(p)||session(p.getUUID())!=null||queued(p.getUUID())||GuildRaids.of(p.getUUID())!=null||com.mmorpg.dungeon.InstanceManager.containsPlayer(p))throw new IllegalArgumentException("Tu es déjà inscrit ou engagé dans une activité.");
-        if(CompetitionTravel.route(p,"arena:"+kind.name()+":"+bracket))return;
+        if(NetworkConfig.current.enabled){SharedArenaQueue.join(p,kind,bracket);open(p,"Inscrit : tu restes ici jusqu’à "+(kind.size*2)+" inscrits et leur confirmation.");return;}
         current=p.level().getServer();QUEUES.computeIfAbsent(new Key(kind,bracket),k->new LinkedHashSet<>()).add(p.getUUID());open(p,"Inscription confirmée : attente des autres joueurs.");
+    }
+    public static void startShared(MinecraftServer server,SharedArenaQueue.Match match){
+        Key key=new Key(match.kind,match.bracket);
+        if(SESSIONS.containsKey(key))throw new IllegalArgumentException("Cette arène est déjà occupée.");
+        Session s=new Session(key,server.getTickCount());s.sharedId=match.id;s.match.teams.putAll(match.teams);s.accepted.addAll(match.teams.keySet());SESSIONS.put(key,s);
     }
     public static void test(ServerPlayer p,ArenaRules.Kind kind){
         CompetitionAdmin.require(p);CompetitionAdmin.available(p);
@@ -54,9 +60,9 @@ public final class ArenaManager {
         if(s==null||!s.test||!s.active)throw new IllegalArgumentException("Lance d’abord une arène de test et attends sa préparation.");
         s.match.teams.put(p.getUUID(),team);p.sendSystemMessage(Component.literal("Équipe de test : "+(team==0?"rouge":"bleue")+". Frappe le cristal pour le capturer."));
     }
-    public static void leave(ServerPlayer p){QUEUES.values().forEach(q->q.remove(p.getUUID()));var s=session(p.getUUID());if(s==null){if(CompetitionTravel.inside(p))CompetitionTravel.home(p);return;}s.match.teams.remove(p.getUUID());s.accepted.remove(p.getUUID());restore(p,s);if(!s.active)cancel(s,p.level().getServer(),p.getUUID());}
+    public static void leave(ServerPlayer p){if(NetworkConfig.current.enabled)SharedArenaQueue.leave(p);QUEUES.values().forEach(q->q.remove(p.getUUID()));var s=session(p.getUUID());if(s==null){if(CompetitionTravel.inside(p))CompetitionTravel.home(p);return;}s.match.teams.remove(p.getUUID());s.accepted.remove(p.getUUID());restore(p,s);if(!s.active)cancel(s,p.level().getServer(),p.getUUID());}
     private static void popup(ServerPlayer p,Session s){var t=new CompoundTag();t.putString("match",s.match.id.toString());t.putString("arena",s.key.kind.label);t.putInt("seconds",30);Net.toPlayer(p,new S2COpenScreen(S2COpenScreen.ARENA_READY,t));}
-    private static void cancel(Session s,MinecraftServer server,UUID excluded){SESSIONS.remove(s.key);for(UUID id:s.match.teams.keySet()){var p=server.getPlayerList().getPlayer(id);if(p!=null){if(!s.test&&!id.equals(excluded)&&s.accepted.contains(id))QUEUES.computeIfAbsent(s.key,k->new LinkedHashSet<>()).add(id);else if(NetworkConfig.current.enabled)CompetitionTravel.home(p);p.sendSystemMessage(Component.literal("Arène annulée : un joueur n’a pas confirmé. Les joueurs prêts sont réinscrits."));}}}
+    private static void cancel(Session s,MinecraftServer server,UUID excluded){SESSIONS.remove(s.key);if(s.sharedId!=null)SharedArenaQueue.finish(server,s.sharedId);for(UUID id:s.match.teams.keySet()){var p=server.getPlayerList().getPlayer(id);if(p!=null){if(s.sharedId==null&&!s.test&&!id.equals(excluded)&&s.accepted.contains(id))QUEUES.computeIfAbsent(s.key,k->new LinkedHashSet<>()).add(id);else if(NetworkConfig.current.enabled)CompetitionTravel.home(p);p.sendSystemMessage(Component.literal("Arène annulée : un joueur n’a pas confirmé. Les joueurs prêts sont réinscrits."));}}}
     private static void start(Session s,MinecraftServer server){
         var level=CompetitionWorld.level(server);s.active=true;s.match.started=server.getTickCount();var c=s.center();
         for(UUID id:s.match.teams.keySet()){var p=server.getPlayerList().getPlayer(id);if(p==null||(!s.test&&(ArenaRules.bracket(RpgPlayers.get(p).level)!=s.key.bracket||p.isCreative()||p.isSpectator()))){s.active=false;cancel(s,server,id);return;}}
@@ -67,8 +73,9 @@ public final class ArenaManager {
     public static boolean lethal(ServerPlayer victim,net.minecraft.world.entity.Entity attacker){var s=session(victim.getUUID());if(s==null||!s.active)return false;if(attacker==null&&victim.getLastHurtByPlayer() instanceof ServerPlayer recent)attacker=recent;if(attacker instanceof ServerPlayer killer)s.match.kill(killer.getUUID(),victim.getUUID());spawn(victim,s);return true;}
     public static boolean capture(ArenaCrystal crystal,ServerPlayer p){var s=session(p.getUUID());if(s==null||!s.active||s.crystal!=crystal||protectedPlayer(p))return false;s.match.capture(p.getUUID(),p.level().getServer().getTickCount());crystal.setTeam(s.match.owner);return true;}
     private static void restore(ServerPlayer p,Session s){RpgPlayers.fullRestore(p);p.clearFire();p.removeAllEffects();var r=s.returns.remove(p.getUUID());if(NetworkConfig.current.enabled){CompetitionTravel.home(p);return;}if(r!=null){var l=p.level().getServer().getLevel(r.dim);if(l!=null){p.teleportTo(l,r.x,r.y,r.z,Set.of(),r.yaw,r.pitch,true);return;}}CompetitionTravel.home(p);}
-    private static void finish(Session s,MinecraftServer server){if(s.crystal!=null)s.crystal.discard();SESSIONS.remove(s.key);int winner=s.match.winner();for(UUID id:new ArrayList<>(s.match.teams.keySet())){var p=server.getPlayerList().getPlayer(id);if(p!=null){p.sendSystemMessage(Component.literal("Fin de l’arène : "+(winner<0?"égalité":winner==0?"victoire rouge":"victoire bleue")+" · "+s.match.red+" / "+s.match.blue));restore(p,s);}}}
+    private static void finish(Session s,MinecraftServer server){if(s.sharedId!=null)SharedArenaQueue.finish(server,s.sharedId);if(s.crystal!=null)s.crystal.discard();SESSIONS.remove(s.key);int winner=s.match.winner();for(UUID id:new ArrayList<>(s.match.teams.keySet())){var p=server.getPlayerList().getPlayer(id);if(p!=null){p.sendSystemMessage(Component.literal("Fin de l’arène : "+(winner<0?"égalité":winner==0?"victoire rouge":"victoire bleue")+" · "+s.match.red+" / "+s.match.blue));restore(p,s);}}}
     public static void tick(MinecraftServer server){
+        SharedArenaQueue.tick(server);
         current=server;long tick=server.getTickCount();if(!NetworkConfig.hosts(NetworkConfig.Role.DUNGEONS))return;
         for(var key:new ArrayList<>(QUEUES.keySet())){var q=QUEUES.get(key);q.removeIf(id->{var p=server.getPlayerList().getPlayer(id);return p==null||ArenaRules.bracket(RpgPlayers.get(p).level)!=key.bracket;});
             if(!SESSIONS.containsKey(key)&&q.size()>=key.kind.size*2){Session s=new Session(key,tick);List<ServerPlayer> players=new ArrayList<>();for(UUID id:new ArrayList<>(q)){players.add(server.getPlayerList().getPlayer(id));q.remove(id);if(players.size()==key.kind.size*2)break;}var levels=new LinkedHashMap<UUID,Integer>();for(var p:players)levels.put(p.getUUID(),RpgPlayers.get(p).level);s.match.teams.putAll(ArenaRules.balance(key.kind,key.bracket,levels));SESSIONS.put(key,s);for(var p:players)popup(p,s);}}

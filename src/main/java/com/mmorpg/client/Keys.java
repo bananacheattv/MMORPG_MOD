@@ -22,6 +22,8 @@ public final class Keys {
     /** Saute la cinematique d'arrivee. */
     public static final KeyMapping SKIP = new KeyMapping("key.mmorpg.skip", InputConstants.KEY_SPACE, CATEGORY);
     public static final KeyMapping HUD_EDIT = new KeyMapping("key.mmorpg.hud_edit", InputConstants.KEY_U, CATEGORY);
+    public static final KeyMapping CAMERA_NEAR = new KeyMapping("key.mmorpg.camera_near", InputConstants.KEY_PAGEUP, CATEGORY);
+    public static final KeyMapping CAMERA_FAR = new KeyMapping("key.mmorpg.camera_far", InputConstants.KEY_PAGEDOWN, CATEGORY);
     public static final KeyMapping[] SKILLS = createSkills();
 
     private Keys() {
@@ -45,12 +47,16 @@ public final class Keys {
         event.register(HUD_EDIT);
         event.register(SKIP);
         event.register(MOUNT);
+        event.register(CAMERA_NEAR);
+        event.register(CAMERA_FAR);
         for (KeyMapping skill : SKILLS) event.register(skill);
     }
 
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
+        while (CAMERA_NEAR.consumeClick()) if (mc.player != null && mc.gui.screen() == null) MountCameraClient.zoom(-1);
+        while (CAMERA_FAR.consumeClick()) if (mc.player != null && mc.gui.screen() == null) MountCameraClient.zoom(1);
         while (MENU.consumeClick()) {
             if (mc.player != null && mc.level != null && mc.gui.screen() == null) {
                 MenuScreen.open(MenuScreen.lastTab);

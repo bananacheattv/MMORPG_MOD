@@ -141,7 +141,7 @@ public class LootTables {
             merge(t.getValue(), "mmorpg:sceau_", "mmorpg:sceau_mystere");
         }
         for (List<Entry> list : tables.values()) {
-            list.removeIf(x -> x == null || x.item == null || x.item.isBlank());
+            list.removeIf(x -> x == null || x.item == null || x.item.isBlank() || com.mmorpg.server.RetiredItems.id(x.item));
             for (Entry x : list) {
                 x.min = Math.max(1, x.min);
                 x.max = Math.max(x.min, x.max);

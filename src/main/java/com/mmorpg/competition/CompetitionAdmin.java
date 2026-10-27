@@ -18,7 +18,6 @@ public final class CompetitionAdmin {
     }
     public static void available(ServerPlayer p){
         if(ArenaManager.session(p.getUUID())!=null||ArenaManager.queued(p.getUUID())||GuildRaids.of(p.getUUID())!=null||com.mmorpg.dungeon.InstanceManager.containsPlayer(p)||com.mmorpg.hub.ClassTrial.active(p))throw new IllegalArgumentException("Quitte ton activité actuelle avant de lancer un test.");
-        if(!com.mmorpg.server.RpgPlayers.get(p).playerClass.isPlayable())throw new IllegalArgumentException("Choisis d’abord une classe pour tester le combat.");
     }
     public static void arrive(ServerPlayer p,String destination){
         require(p);String[] parts=destination.split(":");

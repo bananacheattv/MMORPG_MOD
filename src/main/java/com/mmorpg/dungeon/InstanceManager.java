@@ -141,8 +141,9 @@ public final class InstanceManager {
     public static boolean enterPool(ServerPlayer player, String pool) {
         if (!validPool(pool)) return false;
         if (!com.mmorpg.server.PortalAccess.consume(player,"donjon")) return false;
+        if (com.mmorpg.network.GroupTravel.begin(player,"donjon",pool)) return true;
         if (com.mmorpg.network.DungeonTravel.enterRemote(player, pool)) return true;
-        return enterLocal(player, pool, true);
+        return enterLocal(player, pool, !com.mmorpg.network.GroupTravel.individual());
     }
     /** Each proxy arrival joins the same owner reservation without teleporting teammates already inside. */
     public static boolean enterArriving(ServerPlayer player, String pool) {
@@ -165,7 +166,6 @@ public final class InstanceManager {
         int color = StyledDungeon.colorOf(t);
         long at = server.overworld().getGameTime() + MIN_LOADING_TICKS;
         for (ServerPlayer m : groupEntry ? PartyManager.onlineMembers(player) : java.util.List.of(player)) {
-            if (m != player && (m.level() != player.level() || m.distanceToSqr(player) > 24 * 24)) continue;       // les autres membres rejoignent par le PNJ
             if (RpgPlayers.get(m).level < com.mmorpg.dungeon.DungeonMaster.requiredLevel(typeOf(pool), difficultyOf(pool))) continue;
             if (!m.level().dimension().equals(DIM)) RETURNS.put(m.getUUID(), new Return(m.level().dimension(), m.getX(), m.getY(), m.getZ(), m.getYRot()));
             com.mmorpg.server.AdventureSummary.begin(m,"donjon");
@@ -389,7 +389,7 @@ public final class InstanceManager {
     public static final int EXIT_SECONDS = 15;
 
     /** Exemplaire dont l'emprise contient la position, ou {@code null}. */
-    static @Nullable Slot slotAt(MinecraftServer server, ServerLevel level, double x, double z) {
+    public static @Nullable Slot slotAt(MinecraftServer server, ServerLevel level, double x, double z) {
         if (!level.dimension().equals(DIM)) return null;
         for (Slot s : InstanceData.get(server).slots) {
             if (Math.abs(x - s.x) < 40 && z > s.z - 6 && z < s.z + Layout.LENGTH + 6) return s;

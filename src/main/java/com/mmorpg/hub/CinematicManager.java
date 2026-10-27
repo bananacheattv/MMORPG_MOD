@@ -51,7 +51,7 @@ public final class CinematicManager {
         Vec3 spawn = HubLayout.center(hubOrigin, HubLayout.SPAWN);
         p.stopRiding();
         p.teleportTo(level, spawn.x, spawn.y, spawn.z, Set.of(), 180F, 6F, true);
-        String json = CinematicConfig.load();
+        String json = CinematicConfig.shortened(CinematicConfig.load());
         double seconds = CinematicConfig.totalSeconds(json);
         LOCKED.put(p.getUUID(), new Lock(p.level().getGameTime() + (long) (seconds * 20) + 400, spawn));
         CompoundTag t = new CompoundTag();
@@ -74,6 +74,7 @@ public final class CinematicManager {
         p.teleportTo(p.level(), lock.pos.x, lock.pos.y, lock.pos.z, Set.of(), 180F, 6F, true);
         if (wasFirst && !RpgPlayers.get(p).playerClass.isPlayable()) {
             p.sendOverlayMessage(Component.literal("Parlez aux Maîtres de classe : essayez, puis choisissez votre voie.").withColor(0xFFE6A0));
+            Net.toPlayer(p,new S2COpenScreen(S2COpenScreen.HUB_TUTORIAL,new CompoundTag()));
         }
     }
 

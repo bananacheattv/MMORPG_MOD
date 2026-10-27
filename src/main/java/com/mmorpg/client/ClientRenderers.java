@@ -40,25 +40,17 @@ public final class ClientRenderers {
         for(int i=0;i<10;i++){final int tier=i;event.registerEntityRenderer(ModEntities.GUILD_GUARDIANS.get(i).get(),c->new com.mmorpg.client.model.YggdrasilRenderer(c,tier));}
         event.registerEntityRenderer(ModEntities.ARENA_CRYSTAL.get(),com.mmorpg.client.model.ArenaCrystalRenderer::new);
         ModEntities.IMPORTED.forEach((key, type) -> event.registerEntityRenderer(type.get(), c -> new com.mmorpg.client.model.imported.ImportedMobRenderer(c, key)));
-        event.registerEntityRenderer(ModEntities.CRYPT_ZOMBIE.get(), net.minecraft.client.renderer.entity.ZombieRenderer::new);
-        event.registerEntityRenderer(ModEntities.VENOM_SPIDER.get(), net.minecraft.client.renderer.entity.CaveSpiderRenderer::new);
-        event.registerEntityRenderer(ModEntities.BANDIT.get(), net.minecraft.client.renderer.entity.PillagerRenderer::new);
-        event.registerEntityRenderer(ModEntities.GOBLIN.get(), c -> humanoid(c, "gobelin"));
-        event.registerEntityRenderer(ModEntities.DARK_WOLF.get(), c -> new TexturedMobRenderer<>(c,
-                new AdultWolfModel(c.bakeLayer(ModelLayers.WOLF)), WolfRenderState::new, "loup_sombre", 0.4F)
-                .extra((entity, state) -> {
-                    state.isAngry = true;
-                    state.tailAngle = (float) (Math.PI / 4);
-                    state.texture = MMORPG.id("textures/entity/loup_sombre.png");
-                }));
-        event.registerEntityRenderer(ModEntities.CURSED_SKELETON.get(), c -> new HumanoidRenderer<>(c,
-                new SkeletonModel<SkeletonRenderState>(c.bakeLayer(ModelLayers.SKELETON)), SkeletonRenderState::new, "squelette_maudit"));
-        event.registerEntityRenderer(ModEntities.ORC.get(), c -> humanoid(c, "orc_guerrier"));
-        event.registerEntityRenderer(ModEntities.FIRE_ELEMENTAL.get(), c -> new TexturedMobRenderer<>(c,
-                new BlazeModel(c.bakeLayer(ModelLayers.BLAZE)), LivingEntityRenderState::new, "elementaire_feu", 0.5F));
-        event.registerEntityRenderer(ModEntities.ICE_WRAITH.get(), c -> humanoid(c, "spectre_givre"));
-        event.registerEntityRenderer(ModEntities.CRYSTAL_GOLEM.get(), c -> golem(c, "golem_cristal"));
-        event.registerEntityRenderer(ModEntities.VOID_KNIGHT.get(), c -> humanoid(c, "chevalier_neant"));
+        event.registerEntityRenderer(ModEntities.CRYPT_ZOMBIE.get(),c->new com.mmorpg.client.model.imported.ClassicMobRenderer<>(c,"zombie_des_cryptes"));
+        event.registerEntityRenderer(ModEntities.VENOM_SPIDER.get(),c->new com.mmorpg.client.model.imported.ClassicMobRenderer<>(c,"araignee_venimeuse"));
+        event.registerEntityRenderer(ModEntities.BANDIT.get(),c->new com.mmorpg.client.model.imported.ClassicMobRenderer<>(c,"bandit_arbaletrier"));
+        event.registerEntityRenderer(ModEntities.GOBLIN.get(),c->new com.mmorpg.client.model.imported.ClassicMobRenderer<>(c,"gobelin"));
+        event.registerEntityRenderer(ModEntities.DARK_WOLF.get(),c->new com.mmorpg.client.model.imported.ClassicMobRenderer<>(c,"loup_sombre"));
+        event.registerEntityRenderer(ModEntities.CURSED_SKELETON.get(),c->new com.mmorpg.client.model.imported.ClassicMobRenderer<>(c,"squelette_maudit"));
+        event.registerEntityRenderer(ModEntities.ORC.get(),c->new com.mmorpg.client.model.imported.ClassicMobRenderer<>(c,"orc_guerrier"));
+        event.registerEntityRenderer(ModEntities.FIRE_ELEMENTAL.get(),c->new com.mmorpg.client.model.imported.ClassicMobRenderer<>(c,"elementaire_feu"));
+        event.registerEntityRenderer(ModEntities.ICE_WRAITH.get(),c->new com.mmorpg.client.model.imported.ClassicMobRenderer<>(c,"spectre_givre"));
+        event.registerEntityRenderer(ModEntities.CRYSTAL_GOLEM.get(),c->new com.mmorpg.client.model.imported.ClassicMobRenderer<>(c,"golem_cristal"));
+        event.registerEntityRenderer(ModEntities.VOID_KNIGHT.get(),c->new com.mmorpg.client.model.imported.ClassicMobRenderer<>(c,"chevalier_neant"));
         // boss : modeles animes Blockbench (art/boss_blockbench), voir AnimatedModels
         event.registerEntityRenderer(ModEntities.GOBLIN_KING.get(), AnimatedModels::goblinKing);
         event.registerEntityRenderer(ModEntities.LICH.get(), AnimatedModels::lich);
