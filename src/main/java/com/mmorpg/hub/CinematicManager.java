@@ -74,7 +74,7 @@ public final class CinematicManager {
         p.teleportTo(p.level(), lock.pos.x, lock.pos.y, lock.pos.z, Set.of(), 180F, 6F, true);
         if (wasFirst && !RpgPlayers.get(p).playerClass.isPlayable()) {
             p.sendOverlayMessage(Component.literal("Parlez aux Maîtres de classe : essayez, puis choisissez votre voie.").withColor(0xFFE6A0));
-            Net.toPlayer(p,new S2COpenScreen(S2COpenScreen.HUB_TUTORIAL,new CompoundTag()));
+            HubGuides.point(p);
         }
     }
 

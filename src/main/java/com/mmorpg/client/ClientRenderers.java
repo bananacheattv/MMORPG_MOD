@@ -63,9 +63,10 @@ public final class ClientRenderers {
         event.registerEntityRenderer(ModEntities.PET.get(), com.mmorpg.client.model.pet.PetRenderer::new);     // familiers 3D animes
         ModEntities.MOUNTS.forEach((type, entity) -> event.registerEntityRenderer(entity.get(),
                 c -> new com.mmorpg.client.model.mount.MountRenderer(c, type)));     // montures 3D animees
+        event.registerEntityRenderer(ModEntities.HUB_GUIDE.get(), com.mmorpg.client.model.imported.HubGuideRenderer::new);
         event.registerEntityRenderer(ModEntities.NPC.get(), NpcRenderer::new);
         event.registerEntityRenderer(ModEntities.TRAINING_DUMMY.get(), com.mmorpg.client.model.dummy.DummyRenderer::new);
-        event.registerEntityRenderer(ModEntities.CLASS_MASTER.get(), com.mmorpg.client.model.hub.MasterRenderer::new);
+        event.registerEntityRenderer(ModEntities.CLASS_MASTER.get(), com.mmorpg.client.model.imported.AuthoredMasterRenderer::new);
     }
 
     private static <T extends Mob> HumanoidRenderer<T, HumanoidRenderState> humanoid(EntityRendererProvider.Context c, String texture) {

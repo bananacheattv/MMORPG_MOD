@@ -14,6 +14,7 @@ import org.jspecify.annotations.Nullable;
  */
 public class HubPlayerData implements ValueIOSerializable {
     public boolean cinematicSeen;
+    public int tutorialMask;
     /** Copie du hub attribuee au joueur (0 = Hub 1). */
     public int hub;
     /** Bit (ordinal de la classe) a 1 : la classe a deja ete essayee. */
@@ -39,6 +40,7 @@ public class HubPlayerData implements ValueIOSerializable {
         t.putBoolean("cinematic", cinematicSeen);
         t.putInt("hub", hub);
         t.putInt("tried", triedMask);
+        t.putInt("tutorial", tutorialMask);
         t.putBoolean("inTrial", inTrial);
         t.putInt("trialClass", trialClass);
         t.putInt("trialLevel", trialLevel);
@@ -60,6 +62,7 @@ public class HubPlayerData implements ValueIOSerializable {
             cinematicSeen = t.getBooleanOr("cinematic", false);
             hub = t.getIntOr("hub", 0);
             triedMask = t.getIntOr("tried", 0);
+            tutorialMask = t.getIntOr("tutorial", 0);
             inTrial = t.getBooleanOr("inTrial", false);
             trialClass = t.getIntOr("trialClass", 0);
             trialLevel = t.getIntOr("trialLevel", 1);

@@ -89,10 +89,18 @@ En survie, les boss attaquent normalement ; en créatif, ils peuvent être obser
 ## Équipement et construction — bêta 0.0
 
 - Paladin avec un marteau : bouclier visuel de classe automatique, cinq apparences selon le niveau. La seconde main ne reçoit pas d’objets manuellement.
-- `/tuto` : revoir le guide du hub. Les séquences de présentation des classes sont raccourcies.
+- `/tuto` : retrouver le prochain PNJ du tutoriel dans le hub. Les séquences de présentation des classes sont raccourcies.
 - `/outilarmure` : outil administrateur pour équiper et poser les porte-armures, déplacer leurs membres, choisir une posture et régler leur position. Également accessible dans l’outil d’aménagement.
 - Forge : recettes classées par niveau ; mannequins retirés des consommables ; anciennes haches, pelles, caisse et clé d’aventure retirées de la progression. Les anciens identifiants restent réservés pour charger les sauvegardes.
 - Orbe de renaissance : choisir à nouveau sa classe en repartant au niveau 1.
 - Outils : quatre runes, cinq rangs chacune, dans Amélioration. Abondance augmente le rendement, Prospection les chances rares de la pioche, Célérité la vitesse et la zone de récolte de la houe, Ténacité économise la durabilité. Chaque rang consomme sa rune et de l’or ; le coût est affiché avant l’amélioration.
 - Tables de craft, fours, enclumes et tables d’enchantement vanilla désactivés, y compris la cuisson automatisée.
 - Les PNJ personnalisés du marché ne sont plus supprimés par le nettoyage des anciens marchands. Les textes ont une portée accrue ; les PNJ et mannequins ne tombent plus dans le vide.
+
+## Tutoriel incarné — bêta 0.0
+
+Sélène accueille les héros, Kaël explique les expéditions, Borin la forge et les runes, Élyra les guildes et Néria les arènes. Clic droit (ou clic gauche) pour leur parler, puis « Merci, j’ai compris » pour mémoriser l’étape. Les conversations restent accessibles après validation ; `/tuto` indique le prochain guide et le met brièvement en surbrillance si son chunk est chargé.
+
+Les quatre Maîtres de classe et le Gardien de l’épreuve ont également de nouveaux modèles cubiques articulés. Les essais et le choix de classe gardent leur fonctionnement. Le premier tutoriel ne s’ouvre plus automatiquement sous forme de livre après la cinématique : il oriente vers Sélène.
+
+L’ancien bloc téléporteur du hub est retiré automatiquement à son emplacement connu, avec son point de passage. Le reste du décor est conservé ; les portails physiques des expéditions sont inchangés. Aucun changement de numéro de plan et aucune reconstruction du hub ne sont nécessaires.

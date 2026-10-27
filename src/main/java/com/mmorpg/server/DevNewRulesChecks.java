@@ -46,6 +46,7 @@ public final class DevNewRulesChecks {
             p.getMainHandItem().use(p.level(),p,net.minecraft.world.InteractionHand.MAIN_HAND);check(d.level==1&&d.xp==0&&d.playerClass==PlayerClass.NONE,"rebirth resets class and level");
             var world=com.mmorpg.competition.CompetitionWorld.level(server);var center=new BlockPos(500,100,4000);var cave=com.mmorpg.competition.CompetitionWorld.raid(center,0);while(!cave.done())cave.tick(world);
             check(!world.getBlockState(center.offset(0,43,0)).isAir(),"cave has solid ceiling");check(!world.getBlockState(center.offset(40,10,0)).isAir(),"cave has solid walls");check(world.getBlockState(center.above(5)).isAir(),"cave central combat space clear");
+            DevHubGuideChecks.run(p);
             com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] NEW_RULES PASS: stations, retired sources/inventory, short cinematic, bound paladin shield, four runes, armor stand equipment/pose/position, rebirth and solid cavern");
         } finally {com.mmorpg.network.NetworkConfig.current=cfg;}
     }

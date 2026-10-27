@@ -1,0 +1,383 @@
+[
+  {
+    "id": "selene",
+    "bones": 7,
+    "meshes": 90,
+    "faces": 540,
+    "vertices": 720,
+    "emissive": 0,
+    "animations": [
+      "walk",
+      "idle",
+      "attack",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      0,
+      14,
+      4,
+      9,
+      8,
+      5,
+      10,
+      11,
+      7
+    ],
+    "bounds": {
+      "min": [
+        -8.55,
+        0,
+        -4.4
+      ],
+      "max": [
+        7.95,
+        33.5,
+        4.4
+      ]
+    }
+  },
+  {
+    "id": "kael",
+    "bones": 7,
+    "meshes": 105,
+    "faces": 630,
+    "vertices": 840,
+    "emissive": 0,
+    "animations": [
+      "walk",
+      "idle",
+      "attack",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      0,
+      14,
+      4,
+      9,
+      8,
+      6,
+      10,
+      11,
+      7
+    ],
+    "bounds": {
+      "min": [
+        -8.85,
+        0,
+        -4.4
+      ],
+      "max": [
+        7.95,
+        33.55,
+        6.2
+      ]
+    }
+  },
+  {
+    "id": "borin",
+    "bones": 7,
+    "meshes": 82,
+    "faces": 492,
+    "vertices": 656,
+    "emissive": 0,
+    "animations": [
+      "walk",
+      "idle",
+      "attack",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      2,
+      13,
+      4,
+      9,
+      14,
+      8,
+      10,
+      12,
+      15
+    ],
+    "bounds": {
+      "min": [
+        -11.75,
+        0,
+        -4.699999999999999
+      ],
+      "max": [
+        8.95,
+        28.5,
+        4.4
+      ]
+    }
+  },
+  {
+    "id": "elyra",
+    "bones": 7,
+    "meshes": 108,
+    "faces": 648,
+    "vertices": 864,
+    "emissive": 1,
+    "animations": [
+      "walk",
+      "idle",
+      "attack",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      0,
+      13,
+      4,
+      6,
+      14,
+      8,
+      10,
+      9,
+      15,
+      5,
+      11
+    ],
+    "bounds": {
+      "min": [
+        -8.55,
+        0,
+        -4.4
+      ],
+      "max": [
+        7.95,
+        36.35,
+        4.4
+      ]
+    }
+  },
+  {
+    "id": "neria",
+    "bones": 7,
+    "meshes": 90,
+    "faces": 540,
+    "vertices": 720,
+    "emissive": 0,
+    "animations": [
+      "walk",
+      "idle",
+      "attack",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      1,
+      14,
+      4,
+      9,
+      8,
+      5,
+      10,
+      12
+    ],
+    "bounds": {
+      "min": [
+        -9.5,
+        0,
+        -4.7
+      ],
+      "max": [
+        7.95,
+        37.5,
+        4.5
+      ]
+    }
+  },
+  {
+    "id": "master_guerrier",
+    "bones": 7,
+    "meshes": 121,
+    "faces": 726,
+    "vertices": 968,
+    "emissive": 0,
+    "animations": [
+      "walk",
+      "idle",
+      "attack",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      0,
+      14,
+      4,
+      9,
+      8,
+      7,
+      10,
+      12
+    ],
+    "bounds": {
+      "min": [
+        -10.3,
+        -0.10000000000000009,
+        -4.4
+      ],
+      "max": [
+        10.3,
+        34.1,
+        4.4
+      ]
+    }
+  },
+  {
+    "id": "master_mage",
+    "bones": 7,
+    "meshes": 118,
+    "faces": 708,
+    "vertices": 944,
+    "emissive": 7,
+    "animations": [
+      "walk",
+      "idle",
+      "attack",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      0,
+      14,
+      4,
+      9,
+      8,
+      5,
+      10,
+      15,
+      11
+    ],
+    "bounds": {
+      "min": [
+        -8.55,
+        0,
+        -5
+      ],
+      "max": [
+        7.95,
+        45.55,
+        5
+      ]
+    }
+  },
+  {
+    "id": "master_archer",
+    "bones": 7,
+    "meshes": 117,
+    "faces": 702,
+    "vertices": 936,
+    "emissive": 0,
+    "animations": [
+      "walk",
+      "idle",
+      "attack",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      0,
+      14,
+      4,
+      9,
+      8,
+      6,
+      10,
+      11,
+      7
+    ],
+    "bounds": {
+      "min": [
+        -8.85,
+        0,
+        -4.4
+      ],
+      "max": [
+        7.95,
+        34.1,
+        6.2
+      ]
+    }
+  },
+  {
+    "id": "master_paladin",
+    "bones": 7,
+    "meshes": 119,
+    "faces": 714,
+    "vertices": 952,
+    "emissive": 1,
+    "animations": [
+      "walk",
+      "idle",
+      "attack",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      0,
+      13,
+      4,
+      9,
+      14,
+      8,
+      10,
+      12,
+      15,
+      5
+    ],
+    "bounds": {
+      "min": [
+        -10,
+        0,
+        -4.65
+      ],
+      "max": [
+        10,
+        33.5,
+        4.5
+      ]
+    }
+  },
+  {
+    "id": "master_epreuve",
+    "bones": 7,
+    "meshes": 112,
+    "faces": 672,
+    "vertices": 896,
+    "emissive": 2,
+    "animations": [
+      "walk",
+      "idle",
+      "attack",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      0,
+      14,
+      4,
+      9,
+      8,
+      5,
+      10,
+      12,
+      15
+    ],
+    "bounds": {
+      "min": [
+        -8.5,
+        0,
+        -4.4
+      ],
+      "max": [
+        8.5,
+        36.5,
+        4.4
+      ]
+    }
+  }
+]

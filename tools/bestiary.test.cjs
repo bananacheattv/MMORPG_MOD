@@ -2,7 +2,7 @@ const {test}=require('node:test'),assert=require('node:assert/strict'),fs=requir
 const ROOT=path.resolve(__dirname,'..'),RES=path.join(ROOT,'src/main/resources/assets/mmorpg');
 const flatten=n=>[n,...(n.children||[]).flatMap(flatten)];
 test('all refined cubic rigs retain valid UVs, bones, textures and animation targets',()=>{
- for(const [kind,expected]of[['classic',11],['mobs',30],['mounts',12]]){
+ for(const [kind,expected]of[['classic',11],['mobs',30],['mounts',12],['guides',10]]){
   const files=fs.readdirSync(path.join(RES,'bbmodels',kind)).filter(f=>f.endsWith('.json'));assert.equal(files.length,expected);
   for(const file of files){const d=JSON.parse(fs.readFileSync(path.join(RES,'bbmodels',kind,file))),nodes=d.parts.flatMap(flatten),bones=new Set(nodes.filter(n=>n.children).map(n=>n.uuid)),leaves=nodes.filter(n=>!n.children);
    assert.equal(d.revision,3,file);assert.ok(leaves.length>=40,file);assert.ok(bones.size>=5,file);assert.ok(d.animations.length>=2,file);
