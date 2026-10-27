@@ -15,6 +15,15 @@ public final class DevVisualChecks {
             var server=p.level().getServer();var level=server.overworld();
             server.getPlayerList().op(new net.minecraft.server.players.NameAndId(p.getGameProfile()));
             com.mmorpg.hub.CinematicManager.finish(p);p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+            if(Boolean.getBoolean("mmorpg.guideVisual")){
+                com.mmorpg.config.ConfigManager.general().customSpawning=false;
+                for(int x=-10;x<=40;x++)for(int z=-5;z<=18;z++)level.setBlockAndUpdate(new BlockPos(x,219,z),net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState());
+                for(int i=0;i<5;i++){
+                    var guide=com.mmorpg.registry.ModEntities.HUB_GUIDE.get().create(level,net.minecraft.world.entity.EntitySpawnReason.COMMAND);guide.guide(i);guide.snapTo(i*5,220,0,0,0);level.addFreshEntity(guide);
+                    var master=com.mmorpg.registry.ModEntities.CLASS_MASTER.get().create(level,net.minecraft.world.entity.EntitySpawnReason.COMMAND);master.setup(i);master.snapTo(i*5,220,7,0,0);master.setNoGravity(true);level.addFreshEntity(master);
+                }
+                p.teleportTo(level,10,222,15,java.util.Set.of(),180,8,true);p.getAbilities().flying=true;p.onUpdateAbilities();return;
+            }
             if(Boolean.getBoolean("mmorpg.socialVisual")){
                 com.mmorpg.config.ConfigManager.general().customSpawning=false;
                 RpgPlayers.get(p).playerClass=com.mmorpg.rpg.PlayerClass.GUERRIER;
@@ -48,6 +57,14 @@ public final class DevVisualChecks {
             SpawnEditor.open(p,new BlockPos(-4,220,4));SpawnEditor.placeOriented(p,"caisse_commune_bloc","moi");
             var npc=com.mmorpg.world.DungeonBuilder.spawnNpc(level,new BlockPos(6,220,8),com.mmorpg.entity.NpcEntity.Role.MARCHAND,"Échoppe visuelle",0,0);
             Scheduler.later(level,40,()->MerchantEditor.open(p,npc));
+        });
+    }
+    @SubscribeEvent public static void guideDimension(PlayerEvent.PlayerChangedDimensionEvent event){
+        if(!Boolean.getBoolean("mmorpg.guideVisual")||!(event.getEntity() instanceof net.minecraft.server.level.ServerPlayer p)||!p.level().dimension().equals(com.mmorpg.hub.HubManager.HUB_DIM))return;
+        Scheduler.later(p.level(),20,()->{for(int i=0;i<5;i++){var actor=p.level().getEntity(com.mmorpg.hub.HubGuides.id(0,i));if(actor!=null)actor.discard();}var hub=com.mmorpg.hub.HubData.get(p.level().getServer());com.mmorpg.hub.HubGuides.install(p.level(),hub.origin(0),0);});
+        Scheduler.later(p.level(),100,()->{
+            var hub=com.mmorpg.hub.HubData.get(p.level().getServer());int found=0;for(int i=0;i<5;i++)if(p.level().getEntity(com.mmorpg.hub.HubGuides.id(0,i)) instanceof com.mmorpg.entity.hub.HubGuideEntity guide){found++;var at=guide.blockPosition();if(!p.level().getBlockState(at).getCollisionShape(p.level(),at).isEmpty()||!p.level().getBlockState(at.above()).getCollisionShape(p.level(),at.above()).isEmpty())throw new AssertionError("Guide embedded in hub construction: "+i);}
+            if(found!=5)throw new AssertionError("Missing hub guides: "+found);var tp=hub.origin(0).offset(com.mmorpg.hub.HubLayout.TELEPORTER[0],0,com.mmorpg.hub.HubLayout.TELEPORTER[2]);if(p.level().getBlockState(tp).is(com.mmorpg.registry.ModBlocks.TELEPORTEUR.get()))throw new AssertionError("Legacy hub teleporter still present");MMORPG.LOGGER.info("[CODEX CHECKS] HUB_GUIDE_WORLD PASS: five guides accessible in actual hub, no portal block, no hub rebuild");
         });
     }
     @SubscribeEvent public static void left(PlayerEvent.PlayerLoggedOutEvent event) {

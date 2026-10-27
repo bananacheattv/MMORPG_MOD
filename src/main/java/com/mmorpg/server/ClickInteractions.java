@@ -59,6 +59,7 @@ public final class ClickInteractions {
         if (!(event.getTarget() instanceof NpcEntity npc)) return;
         event.setCanceled(true);
         if (event.getEntity() instanceof ServerPlayer sp && !throttled(sp)) {
+            if(npc instanceof com.mmorpg.entity.hub.HubGuideEntity guide){com.mmorpg.hub.HubGuides.open(sp,guide);return;}
             switch (npc.role()) {
                 case QUETES -> QuestManager.openGiver(sp, npc);
                 case MARCHAND -> ShopManager.open(sp, npc);

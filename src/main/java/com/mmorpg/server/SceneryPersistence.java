@@ -21,6 +21,6 @@ public final class SceneryPersistence {
         });
     }
     @SubscribeEvent public static void commands(net.neoforged.neoforge.event.RegisterCommandsEvent event){
-        event.getDispatcher().register(net.minecraft.commands.Commands.literal("tuto").executes(c->{com.mmorpg.network.Net.toPlayer(c.getSource().getPlayerOrException(),new com.mmorpg.network.S2COpenScreen(com.mmorpg.network.S2COpenScreen.HUB_TUTORIAL,new net.minecraft.nbt.CompoundTag()));return 1;}));
+        event.getDispatcher().register(net.minecraft.commands.Commands.literal("tuto").executes(c->{com.mmorpg.hub.HubGuides.point(c.getSource().getPlayerOrException());return 1;}));
     }
 }

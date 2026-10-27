@@ -77,6 +77,7 @@ public final class HubManager {
     /** Action recue du client (dialogue, cinematique). */
     public static void action(ServerPlayer p, int action, int a, int b) {
         switch (action) {
+            case Payloads.HubAction.GUIDE_COMPLETE -> HubGuides.complete(p,a);
             case Payloads.HubAction.TRY -> {
                 if (!nearMaster(p) || !isPlayable(a)) return;
                 String err = ClassTrial.start(p, PlayerClass.values()[a], b);
@@ -119,6 +120,7 @@ public final class HubManager {
                 for (int i = 0; i < existing.count(); i++) HubBuilder.build(hubLevel, existing.origin(i), i);
                 return true;
             }
+            if(hubLevel!=null)for(int i=0;i<existing.count();i++)HubGuides.install(hubLevel,existing.origin(i),i);
             return false;
         }
         ServerLevel level = server.getLevel(HUB_DIM);

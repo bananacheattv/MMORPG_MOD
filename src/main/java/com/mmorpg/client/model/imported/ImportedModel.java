@@ -144,6 +144,8 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
         if(state instanceof ClassicMobRenderer.State s){if(s.attackTicks>=0)animate("attack",s.attackTicks,1);if(head!=null){head.yRot+=state.yRot*(float)Math.PI/180;head.xRot+=state.xRot*(float)Math.PI/180;}}
         if(state instanceof ImportedMobRenderer.State s && s.attackTicks>=0) animate("attack",s.attackTicks,1);
         if(state instanceof com.mmorpg.client.model.YggdrasilRenderer.State s){if(s.attackTicks>=0)animate("attack",s.attackTicks,1);if(s.castTicks>=0)animate("cast",s.castTicks,1);}
+        if(state instanceof HubGuideRenderer.State&&head!=null){head.yRot+=state.yRot*(float)Math.PI/180;head.xRot+=state.xRot*(float)Math.PI/180;}
+        if(state instanceof AuthoredMasterRenderer.State s){if(head!=null){head.yRot+=state.yRot*(float)Math.PI/180;head.xRot+=state.xRot*(float)Math.PI/180;}if(s.presenting>=0)animate("cast",s.presenting,1);}
         if(state.deathTime>0)animate("death",state.deathTime,1);
     }
 }

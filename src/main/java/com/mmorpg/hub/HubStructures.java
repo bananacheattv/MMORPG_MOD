@@ -127,11 +127,7 @@ final class HubStructures {
         }
         c.ring(0, 8, tz, 4.6, 6.4, (x, y, z) -> c.state("marbre"));
         c.ring(0, 9, tz, 5.0, 6.0, (x, y, z) -> c.slab("or_ouvrage", false));
-        BlockPos tp = HubLayout.pos(c.O, HubLayout.TELEPORTER);
-        c.L.setBlock(tp, ModBlocks.TELEPORTEUR.get().defaultBlockState(), Block.UPDATE_ALL);
-        WaypointData data = WaypointData.get(c.L.getServer());
-        data.removeAt(c.L.dimension(), tp);
-        data.create(c.L.dimension(), tp, HubBuilder.instance() == 0 ? "Hub d'Aeloria" : "Hub d'Aeloria " + (HubBuilder.instance() + 1), WaypointData.CITY, 1, new UUID(0, 0));
+
     }
 
     // ================================================================== voie de l'arene : arches de marbre

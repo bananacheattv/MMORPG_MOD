@@ -75,6 +75,7 @@ neoForge {
             programArgument '--nogui'
             if (project.hasProperty('networkChecks')) systemProperty 'mmorpg.checkNetwork', 'true'
             if (project.hasProperty('visualChecks')) systemProperty 'mmorpg.visualChecks', 'true'
+            if (project.hasProperty('guideVisual')) systemProperty 'mmorpg.guideVisual', 'true'
             if (project.hasProperty('socialVisual')) systemProperty 'mmorpg.socialVisual', 'true'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }

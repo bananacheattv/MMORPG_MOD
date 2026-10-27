@@ -119,6 +119,7 @@ public final class HubBuilder {
         HubFlora.islets(c);
         texts(c);
         entities(c);
+        HubGuides.install(level,feet,index);
         zones(c);
         var server = level.getServer();
         if (index == 0) {
@@ -360,8 +361,12 @@ public final class HubBuilder {
         textIndex = 0;
         texts(c);
         entities(c);
+        HubGuides.install(level,origin,instance);
         instance = 0;
     }
+
+    private static void retiredText(HubCtx c){var e=c.L.getEntity(stable("text:"+textIndex++,instance));if(e instanceof Display.TextDisplay&&e.entityTags().contains(TAG))e.discard();}
+    static void removeRetiredTutorialTexts(ServerLevel level,int copy){for(int index:new int[]{7,10,11,12,13}){var e=level.getEntity(stable("text:"+index,copy));if(e instanceof Display.TextDisplay&&e.entityTags().contains(TAG))e.discard();}}
 
     private static void texts(HubCtx c) {
         text(c, 0, 33, 36, "AELORIA", "#FFD060", 12F);
@@ -377,13 +382,10 @@ public final class HubBuilder {
             text(c, s[0], 25, s[2], t[0], t[1], 6F);
         }
         text(c, 0, 13.5, 0, "MAÎTRE DES CLASSES", "#FFE6A0", 2.2F);
-        text(c, 0, 12, 24, "TÉLÉPORTEUR", "#9FD8FF", 3.4F);
+        retiredText(c);
         text(c, 0, 17, HubLayout.ROOM_Z1 - 1, "ÉPREUVE DES HÉROS", "#FFC060", 5F);
         text(c, HubLayout.YARD_CENTER_X - 17, 11, 0, "AIRE D'ENTRAÎNEMENT", "#FFB070", 4F);
-        text(c,0,4.8,43,"BIENVENUE DANS AELORIA", "#FFD060",1.6F);
-        text(c,0,3.9,43,"1. Parle aux Maîtres et essaie une classe", "#F0E8D8",1.0F);
-        text(c,0,3.1,43,"2. Confirme ton choix puis rejoins le spawn", "#F0E8D8",1.0F);
-        text(c,0,2.3,43,"Guide complet : /tuto · Menu : M", "#9FD8FF",1.0F);
+        for(int i=0;i<4;i++)retiredText(c);
     }
 
     // ================================================================== PNJ et mannequins

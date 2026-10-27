@@ -102,6 +102,7 @@ public class ClassMasterScreen extends MmoScreen {
         int idx = kind < 4 ? kind : Math.max(0, Math.min(3, java.util.Arrays.asList(CLASSES).indexOf(PlayerClass.byId(classOrdinal))));
         if (portraits[idx] == null && Minecraft.getInstance().level != null) {
             ClassMasterEntity e = new ClassMasterEntity(ModEntities.CLASS_MASTER.get(), Minecraft.getInstance().level);
+            e.setId(120000+idx);
             e.setup(idx);
             e.setCustomNameVisible(false);
             e.stage(2.4F);

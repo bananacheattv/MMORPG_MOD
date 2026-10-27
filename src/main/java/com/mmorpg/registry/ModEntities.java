@@ -79,6 +79,9 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.NpcEntity>> NPC =
             ENTITIES.registerEntityType("pnj", com.mmorpg.entity.NpcEntity::new, MobCategory.MISC,
                     b -> b.sized(0.6F, 1.95F).clientTrackingRange(10));
+    public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.hub.HubGuideEntity>> HUB_GUIDE =
+            ENTITIES.registerEntityType("guide_hub", com.mmorpg.entity.hub.HubGuideEntity::new, MobCategory.MISC,
+                    b -> b.sized(.7F,2.15F).clientTrackingRange(10));
     /** Les montures sont affichees 2x plus grandes que leur modele. */
     public static final float MOUNT_SCALE = 2f;
     /** Une entite par monture 3D (taille et hauteur de selle propres). */
@@ -145,6 +148,7 @@ public final class ModEntities {
         event.put(ARENA_CRYSTAL.get(),RpgMonster.createAttributes().build());
         for (var mount : MOUNTS.values()) event.put(mount.get(), net.minecraft.world.entity.animal.equine.AbstractHorse.createBaseHorseAttributes()
                 .add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH, 20).build());
+        event.put(HUB_GUIDE.get(), com.mmorpg.entity.NpcEntity.createAttributes().build());
         event.put(NPC.get(), com.mmorpg.entity.NpcEntity.createAttributes().build());
         event.put(CLASS_MASTER.get(), com.mmorpg.entity.hub.ClassMasterEntity.createAttributes().build());
         event.put(TRAINING_DUMMY.get(), com.mmorpg.entity.dummy.TrainingDummyEntity.createAttributes().build());

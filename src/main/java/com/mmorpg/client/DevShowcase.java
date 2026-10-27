@@ -53,6 +53,23 @@ public final class DevShowcase {
             if(tick==80){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();mc.gui.setScreen(new DevBestiaryScreen());}
             if(mc.gui.screen() instanceof DevBestiaryScreen screen){for(int page=0;page<screen.pages();page++){if(tick==90+page*25)screen.page(page);if(tick==110+page*25)shot(mc,"bestiary_"+page);}if(tick>125+screen.pages()*25)stop(mc);}return;
         }
+        if(MODE.equals("hub_guides")){
+            if(mc.player==null||mc.level==null)return;tick++;
+            if(tick==90){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();mc.gui.setScreen(new DevHubGuideGallery());}
+            if(tick==120)shot(mc,"hub_actors_0");
+            if(tick==130)((DevHubGuideGallery)mc.gui.screen()).page=1;
+            if(tick==160)shot(mc,"hub_actors_1");
+            if(tick==170)((DevHubGuideGallery)mc.gui.screen()).page=2;
+            if(tick==200)shot(mc,"hub_actors_2");
+            if(tick==210){var data=new CompoundTag();data.putInt("guide",0);mc.gui.setScreen(new com.mmorpg.client.screen.HubGuideScreen(data));}
+            if(tick==250)shot(mc,"hub_npc_dialogue");
+            if(tick==260){mc.gui.setScreen(null);mc.player.connection.sendCommand("tp @s 10 221 13 180 0");}
+            if(tick==320)shot(mc,"hub_masters_inworld");
+            if(tick==340){var t=new CompoundTag();t.putInt("kind",1);mc.gui.setScreen(new com.mmorpg.client.screen.ClassMasterScreen(t));}
+            if(tick==390)shot(mc,"hub_master_mage_dialogue");
+            if(tick==410){mc.gui.setScreen(null);mc.player.connection.sendCommand("execute in mmorpg:hub run tp @s 0 96 46 180 0");}
+            if(tick==580)shot(mc,"hub_tutorial_arrival");if(tick==600)stop(mc);return;
+        }
         if(MODE.equals("cave_bestiary")){
             if(mc.player==null||mc.level==null)return;tick++;
             if(tick==100){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();mc.player.connection.sendCommand("execute in mmorpg:competitions run tp @s 500 105 4000 0 -30");}

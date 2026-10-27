@@ -687,8 +687,9 @@ public final class MmoHud {
             if (s == null) continue;
             float fade = Math.max(0.3f, Math.min(1f, 1.5f - s[2] / 20f));
             String name = npc.displayName();
-            boolean quest = npc.role() == com.mmorpg.entity.NpcEntity.Role.QUETES;
-            String role = "<" + npc.role().label + ">";
+            boolean guide = npc instanceof com.mmorpg.entity.hub.HubGuideEntity;
+            boolean quest = !guide && npc.role() == com.mmorpg.entity.NpcEntity.Role.QUETES;
+            String role = guide ? "<Guide · clic droit>" : "<" + npc.role().label + ">";
             g.pose().pushMatrix();
             g.pose().translate(s[0], s[1]);
             g.pose().scale(0.8f, 0.8f);
@@ -703,7 +704,7 @@ public final class MmoHud {
                 g.pose().pushMatrix();
                 g.pose().translate(s[0] - 6, s[1] - 32);
                 g.pose().scale(0.75f, 0.75f);
-                g.item(new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.PIECE_OR.get()), 0, 0);
+                g.item(new net.minecraft.world.item.ItemStack(guide ? net.minecraft.world.item.Items.WRITABLE_BOOK : com.mmorpg.registry.ModItems.PIECE_OR.get()), 0, 0);
                 g.pose().popMatrix();
             }
         }
