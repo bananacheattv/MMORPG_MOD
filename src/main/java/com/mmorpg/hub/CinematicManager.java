@@ -73,8 +73,8 @@ public final class CinematicManager {
         hd.cinematicSeen = true;
         p.teleportTo(p.level(), lock.pos.x, lock.pos.y, lock.pos.z, Set.of(), 180F, 6F, true);
         if (wasFirst && !RpgPlayers.get(p).playerClass.isPlayable()) {
-            p.sendOverlayMessage(Component.literal("Parlez aux Maîtres de classe : essayez, puis choisissez votre voie.").withColor(0xFFE6A0));
-            HubGuides.point(p);
+            p.sendOverlayMessage(Component.literal("Suivez la flèche violette pour rencontrer Sélène et commencer le tutoriel.").withColor(0xFFE6A0));
+            com.mmorpg.server.GuidanceManager.refresh(p);
         }
     }
 

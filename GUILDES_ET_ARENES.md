@@ -104,3 +104,11 @@ Sélène accueille les héros, Kaël explique les expéditions, Borin la forge e
 Les quatre Maîtres de classe et le Gardien de l’épreuve ont également de nouveaux modèles cubiques articulés. Les essais et le choix de classe gardent leur fonctionnement. Le premier tutoriel ne s’ouvre plus automatiquement sous forme de livre après la cinématique : il oriente vers Sélène.
 
 L’ancien bloc téléporteur du hub est retiré automatiquement à son emplacement connu, avec son point de passage. Le reste du décor est conservé ; les portails physiques des expéditions sont inchangés. Aucun changement de numéro de plan et aucune reconstruction du hub ne sont nécessaires.
+
+## Guidage automatique — bêta 0.0
+
+Le tutoriel se suit automatiquement dès l’arrivée dans le hub, sans `/tuto`. Une flèche 3D violette indique le prochain guide et change après validation de sa conversation. La flèche apparaît au-dessus du personnage en troisième personne ; en première personne, elle reste en 3D et apparaît devant la caméra. Elle reste horizontale et pivote vers la cible. F1 la masque également.
+
+Une quête acceptée devient automatiquement la quête suivie. La même flèche violette indique son premier objectif non terminé : repère défini par l’administrateur, cible vivante à proximité, butin accessible, zone de chasse connue ou portail correspondant. Quand la quête est prête à rendre, elle pointe vers son donneur enregistré ; si celui-ci est sur un autre serveur, le guidage commence par le portail de retour. Le suivi choisi dans le journal garde la priorité ; « Ne plus suivre » masque le guidage de quête jusqu’à une nouvelle sélection ou acceptation.
+
+Dans l’éditeur de quêtes, onglet Objectifs, « Repère ici » enregistre la position, la dimension et le serveur actuels pour l’objectif sélectionné ; « Automatique » rétablit la détection normale. Si aucune destination n’est connue, le suivi affiche l’objectif à rechercher sans inventer une direction.

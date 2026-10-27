@@ -100,6 +100,7 @@ public final class MmoHud {
         int w = g.guiWidth();
         int h = g.guiHeight();
         if (!HudLayout.editing) worldOverlays(g, mc, w, h);
+        if(!HudLayout.editing)GuidanceArrow.render(g,mc);
         if (!ClientData.received) return;
         if (HudLayout.begin(g, HudLayout.JOUEUR)) {
             playerFrame(g, mc);

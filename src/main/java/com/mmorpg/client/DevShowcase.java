@@ -53,6 +53,25 @@ public final class DevShowcase {
             if(tick==80){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();mc.gui.setScreen(new DevBestiaryScreen());}
             if(mc.gui.screen() instanceof DevBestiaryScreen screen){for(int page=0;page<screen.pages();page++){if(tick==90+page*25)screen.page(page);if(tick==110+page*25)shot(mc,"bestiary_"+page);}if(tick>125+screen.pages()*25)stop(mc);}return;
         }
+        if(MODE.equals("guidance")){
+            if(mc.player==null||mc.level==null)return;tick++;
+            if(tick==85){mc.player.connection.sendCommand("time set day");mc.player.connection.sendCommand("weather clear");mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK);mc.player.connection.sendCommand("tp @s 10 222 15 180 25");}
+            if(tick==135)shot(mc,"guidance_third_person");
+            if(tick==155)mc.player.connection.sendCommand("tp @s 10 222 15 90 25");
+            if(tick==200)shot(mc,"guidance_camera_turn");
+            if(tick==220)mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            if(tick==260)shot(mc,"guidance_first_person");
+            if(tick==280)mc.gui.hud.toggle();if(tick==310)shot(mc,"guidance_f1_hidden");if(tick==320)mc.gui.hud.toggle();
+            if(tick==340)mc.player.connection.sendCommand("execute in mmorpg:hub run tp @s 0 96 46 180 25");
+            if(tick==420)mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK);
+            if(tick==500)shot(mc,"guidance_tutorial_auto");
+            if(tick==520){var guide=mc.level.getEntitiesOfClass(com.mmorpg.entity.hub.HubGuideEntity.class,mc.player.getBoundingBox().inflate(12),e->e.guide()==0).stream().findFirst();guide.ifPresent(e->com.mmorpg.client.ClientNet.send(new com.mmorpg.network.Payloads.HubAction(com.mmorpg.network.Payloads.HubAction.GUIDE_COMPLETE,e.getId(),0)));}
+            if(tick==580)shot(mc,"guidance_next_guide");
+            if(tick==605){var editor=new com.mmorpg.client.screen.QuestEditorScreen(new CompoundTag());mc.gui.setScreen(editor);editor.showPage(1);}
+            if(tick==640)shot(mc,"guidance_editor_marker");
+            if(tick==650){mc.options.guiScale().set(3);mc.resizeGui();}
+            if(tick==690)shot(mc,"guidance_editor_compact");if(tick==710)stop(mc);return;
+        }
         if(MODE.equals("hub_guides")){
             if(mc.player==null||mc.level==null)return;tick++;
             if(tick==90){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();mc.gui.setScreen(new DevHubGuideGallery());}

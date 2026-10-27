@@ -102,6 +102,7 @@ public final class RpgPlayers {
         player.refreshTabListName();
         PlayerData d = get(player);
         CompoundTag t = d.save();
+        t.putString("backend",com.mmorpg.network.NetworkConfig.current.role.name());
         t.store("stats", com.mojang.serialization.Codec.DOUBLE.listOf(), toList(d.stats.raw()));
         t.putLong("xpToNext", LevelSystem.xpToNext(d.level));
         t.putInt("skillPoints", d.availableSkillPoints());

@@ -22,6 +22,9 @@ public final class DevVisualChecks {
                     var guide=com.mmorpg.registry.ModEntities.HUB_GUIDE.get().create(level,net.minecraft.world.entity.EntitySpawnReason.COMMAND);guide.guide(i);guide.snapTo(i*5,220,0,0,0);level.addFreshEntity(guide);
                     var master=com.mmorpg.registry.ModEntities.CLASS_MASTER.get().create(level,net.minecraft.world.entity.EntitySpawnReason.COMMAND);master.setup(i);master.snapTo(i*5,220,7,0,0);master.setNoGravity(true);level.addFreshEntity(master);
                 }
+                if(Boolean.getBoolean("mmorpg.guidanceVisual")){
+                    var q=new com.mmorpg.quest.QuestDef();q.name="Rencontrer l’éclaireur";var objective=new com.mmorpg.quest.QuestDef.Objective("kill","gobelin",1);objective.navigation=new com.mmorpg.quest.QuestDef.Navigation();objective.navigation.dimension=level.dimension().identifier().toString();objective.navigation.backend=com.mmorpg.network.NetworkConfig.current.role.name();objective.navigation.x=5;objective.navigation.y=220;objective.navigation.z=0;q.objectives.add(objective);com.mmorpg.config.ConfigManager.quests().put("codex_visual_guidance",q);var d=RpgPlayers.get(p);d.activeQuests.clear();d.activeQuests.put("codex_visual_guidance",new int[]{0});d.trackedQuest="codex_visual_guidance";d.questGuidanceMuted=false;com.mmorpg.hub.ClassTrial.data(p).tutorialMask=0;
+                }
                 p.teleportTo(level,10,222,15,java.util.Set.of(),180,8,true);p.getAbilities().flying=true;p.onUpdateAbilities();return;
             }
             if(Boolean.getBoolean("mmorpg.socialVisual")){

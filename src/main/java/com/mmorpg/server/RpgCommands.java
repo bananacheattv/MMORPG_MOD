@@ -296,6 +296,8 @@ public final class RpgCommands {
                             ServerPlayer p = EntityArgument.getPlayer(c, "joueur");
                             PlayerData data = RpgPlayers.get(p);
                             data.activeQuests.clear();
+                            data.questGivers.clear();data.questGuidanceMuted=false;
+                            GuidanceManager.refresh(p);
                             data.trackedQuest = "";
                             data.completedQuests.clear();
                             data.dailyQuests.clear();

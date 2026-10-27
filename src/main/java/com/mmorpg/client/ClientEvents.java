@@ -66,11 +66,13 @@ public final class ClientEvents {
     public static void onTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         MmoHud.tick(mc);
+        com.mmorpg.client.hud.GuidanceArrow.update(mc);
         CosmeticFx.tick(mc);
     }
 
     @SubscribeEvent
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
+        com.mmorpg.client.hud.GuidanceArrow.clear();
         ClientData.reset();
         HudEffects.clear();
     }

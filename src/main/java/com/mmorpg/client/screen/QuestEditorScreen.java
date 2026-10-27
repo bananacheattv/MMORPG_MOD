@@ -54,7 +54,7 @@ public final class QuestEditorScreen extends MmoScreen {
     public void showPage(int p) {editingNpc=false;page=p;rebuild();}
     @Override protected void init() {
         super.init();fieldLabels.clear();
-        listW=Math.min(180,Math.max(120,pw/3));rx=left+listW+20;rw=pw-listW-30;fy=top+60;
+        listW=Math.min(180,Math.max(120,pw/3));rx=left+listW+20;rw=pw-listW-30;fy=top+((!editingNpc&&page==1&&ph<270)?52:60);
         field(left+9,top+50,listW-2,"Recherche",query,v->{query=v;scroll=0;},100,false);
         if(editingNpc) {
             field(rx,fy,rw,"Nom du PNJ",npcName,v->npcName=v,80,false);
@@ -74,7 +74,7 @@ public final class QuestEditorScreen extends MmoScreen {
             case 1 -> {
                 if(!draft.objectives.isEmpty()) {
                     objective=Math.min(objective,draft.objectives.size()-1);var o=draft.objectives.get(objective);
-                    field(rx,fy+70,85,"Quantité / niveau",Integer.toString(o.count),v->o.count=number(v),6,true);
+                    field(rx,fy+objectiveOffset(70),85,"Quantité / niveau",Integer.toString(o.count),v->o.count=number(v),6,true);
                 }
             }
             case 2 -> {
@@ -204,18 +204,26 @@ public final class QuestEditorScreen extends MmoScreen {
             g.text(font,pos.getX()+", "+pos.getY()+", "+pos.getZ(),rx,fy+123,Ui.MUTED,false);
         });
     }
+    private int objectiveOffset(int offset){return ph<270?Math.round(offset*.78f):offset;}
     private void renderObjectives(GuiGraphicsExtractor g) {
         if(!draft.objectives.isEmpty()) {
             var o=draft.objectives.get(objective);
             button(g,rx,fy,rw,19,switch(o.type){case "collect"->"Rapporter des objets ▾";case "level"->"Atteindre un niveau ▾";default->"Vaincre des monstres ▾";},true,Ui.GOLD,
                     ()->choose("Type d’objectif",List.of(new Choice("kill","Vaincre des monstres"),new Choice("collect","Rapporter des objets"),new Choice("level","Atteindre un niveau")),v->{o.type=v;o.target=v.equals("collect")?"minecraft:iron_ingot":"*";}));
-            if(!o.type.equals("level")) button(g,rx,fy+31,rw,21,font.plainSubstrByWidth(o.type.equals("collect")?itemName(o.target):o.target.equals("*")?"Tous les monstres":o.target.equals("boss")?"Tous les boss":Component.translatable("entity."+o.target.replace(':','.').replaceFirst("^(?!.*\\.).*", "mmorpg."+o.target)).getString(),rw-10),true,Ui.GOLD,()->target(o));
-            button(g,rx+94,fy+70,25,18,"◀",objective>0,Ui.GOLD,()->{objective--;rebuild();});
-            button(g,rx+122,fy+70,25,18,"▶",objective+1<draft.objectives.size(),Ui.GOLD,()->{objective++;rebuild();});
-            g.text(font,(objective+1)+" / "+draft.objectives.size(),rx+155,fy+75,Ui.TEXT,false);
+            if(!o.type.equals("level")) button(g,rx,fy+objectiveOffset(31),rw,ph<270?18:21,font.plainSubstrByWidth(o.type.equals("collect")?itemName(o.target):o.target.equals("*")?"Tous les monstres":o.target.equals("boss")?"Tous les boss":Component.translatable("entity."+o.target.replace(':','.').replaceFirst("^(?!.*\\.).*", "mmorpg."+o.target)).getString(),rw-10),true,Ui.GOLD,()->target(o));
+            button(g,rx+94,fy+objectiveOffset(70),25,18,"◀",objective>0,Ui.GOLD,()->{objective--;rebuild();});
+            button(g,rx+122,fy+objectiveOffset(70),25,18,"▶",objective+1<draft.objectives.size(),Ui.GOLD,()->{objective++;rebuild();});
+            g.text(font,(objective+1)+" / "+draft.objectives.size(),rx+155,fy+objectiveOffset(75),Ui.TEXT,false);
         }
-        button(g,rx,fy+106,rw/2-3,18,"+ Objectif",draft.objectives.size()<16,Ui.GREEN,()->{draft.objectives.add(new QuestDef.Objective());objective=draft.objectives.size()-1;rebuild();});
-        button(g,rx+rw/2+3,fy+106,rw/2-3,18,"Retirer",!draft.objectives.isEmpty(),Ui.RED,()->{draft.objectives.remove(objective);objective=Math.max(0,objective-1);rebuild();});
+        if(!draft.objectives.isEmpty()){
+            var o=draft.objectives.get(objective);
+            button(g,rx,fy+objectiveOffset(132),rw/2-3,18,"Repère ici",minecraft.player!=null,Ui.GOLD,()->{var n=new QuestDef.Navigation();n.dimension=minecraft.level.dimension().identifier().toString();n.backend=com.mmorpg.client.ClientData.backend;n.x=minecraft.player.getX();n.y=minecraft.player.getY();n.z=minecraft.player.getZ();o.navigation=n;});
+            button(g,rx+rw/2+3,fy+objectiveOffset(132),rw/2-3,18,"Automatique",o.navigation!=null,Ui.MUTED,()->o.navigation=null);
+            String marker=o.navigation==null?"Flèche : cible automatique":"Flèche : "+(int)o.navigation.x+", "+(int)o.navigation.y+", "+(int)o.navigation.z;
+            g.text(font,font.plainSubstrByWidth(marker,rw),rx,Math.max(fy+objectiveOffset(154),fy+objectiveOffset(132)+22),Ui.MUTED,false);
+        }
+        button(g,rx,fy+objectiveOffset(106),rw/2-3,18,"+ Objectif",draft.objectives.size()<16,Ui.GREEN,()->{draft.objectives.add(new QuestDef.Objective());objective=draft.objectives.size()-1;rebuild();});
+        button(g,rx+rw/2+3,fy+objectiveOffset(106),rw/2-3,18,"Retirer",!draft.objectives.isEmpty(),Ui.RED,()->{draft.objectives.remove(objective);objective=Math.max(0,objective-1);rebuild();});
     }
     private void renderRewards(GuiGraphicsExtractor g) {
         String[] tabs={"Or / XP","Objets","Évolution de classe"};int tw=rw/3;
