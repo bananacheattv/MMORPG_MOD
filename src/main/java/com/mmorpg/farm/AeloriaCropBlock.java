@@ -52,11 +52,11 @@ public class AeloriaCropBlock extends CropBlock {
         RpgPlayers.giveGatherXp(player, 2 + rank * 3L);
         level.sendParticles(ParticleTypes.HAPPY_VILLAGER, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 4, 0.3, 0.3, 0.3, 0.0);
         if (hoe <= 0) return;
-        bonus(level, pos, hoe);
+        bonus(level, pos, hoe,com.mmorpg.mine.ToolRunes.rank(tool,0));
         if (hoe < 2) return;
         // houe d'Argentite et au-dela : recolte en zone (rayon 1, ou 2 des le Glacium), replante la plante cassee et ses voisines
         level.setBlock(pos, getStateForAge(0), 3);
-        int r = hoe >= 4 ? 2 : 1;
+        int r = Math.min(4,(hoe >= 4 ? 2 : 1)+com.mmorpg.mine.ToolRunes.rank(player.getMainHandItem(),2)/2);
         int n = 0;
         for (int dx = -r; dx <= r; dx++) {
             for (int dz = -r; dz <= r; dz++) {
@@ -65,7 +65,7 @@ public class AeloriaCropBlock extends CropBlock {
                 BlockState st = level.getBlockState(at);
                 if (!(st.getBlock() instanceof AeloriaCropBlock cb) || !cb.isMaxAge(st)) continue;
                 net.minecraft.world.level.block.Block.dropResources(st, level, at, null, player, tool);
-                cb.bonus(level, at, hoe);
+                cb.bonus(level, at, hoe,com.mmorpg.mine.ToolRunes.rank(tool,0));
                 level.setBlock(at, cb.getStateForAge(0), 3);
                 RpgPlayers.giveGatherXp(player, 2 + FarmCrops.CROPS.indexOf(cb.crop) * 3L);
                 n++;
@@ -75,10 +75,10 @@ public class AeloriaCropBlock extends CropBlock {
     }
 
     /** Recoltes supplementaires de la houe : deux tirages de 10 % par palier. */
-    private void bonus(ServerLevel level, BlockPos pos, int hoe) {
+    private void bonus(ServerLevel level, BlockPos pos, int hoe,int rune) {
         int extra = 0;
         for (int i = 0; i < 2; i++) {
-            if (level.getRandom().nextInt(100) < hoe * 10) extra++;
+            if (level.getRandom().nextInt(100) < hoe * 10+rune*10) extra++;
         }
         if (extra > 0) {
             level.addFreshEntity(new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 0.3, pos.getZ() + 0.5, new ItemStack(ModItems.get(crop.product()), extra)));

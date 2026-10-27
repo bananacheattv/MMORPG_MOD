@@ -1,4 +1,4 @@
-// Genere automatiquement par art/boss_blockbench/generer_boss.py - ne pas modifier a la main (relancer le script).
+// Genere automatiquement par tools/refine-bestiary.py - ne pas modifier a la main (relancer le script).
 package com.mmorpg.entity.boss.anim;
 
 /** Animations de Titan de glace : indices, durees et instants de frappe (en ticks). */

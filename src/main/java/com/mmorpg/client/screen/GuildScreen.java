@@ -52,7 +52,9 @@ public final class GuildScreen extends MmoScreen {
         for(int i=0;i<10;i++){final int index=i;int row=i/2,y=base-19-row*24,x=cx+(i%2==0?-43:25);g.fill(Math.min(cx,x),y+8,Math.max(cx,x)+10,y+11,0xFF6D8F53);button(g,x,y,23,19,Integer.toString(i+1),true,Yggdrasil.cleared(guild,i)?Ui.GREEN:i==boss?Ui.GOLD:Ui.MUTED,()->boss=index);}
         int x=left+treeW+8,w=pw-treeW-20;var def=Yggdrasil.ALL[boss];g.text(font,font.plainSubstrByWidth(def.name(),w),x,top+54,0xFF000000|def.color(),false);g.text(font,font.plainSubstrByWidth(def.form(),w),x,top+73,Ui.TEXT,false);
         g.text(font,"Gardien "+(boss+1)+" / 10",x,top+94,Ui.GOLD,false);g.text(font,Yggdrasil.cleared(guild,boss)?"Vaincu":"Non vaincu",x,top+111,Yggdrasil.cleared(guild,boss)?Ui.GREEN:Ui.TEXT,false);
-        button(g,x,top+123,w,18,"Défier le gardien",boss==guild.level-1&&!Yggdrasil.cleared(guild,boss),Ui.RED,()->send("boss"));
+        long remaining=Math.max(0,guild.bossCooldowns.getOrDefault(boss,0L)-System.currentTimeMillis());
+        String challenge=remaining>0?String.format("Recharge %dh %02dmin",remaining/3600000,(remaining/60000)%60):"Défier le gardien";
+        button(g,x,top+123,w,18,challenge,boss<guild.level&&remaining==0,Ui.RED,()->send("boss",t->t.putInt("tier",boss)));
         if(guild.level<10){g.text(font,"10 000 or + "+Yggdrasil.xpRequired(guild.level)+" XP",x,top+145,Ui.TEXT,false);button(g,x,top+ph-66,w,18,"Passer au niveau "+(guild.level+1),officer()&&Yggdrasil.cleared(guild,guild.level-1)&&guild.gold>=10000&&guild.xp>=Yggdrasil.xpRequired(guild.level),Ui.GREEN,()->send("upgrade"));}
     }
     private void buffs(GuiGraphicsExtractor g){text(g,"1 000 or par buff · 1 heure · tous les membres",left+12,top+49,Ui.GOLD);

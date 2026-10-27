@@ -45,9 +45,8 @@ public final class DungeonTravel {
         catch (Exception e) { player.sendSystemMessage(Component.literal("Le groupe ne peut pas être vérifié. Réessayez dans un instant.")); return true; }
         var type = com.mmorpg.dungeon.InstanceManager.typeOf(pool);
         int required = com.mmorpg.dungeon.DungeonMaster.requiredLevel(type, com.mmorpg.dungeon.InstanceManager.difficultyOf(pool));
-        List<ServerPlayer> members = new ArrayList<>(PartyManager.onlineMembers(player));
+        List<ServerPlayer> members = new ArrayList<>(GroupTravel.individual() ? List.of(player) : PartyManager.onlineMembers(player));
         if (!members.contains(player)) members.add(player);
-        members.removeIf(p -> p != player && (p.level() != player.level() || p.distanceToSqr(player) > 24 * 24));
         for (ServerPlayer p : members) {
             if (RpgPlayers.get(p).level < required || !NetworkPlayers.canTransfer(p, NetworkConfig.Role.DUNGEONS)) {
                 player.sendSystemMessage(Component.literal("Départ annulé : " + p.getName().getString() + " n'est pas prêt ou n'a pas le niveau " + required + ".")); return true;

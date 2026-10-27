@@ -66,7 +66,8 @@ public final class SpawnEditorScreen extends MmoScreen {
                 button(g,x,y,cw,19,label,tab==1||orientation()!=null,Ui.GOLD,()->action("amenagement poser "+entry.id()+" "+(tab==1?DIRECTIONS[facing]:orientation())));
             }
             button(g,left+12,bottom-52,50,17,"‹",page>0,Ui.GOLD,()->page--);
-            if(tab==2)button(g,left+pw/2-72,bottom-52,144,17,"Obtenir l’outil PNJ",true,Ui.GOLD,()->action("amenagement outilpnj"));
+            if(tab==0)button(g,left+pw/2-72,bottom-52,144,17,"Outil porte-armure",true,Ui.GOLD,()->action("amenagement outilarmure"));
+            else if(tab==2)button(g,left+pw/2-72,bottom-52,144,17,"Obtenir l’outil PNJ",true,Ui.GOLD,()->action("amenagement outilpnj"));
             else g.centeredText(font,Component.literal((page+1)+" / "+pages),left+pw/2,bottom-48,Ui.MUTED);
             button(g,left+pw-62,bottom-52,50,17,"›",page+1<pages,Ui.GOLD,()->page++);
         }

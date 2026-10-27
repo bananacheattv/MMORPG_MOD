@@ -12,6 +12,7 @@ public final class MerchantEditor {
     private static final com.google.gson.Gson JSON=new com.google.gson.Gson();
     public static ShopConfig config(NpcEntity npc) {
         var cfg=JSON.fromJson(npc.merchantShop().isEmpty()?ConfigManager.shopJson():npc.merchantShop(),ShopConfig.class);
+        cfg.buy.removeIf(o->RetiredItems.id(o.item));cfg.sellPrices.keySet().removeIf(RetiredItems::id);
         com.mmorpg.economy.ShopSorting.sort(cfg);return cfg;
     }
     public static String revision(NpcEntity npc) {

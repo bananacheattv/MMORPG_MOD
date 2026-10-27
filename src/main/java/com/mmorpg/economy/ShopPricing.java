@@ -19,7 +19,7 @@ public final class ShopPricing {
 
     /** Prix d'une unite de l'objet, ou 0 si le marchand ne l'achete pas. */
     public static int sellPrice(ItemStack stack, ShopConfig cfg) {
-        if (stack.isEmpty()) return 0;
+        if (stack.isEmpty()||com.mmorpg.server.RetiredItems.item(stack.getItem())||com.mmorpg.server.PaladinOffhand.shield(stack)) return 0;
         String id = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
         Integer explicit = cfg.sellPrices.get(id);
         if (explicit != null) return Math.max(0, explicit);

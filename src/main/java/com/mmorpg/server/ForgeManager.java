@@ -94,6 +94,7 @@ public final class ForgeManager {
         Inventory inv = player.getInventory();
         if (slot < 0 || slot >= inv.getContainerSize()) return;
         ItemStack stack = inv.getItem(slot);
+        if (clover.startsWith("rune:")) {com.mmorpg.mine.ToolRunes.apply(player,slot,clover.substring(5));return;}
         if (!(stack.getItem() instanceof RpgEquipment)) return;
         int current = RpgEquipment.upgrade(stack);
         if (current >= RpgEquipment.MAX_UPGRADE) return;

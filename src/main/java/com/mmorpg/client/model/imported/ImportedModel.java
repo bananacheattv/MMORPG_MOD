@@ -18,10 +18,12 @@ import java.util.*;
 public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
     private final Map<String, KeyframeAnimation> animations = new HashMap<>();
     public final Identifier texture;
+    private final ModelPart head;
     public ImportedModel(String kind, String key) { this(kind, key, read(kind, key),false); }
     public ImportedModel(String kind,String key,boolean emissiveOnly){this(kind,key,read(kind,key),emissiveOnly);}
     private ImportedModel(String kind, String key, JsonObject data,boolean emissiveOnly) {
         super(root(data, kind.equals("cosmetics") ? 0 : 24,emissiveOnly), RenderTypes::entityTranslucent);
+        String headId=findHead(data.getAsJsonArray("parts"));head=headId==null?null:root().createPartLookup().apply(headId);
         texture = data.has("texture")?Identifier.parse(data.get("texture").getAsString()):MMORPG.id("textures/imported/" + kind + "/" + key + ".png");
         for (var value : data.getAsJsonArray("animations")) {
             var a = value.getAsJsonObject();
@@ -29,6 +31,11 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
                     a.get("length").getAsFloat(), a.get("loop").getAsBoolean());
             animations.put(a.get("name").getAsString(), def.bake(root()));
         }
+    }
+    private static String findHead(JsonArray nodes){
+        for(var node:nodes){var value=node.getAsJsonObject();if(value.has("name")&&value.get("name").getAsString().equals("head"))return value.get("uuid").getAsString();
+            if(value.has("children")){String nested=findHead(value.getAsJsonArray("children"));if(nested!=null)return nested;}}
+        return null;
     }
     private static JsonObject read(String kind, String key) {
         var id = MMORPG.id("bbmodels/" + kind + "/" + key + ".json");
@@ -134,6 +141,7 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
         animate("idle",state.ageInTicks,1-moving);
         String move=animations.containsKey("walk")?"walk":animations.containsKey("fly")?"fly":"slither";
         animate(move,state.ageInTicks,moving);
+        if(state instanceof ClassicMobRenderer.State s){if(s.attackTicks>=0)animate("attack",s.attackTicks,1);if(head!=null){head.yRot+=state.yRot*(float)Math.PI/180;head.xRot+=state.xRot*(float)Math.PI/180;}}
         if(state instanceof ImportedMobRenderer.State s && s.attackTicks>=0) animate("attack",s.attackTicks,1);
         if(state instanceof com.mmorpg.client.model.YggdrasilRenderer.State s){if(s.attackTicks>=0)animate("attack",s.attackTicks,1);if(s.castTicks>=0)animate("cast",s.castTicks,1);}
         if(state.deathTime>0)animate("death",state.deathTime,1);

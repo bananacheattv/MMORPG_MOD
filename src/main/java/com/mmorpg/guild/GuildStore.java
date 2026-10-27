@@ -14,6 +14,7 @@ public final class GuildStore {
     public static final class Guild {
         public UUID id=UUID.randomUUID();public String name,motto="";public int level=1;public long xp,gold;public int bosses;
         public LinkedHashMap<UUID,Member> members=new LinkedHashMap<>();public LinkedHashMap<UUID,Long> invites=new LinkedHashMap<>();public ArrayList<String> history=new ArrayList<>();
+        public LinkedHashMap<Integer,Long> bossCooldowns=new LinkedHashMap<>();
         public LinkedHashMap<String,Long> buffs=new LinkedHashMap<>();
         public void log(String message){history.add(0,java.time.Instant.now()+" · "+message);while(history.size()>60)history.removeLast();}
     }
@@ -27,6 +28,8 @@ public final class GuildStore {
         if(s==null||s.guilds==null||s.pending==null)throw new IllegalStateException("Registre de guildes invalide");
         Set<UUID> ids=new HashSet<>(),players=new HashSet<>();Set<String> names=new HashSet<>();
         for(var g:s.guilds){if(g==null||g.id==null||!ids.add(g.id)||g.name==null||!names.add(g.name.toLowerCase(Locale.ROOT))||g.level<1||g.level>10||g.gold<0||g.xp<0||g.members==null||g.members.isEmpty()||g.members.size()>50||g.history==null||g.invites==null||g.members.entrySet().stream().anyMatch(e->e.getValue()==null||!e.getKey().equals(e.getValue().id)))throw new IllegalStateException("Guilde invalide");
+            if(g.bossCooldowns==null)g.bossCooldowns=new LinkedHashMap<>();
+            if(g.bossCooldowns.size()>10||g.bossCooldowns.entrySet().stream().anyMatch(e->e.getKey()<0||e.getKey()>9||e.getValue()==null||e.getValue()<0))throw new IllegalStateException("Cooldown de gardien invalide");
             if(g.buffs==null||g.buffs.size()>4)throw new IllegalStateException("Buffs invalides");for(var e:g.buffs.entrySet()){GuildBuffs.Kind.valueOf(e.getKey());if(e.getValue()==null||e.getValue()<0)throw new IllegalStateException("Durée de buff invalide");}
             int leaders=0;for(var m:g.members.values()){if(m==null||m.id==null||!players.add(m.id)||!List.of("CHEF","OFFICIER","MEMBRE").contains(m.rank))throw new IllegalStateException("Membre invalide");if(m.rank.equals("CHEF"))leaders++;}if(leaders!=1)throw new IllegalStateException("Chef invalide");}
         Set<UUID> tx=new HashSet<>();for(var t:s.pending)if(t==null||t.id==null||!tx.add(t.id)||t.player==null||byId(s,t.guild)==null||t.delta==0||Math.abs(t.delta)>1_000_000_000)throw new IllegalStateException("Transaction invalide");

@@ -99,6 +99,7 @@ public class RpgConsumableItem extends RpgMaterialItem {
                 sl.playSound(null, sp.blockPosition(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 1, 0.8f);
             }
             case REBIRTH_ORB -> {
+                data.level = 1; data.xp = 0; data.classChosenOnce = false;
                 data.resetClass();
                 RpgPlayers.recomputeAndSync(sp);
                 RpgPlayers.openClassSelection(sp);

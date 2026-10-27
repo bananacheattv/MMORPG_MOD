@@ -34,11 +34,11 @@ public final class InventoryRules {
         for (int i = 0; i < menu.slots.size(); i++) {
             if (!blockedSlot(i)) continue;
             Slot slot = menu.slots.get(i);
-            if (!restricted(p)) {
+            if (!restricted(p) && i != InventoryMenu.SHIELD_SLOT) {
                 if (slot instanceof DisabledSlot disabled) menu.slots.set(i, disabled.original);
                 continue;
             }
-            if (p instanceof ServerPlayer && slot.hasItem()) {
+            if (p instanceof ServerPlayer && slot.hasItem() && !PaladinOffhand.shield(slot.getItem())) {
                 ItemStack saved = slot.getItem().copy();
                 slot.set(ItemStack.EMPTY);
                 // Le resultat est une previsualisation ; seuls les ingredients sont rendus.
@@ -50,8 +50,14 @@ public final class InventoryRules {
         }
     }
 
-    @SubscribeEvent public static void tick(PlayerTickEvent.Pre event) { apply(event.getEntity()); }
+    @SubscribeEvent public static void tick(PlayerTickEvent.Pre event) {
+        apply(event.getEntity());
+        if(event.getEntity() instanceof ServerPlayer p){
+            if(p.tickCount%20==0){RetiredItems.clear(p.getInventory());RetiredItems.clear(p.getEnderChestInventory());}
+            PaladinOffhand.maintain(p);
+        }
+    }
     @SubscribeEvent public static void swap(LivingSwapItemsEvent.Hands event) {
-        if (event.getEntity() instanceof Player p && restricted(p)) event.setCanceled(true);
+        if (event.getEntity() instanceof Player p) event.setCanceled(true);
     }
 }

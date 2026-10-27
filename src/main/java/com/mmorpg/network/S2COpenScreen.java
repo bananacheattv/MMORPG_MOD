@@ -38,7 +38,7 @@ public record S2COpenScreen(int screen, CompoundTag extra) implements CustomPack
     public static final int SPAWN_EDITOR = 19;
     public static final int ADVENTURE_SUMMARY = 20;
     public static final int MERCHANT_EDITOR = 21;
-    public static final int GUILD=22,ARENA=23,ARENA_READY=24;
+    public static final int GUILD=22,ARENA=23,ARENA_READY=24,HUB_TUTORIAL=25,ARMOR_STAND_EDITOR=26;
 
     public static final Type<S2COpenScreen> TYPE = new Type<>(MMORPG.id("open_screen"));
     public static final StreamCodec<ByteBuf, S2COpenScreen> CODEC = StreamCodec.composite(

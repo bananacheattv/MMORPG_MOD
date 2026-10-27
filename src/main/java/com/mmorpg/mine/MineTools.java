@@ -52,6 +52,10 @@ public final class MineTools {
             this.tier = tier;
         }
 
+        @Override public <T extends net.minecraft.world.entity.LivingEntity> int damageItem(ItemStack stack,int amount,T entity,java.util.function.Consumer<ItemStack> onBroken){
+            if(entity==null)return amount;int keep=0;for(int i=0;i<amount;i++)if(!ToolRunes.preserve(stack,entity.getRandom()))keep++;return keep;
+        }
+
         @Override
         public Component getName(ItemStack stack) {
             return Component.translatable(this.getDescriptionId()).withColor(TIER_COLOR[tier]);
@@ -61,6 +65,7 @@ public final class MineTools {
         public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> out, TooltipFlag flag) {
             String reach = tier >= MineBlocks.ORES.size() - 1 ? "tous les minerais" : "jusqu'à la " + MineBlocks.ORES.get(Math.min(tier, MineBlocks.ORES.size() - 1)).name();
             String vein = MineManager.veinLimit(tier) > 0 ? "\nBonus : accroupi, extrait toute la veine d'un coup (jusqu'à " + MineManager.veinLimit(tier) + " minerais)." : "\nÀ partir de l'Ambrasite : accroupi, extrait toute la veine d'un coup.";
+            ToolRunes.tooltip(stack,out);
             ItemTooltips.simple(RARITY[tier], "Pioche des mines", "Extrait " + (tier == 0 ? "la Verdite" : reach) + ". Plus le palier est haut, plus les lingots doublent et plus les lingots rares tombent." + vein, out);
         }
     }
@@ -76,6 +81,10 @@ public final class MineTools {
             this.kind = kind;
         }
 
+        @Override public <T extends net.minecraft.world.entity.LivingEntity> int damageItem(ItemStack stack,int amount,T entity,java.util.function.Consumer<ItemStack> onBroken){
+            if(entity==null)return amount;int keep=0;for(int i=0;i<amount;i++)if(!ToolRunes.preserve(stack,entity.getRandom()))keep++;return keep;
+        }
+
         @Override
         public Component getName(ItemStack stack) {
             return Component.translatable(this.getDescriptionId()).withColor(TIER_COLOR[tier]);
@@ -86,6 +95,7 @@ public final class MineTools {
             String text = kind.equals("Houe")
                     ? "Chaque récolte mûre peut donner des récoltes en plus." + (tier >= 2 ? "\nBonus : récolte aussi les plantes mûres alentour (rayon " + (tier >= 4 ? 2 : 1) + ") et les replante." : "\nÀ partir de l'Argentite : récolte en zone et replante.")
                     : "Outil forgé dans le minerai du palier ; plus le palier est haut, plus il est solide et rapide.";
+            ToolRunes.tooltip(stack,out);
             ItemTooltips.simple(RARITY[tier], kind + " des mines", text, out);
         }
     }

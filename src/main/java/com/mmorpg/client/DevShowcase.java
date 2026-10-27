@@ -48,13 +48,60 @@ public final class DevShowcase {
             if(frame==160){CompoundTag data=new CompoundTag();data.putString("arena","Arène de feu · 5 contre 5");mc.gui.setScreen(new com.mmorpg.client.screen.ArenaReadyScreen(data));}
             if(frame==175)shot(mc,"arena_ready");if(frame==180)stop(mc);return;
         }
+        if(MODE.equals("bestiary_ui")){
+            if(mc.player==null||mc.level==null)return;tick++;
+            if(tick==80){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();mc.gui.setScreen(new DevBestiaryScreen());}
+            if(mc.gui.screen() instanceof DevBestiaryScreen screen){for(int page=0;page<screen.pages();page++){if(tick==90+page*25)screen.page(page);if(tick==110+page*25)shot(mc,"bestiary_"+page);}if(tick>125+screen.pages()*25)stop(mc);}return;
+        }
+        if(MODE.equals("cave_bestiary")){
+            if(mc.player==null||mc.level==null)return;tick++;
+            if(tick==100){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();mc.player.connection.sendCommand("execute in mmorpg:competitions run tp @s 500 105 4000 0 -30");}
+            if(tick==300)mc.levelExtractor.allChanged();
+            if(tick==550)shot(mc,"cave_center");
+            if(tick==575)mc.gui.setScreen(new DevBestiaryScreen());
+            if(tick>=600&&tick<975&&tick%25==0){int page=(tick-600)/25;((DevBestiaryScreen)mc.gui.screen()).page(page);}
+            if(tick>=615&&tick<990&&tick%25==15)shot(mc,"bestiary_"+((tick-615)/25));
+            if(tick==1000)stop(mc);return;
+        }
+        if(MODE.equals("new_rules_ui")){
+            if(mc.player==null||mc.level==null)return;tick++;
+            if(tick==80){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();mc.gui.setScreen(new com.mmorpg.client.screen.HubTutorialScreen());}
+            if(tick==105)shot(mc,"hub_tutorial");
+            if(tick==115){var stand=mc.level.getEntitiesOfClass(net.minecraft.world.entity.decoration.ArmorStand.class,mc.player.getBoundingBox().inflate(16)).stream().findFirst().orElse(null);if(stand!=null){var t=new CompoundTag();t.putInt("entity",stand.getId());mc.gui.setScreen(new com.mmorpg.client.screen.ArmorStandEditorScreen(t));}}
+            if(tick==145)shot(mc,"armor_stand_editor");
+            if(tick==155){try{var f=ForgeScreen.class.getDeclaredField("tab");f.setAccessible(true);f.set(null,com.mmorpg.crafting.ForgeRecipes.Category.values().length);}catch(Exception e){throw new IllegalStateException(e);}mc.gui.setScreen(new ForgeScreen(net.minecraft.core.BlockPos.ZERO));}
+            if(tick==165&&mc.gui.screen() instanceof ForgeScreen screen){try{var f=ForgeScreen.class.getDeclaredField("upgradeSlot");f.setAccessible(true);f.set(screen,4);}catch(Exception e){throw new IllegalStateException(e);}}
+            if(tick==185)shot(mc,"tool_runes_forge");
+            if(tick==195){mc.gui.setScreen(null);mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);}
+            if(tick==225)shot(mc,"paladin_shield");
+            if(tick==230){mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);mc.player.connection.sendCommand("tp @s 5015 226 20 180 0");}
+            if(tick==280)shot(mc,"vanilla_custom_shield_alignment");
+            if(tick==290){if(!mc.gui.hud.isHidden())mc.gui.hud.toggle();mc.player.connection.sendCommand("execute in mmorpg:competitions run tp @s 518 108 4025 145 0");}
+            if(tick==370){var pos=new net.minecraft.core.BlockPos(500,140,4000);var chunk=mc.level.getChunkAt(pos);com.mmorpg.MMORPG.LOGGER.info("CAVE SECTION position={} block={} sectionAir={} camera={}",mc.player.position(),mc.level.getBlockState(pos),chunk.getSection(mc.level.getSectionIndex(140)).hasOnlyAir(),mc.gameRenderer.mainCamera().position());mc.levelExtractor.allChanged();}
+            if(tick==1450)shot(mc,"yggdrasil_cavern");if(tick==1470)stop(mc);return;
+        }
+        if(MODE.equals("beta_ui")){
+            if(mc.player==null||mc.level==null)return;tick++;
+            if(tick==80){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();
+                try{var f=ForgeScreen.class.getDeclaredField("selectedRecipe");f.setAccessible(true);f.set(null,"lame_tempetes");}catch(Exception e){throw new IllegalStateException(e);}
+                mc.gui.setScreen(new ForgeScreen(net.minecraft.core.BlockPos.ZERO));}
+            if(tick==110)shot(mc,"forge_clipped_top");
+            if(tick==120&&mc.gui.screen() instanceof ForgeScreen f)for(int n=0;n<12;n++)f.mouseScrolled(mc.getWindow().getGuiScaledWidth()*.75,mc.getWindow().getGuiScaledHeight()*.5,0,-20);
+            if(tick==140)shot(mc,"forge_clipped_bottom");
+            if(tick==150)mc.gui.setScreen(new com.mmorpg.client.screen.HudEditorScreen(null));
+            if(tick==175)shot(mc,"hud_scale_controls");
+            if(tick==185){var t=new CompoundTag();t.putInt("bracket",0);t.putInt("FEU",7);t.putBoolean("queued",true);mc.gui.setScreen(new com.mmorpg.client.screen.ArenaScreen(t));}
+            if(tick==200)shot(mc,"arena_queue_status");if(tick==210)stop(mc);return;
+        }
         if(MODE.equals("social_gallery")||MODE.equals("crystal_gallery")){
             if(mc.level==null||mc.player==null||mc.gui.screen()!=null)return;tick++;
             if(tick==5){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();if(!mc.gui.hud.isHidden())mc.gui.hud.toggle();mc.gui.setScreen(null);}
+            if(tick==80)mc.player.connection.sendCommand("time set day");
             if(MODE.equals("crystal_gallery")&&tick==100)tick=995;
             for(int i=0;i<10;i++){if(tick==100+i*75){double[] heights={5.56,9.1,6.01,9.82,4.12,9.82,5.32,10.07,13.5,13.71};double h=heights[i],d=Math.max(12.5,h*1.75);mc.player.connection.sendCommand("tp @s "+(5000+i*50+.5+d*.5)+" "+(220+h*.55)+" "+(.5+d*.866)+" 150 10");}if(tick==145+i*75)shot(mc,"guardian_"+(i+1));}
             if(tick==860)mc.player.connection.sendCommand("execute in mmorpg:competitions run tp @s 525 125 32 142 31");if(tick==910)shot(mc,"arena_fire_decor");
-            if(tick==930)mc.player.connection.sendCommand("execute in mmorpg:competitions run tp @s 765 125 32 142 31");if(tick==980)shot(mc,"arena_dunes_decor");for(int i=0;i<3;i++){if(tick==1000+i*80)mc.player.connection.sendCommand("execute in minecraft:overworld run tp @s "+(5558.5+i*50)+" 223 12.5 145 8");if(tick==1055+i*80)shot(mc,"arena_crystal_"+i);}if(tick==1240)stop(mc);return;
+            if(tick==930)mc.player.connection.sendCommand("execute in mmorpg:competitions run tp @s 765 125 32 142 31");if(tick==980)shot(mc,"arena_dunes_decor");for(int i=0;i<3;i++){if(tick==1000+i*80)mc.player.connection.sendCommand("execute in minecraft:overworld run tp @s "+(5558.5+i*50)+" 223 12.5 145 8");if(tick==1055+i*80)shot(mc,"arena_crystal_"+i);}if(tick==1240)mc.player.connection.sendCommand("execute in mmorpg:competitions run tp @s 500 104 4025 180 -16");if(tick==1320){MMORPG.LOGGER.info("CAVE CLIENT dim={} pos={} roof={} wall={}",mc.level.dimension().identifier(),mc.player.position(),mc.level.getBlockState(new net.minecraft.core.BlockPos(500,143,4000)),mc.level.getBlockState(new net.minecraft.core.BlockPos(540,110,4000)));}
+            if(tick==1400)mc.player.connection.sendCommand("execute in mmorpg:competitions run tp @s 500 106 3970 180 -15");if(tick==1480)shot(mc,"yggdrasil_cavern");if(tick==1500)stop(mc);return;
         }
         if(MODE.equals("merchant_preview")) {
             if(mc.gui.screen() instanceof com.mmorpg.client.screen.MerchantEditorScreen screen) {

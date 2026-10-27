@@ -22,6 +22,7 @@ public final class ImportedMobRenderer extends MobRenderer<ImportedMobEntity, Im
         this.modelScale=s;
         this.hover=h;
         this.shadowRadius=.5f*s;
+        var glow=new ImportedModel("mobs",key,true);addLayer(new com.mmorpg.client.model.ImportedGlowLayer<>(this,state->glow));
     }
     @Override public State createRenderState() { return new State(); }
     @Override public Identifier getTextureLocation(State state) { return model.texture; }

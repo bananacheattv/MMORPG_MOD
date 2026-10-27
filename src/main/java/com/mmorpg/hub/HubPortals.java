@@ -100,13 +100,14 @@ public final class HubPortals {
 
     @SubscribeEvent
     public static void onTick(ServerTickEvent.Post event) {
+        if (!com.mmorpg.network.NetworkConfig.town()) return;
         var server = event.getServer();
         if (server.getTickCount() % 200 == 100) HubBuilder.cleanLegacyMarket(server);
         if (server.getTickCount() % 8 != 0) return;
         HubData hub = HubData.get(server);
         SpawnData spawn = SpawnData.get(server);
         for (ServerPlayer p : server.getPlayerList().getPlayers()) {
-            if (p.isSpectator() || p.isPassenger()) continue;
+            if (p.isSpectator() || p.isPassenger() || com.mmorpg.network.NetworkPlayers.portalBlocked(p)) continue;
             ServerLevel level = p.level();
             boolean inHub = hub.exists() && level.dimension().equals(hub.dimension());
             boolean inSpawn = spawn.exists() && level.dimension().equals(SpawnBuilder.DIM);

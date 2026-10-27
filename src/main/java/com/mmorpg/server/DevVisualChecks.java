@@ -30,6 +30,14 @@ public final class DevVisualChecks {
                 }
                 var arenaLevel=com.mmorpg.competition.CompetitionWorld.level(server);
                 for(int i=0;i<2;i++){var job=com.mmorpg.competition.CompetitionWorld.arena(com.mmorpg.competition.CompetitionWorld.center(i),com.mmorpg.competition.ArenaRules.Kind.values()[i]);while(!job.done())job.tick(arenaLevel);}
+                var cave=com.mmorpg.competition.CompetitionWorld.raid(new BlockPos(500,100,4000),0);while(!cave.done())cave.tick(arenaLevel);
+                var stand=net.minecraft.world.entity.EntityTypes.ARMOR_STAND.create(level,net.minecraft.world.entity.EntitySpawnReason.COMMAND);stand.setShowArms(true);stand.setNoGravity(true);stand.snapTo(5015,225,15,180,0);stand.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND,new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("excalibur_celeste")));stand.setRightArmPose(new net.minecraft.core.Rotations(-100,0,20));level.addFreshEntity(stand);
+                for(int i=0;i<2;i++){
+                    var comparison=net.minecraft.world.entity.EntityTypes.ARMOR_STAND.create(level,net.minecraft.world.entity.EntitySpawnReason.COMMAND);comparison.setShowArms(true);comparison.setNoGravity(true);comparison.snapTo(5013+i*4,225,14,0,0);comparison.setItemSlot(net.minecraft.world.entity.EquipmentSlot.OFFHAND,new net.minecraft.world.item.ItemStack(i==0?net.minecraft.world.item.Items.SHIELD:com.mmorpg.registry.ModItems.PALADIN_SHIELDS.get(2).get()));level.addFreshEntity(comparison);
+                }
+                RpgPlayers.get(p).playerClass=com.mmorpg.rpg.PlayerClass.TANK;RpgPlayers.get(p).level=60;RpgPlayers.recomputeAndSync(p);
+                p.getInventory().clearContent();p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND,new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("marteau_runique")));
+                p.getInventory().setItem(4,new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("pioche_verdite")));
                 p.teleportTo(level,5015,226,18,java.util.Set.of(),140F,8F,true);p.getAbilities().flying=true;p.onUpdateAbilities();return;
             }
             RpgPlayers.get(p).playerClass=com.mmorpg.rpg.PlayerClass.GUERRIER;
@@ -44,8 +52,5 @@ public final class DevVisualChecks {
     }
     @SubscribeEvent public static void left(PlayerEvent.PlayerLoggedOutEvent event) {
         if(Boolean.getBoolean("mmorpg.visualChecks")&&event.getEntity() instanceof net.minecraft.server.level.ServerPlayer p)p.level().getServer().halt(false);
-    }
-    @SubscribeEvent public static void stopped(net.neoforged.neoforge.event.server.ServerStoppedEvent event) {
-        if(Boolean.getBoolean("mmorpg.visualChecks"))System.exit(0);
     }
 }

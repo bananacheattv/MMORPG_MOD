@@ -20,6 +20,7 @@ import java.util.List;
 /** All consumption and rolls happen on the server. No client-selected reward. Tables : config/mmorpg/butins.json. */
 public final class AdventureLoot {
     public static boolean openCrate(ServerPlayer p, ItemStack crate) {
+        if (RetiredItems.item(crate.getItem())) return false;
         if (!p.isAlive() || p.isSpectator() || !crate.is(ModItems.CAISSE_AVENTURE.get())) return false;
         ItemStack key = ItemStack.EMPTY;
         for (ItemStack s : p.getInventory()) if (s.is(ModItems.CLE_AVENTURE.get())) { key = s; break; }

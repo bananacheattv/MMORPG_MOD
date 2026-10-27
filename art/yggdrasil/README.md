@@ -2,9 +2,11 @@
 
 Cette refonte est limitée aux dix gardiens d’Yggdrasil et au cristal d’arène. Les cinq anciens boss, les monstres existants, les pets et les montures ne sont pas remplacés.
 
-Les fichiers `models/*.bbmodel` sont des projets **Blockbench Free Model** éditables : véritables maillages polygonaux, faces triangulaires et quadrilatères, articulations nommées, UV continus et animations. Ouvrir le projet dans Blockbench en conservant `material_atlas.png` dans le dossier parent. Si Blockbench demande la texture, sélectionner ce fichier.
+Les fichiers `models/*.bbmodel` sont des projets **Blockbench Free Model** éditables : géométrie exclusivement cubique (prismes rectangulaires), silhouettes en paliers, faces quadrilatères, articulations nommées, UV par face et animations. Ouvrir le projet dans Blockbench en conservant `material_atlas.png` dans le dossier parent. Si Blockbench demande la texture, sélectionner ce fichier.
 
-Chaque gardien possède une silhouette, un matériau principal et une armature propres. Le cristal possède trois états de capture utilisant la même géométrie, les mêmes articulations et des surfaces colorées différentes. Les yeux, les cœurs et les runes ont un passage de rendu lumineux séparé ; les carapaces restent éclairées par le monde.
+Chaque gardien possède une silhouette, un matériau principal et une armature propres. La révision 3 garde les articulations et les détails, mais remplace toutes les formes arrondies par des volumes cubiques Minecraft. Les anciens modèles sont sauvegardés dans l’archive locale `backups/modeles-avant-refonte-2026-10-26/aeloria-modeles-c92f062.zip`.
+
+Le cristal possède trois états de capture utilisant la même géométrie, les mêmes articulations et des surfaces colorées différentes. Les yeux, les cœurs et les runes ont un passage de rendu lumineux séparé ; les carapaces restent éclairées par le monde.
 
 ## Projets
 

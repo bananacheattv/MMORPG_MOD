@@ -32,6 +32,7 @@ public final class ServerEvents {
     @SubscribeEvent
     public static void onServerStarted(net.neoforged.neoforge.event.server.ServerStartedEvent event) {
         event.getServer().getGameRules().set(net.minecraft.world.level.gamerules.GameRules.KEEP_INVENTORY, true, event.getServer());
+        event.getServer().getGameRules().set(net.minecraft.world.level.gamerules.GameRules.NATURAL_HEALTH_REGENERATION, false, event.getServer());
         // monde neuf : le hub est construit tout seul (un peu apres le demarrage), la premiere connexion s'y fait toujours
         var server = event.getServer();
         Scheduler.later(server.overworld(), 60, () -> com.mmorpg.hub.HubManager.ensureHub(server));
@@ -61,6 +62,8 @@ public final class ServerEvents {
     public static void onServerTick(ServerTickEvent.Post event) {
         Scheduler.tick();
         PartyManager.tick(event.getServer());
+        com.mmorpg.network.GroupTravel.tick(event.getServer());
+        com.mmorpg.network.AdminTravel.tick(event.getServer());
         com.mmorpg.network.NetworkPlayers.tick(event.getServer());
     }
 
@@ -104,9 +107,9 @@ public final class ServerEvents {
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
             RpgPlayers.onRespawn(sp);
-            if (com.mmorpg.network.NetworkConfig.current.enabled && com.mmorpg.network.NetworkConfig.current.role == com.mmorpg.network.NetworkConfig.Role.DUNGEONS) {
-                Scheduler.later(sp.level(), 5, () -> com.mmorpg.network.DungeonTravel.returnToSource(sp));
-            }
+            if (!event.isEndConquered()) Scheduler.later(sp.level(), 5, () -> {
+                if (!sp.isRemoved()) com.mmorpg.hub.HubManager.goToSpawn(sp);
+            });
         }
     }
 

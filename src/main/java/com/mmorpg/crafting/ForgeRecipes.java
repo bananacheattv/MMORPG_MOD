@@ -107,7 +107,7 @@ public final class ForgeRecipes {
         for (int t = 1; t < tier.length; t++) {
             String ore = MINE_ORES[t - 1];
             int lvl = MINE_LEVEL[t - 1];
-            String[] kinds = {"pioche", "hache", "pelle", "houe"};
+            String[] kinds = {"pioche", "houe"};
             for (int k = 0; k < kinds.length; k++) {
                 List<Object> ing = new ArrayList<>();
                 ing.add("compresse_" + ore);
@@ -163,16 +163,12 @@ public final class ForgeRecipes {
 
     static {
         PlayerClass N = PlayerClass.NONE;
+        for(int i=0;i<com.mmorpg.mine.ToolRunes.IDS.length;i++)add(Category.MATERIAUX,com.mmorpg.mine.ToolRunes.IDS[i],1,100,10+i*10,N,"cristal_arcanique",2,"poussiere_ame",8,"lingot_argentite",2);
         add(Category.MATERIAUX, "fiole_runique", 4, 1, 1, N, "lingot_verdite", 1, "poussiere_ame", 1);
         add(Category.CONSOMMABLES, "charme_experience", 1, 100, 10, N, "poussiere_ame", 8, "poussiere_ame", 4);
-        add(Category.CONSOMMABLES, "cle_aventure", 1, 80, 5, N, "lingot_verdite", 4, "poussiere_ame", 2);
-        add(Category.CONSOMMABLES, "caisse_aventure", 1, 40, 5, N, "ecorce_ancienne", 8, "ferraille_gobeline", 4);
         add(Category.CONSOMMABLES, "lucky_block", 1, 120, 10, N, "lingot_argentite", 4, "trefle_chance", 1);
         add(Category.CONSOMMABLES, "charme_chance", 1, 100, 10, N, "trefle_chance", 1, "lingot_argentite", 2);
         // mannequins d'entrainement (hub) : le standard sert de base aux variantes
-        add(Category.CONSOMMABLES, "mannequin_entrainement", 1, 20, 1, N, "racine_lueur", 2, "ecorce_ancienne", 2, "soie_araignee", 4);
-        add(Category.CONSOMMABLES, "mannequin_blinde", 1, 60, 1, N, "mannequin_entrainement", 1, "lingot_verdite", 8, "ferraille_gobeline", 4);
-        add(Category.CONSOMMABLES, "mannequin_magique", 1, 100, 1, N, "mannequin_entrainement", 1, "cristal_arcanique", 2, "tissu_enchante", 4);
         add(Category.FAMILIERS, "nourriture_familier", 4, 5, 1, N, "racine_lueur", 4, "racine_lueur", 2);
         // ---------------------------------------------------------------- materiaux intermediaires
         add(Category.MATERIAUX, "lingot_mithril", 1, 5, 20, N, "lingot_argentite", 2, "acier_orc", 2, "poussiere_ame", 1);

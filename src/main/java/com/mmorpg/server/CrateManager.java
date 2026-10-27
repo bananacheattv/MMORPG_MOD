@@ -120,14 +120,14 @@ public final class CrateManager {
     private static int countKeys(ServerPlayer p, CrateTier tier) {
         int n = 0;
         Item key = ForgeRecipes.resolveItem("mmorpg:" + tier.keyItem());
-        Item legacy = tier == CrateTier.COMMUNE ? ForgeRecipes.resolveItem("mmorpg:cle_aventure") : null;
+        Item legacy = null;
         for (ItemStack s : p.getInventory()) if (!s.isEmpty() && (s.is(key) || (legacy != null && s.is(legacy)))) n += s.getCount();
         return n;
     }
 
     private static ItemStack findKey(ServerPlayer p, CrateTier tier) {
         Item key = ForgeRecipes.resolveItem("mmorpg:" + tier.keyItem());
-        Item legacy = tier == CrateTier.COMMUNE ? ForgeRecipes.resolveItem("mmorpg:cle_aventure") : null;
+        Item legacy = null;
         if (key == null || key == Items.AIR) return ItemStack.EMPTY;
         for (ItemStack s : p.getInventory()) {
             if (!s.isEmpty() && (s.is(key) || (legacy != null && s.is(legacy)))) return s;

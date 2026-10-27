@@ -86,6 +86,8 @@ public final class ClientPayloadHandlers {
             case S2COpenScreen.ARENA_READY -> mc.gui.setScreen(new com.mmorpg.client.screen.ArenaReadyScreen(payload.extra()));
             case S2COpenScreen.ADVENTURE_SUMMARY -> mc.gui.setScreen(new com.mmorpg.client.screen.AdventureSummaryScreen(payload.extra()));
             case S2COpenScreen.MERCHANT_EDITOR -> mc.gui.setScreen(new com.mmorpg.client.screen.MerchantEditorScreen(payload.extra()));
+            case S2COpenScreen.HUB_TUTORIAL -> mc.gui.setScreen(new com.mmorpg.client.screen.HubTutorialScreen());
+            case S2COpenScreen.ARMOR_STAND_EDITOR -> mc.gui.setScreen(new com.mmorpg.client.screen.ArmorStandEditorScreen(payload.extra()));
             case S2COpenScreen.CLASS_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.ClassMasterScreen(payload.extra()));
             case S2COpenScreen.TRIAL_STATE -> {
                 ClientData.trialActive = payload.extra().getBooleanOr("active", false);

@@ -16,6 +16,9 @@ public final class ModDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> UPGRADE =
             COMPONENTS.registerComponentType("upgrade", b -> b.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> TOOL_RUNES =
+            COMPONENTS.registerComponentType("tool_runes",b->b.persistent(Codec.intRange(0,4095)).networkSynchronized(ByteBufCodecs.VAR_INT));
+
     private ModDataComponents() {
     }
 }

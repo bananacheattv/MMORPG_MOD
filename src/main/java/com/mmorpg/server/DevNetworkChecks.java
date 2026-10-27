@@ -141,6 +141,8 @@ public final class DevNetworkChecks {
             DevSpawnEditorChecks.run(p);
             DevMerchantChecks.run(p);
             DevSocialChecks.run(p);
+            DevBetaChecks.run(p);
+            DevNewRulesChecks.run(p);
             java.nio.file.Files.writeString(java.nio.file.Path.of("../build/reports/blueprints.json"),new com.google.gson.Gson().toJson(ForgeRecipes.all().stream().filter(r->ForgeProgression.required(r)>0).map(ForgeProgression::blueprint).toList()));
             MMORPG.LOGGER.info("[CODEX CHECKS] NETWORK_FORGE PASS: session locks, backup, proxy format, recipes, starters, scrolls, crafting, quests, shared inventory/bank, corruption refusal, handoff");
             Files.createDirectories(Path.of("../build/reports"));

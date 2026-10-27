@@ -1,0 +1,391 @@
+[
+  {
+    "id": "zombie_des_cryptes",
+    "bones": 7,
+    "meshes": 49,
+    "faces": 294,
+    "vertices": 392,
+    "emissive": 4,
+    "animations": [
+      "walk",
+      "attack",
+      "idle",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      0,
+      7,
+      15,
+      14,
+      4,
+      12,
+      6
+    ],
+    "bounds": {
+      "min": [
+        -7.8,
+        -1.7999999999999998,
+        -4.329999999999999
+      ],
+      "max": [
+        7.65,
+        31,
+        3.5
+      ]
+    }
+  },
+  {
+    "id": "bandit_arbaletrier",
+    "bones": 7,
+    "meshes": 51,
+    "faces": 306,
+    "vertices": 408,
+    "emissive": 4,
+    "animations": [
+      "walk",
+      "attack",
+      "idle",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      1,
+      7,
+      5,
+      15,
+      14,
+      4,
+      12,
+      6
+    ],
+    "bounds": {
+      "min": [
+        -10.3,
+        0,
+        -8.5
+      ],
+      "max": [
+        7.65,
+        32.05,
+        4.5
+      ]
+    }
+  },
+  {
+    "id": "gobelin",
+    "bones": 7,
+    "meshes": 55,
+    "faces": 330,
+    "vertices": 440,
+    "emissive": 4,
+    "animations": [
+      "walk",
+      "attack",
+      "idle",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      0,
+      7,
+      15,
+      14,
+      4,
+      12,
+      6
+    ],
+    "bounds": {
+      "min": [
+        -7.8,
+        -1.7999999999999998,
+        -4.55
+      ],
+      "max": [
+        7.65,
+        31,
+        3.5
+      ]
+    }
+  },
+  {
+    "id": "squelette_maudit",
+    "bones": 7,
+    "meshes": 53,
+    "faces": 318,
+    "vertices": 424,
+    "emissive": 4,
+    "animations": [
+      "walk",
+      "attack",
+      "idle",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      4,
+      7,
+      6,
+      15,
+      14,
+      12
+    ],
+    "bounds": {
+      "min": [
+        -7.8,
+        -1.7999999999999998,
+        -4.329999999999999
+      ],
+      "max": [
+        6.425,
+        31,
+        3.5
+      ]
+    }
+  },
+  {
+    "id": "orc_guerrier",
+    "bones": 7,
+    "meshes": 55,
+    "faces": 330,
+    "vertices": 440,
+    "emissive": 4,
+    "animations": [
+      "walk",
+      "attack",
+      "idle",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      0,
+      7,
+      6,
+      15,
+      14,
+      4,
+      12
+    ],
+    "bounds": {
+      "min": [
+        -7.8,
+        -1.7999999999999998,
+        -4.55
+      ],
+      "max": [
+        7.65,
+        31,
+        3.5
+      ]
+    }
+  },
+  {
+    "id": "spectre_givre",
+    "bones": 7,
+    "meshes": 56,
+    "faces": 336,
+    "vertices": 448,
+    "emissive": 7,
+    "animations": [
+      "walk",
+      "attack",
+      "idle",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      9,
+      7,
+      15,
+      4,
+      12,
+      14,
+      5
+    ],
+    "bounds": {
+      "min": [
+        -7.65,
+        0,
+        -4.329999999999999
+      ],
+      "max": [
+        7.65,
+        35.95,
+        4
+      ]
+    }
+  },
+  {
+    "id": "chevalier_neant",
+    "bones": 7,
+    "meshes": 60,
+    "faces": 360,
+    "vertices": 480,
+    "emissive": 7,
+    "animations": [
+      "walk",
+      "attack",
+      "idle",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      15,
+      7,
+      10,
+      14,
+      4,
+      12,
+      6,
+      5
+    ],
+    "bounds": {
+      "min": [
+        -7.8,
+        -1.7999999999999998,
+        -4.329999999999999
+      ],
+      "max": [
+        7.65,
+        35.95,
+        4
+      ]
+    }
+  },
+  {
+    "id": "loup_sombre",
+    "bones": 8,
+    "meshes": 58,
+    "faces": 348,
+    "vertices": 464,
+    "emissive": 4,
+    "animations": [
+      "walk",
+      "idle",
+      "attack",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      15,
+      1,
+      5,
+      14,
+      4
+    ],
+    "bounds": {
+      "min": [
+        -4.3,
+        0,
+        -14.5
+      ],
+      "max": [
+        4.3,
+        20.6,
+        16.579141606172445
+      ]
+    }
+  },
+  {
+    "id": "araignee_venimeuse",
+    "bones": 11,
+    "meshes": 67,
+    "faces": 402,
+    "vertices": 536,
+    "emissive": 4,
+    "animations": [
+      "walk",
+      "attack",
+      "idle",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      15,
+      3,
+      14,
+      4,
+      10,
+      0
+    ],
+    "bounds": {
+      "min": [
+        -10.40330204131141,
+        0.22019308863580023,
+        -9.566819453647522
+      ],
+      "max": [
+        10.40330204131141,
+        8.5,
+        9
+      ]
+    }
+  },
+  {
+    "id": "elementaire_feu",
+    "bones": 21,
+    "meshes": 46,
+    "faces": 276,
+    "vertices": 368,
+    "emissive": 23,
+    "animations": [
+      "idle",
+      "walk",
+      "attack",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      8,
+      15,
+      4,
+      6
+    ],
+    "bounds": {
+      "min": [
+        -9.88997762092696,
+        6,
+        -9.072859135081606
+      ],
+      "max": [
+        9.88997762092696,
+        28,
+        8.897859135081607
+      ]
+    }
+  },
+  {
+    "id": "golem_cristal",
+    "bones": 7,
+    "meshes": 45,
+    "faces": 270,
+    "vertices": 360,
+    "emissive": 23,
+    "animations": [
+      "walk",
+      "attack",
+      "idle",
+      "cast",
+      "death"
+    ],
+    "materials": [
+      6,
+      9,
+      14,
+      15,
+      4
+    ],
+    "bounds": {
+      "min": [
+        -17,
+        0,
+        -7.25
+      ],
+      "max": [
+        17,
+        44.5,
+        5.5
+      ]
+    }
+  }
+]

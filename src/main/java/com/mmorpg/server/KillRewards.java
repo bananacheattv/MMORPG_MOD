@@ -42,6 +42,11 @@ public final class KillRewards {
     private KillRewards() {
     }
 
+    private static boolean dungeonMob(LivingEntity entity) {
+        return entity.level() instanceof ServerLevel level
+                && com.mmorpg.dungeon.InstanceManager.slotAt(level.getServer(), level, entity.getX(), entity.getZ()) != null;
+    }
+
     private static ServerPlayer killer(LivingEntity dead, Entity sourceEntity) {
         if (sourceEntity instanceof ServerPlayer sp) return sp;
         Player last = dead.getLastHurtByPlayer() instanceof Player p ? p : null;
@@ -84,7 +89,7 @@ public final class KillRewards {
             PlayerData d = RpgPlayers.get(p);
             boolean inGroup = p == killer || PartyManager.sameParty(killer, p);
             double share = inGroup ? groupFactor : 1.0;
-            long xp = Math.max(1, Math.round(LevelSystem.xpForKill(md.level, md.xpMultiplier, d.level) * share * 0.5));
+            long xp = Math.max(1, Math.round(LevelSystem.xpForKill(md.level, md.xpMultiplier, d.level) * share * 0.5 * (dungeonMob(dead) ? 0.2 : 1.0)));
             RpgPlayers.giveXp(p, xp, true);
             if (!d.activePet.isEmpty()) PetManager.addPetXp(p, d.activePet, (int) Math.max(1, xp * 0.05));
             AdventureSummary.count(p,"kills",1);
@@ -129,7 +134,7 @@ public final class KillRewards {
                 double chance = Math.min(1.0, d.chance * dropMultiplier);
                 if (random.nextDouble() < chance) {
                     Item item = ForgeRecipes.resolveItem(d.item);
-                    if (item != null && item != net.minecraft.world.item.Items.AIR && !CrateOnly.is(item)) {
+                    if (item != null && item != net.minecraft.world.item.Items.AIR && !CrateOnly.is(item) && !RetiredItems.item(item)) {
                         int n = d.min >= d.max ? d.min : d.min + random.nextInt(d.max - d.min + 1);
                         loot.add(new ItemStack(item, Math.max(1, n)));
                     }
@@ -160,6 +165,8 @@ public final class KillRewards {
                 loot.add(new ItemStack(potion));
             }
         }
+        // Thin whole reward rolls, including guaranteed drops and gold: expected quantity is divided by ten.
+        if (dungeonMob(dead)) loot.removeIf(stack -> random.nextInt(10) != 0);
         for (ItemStack stack : loot) {
             ItemEntity ie = new ItemEntity(level, dead.getX(), dead.getY() + 0.5, dead.getZ(), stack);
             ie.setDefaultPickUpDelay();
