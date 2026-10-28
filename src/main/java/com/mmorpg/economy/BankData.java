@@ -60,6 +60,32 @@ public class BankData extends SavedData {
         return server.overworld().getDataStorage().computeIfAbsent(TYPE);
     }
 
+    /** Le compte du joueur s'il existe (sans en creer un). */
+    public Account peek(UUID player) {
+        return accounts.get(player);
+    }
+
+    /** Compte en texte (SNBT) pour la base de donnees du reseau. */
+    public static String encode(Account a, net.minecraft.core.HolderLookup.Provider registries) {
+        var ops = net.minecraft.resources.RegistryOps.create(net.minecraft.nbt.NbtOps.INSTANCE, registries);
+        return Account.CODEC.encodeStart(ops, a).getOrThrow().toString();
+    }
+
+    /** Remplace le compte du joueur par celui lu dans la base ; faux si le texte est illisible (le compte local est alors garde). */
+    public boolean replace(UUID player, String snbt, net.minecraft.core.HolderLookup.Provider registries) {
+        try {
+            var tag = net.minecraft.nbt.TagParser.parseCompoundFully(snbt);
+            var ops = net.minecraft.resources.RegistryOps.create(net.minecraft.nbt.NbtOps.INSTANCE, registries);
+            Account a = Account.CODEC.parse(ops, tag).getOrThrow();
+            accounts.put(player, a);
+            setDirty();
+            return true;
+        } catch (Exception e) {
+            MMORPG.LOGGER.warn("[MMORPG] Compte bancaire de {} illisible dans la base : {}", player, e.getMessage());
+            return false;
+        }
+    }
+
     public Account account(UUID player) {
         return accounts.computeIfAbsent(player, k -> new Account());
     }

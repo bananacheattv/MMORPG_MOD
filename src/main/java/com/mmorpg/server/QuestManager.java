@@ -275,6 +275,7 @@ public final class QuestManager {
         if (id.equals(d.trackedQuest)) d.trackedQuest = "";
         if (q.daily) d.dailyQuests.put(id, today());
         else d.completedQuests.add(id);
+        com.mmorpg.db.Audit.log(p, com.mmorpg.db.Audit.QUEST_DONE, 0, id);
         // recompenses
         long xp = rewardXp(q, d.level);
         if (q.rewards.gold > 0) RpgPlayers.addGold(p, q.rewards.gold, true);
