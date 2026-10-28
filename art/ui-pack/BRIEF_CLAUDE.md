@@ -8,9 +8,9 @@ Tu travailles déjà sur le mod. Ce pack est préparé dans un checkout distinct
 
 ## Sources
 
-- `art/ui-pack/images/` : quinze PNG originaux, conservés sans retouche destructrice.
+- `art/ui-pack/images/` : PNG originaux du pack, conservés sans retouche destructrice.
 - `art/ui-pack/manifest.json` : dimensions réelles, alpha, SHA256, usage, zones UV des quatre classes.
-- `art/ui-pack/prompts.json` : prompts exacts des douze nouvelles générations, outil intégré image_gen. Les trois images métier proviennent des générations précédentes approuvées dans cette conversation.
+- `art/ui-pack/prompts.json` : prompts exacts des générations et extractions livrées, outil intégré image_gen. Les trois images métier proviennent des générations précédentes approuvées dans cette conversation.
 - [Galerie du pack](README.md).
 
 Copier les seules images utilisées vers `src/main/resources/assets/mmorpg/textures/gui/illustrations/` dans ton implémentation, ou dériver des versions optimisées sans écraser les originaux. Les identifiants de ressources doivent rester en minuscules ASCII (`mmorpg:textures/gui/illustrations/...png`). Ne charger aucune image par URL réseau pendant le rendu.
@@ -110,7 +110,16 @@ Le livre illustré sert d’en-tête de collection. Les fiches et portraits indi
 
 ## 11 — Succès
 
-**Asset :** `achievement_medals_atlas`, six médailles sur alpha réel. Ordre3colonnes×2lignes : Mine, Exploration, Forge / Boss, Arène, Récolte. Lire les six régions pixels et UV du manifeste ; chaque cellule couvre exactement son icône.
+**Assets à utiliser : six PNG INDIVIDUELS**, conformément à la demande explicite de l’utilisateur :
+
+- `medal_mining.png` — Mine.
+- `medal_exploration.png` — Exploration.
+- `medal_crafting.png` — Forge.
+- `medal_boss.png` — Boss.
+- `medal_arena.png` — Arène.
+- `medal_harvest.png` — Récolte.
+
+Ils possèdent chacun leur alpha et leur taille propre dans le manifeste. Les afficher en contain, avec une marge extérieure d’environ8%, sans couper les gemmes et sans les étirer. **Ne pas utiliser la planche6icônes comme un seul bouton ni la faire découper à la main à l’utilisateur.** `achievement_medals_atlas` reste une référence artistique facultative, pas la source à intégrer par défaut.
 
 Utiliser les médailles avec leurs vrais objectifs et progressions, lorsqu’un système de succès existe sur la branche actuelle. Un compas de succès Exploration ne demande pas de carte du monde. **L’utilisateur a retiré la carte du monde de la demande : ne créer aucun écran ni asset de carte.** Ne pas afficher de progression ou récompense inventée si le backend de succès est absent. Conserver les images transparentes et leurs proportions, prévoir obtenu/verrouillé/en cours sans imposer un sens caché aux seules couleurs.
 

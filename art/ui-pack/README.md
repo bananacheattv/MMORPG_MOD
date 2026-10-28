@@ -6,10 +6,11 @@ Ce dossier est le **point d’entrée unique pour Claude**. Il regroupe toutes l
 
 - Lot1 : Métiers, Donjons, Classes, Quêtes, Montures/Familiers, Boutique, Chargements — livré.
 - Lot2 : Guildes, Forge, Bestiaire, Succès, Résultats d’arène — livré.
+- Médailles : six PNG transparents individuels livrés, un fichier par icône.
 - Lot3 : HDV, Banque/Sacs, Compétences, Fin de donjon, Fiches d’équipement — en préparation.
 - **Carte du monde retirée à la demande de l’utilisateur. Aucun fichier de carte ni demande de création de ce menu n’est livré.**
 
-**15 PNG disponibles**, dont les trois métiers de la première série. Les images sont des assets, pas des interfaces déjà fonctionnelles.
+**21 PNG disponibles**, dont les trois métiers de la première série. Les images sont des assets, pas des interfaces déjà fonctionnelles.
 
 ➡️ [Instructions d’intégration pour Claude](BRIEF_CLAUDE.md) · [Contrôles d’affichage obligatoires](DISPLAY_QA.md) · [Manifeste technique](manifest.json) · [Prompts](prompts.json)
 
@@ -36,6 +37,12 @@ Récupérer les commits d’assets uniquement par cherry-pick depuis la branche 
 | [Bestiaire](images/bestiary_header.png) | 1672×941 | bestiary_header |
 | [Médailles de succès](images/achievement_medals_atlas.png) | 1536×1024 | six_medal_atlas |
 | [Résultats d’arène](images/arena_results_background.png) | 1672×941 | results_background |
+| [Médaille Mine](images/medal_mining.png) | 1254×1254 | achievement_icon |
+| [Médaille Exploration](images/medal_exploration.png) | 1254×1254 | achievement_icon |
+| [Médaille Forge](images/medal_crafting.png) | 1254×1254 | achievement_icon |
+| [Médaille Boss](images/medal_boss.png) | 1254×1254 | achievement_icon |
+| [Médaille Arène](images/medal_arena.png) | 1254×1254 | achievement_icon |
+| [Médaille Récolte](images/medal_harvest.png) | 1254×1254 | achievement_icon |
 
 ## Galerie
 
@@ -98,3 +105,27 @@ Récupérer les commits d’assets uniquement par cherry-pick depuis la branche 
 ### Résultats d’arène
 
 ![Résultats d’arène](images/arena_results_background.png)
+
+### Médaille Mine
+
+![Médaille Mine](images/medal_mining.png)
+
+### Médaille Exploration
+
+![Médaille Exploration](images/medal_exploration.png)
+
+### Médaille Forge
+
+![Médaille Forge](images/medal_crafting.png)
+
+### Médaille Boss
+
+![Médaille Boss](images/medal_boss.png)
+
+### Médaille Arène
+
+![Médaille Arène](images/medal_arena.png)
+
+### Médaille Récolte
+
+![Médaille Récolte](images/medal_harvest.png)

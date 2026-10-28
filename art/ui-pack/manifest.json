@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "generation_tool": "image_gen built-in",
   "date": "2026-10-28",
   "namespace_suggestion": "mmorpg:textures/gui/illustrations/",
@@ -368,7 +368,8 @@
             1.0
           ]
         }
-      ]
+      ],
+      "usage_note": "Planche de référence uniquement. Utiliser les six fichiers medal_*.png pour intégrer les icônes individuellement."
     },
     {
       "id": "arena_results_background",
@@ -397,6 +398,144 @@
           0.37
         ]
       ]
+    },
+    {
+      "id": "medal_mining",
+      "path": "images/medal_mining.png",
+      "label": "Médaille Mine",
+      "role": "achievement_icon",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha_content_bounds_px": [
+        23,
+        30,
+        1234,
+        1210
+      ],
+      "sha256": "6d9841a999104e439b1b21cd8b2bf50a6c043b5528ec2e50bb116af4ee992c02",
+      "contains_embedded_text": false,
+      "recommended_render_mode": "contain",
+      "recommended_outer_padding": 0.08,
+      "variant_of": "achievement_medals_atlas"
+    },
+    {
+      "id": "medal_exploration",
+      "path": "images/medal_exploration.png",
+      "label": "Médaille Exploration",
+      "role": "achievement_icon",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha_content_bounds_px": [
+        0,
+        23,
+        1229,
+        1226
+      ],
+      "sha256": "1219555f2379f3a9ac12a6b75d622ee702b21c4502c5a2439b1c8f96b8d90fcb",
+      "contains_embedded_text": false,
+      "recommended_render_mode": "contain",
+      "recommended_outer_padding": 0.08,
+      "variant_of": "achievement_medals_atlas"
+    },
+    {
+      "id": "medal_crafting",
+      "path": "images/medal_crafting.png",
+      "label": "Médaille Forge",
+      "role": "achievement_icon",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha_content_bounds_px": [
+        0,
+        6,
+        1254,
+        1254
+      ],
+      "sha256": "6a7699bb930c548b2bce00e6ab04a11ad1aec2d7977e762e0de876d16ca9451c",
+      "contains_embedded_text": false,
+      "recommended_render_mode": "contain",
+      "recommended_outer_padding": 0.08,
+      "variant_of": "achievement_medals_atlas"
+    },
+    {
+      "id": "medal_boss",
+      "path": "images/medal_boss.png",
+      "label": "Médaille Boss",
+      "role": "achievement_icon",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha_content_bounds_px": [
+        0,
+        9,
+        1230,
+        1254
+      ],
+      "sha256": "94ba29ad406f53119974e5bdce3bafc5675856e41e361e5272715f0360575c4b",
+      "contains_embedded_text": false,
+      "recommended_render_mode": "contain",
+      "recommended_outer_padding": 0.08,
+      "variant_of": "achievement_medals_atlas"
+    },
+    {
+      "id": "medal_arena",
+      "path": "images/medal_arena.png",
+      "label": "Médaille Arène",
+      "role": "achievement_icon",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha_content_bounds_px": [
+        0,
+        21,
+        1236,
+        1232
+      ],
+      "sha256": "31c2174aaf774f24a90028b4bbd968ffc55f3cee6069c1cf4013bb5d330047b3",
+      "contains_embedded_text": false,
+      "recommended_render_mode": "contain",
+      "recommended_outer_padding": 0.08,
+      "variant_of": "achievement_medals_atlas"
+    },
+    {
+      "id": "medal_harvest",
+      "path": "images/medal_harvest.png",
+      "label": "Médaille Récolte",
+      "role": "achievement_icon",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha_content_bounds_px": [
+        0,
+        24,
+        1230,
+        1254
+      ],
+      "sha256": "4a39539203bf5b90ead0e32e393e3adfa1cfe5e3ea0d12b07195f8a80b3f381a",
+      "contains_embedded_text": false,
+      "recommended_render_mode": "contain",
+      "recommended_outer_padding": 0.08,
+      "variant_of": "achievement_medals_atlas"
     }
   ]
 }
