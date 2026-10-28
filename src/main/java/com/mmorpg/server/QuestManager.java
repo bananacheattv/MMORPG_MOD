@@ -288,6 +288,7 @@ public final class QuestManager {
         Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "QUÊTE TERMINÉE", q.name, 0x60FF80));
         p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.SUCCESS.get(), SoundSource.PLAYERS, 1f, 1f);
         if (xp > 0) RpgPlayers.giveXp(p, xp, false);
+        com.mmorpg.achievement.Achievements.add(p, com.mmorpg.achievement.Achievement.QUESTS, 1);
         d.dirty = true;
         openGiver(p, npc);
     }

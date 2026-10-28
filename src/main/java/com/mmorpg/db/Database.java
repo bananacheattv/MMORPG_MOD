@@ -34,7 +34,7 @@ public final class Database {
     }
 
     private static final int QUEUE_LIMIT = 20_000;
-    private static final long SCHEMA_VERSION = 2;
+    private static final long SCHEMA_VERSION = 3;
 
     private static volatile DbConfig config = new DbConfig();
     private static volatile boolean ready;
@@ -141,7 +141,12 @@ public final class Database {
             // donnees partagees (guildes, hotel des ventes, registres...) : independant de la version du schema pour rester compatible avec les autres ajouts
             s.execute("CREATE TABLE IF NOT EXISTS shared_docs (name VARCHAR(64) NOT NULL PRIMARY KEY, data MEDIUMTEXT NOT NULL, revision BIGINT NOT NULL DEFAULT 1, "
                     + "updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-            // les prochaines evolutions du schema s'ajoutent ici : if (have < 3) { ... }
+            if (have < 3) {                                           // v3 : classements (panneaux)
+                s.execute("CREATE TABLE IF NOT EXISTS leaderboard_stats (board VARCHAR(32) NOT NULL, uuid CHAR(36) NOT NULL, name VARCHAR(64) NOT NULL, "
+                        + "value BIGINT NOT NULL DEFAULT 0, extra BIGINT NOT NULL DEFAULT 0, updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, "
+                        + "PRIMARY KEY (board, uuid), KEY idx_lb_rank (board, value, extra)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+            }
+            // les prochaines evolutions du schema s'ajoutent ici : if (have < 4) { ... }
             s.execute("REPLACE INTO aeloria_meta (k, v) VALUES ('schema_version', '" + SCHEMA_VERSION + "')");
             // reprise apres plantage : les joueurs que CE serveur avait en ligne ne le sont plus
             s.executeUpdate("UPDATE players SET online = 0 WHERE server_id = '" + config.serverId.replace("'", "''") + "' AND online = 1");

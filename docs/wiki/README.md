@@ -16,6 +16,7 @@ Le guide du MMORPG Aeloria : prise en main, progression, activités et administr
 - [Montures, familiers et apparences](montures-cosmetiques.md)
 - [Commandes et dépannage](commandes-aide.md)
 - [Administration et personnalisation](administration.md)
+- [Succès et titres](succes-titres.md)
 - [Catalogue des compétences](catalogue-competences.md)
 - [Catalogue des armes PvE](catalogue-armes.md)
 

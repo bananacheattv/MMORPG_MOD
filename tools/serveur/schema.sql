@@ -80,3 +80,15 @@ CREATE TABLE IF NOT EXISTS shared_docs (
 --   SELECT ts, name, amount, detail FROM events WHERE kind = 'auction_sale' AND ts > NOW() - INTERVAL 7 DAY ORDER BY ts DESC;
 -- Purge du journal de plus de 90 jours (a planifier) :
 --   DELETE FROM events WHERE ts < NOW() - INTERVAL 90 DAY;
+
+-- Classements des panneaux (schema v3) : une ligne par joueur et par classement (board : niveau, fortune, monstres, boss, donjons, quetes, pvp_victoires, pvp_elims).
+CREATE TABLE IF NOT EXISTS leaderboard_stats (
+  board VARCHAR(32) NOT NULL,
+  uuid CHAR(36) NOT NULL,
+  name VARCHAR(64) NOT NULL,
+  value BIGINT NOT NULL DEFAULT 0,
+  extra BIGINT NOT NULL DEFAULT 0,
+  updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (board, uuid),
+  KEY idx_lb_rank (board, value, extra)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

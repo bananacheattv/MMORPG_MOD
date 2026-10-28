@@ -29,7 +29,11 @@ import java.util.UUID;
 public class PlayerData implements ValueIOSerializable {
     public float shieldGuard=100;
     public boolean shieldGuardRecovering;
+    /** Titre affiche apres le pseudo (succes ou PvP). */
     public String pvpTitle="";
+    /** Compteurs des succes et succes debloques (id -> date de deblocage, en secondes). */
+    public final Map<String, Long> stats = new LinkedHashMap<>();
+    public final Map<String, Long> achievements = new LinkedHashMap<>();
     public CompoundTag backpacks=new CompoundTag();
     public CompoundTag adventureSummary = new CompoundTag();
     public String rankLabel="Aelorien";public int rankColor=0xB9AFCC,rankTier,auctionSlots=12;
@@ -216,6 +220,8 @@ public class PlayerData implements ValueIOSerializable {
         t.store("waypoints", UUIDUtil.CODEC.listOf(), new ArrayList<>(waypoints));
         t.store("kills", STR_INT_MAP, kills);
         t.store("jobXp", Codec.unboundedMap(Codec.STRING, Codec.LONG), jobXp);
+        t.store("stats", Codec.unboundedMap(Codec.STRING, Codec.LONG), stats);
+        t.store("achievements", Codec.unboundedMap(Codec.STRING, Codec.LONG), achievements);
         t.putBoolean("chosen", classChosenOnce);
         t.putBoolean("starterTools", starterTools);
         t.putInt("forgeBlueprints", forgeBlueprints);
@@ -284,6 +290,10 @@ public class PlayerData implements ValueIOSerializable {
         kills.putAll(t.read("kills", STR_INT_MAP).orElse(Map.of()));
         jobXp.clear();
         jobXp.putAll(t.read("jobXp", Codec.unboundedMap(Codec.STRING, Codec.LONG)).orElse(Map.of()));
+        stats.clear();
+        stats.putAll(t.read("stats", Codec.unboundedMap(Codec.STRING, Codec.LONG)).orElse(Map.of()));
+        achievements.clear();
+        achievements.putAll(t.read("achievements", Codec.unboundedMap(Codec.STRING, Codec.LONG)).orElse(Map.of()));
         classChosenOnce = t.getBooleanOr("chosen", playerClass != PlayerClass.NONE);
         starterTools = t.getBooleanOr("starterTools", false);
         forgeBlueprints = t.getIntOr("forgeBlueprints", 0) & 31;

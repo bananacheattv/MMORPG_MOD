@@ -74,7 +74,6 @@ neoForge {
         server {
             server()
             programArgument '--nogui'
-            if (project.hasProperty('sharedChecks')) systemProperty 'mmorpg.checkShared', 'true'
             if (project.hasProperty('networkChecks')) systemProperty 'mmorpg.checkNetwork', 'true'
             if (project.hasProperty('visualChecks')) systemProperty 'mmorpg.visualChecks', 'true'
             if (project.hasProperty('guidanceVisual')) systemProperty 'mmorpg.guidanceVisual', 'true'
@@ -136,7 +135,7 @@ configurations {
 }
 
 dependencies {
-    // Pilote MariaDB/MySQL (base de donnees du reseau Aeloria, voir GUIDE_SERVEUR.md) : embarque dans le jar du mod (jar-in-jar)
+    // Pilote MariaDB/MySQL (base de donnees du reseau Aeloria) : embarque dans le jar du mod (jar-in-jar)
     implementation 'org.mariadb.jdbc:mariadb-java-client:3.5.3'
     jarJar('org.mariadb.jdbc:mariadb-java-client:[3.5.3,3.6)')
 

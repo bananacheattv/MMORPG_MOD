@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "mmorpg:block/classement_guilde_banque"
+    },
+    "facing=east": {
+      "model": "mmorpg:block/classement_guilde_banque",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "mmorpg:block/classement_guilde_banque",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "mmorpg:block/classement_guilde_banque",
+      "y": 270
+    }
+  }
+}

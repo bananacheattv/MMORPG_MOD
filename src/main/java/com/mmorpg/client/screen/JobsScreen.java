@@ -13,6 +13,18 @@ public class JobsScreen extends MenuScreen {
         super(Tab.METIERS);
     }
 
+    /** Illustration du metier (256x256) ; le mineur n'en a pas encore : pioche a la place. */
+    private static void art(GuiGraphicsExtractor g, Job j, int x, int y, int size) {
+        if (j == Job.MINEUR) {
+            Ui.rounded(g, x, y, size, size, 6, Ui.CARD);
+            Ui.border(g, x, y, size, size, j.color);
+            g.item(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND_PICKAXE), x + size / 2 - 8, y + size / 2 - 8);
+            return;
+        }
+        Ui.icon(g, com.mmorpg.MMORPG.id("textures/gui/jobs/" + j.id + ".png"), x, y, size, 256);
+        Ui.border(g, x, y, size, size, j.color);
+    }
+
     private static long xp(Job j) {
         return ClientData.DATA.jobXp.getOrDefault(j.id, 0L);
     }
@@ -25,12 +37,13 @@ public class JobsScreen extends MenuScreen {
         for (Job j : Job.values()) {
             boolean sel = j == selected;
             Ui.frame(g, x0, ry, lw, 34, j.color, sel || hovered(x0, ry, lw, 34));
-            g.text(font, j.label, x0 + 6, ry + 5, sel ? Ui.GOLD_LIGHT : Ui.TEXT, false);
+            art(g, j, x0 + 3, ry + 3, 28);
+            g.text(font, j.label, x0 + 36, ry + 5, sel ? Ui.GOLD_LIGHT : Ui.TEXT, false);
             int lvl = Job.levelFor(xp(j));
             String lv = "Niv. " + lvl;
             g.text(font, lv, x0 + lw - 6 - font.width(lv), ry + 5, j.color, false);
             float frac = lvl >= Job.MAX_LEVEL ? 1f : (float) (xp(j) - Job.totalFor(lvl)) / Job.xpToNext(lvl);
-            Ui.bar(g, x0 + 6, ry + 21, lw - 12, 6, frac, j.color, Ui.darker(j.color, 0.6f), null);
+            Ui.bar(g, x0 + 36, ry + 21, lw - 42, 6, frac, j.color, Ui.darker(j.color, 0.6f), null);
             final Job jj = j;
             click(x0, ry, lw, 34, () -> selected = jj);
             ry += 38;
@@ -41,16 +54,17 @@ public class JobsScreen extends MenuScreen {
         Job j = selected;
         long total = xp(j);
         int lvl = Job.levelFor(total);
-        Ui.scaledText(g, j.label, dx + 8, y0 + 8, 1.5f, j.color, false);
+        art(g, j, dx + 8, y0 + 8, 52);
+        Ui.scaledText(g, j.label, dx + 68, y0 + 8, 1.5f, j.color, false);
         String lv = "Niveau " + lvl + " / " + Job.MAX_LEVEL;
         g.text(font, lv, dx + dw - 8 - font.width(lv), y0 + 10, Ui.GOLD_LIGHT, false);
-        g.text(font, j.description, dx + 8, y0 + 26, Ui.MUTED, false);
+        g.text(font, font.plainSubstrByWidth(j.description, dw - 76), dx + 68, y0 + 24, Ui.MUTED, false);
         boolean max = lvl >= Job.MAX_LEVEL;
         long cur = max ? 0 : total - Job.totalFor(lvl), need = max ? 0 : Job.xpToNext(lvl);
-        Ui.bar(g, dx + 8, y0 + 40, dw - 16, 10, max ? 1f : (float) cur / need, j.color, Ui.darker(j.color, 0.6f),
+        Ui.bar(g, dx + 68, y0 + 40, dw - 76, 10, max ? 1f : (float) cur / need, j.color, Ui.darker(j.color, 0.6f),
                 max ? "Niveau maximal" : Ui.fmt(cur) + " / " + Ui.fmt(need) + " XP");
 
-        int ty = y0 + 60;
+        int ty = y0 + 66;
         Ui.header(g, dx + 8, ty, dw - 16, "BONUS ACTUELS");
         ty += 15;
         int shown = (int) Math.round(Job.doubleChance(lvl) * 100);

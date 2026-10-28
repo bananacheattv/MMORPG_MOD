@@ -425,6 +425,7 @@ public final class InstanceManager {
                 : Math.abs(p.getX() - hall.x) < 40 && p.getZ() > hall.z - 6 && p.getZ() < hall.z + Layout.LENGTH);
         for (ServerPlayer p : level.players()) {
             if (inside.test(p)) {
+                com.mmorpg.achievement.Achievements.add(p, com.mmorpg.achievement.Achievement.DUNGEONS, 1);
                 p.sendSystemMessage(Component.literal("✦ Donjon vaincu ! Récupérez votre butin : vous serez ramené à l'entrée dans " + EXIT_SECONDS + " secondes, ou parlez tout de suite au Passeur.").withColor(0xFFE080));
             }
         }
