@@ -37,6 +37,7 @@ public final class SpawnEditor {
         }, 0));
         for (var t : com.mmorpg.block.crate.CrateTier.values()) all.add(new Entry(t.blockId(), t.label, 0));
         all.add(new Entry("portail:hub", "Vers le hub", 1)); all.add(new Entry("portail:spawn", "Vers le spawn", 1));
+        all.add(new Entry("portail:donjons", "Donjons : menu", 1));
         all.add(new Entry("portail:mine", "Mines : menu", 1)); all.add(new Entry("portail:plaines", "Plaines : menu", 1));
         for (int i=0;i<5;i++) all.add(new Entry("portail:mine:"+i, "Mine · "+(i+1), 1));
         for (int i=0;i<6;i++) all.add(new Entry("portail:plaines:"+i, "Plaine · "+(i+1), 1));

@@ -39,8 +39,9 @@ public class NpcEntity extends PathfinderMob {
             return id >= 0 && id < v.length ? v[id] : QUETES;
         }
     }
-
-    public static final int SKINS = 4;
+    public static final String[] APPEARANCES={"Villageois 1","Villageois 2","Villageois 3","Villageois 4","Sélène","Kaël","Borin","Élyra","Néria","Maître Guerrier","Maître Mage","Maître Archer","Maître Paladin","Gardien de l’épreuve"};
+    public static final String[] AUTHORED_MODELS={"selene","kael","borin","elyra","neria","master_guerrier","master_mage","master_archer","master_paladin","master_epreuve"};
+    public static final int SKINS = APPEARANCES.length;
     private static final EntityDataAccessor<Integer> ROLE = SynchedEntityData.defineId(NpcEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> SKIN = SynchedEntityData.defineId(NpcEntity.class, EntityDataSerializers.INT);
     private String group = "";

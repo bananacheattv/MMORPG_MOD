@@ -137,14 +137,15 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
             animate("fly",state.ageInTicks,1);
             return;
         }
-        float moving = Math.min(1,state.walkAnimationSpeed*3);
+        // The capture crystal is moved by the server, but its orbit must never blend out into a walking animation.
+        float moving = state instanceof com.mmorpg.client.model.ArenaCrystalRenderer.State?0:Math.min(1,state.walkAnimationSpeed*3);
         animate("idle",state.ageInTicks,1-moving);
         String move=animations.containsKey("walk")?"walk":animations.containsKey("fly")?"fly":"slither";
         animate(move,state.ageInTicks,moving);
         if(state instanceof ClassicMobRenderer.State s){if(s.attackTicks>=0)animate("attack",s.attackTicks,1);if(head!=null){head.yRot+=state.yRot*(float)Math.PI/180;head.xRot+=state.xRot*(float)Math.PI/180;}}
         if(state instanceof ImportedMobRenderer.State s && s.attackTicks>=0) animate("attack",s.attackTicks,1);
-        if(state instanceof com.mmorpg.client.model.YggdrasilRenderer.State s){if(s.attackTicks>=0)animate("attack",s.attackTicks,1);if(s.castTicks>=0)animate("cast",s.castTicks,1);}
-        if(state instanceof HubGuideRenderer.State&&head!=null){head.yRot+=state.yRot*(float)Math.PI/180;head.xRot+=state.xRot*(float)Math.PI/180;}
+        if(state instanceof com.mmorpg.client.model.YggdrasilRenderer.State s){if(s.attackTicks>=0)animate("attack",s.attackTicks,1);if(s.castTicks>=0)animate("cast",s.castTicks*(s.phase==3?1.5f:s.phase==2?1.2f:1),1);if(s.phase>=2){var rootPart=root();rootPart.zRot+=(float)Math.sin(state.ageInTicks*.08)*.012f*(s.phase-1);}}
+        if((state instanceof HubGuideRenderer.State||state instanceof AuthoredNpcRenderer.State)&&head!=null){head.yRot+=state.yRot*(float)Math.PI/180;head.xRot+=state.xRot*(float)Math.PI/180;}
         if(state instanceof AuthoredMasterRenderer.State s){if(head!=null){head.yRot+=state.yRot*(float)Math.PI/180;head.xRot+=state.xRot*(float)Math.PI/180;}if(s.presenting>=0)animate("cast",s.presenting,1);}
         if(state.deathTime>0)animate("death",state.deathTime,1);
     }

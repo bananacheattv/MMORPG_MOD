@@ -197,7 +197,7 @@ public final class QuestEditorScreen extends MmoScreen {
     }
     private void renderNpc(GuiGraphicsExtractor g) {
         Ui.header(g,rx,top+27,rw,npcId.isEmpty()?"CRÉER UN PNJ":"MODIFIER LE PNJ");
-        button(g,rx,fy+97,rw/2-3,18,"Apparence : "+(npcSkin+1),true,Ui.GOLD,()->npcSkin=(npcSkin+1)%4);
+        button(g,rx,fy+97,rw/2-3,18,"Apparence : "+com.mmorpg.entity.NpcEntity.APPEARANCES[npcSkin],true,Ui.GOLD,()->npcSkin=(npcSkin+1)%com.mmorpg.entity.NpcEntity.SKINS);
         button(g,rx+rw/2+3,fy+97,rw/2-3,18,npcRole==0?"Quêtes":"Marchand",true,Ui.GOLD,()->npcRole=1-npcRole);
         if(!npcId.isEmpty()) npcs.stream().filter(n->npcId.equals(n.getStringOr("id",""))).findFirst().ifPresent(n->{
             var pos=net.minecraft.core.BlockPos.of(n.getLongOr("pos",0));

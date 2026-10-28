@@ -47,6 +47,7 @@ public final class TrialManager {
     private static final class Wave {
         int wave;
         int total;
+        int maximum;
         final List<UUID> mobs = new ArrayList<>();
         long nextAt = -1;
         boolean spawned;
@@ -60,6 +61,7 @@ public final class TrialManager {
         boolean input;
         int generation;
     }
+    private static final Map<String,net.minecraft.server.level.ServerBossEvent> BARS=new HashMap<>();
 
     private static final Map<String, Wave> WAVES = new HashMap<>();
     private static final Map<String, Simon> SIMON = new HashMap<>();
@@ -98,7 +100,24 @@ public final class TrialManager {
                 }
             }
         }
+        updateCounters(server,data);
     }
+    private static void updateCounters(MinecraftServer server,TrialData data){
+        Set<String> active=new HashSet<>();
+        for(Trial trial:data.all()){
+            Wave wave=WAVES.get(trial.id());ServerLevel level=server.getLevel(trial.dim());
+            if(wave==null||trial.done()||level==null||!wave.spawned)continue;
+            active.add(trial.id());wave.maximum=Math.max(wave.maximum,wave.mobs.size());
+            var bar=BARS.computeIfAbsent(trial.id(),id->new net.minecraft.server.level.ServerBossEvent(java.util.UUID.randomUUID(),Component.empty(),net.minecraft.world.BossEvent.BossBarColor.PURPLE,net.minecraft.world.BossEvent.BossBarOverlay.PROGRESS));
+            int alive=wave.mobs.size();String label=trial.kind().equals(TrialData.AMBUSH)?"Embuscade":trial.kind().equals(TrialData.ELITE)?"Gardiens":"Vague "+wave.wave+" / "+wave.total;
+            bar.setName(Component.literal(label+" · Ennemis restants : "+alive+(wave.nextAt>=0?" · Prochaine vague…":"")));
+            bar.setProgress(wave.maximum==0?0:(float)alive/wave.maximum);
+            var players=inside(level,trial);for(var previous:new ArrayList<>(bar.getPlayers()))if(!players.contains(previous))bar.removePlayer(previous);
+            for(var player:players)bar.addPlayer(player);
+        }
+        BARS.entrySet().removeIf(entry->{if(active.contains(entry.getKey()))return false;entry.getValue().removeAllPlayers();return true;});
+    }
+    @SubscribeEvent public static void stopped(net.neoforged.neoforge.event.server.ServerStoppedEvent event){BARS.values().forEach(net.minecraft.server.level.ServerBossEvent::removeAllPlayers);BARS.clear();WAVES.clear();SIMON.clear();ORDER.clear();HITS.clear();SEEN.clear();}
 
     private static List<ServerPlayer> inside(ServerLevel level, Trial t) {
         List<ServerPlayer> out = new ArrayList<>();
