@@ -44,6 +44,9 @@ public final class GuildStore {
         try{Files.writeString(temp,JSON.toJson(state));try(var c=FileChannel.open(temp,StandardOpenOption.WRITE)){c.force(true);}if(Files.exists(file))Files.copy(file,file.resolveSibling("guilds.json.bak"),StandardCopyOption.REPLACE_EXISTING);Files.move(temp,file,StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.ATOMIC_MOVE);}finally{Files.deleteIfExists(temp);}
     }
     public static synchronized <T>T access(MinecraftServer server,boolean write,Function<State,T> action){
+        if(com.mmorpg.db.SharedDocs.useDb())return com.mmorpg.db.SharedDocs.access("guilds",State.class,State::new,directory(server).resolve("guilds.json"),write,state->{
+            try{validate(state);}catch(RuntimeException e){throw new IllegalStateException("Registre de guildes illisible : intervention administrateur nécessaire",e);}
+            T result=action.apply(state);if(write){validate(state);state.revision++;}return result;});
         try{Path dir=directory(server);Files.createDirectories(dir);try(var channel=FileChannel.open(dir.resolve("guilds.lock"),StandardOpenOption.CREATE,StandardOpenOption.WRITE)){
             FileLock lock=null;long until=System.nanoTime()+500_000_000L;while(lock==null&&System.nanoTime()<until){try{lock=channel.tryLock();}catch(OverlappingFileLockException ignored){}if(lock==null)Thread.sleep(5);}if(lock==null)throw new java.io.IOException("Registre occupé");
             try{Path file=dir.resolve("guilds.json");State state=read(file);T result=action.apply(state);if(write)write(file,state);return result;}finally{lock.release();}

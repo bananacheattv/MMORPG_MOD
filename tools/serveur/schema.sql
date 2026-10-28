@@ -59,6 +59,14 @@ CREATE TABLE IF NOT EXISTS events (
   KEY idx_events_kind (kind, ts)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Documents JSON partages (guildes, hotel des ventes, registres de coordination, groupes) : cree automatiquement par le mod.
+CREATE TABLE IF NOT EXISTS shared_docs (
+  name VARCHAR(64) NOT NULL PRIMARY KEY,
+  data MEDIUMTEXT NOT NULL,
+  revision BIGINT NOT NULL DEFAULT 1,
+  updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- ------------------------------------------------------------------ requetes utiles
 -- Joueurs en ligne sur le reseau :
 --   SELECT name, class, level, server_id FROM players WHERE online = 1 AND last_seen > NOW() - INTERVAL 5 MINUTE;

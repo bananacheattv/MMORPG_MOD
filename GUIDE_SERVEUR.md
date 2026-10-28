@@ -150,5 +150,5 @@ Statistiques, classement, or en circulation, historique d'un joueur : voir les r
 
 ## 11. Plusieurs serveurs derrière un proxy (hub, spawn, mines, plaines)
 
-Le réseau multi-serveurs (rôles `HUB`/`MAIN`/`MINES`/`PLAINS`/`DUNGEONS`, `config/mmorpg/network.json`, profils partagés, transferts Velocity) est décrit dans `RESEAU_AELORIA.md`. La base MariaDB (§10) y est facultative : elle reflète profils et banque (le profil partagé fait foi en réseau), journalise les actions et stocke les données partagées (guildes, hôtel des ventes).
+Le réseau multi-serveurs (rôles `HUB`/`MAIN`/`MINES`/`PLAINS`/`DUNGEONS`, `config/mmorpg/network.json`, profils partagés, transferts Velocity) est décrit dans `RESEAU_AELORIA.md`. La base MariaDB (§10) y est facultative : elle reflète profils et banque (le profil partagé fait foi en réseau), journalise les actions et stocke les données partagées (guildes, hôtel des ventes, groupes, registres de coordination) dans la table `shared_docs` (option `syncShared` de `database.json`, vrai par défaut). Au premier accès, les anciens fichiers (`guilds.json`, `coordination/*.json`, `parties.json`) et l'hôtel des ventes du monde sont importés, puis les fichiers sont renommés en `.migre`. En réseau, une base injoignable refuse l'opération au lieu de diverger.
 

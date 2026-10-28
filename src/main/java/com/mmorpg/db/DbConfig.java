@@ -31,6 +31,8 @@ public final class DbConfig {
     public int autosaveSeconds = 120;
     /** Profils des joueurs (niveau, or, classe, quetes...) et banque : la base fait foi quand un joueur arrive d'un autre serveur. */
     public boolean syncPlayers = true;
+    /** Donnees partagees (guildes, hotel des ventes, registres de coordination, groupes) dans la base au lieu de fichiers ; l'ancien JSON est importe au premier acces. */
+    public boolean syncShared = true;
     /** Journal des evenements (connexions, morts, niveaux, banque, ventes...). */
     public boolean audit = true;
 

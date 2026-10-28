@@ -138,6 +138,9 @@ public final class Database {
                 s.execute("CREATE TABLE IF NOT EXISTS transfers (uuid CHAR(36) NOT NULL PRIMARY KEY, dest_server VARCHAR(32) NOT NULL, kind VARCHAR(16) NOT NULL, "
                         + "arg INT NOT NULL DEFAULT 0, created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
             }
+            // donnees partagees (guildes, hotel des ventes, registres...) : independant de la version du schema pour rester compatible avec les autres ajouts
+            s.execute("CREATE TABLE IF NOT EXISTS shared_docs (name VARCHAR(64) NOT NULL PRIMARY KEY, data MEDIUMTEXT NOT NULL, revision BIGINT NOT NULL DEFAULT 1, "
+                    + "updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
             // les prochaines evolutions du schema s'ajoutent ici : if (have < 3) { ... }
             s.execute("REPLACE INTO aeloria_meta (k, v) VALUES ('schema_version', '" + SCHEMA_VERSION + "')");
             // reprise apres plantage : les joueurs que CE serveur avait en ligne ne le sont plus
