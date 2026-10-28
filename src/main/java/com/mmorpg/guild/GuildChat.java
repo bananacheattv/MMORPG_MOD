@@ -19,7 +19,7 @@ import java.util.*;
 /** Chat de guilde partage entre tous les serveurs du reseau (registre de coordination « guild-chat »). */
 @EventBusSubscriber(modid = MMORPG.MODID)
 public final class GuildChat {
-    public static final class Message { public long id, time; public String guild, name, rank, text; }
+    public static final class Message { public long id, time; public String guild, name, rank, text, title; }
     public static final class State { public long next = 1; public List<Message> messages = new ArrayList<>(); }
     private static final int MAX_LENGTH = 200, KEPT = 300;
     private static final long COOLDOWN_MS = 1000;
@@ -58,6 +58,7 @@ public final class GuildChat {
                 m.guild = info[0];
                 m.rank = info[1];
                 m.name = p.getName().getString();
+                m.title = com.mmorpg.server.RpgPlayers.get(p).pvpTitle;
                 m.text = message;
                 st.messages.add(m);
                 while (st.messages.size() > KEPT) st.messages.removeFirst();
@@ -90,6 +91,7 @@ public final class GuildChat {
         for (var m : fresh) {
             Component line = Component.literal("[Guilde] ").withColor(0x4FD1A5)
                     .append(Component.literal(("CHEF".equals(m.rank) ? "★ " : "OFFICIER".equals(m.rank) ? "✦ " : "") + m.name).withColor(0xE8D9FF))
+                    .append(m.title == null || m.title.isEmpty() ? Component.empty() : Component.literal(" « " + m.title + " »").withColor(0xE8C36A))
                     .append(Component.literal(" : " + m.text).withColor(0xFFFFFF));
             for (ServerPlayer p : server.getPlayerList().getPlayers())
                 if (m.guild.equals(guildOf.get(p.getUUID()))) p.sendSystemMessage(line);
