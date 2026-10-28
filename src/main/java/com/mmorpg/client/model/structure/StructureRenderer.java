@@ -67,6 +67,8 @@ public class StructureRenderer implements BlockEntityRenderer<StructureBlockEnti
                 new int[]{BanqueAeloriaAnims.REPOS, BanqueAeloriaAnims.OUVERTURE, BanqueAeloriaAnims.ACTIVE}, "banque_aeloria", null));
         models.put(MultiblockKind.HDV, models(c, HdvAeloriaModel.LAYER, HdvAeloriaModel.animations(),
                 new int[]{HdvAeloriaAnims.REPOS, HdvAeloriaAnims.OUVERTURE, HdvAeloriaAnims.ACTIVE}, "hdv_aeloria", null));
+        models.put(MultiblockKind.QUETES_HEBDO, models(c, QuetesHebdoModel.LAYER, QuetesHebdoModel.animations(),
+                new int[]{QuetesHebdoAnims.REPOS, QuetesHebdoAnims.OUVERTURE, QuetesHebdoAnims.ACTIVE}, "quetes_hebdo", null));
     }
 
     private static Models models(BlockEntityRendererProvider.Context c, ModelLayerLocation layer, AnimationDefinition[] defs, int[] anims,

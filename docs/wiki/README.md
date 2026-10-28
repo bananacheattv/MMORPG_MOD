@@ -7,6 +7,7 @@ Le guide du MMORPG Aeloria : prise en main, progression, activités et administr
 - [Compétences et effets](competences.md)
 - [Combat et bouclier](combat.md)
 - [Inventaire, sacs et interface](inventaire.md)
+- [Quêtes hebdomadaires](quetes-hebdomadaires.md)
 - [Donjons et boss](donjons.md)
 - [Arènes, cristal et bilan](arenes.md)
 - [Points et équipement PvP](recompenses-pvp.md)

@@ -78,6 +78,7 @@ public class SpawnConfig {
         c.npcs.add(new Npc("ferme", "MARCHAND", "Fermière d'Aeloria", 2, "marche:ferme", -29, 23, 180F));
         c.stations.add(new Station("banque", "banque_aeloria", 0, -25, "south"));
         c.stations.add(new Station("hotel_des_ventes", "hdv_aeloria", -27, 0, "east"));
+        c.stations.add(new Station("quetes_hebdo", "quetes_hebdo", -27, -14, "east"));
         c.stations.add(new Station("presse", "presse_compression", 0, 24, "north"));
         c.stations.add(new Station("forge_ouest", "forge_arcanique", -21, 25, "north"));
         c.stations.add(new Station("forge_est", "forge_arcanique", 22, 25, "north"));

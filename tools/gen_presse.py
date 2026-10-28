@@ -94,6 +94,7 @@ KINDS = [
     ('presse_compression', 'Presse de compression', 'Compression Press', None, True),
     ('banque_aeloria', "Banque d'Aeloria", 'Aeloria Bank', GOLD, False),
     ('hdv_aeloria', 'Hôtel des ventes', 'Auction House', AMBER, False),
+    ('quetes_hebdo', 'Pancarte des quêtes hebdomadaires', 'Weekly Quest Board', GOLD, False),
 ]
 
 

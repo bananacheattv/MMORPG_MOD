@@ -37,6 +37,28 @@ public final class DevShowcase {
     public static void onTick(ClientTickEvent.Post event) {
         if (!ENABLED) return;
         Minecraft mc = Minecraft.getInstance();
+        if(MODE.equals("weekly")){
+            if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
+            var board=com.mmorpg.server.DevWeeklyChecks.VISUAL_BOARD;
+            java.util.function.IntConsumer browse=t->com.mmorpg.client.ClientNet.send(new com.mmorpg.network.Payloads.ServiceAction(com.mmorpg.network.Payloads.ServiceAction.WEEKLY,com.mmorpg.server.WeeklyQuests.ACT_BROWSE,-1,"",0,board));
+            java.util.function.BiConsumer<Integer,Integer> act=(a,t)->com.mmorpg.client.ClientNet.send(new com.mmorpg.network.Payloads.ServiceAction(com.mmorpg.network.Payloads.ServiceAction.WEEKLY,a,t,"",0,board));
+            if(tick==40){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();mc.options.setCameraType(CameraType.FIRST_PERSON);}
+            if(tick==220)shot(mc,"weekly_01_3d");
+            if(tick==230)mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
+            if(tick==270)shot(mc,"weekly_02_3d_third");
+            if(tick==280)mc.options.setCameraType(CameraType.FIRST_PERSON);
+            if(tick==290)browse.accept(0);
+            if(tick==330)shot(mc,"weekly_03_ui_initial");
+            if(tick==340)act.accept(com.mmorpg.server.WeeklyQuests.ACT_ACCEPT,1);
+            if(tick==350)act.accept(com.mmorpg.server.WeeklyQuests.ACT_ACCEPT,0);
+            if(tick==390)shot(mc,"weekly_04_ui_accepted");
+            if(tick==520)browse.accept(0);
+            if(tick==560)shot(mc,"weekly_05_ui_ready");
+            if(tick==570)act.accept(com.mmorpg.server.WeeklyQuests.ACT_CLAIM,1);
+            if(tick==610)shot(mc,"weekly_06_ui_claimed");
+            if(tick==640)stop(mc);
+            return;
+        }
         if(MODE.equals("pvp_polish")){DevPvpVisual.tick(mc);return;}
         if(MODE.equals("staff_final")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();

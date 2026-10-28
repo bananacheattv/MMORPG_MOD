@@ -22,6 +22,8 @@ public class QuestDef {
     public List<String> requires = new ArrayList<>();
     /** Quete journaliere (recommencable chaque jour civil du serveur). */
     public boolean daily = false;
+    /** Quete hebdomadaire personnelle generee par WeeklyQuests (jamais ecrite dans quests.json). */
+    public boolean weekly = false;
     /** Groupe de PNJ qui proposent la quete (vide = tous les maitres des quetes). */
     public String giver = "";
     /** Optional exact NPC UUID; empty retains the historical group-based behaviour. */

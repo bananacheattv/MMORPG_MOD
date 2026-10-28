@@ -76,6 +76,10 @@ public final class ClientPayloadHandlers {
                 if (mc.gui.screen() instanceof com.mmorpg.client.screen.AuctionScreen screen) screen.receive(payload.extra());
                 else mc.gui.setScreen(new com.mmorpg.client.screen.AuctionScreen(payload.extra()));
             }
+            case S2COpenScreen.WEEKLY -> {
+                if (mc.gui.screen() instanceof com.mmorpg.client.screen.WeeklyQuestScreen screen) screen.receive(payload.extra());
+                else mc.gui.setScreen(new com.mmorpg.client.screen.WeeklyQuestScreen(payload.extra()));
+            }
             case S2COpenScreen.COMPRESSOR -> mc.gui.setScreen(new com.mmorpg.client.screen.CompressorScreen(BlockPos.of(payload.extra().getLongOr("pos", 0))));
             case S2COpenScreen.QUEST_GIVER -> mc.gui.setScreen(new com.mmorpg.client.screen.QuestGiverScreen(payload.extra()));
             case S2COpenScreen.SHOP -> mc.gui.setScreen(new com.mmorpg.client.screen.ShopScreen(payload.extra()));

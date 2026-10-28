@@ -762,5 +762,6 @@
   "item.mmorpg.pvp_tank_4_bottes": "Bottes de Gladiateur Paladin 5",
   "item.mmorpg.pvp_tank_4_arme": "Arme de Gladiateur Paladin 5",
   "item.mmorpg.sceau_chimere_arene": "Sceau de la Chimère des arènes",
-  "entity.mmorpg.monture_chimere_arene": "Chimère des arènes"
+  "entity.mmorpg.monture_chimere_arene": "Chimère des arènes",
+  "block.mmorpg.quetes_hebdo": "Weekly Quest Board"
 }

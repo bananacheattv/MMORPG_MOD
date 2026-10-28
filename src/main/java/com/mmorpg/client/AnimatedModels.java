@@ -54,6 +54,7 @@ public final class AnimatedModels {
         event.registerLayerDefinition(com.mmorpg.client.model.structure.PresseCompressionModel.LAYER, com.mmorpg.client.model.structure.PresseCompressionModel::createBodyLayer);
         event.registerLayerDefinition(com.mmorpg.client.model.structure.BanqueAeloriaModel.LAYER, com.mmorpg.client.model.structure.BanqueAeloriaModel::createBodyLayer);
         event.registerLayerDefinition(com.mmorpg.client.model.structure.HdvAeloriaModel.LAYER, com.mmorpg.client.model.structure.HdvAeloriaModel::createBodyLayer);
+        event.registerLayerDefinition(com.mmorpg.client.model.structure.QuetesHebdoModel.LAYER, com.mmorpg.client.model.structure.QuetesHebdoModel::createBodyLayer);
         // mannequins d'entrainement (art/mannequin_blockbench)
         event.registerLayerDefinition(com.mmorpg.client.model.dummy.MannequinStandardModel.LAYER, com.mmorpg.client.model.dummy.MannequinStandardModel::createBodyLayer);
         event.registerLayerDefinition(com.mmorpg.client.model.dummy.MannequinBlindeModel.LAYER, com.mmorpg.client.model.dummy.MannequinBlindeModel::createBodyLayer);

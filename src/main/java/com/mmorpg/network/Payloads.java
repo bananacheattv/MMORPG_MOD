@@ -342,7 +342,7 @@ public final class Payloads {
 
     /** Action d'un service de la ville : banque (service 0) ou hotel des ventes (service 1). */
     public record ServiceAction(int service, int action, long amount, String text, int page, BlockPos pos) implements CustomPacketPayload {
-        public static final int BANK = 0, AUCTION = 1;
+        public static final int BANK = 0, AUCTION = 1, WEEKLY = 2;
         public static final Type<ServiceAction> TYPE = new Type<>(MMORPG.id("service_action"));
         public static final StreamCodec<ByteBuf, ServiceAction> CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, ServiceAction::service, ByteBufCodecs.VAR_INT, ServiceAction::action,
