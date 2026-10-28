@@ -98,6 +98,8 @@ public class PlayerData implements ValueIOSerializable {
     public final Map<String, Long> dailyQuests = new HashMap<>();
 
     public final Set<String> mounts = new HashSet<>();
+    /** Experience cumulee des metiers (pecheur, fermier, mineur). */
+    public final Map<String, Long> jobXp = new LinkedHashMap<>();
 
     // --- transient (non sauvegarde)
     public StatBlock stats = new StatBlock();
@@ -211,6 +213,7 @@ public class PlayerData implements ValueIOSerializable {
         t.store("equipped", STR_STR_MAP, eq);
         t.store("waypoints", UUIDUtil.CODEC.listOf(), new ArrayList<>(waypoints));
         t.store("kills", STR_INT_MAP, kills);
+        t.store("jobXp", Codec.unboundedMap(Codec.STRING, Codec.LONG), jobXp);
         t.putBoolean("chosen", classChosenOnce);
         t.putBoolean("starterTools", starterTools);
         t.putInt("forgeBlueprints", forgeBlueprints);
@@ -276,6 +279,8 @@ public class PlayerData implements ValueIOSerializable {
         waypoints.addAll(t.read("waypoints", UUIDUtil.CODEC.listOf()).orElse(List.of()));
         kills.clear();
         kills.putAll(t.read("kills", STR_INT_MAP).orElse(Map.of()));
+        jobXp.clear();
+        jobXp.putAll(t.read("jobXp", Codec.unboundedMap(Codec.STRING, Codec.LONG)).orElse(Map.of()));
         classChosenOnce = t.getBooleanOr("chosen", playerClass != PlayerClass.NONE);
         starterTools = t.getBooleanOr("starterTools", false);
         forgeBlueprints = t.getIntOr("forgeBlueprints", 0) & 31;
