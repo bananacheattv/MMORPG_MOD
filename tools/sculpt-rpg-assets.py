@@ -275,7 +275,7 @@ for id,cls,kind,rawlevel in weapons:
     E.append(B([8,27,8],[4.5,4.5,4.5],gem,'Celestial orrery heart','y',45))
     for side in (-1,1):
      for j in range(4):E.append(B([8+side*(4.6-abs(j-1.5)*.55),24+j*2,8],[.8,2.6,.8],metal,'Orrery cage','z',side*(22.5 if j<2 else -22.5)))
-    E.append(B([8,32,8],[2,.8,2],metal,'Orrery crown'))
+    E.append(B([8,31.4,8],[2,.8,2],metal,'Orrery crown'))
   elif kind=='BOW' and rank>=2:
    for side in (-1,1):
     if rank==2:
