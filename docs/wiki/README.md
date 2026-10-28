@@ -12,6 +12,7 @@ Le guide du MMORPG Aeloria : prise en main, progression, activités et administr
 - [Arènes, cristal et bilan](arenes.md)
 - [Points et équipement PvP](recompenses-pvp.md)
 - [Or, HDV, banque et forge](economie.md)
+- [Échanges entre joueurs](echanges.md)
 - [Groupes et guildes](guildes-groupes.md)
 - [Coffres, Lucky Blocks et boutique](coffres-boutique.md)
 - [Montures, familiers et apparences](montures-cosmetiques.md)
