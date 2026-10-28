@@ -75,7 +75,7 @@ public class AchievementsScreen extends MenuScreen {
             Achievement a = list.get(i + scroll);
             int y = top + i * (ch + 3), w = dw - 16, x = dx + 8;
             boolean ok = d.achievements.containsKey(a.id());
-            long value = Math.min(a.target(), d.stats.getOrDefault(a.stat(), 0L));
+            long value = Math.min(a.target(), d.counters.getOrDefault(a.stat(), 0L));
             Ui.frame(g, x, y, w, ch, ok ? selected.color : 0xFF6A6478, hovered(x, y, w, ch));
             g.text(font, (ok ? "✔ " : "") + a.name(), x + 6, y + 4, ok ? Ui.GOLD_LIGHT : Ui.TEXT, false);
             if (a.hasTitle()) {

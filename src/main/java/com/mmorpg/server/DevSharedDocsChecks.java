@@ -97,7 +97,8 @@ public final class DevSharedDocsChecks {
             check(SharedLedger.access(server, "test-ledger", Counter.class, Counter::new, c -> c.n) == 2, "registre de coordination (2)");
             // 4) hotel des ventes
             AuctionData a = AuctionData.get(server);
-            check(a.listings().isEmpty(), "hotel des ventes vide au depart");
+            a.listings().clear();                                      // le monde de test peut garder des annonces d'une execution precedente
+            a.takeEarnings(chef);
             a.add(new AuctionData.Listing(a.nextId(), UUID.randomUUID(), "Vendeur", new ItemStack(Items.DIAMOND, 5), 250, System.currentTimeMillis() + 3_600_000L));
             a.addEarnings(chef, 40);
             Database.await("barriere", 5000, c -> null);

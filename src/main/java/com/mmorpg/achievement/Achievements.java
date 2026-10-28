@@ -29,20 +29,20 @@ public final class Achievements {
     public static void add(ServerPlayer p, String stat, long amount) {
         if (amount <= 0 || com.mmorpg.hub.ClassTrial.active(p)) return;
         PlayerData d = RpgPlayers.get(p);
-        d.stats.merge(stat, amount, Long::sum);
+        d.counters.merge(stat, amount, Long::sum);
         check(p, d, stat);
     }
 
     /** Releve un compteur de type "maximum" (niveaux). */
     public static void max(ServerPlayer p, String stat, long value) {
         PlayerData d = RpgPlayers.get(p);
-        if (d.stats.getOrDefault(stat, 0L) >= value) return;
-        d.stats.put(stat, value);
+        if (d.counters.getOrDefault(stat, 0L) >= value) return;
+        d.counters.put(stat, value);
         check(p, d, stat);
     }
 
     private static void check(ServerPlayer p, PlayerData d, String stat) {
-        long value = d.stats.getOrDefault(stat, 0L);
+        long value = d.counters.getOrDefault(stat, 0L);
         boolean unlocked = false;
         for (Achievement a : Achievement.forStat(stat)) {
             if (value >= a.target() && !d.achievements.containsKey(a.id())) {
@@ -63,7 +63,7 @@ public final class Achievements {
     }
 
     private static void store(ServerPlayer p, PlayerData d) {
-        if (AchievementStore.enabled()) AchievementStore.save(p.getUUID(), d.achievements, d.stats, d.pvpTitle);
+        if (AchievementStore.enabled()) AchievementStore.save(p.getUUID(), d.achievements, d.counters, d.pvpTitle);
     }
 
     /** Reprend l'existant (niveau, metiers) pour les joueurs qui avaient deja progresse avant les succes. */
@@ -122,7 +122,7 @@ public final class Achievements {
                 if (p.isRemoved()) return;
                 PlayerData d = RpgPlayers.get(p);
                 loaded.achievements().forEach((k, v) -> d.achievements.putIfAbsent(k, v));
-                loaded.stats().forEach((k, v) -> d.stats.merge(k, v, Math::max));
+                loaded.stats().forEach((k, v) -> d.counters.merge(k, v, Math::max));
                 if (d.pvpTitle.isEmpty() && !loaded.title().isEmpty()) d.pvpTitle = loaded.title();
                 d.dirty = true;
                 RpgPlayers.updatePublic(p);
