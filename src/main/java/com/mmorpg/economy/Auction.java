@@ -169,8 +169,8 @@ public final class Auction {
         }
         int mine = 0;
         for (AuctionData.Listing l : data.listings()) if (l.seller().equals(p.getUUID())) mine++;
-        if (mine >= MAX_LISTINGS) {
-            p.sendOverlayMessage(Component.literal("Vous avez déjà " + MAX_LISTINGS + " annonces en cours.").withColor(0xFF7060));
+        if (mine >= com.mmorpg.server.RpgPlayers.get(p).auctionSlots) {
+            p.sendOverlayMessage(Component.literal("Vous avez déjà " + com.mmorpg.server.RpgPlayers.get(p).auctionSlots + " annonces en cours.").withColor(0xFF7060));
             return;
         }
         ItemStack sold = held.copy();

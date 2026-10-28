@@ -17,18 +17,18 @@ public final class Ui {
     public static final int GOLD = 0xFFE2B85A;
     public static final int GOLD_LIGHT = 0xFFFFE6A0;
     public static final int GOLD_DARK = 0xFF3B3350;          // bordures et filets (violet gris, interface plate)
-    public static final int LINE = 0xFF2B2538;
-    public static final int CARD = 0xFF14111C;
-    public static final int CARD_HOVER = 0xFF1E1929;
-    public static final int BAR = 0xFF0D0B14;
+    public static final int LINE = 0x887D659D;
+    public static final int CARD = 0xB5221738;
+    public static final int CARD_HOVER = 0xDB382550;
+    public static final int BAR = 0xB9161027;
     public static final int TEXT = 0xFFEDE8F5;
-    public static final int MUTED = 0xFF8D84A3;
+    public static final int MUTED = 0xFFB9ABCF;
     public static final int RED = 0xFFFF6B6B;
     public static final int GREEN = 0xFF6AE06A;
     public static final int BLUE = 0xFF62A8FF;
-    public static final int PANEL_TOP = 0xF40E0C16;
-    public static final int PANEL_BOTTOM = 0xF40B0910;
-    public static final int INSET = 0xF2080610;
+    public static final int PANEL_TOP = 0xDA291D40;
+    public static final int PANEL_BOTTOM = 0xD019142B;
+    public static final int INSET = 0x80201832;
 
     private Ui() {
     }
@@ -68,10 +68,33 @@ public final class Ui {
     }
 
     public static void border(GuiGraphicsExtractor g, int x, int y, int w, int h, int color) {
-        g.fill(x, y, x + w, y + 1, color);
-        g.fill(x, y + h - 1, x + w, y + h, color);
-        g.fill(x, y, x + 1, y + h, color);
-        g.fill(x + w - 1, y, x + w, y + h, color);
+        roundedOutline(g,x,y,w,h,Math.min(7,h/3),color);
+    }
+
+    /** Rounded glass primitives, bounded to two small corner bands. */
+    public static void rounded(GuiGraphicsExtractor g,int x,int y,int w,int h,int radius,int color) {
+        if(w<=0||h<=0)return;
+        int r=Math.max(0,Math.min(radius,Math.min(w,h)/2));
+        g.fill(x,y+r,x+w,y+h-r,color);
+        for(int i=0;i<r;i++){
+            int dx=(int)Math.ceil(r-Math.sqrt(r*r-(r-i-.5)*(r-i-.5)));
+            g.fill(x+dx,y+i,x+w-dx,y+i+1,color);
+            g.fill(x+dx,y+h-i-1,x+w-dx,y+h-i,color);
+        }
+        if(r==0)g.fill(x,y,x+w,y+h,color);
+    }
+    public static void roundedOutline(GuiGraphicsExtractor g,int x,int y,int w,int h,int radius,int color){
+        if(w<2||h<2)return;
+        int r=Math.max(1,Math.min(radius,Math.min(w,h)/2));
+        g.fill(x+r,y,x+w-r,y+1,color);g.fill(x+r,y+h-1,x+w-r,y+h,color);
+        g.fill(x,y+r,x+1,y+h-r,color);g.fill(x+w-1,y+r,x+w,y+h-r,color);
+        int last=r;
+        for(int i=0;i<r;i++){
+            int dx=(int)Math.ceil(r-Math.sqrt(r*r-(r-i-.5)*(r-i-.5)));
+            int len=Math.max(1,last-dx);last=dx;
+            g.fill(x+dx,y+i,x+dx+len,y+i+1,color);g.fill(x+w-dx-len,y+i,x+w-dx,y+i+1,color);
+            g.fill(x+dx,y+h-i-1,x+dx+len,y+h-i,color);g.fill(x+w-dx-len,y+h-i-1,x+w-dx,y+h-i,color);
+        }
     }
 
     /** Losange decoratif. */
@@ -84,19 +107,20 @@ public final class Ui {
 
     /** Grand panneau plat : fond sombre et bordure fine. */
     public static void panel(GuiGraphicsExtractor g, int x, int y, int w, int h) {
-        g.fillGradient(x, y, x + w, y + h, PANEL_TOP, PANEL_BOTTOM);
+        rounded(g,x,y+3,w,h,10,0x35050010);
+        rounded(g,x,y,w,h,10,PANEL_TOP);
         border(g, x, y, w, h, LINE);
     }
 
     /** Panneau secondaire encastre. */
     public static void inset(GuiGraphicsExtractor g, int x, int y, int w, int h) {
-        g.fill(x, y, x + w, y + h, INSET);
+        rounded(g,x,y,w,h,7,INSET);
         border(g, x, y, w, h, 0xFF221D2E);
     }
 
     /** Cadre fin colore (cartes, emplacements). */
     public static void frame(GuiGraphicsExtractor g, int x, int y, int w, int h, int color, boolean highlight) {
-        g.fill(x, y, x + w, y + h, highlight ? CARD_HOVER : CARD);
+        rounded(g,x,y,w,h,7,highlight ? CARD_HOVER : CARD);
         border(g, x, y, w, h, highlight ? lighter(color, 0.2f) : mix(LINE, 0xFF000000 | (color & 0xFFFFFF), 0.3f));
     }
 
@@ -119,10 +143,10 @@ public final class Ui {
     /** Barre de progression plate. */
     public static void bar(GuiGraphicsExtractor g, int x, int y, int w, int h, float frac, int top, int bottom, String text) {
         frac = Math.max(0, Math.min(1, frac));
-        g.fill(x - 1, y - 1, x + w + 1, y + h + 1, 0xFF0B0910);
-        g.fill(x, y, x + w, y + h, 0xFF191521);
+        rounded(g,x-1,y-1,w+2,h+2,h/2,0xA0100B20);
+        rounded(g,x,y,w,h,h/2,0xA0271B39);
         int fw = (int) (w * frac);
-        if (fw > 0) g.fillGradient(x, y, x + fw, y + h, top, bottom);
+        if (fw > 0) rounded(g,x,y,fw,h,h/2,top);
         border(g, x - 1, y - 1, w + 2, h + 2, LINE);
         if (text != null && h >= 7) {
             Font f = font();
@@ -135,11 +159,13 @@ public final class Ui {
     public static boolean button(GuiGraphicsExtractor g, int x, int y, int w, int h, String label, boolean enabled, int mx, int my, int accent) {
         boolean hover = enabled && in(mx, my, x, y, w, h);
         int rgb = accent & 0xFFFFFF;
+        boolean primary=enabled&&label.equals("ENTRER DANS AELORIA");
         int fill = !enabled ? 0xFF0F0D15 : mix(CARD, 0xFF000000 | rgb, hover ? 0.32f : 0.16f);
-        g.fill(x, y, x + w, y + h, fill);
+        rounded(g,x,y+2,w,h,Math.min(7,h/3),0x30050010);
+        rounded(g,x,y,w,h,Math.min(7,h/3),primary?(hover?0xFFF7DA8C:0xFFE7BD65):withAlpha(fill,enabled?hover?235:195:125));
         border(g, x, y, w, h, !enabled ? 0xFF1E1A28 : hover ? 0xFF000000 | rgb : mix(LINE, 0xFF000000 | rgb, 0.4f));
         Font f = font();
-        int color = enabled ? (hover ? 0xFFFFFFFF : TEXT) : 0xFF5C556E;
+        int color = primary?0xFF302039:enabled ? (hover ? 0xFFFFFFFF : TEXT) : 0xFF8D829E;
         int tw = f.width(label);
         if (tw > w - 6 && tw > 0) {
             float scale = Math.max(0.55f, (w - 6) / (float) tw);
@@ -149,7 +175,8 @@ public final class Ui {
             g.text(f, label, -tw / 2, 0, color, true);
             g.pose().popMatrix();
         } else {
-            g.centeredText(f, Component.literal(label), x + w / 2, y + (h - 8) / 2, color);
+            if(primary)g.text(f,label,x+(w-tw)/2,y+(h-8)/2,color,false);
+            else g.centeredText(f, Component.literal(label), x + w / 2, y + (h - 8) / 2, color);
         }
         return hover;
     }
@@ -166,8 +193,8 @@ public final class Ui {
         Font f = font();
         int tw = f.width(text) + 12;
         int x = right - tw;
-        g.fill(x, 5, x + tw, 22, fill);
-        g.outline(x, 5, tw, 17, withAlpha(color & 0xFFFFFF, 0x60));
+        rounded(g,x,5,tw,17,6,withAlpha(fill,165));
+        roundedOutline(g,x,5,tw,17,6,withAlpha(color,0x60));
         g.text(f, text, x + 6, 10, color, false);
         return x - 6;
     }

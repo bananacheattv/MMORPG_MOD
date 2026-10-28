@@ -43,7 +43,7 @@ public final class SpawnEditor {
         for (int i=0;i<6;i++) all.add(new Entry("portail:plaines:"+i, "Plaine · "+(i+1), 1));
         for (var d : com.mmorpg.world.DungeonBuilder.DungeonType.values())
             for (int i=0;i<3;i++) all.add(new Entry("portail:donjon:"+d.id+":"+i, d.label+" · "+new String[]{"normal","héroïque","mythique"}[i], 1));
-        for (String role : new String[]{"MARCHAND","QUETES","MINES","DONJON"}) all.add(new Entry("pnj:"+role, "PNJ · "+role.toLowerCase(Locale.ROOT), 2));
+        for (String role : new String[]{"MARCHAND","QUETES","MINES","DONJON","BOUTIQUE"}) all.add(new Entry("pnj:"+role, "PNJ · "+role.toLowerCase(Locale.ROOT), 2));
         all.add(new Entry("maitre", "Maître des classes", 2));
         all.add(new Entry("porte_armure","Porte-armure de scène",0));
         return List.copyOf(all);

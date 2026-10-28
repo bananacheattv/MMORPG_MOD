@@ -13,13 +13,14 @@ public final class GuildStore {
     public static final class Member {public UUID id;public String name,rank="MEMBRE";public long joined=System.currentTimeMillis();public Member(UUID id,String name,String rank){this.id=id;this.name=name;this.rank=rank;}}
     public static final class Guild {
         public UUID id=UUID.randomUUID();public String name,motto="";public int level=1;public long xp,gold;public int bosses;
+        public String banner="VIOLET",bannerPattern="CRISTAL";public int hallLevel,hallIndex=-1;
         public LinkedHashMap<UUID,Member> members=new LinkedHashMap<>();public LinkedHashMap<UUID,Long> invites=new LinkedHashMap<>();public ArrayList<String> history=new ArrayList<>();
         public LinkedHashMap<Integer,Long> bossCooldowns=new LinkedHashMap<>();
         public LinkedHashMap<String,Long> buffs=new LinkedHashMap<>();
         public void log(String message){history.add(0,java.time.Instant.now()+" · "+message);while(history.size()>60)history.removeLast();}
     }
     public static final class Transfer {public UUID id=UUID.randomUUID(),player,guild;public long delta;public String name;}
-    public static final class State {public ArrayList<Guild> guilds=new ArrayList<>();public ArrayList<Transfer> pending=new ArrayList<>();public long revision;}
+    public static final class State {public ArrayList<Guild> guilds=new ArrayList<>();public ArrayList<Transfer> pending=new ArrayList<>();public long revision;public int nextHall;}
     private static final com.google.gson.Gson JSON=new GsonBuilder().setPrettyPrinting().create();
     public static Path directory(MinecraftServer server){return NetworkConfig.current.enabled?Path.of(NetworkConfig.current.sharedDirectory).toAbsolutePath().resolveSibling("guilds"):server.getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).resolve("data/aeloria-guilds");}
     public static Guild of(State state,UUID player){return state.guilds.stream().filter(g->g.members.containsKey(player)).findFirst().orElse(null);}
@@ -28,6 +29,9 @@ public final class GuildStore {
         if(s==null||s.guilds==null||s.pending==null)throw new IllegalStateException("Registre de guildes invalide");
         Set<UUID> ids=new HashSet<>(),players=new HashSet<>();Set<String> names=new HashSet<>();
         for(var g:s.guilds){if(g==null||g.id==null||!ids.add(g.id)||g.name==null||!names.add(g.name.toLowerCase(Locale.ROOT))||g.level<1||g.level>10||g.gold<0||g.xp<0||g.members==null||g.members.isEmpty()||g.members.size()>50||g.history==null||g.invites==null||g.members.entrySet().stream().anyMatch(e->e.getValue()==null||!e.getKey().equals(e.getValue().id)))throw new IllegalStateException("Guilde invalide");
+            if(g.hallIndex< -1||g.hallIndex>100000||s.nextHall<0||s.nextHall>100001)throw new IllegalStateException("Adresse de hall invalide.");
+            if(g.bannerPattern==null)g.bannerPattern="CRISTAL";if(!List.of("CRISTAL","SOLEIL","LUNE","ARBRE","DRAGON").contains(g.bannerPattern))throw new IllegalStateException("Emblème invalide");
+            if(g.banner==null)g.banner="VIOLET";if(!List.of("VIOLET","AZUR","EMERAUDE","CARMIN","OR").contains(g.banner)||g.hallLevel<0||g.hallLevel>3)throw new IllegalStateException("Identité de guilde invalide");
             if(g.bossCooldowns==null)g.bossCooldowns=new LinkedHashMap<>();
             if(g.bossCooldowns.size()>10||g.bossCooldowns.entrySet().stream().anyMatch(e->e.getKey()<0||e.getKey()>9||e.getValue()==null||e.getValue()<0))throw new IllegalStateException("Cooldown de gardien invalide");
             if(g.buffs==null||g.buffs.size()>4)throw new IllegalStateException("Buffs invalides");for(var e:g.buffs.entrySet()){GuildBuffs.Kind.valueOf(e.getKey());if(e.getValue()==null||e.getValue()<0)throw new IllegalStateException("Durée de buff invalide");}

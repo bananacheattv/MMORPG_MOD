@@ -78,6 +78,7 @@ neoForge {
             if (project.hasProperty('guidanceVisual')) systemProperty 'mmorpg.guidanceVisual', 'true'
             if (project.hasProperty('guideVisual')) systemProperty 'mmorpg.guideVisual', 'true'
             if (project.hasProperty('socialVisual')) systemProperty 'mmorpg.socialVisual', 'true'
+            if (project.hasProperty('expansionVisual')) systemProperty 'mmorpg.expansionVisual', 'true'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 

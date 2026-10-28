@@ -31,7 +31,7 @@ public final class ModCreativeTabs {
                 out.accept(ModItems.PRESSE_COMPRESSION.get());
                 out.accept(ModItems.BANQUE.get());
                 out.accept(ModItems.HDV.get());
-                out.accept(ModItems.LUCKY_BLOCK.get());
+                ModItems.LUCKY_BLOCKS.forEach(i->out.accept(i.get()));
                 ModItems.CRATE_BLOCKS.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
                 out.accept(ModItems.TELEPORTEUR.get());
                 out.accept(ModItems.SCEPTRE_QUETES.get());

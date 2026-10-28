@@ -283,7 +283,7 @@ public final class NetworkPlayers {
                 AdminTravel.arrive(p, destination.substring(9));
             } else if (destination.equals("dungeon-return")) {
                 DungeonTravel.arriveHome(p);
-            } else if (((destination.startsWith("arena:")||destination.startsWith("arena-match:"))||destination.startsWith("guild-raid")||destination.startsWith("admin-test:")) && NetworkConfig.hosts(NetworkConfig.Role.DUNGEONS)) {
+            } else if (((destination.startsWith("arena:")||destination.startsWith("arena-match:"))||(destination.startsWith("guild-raid")||destination.equals("guild-hall"))||destination.startsWith("admin-test:")) && NetworkConfig.hosts(NetworkConfig.Role.DUNGEONS)) {
                 com.mmorpg.competition.CompetitionTravel.arrive(p,destination);
             } else if (destination.startsWith("mine:") && NetworkConfig.hosts(NetworkConfig.Role.MINES)) {
                 int region = Integer.parseInt(destination.substring(5));

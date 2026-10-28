@@ -33,6 +33,7 @@ public final class GuildService {
             require(!com.mmorpg.hub.ClassTrial.active(p),"Termine d’abord ton essai de classe.");
             require(!NetworkPlayers.inTransit(p),"Changement de serveur en cours.");
             if(action.equals("deposit")||action.equals("withdraw")){transfer(p,data.getLongOr("amount",0),action.equals("withdraw"));open(p,"Transaction enregistrée.");return;}
+            if(action.equals("hall")){GuildHall.enter(p);return;}
             if(action.equals("boss")){com.mmorpg.competition.GuildRaids.enter(p,data.getIntOr("tier",-1));return;}
             if(action.equals("raidLeave")){com.mmorpg.competition.GuildRaids.leave(p);open(p);return;}
             reconcile(p);
@@ -53,6 +54,9 @@ public final class GuildService {
                     case "kick","promote","demote","leader"->{UUID target=UUID.fromString(data.getStringOr("target",""));var m=g.members.get(target);require(m!=null&&!target.equals(self),"Membre invalide.");
                         if(action.equals("kick")){officer(g,self);require(!m.rank.equals("CHEF")&&(g.members.get(self).rank.equals("CHEF")||m.rank.equals("MEMBRE")),"Rang insuffisant.");g.members.remove(target);g.log(m.name+" exclu par "+p.getName().getString());}
                         else{chief(g,self);if(action.equals("leader")){g.members.get(self).rank="OFFICIER";m.rank="CHEF";}else{require(!m.rank.equals("CHEF"),"Rang invalide.");m.rank=action.equals("promote")?"OFFICIER":"MEMBRE";}g.log("Rang de "+m.name+" : "+m.rank);}}
+                    case "banner"->{officer(g,self);String banner=data.getStringOr("banner","");require(List.of("VIOLET","AZUR","EMERAUDE","CARMIN","OR").contains(banner),"Bannière inconnue.");g.banner=banner;g.log("Nouvelle bannière : "+banner);}
+                    case "bannerPattern"->{officer(g,self);String pattern=data.getStringOr("pattern","");require(List.of("CRISTAL","SOLEIL","LUNE","ARBRE","DRAGON").contains(pattern),"Emblème inconnu.");g.bannerPattern=pattern;g.log("Emblème : "+pattern);}
+                    case "hallUpgrade"->{officer(g,self);require(g.hallLevel<3,"Hall au niveau maximum.");long cost=5000L*(g.hallLevel+1);require(g.gold>=cost,"Banque insuffisante : "+cost+" or.");g.gold-=cost;g.hallLevel++;g.log("Hall amélioré au niveau "+g.hallLevel);}
                     case "motto"->{officer(g,self);String text=data.getStringOr("text","").trim();require(text.length()<=120,"Devise limitée à 120 caractères.");g.motto=text;}
                     case "upgrade"->{officer(g,self);Yggdrasil.advance(g);}
                     case "buff"->{officer(g,self);GuildBuffs.activate(g,GuildBuffs.Kind.valueOf(data.getStringOr("buff","")),System.currentTimeMillis());}

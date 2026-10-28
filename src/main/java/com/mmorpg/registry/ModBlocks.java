@@ -36,6 +36,9 @@ public final class ModBlocks {
     public static final DeferredBlock<com.mmorpg.block.LuckyBlock> LUCKY_BLOCK = BLOCKS.registerBlock("lucky_block", com.mmorpg.block.LuckyBlock::new,
             p -> p.mapColor(MapColor.GOLD).strength(0.8f, 1200f).sound(SoundType.METAL).lightLevel(s -> 5).noLootTable().pushReaction(PushReaction.IMMOVEABLE));
 
+    public static final java.util.List<DeferredBlock<com.mmorpg.block.LuckyBlock>> LUCKY_BLOCKS=new java.util.ArrayList<>();
+    static {for(var tier:com.mmorpg.block.LuckyTier.values()){final int index=tier.ordinal();LUCKY_BLOCKS.add(BLOCKS.registerBlock(tier.id,p->new com.mmorpg.block.LuckyBlock(p,index),p->p.mapColor(MapColor.COLOR_PURPLE).strength(.8f,1200f).sound(SoundType.METAL).lightLevel(s->9).noOcclusion().noLootTable().pushReaction(PushReaction.IMMOVEABLE)));}}
+
     /** Caisses en bloc 3D (une par type), posees par les admins et ouvertes avec la cle correspondante. */
     public static final java.util.Map<com.mmorpg.block.crate.CrateTier, DeferredBlock<com.mmorpg.block.crate.CrateBlock>> CRATES =
             new java.util.EnumMap<>(com.mmorpg.block.crate.CrateTier.class);

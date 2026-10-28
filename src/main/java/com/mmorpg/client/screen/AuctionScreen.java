@@ -160,7 +160,7 @@ public class AuctionScreen extends MmoScreen {
             g.text(font, held.getHoverName().getString() + " x" + held.getCount(), x0 + 34, top + 76, Ui.TEXT, true);
             if (hovered(x0 + 10, top + 72, 16, 16)) g.setTooltipForNextFrame(font, held, mouseX, mouseY);
         }
-        g.text(font, "Durée : 48 h · taxe de 5 % prélevée à la vente · " + Auction.MAX_LISTINGS + " annonces maximum", x0 + 8, top + 108, Ui.MUTED, false);
+        g.text(font, "Durée : 48 h · taxe de 5 % prélevée à la vente · " + com.mmorpg.client.ClientData.DATA.auctionSlots + " annonces maximum", x0 + 8, top + 108, Ui.MUTED, false);
         long value = 0;
         try {
             value = price.getValue().isEmpty() ? 0 : Long.parseLong(price.getValue());

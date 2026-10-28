@@ -149,7 +149,7 @@ public final class MmoHud {
     }
 
     private static void smallPanel(GuiGraphicsExtractor g, int x, int y, int w, int h, int accent) {
-        g.fill(x, y, x + w, y + h, 0xD00D0B14);
+        Ui.rounded(g,x,y,w,h,7,0xB5211734);
         Ui.border(g, x, y, w, h, Ui.LINE);
         g.fill(x, y, x + 2, y + h, Ui.withAlpha(accent, 0xE0));
     }
@@ -448,7 +448,7 @@ public final class MmoHud {
     }
 
     private static void questBox(GuiGraphicsExtractor g, int x, int y, int w, int h, boolean ready) {
-        g.fillGradient(x - 3, y - 2, x + w, y + h, 0x90100C14, 0x40100C14);
+        Ui.rounded(g,x-3,y-2,w+3,h+2,6,0xA0221735);
         g.fill(x - 3, y - 2, x - 2, y + h, ready ? 0xFF60E060 : 0xFFE8C060);
     }
 
@@ -478,7 +478,7 @@ public final class MmoHud {
         int x = 6;
         int y = 2;
         Font f = font();
-        g.fillGradient(x - 6, y - 2, x + w + 6, y + 30, 0xC0200808, 0xC0080404);
+        Ui.rounded(g,x-6,y-2,w+12,32,7,0xB52A163B);
         Ui.border(g, x - 6, y - 2, w + 12, 32, 0xFF8A2A1A);
         Ui.diamond(g, x - 6, y + 14, 4, 0xFFC03020);
         Ui.diamond(g, x + w + 5, y + 14, 4, 0xFFC03020);
@@ -497,11 +497,11 @@ public final class MmoHud {
         int x = 3;
         int y = 3;
         Font f = font();
-        g.fillGradient(x - 3, y - 3, x + total + 3, y + slot + 3, 0xB0201828, 0xB0100C14);
+        Ui.rounded(g,x-3,y-3,total+6,slot+6,7,0xB524193A);
         Ui.border(g, x - 3, y - 3, total + 6, slot + 6, Ui.GOLD_DARK);
         for (int i = 0; i < PlayerData.SKILL_SLOTS; i++) {
             int sx = x + i * (slot + gap);
-            g.fill(sx, y, sx + slot, y + slot, 0xFF0C0A10);
+            Ui.rounded(g,sx,y,slot,slot,5,0xB519112C);
             Ui.border(g, sx, y, slot, slot, 0xFF2B2538);
             Skill s = Skills.get(d.skillBar[i]);
             if (s != null) {
@@ -610,7 +610,7 @@ public final class MmoHud {
             // reste dans l'ecran (de pres, la tete du mannequin sort par le haut)
             float top = s[1] + y * scale;
             if (top < 4) g.pose().translate(0, 4 - top);
-            g.fill(x, y, x + bw, y + bh, Ui.alpha(0xD00D0B14, fade));
+            Ui.rounded(g,x,y,bw,bh,7,Ui.alpha(0xB5211734,fade));
             Ui.border(g, x, y, bw, bh, Ui.alpha(Ui.LINE, fade));
             g.fill(x, y, x + 2, y + bh, Ui.alpha(Ui.GOLD, fade));
             g.centeredText(f, Component.literal(d.config().name), 0, y + 4, Ui.alpha(Ui.GOLD_LIGHT, fade));

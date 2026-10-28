@@ -29,6 +29,7 @@ public class InstanceData extends SavedData {
         public long lastBusy;
         /** Faux tant que le donjon n'est pas entierement construit (construction en cours ou interrompue). */
         public boolean ready = true;
+        public long variantSeed;
 
         public Slot(String pool, int index, int x, int y, int z, String owner, long lastBusy, boolean ready) {
             this(pool, index, x, y, z, owner, lastBusy);
@@ -53,8 +54,9 @@ public class InstanceData extends SavedData {
                 Codec.INT.fieldOf("z").forGetter(s -> s.z),
                 Codec.STRING.optionalFieldOf("owner", "").forGetter(s -> s.owner),
                 Codec.LONG.optionalFieldOf("lastBusy", 0L).forGetter(s -> s.lastBusy),
-                Codec.BOOL.optionalFieldOf("ready", true).forGetter(s -> s.ready)
-        ).apply(i, (pool, index, x, y, z, owner, lastBusy, ready) -> new Slot(pool, index, x, y, z, owner, lastBusy, ready)));
+                Codec.BOOL.optionalFieldOf("ready", true).forGetter(s -> s.ready),
+                Codec.LONG.optionalFieldOf("variantSeed", 0L).forGetter(s -> s.variantSeed)
+        ).apply(i, (pool, index, x, y, z, owner, lastBusy, ready, seed) -> {var slot=new Slot(pool,index,x,y,z,owner,lastBusy,ready);slot.variantSeed=seed;return slot;}));
     }
 
     private static final Codec<InstanceData> CODEC = RecordCodecBuilder.create(i -> i.group(

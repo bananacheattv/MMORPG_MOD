@@ -166,7 +166,7 @@ public final class ForgeRecipes {
         for(int i=0;i<com.mmorpg.mine.ToolRunes.IDS.length;i++)add(Category.MATERIAUX,com.mmorpg.mine.ToolRunes.IDS[i],1,100,10+i*10,N,"cristal_arcanique",2,"poussiere_ame",8,"lingot_argentite",2);
         add(Category.MATERIAUX, "fiole_runique", 4, 1, 1, N, "lingot_verdite", 1, "poussiere_ame", 1);
         add(Category.CONSOMMABLES, "charme_experience", 1, 100, 10, N, "poussiere_ame", 8, "poussiere_ame", 4);
-        add(Category.CONSOMMABLES, "lucky_block", 1, 120, 10, N, "lingot_argentite", 4, "trefle_chance", 1);
+        add(Category.CONSOMMABLES, "lucky_celeste", 1, 120, 10, N, "lingot_argentite", 4, "trefle_chance", 1);
         add(Category.CONSOMMABLES, "charme_chance", 1, 100, 10, N, "trefle_chance", 1, "lingot_argentite", 2);
         // mannequins d'entrainement (hub) : le standard sert de base aux variantes
         add(Category.FAMILIERS, "nourriture_familier", 4, 5, 1, N, "racine_lueur", 4, "racine_lueur", 2);

@@ -126,6 +126,7 @@ public final class ServerEvents {
     public static void onJoin(EntityJoinLevelEvent event) {
         if (event.getLevel() instanceof ServerLevel level && event.getEntity() instanceof Mob mob) {
             MobLevels.initialize(mob, level);
+            com.mmorpg.dungeon.DungeonVariants.scaleMob(mob,level);
         }
     }
 }
