@@ -68,23 +68,15 @@ public final class ArmorModels {
     }
 
     public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        LinkedHashSet<String> panoplies = new LinkedHashSet<>(ArmorLayers.SET_PANOPLY.values());
-        for (String[] v : SET_VARIANTS.values()) panoplies.add(v[0]);
-        for (String panoply : panoplies) {
-            for (EquipmentSlot slot : SLOTS) {
-                event.registerLayerDefinition(layer(panoply, slot), () -> ArmorLayers.create(panoply, slot));
-            }
-        }
+        for(var holder:ModItems.ARMORS){if(!(holder.get() instanceof RpgArmorItem armor))continue;var def=armor.rpgDef();EquipmentSlot slot=switch(def.slot()){case HEAD->EquipmentSlot.HEAD;case CHEST->EquipmentSlot.CHEST;case LEGS->EquipmentSlot.LEGS;case FEET->EquipmentSlot.FEET;default->throw new IllegalStateException("Armor slot");};event.registerLayerDefinition(layer("sculpted_"+def.setId(),slot),()->RpgArmorSculptor.create(def.playerClass(),def.level(),slot));}
     }
 
     public static void registerExtensions(RegisterClientExtensionsEvent event) {
         for (DeferredItem<? extends Item> holder : ModItems.ARMORS) {
             if (!(holder.get() instanceof RpgArmorItem armor)) continue;
             String setId = armor.rpgDef().setId();
-            String[] variant = SET_VARIANTS.get(setId);
-            String panoply = variant != null ? variant[0] : ArmorLayers.SET_PANOPLY.get(setId);
-            if (panoply == null) continue;
-            Identifier texture = MMORPG.id("textures/entity/armor/" + (variant != null ? variant[1] : panoply) + ".png");
+            String panoply="sculpted_"+setId;
+            Identifier texture=MMORPG.id("textures/entity/armor/aeloria_sculpted_hd.png");
             event.registerItem(new IClientItemExtensions() {
                 @Override
                 @SuppressWarnings("rawtypes")

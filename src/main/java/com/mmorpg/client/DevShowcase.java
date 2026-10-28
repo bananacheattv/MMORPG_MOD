@@ -37,6 +37,64 @@ public final class DevShowcase {
     public static void onTick(ClientTickEvent.Post event) {
         if (!ENABLED) return;
         Minecraft mc = Minecraft.getInstance();
+        if(MODE.equals("equipment_final")){
+            if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
+            if(tick==60){mc.options.guiScale().set(2);mc.getWindow().setWindowed(1280,720);mc.resizeGui();var gallery=new DevSculptedGallery();gallery.page=4;mc.gui.setScreen(gallery);}
+            if(tick==85)shot(mc,"progression_warrior_mage");
+            if(tick==95){var gallery=new DevSculptedGallery();gallery.page=5;mc.gui.setScreen(gallery);}
+            if(tick==120)shot(mc,"progression_archer_paladin");
+            if(tick==130)mc.gui.setScreen(new DevSculptedGallery());
+            if(tick==155)shot(mc,"sculpted_weapons");
+            for(int i=0;i<5;i++){int start=165+i*35;if(tick==start){var data=new CompoundTag();data.putInt("tier",i);data.put("table",com.mmorpg.server.AdventureLoot.preview(com.mmorpg.block.LuckyTier.of(i).id));mc.gui.setScreen(new com.mmorpg.client.screen.LuckyBlockScreen(data));}if(tick==start+20)shot(mc,"lucky_theme_"+i);}
+            if(tick==355)stop(mc);return;
+        }
+        if(MODE.equals("polish_visual")){
+            if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
+            if(tick==80){mc.options.guiScale().set(2);mc.getWindow().setWindowed(1280,720);mc.resizeGui();ClientNet.send(new Payloads.SocialAction("backpack",new CompoundTag()));}
+            if(tick==105)shot(mc,"backpacks");
+            if(tick==115){mc.player.closeContainer();var screen=new com.mmorpg.client.screen.AuctionScreen(new CompoundTag());screen.previewTab(1);mc.gui.setScreen(screen);}
+            if(tick==140)shot(mc,"auction_inventory_choice");
+            if(tick==150){var data=new CompoundTag();data.putInt("tier",2);data.put("table",com.mmorpg.server.AdventureLoot.preview("lucky_infernal"));mc.gui.setScreen(new com.mmorpg.client.screen.LuckyBlockScreen(data));}
+            if(tick==175)shot(mc,"lucky_3d_mystery");
+            if(tick==185&&mc.gui.screen() instanceof com.mmorpg.client.screen.LuckyBlockScreen lucky)lucky.previewResult();
+            if(tick==200)shot(mc,"lucky_3d_spin");
+            if(tick==275)shot(mc,"lucky_3d_result");
+            if(tick==285)mc.gui.setScreen(new DevSculptedGallery());
+            if(tick==310)shot(mc,"sculpted_weapons");
+            if(tick==320&&mc.gui.screen() instanceof DevSculptedGallery gallery)gallery.page=1;
+            if(tick==345)shot(mc,"sculpted_luckyblocks");
+            if(tick==355&&mc.gui.screen() instanceof DevSculptedGallery gallery)gallery.page=2;
+            if(tick==380)shot(mc,"sculpted_chests");
+            if(tick==390&&mc.gui.screen() instanceof DevSculptedGallery gallery)gallery.page=3;
+            if(tick==435)shot(mc,"armour_and_stand_looks");
+            if(tick==445)mc.gui.setScreen(new com.mmorpg.client.screen.CharacterScreen(mc.player));
+            if(tick==470)shot(mc,"character_readable");
+            if(tick==480){mc.gui.setScreen(null);cmd(mc,"item replace entity @s weapon.mainhand with mmorpg:baton_archimage");}
+            if(tick==505)shot(mc,"staff_first_person");
+            if(tick==515)mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
+            if(tick==540)shot(mc,"staff_third_person");
+            if(tick==550){mc.options.setCameraType(CameraType.FIRST_PERSON);mc.gui.setScreen(new DevRankGallery());}
+            if(tick==575)shot(mc,"rank_badges");
+            if(tick==585)mc.reloadResourcePacks();
+            if(tick==588)shot(mc,"aeloria_resource_loading");
+            if(tick==640){var gallery=new DevSculptedGallery();gallery.page=4;mc.gui.setScreen(gallery);}
+            if(tick==670)shot(mc,"progression_warrior_mage");
+            if(tick==680){var gallery=new DevSculptedGallery();gallery.page=5;mc.gui.setScreen(gallery);}
+            if(tick==710)shot(mc,"progression_archer_paladin");
+            if(tick==730)stop(mc);return;
+        }
+        if(MODE.equals("quick_fixes")){
+            if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
+            if(tick==80){mc.options.guiScale().set(2);mc.getWindow().setWindowed(1280,720);mc.resizeGui();mc.gui.setScreen(new net.minecraft.client.gui.screens.Screen(net.minecraft.network.chat.Component.literal("Portail")){@Override public void extractRenderState(net.minecraft.client.gui.GuiGraphicsExtractor g,int x,int y,float a){com.mmorpg.client.ui.PortalLoadingView.draw(g,width,height);}});}
+            if(tick==105)shot(mc,"portal_loading");
+            if(tick==115)mc.gui.setScreen(new com.mmorpg.client.screen.AeloriaDirectoryScreen());
+            if(tick==140)shot(mc,"directory_creative");
+            if(tick==150)mc.gui.setScreen(new com.mmorpg.client.screen.CharacterScreen(mc.player));
+            if(tick==180)shot(mc,"character_creative");
+            if(tick==190)mc.gui.setScreen(new com.mmorpg.client.screen.AeloriaCreativeScreen());
+            if(tick==220)shot(mc,"creative_catalogue");
+            if(tick==240)stop(mc);return;
+        }
         if(MODE.equals("graphics")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
             if(tick==80){mc.options.guiScale().set(2);mc.getWindow().setWindowed(1280,720);mc.resizeGui();mc.gui.setScreen(new com.mmorpg.client.screen.AeloriaTitleScreen());}

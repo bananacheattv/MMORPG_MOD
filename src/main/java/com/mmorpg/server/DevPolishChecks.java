@@ -1,0 +1,42 @@
+package com.mmorpg.server;
+import com.mmorpg.registry.*;
+import com.mmorpg.rpg.PlayerClass;
+import com.mmorpg.economy.*;
+import com.mmorpg.quest.*;
+import net.minecraft.server.level.*;
+import net.minecraft.world.*;
+import net.minecraft.world.item.*;
+import net.minecraft.world.inventory.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+/** Regression checks against actual containers, slots, entity persistence and server authority. */
+public final class DevPolishChecks {
+ private static void check(boolean yes,String message){if(!yes)throw new AssertionError("polish: "+message);}
+ public static void run(ServerPlayer p){var d=RpgPlayers.get(p);var old=d.save();var inv=p.getInventory();var saved=new java.util.ArrayList<ItemStack>();for(var stack:inv)saved.add(stack.copy());var server=p.level().getServer();var identity=new net.minecraft.server.players.NameAndId(p.getGameProfile());boolean wasOp=server.getPlayerList().isOp(identity);server.getPlayerList().op(identity);
+  try{
+   d.backpacks=new CompoundTag();inv.clearContent();var bags=Backpacks.inventory(p);bags.setItem(0,new ItemStack(ModItems.BACKPACKS.get(0).get()));check(Backpacks.capacity(bags)==6,"first bag adds six slots");
+   for(int i=0;i<36;i++)inv.setItem(i,new ItemStack(Items.STONE,64));var incoming=new ItemStack(Items.DIAMOND,5);check(inv.add(incoming)&&incoming.isEmpty(),"full vanilla inventory routes pickup into equipped bag");check(bags.getItem(2).is(Items.DIAMOND)&&bags.getItem(2).getCount()==5,"pickup credited once");
+   var snapshot=d.save();d.load(snapshot);bags=Backpacks.inventory(p);check(bags.getItem(2).getCount()==5&&Backpacks.capacity(bags)==6,"bag equipment and contents survive RPG/network profile reload");
+   var menu=new ChestMenu(MenuType.GENERIC_9x6,99,inv,bags,6);Backpacks.restrict(menu);check(!menu.getSlot(0).mayPickup(p),"filled bag cannot be removed and orphan items");check(!menu.getSlot(2).mayPlace(new ItemStack(ModItems.BACKPACKS.get(1).get())),"nested bags rejected");check(!menu.getSlot(8).mayPlace(new ItemStack(Items.DIAMOND)),"locked capacity rejects inventory insertion");
+   menu.clicked(0,0,ContainerInput.PICKUP,p);check(menu.getCarried().isEmpty()&&!bags.getItem(0).isEmpty(),"native click cannot bypass filled bag lock");
+   bags.setItem(1,new ItemStack(ModItems.BACKPACKS.get(3).get()));check(Backpacks.capacity(bags)==30&&menu.getSlot(0).mayPickup(p),"second bag expands capacity and permits safe removal");
+   inv.clearContent();bags.clearContent();bags.setItem(0,new ItemStack(ModItems.BACKPACKS.get(3).get()));bags.setItem(1,new ItemStack(ModItems.BACKPACKS.get(3).get()));check(Backpacks.capacity(bags)==48,"two upgraded bags give forty-eight extra cells");
+   var place=p.blockPosition().offset(1,0,0);var block=p.level().getBlockState(place);p.level().setBlockAndUpdate(place,ModBlocks.HDV.get().defaultBlockState());try{
+    inv.setItem(17,new ItemStack(Items.DIAMOND,4));inv.setItem(0,new ItemStack(Items.STONE,3));var fingerprint=Auction.saleFingerprint(inv.getItem(17),p.level().registryAccess());var data=AuctionData.get(server);int before=data.listings().size();
+    Auction.action(p,place,Auction.ACT_SELL,100,"slot:17:invalid",0);check(data.listings().size()==before&&inv.getItem(17).getCount()==4,"stale sale cannot remove a changed stack");
+    Auction.action(p,place,Auction.ACT_SELL,100,"slot:17:"+fingerprint,0);check(inv.getItem(17).isEmpty()&&inv.getItem(0).getCount()==3&&data.listings().size()==before+1,"auction sells selected inventory slot, not held item");
+    bags.setItem(2,new ItemStack(Items.EMERALD,3));fingerprint=Auction.saleFingerprint(bags.getItem(2),p.level().registryAccess());Auction.action(p,place,Auction.ACT_SELL,75,"slot:36:"+fingerprint,0);check(bags.getItem(2).isEmpty()&&data.listings().size()==before+2,"extended inventory contents can be sold");
+   }finally{p.level().setBlockAndUpdate(place,block);}
+   d.level=100;d.playerClass=PlayerClass.MAGE;check(!WeaponAccess.allowed(p,new ItemStack(ModItems.get("epee_recrue")),false),"mage cannot use warrior sword");check(WeaponAccess.allowed(p,new ItemStack(ModItems.get("baton_apprenti")),false),"mage can use own staff");d.playerClass=PlayerClass.ARCHER;check(WeaponAccess.allowed(p,new ItemStack(ModItems.get("arc_chasseur")),false),"archer can use bow");check(!WeaponAccess.allowed(p,new ItemStack(ModItems.get("baton_apprenti")),false),"archer cannot use mage staff");
+   var spawn=server.getLevel(com.mmorpg.hub.SpawnBuilder.DIM);var definitions=SpawnDiscovery.definitions();for(int i=0;i<5;i++){var npc=ModEntities.NPC.get().create(spawn,net.minecraft.world.entity.EntitySpawnReason.COMMAND);npc.setUUID(SpawnDiscovery.id(i));npc.setup(com.mmorpg.entity.NpcEntity.Role.QUETES,"Test",4,"spawn_decouverte_"+i);for(int j=0;j<5;j++)check(QuestManager.matchesNpc(definitions.get(SpawnDiscovery.IDS[j]),npc)==(i==j),"each discovery NPC has its own quest");}
+   var stand=net.minecraft.world.entity.EntityTypes.ARMOR_STAND.create(p.level(),net.minecraft.world.entity.EntitySpawnReason.COMMAND);stand.snapTo(p.getX()+2,p.getY(),p.getZ(),0,0);p.level().addFreshEntity(stand);try{var t=new CompoundTag();t.putInt("entity",stand.getId());t.putString("action","appearance");t.putString("appearance","guides:borin");ArmorStandEditor.action(p,t);check(stand.getData(com.mmorpg.registry.ModAttachments.STAND_LOOK).equals("guides:borin"),"3D stand appearance applied through secured editor");var out=net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING,p.level().registryAccess());stand.saveWithoutId(out);check(out.buildResult().toString().contains("guides:borin"),"stand appearance persists in entity save");t.putString("appearance","skin:invalid/name");ArmorStandEditor.action(p,t);check(stand.getData(com.mmorpg.registry.ModAttachments.STAND_LOOK).equals("guides:borin"),"invalid remote skin value rejected");}finally{stand.discard();}
+   var placer=net.neoforged.neoforge.common.util.FakePlayerFactory.get(spawn,new com.mojang.authlib.GameProfile(java.util.UUID.fromString("7c01de00-0000-0000-0000-000000000091"),"NpcPlacementChecks"));
+   var placerId=new net.minecraft.server.players.NameAndId(placer.getGameProfile());var at=new BlockPos(8400,130,8400);var below=spawn.getBlockState(at.below());var obstacle=spawn.getBlockState(at);var npc=ModEntities.NPC.get().create(spawn,net.minecraft.world.entity.EntitySpawnReason.COMMAND);npc.setup(com.mmorpg.entity.NpcEntity.Role.QUETES,"Placement test",4,"placement_test");npc.snapTo(8402,130,8400,0,0);spawn.addFreshEntity(npc);
+   try{spawn.setBlockAndUpdate(at.below(),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());spawn.setBlockAndUpdate(at,net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());placer.snapTo(8400,130,8401,0,0);
+    boolean denied=false;try{NpcPlacement.move(placer,npc,at,90);}catch(IllegalArgumentException e){denied=true;}check(denied,"non-operator cannot relocate NPC");server.getPlayerList().op(placerId);
+    NpcPlacement.move(placer,npc,at,90);check(npc.blockPosition().equals(at)&&npc.getYRot()==90,"operator sets exact position and orientation");var directory=com.mmorpg.world.NpcDirectory.get(server);var tag=com.mmorpg.world.NpcDirectory.CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE,directory).getOrThrow();var restored=com.mmorpg.world.NpcDirectory.CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE,tag).getOrThrow();check(restored.entry(npc.getUUID().toString()).getLongOr("pos",0)==at.asLong(),"moved NPC directory position survives serialization");spawn.setBlockAndUpdate(at,net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());denied=false;try{NpcPlacement.move(placer,npc,at,180);}catch(IllegalArgumentException e){denied=true;}check(denied&&npc.getYRot()==90,"collision refused without mutating the saved pose");
+   }finally{npc.discard();server.getPlayerList().deop(placerId);spawn.setBlockAndUpdate(at.below(),below);spawn.setBlockAndUpdate(at,obstacle);}
+   com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] POLISH PASS: real backpack pickup/capacity/native locks/profile reload, selected-slot auctions/stale rejection, class locks, unique quests and stand model persistence");
+  }finally{d.load(old);for(int i=0;i<saved.size();i++)inv.setItem(i,saved.get(i));if(!wasOp)server.getPlayerList().deop(identity);}
+ }
+}

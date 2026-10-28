@@ -55,6 +55,7 @@ public final class QuestManager {
     }
 
     public static boolean matchesNpc(QuestDef q, NpcEntity npc) {
+        if(npc.level().dimension().equals(com.mmorpg.hub.SpawnBuilder.DIM)&&(q.npc==null||q.npc.isEmpty())&&q.giver.isEmpty())return false;
         return (q.npc == null || q.npc.isEmpty() || q.npc.equals(npc.getUUID().toString()))
                 && (q.giver.isEmpty() || q.giver.equalsIgnoreCase(npc.group()));
     }

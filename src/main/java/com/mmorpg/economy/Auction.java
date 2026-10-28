@@ -115,7 +115,11 @@ public final class Auction {
             case ACT_BROWSE -> {
             }
             case ACT_BUY -> buy(p, data, a);
-            case ACT_SELL -> sell(p, data, a);
+            case ACT_SELL -> {
+                int slot=p.getInventory().getSelectedSlot();String fingerprint="";
+                if(query.startsWith("slot:")){String[] choice=query.split(":",3);try{slot=Integer.parseInt(choice[1]);fingerprint=choice.length>2?choice[2]:"";}catch(RuntimeException e){return;}}
+                sell(p,data,a,slot,fingerprint);query="";
+            }
             case ACT_CANCEL -> cancel(p, data, a);
             case ACT_CLAIM -> claim(p, data);
             default -> {
@@ -153,8 +157,13 @@ public final class Auction {
         }
     }
 
-    private static void sell(ServerPlayer p, AuctionData data, long price) {
-        ItemStack held = p.getItemInHand(InteractionHand.MAIN_HAND);
+    public static String saleFingerprint(ItemStack stack,net.minecraft.core.RegistryAccess registries){
+        try{var ops=net.minecraft.resources.RegistryOps.create(net.minecraft.nbt.NbtOps.INSTANCE,registries);var tag=ItemStack.OPTIONAL_CODEC.encodeStart(ops,stack).getOrThrow();return java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(tag.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8)));}catch(Exception e){throw new IllegalStateException(e);}
+    }
+    private static void sell(ServerPlayer p, AuctionData data, long price,int slot,String fingerprint) {
+        var bags=com.mmorpg.server.Backpacks.inventory(p);if(slot<0||slot>=36+com.mmorpg.server.Backpacks.capacity(bags))return;
+        ItemStack held = slot<36?p.getInventory().getItem(slot):bags.getItem(slot-34);
+        if(!fingerprint.isEmpty()&&!fingerprint.equals(saleFingerprint(held,p.level().registryAccess())))return;
         if (held.isEmpty()) {
             p.sendOverlayMessage(Component.literal("Tenez en main l'objet à mettre en vente.").withColor(0xFF7060));
             return;
@@ -174,7 +183,7 @@ public final class Auction {
             return;
         }
         ItemStack sold = held.copy();
-        p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        if(slot<36)p.getInventory().setItem(slot,ItemStack.EMPTY);else bags.setItem(slot-34,ItemStack.EMPTY);
         data.add(new AuctionData.Listing(data.nextId(), p.getUUID(), p.getGameProfile().name(), sold, price, System.currentTimeMillis() + DURATION_MS));
         p.level().playSound(null, p.blockPosition(), SoundEvents.VILLAGER_YES, SoundSource.NEUTRAL, 0.8f, 1.1f);
         p.sendOverlayMessage(Component.literal("Mis en vente : " + sold.getHoverName().getString() + " x" + sold.getCount() + " pour " + price + " or (48 h).").withColor(0xFFD040));

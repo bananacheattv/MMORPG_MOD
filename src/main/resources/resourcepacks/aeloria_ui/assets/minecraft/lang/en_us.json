@@ -3,5 +3,7 @@
   "menu.returnToGame": "Back to the adventure",
   "menu.returnToMenu": "Save and quit",
   "menu.disconnect": "Leave Aeloria",
-  "menu.paused": "Game paused"
+  "menu.paused": "Game paused",
+  "chat.type.text": "%s  ›  %s",
+  "chat.type.announcement": "%s  ›  %s"
 }

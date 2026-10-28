@@ -3,5 +3,7 @@
   "menu.returnToGame": "Reprendre l'aventure",
   "menu.returnToMenu": "Sauvegarder et quitter",
   "menu.disconnect": "Quitter Aeloria",
-  "menu.paused": "Jeu en pause"
+  "menu.paused": "Jeu en pause",
+  "chat.type.text": "%s  ›  %s",
+  "chat.type.announcement": "%s  ›  %s"
 }

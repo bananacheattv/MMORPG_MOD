@@ -37,6 +37,7 @@ public final class ModItems {
     public static final DeferredItem<com.mmorpg.item.SpawnEditorItem> SPAWN_EDITOR = ITEMS.registerItem("outil_spawn", com.mmorpg.item.SpawnEditorItem::new);
     public static final DeferredItem<com.mmorpg.item.NpcEditorItem> NPC_EDITOR = ITEMS.registerItem("outil_pnj", com.mmorpg.item.NpcEditorItem::new);
 
+    public static final DeferredItem<Item> MYSTERY_CUBE=ITEMS.registerSimpleItem("cube_mystere",p->p.stacksTo(1));
     public static final DeferredItem<com.mmorpg.item.ArmorStandEditorItem> ARMOR_STAND_EDITOR=ITEMS.registerItem("outil_armure",com.mmorpg.item.ArmorStandEditorItem::new);
     public static final List<DeferredItem<Item>> PALADIN_SHIELDS=new ArrayList<>();
     static {for(int tier=0;tier<5;tier++)PALADIN_SHIELDS.add(ITEMS.registerSimpleItem("bouclier_paladin_"+tier,p -> p.stacksTo(1)));}
@@ -48,6 +49,8 @@ public final class ModItems {
     public static final List<DeferredItem<? extends Item>> SUMMONS = new ArrayList<>();
     public static final List<DeferredItem<? extends Item>> SPAWN_EGGS = new ArrayList<>();
     public static final Map<String, DeferredItem<? extends Item>> BY_ID = new LinkedHashMap<>();
+    public static final List<DeferredItem<com.mmorpg.item.BackpackItem>> BACKPACKS=new ArrayList<>();
+    static {for(int i=0;i<4;i++){final int tier=i;String id="sac_a_dos_"+i;var item=ITEMS.registerItem(id,p->new com.mmorpg.item.BackpackItem(p,tier));BACKPACKS.add(item);BY_ID.put(id,item);}}
     static {
         for (int tier = 1; tier <= com.mmorpg.crafting.ForgeProgression.TIERS; tier++) {
             final int t = tier;

@@ -16,6 +16,7 @@ public final class NpcEditorItem extends Item {
     public static boolean edit(ServerPlayer p,NpcEntity npc){
         if(!QuestEditor.allowed(p)){p.sendSystemMessage(Component.literal("Outil réservé aux opérateurs."));return false;}
         if(npc.level()!=p.level()||npc.distanceToSqr(p)>64||!p.hasLineOfSight(npc))return false;
+        if(p.isShiftKeyDown()){NpcPlacement.select(p,npc);return true;}
         if(npc.role()==NpcEntity.Role.MARCHAND)MerchantEditor.open(p,npc);else QuestEditor.open(p,npc.getUUID().toString());
         return true;
     }
@@ -28,5 +29,5 @@ public final class NpcEditorItem extends Item {
         if(target==null||!edit(p,target))p.sendSystemMessage(Component.literal("Vise un PNJ visible à huit blocs maximum."));
     }
     @Override public InteractionResult use(Level level,Player player,InteractionHand hand){if(player instanceof ServerPlayer p)aimed(p);return InteractionResult.SUCCESS;}
-    @Override public InteractionResult useOn(UseOnContext context){if(context.getPlayer() instanceof ServerPlayer p)aimed(p);return InteractionResult.SUCCESS;}
+    @Override public InteractionResult useOn(UseOnContext context){if(context.getPlayer() instanceof ServerPlayer p){if(!p.isShiftKeyDown()&&NpcPlacement.placeSelected(p,context.getClickedPos().relative(context.getClickedFace())))return InteractionResult.SUCCESS;aimed(p);}return InteractionResult.SUCCESS;}
 }

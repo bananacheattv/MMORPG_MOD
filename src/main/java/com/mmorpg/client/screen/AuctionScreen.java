@@ -39,12 +39,14 @@ public class AuctionScreen extends MmoScreen {
     private long wallet;
     private EditBox search;
     private EditBox price;
+    private int sellSlot=-1,inventoryPage;
 
     public AuctionScreen(CompoundTag data) {
         super("Hôtel des ventes");
         receive(data);
     }
 
+    public void previewTab(int value){tab=Math.clamp(value,0,2);}
     private static List<Row> decode(ListTag list) {
         List<Row> out = new ArrayList<>();
         var level = Minecraft.getInstance().level;
@@ -148,19 +150,26 @@ public class AuctionScreen extends MmoScreen {
     }
 
     private void renderSell(GuiGraphicsExtractor g) {
-        ItemStack held = Minecraft.getInstance().player.getMainHandItem();
-        int x0 = left + 12;
-        Ui.inset(g, x0, top + 50, pw - 24, 80);
-        g.text(font, "OBJET EN MAIN", x0 + 8, top + 56, Ui.MUTED, false);
-        if (held.isEmpty()) {
-            g.text(font, "Tenez en main l'objet à vendre (l'ensemble de la pile sera mis en vente).", x0 + 8, top + 74, Ui.RED, false);
-        } else {
-            g.item(held, x0 + 10, top + 72);
-            g.itemDecorations(font, held, x0 + 10, top + 72);
-            g.text(font, held.getHoverName().getString() + " x" + held.getCount(), x0 + 34, top + 76, Ui.TEXT, true);
-            if (hovered(x0 + 10, top + 72, 16, 16)) g.setTooltipForNextFrame(font, held, mouseX, mouseY);
+        var player=Minecraft.getInstance().player;
+        if(sellSlot<0)sellSlot=player.getInventory().getSelectedSlot();
+        var bags=com.mmorpg.server.Backpacks.decode(com.mmorpg.client.ClientData.DATA.backpacks,player.level().registryAccess());
+        int inventorySize=36+com.mmorpg.server.Backpacks.capacity(bags),invPages=(inventorySize+35)/36;inventoryPage=Math.clamp(inventoryPage,0,invPages-1);if(sellSlot>=inventorySize)sellSlot=0;
+        java.util.function.IntFunction<ItemStack> stackAt=slot->slot<36?player.getInventory().getItem(slot):bags.getItem(slot-34);
+        ItemStack held=stackAt.apply(sellSlot);int x0=left+12;
+        Ui.inset(g,x0,top+48,pw-24,83);
+        g.text(font,"CHOISIR DANS MON INVENTAIRE",x0+7,top+53,Ui.GOLD,false);
+        if(invPages>1){button(g,x0+150,top+50,15,13,"‹",inventoryPage>0,Ui.GOLD,()->inventoryPage--);button(g,x0+167,top+50,15,13,"›",inventoryPage+1<invPages,Ui.GOLD,()->inventoryPage++);}
+        for(int i=0;i<36&&inventoryPage*36+i<inventorySize;i++){
+            int slot=inventoryPage==0?(i<27?i+9:i-27):inventoryPage*36+i,sx=x0+7+(i%9)*19,sy=top+65+(i/9)*16;
+            ItemStack stack=stackAt.apply(slot);Ui.frame(g,sx,sy,18,16,slot==sellSlot?Ui.GOLD:Ui.LINE,slot==sellSlot);
+            g.item(stack,sx+1,sy);g.itemDecorations(font,stack,sx+1,sy);
+            if(!stack.isEmpty()){click(sx,sy,18,16,()->sellSlot=slot);if(hovered(sx,sy,18,16))g.setTooltipForNextFrame(font,stack,mouseX,mouseY);}
         }
-        g.text(font, "Durée : 48 h · taxe de 5 % prélevée à la vente · " + com.mmorpg.client.ClientData.DATA.auctionSlots + " annonces maximum", x0 + 8, top + 108, Ui.MUTED, false);
+        int tx=x0+186,tw=pw-218;
+        g.text(font,font.plainSubstrByWidth(held.isEmpty()?"Choisissez un objet":held.getHoverName().getString(),Math.max(40,tw)),tx,top+69,Ui.TEXT,false);
+        if(!held.isEmpty())g.text(font,"Pile : "+held.getCount()+" objet(s)",tx,top+83,Ui.MUTED,false);
+        g.text(font,"48 h · taxe : 5 %",tx,top+99,Ui.MUTED,false);
+        g.text(font,"Toute la pile sélectionnée sera vendue.",left+20,top+188,Ui.MUTED,false);
         long value = 0;
         try {
             value = price.getValue().isEmpty() ? 0 : Long.parseLong(price.getValue());
@@ -169,7 +178,7 @@ public class AuctionScreen extends MmoScreen {
         final long p = value;
         if (p > 0) g.text(font, "Vous recevrez " + Math.max(1, p - Math.round(p * Auction.TAX)) + " or", left + 150, top + 144, 0xFF7CE08A, false);
         button(g, left + 20, top + 164, 180, 18, "Mettre en vente", !held.isEmpty() && p > 0 && p <= Auction.MAX_PRICE, 0xFF2A6A3A, () -> {
-            send(Auction.ACT_SELL, p, "", 0);
+            send(Auction.ACT_SELL,p,"slot:"+sellSlot+":"+Auction.saleFingerprint(held,player.level().registryAccess()),0);
             price.setValue("");
         });
     }

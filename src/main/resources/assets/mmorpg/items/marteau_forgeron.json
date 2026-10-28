@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "mmorpg:item/marteau_forgeron"
+    "model": "mmorpg:item/sculpted_marteau_forgeron"
   }
 }

@@ -10,7 +10,7 @@ import net.minecraft.client.input.KeyEvent;
 /** Menu principal a onglets du mod. */
 public abstract class MenuScreen extends MmoScreen {
     public enum Tab {
-        PERSONNAGE("Personnage"), COMPETENCES("Compétences"), QUETES("Quêtes"), GROUPE("Groupe"), GUILDE("Guilde"), ARENE("Arène"), FAMILIERS("Familiers"), MONTURES("Montures"), COSMETIQUES("Cosmétiques"), BESTIAIRE("Bestiaire"), BOUTIQUE("Boutique");
+        PERSONNAGE("Personnage"), COMPETENCES("Compétences"), QUETES("Quêtes"), GROUPE("Groupe"), GUILDE("Guilde"), ARENE("Arène"), FAMILIERS("Familiers"), MONTURES("Montures"), COSMETIQUES("Cosmétiques"), BESTIAIRE("Bestiaire"), BOUTIQUE("Boutique"), CREATIF("Créatif");
 
         public final String label;
 
@@ -29,6 +29,7 @@ public abstract class MenuScreen extends MmoScreen {
     }
 
     public static void open(Tab tab) {
+        if(tab==Tab.CREATIF){var mc=Minecraft.getInstance();if(mc.player!=null&&mc.player.hasInfiniteMaterials())mc.gui.setScreen(new AeloriaCreativeScreen());return;}
         if(tab==Tab.GUILDE||tab==Tab.ARENE||tab==Tab.BOUTIQUE){var t=new net.minecraft.nbt.CompoundTag();t.putString("action","open");com.mmorpg.client.ClientNet.send(new com.mmorpg.network.Payloads.SocialAction(tab==Tab.GUILDE?"guild":tab==Tab.BOUTIQUE?"store":"arena",t));return;}
         if (tab == Tab.PERSONNAGE) {             // personnage + inventaire + equipement (aussi sans classe)
             lastTab = tab;
@@ -49,7 +50,7 @@ public abstract class MenuScreen extends MmoScreen {
             case MONTURES -> new MountsScreen();
             case COSMETIQUES -> new CosmeticsScreen();
             case BESTIAIRE -> new BestiaryScreen();
-            case GUILDE,ARENE,BOUTIQUE -> throw new IllegalStateException("Server-backed screen");
+            case GUILDE,ARENE,BOUTIQUE,CREATIF -> throw new IllegalStateException("Server-backed screen");
         });
     }
 
@@ -70,10 +71,17 @@ public abstract class MenuScreen extends MmoScreen {
     protected abstract void renderTab(GuiGraphicsExtractor g, int mx, int my, float a);
 
     /** Barre d'onglets du menu (partagee avec l'ecran Personnage, qui est un ecran d'inventaire). */
+    private static int navPage;private static Tab navActive;
     public static void drawTabs(GuiGraphicsExtractor g, net.minecraft.client.gui.Font font, int left, int top, int pw, Tab active, int mx, int my,
                                 java.util.function.BiConsumer<int[], Runnable> click) {
-        Tab[] tabs = Tab.values();
-        int tw = (pw - 16 - 42) / tabs.length;
+        var available=new java.util.ArrayList<Tab>(java.util.Arrays.asList(Tab.values()));available.remove(Tab.CREATIF);
+        if(Minecraft.getInstance().player!=null&&Minecraft.getInstance().player.hasInfiniteMaterials())available.add(1,Tab.CREATIF);
+        Tab[] tabs=available.toArray(Tab[]::new);int count=Math.clamp((pw-100)/64,2,5),pages=(tabs.length+count-1)/count;
+        if(navActive!=active){navActive=active;navPage=available.indexOf(active)/count;}
+        navPage=Math.clamp(navPage,0,pages-1);int tw=(pw-100)/count;
+        int ax=left+pw-86;
+        Ui.button(g,ax,top+6,18,18,"‹",navPage>0,mx,my,Ui.GOLD);if(navPage>0)click.accept(new int[]{ax,top+6,18,18},()->navPage--);
+        Ui.button(g,ax+20,top+6,18,18,"›",navPage+1<pages,mx,my,Ui.GOLD);if(navPage+1<pages)click.accept(new int[]{ax+20,top+6,18,18},()->navPage++);
         // bouton d'edition de l'interface (HUD) au bout de la barre d'onglets
         int ex = left + pw - 8 - 18;
         boolean eh = Ui.in(mx, my, ex, top + 6, 18, 18);
@@ -90,9 +98,9 @@ public abstract class MenuScreen extends MmoScreen {
         click.accept(new int[]{ex, top + 6, 18, 18}, () -> Minecraft.getInstance().gui.setScreen(new HudEditorScreen(Minecraft.getInstance().gui.screen())));
         drawMusicButton(g, font, ex - 20, top + 6, mx, my, click);
         float common = 1f;                                    // meme taille de texte pour tous les onglets
-        for (Tab t : tabs) common = Math.min(common, (tw - 8) / (float) Math.max(1, font.width(t.label)));
-        for (int i = 0; i < tabs.length; i++) {
-            Tab t = tabs[i];
+        for (int j=navPage*count;j<Math.min(tabs.length,(navPage+1)*count);j++) common = Math.min(common, (tw - 8) / (float) Math.max(1, font.width(tabs[j].label)));
+        for (int i = 0; i < count&&navPage*count+i<tabs.length; i++) {
+            Tab t = tabs[navPage*count+i];
             int tx = left + 8 + i * tw;
             int ty = top + 6;
             boolean on = t == active;

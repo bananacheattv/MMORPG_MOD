@@ -166,3 +166,24 @@ Seul le proprietaire peut monter. La monture invoquee disparait si son proprieta
 - Tests automatiques du hub (client de développement) : `./gradlew runClient -Pshowcase=hub` (essai, restauration, accès, protection, `/hub`), `-Pshowcase=cinematique` (caméra, saut, verrou), `-Pshowcase=hubdesign` (revue visuelle sous 16 angles + vues de nuit, captures `showcase_15xx_*`).
 - Réglages : `config/mmorpg/cinematique.json` (format version 2 : un **parcours** global d'images clés horodatées `{t, camera, cible, fov}` en secondes, interpolées par courbes d'Hermite pour un mouvement continu ; les plans ne portent que les titres, sons, particules et la mise en scène des Maîtres ; coordonnées relatives à la place centrale du hub). Un fichier d'un ancien format est sauvegardé en `cinematique.json.ancienne` puis remplacé. Supprimer le fichier pour revenir au parcours par défaut.
 
+
+## Portails, PNJ et inventaire étendu
+
+- Le titre et l’icône de fenêtre utilisent Aeloria ; la connexion et le rechargement des ressources reprennent son identité violette.
+- Au spawn, chaque guide de découverte possède sa propre quête. Les quêtes existantes gardent leurs affectations manuelles ; les anciennes quêtes sans PNJ sont réparties entre les donneurs du spawn.
+- Opérateur : avec l’outil d’édition de PNJ, Maj + clic droit sélectionne un PNJ, puis clic droit sur le sol le déplace. Le panneau propose aussi « Placer ici » et une rotation de 90°. La position est sauvegardée ; les objectifs de visite suivent le déplacement. Le sol doit être libre et solide.
+- L’éditeur de porte-armure propose Poses, Position et Apparence. Choisir un modèle de personnage Aeloria ou saisir un pseudo Minecraft pour son skin. Les poses et équipements restent utilisables.
+- Deux emplacements de sacs à dos dans Personnage : quatre tailles de 6, 12, 18 et 24 cases, cumulables jusqu’à 48 cases supplémentaires. Les recettes sont dans la Forge. Utiliser un sac l’équipe dans un emplacement libre ; « Ouvrir les sacs » donne accès aux objets. Impossible de retirer un sac si cela ferme des cases occupées ou d’imbriquer des sacs.
+- Les objets ramassés remplissent aussi les sacs équipés lorsque l’inventaire normal est plein. Leur contenu suit le profil partagé entre les serveurs.
+- HDV > Vendre : sélectionner la pile dans l’inventaire affiché, y compris les pages des sacs, puis fixer son prix. Une pile modifiée entre sélection et confirmation est refusée.
+- Les armes exigent la classe et le niveau indiqués : corps à corps, arcs et compétences sont vérifiés côté serveur.
+- Le personnage conserve son interface en créatif ; l’onglet Créatif ouvre le catalogue de construction. Le menu « Tous les menus » a été corrigé.
+- Les grades utilisent des badges dessinés ; les pseudos sont colorés et gras. Fondateur/Administrateur rouges, Modérateur bleu, Builder vert. Le chat ne met plus les noms entre crochets.
+
+## Équipement et Lucky Blocks
+
+Les armures utilisent des silhouettes articulées propres aux quatre classes, avec six paliers de finition : métal simple, renforts, gravures, gemmes, épaulières et ornements de prestige. Les 44 armes ont une géométrie volumétrique ; les armes de début et de fin de progression se distinguent par leurs formes. Les bâtons se tiennent verticalement. L’atlas original de matériaux mesure 1024 × 1024 pixels ; `tools/sculpt-rpg-assets.py` permet de le régénérer avec les modèles d’armes, coffres et Lucky Blocks.
+
+Les Lucky Blocks affichent trois cubes 3D marqués « ? », puis des objets 3D tournants. L’interface et les cubes prennent la couleur de leur variante. Le bouton est « Ouvrir le Lucky Block » ; les probabilités ne sont plus affichées dans l’interface. La table et le tirage restent contrôlés par le serveur. Les coffres ont des ferrures, charnières, serrures, pieds et couvercles en volume.
+
+Le launcher Aeloria 1.3.7 propose l’installation facultative d’Iris et Sodium compatibles dans ses Réglages, ainsi que l’ouverture du dossier des shaders. Choisir ensuite son pack dans le menu des shaders en jeu.

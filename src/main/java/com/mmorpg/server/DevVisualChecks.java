@@ -17,6 +17,8 @@ public final class DevVisualChecks {
             com.mmorpg.hub.CinematicManager.finish(p);p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
             if(Boolean.getBoolean("mmorpg.expansionVisual")){com.mmorpg.dungeon.DevExpansionVisual.install(p);return;}
             if(Boolean.getBoolean("mmorpg.guideVisual")){
+                var bags=Backpacks.inventory(p);bags.setItem(0,new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.BACKPACKS.get(3).get()));bags.setItem(1,new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.BACKPACKS.get(2).get()));bags.setItem(2,new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("potion_soin_majeure"),5));
+
                 com.mmorpg.config.ConfigManager.general().customSpawning=false;
                 for(int x=-10;x<=40;x++)for(int z=-5;z<=18;z++)level.setBlockAndUpdate(new BlockPos(x,219,z),net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState());
                 for(int i=0;i<5;i++){

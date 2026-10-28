@@ -28,6 +28,7 @@ public final class ModCreativeTabs {
             .icon(() -> new ItemStack(ModItems.FRAGMENT_DIVIN.get()))
             .displayItems((params, out) -> {
                 out.accept(ModItems.FORGE_ARCANIQUE.get());
+                ModItems.BACKPACKS.forEach(item->out.accept(item.get()));
                 out.accept(ModItems.PRESSE_COMPRESSION.get());
                 out.accept(ModItems.BANQUE.get());
                 out.accept(ModItems.HDV.get());

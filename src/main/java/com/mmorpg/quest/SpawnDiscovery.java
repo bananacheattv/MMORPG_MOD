@@ -25,7 +25,7 @@ public final class SpawnDiscovery {
     public static UUID id(int i){return UUID.nameUUIDFromBytes(("aeloria:spawn-discovery:"+i).getBytes(java.nio.charset.StandardCharsets.UTF_8));}
     public static Map<String,QuestDef> definitions(){
         var map=new LinkedHashMap<String,QuestDef>();for(int i=0;i<IDS.length;i++){
-            var q=new QuestDef();q.name=TITLES[i];q.description=LORE[i];q.giver="spawn_decouverte_"+i;q.minLevel=1;
+            var q=new QuestDef();q.name=TITLES[i];q.description=LORE[i];q.giver="spawn_decouverte_"+i;q.npc=id(i).toString();q.minLevel=1;
             if(i>0)q.requires.add(IDS[i-1]);q.objectives.add(new QuestDef.Objective(i==4?"kill":"visit",i==4?"gobelin":NAMES[i+1],i==4?3:1));q.rewards.xp=80+i*40;q.rewards.gold=10+i*5;
             q.rewards.items.add(new QuestDef.ItemReward("mmorpg:potion_soin_mineure",i==4?3:1));map.put(IDS[i],q);
         }return map;
@@ -41,16 +41,40 @@ public final class SpawnDiscovery {
         var l=player.level();NpcEntity[] actors=new NpcEntity[IDS.length];
         for(int i=0;i<IDS.length;i++){
             var existing=l.getEntity(id(i));if(existing instanceof NpcEntity n){actors[i]=n;continue;}
+            if(com.mmorpg.world.NpcDirectory.get(l.getServer()).entry(id(i).toString())!=null)continue;
             var at=safe(l,player.blockPosition(),i);if(at==null)continue;
             var n=com.mmorpg.registry.ModEntities.NPC.get().create(l,net.minecraft.world.entity.EntitySpawnReason.COMMAND);n.setUUID(id(i));n.setup(NpcEntity.Role.QUETES,NAMES[i],new int[]{4,6,8,7,5}[i],"spawn_decouverte_"+i);n.snapTo(at.getX()+.5,at.getY(),at.getZ()+.5,180,0);n.setPersistenceRequired();if(l.addFreshEntity(n))actors[i]=n;
         }
         UUID merchantId=UUID.nameUUIDFromBytes("aeloria:spawn-premium-store".getBytes(java.nio.charset.StandardCharsets.UTF_8));
-        if(l.getEntity(merchantId)==null){var at=safe(l,player.blockPosition(),5);if(at!=null){var n=com.mmorpg.registry.ModEntities.NPC.get().create(l,net.minecraft.world.entity.EntitySpawnReason.COMMAND);n.setUUID(merchantId);n.setup(NpcEntity.Role.BOUTIQUE,"Céliane · Boutique d’Aeloria",8,"");n.snapTo(at.getX()+.5,at.getY(),at.getZ()+.5,180,0);n.setPersistenceRequired();l.addFreshEntity(n);}}
-        for(int i=0;i<4;i++){
-            var q=ConfigManager.quests().get(IDS[i]);if(q==null||q.objectives.isEmpty()||actors[i+1]==null)continue;var objective=q.objectives.getFirst();
-            if(objective.navigation==null){var n=new QuestDef.Navigation();n.dimension=l.dimension().identifier().toString();n.backend="MAIN";n.x=actors[i+1].getX();n.y=actors[i+1].getY();n.z=actors[i+1].getZ();objective.navigation=n;try{ConfigManager.saveQuest(IDS[i],q);}catch(java.io.IOException e){MMORPG.LOGGER.error("Spawn discovery quest save",e);}}
-        }
+        if(l.getEntity(merchantId)==null&&com.mmorpg.world.NpcDirectory.get(l.getServer()).entry(merchantId.toString())==null){var at=safe(l,player.blockPosition(),5);if(at!=null){var n=com.mmorpg.registry.ModEntities.NPC.get().create(l,net.minecraft.world.entity.EntitySpawnReason.COMMAND);n.setUUID(merchantId);n.setup(NpcEntity.Role.BOUTIQUE,"Céliane · Boutique d’Aeloria",8,"");n.snapTo(at.getX()+.5,at.getY(),at.getZ()+.5,180,0);n.setPersistenceRequired();l.addFreshEntity(n);}}
+        bindDefaults(l.getServer());refreshNavigation(l.getServer());
         if(actors[0]!=null&&!RpgPlayers.get(player).completedQuests.contains(IDS[0]))player.sendSystemMessage(Component.literal("Découvrez la cité avec Maëlys, l’accueil du spawn. Ses quêtes vous présentent Aeloria.").withColor(0xD5B0FF));
+    }
+    public static void refreshNavigation(net.minecraft.server.MinecraftServer server){
+        var directory=com.mmorpg.world.NpcDirectory.get(server);
+        for(int i=0;i<IDS.length;i++){
+            var q=ConfigManager.quests().get(IDS[i]);if(q==null)continue;boolean changed=false;
+            if(q.npc==null||q.npc.isEmpty()){q.npc=id(i).toString();changed=true;}
+            if(i<4&&!q.objectives.isEmpty()){
+                var entry=directory.entry(id(i+1).toString());if(entry!=null){var at=BlockPos.of(entry.getLongOr("pos",0));var objective=q.objectives.getFirst();var n=objective.navigation;
+                    if(n==null||n.x!=at.getX()+.5||n.y!=at.getY()||n.z!=at.getZ()+.5||!n.dimension.equals(entry.getStringOr("dimension",""))){
+                        n=new QuestDef.Navigation();n.dimension=entry.getStringOr("dimension","");n.backend=entry.getStringOr("backend","MAIN");n.x=at.getX()+.5;n.y=at.getY();n.z=at.getZ()+.5;objective.navigation=n;changed=true;
+                    }
+                }
+            }
+            if(changed)try{ConfigManager.saveQuest(IDS[i],q);}catch(java.io.IOException e){MMORPG.LOGGER.error("Spawn discovery binding save",e);}
+        }
+        for(var p:server.getPlayerList().getPlayers())RpgPlayers.get(p).dirty=true;
+    }
+    private static void bindDefaults(net.minecraft.server.MinecraftServer server){
+        var candidates=new ArrayList<net.minecraft.nbt.CompoundTag>();
+        for(var t:com.mmorpg.world.NpcDirectory.get(server).snapshot())if(t instanceof net.minecraft.nbt.CompoundTag n&&n.getIntOr("role",-1)==0&&!n.getBooleanOr("tutorialGuide",false)&&n.getStringOr("dimension","").equals(com.mmorpg.hub.SpawnBuilder.DIM.identifier().toString())&&!n.getStringOr("group","").startsWith("spawn_decouverte_"))candidates.add(n);
+        candidates.sort(java.util.Comparator.comparing(n->n.getStringOr("id","")));if(candidates.isEmpty())return;
+        int index=0;for(String key:DefaultQuests.create().keySet()){
+            var q=ConfigManager.quests().get(key);if(q==null||q.npc!=null&&!q.npc.isEmpty())continue;
+            var eligible=candidates.stream().filter(n->q.giver.isEmpty()||q.giver.equalsIgnoreCase(n.getStringOr("group",""))).toList();if(eligible.isEmpty())continue;
+            q.npc=eligible.get(index++%eligible.size()).getStringOr("id","");try{ConfigManager.saveQuest(key,q);}catch(java.io.IOException e){MMORPG.LOGGER.error("Unique quest giver save",e);}
+        }
     }
     @SubscribeEvent public static void login(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent e){if(e.getEntity() instanceof ServerPlayer p)com.mmorpg.server.Scheduler.later(p.level(),60,()->install(p));}
     @SubscribeEvent public static void dimension(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent e){if(e.getEntity() instanceof ServerPlayer p)com.mmorpg.server.Scheduler.later(p.level(),40,()->install(p));}

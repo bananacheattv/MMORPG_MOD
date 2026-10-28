@@ -646,5 +646,10 @@
   "block.mmorpg.lucky_sylvestre": "Lucky Block Sylvestre",
   "block.mmorpg.lucky_infernal": "Lucky Block Infernal",
   "block.mmorpg.lucky_givre": "Lucky Block Givre",
-  "block.mmorpg.lucky_neant": "Lucky Block Néant"
+  "block.mmorpg.lucky_neant": "Lucky Block Néant",
+  "container.mmorpg.backpacks": "Sacs à dos",
+  "item.mmorpg.sac_a_dos_0": "Sac de voyage",
+  "item.mmorpg.sac_a_dos_1": "Sac d’éclaireur",
+  "item.mmorpg.sac_a_dos_2": "Sac d’aventurier",
+  "item.mmorpg.sac_a_dos_3": "Sac de l’archimage"
 }

@@ -69,7 +69,7 @@ public final class Net {
         r.playToServer(Payloads.QuestAction.TYPE, Payloads.QuestAction.CODEC, ServerHandlers::questAction);
         r.playToServer(Payloads.ShopAction.TYPE, Payloads.ShopAction.CODEC, ServerHandlers::shopAction);
         r.playToServer(Payloads.MerchantEdit.TYPE,Payloads.MerchantEdit.CODEC,(packet,ctx)->{if(ctx.player() instanceof ServerPlayer p)com.mmorpg.server.MerchantEditor.action(p,packet.data());});
-        r.playToServer(Payloads.SocialAction.TYPE,Payloads.SocialAction.CODEC,(packet,ctx)->{if(ctx.player() instanceof ServerPlayer p){if(packet.system().equals("store"))com.mmorpg.store.PremiumStore.action(p,packet.data());else if(packet.system().equals("guild"))com.mmorpg.guild.GuildService.action(p,packet.data());else if(packet.system().equals("armorstand"))com.mmorpg.server.ArmorStandEditor.action(p,packet.data());else if(packet.system().equals("arena"))com.mmorpg.competition.ArenaManager.action(p,packet.data());}});
+        r.playToServer(Payloads.SocialAction.TYPE,Payloads.SocialAction.CODEC,(packet,ctx)->{if(ctx.player() instanceof ServerPlayer p){if(packet.system().equals("backpack"))com.mmorpg.server.Backpacks.open(p);else if(packet.system().equals("store"))com.mmorpg.store.PremiumStore.action(p,packet.data());else if(packet.system().equals("guild"))com.mmorpg.guild.GuildService.action(p,packet.data());else if(packet.system().equals("armorstand"))com.mmorpg.server.ArmorStandEditor.action(p,packet.data());else if(packet.system().equals("arena"))com.mmorpg.competition.ArenaManager.action(p,packet.data());}});
         r.playToServer(Payloads.PartyAction.TYPE, Payloads.PartyAction.CODEC, ServerHandlers::partyAction);
     }
 

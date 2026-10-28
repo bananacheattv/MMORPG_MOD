@@ -73,6 +73,11 @@ public final class QuestEditor {
                     NpcDirectory.get(p.level().getServer()).record(npc);selectedNpc=npc.getUUID().toString();
                     status="PNJ enregistré : "+name;
                 }
+                case "move_npc", "rotate_npc" -> {
+                    var npc=NpcPlacement.find(p,text(data,"id",80));
+                    NpcPlacement.move(p,npc,data.getStringOr("action","").equals("move_npc")?p.blockPosition():npc.blockPosition(),data.getStringOr("action","").equals("move_npc")?p.getYRot()+180:npc.getYRot()+90);
+                    selectedNpc=npc.getUUID().toString();status="Position et orientation enregistrées.";
+                }
                 case "refresh" -> status="Catalogue actualisé.";
                 default -> throw new IllegalArgumentException("Action inconnue.");
             }

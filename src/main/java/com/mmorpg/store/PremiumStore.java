@@ -16,7 +16,7 @@ public final class PremiumStore {
     public static void refresh(ServerPlayer p){
         var cfg=StoreConfig.load(p.level().getServer());var account=StoreLedger.access(p.level().getServer(),s->StoreLedger.account(s,p.getUUID()));var rank=cfg.ranks.get(Math.clamp(account.rank,0,4));var d=RpgPlayers.get(p);
         String label=account.staff.isEmpty()?rank.label:switch(account.staff){case "fondateur"->"Fondateur";case "administrateur"->"Administrateur";case "moderateur"->"Modérateur";case "builder"->"Builder";default->rank.label;};
-        int color=account.staff.isEmpty()?rank.color:0xF08078;boolean changed=!d.rankLabel.equals(label)||d.rankColor!=color||d.rankTier!=account.rank;
+        int color=account.staff.isEmpty()?rank.color:switch(account.staff){case "moderateur"->0x55AFFF;case "builder"->0x58DE87;default->0xFF5555;};boolean changed=!d.rankLabel.equals(label)||d.rankColor!=color||d.rankTier!=account.rank;
         d.rankLabel=label;d.rankColor=color;d.rankTier=account.rank;d.auctionSlots=rank.auctionSlots;
         for(int i=1;i<=account.rank;i++)if(!cfg.ranks.get(i).cosmetic.isEmpty())d.cosmetics.add(cfg.ranks.get(i).cosmetic);
         if(changed){d.dirty=true;p.refreshDisplayName();p.refreshTabListName();RpgPlayers.updatePublic(p);}
@@ -50,8 +50,8 @@ public final class PremiumStore {
     }
     @SubscribeEvent public static void login(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent e){if(e.getEntity() instanceof ServerPlayer p)com.mmorpg.server.Scheduler.later(p.level(),30,()->{try{refresh(p);p.refreshDisplayName();p.refreshTabListName();}catch(Exception ex){MMORPG.LOGGER.warn("Grade temporairement indisponible : {}",ex.getMessage());}});}
     @SubscribeEvent public static void tick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post e){if(e.getServer().getTickCount()%100==0)for(var p:e.getServer().getPlayerList().getPlayers())try{refresh(p);deliver(p);}catch(Exception ex){MMORPG.LOGGER.warn("Boutique : {}",ex.getMessage());}}
-    @SubscribeEvent public static void name(net.neoforged.neoforge.event.entity.player.PlayerEvent.NameFormat e){if(e.getEntity() instanceof ServerPlayer p){var d=RpgPlayers.get(p);e.setDisplayname(Component.literal("["+d.rankLabel+"] ").withColor(d.rankColor).append(e.getUsername().copy().withColor(0xFFFFFF)));}}
-    @SubscribeEvent public static void tab(net.neoforged.neoforge.event.entity.player.PlayerEvent.TabListNameFormat e){if(e.getEntity() instanceof ServerPlayer p){var d=RpgPlayers.get(p);e.setDisplayName(Component.literal("["+d.rankLabel+"] ").withColor(d.rankColor).append(p.getGameProfile().name()));}}
+    @SubscribeEvent public static void name(net.neoforged.neoforge.event.entity.player.PlayerEvent.NameFormat e){if(e.getEntity() instanceof ServerPlayer p){var d=RpgPlayers.get(p);e.setDisplayname(RankTags.name(d.rankLabel,d.rankColor,e.getUsername().getString()));}}
+    @SubscribeEvent public static void tab(net.neoforged.neoforge.event.entity.player.PlayerEvent.TabListNameFormat e){if(e.getEntity() instanceof ServerPlayer p){var d=RpgPlayers.get(p);e.setDisplayName(RankTags.name(d.rankLabel,d.rankColor,p.getGameProfile().name()));}}
     @SubscribeEvent public static void commands(net.neoforged.neoforge.event.RegisterCommandsEvent e){var d=e.getDispatcher();
         d.register(net.minecraft.commands.Commands.literal("boutique").executes(c->{open(c.getSource().getPlayerOrException(),"");return 1;}));
         d.register(net.minecraft.commands.Commands.literal("credits").executes(c->{open(c.getSource().getPlayerOrException(),"");return 1;}).then(net.minecraft.commands.Commands.literal("ajouter").requires(net.minecraft.commands.Commands.hasPermission(net.minecraft.commands.Commands.LEVEL_OWNERS))

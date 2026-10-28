@@ -1015,11 +1015,41 @@ def sheet(entries, path, title):
 
 
 # ============================================================================================== main
+def refine_aeloria(A):
+    """Layered, fitted armour: reduce oversized blocks and add articulated relief."""
+    for bone in A.bones.values():
+        bone.cubes[:]=[c for c in bone.cubes if not c.name.startswith('fragment_flottant')]
+        for c in bone.cubes:
+            if c.name.startswith('epauliere_') and c.size[0]>=8:
+                c.frm[0]+=1;c.size[0]-=2
+    trim='argent'
+    robe=A.num in (1,3,8,11,16)
+    for side,sx in SIDES:
+        cx=6*sx
+        # Fitted gauntlet edge and forged rivets follow their own arm bone.
+        A.cube(A.bras[side], 'aeloria_cuff_'+side,(cx-2,13,-3),(4,1,6),trim,.12)
+        for y in (15,18):A.cube(A.bras[side],'aeloria_bracer_stud_'+side+str(y),(cx-.5,y,-3.4),(1,1,1),trim,0)
+        # V-shaped gorget, inset rather than an oversized solid chest cube.
+        b=A.sub(A.torse,'aeloria_gorget_'+side,(sx*2.4,22,-3.1),(0,0,sx*22.5))
+        A.cube(b,'aeloria_gorget_edge_'+side,(sx*2.4-.5,19,-3.7),(1,6,1),trim,0)
+        lx=1.9*sx
+        A.cube(A.pied[side],'aeloria_toe_cap_'+side,(lx-1.5,.2,-3.8),(3,2,2),'metal' if A.level>=50 else 'acier',.15)
+        A.cube(A.jambe[side],'aeloria_greave_ridge_'+side,(lx-.5,3,-3.1),(1,5,1),trim,0)
+        if robe:
+            A.cube(A.torse,'aeloria_split_robe_'+side,(sx*2-1,2,-3),(2,10,1),'tissu_violet',.1)
+            A.cube(A.torse,'aeloria_embroidered_hem_'+side,(sx*2-1,2,-3.2),(2,1,1),trim,.05)
+        elif A.level>=20:
+            hip=A.sub(A.taille,'aeloria_faulds_'+side,(sx*3,12,-3),(0,0,sx*12))
+            for j in range(3):A.cube(hip,'aeloria_lamella_'+side+str(j),(sx*3-1.5,10-j*1.4,-3.2),(3,2,1),'metal' if A.level>=50 else 'acier',.12)
+    if A.level>=20:crystal_core(A,A.torse,'aeloria_clasp',(0,22),2,frame=trim,z=-4.2,frame_w=1)
+
+
 def main():
     os.makedirs(os.path.join(ICI, 'apercu'), exist_ok=True)
     thumbs = []
     for fn in PANOPLIES:
         A = fn()
+        refine_aeloria(A)
         if A.level >= 50:   # armures sombres : le bas du corps reste noir, l'argent est reserve aux accents
             for _, c in A.all_cubes():
                 if c.mat == 'argent' and (c.name.startswith('revers_') or (c.name.startswith('genouillere_') and A.num not in (15, 18))):
