@@ -143,6 +143,7 @@ public final class DevNetworkChecks {
             DevSocialChecks.run(p);
             DevBetaChecks.run(p);
             DevNewRulesChecks.run(p);
+            DevRankingChecks.run(p);
             DevGuidanceChecks.run(p);
             com.mmorpg.dungeon.DevExpansionChecks.run(p);
             DevPolishChecks.run(p);

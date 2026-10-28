@@ -60,9 +60,9 @@ def panel(kid, title, sub, col, kind):
     d.rectangle([4, 4, W - 5, H - 5], outline=mix(col, .45), width=1)
     big, small = ImageFont.truetype(FONT, 15), ImageFont.truetype(FONT, 8)
     tw = d.textlength(title, font=big)
-    d.text(((W - tw) / 2, 4), title, font=big, fill=col)
+    d.text(((W - tw) / 2, 0), title, font=big, fill=col)
     sw = d.textlength(sub, font=small)
-    d.text(((W - sw) / 2, 15), sub, font=small, fill=(225, 218, 240))
+    d.text(((W - sw) / 2, 15.5), sub, font=small, fill=(225, 218, 240))
     for cx in (20, W - 20):
         motif(d, kind, cx, 12, 8, col)
     img.save(ASSETS / f"textures/block/classement_{kid}.png")

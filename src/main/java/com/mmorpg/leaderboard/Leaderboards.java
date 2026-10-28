@@ -94,19 +94,21 @@ public final class Leaderboards {
 
     /** Releve les valeurs mesurees des joueurs connectes. */
     public static void sample(MinecraftServer server) {
-        for (ServerPlayer p : server.getPlayerList().getPlayers()) {
-            if (com.mmorpg.network.NetworkPlayers.inTransit(p)) continue;
-            var d = RpgPlayers.get(p);
-            if (!d.playerClass.isPlayable()) continue;
-            UUID id = p.getUUID();
-            String name = p.getGameProfile().name();
-            set(server, id, name, Board.NIVEAU, d.level, d.xp);
-            set(server, id, name, Board.FORTUNE, d.gold, 0);
-            long kills = 0;
-            for (int k : d.kills.values()) kills += k;
-            set(server, id, name, Board.MONSTRES, kills, 0);
-            set(server, id, name, Board.QUETES, d.completedQuests.size(), 0);
-        }
+        for (ServerPlayer p : server.getPlayerList().getPlayers()) sample(server, p);
+    }
+
+    public static void sample(MinecraftServer server, ServerPlayer p) {
+        if (com.mmorpg.network.NetworkPlayers.inTransit(p)) return;
+        var d = RpgPlayers.get(p);
+        if (!d.playerClass.isPlayable()) return;
+        UUID id = p.getUUID();
+        String name = p.getGameProfile().name();
+        set(server, id, name, Board.NIVEAU, d.level, d.xp);
+        set(server, id, name, Board.FORTUNE, d.gold, 0);
+        long kills = 0;
+        for (int k : d.kills.values()) kills += k;
+        set(server, id, name, Board.MONSTRES, kills, 0);
+        set(server, id, name, Board.QUETES, d.completedQuests.size(), 0);
     }
 
     /** Relit les classements : depuis la base si elle est prete (resultat publie sur le thread serveur), sinon depuis la copie locale. */
@@ -115,14 +117,7 @@ public final class Leaderboards {
         for (Board board : Board.values()) {
             if (db) {
                 Database.fire("classement " + board.id, c -> {
-                    List<Row> rows = new ArrayList<>();
-                    try (var ps = c.prepareStatement("SELECT uuid, name, value, extra FROM leaderboard_stats WHERE board = ? AND value > 0 "
-                            + "ORDER BY value DESC, extra DESC, name LIMIT " + KEPT)) {
-                        ps.setString(1, board.id);
-                        try (var rs = ps.executeQuery()) {
-                            while (rs.next()) rows.add(new Row(rs.getString(1), rs.getString(2), rs.getLong(3), rs.getLong(4)));
-                        }
-                    }
+                    List<Row> rows = query(c, board);
                     server.execute(() -> publish(board, rows));
                     return null;
                 });
@@ -131,6 +126,30 @@ public final class Leaderboards {
                         .map(e -> new Row(e.id().toString(), e.name(), e.value(), e.extra())).toList());
             }
         }
+    }
+
+    /** Comme {@link #refresh} mais attend la base (verifications de developpement uniquement). */
+    public static void refreshAndWait(MinecraftServer server) {
+        if (!(Database.enabled() && Database.ready())) {
+            refresh(server);
+            return;
+        }
+        for (Board board : Board.values()) {
+            List<Row> rows = Database.await("classement " + board.id, 5000, c -> query(c, board));
+            if (rows != null) publish(board, rows);
+        }
+    }
+
+    private static List<Row> query(java.sql.Connection c, Board board) throws java.sql.SQLException {
+        List<Row> rows = new ArrayList<>();
+        try (var ps = c.prepareStatement("SELECT uuid, name, value, extra FROM leaderboard_stats WHERE board = ? AND value > 0 "
+                + "ORDER BY value DESC, extra DESC, name LIMIT " + KEPT)) {
+            ps.setString(1, board.id);
+            try (var rs = ps.executeQuery()) {
+                while (rs.next()) rows.add(new Row(rs.getString(1), rs.getString(2), rs.getLong(3), rs.getLong(4)));
+            }
+        }
+        return rows;
     }
 
     private static synchronized void publish(Board board, List<Row> rows) {

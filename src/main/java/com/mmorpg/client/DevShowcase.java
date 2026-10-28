@@ -468,6 +468,10 @@ public final class DevShowcase {
             integrationPhase(mc, me);
             return;
         }
+        if (MODE.equals("classements")) {
+            rankingsPhase(mc, me);
+            return;
+        }
         if (MODE.equals("structures")) {
             structuresPhase(mc, me);
             return;
@@ -2555,6 +2559,38 @@ public final class DevShowcase {
      * Controle des structures multiblocs (autel, teleporteur, forge) : vue d'ensemble eteinte puis active, gros plans,
      * collision de la plateforme de l'autel, interface d'amelioration avec un trefle et amelioration reelle.
      */
+    /** Panneaux de classement : vue d'ensemble puis gros plans de chaque type (le serveur doit avoir des lignes en base). */
+    private static void rankingsPhase(Minecraft mc, String me) {
+        String[] kinds = {"niveau", "monstres", "arene", "fortune", "boss", "donjons", "quetes", "guilde_niveau", "guilde_banque", "guilde_gardiens"};
+        if (tick == 5) mc.getWindow().setWindowed(1280, 720);
+        if (tick == 20) {
+            cmd(mc, "time set day");
+            cmd(mc, "weather clear");
+            cmd(mc, "gamemode creative " + me);
+            cmd(mc, "fill ~-30 180 ~-30 ~30 180 ~30 minecraft:smooth_stone");
+            cmd(mc, "fill ~-30 181 ~-30 ~30 190 ~30 minecraft:air");
+            cmd(mc, "tp " + me + " ~ 181 ~ 180 0");
+        }
+        if (tick == 40) structOrigin = mc.player.blockPosition();
+        if (structOrigin == null || tick < 42) return;
+        if (tick == 42) {
+            for (int i = 0; i < kinds.length; i++) {
+                int col = i % 5, row = i / 5;
+                cmd(mc, "setblock ~" + (col * 6 - 12) + " ~ ~" + (-10 - row * 8) + " mmorpg:classement_" + kinds[i] + "[facing=south]");
+            }
+        }
+        if (tick == 45 && !mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        if (tick == 45) mc.options.setCameraType(CameraType.FIRST_PERSON);
+        if (tick == 60) look(mc, me, 0, 2, 8, 0, -10, 8);
+        if (tick == 700) shot(mc, "classements_vue_ensemble");
+        for (int i = 0; i < kinds.length; i++) {
+            int col = i % 5, row = i / 5, t = 710 + i * 90;
+            if (tick == t) look(mc, me, col * 6 - 12 + 0.5, 1.5, -10 - row * 8 + 2.5, col * 6 - 12 + 0.5, -10 - row * 8, 0);
+            if (tick == t + 70) shot(mc, "classement_" + kinds[i]);
+        }
+        if (tick == 710 + kinds.length * 90 + 20) stop(mc);
+    }
+
     private static void structuresPhase(Minecraft mc, String me) {
         if (tick == 5) mc.getWindow().setWindowed(1280, 720);
         if (tick == 20) {
