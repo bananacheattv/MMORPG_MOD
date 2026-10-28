@@ -7,10 +7,10 @@ Ce dossier est le **point d’entrée unique pour Claude**. Il regroupe toutes l
 - Lot1 : Métiers, Donjons, Classes, Quêtes, Montures/Familiers, Boutique, Chargements — livré.
 - Lot2 : Guildes, Forge, Bestiaire, Succès, Résultats d’arène — livré.
 - Médailles : six PNG transparents individuels livrés, un fichier par icône.
-- Lot3 : HDV, Banque/Sacs, Compétences, Fin de donjon, Fiches d’équipement — en préparation.
+- Lot3 : HDV, Banque/Sacs, Compétences, Fin de donjon, Fiches d’équipement — livré.
 - **Carte du monde retirée à la demande de l’utilisateur. Aucun fichier de carte ni demande de création de ce menu n’est livré.**
 
-**21 PNG disponibles**, dont les trois métiers de la première série. Les images sont des assets, pas des interfaces déjà fonctionnelles.
+**26 PNG disponibles**, dont les trois métiers de la première série. Les images sont des assets, pas des interfaces déjà fonctionnelles.
 
 ➡️ [Instructions d’intégration pour Claude](BRIEF_CLAUDE.md) · [Contrôles d’affichage obligatoires](DISPLAY_QA.md) · [Manifeste technique](manifest.json) · [Prompts](prompts.json)
 
@@ -19,6 +19,8 @@ Ce dossier est le **point d’entrée unique pour Claude**. Il regroupe toutes l
 Récupérer les commits d’assets uniquement par cherry-pick depuis la branche de travail actuelle de Claude. Ne pas fusionner l’ancienne base de gameplay de cette branche par défaut. Les commits de ce pack modifient seulement `art/ui-pack/`, aucun Java ni launcher.
 
 ## Fichiers
+
+Les six médailles individuelles `medal_*.png` sont les fichiers à intégrer. La planche d’ensemble reste une référence, pas un bouton regroupant six icônes.
 
 | Asset | Dimensions | Usage |
 |---|---:|---|
@@ -43,6 +45,11 @@ Récupérer les commits d’assets uniquement par cherry-pick depuis la branche 
 | [Médaille Boss](images/medal_boss.png) | 1254×1254 | achievement_icon |
 | [Médaille Arène](images/medal_arena.png) | 1254×1254 | achievement_icon |
 | [Médaille Récolte](images/medal_harvest.png) | 1254×1254 | achievement_icon |
+| [Hôtel des ventes](images/auction_header.png) | 1672×941 | auction_header |
+| [Banque et sacs](images/storage_header.png) | 1672×941 | storage_header |
+| [Compétences](images/skills_background.png) | 1672×941 | skills_background |
+| [Fin de donjon](images/dungeon_results_background.png) | 1672×941 | results_background |
+| [Fiche d’équipement](images/equipment_inspection_background.png) | 1672×941 | item_inspection_background |
 
 ## Galerie
 
@@ -129,3 +136,23 @@ Récupérer les commits d’assets uniquement par cherry-pick depuis la branche 
 ### Médaille Récolte
 
 ![Médaille Récolte](images/medal_harvest.png)
+
+### Hôtel des ventes
+
+![Hôtel des ventes](images/auction_header.png)
+
+### Banque et sacs
+
+![Banque et sacs](images/storage_header.png)
+
+### Compétences
+
+![Compétences](images/skills_background.png)
+
+### Fin de donjon
+
+![Fin de donjon](images/dungeon_results_background.png)
+
+### Fiche d’équipement
+
+![Fiche d’équipement](images/equipment_inspection_background.png)

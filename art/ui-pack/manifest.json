@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "generation_tool": "image_gen built-in",
   "date": "2026-10-28",
   "namespace_suggestion": "mmorpg:textures/gui/illustrations/",
@@ -536,6 +536,112 @@
       "recommended_render_mode": "contain",
       "recommended_outer_padding": 0.08,
       "variant_of": "achievement_medals_atlas"
+    },
+    {
+      "id": "auction_header",
+      "path": "images/auction_header.png",
+      "label": "Hôtel des ventes",
+      "role": "auction_header",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "6167c7a759166589db1fddb5dc08880e2110f74afee97ae293cdbbbefba66a1d",
+      "contains_embedded_text": false,
+      "text_safe_rect_uv": [
+        0.04,
+        0.1,
+        0.31,
+        0.75
+      ]
+    },
+    {
+      "id": "storage_header",
+      "path": "images/storage_header.png",
+      "label": "Banque et sacs",
+      "role": "storage_header",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "08b5547612e89d345836cbafe59a48685074c734154b9e6cca572901f29959f3",
+      "contains_embedded_text": false,
+      "text_safe_rect_uv": [
+        0.04,
+        0.1,
+        0.31,
+        0.75
+      ]
+    },
+    {
+      "id": "skills_background",
+      "path": "images/skills_background.png",
+      "label": "Compétences",
+      "role": "skills_background",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "d0a4e3914956d069e408d5a80d9232ef0a22f2401a350f5aa8f0794912708419",
+      "contains_embedded_text": false,
+      "text_safe_rect_uv": [
+        0.04,
+        0.56,
+        0.91,
+        0.36
+      ]
+    },
+    {
+      "id": "dungeon_results_background",
+      "path": "images/dungeon_results_background.png",
+      "label": "Fin de donjon",
+      "role": "results_background",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "dd1d064e7ac00d7b731d4c76c8e7bc0bc26524de38f5681656f2e3183ba6a042",
+      "contains_embedded_text": false,
+      "text_safe_rect_uv": [
+        0.05,
+        0.58,
+        0.9,
+        0.34
+      ]
+    },
+    {
+      "id": "equipment_inspection_background",
+      "path": "images/equipment_inspection_background.png",
+      "label": "Fiche d’équipement",
+      "role": "item_inspection_background",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "8cd7f10d8b56ec3a9b36559a80613eb51bc845aa2178b42da18bfc192e66d21f",
+      "contains_embedded_text": false,
+      "item_preview_rect_uv": [
+        0.14,
+        0.12,
+        0.34,
+        0.55
+      ],
+      "text_safe_rect_uv": [
+        0.53,
+        0.1,
+        0.33,
+        0.62
+      ]
     }
   ]
 }

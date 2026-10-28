@@ -51,6 +51,11 @@ Utiliser des fixtures de QA isolées, sans modifier les profils de production :
 | Bestiaire | À remplir | À remplir | À remplir | À joindre | Non intégré par ce pack |
 | Succès | À remplir | À remplir | À remplir | À joindre | Système réel à vérifier |
 | Résultats d’arène | À remplir | À remplir | À remplir | À joindre | Non intégré par ce pack |
+| HDV | À remplir | À remplir | À remplir | À joindre | Non intégré par ce pack |
+| Banque/sacs | À remplir | À remplir | À remplir | À joindre | Non intégré par ce pack |
+| Compétences | À remplir | À remplir | À remplir | À joindre | Non intégré par ce pack |
+| Fin de donjon | À remplir | À remplir | À remplir | À joindre | Bilan réel à raccorder |
+| Fiche d’équipement | À remplir | À remplir | À remplir | À joindre | Non intégré par ce pack |
 
 ## Vérification des fichiers du pack
 

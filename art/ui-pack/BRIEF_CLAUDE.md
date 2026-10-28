@@ -131,9 +131,43 @@ Le visuel est neutre : rouge à gauche et bleu à droite. Les deux tableaux rest
 
 Pour dix joueurs ou une fenêtre étroite, prévoir une vraie adaptation : colonnes essentielles puis détail au survol, ou défilement borné. Ne jamais superposer les textes des deux équipes ou cacher Fermer/Marchand. Préserver la livraison du bilan après chargement et `/arene bilan`.
 
+## 13 — Hôtel des ventes
+
+**Asset :** `auction_header`. Cible indicative : `AuctionScreen.java`.
+
+Employer l’image comme en-tête, sans masquer filtres, recherche, prix, vendeur et durée. Les annonces affichent les vrais objets, leur quantité et leurs statistiques ; ne pas prendre les objets peints du comptoir pour les annonces réelles. Dans Vendre, conserver la sélection d’une pile dans l’inventaire et les pages de sacs, ainsi que la vérification serveur de la pile sélectionnée. Tester vente/achat, annonce expirée, solde insuffisant, liste vide et noms longs. Ne pas changer les frais ou règles de transaction pour intégrer le décor.
+
+## 14 — Banque et sacs
+
+**Asset :** `storage_header`. Cibles indicatives : `BankScreen.java`, `BackpackScreen.java`.
+
+Réserver une petite bande de titre au décor ; le maximum d’espace reste à la vraie grille. Ne pas poser le coffre illustré au-dessus des objets cliquables et ne pas réduire les cases pour faire entrer une grande image. Les objets et leurs cadres doivent rester centrés, leurs zones de survol/clic correspondantes, y compris à échelle GUI élevée. Garder Maj-clic, glisser/transfert, curseur portant un objet et protections contre perte d’objets. Les deux sacs peints ne définissent pas les capacités : lire les vrais emplacements et tailles équipés.
+
+## 15 — Compétences
+
+**Assets :** `skills_background` et portrait de la classe sélectionnée dans `classes_atlas`. Cible indicative : `SkillsScreen.java`.
+
+Utiliser une illustration de classe distincte via sa région d’atlas, avec un fond discret et limité. Ne pas cacher la liste, les points, la description du rang choisi, le coût en mana, la recharge et les six emplacements de barre. Les icônes et états de chaque compétence restent ceux du système réel ; ne pas dessiner de faux nœuds ou connexions à partir des motifs du décor. Préserver les paliers, le budget et les améliorations gérés par le serveur. Tester classe changée, rangmax, points0, liste longue et description multiligne sans chevauchement avec BARRE DE COMPÉTENCES.
+
+## 16 — Fin de donjon
+
+**Asset :** `dungeon_results_background`.
+
+Raccorder le visuel à un véritable récapitulatif de fin d’expédition sur la branche actuelle. Le titre, boss vaincu, difficulté, durée, XP/or et objets gagnés doivent provenir des données de la session et du versement réel. Si le payload de bilan manque, le créer à partir de ces informations, pas d’un tirage client ou de valeurs décoratives. Le coffre et la couronne peints ne garantissent aucun loot.
+
+Afficher les récompenses avec leurs vrais modèles/icônes et conserver les mécanismes de livraison existants. Le bouton Retour et la fermeture ne doivent pas verser une seconde fois la récompense ni effacer une livraison pleine. Tester fin normale, reconnexion/transfert, récompenses nombreuses et inventaire plein ; ne pas montrer un écran de victoire après abandon ou échec.
+
+## 17 — Fiche d’équipement
+
+**Asset :** `equipment_inspection_background`.
+
+Le socle vide est destiné au **véritable modèle3D** de l’objet sélectionné, pas à une arme fixe peinte. Afficher à droite son nom, type, rareté, classe/niveau requis, améliorations, statistiques et comparaison avec l’équipement réellement porté. Les nombres viennent de l’objet serveur et de ses composants, pas de l’illustration ou d’un équipement exemple.
+
+Lier l’ouverture de la fiche à une action explicite et cohérente avec le reste des menus ; ne pas détourner un clic qui sert déjà à déplacer/vendre un objet sans alternative claire. Prévoir objet sans modèle spécifique, aucune comparaison possible, noms/statistiques longs et rotation d’aperçu bornée. L’image ne transforme pas une icône en nouvel objet équipé et ne change aucune statistique de combat.
+
 ## Vérification avant livraison
 
-- Vérifier les douze interfaces concernées dans les résolutions et échelles GUI effectivement supportées, dont1280x720 et1920x1080, ainsi qu’une petite fenêtre. Les images ne doivent masquer ni boutons ni données.
+- Vérifier les dix-sept interfaces concernées dans les résolutions et échelles GUI effectivement supportées, dont1280x720 et1920x1080, ainsi qu’une petite fenêtre. Les images ne doivent masquer ni boutons ni données.
 - Tester le recadrage des quatre classes, les libellés uniques des métiers, l’alpha du portrait et le passage du chargement au monde.
 - Les listes, défilements, info-bulles et zones de clic doivent rester cohérents avec ce qui est dessiné. Préserver clavier, Échap, focus, droits OP et fonctionnement hors connexion des assets.
 - Ne pas tester les générateurs Java/Gradle en recompilant pendant un client de QA lancé : un précédent essai a supprimé temporairement des classes chargées tardivement.
