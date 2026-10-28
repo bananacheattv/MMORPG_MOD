@@ -38,6 +38,7 @@ public final class JobSystem {
         int newLevel = Job.levelFor(after);
         p.sendOverlayMessage(Component.literal("+" + amount + " XP " + job.label).withColor(job.color & 0xFFFFFF));
         if (newLevel <= oldLevel) return;
+        com.mmorpg.achievement.Achievements.max(p, com.mmorpg.achievement.Achievement.jobStat(job.id), newLevel);
         p.sendSystemMessage(Component.literal("✦ " + job.label + " niveau " + newLevel).withColor(job.color & 0xFFFFFF));
         p.level().playSound(null, p.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.8F, 1.3F);
         for (Job.Milestone m : job.milestones) {

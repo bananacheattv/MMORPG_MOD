@@ -311,7 +311,10 @@ public final class RpgPlayers {
             leveled = true;
         }
         if (d.level >= LevelSystem.MAX_LEVEL) d.xp = 0;
-        if (leveled) onLevelUp(player, oldLevel, d.level);
+        if (leveled) {
+            onLevelUp(player, oldLevel, d.level);
+            com.mmorpg.achievement.Achievements.max(player, com.mmorpg.achievement.Achievement.LEVEL, d.level);
+        }
         d.dirty = true;
     }
 
@@ -663,6 +666,7 @@ public final class RpgPlayers {
         if (amount <= 0) return;
         PlayerData d = get(player);
         AdventureSummary.count(player,"gold",amount);
+        com.mmorpg.achievement.Achievements.add(player, com.mmorpg.achievement.Achievement.GOLD_EARNED, amount);
         d.gold += amount;
         d.dirty = true;
         if (showText) {
