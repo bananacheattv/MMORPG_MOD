@@ -20,6 +20,7 @@ public final class PetManager {
     }
 
     public static void setActive(ServerPlayer player, String id) {
+        if(!id.isEmpty()&&!FeatureFlags.allow(player,"familiers"))return;
         PlayerData d = RpgPlayers.get(player);
         despawn(player);
         if (id == null || id.isEmpty()) {
@@ -56,6 +57,7 @@ public final class PetManager {
 
     /** Appele chaque seconde : recree le familier s'il a disparu (changement de dimension, dechargement...). */
     public static void maintain(ServerPlayer player) {
+        if(!FeatureFlags.enabled(player.level().getServer(),"familiers")){despawn(player);return;}
         PlayerData d = RpgPlayers.get(player);
         if (d.activePet.isEmpty() || !player.isAlive() || player.isSpectator()) return;
         PetType type = PetType.byId(d.activePet);

@@ -28,6 +28,11 @@ public final class ItemTooltips {
 
     public static void equipment(ItemStack stack, RpgItemDef def, String kind, Consumer<Component> out) {
         out.accept(rarityLine(def.rarity(), kind));
+        if(def.id().startsWith("pvp_")){
+            out.accept(Component.literal("ÉQUIPEMENT D’ARÈNE · Exclusivité PvP").withColor(0xEF6F91));
+            out.accept(Component.literal(def.slot()==RpgItemDef.Slot.WEAPON?"Joueurs : +12 % dégâts · Monstres : −15 % dégâts":"Par pièce : +3 % dégâts / −5 % dégâts subis en PvP").withColor(0x85C7FF));
+            if(def.slot()!=RpgItemDef.Slot.WEAPON)out.accept(Component.literal("PvE : −2,5 % dégâts / +2,5 % dégâts subis par pièce").withColor(0xCF9A85));
+        }
         PlayerClass cls = ClientView.playerClass;
         int level = ClientView.level;
         if (def.playerClass() != PlayerClass.NONE) {

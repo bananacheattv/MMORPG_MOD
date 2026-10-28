@@ -212,6 +212,16 @@ public final class ItemDefs {
     }
 
     static {
+        for(var cls: new PlayerClass[]{PlayerClass.GUERRIER,PlayerClass.MAGE,PlayerClass.ARCHER,PlayerClass.TANK})for(int bracket=0;bracket<5;bracket++){
+            int level=bracket*20+1;String id="pvp_"+cls.id()+"_"+bracket;
+            var base=SETS.values().stream().filter(v->v.cls()==cls&&!v.id().startsWith("pvp_")).min(java.util.Comparator.comparingInt(v->Math.abs(v.level()-level))).orElseThrow();
+            set(id,"Gladiateur "+cls.label+" · "+(bracket+1),cls,level,Rarity.EPIQUE,base.style(),base.totals().scaled(.85),base.bonus2().scaled(.8),base.bonus4Pct().scaled(.8),"Résilience et puissance renforcées contre les joueurs ; équipement spécialisé PvP.");
+            var weapon=WEAPONS.stream().filter(v->v.cls()==cls&&!v.id().startsWith("pvp_")).min(java.util.Comparator.comparingInt(v->Math.abs(v.level()-level))).orElseThrow();
+            WEAPONS.add(new WeaponDef(id+"_arme",cls,weapon.kind(),level,Rarity.EPIQUE,weapon.stats().scaled(.85),weapon.element(),"Arme de gladiateur : +12 % de dégâts contre les joueurs ; −15 % contre les monstres."));
+        }
+    }
+
+    static {
         // l'equipement d'une classe donne aussi son second attribut (60 % du premier) ; le set universel donne les trois nouveaux
         for (WeaponDef w : WEAPONS) addSecondAttribute(w.cls(), w.stats());
         for (ArmorSet s : SETS.values()) addSecondAttribute(s.cls(), s.totals());

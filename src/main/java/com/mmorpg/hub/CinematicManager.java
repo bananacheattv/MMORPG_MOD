@@ -42,6 +42,7 @@ public final class CinematicManager {
 
     /** Lance la cinematique ; {@code first} : premiere arrivee (marque la cinematique comme vue a la fin). Faux si le hub n'existe pas. */
     public static boolean start(ServerPlayer p, boolean first) {
+        if(!com.mmorpg.server.FeatureFlags.allow(p,"cinematique"))return false;
         HubData hub = HubData.get(p.level().getServer());
         ServerLevel level = hub.level(p.level().getServer());
         if (!hub.exists() || level == null) return false;

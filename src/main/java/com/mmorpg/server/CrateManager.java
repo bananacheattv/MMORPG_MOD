@@ -51,6 +51,7 @@ public final class CrateManager {
     }
 
     public static void open(ServerPlayer p, BlockPos pos) {
+        if(!FeatureFlags.allow(p,"coffres"))return;
         CrateBlockEntity be = crate(p, pos);
         if (be == null || !(be.getBlockState().getBlock() instanceof CrateBlock block)) return;
         CrateTier tier = block.tier;

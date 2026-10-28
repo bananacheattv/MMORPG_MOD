@@ -194,7 +194,7 @@ public final class QuestManager {
         }
         CompoundTag t = new CompoundTag();
         t.putInt("npc", npc.getId());
-        t.putString("name", npc.displayName());
+        t.putString("name", npc.displayName());t.putString("dialogue",npc.dialogue());
         t.put("available", available);
         t.put("active", active);
         t.putInt("completed", d.completedQuests.size());
@@ -212,6 +212,7 @@ public final class QuestManager {
     // ================================================================== actions
 
     public static void accept(ServerPlayer p, String id, int npcId) {
+        if(!FeatureFlags.allow(p,"quetes"))return;
         NpcEntity npc = nearGiver(p, npcId);
         PlayerData d = RpgPlayers.get(p);
         QuestDef q = def(id);

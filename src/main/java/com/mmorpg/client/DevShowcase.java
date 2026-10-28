@@ -37,6 +37,7 @@ public final class DevShowcase {
     public static void onTick(ClientTickEvent.Post event) {
         if (!ENABLED) return;
         Minecraft mc = Minecraft.getInstance();
+        if(MODE.equals("pvp_polish")){DevPvpVisual.tick(mc);return;}
         if(MODE.equals("staff_final")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
             if(tick==60){mc.options.guiScale().set(2);mc.getWindow().setWindowed(1280,720);mc.resizeGui();cmd(mc,"time set day");cmd(mc,"item replace entity @s weapon.mainhand with mmorpg:baton_archimage");mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);}

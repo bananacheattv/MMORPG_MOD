@@ -14,6 +14,7 @@ public final class ArenaDefence {
     private final Map<UUID,Long> since=new HashMap<>();
     int remaining(UUID id,long tick){return (int)Math.max(0,LOCK_TICKS-(tick-since.computeIfAbsent(id,key->tick)));}
     void cancel(UUID id){clear(id);}
+    public int dangerRemaining(UUID id,long tick){return since.containsKey(id)?Math.max(0,LOCK_TICKS-(int)(tick-since.get(id))):-1;}
     private final Map<UUID,ServerBossEvent> warnings=new HashMap<>();
     private ServerLevel arenaLevel;
     private final Set<net.minecraft.world.level.ChunkPos> tickets=new HashSet<>();
@@ -24,7 +25,7 @@ public final class ArenaDefence {
             if(tickets.add(chunk))level.setChunkForced(chunk.x(),chunk.z(),true);
             level.getChunk(chunk.x(),chunk.z());
             var drone=com.mmorpg.registry.ModEntities.ARENA_DRONE.get().create(level,net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-            drone.snapTo(center.getX()+side*43+.5,105,center.getZ()+z+.5,side<0?-90:90,0);level.addFreshEntity(drone);drones.add(drone);
+            drone.snapTo(center.getX()+side*43+.5,105,center.getZ()+z+.5,side<0?-90:90,0);drone.setCustomName(Component.literal("Drone de défense"));drone.setCustomNameVisible(true);level.addFreshEntity(drone);drones.add(drone);
         }
     }
     private void clear(UUID id){since.remove(id);var bar=warnings.remove(id);if(bar!=null)bar.removeAllPlayers();}
@@ -41,7 +42,7 @@ public final class ArenaDefence {
             var drone=drones.stream().filter(ArenaDrone::isAlive).min(Comparator.comparingDouble(d->d.distanceToSqr(player))).orElse(null);
             if(drone!=null&&(tick%5==0||remaining==0)){
                 drone.lookAt(player,360,360);drone.setYBodyRot(drone.getYHeadRot());
-                var beam=SkillFxEntity.create(player.level(),FxKind.BEAM,drone.getEyePosition(),remaining==0?.5:.06,0xFF2040,6).points(List.of(drone.getEyePosition(),player.getEyePosition()));player.level().addFreshEntity(beam);
+                var beam=SkillFxEntity.create(player.level(),FxKind.BEAM,drone.getEyePosition(),remaining==0?1.0:.32,0xFF2040,6).points(List.of(drone.getEyePosition(),player.getEyePosition()));player.level().addFreshEntity(beam);
             }
             if(remaining==0){
                 player.level().addFreshEntity(SkillFxEntity.create(player.level(),FxKind.BURST,player.position(),1.5,0xFF2040,16));

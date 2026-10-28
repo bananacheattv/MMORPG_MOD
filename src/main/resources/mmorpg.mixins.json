@@ -8,7 +8,8 @@
     "InventoryCraftMixin",
     "ProxyChatSessionMixin",
     "DisabledFurnaceMixin",
-    "BackpackPickupMixin"
+    "BackpackPickupMixin",
+    "CreativeAccessMixin"
   ],
   "injectors": {
     "defaultRequire": 1
@@ -17,6 +18,9 @@
     "AeloriaWindowTitleMixin",
     "PortalLoadingScreenMixin",
     "AeloriaLoadingOverlayMixin",
-    "AeloriaWindowIconMixin"
+    "AeloriaWindowIconMixin",
+    "SlotPositionAccessor",
+    "HideFireOverlayMixin",
+    "ShiftDragTransferMixin"
   ]
 }

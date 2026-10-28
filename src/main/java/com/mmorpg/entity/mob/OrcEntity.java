@@ -43,7 +43,7 @@ public class OrcEntity extends RpgMonster {
             smashCooldown = 140;
             this.swing(net.minecraft.world.InteractionHand.MAIN_HAND, net.minecraft.world.item.component.SwingAnimation.DEFAULT, true);
             RpgCombat.mobHit(this, target, 1.7);
-            target.push(0, 0.5, 0);
+            if(com.mmorpg.combat.CrowdControl.allow(target))target.push(0, 0.5, 0);
             target.needsSync = true;
             level.sendParticles(ParticleTypes.CRIT, target.getX(), target.getY() + 1, target.getZ(), 20, 0.3, 0.3, 0.3, 0.3);
             level.playSound(null, this.blockPosition(), SoundEvents.ANVIL_LAND, SoundSource.HOSTILE, 0.6f, 0.6f);

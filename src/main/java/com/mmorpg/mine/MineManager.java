@@ -482,6 +482,7 @@ public final class MineManager {
 
     /** Ecran de chargement puis arrivee a la mine (menu, portail cache). */
     public static void startTransition(ServerPlayer p, int k) {
+        if(!com.mmorpg.server.FeatureFlags.allow(p,"mines"))return;
         if (k < 0 || k >= MineLayout.SECTORS || k >= RpgPlayers.get(p).minesUnlocked) return;
         if (!com.mmorpg.server.PortalAccess.consume(p,"mine")) return;
         if (com.mmorpg.network.GroupTravel.begin(p,"mine",Integer.toString(k))) return;
@@ -580,6 +581,7 @@ public final class MineManager {
 
     /** Envoie directement le joueur a une mine, sans menu ni chargement (portail cache, tests et administration). */
     public static boolean enterNow(ServerPlayer p, int region) {
+        if(!com.mmorpg.server.FeatureFlags.allow(p,"mines"))return false;
         MinecraftServer server = p.level().getServer();
         if (region < 0 || region >= MineLayout.SECTORS || !built(server, region) || dim(server) == null) return false;
         arrive(p, region);

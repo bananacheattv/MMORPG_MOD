@@ -29,6 +29,7 @@ public final class MountManager {
     }
     /** Invoque la monture et place directement le joueur dessus. */
     public static boolean summon(ServerPlayer p, String id) {
+        if(!FeatureFlags.allow(p,"montures"))return false;
         var type = MountType.byId(id); var d = RpgPlayers.get(p);
         if (!playable(p) || type == null || !d.mounts.contains(id)) return false;
         long now = p.level().getServer().getTickCount();
@@ -81,6 +82,7 @@ public final class MountManager {
         d.mountEntity = null; d.activeMount = ""; d.dirty = true;
     }
     public static void maintain(ServerPlayer p) {
+        if(!FeatureFlags.enabled(p.level().getServer(),"montures")){despawn(p);return;}
         var d = RpgPlayers.get(p);
         if (d.mountEntity != null && inDungeon(p)) {                       // entree dans un donjon (ou mort/teleport sur monture) : on descend
             despawn(p);

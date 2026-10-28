@@ -746,8 +746,30 @@ def hippogriffe():
     return m, base + [anim('fly', .7, fly)]
 
 
+def chimere_arene():
+    m=Model('chimere_arene',31)
+    fur=('fur','#50363b','#291f2d');gold=('metal','#d5aa57');steel=('metal','#8fa6be');ruby=('crystal','#d74866')
+    info=quadruped(m,dict(bw=12,bh=11,bl=25,leg=12,lt=3.8,body_mat=fur,leg_mat=fur,paw_mat=('dark','#251c2c'),neck=4,neck_w=10,neck_y=.8,neck_up=20,hw=11,hh=9,hl=9,snout=(7,4,4),nose=('dark','#151520'),eye=('glow','#70dcff'),ears=(2.5,3,fur),tail=(2.3,19,fur),tail_up=25))
+    # Segmented lion mane, articulated horn crown and bronze jaw guards.
+    for j in range(7):
+        a=j*math.pi/6;x=math.cos(a)*7;y=23+math.sin(a)*7
+        m.box('head',(x-1.5,y-2,-17),(x+1.5,y+2,-12),gold,rot=(0,0,j*30),pivot=(0,23,-14),mirror=j>0 and j<6)
+    for side in [-1,1]:
+        for j in range(4):m.box('head',(side*(4+j*.8)-.8,29+j*2,-13+j*.4),(side*(4+j*.8)+.8,32+j*2,-10+j*.4),steel,rot=(0,0,-side*18),pivot=(side*4,29,-12))
+        m.box('head',(side*5-1,21,-20),(side*5+1,25,-15),steel)
+    for z in [-6,1,8]:
+        m.box('body',(-7,20,z),(7,22,z+3),steel)
+        m.box('body',(-7.6,14,z),(7.6,17,z+2),gold)
+    m.box('body',(-1.5,23,-4),(1.5,27,0),ruby,rot=(0,0,45),pivot=(0,24,-2))
+    for leg in ('leg_fl','leg_fr','leg_bl','leg_br'):
+        at=m.groups[leg]['origin'];m.box(leg,(at[0]-2.5,3,at[2]-2.5),(at[0]+2.5,6,at[2]+2.5),steel);m.box(leg,(at[0]-2.8,6,at[2]-2.8),(at[0]+2.8,7,at[2]+2.8),gold)
+    saddle(m,12,23,3,10,'#67293e','#dfb65f','eye',metal=gold)
+    bridle(m,info,strap='#53263b',metal=gold)
+    return m,quad_anims(swing=28,speed=.75)
+
+
 MOUNTS = [sanglier, loup_givre, cerf_sylvestre, lezard_lave, raptor_sables, felin_vide,
-          ours_runique, tortue_cristal, scorpion_dunes, chevre_celeste, araignee_cavernes, hippogriffe]
+          ours_runique, tortue_cristal, scorpion_dunes, chevre_celeste, araignee_cavernes, hippogriffe, chimere_arene]
 
 
 def main():

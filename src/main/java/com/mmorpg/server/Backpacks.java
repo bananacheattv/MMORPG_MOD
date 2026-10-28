@@ -33,9 +33,11 @@ public final class Backpacks {
    @Override public boolean isActive(){return index<2||index<2+capacity(c);}
    @Override public int getMaxStackSize(){return index<2?1:64;}
   };slot.index=old.index;menu.slots.set(i,slot);}}
- public static void open(ServerPlayer p){if(!p.isAlive()||p.isSpectator())return;var c=inventory(p);p.openMenu(new SimpleMenuProvider((id,inv,player)->{var menu=new ChestMenu(MenuType.GENERIC_9x6,id,inv,c,6);restrict(menu);return menu;},TITLE));}
- public static void equipAndOpen(ServerPlayer p,InteractionHand hand){var c=inventory(p);var held=p.getItemInHand(hand);if(held.getItem() instanceof BackpackItem)for(int i=0;i<2;i++)if(c.getItem(i).isEmpty()){c.setItem(i,held.copyWithCount(1));held.shrink(1);break;}open(p);}
+ public static void open(ServerPlayer p){
+        if(!FeatureFlags.allow(p,"sacs"))return;if(!p.isAlive()||p.isSpectator())return;var c=inventory(p);p.openMenu(new SimpleMenuProvider((id,inv,player)->{var menu=new ChestMenu(MenuType.GENERIC_9x6,id,inv,c,6);restrict(menu);return menu;},TITLE));}
+ public static void equipAndOpen(ServerPlayer p,InteractionHand hand){if(!FeatureFlags.allow(p,"sacs"))return;var c=inventory(p);var held=p.getItemInHand(hand);if(held.getItem() instanceof BackpackItem)for(int i=0;i<2;i++)if(c.getItem(i).isEmpty()){c.setItem(i,held.copyWithCount(1));held.shrink(1);break;}open(p);}
  public static boolean insert(ServerPlayer p,ItemStack incoming){
+  if(!FeatureFlags.enabled(p.level().getServer(),"sacs"))return incoming.isEmpty();
   if(incoming.isEmpty()||incoming.getItem() instanceof BackpackItem)return incoming.isEmpty();var c=inventory(p);int end=2+capacity(c);
   for(int pass=0;pass<2&&!incoming.isEmpty();pass++)for(int i=2;i<end&&!incoming.isEmpty();i++){var current=c.getItem(i);if(pass==0&&!current.isEmpty()&&ItemStack.isSameItemSameComponents(current,incoming)){int n=Math.min(incoming.getCount(),current.getMaxStackSize()-current.getCount());if(n>0){current.grow(n);incoming.shrink(n);c.setChanged();}}else if(pass==1&&current.isEmpty()){int n=Math.min(incoming.getCount(),incoming.getMaxStackSize());c.setItem(i,incoming.copyWithCount(n));incoming.shrink(n);}}
   return incoming.isEmpty();

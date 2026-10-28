@@ -11,8 +11,9 @@ public final class RpgArmorSculptor {
  private static void cube(PartDefinition parent,float x,float y,float z,float w,float h,float d,int material,float rx,float ry,float rz){
   parent.addOrReplaceChild("detail_"+COUNTER.incrementAndGet(),CubeListBuilder.create().texOffs(material%4*256+8,material/4*256+8).addBox(-w*2,-h*2,-d*2,w*4,h*4,d*4),PartPose.offsetAndRotation(x,y,z,rx,ry,rz).withScale(.25f));
  }
- public static LayerDefinition create(PlayerClass cls,int level,EquipmentSlot slot){
-  int r=rank(level);boolean mage=cls==PlayerClass.MAGE,ranger=cls==PlayerClass.ARCHER,paladin=cls==PlayerClass.TANK;
+ public static LayerDefinition create(PlayerClass cls,int level,EquipmentSlot slot){return create(cls,level,slot,false);}
+ public static LayerDefinition create(PlayerClass cls,int level,EquipmentSlot slot,boolean pvp){
+  int r=pvp?1+(level-1)/20:rank(level);boolean mage=cls==PlayerClass.MAGE,ranger=cls==PlayerClass.ARCHER,paladin=cls==PlayerClass.TANK;
   int body=mage?13:ranger?(r>=3?0:6):paladin?(r>=3?12:3):(r>=3?10:3),trim=r>=3?1:mage?2:ranger?11:3,gem=mage?4:ranger?6:paladin?5:8;
   var mesh=new MeshDefinition();var root=mesh.getRoot();var head=root.addOrReplaceChild("head",CubeListBuilder.create(),PartPose.ZERO);head.addOrReplaceChild("hat",CubeListBuilder.create(),PartPose.ZERO);
   var torso=root.addOrReplaceChild("body",CubeListBuilder.create(),PartPose.ZERO);
@@ -43,7 +44,7 @@ public final class RpgArmorSculptor {
    else if(ranger){cube(torso,0,5.4f,-3.1f,1.2f,11,.7f,11,0,0,.45f);cube(torso,-3.4f,9.6f,-3,2.4f,2.4f,2,7);cube(torso,2.3f,4.9f,4.1f,3.2f,8.8f,3,11,0,0,-.12f);for(int i=0;i<3;i++)cube(torso,1.3f+i*.85f,-.4f,4.5f,.25f,3.5f,.25f,7);}
    else for(int side:new int[]{-1,1})cube(torso,side*2.6f,3,-2.9f,.9f,7.5f,.7f,trim,0,0,side*.23f);
    if(r>=2){cube(torso,0,2.7f,-3.2f,1.5f,2,.8f,gem,0,0,.7854f);if(!mage&&!ranger)for(int j=0;j<3;j++)cube(torso,0,7+j*1.2f,-3,7-j*.6f,.65f,1,body);}
-   for(int i=0;i<2;i++){int side=i==0?-1:1;var arm=arms[i];cube(arm,0,5,0,4.7f,9.8f,4.7f,mage||ranger?body:11);
+   for(int i=0;i<2;i++){int side=i==0?-1:1;var arm=arms[i];cube(arm,0,5.9f,0,4.7f,12.2f,4.7f,mage||ranger?body:11);
     if(mage){cube(arm,0,9,0,5.8f,2.3f,5.8f,body);cube(arm,0,9.9f,0,6,.6f,6,trim);cube(arm,side*.7f,-.8f,0,5.5f,2,5.8f,body);}
     else if(ranger){cube(arm,side*.5f,-1,0,5.8f,2,5.7f,11);cube(arm,0,7.7f,-2.7f,4.2f,3.9f,1.1f,body);}
     else{int layers=1+r/2;for(int j=0;j<layers;j++)cube(arm,side*(.6f+j*.2f),-1.1f-j*.85f,0,5.5f+r*.25f-j*.6f,1.6f,6.4f-j*.35f,j%2==0?body:trim,0,0,side*.07f);cube(arm,0,7.5f,0,5,4.2f,5.3f,body);cube(arm,0,9.5f,0,5.3f,.7f,5.6f,trim);}
@@ -65,6 +66,11 @@ public final class RpgArmorSculptor {
    }
   }
   if(slot==EquipmentSlot.FEET)for(int i=0;i<2;i++){var leg=legs[i];cube(leg,0,10.5f,-.7f,mage?4.5f:4.9f,3.3f,mage?5.2f:6.2f,mage?13:ranger?11:body);cube(leg,0,11.9f,-.6f,5.1f,.7f,6.3f,10);if(!mage){cube(leg,0,8.7f,0,5.3f,1.6f,5.5f,r>=2?trim:body);cube(leg,0,10.6f,-3.3f,3.4f,1.7f,1.2f,trim);}else cube(leg,0,10.2f,-3.1f,3.5f,.6f,.4f,trim);}
+  if(pvp){
+   if(slot==EquipmentSlot.CHEST){cube(torso,0,6,-3.5f,4.5f,6,.65f,8);for(int side:new int[]{-1,1})cube(torso,side*.7f,5.5f,-4, .6f,4.3f,.45f,1,0,0,side*.65f);for(var arm:arms)cube(arm,0,-2.2f,-.2f,6.5f+r*.25f,1,6.8f,3);cube(torso,0,7,3.8f,7.8f,13.5f,1,8);}
+   if(slot==EquipmentSlot.HEAD){cube(head,0,-6.5f,-5,2,2,.8f,8,0,0,.7854f);for(int side:new int[]{-1,1})cube(head,side*3.8f,-7.8f,-3,1.1f,2.7f,2.7f,1);}
+   if(slot==EquipmentSlot.LEGS)for(var leg:legs)cube(leg,0,6.6f,-3.5f,2.2f,3,.7f,8);
+  }
   return LayerDefinition.create(mesh,1024,1024);
  }
 }

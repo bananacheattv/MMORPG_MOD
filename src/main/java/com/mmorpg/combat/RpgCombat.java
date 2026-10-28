@@ -316,9 +316,12 @@ public final class RpgCombat {
             damage *= 1.0 - reduction;
         }
         if (target instanceof ServerPlayer tp) {
-            damage = incomingModifiers(tp, damage);
+            damage = incomingModifiers(tp, damage);damage=ShieldGuard.absorb(tp,source,damage);
         }
+        if(playerAttacker!=null)damage*=com.mmorpg.competition.PvpEquipment.outgoing(playerAttacker,target instanceof ServerPlayer);
+        if(target instanceof ServerPlayer pv&&attacker instanceof LivingEntity)damage*=com.mmorpg.competition.PvpEquipment.incoming(pv,playerAttacker!=null);
         damage = Math.max(0, damage);
+        if(target instanceof ServerPlayer pv&&playerAttacker!=null){var arena=com.mmorpg.competition.ArenaManager.session(playerAttacker.getUUID());if(arena!=null&&arena.active&&arena.match.enemy(playerAttacker.getUUID(),pv.getUUID()))arena.match.contribution(playerAttacker.getUUID()).damage+=Math.min(damage,h.hp());}
 
         if (target instanceof Mob mob && playerAttacker != null) {
             ThreatGoal.damage(mob, playerAttacker, Math.min(damage, h.hp()));

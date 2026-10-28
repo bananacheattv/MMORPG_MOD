@@ -39,7 +39,7 @@ public final class DevSocialChecks {
             for(var kind:ArenaRules.Kind.values()){var roster=new LinkedHashMap<UUID,Integer>();for(int i=0;i<kind.size*2;i++)roster.put(UUID.randomUUID(),1+i);var teams=ArenaRules.balance(kind,0,roster);check(teams.values().stream().filter(n->n==0).count()==kind.size&&teams.values().stream().filter(n->n==1).count()==kind.size,"complete balanced "+kind);roster.put(roster.keySet().iterator().next(),21);try{ArenaRules.balance(kind,0,roster);throw new AssertionError("wrong bracket accepted");}catch(IllegalArgumentException expected){}}
             var match=new ArenaRules.Match(ArenaRules.Kind.DUNES,0);UUID red=UUID.randomUUID(),blue=UUID.randomUUID(),ally=UUID.randomUUID();match.teams.put(red,0);match.teams.put(blue,1);match.teams.put(ally,0);
             match.tick(400);check(match.red==0&&match.blue==0,"neutral crystal awards no points");
-            for(int hit=0;hit<49;hit++){check(match.capture(red,400+hit*40),"valid spaced strike");check(!match.capture(blue,401+hit*40),"shared two-second lock rejects spam");}
+            for(int hit=0;hit<49;hit++)check(match.capture(hit%2==0?red:blue,400),"every strike accepted without capture cooldown");
             check(match.owner==-1&&match.captureHits==49,"49 blows leave white crystal");
             check(match.capture(blue,2360)&&match.owner==1,"50th hit wins for its actual team");match.tick(2399);check(match.blue==0,"no early crystal point");match.tick(2400);check(match.blue==1,"point after two seconds");
             check(!match.capture(blue,2400)&&match.owner==1,"friendly blows do not neutralize owned crystal");

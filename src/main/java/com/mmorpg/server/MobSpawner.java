@@ -44,6 +44,7 @@ public final class MobSpawner {
     }
 
     public static void tick(ServerLevel level) {
+        if(!FeatureFlags.enabled(level.getServer(),"apparition_mobs"))return;
         if(level.dimension().equals(com.mmorpg.competition.CompetitionWorld.DIM))return;
         GeneralConfig g = ConfigManager.general();
         if (!g.customSpawning || level.getDifficulty() == Difficulty.PEACEFUL) return;

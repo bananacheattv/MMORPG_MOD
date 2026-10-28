@@ -40,7 +40,7 @@ public final class ModItems {
     public static final DeferredItem<Item> MYSTERY_CUBE=ITEMS.registerSimpleItem("cube_mystere",p->p.stacksTo(1));
     public static final DeferredItem<com.mmorpg.item.ArmorStandEditorItem> ARMOR_STAND_EDITOR=ITEMS.registerItem("outil_armure",com.mmorpg.item.ArmorStandEditorItem::new);
     public static final List<DeferredItem<Item>> PALADIN_SHIELDS=new ArrayList<>();
-    static {for(int tier=0;tier<5;tier++)PALADIN_SHIELDS.add(ITEMS.registerSimpleItem("bouclier_paladin_"+tier,p -> p.stacksTo(1)));}
+    static {for(int tier=0;tier<5;tier++)PALADIN_SHIELDS.add(ITEMS.registerItem("bouclier_paladin_"+tier,com.mmorpg.item.PaladinShieldItem::new));}
 
     public static final List<DeferredItem<? extends Item>> WEAPONS = new ArrayList<>();
     public static final List<DeferredItem<? extends Item>> ARMORS = new ArrayList<>();

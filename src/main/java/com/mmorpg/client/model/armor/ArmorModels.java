@@ -68,7 +68,7 @@ public final class ArmorModels {
     }
 
     public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        for(var holder:ModItems.ARMORS){if(!(holder.get() instanceof RpgArmorItem armor))continue;var def=armor.rpgDef();EquipmentSlot slot=switch(def.slot()){case HEAD->EquipmentSlot.HEAD;case CHEST->EquipmentSlot.CHEST;case LEGS->EquipmentSlot.LEGS;case FEET->EquipmentSlot.FEET;default->throw new IllegalStateException("Armor slot");};event.registerLayerDefinition(layer("sculpted_"+def.setId(),slot),()->RpgArmorSculptor.create(def.playerClass(),def.level(),slot));}
+        for(var holder:ModItems.ARMORS){if(!(holder.get() instanceof RpgArmorItem armor))continue;var def=armor.rpgDef();EquipmentSlot slot=switch(def.slot()){case HEAD->EquipmentSlot.HEAD;case CHEST->EquipmentSlot.CHEST;case LEGS->EquipmentSlot.LEGS;case FEET->EquipmentSlot.FEET;default->throw new IllegalStateException("Armor slot");};event.registerLayerDefinition(layer("sculpted_"+def.setId(),slot),()->RpgArmorSculptor.create(def.playerClass(),def.level(),slot,def.setId().startsWith("pvp_")));}
     }
 
     public static void registerExtensions(RegisterClientExtensionsEvent event) {

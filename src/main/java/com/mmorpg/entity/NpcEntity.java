@@ -26,7 +26,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 /** PNJ des villes : Maitre des Quetes ou Marchand. Immobile, invulnerable et persistant. */
 public class NpcEntity extends PathfinderMob {
     public enum Role {
-        QUETES("Maître des Quêtes"), MARCHAND("Marchand"), DONJON("Maître des donjons"), MINES("Maître des mines"), SORTIE("Passeur"), BOUTIQUE("Boutique d’Aeloria");
+        QUETES("Maître des Quêtes"), MARCHAND("Marchand"), DONJON("Maître des donjons"), MINES("Maître des mines"), SORTIE("Passeur"), BOUTIQUE("Boutique d’Aeloria"), PVP("Intendant des arènes");
 
         public final String label;
 
@@ -45,6 +45,9 @@ public class NpcEntity extends PathfinderMob {
     private static final EntityDataAccessor<Integer> ROLE = SynchedEntityData.defineId(NpcEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> SKIN = SynchedEntityData.defineId(NpcEntity.class, EntityDataSerializers.INT);
     private String group = "";
+    private String dialogue="";
+    public String dialogue(){return dialogue;}
+    public void setDialogue(String value){dialogue=value;}
     private String merchantShop = "";
     public String merchantShop() {return merchantShop;}
     public void setMerchantShop(String json) {merchantShop=json;}
@@ -111,6 +114,7 @@ public class NpcEntity extends PathfinderMob {
                 com.mmorpg.item.NpcEditorItem.edit(sp,this);return InteractionResult.SUCCESS;
             }
             switch (role()) {
+                case PVP -> com.mmorpg.competition.PvpProgression.open(sp,"");
                 case BOUTIQUE -> com.mmorpg.store.PremiumStore.open(sp,"");
                 case QUETES -> QuestManager.openGiver(sp, this);
                 case MARCHAND -> ShopManager.open(sp,this);
@@ -145,7 +149,7 @@ public class NpcEntity extends PathfinderMob {
         super.addAdditionalSaveData(output);
         output.putInt("NpcRole", this.entityData.get(ROLE));
         output.putInt("NpcSkin", this.entityData.get(SKIN));
-        output.putString("NpcGroup", group);
+        output.putString("NpcGroup", group);output.putString("NpcDialogue",dialogue);
         output.putString("MerchantShop",merchantShop);
         output.putString("NpcZone", zone);
     }
@@ -155,7 +159,7 @@ public class NpcEntity extends PathfinderMob {
         super.readAdditionalSaveData(input);
         this.entityData.set(ROLE, input.getIntOr("NpcRole", 0));
         this.entityData.set(SKIN, input.getIntOr("NpcSkin", 0));
-        this.group = input.getStringOr("NpcGroup", "");
+        this.group = input.getStringOr("NpcGroup", "");this.dialogue=input.getStringOr("NpcDialogue","");
         this.merchantShop = input.getStringOr("MerchantShop", "");
         this.zone = input.getStringOr("NpcZone", "Sans zone");
     }

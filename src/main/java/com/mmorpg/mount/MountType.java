@@ -18,7 +18,8 @@ public enum MountType {
     SCORPION_DUNES("scorpion_dunes", "Scorpion des dunes", Rarity.EPIQUE, 1.4f, 1.0f, .9f, false),
     FELIN_VIDE("felin_vide", "Félin du vide", Rarity.LEGENDAIRE, .9f, 1.4f, 1.33f, false),
     ARAIGNEE_CAVERNES("araignee_cavernes", "Araignée des cavernes", Rarity.LEGENDAIRE, 1.4f, 1.1f, 1.2f, false),
-    HIPPOGRIFFE("hippogriffe", "Hippogriffe", Rarity.MYTHIQUE, 1.0f, 1.6f, 1.6f, true);
+    HIPPOGRIFFE("hippogriffe", "Hippogriffe", Rarity.MYTHIQUE, 1.0f, 1.6f, 1.6f, true),
+    CHIMERE_ARENE("chimere_arene","Chimère des arènes",Rarity.MYTHIQUE,1.4f,2.6f,1.45f,false);
 
     public final String id, label;
     public final Rarity rarity;

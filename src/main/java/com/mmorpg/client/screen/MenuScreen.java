@@ -29,7 +29,7 @@ public abstract class MenuScreen extends MmoScreen {
     }
 
     public static void open(Tab tab) {
-        if(tab==Tab.CREATIF){var mc=Minecraft.getInstance();if(mc.player!=null&&mc.player.hasInfiniteMaterials())mc.gui.setScreen(new AeloriaCreativeScreen());return;}
+        if(tab==Tab.CREATIF){var mc=Minecraft.getInstance();if(mc.player!=null&&ClientData.creativeAllowed&&mc.player.hasInfiniteMaterials())mc.gui.setScreen(new AeloriaCreativeScreen());return;}
         if(tab==Tab.GUILDE||tab==Tab.ARENE||tab==Tab.BOUTIQUE){var t=new net.minecraft.nbt.CompoundTag();t.putString("action","open");com.mmorpg.client.ClientNet.send(new com.mmorpg.network.Payloads.SocialAction(tab==Tab.GUILDE?"guild":tab==Tab.BOUTIQUE?"store":"arena",t));return;}
         if (tab == Tab.PERSONNAGE) {             // personnage + inventaire + equipement (aussi sans classe)
             lastTab = tab;
@@ -57,14 +57,14 @@ public abstract class MenuScreen extends MmoScreen {
     @Override
     protected void init() {
         super.init();
-        this.contentTop = top + 30;
+        this.contentTop = top + 54;
     }
 
     @Override
     protected final void renderContent(GuiGraphicsExtractor g, int mx, int my, float a) {
         Ui.panel(g, left, top, pw, ph);
         drawTabs(g, font, left, top, pw, tab, mx, my, (r, action) -> click(r[0], r[1], r[2], r[3], action));
-        g.fill(left + 6, top + 24, left + pw - 6, top + 25, Ui.LINE);
+        g.fill(left + 6, top + 48, left + pw - 6, top + 49, Ui.LINE);
         renderTab(g, mx, my, a);
     }
 
@@ -75,13 +75,10 @@ public abstract class MenuScreen extends MmoScreen {
     public static void drawTabs(GuiGraphicsExtractor g, net.minecraft.client.gui.Font font, int left, int top, int pw, Tab active, int mx, int my,
                                 java.util.function.BiConsumer<int[], Runnable> click) {
         var available=new java.util.ArrayList<Tab>(java.util.Arrays.asList(Tab.values()));available.remove(Tab.CREATIF);
-        if(Minecraft.getInstance().player!=null&&Minecraft.getInstance().player.hasInfiniteMaterials())available.add(1,Tab.CREATIF);
-        Tab[] tabs=available.toArray(Tab[]::new);int count=Math.clamp((pw-100)/64,2,5),pages=(tabs.length+count-1)/count;
-        if(navActive!=active){navActive=active;navPage=available.indexOf(active)/count;}
-        navPage=Math.clamp(navPage,0,pages-1);int tw=(pw-100)/count;
-        int ax=left+pw-86;
-        Ui.button(g,ax,top+6,18,18,"‹",navPage>0,mx,my,Ui.GOLD);if(navPage>0)click.accept(new int[]{ax,top+6,18,18},()->navPage--);
-        Ui.button(g,ax+20,top+6,18,18,"›",navPage+1<pages,mx,my,Ui.GOLD);if(navPage+1<pages)click.accept(new int[]{ax+20,top+6,18,18},()->navPage++);
+        if(Minecraft.getInstance().player!=null&&ClientData.creativeAllowed&&Minecraft.getInstance().player.hasInfiniteMaterials())available.add(1,Tab.CREATIF);
+        available.removeIf(t->{String key=switch(t){case COMPETENCES->"competences";case QUETES->"quetes";case GUILDE->"guildes";case ARENE->"arenes";case FAMILIERS->"familiers";case MONTURES->"montures";case BOUTIQUE->"boutique";case COSMETIQUES->"cosmetiques";default->"";};return !key.isEmpty()&&!ClientData.features.getBooleanOr(key,true);});
+        Tab[] tabs=available.toArray(Tab[]::new);int count=(tabs.length+1)/2;
+        int tw=(pw-54)/count;
         // bouton d'edition de l'interface (HUD) au bout de la barre d'onglets
         int ex = left + pw - 8 - 18;
         boolean eh = Ui.in(mx, my, ex, top + 6, 18, 18);
@@ -97,20 +94,11 @@ public abstract class MenuScreen extends MmoScreen {
                 net.minecraft.network.chat.Component.literal("Déplacer, redimensionner ou masquer les éléments affichés").withColor(0x9C9282)), mx, my);
         click.accept(new int[]{ex, top + 6, 18, 18}, () -> Minecraft.getInstance().gui.setScreen(new HudEditorScreen(Minecraft.getInstance().gui.screen())));
         drawMusicButton(g, font, ex - 20, top + 6, mx, my, click);
-        float common = 1f;                                    // meme taille de texte pour tous les onglets
-        for (int j=navPage*count;j<Math.min(tabs.length,(navPage+1)*count);j++) common = Math.min(common, (tw - 8) / (float) Math.max(1, font.width(tabs[j].label)));
-        for (int i = 0; i < count&&navPage*count+i<tabs.length; i++) {
-            Tab t = tabs[navPage*count+i];
-            int tx = left + 8 + i * tw;
-            int ty = top + 6;
-            boolean on = t == active;
-            boolean hover = Ui.in(mx, my, tx, ty, tw - 2, 18);
-            Ui.rounded(g,tx,ty,tw-2,18,5,on ? Ui.CARD_HOVER : hover ? Ui.CARD : 0x00000000);
-            if (on) Ui.roundedOutline(g,tx,ty,tw-2,18,5,Ui.GOLD);
-            int lw = font.width(t.label);
-            float sc = common;
-            Ui.scaledText(g, t.label, tx + (tw - 2) / 2f, ty + 9 - 4 * sc, sc, on ? Ui.GOLD_LIGHT : hover ? Ui.TEXT : Ui.MUTED, true);
-            if (!on) click.accept(new int[]{tx, ty, tw - 2, 18}, () -> open(t));
+        for(int i=0;i<tabs.length;i++){
+            Tab t=tabs[i];int tx=left+8+(i%count)*tw,ty=top+5+(i/count)*22;
+            boolean on=t==active,hover=Ui.in(mx,my,tx,ty,tw-3,19);
+            Ui.button(g,tx,ty,tw-3,19,t.label,true,mx,my,on?Ui.GOLD:Ui.LINE);
+            if(!on)click.accept(new int[]{tx,ty,tw-3,19},()->open(t));
         }
     }
 

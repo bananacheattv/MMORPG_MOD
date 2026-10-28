@@ -243,6 +243,7 @@ public final class PlainsManager {
 
     /** Ecran de chargement (comme les mines) puis arrivee sur la place d'entree de la plaine : menu, portail cache. */
     public static void startTransition(ServerPlayer p, int region) {
+        if(!com.mmorpg.server.FeatureFlags.allow(p,"plaines"))return;
         MinecraftServer server = p.level().getServer();
         if (dim(server) == null || region < 0 || region >= REGIONS) return;
         if (built(server,region)) {
@@ -383,6 +384,7 @@ public final class PlainsManager {
 
     /** Envoie le joueur sur la place d'entree d'une plaine. @return faux si elle n'est pas encore construite */
     public static boolean enter(ServerPlayer p, int region) {
+        if(!com.mmorpg.server.FeatureFlags.allow(p,"plaines"))return false;
         MinecraftServer server = p.level().getServer();
         ServerLevel level = dim(server);
         if (level == null || region < 0 || region >= REGIONS) return false;

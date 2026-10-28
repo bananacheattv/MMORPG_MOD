@@ -65,7 +65,7 @@ public class DungeonMasterScreen extends MmoScreen {
         if(ph>260)Ui.wrap(g,"Survolez une difficulté pour lire son parcours et ses dangers. Une reprise conserve votre expédition.",dx+8,y0+56,dw-16,Ui.TEXT);
         int by = y0 + dh - 3 * 32 - 4;
         for (int diff = 0; diff < 3; diff++) {
-            g.text(font,font.plainSubstrByWidth(d.getStringOr("variant"+diff,""),dw-20),dx+8,by+diff*32+22,Ui.MUTED,false);
+            g.text(font,font.plainSubstrByWidth((diff>0?"Groupe conseillé · ":"")+d.getStringOr("variant"+diff,""),dw-20),dx+8,by+diff*32+22,Ui.MUTED,false);
             if(hovered(dx+8,by+diff*32,dw-16,31))g.setComponentTooltipForNextFrame(font,java.util.List.of(Component.literal(d.getStringOr("variant"+diff,"Dangers non disponibles"))),mx,my);
             int need = d.getIntOr("need" + diff, 1);
             boolean ok = playerLevel >= need;

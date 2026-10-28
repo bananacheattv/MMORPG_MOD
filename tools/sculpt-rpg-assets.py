@@ -9,11 +9,11 @@ for m,h in enumerate(COLORS):
  base=tuple(int(h[i:i+2],16)for i in (1,3,5));ox=m%4*256;oy=m//4*256
  for y in range(256):
   for x in range(256):
-   grain=rnd.uniform(-.045,.045);bevel=.17 if min(x,y,255-x,255-y)<3 else 0
+   grain=rnd.uniform(-.018,.018);bevel=.17 if min(x,y,255-x,255-y)<3 else 0
    if m in (1,2,3,12,14):
     line=.06*math.sin(y*.12)+.025*math.sin(x*.8+y*.04)
     # Engraved diagonal lattice and recessed decorative border.
-    if (x+y)%48<2 or (x-y)%48<2:line-=.17
+    if (x+y)%48<2 or (x-y)%48<2:line-=.075
     if x%48 in (5,6) and y%48 in (5,6):line+=.3
    elif m in (6,13):line=(.075 if (x//2+y//2)%2 else -.06)+(.1 if x%24<2 else 0)
    elif m in (7,11):
@@ -116,7 +116,7 @@ for tier,(key,wood,metal,gem) in enumerate([('vote',6,2,6),('quete',7,2,14),('co
   for x in [3,13]:lid.append(B([x,9.2,13.9],[2,1.5,1.3],metal,'Back hinge'))
   lid.append(B([8,11,8],[3.5,1,3.5],metal,'Heraldic setting','y',45));lid.append(B([8,12.5,8],[2,2,2],gem,'Crown jewel','y',45))
   for e in lid:
-   if opened:e['rotation']={'origin':[8,9,14],'axis':'x','angle':-45}
+   if opened:e['rotation']={'origin':[8,9,14],'axis':'x','angle':45}
   E+=lid;E+=[B([8,7,1.4],[3.6,4,.6],metal,'Escutcheon'),B([8,7.4,.95],[1.8,1.8,.5],gem,'Enamel seal','z',45),B([8,5.8,.9],[.5,1.4,.4],10,'Keyhole')]
   if tier>=4:
    for side in [-1,1]:E.append(B([8+side*2.8,7.5,1.7],[1,3,.6],metal,'Heraldic wing','z',side*22.5))
@@ -132,6 +132,8 @@ for tier,(key,wood,metal,gem) in enumerate([('vote',6,2,6),('quete',7,2,14),('co
 print('Reliquaries, mystery cube and fourteen chest states generated')
 # All class weapons receive original volumetric silhouettes rather than flat handheld sprites.
 source=(ROOT/'src/main/java/com/mmorpg/item/ItemDefs.java').read_text(encoding='utf-8');weapons=re.findall(r'w\("([^"]+)",\s*(\w+),\s*WeaponKind\.(\w+),\s*(\d+)',source)
+for cls,key,kind in [('G','guerrier','SWORD'),('M','mage','STAFF'),('A','archer','BOW'),('T','tank','HAMMER')]:
+ for bracket in range(5):weapons.append((f'pvp_{key}_{bracket}_arme',cls,kind,str(bracket*20+1)))
 for id,cls,kind,rawlevel in weapons:
  level=int(rawlevel);rank=0 if level<10 else 1 if level<25 else 2 if level<45 else 3 if level<65 else 4 if level<85 else 5;metal=2 if rank==0 else 3 if rank<3 else 1;gem={'G':8,'M':4,'A':6,'T':5}.get(cls,4)
  def weapon(pull=0):
@@ -140,11 +142,14 @@ for id,cls,kind,rawlevel in weapons:
   if kind=='SWORD':
    length=17+rank*.8
    for j in range(8):
-    w=2.4 if j<5 else max(.45,2.4-(j-4)*.6);E.append(B([8,10+j*length/8,8],[w,length/8+.1,.72],3,'Forged tapered blade'))
+    w=(2.5+rank*.08)*(1 if j<3 else max(.15,1-(j-2)*.17));E.append(B([8,10+j*length/8,8],[w,length/8+.1,.72],3,'Forged tapered blade'))
     if rank>0:E.append(B([8,10+j*length/8,7.56],[.35,length/8+.05,.12],10 if rank<3 else gem,'Recessed fuller'))
    E.append(B([8,9,8],[8+rank*.45,.8,1.8],metal,'Swept crossguard'))
    for side in [-1,1]:E.append(B([8+side*(3.8+rank*.2),9.7,8],[1.7,2.7,2],metal,'Quillon','z',side*22.5))
    E.append(B([8,9.5,7],[1.6,1.6,.8],gem,'Guard cabochon','z',45))
+   for side in [-1,1]:
+    for j in range(5):E.append(B([8+side*(1.15-j*.09),11+j*2.8,8],[.35,2.9,1],metal,'Polished cutting bevel'))
+   E.append(B([8,10+7*length/8+1.6,8],[.3,2.5,.5],3,'Needle point'))
   elif kind=='AXE':
    E.append(B([8,15.5,8],[1.7,15,1.7],7,'Hickory haft'))
    for side in [-1,1]if rank>=3 else[1]:
@@ -181,7 +186,7 @@ for id,cls,kind,rawlevel in weapons:
    for side in [-1,1]:
     for j in range(rank-1):E.append(B([8+side*(1.4+j*.15),12+j*1.7,8],[1.3,2.4,1],metal,'Layered blade root','z',side*22.5))
     if rank>=4:
-     for j in range(3):E.append(B([8+side*(3.8+j*.8),10+j*.65,8],[1.2,3.5-j*.7,1.6],metal,'Celestial guard wing','z',-side*22.5))
+     for j in range(3):E.append(B([8+side*(3.8+j*.8),10+j*.65,8],[1.0,2.1-j*.35,1.4],metal,'Celestial guard wing','z',-side*22.5))
    for j in range(rank):E.append(B([8,13+j*2,7.38],[.6,.6,.25],gem,'Engraved luminous rune','z',45))
   if kind=='STAFF'and rank>=3:
    for side in [-1,1]:
@@ -204,10 +209,13 @@ for id,cls,kind,rawlevel in weapons:
     y=3+j*1.2;E.append(B([8,y,6.95],[.45,.65,.4],gem,'Inlaid grip sigil','z',45))
    if kind in ('SWORD','STAFF'):
     for side in [-1,1]:
-     for j in range(3):E.append(B([8+side*(2.1+j*.7),26+j*1.1 if kind=='STAFF'else 17+j*2,8],[.7,2.5,.8],metal,'Ascended forked crown','z',-side*22.5))
+     for j in range(3):E.append(B([8+side*(2.1+j*.45),26+j*1.1 if kind=='STAFF'else 13+j*1.2,8],[.65,1.7,.8],metal,'Ascended forked crown','z',-side*22.5))
   d=model(E);d['display'].update({'gui':{'rotation':[12,-20,-35],'translation':[0,-2.5,0],'scale':[.48]*3},'fixed':{'rotation':[0,0,0],'translation':[0,-3,0],'scale':[.6]*3},'thirdperson_righthand':{'rotation':[0,-90,0 if kind=='STAFF'else 10],'translation':[0,5,.5],'scale':[.7]*3},'thirdperson_lefthand':{'rotation':[0,90,0 if kind=='STAFF'else -10],'translation':[0,5,.5],'scale':[.7]*3},'firstperson_righthand':{'rotation':[0,-90,0 if kind=='STAFF'else -15],'translation':[.8,3.6,.6],'scale':[.46]*3},'firstperson_lefthand':{'rotation':[0,90,0 if kind=='STAFF'else 15],'translation':[.8,3.6,.6],'scale':[.46]*3}})
+  if id.startswith('pvp_'):
+   E.extend([B([8,9,6.5],[2.6,3,.6],3,'Arena heraldic plate'),B([8,9,6.05],[1.1,1.1,.4],8,'Ruby arena insignia','z',45)])
+   for side in [-1,1]:E.append(B([8+side*1.6,8.5,6.2],[.5,4,.5],1,'Crossed arena blades','z',side*45))
   if kind=='BOW':
-   d['display']['thirdperson_righthand'].update(rotation=[-80,260,-85],translation=[-1,-2,2.5],scale=[.55]*3);d['display']['thirdperson_lefthand'].update(rotation=[-80,-280,85],translation=[-1,-2,2.5],scale=[.55]*3)
+   d['display']['thirdperson_righthand'].update(rotation=[-80,80,-85],translation=[-1,-2,2.5],scale=[.55]*3);d['display']['thirdperson_lefthand'].update(rotation=[-80,-100,85],translation=[-1,-2,2.5],scale=[.55]*3);d['display']['firstperson_righthand']['rotation'][1]=90;d['display']['firstperson_lefthand']['rotation'][1]=-90
   return d
  write(MODELS/f'item/sculpted_{id}.json',weapon())
  if kind=='BOW':

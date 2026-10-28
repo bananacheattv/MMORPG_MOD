@@ -29,7 +29,7 @@ public final class GuildService {
     }
     public static void action(ServerPlayer p,CompoundTag data){
         try{
-            String action=data.getStringOr("action","");if(action.equals("open")){reconcile(p);open(p);return;}
+            String action=data.getStringOr("action","");if(!action.equals("raidLeave")&&!com.mmorpg.server.FeatureFlags.allow(p,"guildes"))return;if(action.equals("open")){reconcile(p);open(p);return;}
             require(!com.mmorpg.hub.ClassTrial.active(p),"Termine d’abord ton essai de classe.");
             require(!NetworkPlayers.inTransit(p),"Changement de serveur en cours.");
             if(action.equals("deposit")||action.equals("withdraw")){transfer(p,data.getLongOr("amount",0),action.equals("withdraw"));open(p,"Transaction enregistrée.");return;}

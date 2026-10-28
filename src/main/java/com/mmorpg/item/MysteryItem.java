@@ -60,14 +60,14 @@ public class MysteryItem extends RpgMaterialItem {
         // jusqu'a 12 tirages pour tomber sur une monture pas encore possedee
         for (int i = 0; i < 12; i++) {
             MountType m = MountType.byId(id(AdventureLoot.roll(p, LootTables.SCEAU).item()).replaceFirst("^sceau_", ""));
-            if (m != null && !owned.contains(m.id)) return MountManager.grant(p, m);
+            if (m != null && m!=MountType.CHIMERE_ARENE && !owned.contains(m.id)) return MountManager.grant(p, m);
         }
-        if (owned.size() >= MountType.values().length) {
+        if (java.util.Arrays.stream(MountType.values()).filter(m->m!=MountType.CHIMERE_ARENE).allMatch(m->owned.contains(m.id))) {
             RpgPlayers.addGold(p, 2000, true);
             p.sendSystemMessage(Component.literal("Vous possédez déjà toutes les montures : +2000 pièces d’or.").withColor(0xE8C060));
             return true;
         }
-        for (MountType m : MountType.values()) if (!owned.contains(m.id)) return MountManager.grant(p, m);
+        for (MountType m : MountType.values()) if (m!=MountType.CHIMERE_ARENE&&!owned.contains(m.id)) return MountManager.grant(p, m);
         return false;
     }
 
