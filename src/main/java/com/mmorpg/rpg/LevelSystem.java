@@ -25,9 +25,16 @@ public final class LevelSystem {
         return (level - 1) * ATTRIBUTE_POINTS_PER_LEVEL;
     }
 
-    /** Points de competence cumules : 1 tous les 4 niveaux. */
+    /** Progressive budget: every class can maximize all its skills at level 100. */
+    public static int skillPointsAt(int level, PlayerClass cls) {
+        int needed = com.mmorpg.skill.Skills.forClass(cls).size() * (com.mmorpg.skill.Skill.MAX_RANK - 1);
+        return (int)((long)needed * (Math.clamp(level, 1, MAX_LEVEL) - 1) / (MAX_LEVEL - 1));
+    }
+
     public static int skillPointsAt(int level) {
-        return level / 4;
+        int maximum=0;
+        for(var cls:PlayerClass.values()) maximum=Math.max(maximum,skillPointsAt(level,cls));
+        return maximum;
     }
 
     /**

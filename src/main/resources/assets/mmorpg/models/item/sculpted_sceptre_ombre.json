@@ -1,7 +1,7 @@
 {
   "credit": "Aeloria · original sculpted geometry",
   "textures": {
-    "atlas": "mmorpg:item/aeloria_materials",
+    "atlas": "mmorpg:item/weapons/sceptre_ombre",
     "particle": "#atlas"
   },
   "elements": [
@@ -696,16 +696,16 @@
       }
     },
     {
-      "name": "Crown cradle",
+      "name": "Arcane trident",
       "from": [
-        5.5,
-        23.95,
-        5.5
+        3.4,
+        23.0,
+        7.4
       ],
       "to": [
-        10.5,
-        24.65,
-        10.5
+        4.6,
+        29.0,
+        8.6
       ],
       "faces": {
         "north": {
@@ -762,1246 +762,394 @@
             3.88
           ]
         }
-      },
-      "rotation": {
-        "origin": [
-          8,
-          24.3,
-          8
-        ],
-        "axis": "y",
-        "angle": 45
       }
     },
     {
-      "name": "Faceted focus",
+      "name": "Trident crystal",
       "from": [
-        6.25,
-        24.9,
-        6.25
-      ],
-      "to": [
-        9.75,
-        29.9,
-        9.75
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          8,
-          27.4,
-          8
-        ],
-        "axis": "y",
-        "angle": 45
-      },
-      "light_emission": 12
-    },
-    {
-      "name": "Focus tip",
-      "from": [
-        7.25,
-        29.35,
-        7.25
-      ],
-      "to": [
-        8.75,
-        31.05,
-        8.75
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          8,
-          30.2,
-          8
-        ],
-        "axis": "y",
-        "angle": 45
-      },
-      "light_emission": 12
-    },
-    {
-      "name": "Curved focus prong",
-      "from": [
-        4.65,
-        22.75,
-        7.55
-      ],
-      "to": [
-        5.55,
-        28.25,
-        8.45
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          5.1,
-          25.5,
-          8
-        ],
-        "axis": "z",
-        "angle": 22.5
-      }
-    },
-    {
-      "name": "Crown finial",
-      "from": [
-        4.0,
-        26.6,
-        7.6
+        3.2,
+        28.0,
+        7.2
       ],
       "to": [
         4.8,
-        29.4,
-        8.4
+        30.0,
+        8.8
       ],
       "faces": {
         "north": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "south": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "east": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "west": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "up": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "down": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
-          ]
-        }
-      }
-    },
-    {
-      "name": "Curved focus prong",
-      "from": [
-        10.45,
-        22.75,
-        7.55
-      ],
-      "to": [
-        11.35,
-        28.25,
-        8.45
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
             4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
+            3.88,
+            7.88
           ]
         }
       },
       "rotation": {
         "origin": [
-          10.9,
-          25.5,
+          4,
+          29,
           8
         ],
-        "axis": "z",
-        "angle": -22.5
+        "axis": "y",
+        "angle": 45
+      },
+      "light_emission": 12
+    },
+    {
+      "name": "Arcane trident",
+      "from": [
+        7.4,
+        22.0,
+        7.4
+      ],
+      "to": [
+        8.6,
+        30.0,
+        8.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#atlas",
+          "uv": [
+            4.12,
+            0.12,
+            7.88,
+            3.88
+          ]
+        },
+        "south": {
+          "texture": "#atlas",
+          "uv": [
+            4.12,
+            0.12,
+            7.88,
+            3.88
+          ]
+        },
+        "east": {
+          "texture": "#atlas",
+          "uv": [
+            4.12,
+            0.12,
+            7.88,
+            3.88
+          ]
+        },
+        "west": {
+          "texture": "#atlas",
+          "uv": [
+            4.12,
+            0.12,
+            7.88,
+            3.88
+          ]
+        },
+        "up": {
+          "texture": "#atlas",
+          "uv": [
+            4.12,
+            0.12,
+            7.88,
+            3.88
+          ]
+        },
+        "down": {
+          "texture": "#atlas",
+          "uv": [
+            4.12,
+            0.12,
+            7.88,
+            3.88
+          ]
+        }
       }
     },
     {
-      "name": "Crown finial",
+      "name": "Trident crystal",
+      "from": [
+        7.2,
+        29.0,
+        7.2
+      ],
+      "to": [
+        8.8,
+        31.0,
+        8.8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "south": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "east": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "west": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "up": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "down": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          30,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      },
+      "light_emission": 12
+    },
+    {
+      "name": "Arcane trident",
+      "from": [
+        11.4,
+        23.0,
+        7.4
+      ],
+      "to": [
+        12.6,
+        29.0,
+        8.6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#atlas",
+          "uv": [
+            4.12,
+            0.12,
+            7.88,
+            3.88
+          ]
+        },
+        "south": {
+          "texture": "#atlas",
+          "uv": [
+            4.12,
+            0.12,
+            7.88,
+            3.88
+          ]
+        },
+        "east": {
+          "texture": "#atlas",
+          "uv": [
+            4.12,
+            0.12,
+            7.88,
+            3.88
+          ]
+        },
+        "west": {
+          "texture": "#atlas",
+          "uv": [
+            4.12,
+            0.12,
+            7.88,
+            3.88
+          ]
+        },
+        "up": {
+          "texture": "#atlas",
+          "uv": [
+            4.12,
+            0.12,
+            7.88,
+            3.88
+          ]
+        },
+        "down": {
+          "texture": "#atlas",
+          "uv": [
+            4.12,
+            0.12,
+            7.88,
+            3.88
+          ]
+        }
+      }
+    },
+    {
+      "name": "Trident crystal",
       "from": [
         11.2,
-        26.6,
-        7.6
+        28.0,
+        7.2
       ],
       "to": [
-        12.0,
-        29.4,
-        8.4
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
-      }
-    },
-    {
-      "name": "Orbiting focus seal",
-      "from": [
-        10.2,
-        25.25,
-        7.5
-      ],
-      "to": [
-        11.2,
-        26.75,
-        8.5
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          10.7,
-          26,
-          8.0
-        ],
-        "axis": "y",
-        "angle": 45
-      },
-      "light_emission": 12
-    },
-    {
-      "name": "Orbiting focus seal",
-      "from": [
-        7.5,
-        25.25,
-        10.2
-      ],
-      "to": [
-        8.5,
-        26.75,
-        11.2
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          8.0,
-          26,
-          10.7
-        ],
-        "axis": "y",
-        "angle": 45
-      },
-      "light_emission": 12
-    },
-    {
-      "name": "Orbiting focus seal",
-      "from": [
-        4.8,
-        25.25,
-        7.5
-      ],
-      "to": [
-        5.8,
-        26.75,
-        8.5
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          5.3,
-          26,
-          8.0
-        ],
-        "axis": "y",
-        "angle": 45
-      },
-      "light_emission": 12
-    },
-    {
-      "name": "Orbiting focus seal",
-      "from": [
-        7.5,
-        25.25,
-        4.8
-      ],
-      "to": [
-        8.5,
-        26.75,
-        5.8
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          7.999999999999999,
-          26,
-          5.3
-        ],
-        "axis": "y",
-        "angle": 45
-      },
-      "light_emission": 12
-    },
-    {
-      "name": "Halo side",
-      "from": [
-        3.85,
-        24.0,
-        8.65
-      ],
-      "to": [
-        4.55,
+        12.8,
         30.0,
-        9.35
+        8.8
       ],
       "faces": {
         "north": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "south": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "east": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "west": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "up": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "down": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
-          ]
-        }
-      }
-    },
-    {
-      "name": "Octagonal focus halo",
-      "from": [
-        4.95,
-        22.25,
-        8.65
-      ],
-      "to": [
-        5.65,
-        25.75,
-        9.35
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
             4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
+            3.88,
+            7.88
           ]
         }
       },
       "rotation": {
         "origin": [
-          5.3,
-          24,
-          9
+          12,
+          29,
+          8
         ],
-        "axis": "z",
+        "axis": "y",
         "angle": 45
-      }
-    },
-    {
-      "name": "Octagonal focus halo",
-      "from": [
-        4.95,
-        28.25,
-        8.65
-      ],
-      "to": [
-        5.65,
-        31.75,
-        9.35
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
       },
-      "rotation": {
-        "origin": [
-          5.3,
-          30,
-          9
-        ],
-        "axis": "z",
-        "angle": -45
-      }
+      "light_emission": 12
     },
     {
-      "name": "Halo side",
+      "name": "Trident crossbar",
       "from": [
-        11.45,
-        24.0,
-        8.65
+        3.5,
+        22.5,
+        7.0
       ],
       "to": [
-        12.15,
-        30.0,
-        9.35
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
-      }
-    },
-    {
-      "name": "Octagonal focus halo",
-      "from": [
-        10.35,
-        22.25,
-        8.65
-      ],
-      "to": [
-        11.05,
-        25.75,
-        9.35
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          10.7,
-          24,
-          9
-        ],
-        "axis": "z",
-        "angle": -45
-      }
-    },
-    {
-      "name": "Octagonal focus halo",
-      "from": [
-        10.35,
-        28.25,
-        8.65
-      ],
-      "to": [
-        11.05,
-        31.75,
-        9.35
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          10.7,
-          30,
-          9
-        ],
-        "axis": "z",
-        "angle": 45
-      }
-    },
-    {
-      "name": "Halo crown",
-      "from": [
-        6.5,
-        30.7,
-        8.65
-      ],
-      "to": [
-        9.5,
-        31.3,
-        9.35
+        12.5,
+        23.5,
+        9.0
       ],
       "faces": {
         "north": {

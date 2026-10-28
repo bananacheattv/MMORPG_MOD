@@ -15,6 +15,12 @@ public enum BuffType {
     ARCANE_EXHAUSTION("Épuisement arcanique · Drain de mana", "bouclier_de_mana", 0xFFB080FF),
     MORTAL_WOUND("Plaie profonde · Soins -40 %", "rage_sanguinaire", 0xFFEF5070);
 
+    public boolean harmful(){return this==ARMOR_FRACTURE||this==ARCANE_EXHAUSTION||this==MORTAL_WOUND;}
+    public String shortLabel(){return switch(this){
+        case WAR_CRY->"Attaque renforcée";case RAGE->"Rage sanguinaire";case ARCANE_GUARD->"Garde arcanique";case MANA_SHIELD->"Bouclier de mana";
+        case AGILITY->"Agilité renforcée";case TAUNT->"Provocation active";case FORTRESS->"Défense renforcée";case SACRED_AURA->"Aura de soin";case TITAN->"Protection du Titan";
+        case ARMOR_FRACTURE->"Défense réduite";case ARCANE_EXHAUSTION->"Mana drainé";case MORTAL_WOUND->"Soins réduits";
+    };}
     public final String label;
     public final String icon;
     public final int color;

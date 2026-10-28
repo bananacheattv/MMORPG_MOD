@@ -9,7 +9,8 @@
     "ProxyChatSessionMixin",
     "DisabledFurnaceMixin",
     "BackpackPickupMixin",
-    "CreativeAccessMixin"
+    "CreativeAccessMixin",
+    "SpawnDecorDamageMixin"
   ],
   "injectors": {
     "defaultRequire": 1
@@ -21,6 +22,7 @@
     "AeloriaWindowIconMixin",
     "SlotPositionAccessor",
     "HideFireOverlayMixin",
-    "ShiftDragTransferMixin"
+    "ShiftDragTransferMixin",
+    "CharacterSlotHighlightMixin"
   ]
 }

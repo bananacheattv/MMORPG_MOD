@@ -1,7 +1,7 @@
 {
   "credit": "Aeloria · original sculpted geometry",
   "textures": {
-    "atlas": "mmorpg:item/aeloria_materials",
+    "atlas": "mmorpg:item/weapons/arc_elfique",
     "particle": "#atlas"
   },
   "elements": [
@@ -3455,12 +3455,12 @@
     {
       "name": "Nocked arrow",
       "from": [
-        -6.0,
+        0.9,
         7.9,
         7.9
       ],
       "to": [
-        9.0,
+        18.9,
         8.1,
         8.1
       ],
@@ -3524,12 +3524,12 @@
     {
       "name": "Arrowhead",
       "from": [
-        -7.15,
+        18.25,
         7.65,
         7.65
       ],
       "to": [
-        -5.85,
+        19.55,
         8.35,
         8.35
       ],
@@ -3591,7 +3591,7 @@
       },
       "rotation": {
         "origin": [
-          -6.5,
+          18.9,
           8,
           8
         ],

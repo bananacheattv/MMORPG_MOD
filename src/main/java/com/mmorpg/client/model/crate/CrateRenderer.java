@@ -116,7 +116,7 @@ public class CrateRenderer implements BlockEntityRenderer<CrateBlockEntity, Crat
         }
         // ---- nom de la caisse
         if (net.minecraft.client.Minecraft.getInstance().gui.hud.isHidden()) return;
-        float labelY = state.spinning || state.showing ? 3.7f : 2.65f;
+        float labelY = state.spinning || state.showing ? 4.6f : 2.65f;
         text(pose, collector, camera, labelY, Component.literal("✦ " + state.label + " ✦"), 0xFF000000 | state.color, 0.05f);
         if (!state.spinning && !state.showing) {
             text(pose, collector, camera, labelY - .45f, Component.literal("Clic droit pour ouvrir"), 0xFFD8D0C0, 0.03f);
@@ -124,7 +124,7 @@ public class CrateRenderer implements BlockEntityRenderer<CrateBlockEntity, Crat
         }
         // ---- roue
         pose.pushPose();
-        pose.translate(0.5f, 2.35f, 0.5f);
+        pose.translate(0.5f, 3.3f, 0.5f);
         pose.rotate(camera.orientation);
         if (state.spinning) {
             for (int i = 0; i < state.items.size(); i++) {
@@ -160,7 +160,7 @@ public class CrateRenderer implements BlockEntityRenderer<CrateBlockEntity, Crat
             pose.popPose();
         }
         pose.popPose();
-        if (state.showing) text(pose, collector, camera, 1.75f, Component.literal(state.winner), 0xFFFFE070, 0.022f);
+        if (state.showing) text(pose, collector, camera, 2.55f, Component.literal(state.winner), 0xFFFFE070, 0.022f);
     }
 
     private void text(PoseStack pose, SubmitNodeCollector collector, CameraRenderState camera, float y, Component text, int color, float scale) {
@@ -175,7 +175,7 @@ public class CrateRenderer implements BlockEntityRenderer<CrateBlockEntity, Crat
 
     @Override
     public AABB getRenderBoundingBox(CrateBlockEntity be) {
-        return new AABB(be.getBlockPos()).inflate(2, 0, 2).expandTowards(0, 4, 0);
+        return new AABB(be.getBlockPos()).inflate(2, 0, 2).expandTowards(0, 5, 0);
     }
 
     @Override

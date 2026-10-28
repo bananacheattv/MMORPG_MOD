@@ -18,7 +18,7 @@ public final class PaladinOffhand {
         for(int i=0;i<player.getInventory().getContainerSize();i++)if(i!=40&&shield(player.getInventory().getItem(i)))player.getInventory().setItem(i,ItemStack.EMPTY);
         ItemStack current=player.getOffhandItem();boolean wanted=equipped(player);
         if(!wanted){if(shield(current))player.setItemSlot(EquipmentSlot.OFFHAND,ItemStack.EMPTY);return;}
-        int tier=Math.clamp((RpgPlayers.get(player).level-1)/25,0,3);if(RpgPlayers.get(player).level>=100)tier=4;
+        int tier=Math.clamp(RpgPlayers.get(player).level/25,0,3);if(RpgPlayers.get(player).level>=100)tier=4;
         var item=ModItems.PALADIN_SHIELDS.get(tier).get();
         if(!current.is(item)){
             if(!current.isEmpty()&&!shield(current)){var saved=current.copy();if(!player.getInventory().add(saved))player.drop(saved,false,net.minecraft.util.Prediction.SERVER_ONLY);}

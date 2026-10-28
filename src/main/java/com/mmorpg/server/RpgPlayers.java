@@ -394,7 +394,7 @@ public final class RpgPlayers {
             for (int i = 0; i < d.skillBar.length; i++) {
                 if (!d.skillRanks.containsKey(d.skillBar[i])) d.skillBar[i] = "";
             }
-            while (d.spentSkillPoints() > LevelSystem.skillPointsAt(d.level)) {
+            while (d.spentSkillPoints() > LevelSystem.skillPointsAt(d.level, d.playerClass)) {
                 d.skillRanks.replaceAll((k, v) -> Math.max(1, v - 1));
             }
         }

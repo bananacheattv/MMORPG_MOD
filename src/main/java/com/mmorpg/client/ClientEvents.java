@@ -66,6 +66,7 @@ public final class ClientEvents {
     public static void onTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         MmoHud.tick(mc);
+        ArenaResultDelivery.tick(mc);
         com.mmorpg.client.hud.GuidanceArrow.update(mc);
         CosmeticFx.tick(mc);
     }

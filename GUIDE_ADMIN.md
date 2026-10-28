@@ -201,7 +201,7 @@ Personnage > Personnaliser : déplacer les panneaux par leur en-tête, agrandir 
 
 Maj + clic transfère une pile ; maintenir Maj et glisser le bouton gauche sur plusieurs piles les transfère successivement, y compris dans les sacs. Éditeur de PNJ > Dialogue modifie son accueil indépendamment des autres guides. Porte-armure > Skin / 3D donne un sélecteur de modèles et un champ pseudo pour le skin.
 
-Le Paladin pare avec son bouclier lié, en main secondaire. La garde se consomme en maintenant le bouclier et en absorbant les coups frontaux ; elle se régénère une fois abaissé, après un délai. Épuiser la réserve impose une récupération. Trois projections rapprochées accordent dix secondes d’immunité aux projections des monstres.
+Le Paladin pare avec son bouclier lié, en main secondaire. La garde se consomme uniquement sur les coups frontaux bloqués : 25 / 20 / 15 / 10 / 2 points aux niveaux 1 / 25 / 50 / 75 / 100. La tenir ne coûte rien. Après rupture, la réserve doit remonter intégralement à 100 ; la récupération, bouclier abaissé, démarre après deux secondes et rend dix points par seconde. La jauge ne porte plus de texte. Trois projections rapprochées accordent dix secondes d’immunité aux projections des monstres.
 
 Les donjons contiennent au moins trois fois moins d’ennemis dans les vagues et embuscades, ne bloquent plus leur galerie par des rochers, donnent la vision nocturne et davantage d’or. Les difficultés supérieures conseillent le groupe. Tuer le boss élimine les ennemis de son instance. L’écran de connexion ne propose plus Annuler et le feu ne masque plus la vue.
 
@@ -214,3 +214,14 @@ Le cristal compte cinquante coups sans délai artificiel entre les coups, avec j
 La fin affiche les deux équipes, éliminations, morts, coups au cristal, dégâts, soins et points. Les contributions donnent des points aux deux camps ; à contribution égale, le vainqueur reçoit le double. Un joueur inactif ne gagne pas de points. Les versements sont protégés contre les doublons.
 
 `/pvp` ou le marchand PvP au spawn ouvre la boutique : potions, titres, Chimère d’arène exclusive, vingt panoplies et vingt armes (quatre classes × cinq tranches de niveau). Les bonus exigent la bonne classe et le niveau requis. Ces équipements favorisent le PvP au prix d’une efficacité réduite contre les monstres. Achat et livraison sont vérifiés côté serveur ; un inventaire plein conserve la livraison en attente.
+
+
+## Correctifs de lisibilité et wiki
+
+Le cristal suit un circuit au sol contournant les obstacles, à 0,7 bloc par seconde. Sa hauteur ne dépend plus du sommet des rochers. Le bilan attend la fin du transfert au spawn ; les entraînements et sorties anticipées ont aussi leur bilan, sans récompense immédiate. `/arene bilan` rouvre le dernier résultat, même après fermeture.
+
+La roulette des coffres flotte à 3,3 blocs, son titre et son gain sont remontés. L’inventaire dispose d’une colonne plus large et centrée, avec cases, objets et survol cohérents. Revenir au jeu est centré sous le logo. Le budget de compétences atteint 44 points au niveau 100, pour les onze compétences au rang 5.
+
+Les buffs et débuffs affichent un texte de trois mots maximum et le temps restant sous le cadre de mana. Les armes possèdent des atlas individuels et des silhouettes franchement distinctes entre familles et paliers.
+
+Les cadres et porte-armures du spawn refusent les interactions et dégâts des non-OP, ainsi que les dégâts environnementaux. Les OP conservent l’édition. [Wiki complet](docs/wiki/README.md) : 17 pages et catalogues générés depuis les 44 compétences et 44 armes PvE.
