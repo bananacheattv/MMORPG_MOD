@@ -129,16 +129,16 @@ public final class DevShowcase {
             if(tick==240)stop(mc);return;
         }
         if(MODE.equals("shaders")){
-            if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
-            if(tick==40){mc.getWindow().setWindowed(1280,720);mc.resizeGui();ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.OFF);}
-            if(tick==80)shot(mc,"shaders_off");
-            if(tick==90)ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.SOFT);
-            if(tick==120)shot(mc,"shaders_soft");
-            if(tick==130)ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.AMBIANCE);
-            if(tick==160)shot(mc,"shaders_ambiance");
-            if(tick==170)ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.CINEMA);
-            if(tick==200)shot(mc,"shaders_cinema");
-            if(tick==210){ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.OFF);stop(mc);}return;
+            if(mc.player==null||mc.level==null)return;tick++;if(com.mmorpg.client.cinematic.CinematicClient.active()){com.mmorpg.client.cinematic.CinematicClient.skip();tick=Math.min(tick,0);return;}mc.gui.toastManager().clear();
+            if(tick==160){mc.getWindow().setWindowed(1280,720);mc.resizeGui();ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.OFF);}
+            if(tick==200)shot(mc,"shaders_off");
+            if(tick==210)ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.SOFT);
+            if(tick==240)shot(mc,"shaders_soft");
+            if(tick==250)ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.AMBIANCE);
+            if(tick==280)shot(mc,"shaders_ambiance");
+            if(tick==290)ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.CINEMA);
+            if(tick==320)shot(mc,"shaders_cinema");
+            if(tick==330){ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.OFF);stop(mc);}return;
         }
         if(MODE.equals("graphics")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
