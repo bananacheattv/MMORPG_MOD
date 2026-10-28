@@ -8,9 +8,9 @@ Tu travailles déjà sur le mod. Ce pack est préparé dans un checkout distinct
 
 ## Sources
 
-- `art/ui-pack/images/` : dix PNG originaux, conservés sans retouche destructrice.
+- `art/ui-pack/images/` : quinze PNG originaux, conservés sans retouche destructrice.
 - `art/ui-pack/manifest.json` : dimensions réelles, alpha, SHA256, usage, zones UV des quatre classes.
-- `art/ui-pack/prompts.json` : prompts exacts des sept nouvelles générations, outil intégré image_gen. Les trois images métier proviennent des générations précédentes approuvées dans cette conversation.
+- `art/ui-pack/prompts.json` : prompts exacts des douze nouvelles générations, outil intégré image_gen. Les trois images métier proviennent des générations précédentes approuvées dans cette conversation.
 - [Galerie du pack](README.md).
 
 Copier les seules images utilisées vers `src/main/resources/assets/mmorpg/textures/gui/illustrations/` dans ton implémentation, ou dériver des versions optimisées sans écraser les originaux. Les identifiants de ressources doivent rester en minuscules ASCII (`mmorpg:textures/gui/illustrations/...png`). Ne charger aucune image par URL réseau pendant le rendu.
@@ -90,9 +90,41 @@ Copier les seules images utilisées vers `src/main/resources/assets/mmorpg/textu
 - Conserver les demandes précédentes : pas de bouton Annuler réintroduit et pas d’écran rouge superposé par erreur. Ne pas retirer les messages d’erreur ni masquer une connexion échouée.
 - Pour une variation par destination, le fond Métiers peut accompagner le spawn et la crypte un donjon adapté. Il n’y a pas de nouvelle image dédiée aux mines seules : ne pas annoncer un pack de destinations plus complet que ce qui est livré.
 
+## 8 — Guildes
+
+**Asset :** `guild_hall_header`. Cible indicative : `GuildScreen.java`.
+
+Utiliser l’image en en-tête ; la grande bannière violette est vierge pour recevoir l’emblème réel de la guilde si ce système le permet. Garder le nom, les membres, invitations, rôles et améliorations en code, selon les permissions réelles. Les trophées peints sont un décor conceptuel, pas une preuve que la guilde a vaincu un boss. Afficher les vrais trophées et états séparément. Prévoir l’état sans guilde et une liste de membres longue.
+
+## 9 — Forge
+
+**Asset :** `forge_header`. Cible indicative : `ForgeScreen.java`.
+
+Le décor doit rester un en-tête ou une zone d’atelier. La liste des recettes, les composants, quantités disponibles, le coût et l’action de fabrication restent des données réelles. Rendre le véritable objet en grand aperçu3D ; ne pas utiliser la lame peinte dans le décor comme aperçu d’un résultat différent. Tester recette indisponible, ingrédients manquants, inventaire plein et libellés longs. Aucune case ou bouton ne doit passer sur la bordure du panneau ou sous l’image.
+
+## 10 — Bestiaire
+
+**Asset :** `bestiary_header`. Cible indicative : `BestiaryScreen.java`.
+
+Le livre illustré sert d’en-tête de collection. Les fiches et portraits individuels doivent venir des vrais modèles/skins du monstre sélectionné. Préserver les filtres Monstres/Boss/familles, la découverte et les données connues. Ne pas révéler des récompenses ou attaques qui doivent encore être découvertes et ne pas identifier un boss à partir du dessin générique du livre. Prévoir état vide et grandes listes.
+
+## 11 — Succès
+
+**Asset :** `achievement_medals_atlas`, six médailles sur alpha réel. Ordre3colonnes×2lignes : Mine, Exploration, Forge / Boss, Arène, Récolte. Lire les six régions pixels et UV du manifeste ; chaque cellule couvre exactement son icône.
+
+Utiliser les médailles avec leurs vrais objectifs et progressions, lorsqu’un système de succès existe sur la branche actuelle. Un compas de succès Exploration ne demande pas de carte du monde. **L’utilisateur a retiré la carte du monde de la demande : ne créer aucun écran ni asset de carte.** Ne pas afficher de progression ou récompense inventée si le backend de succès est absent. Conserver les images transparentes et leurs proportions, prévoir obtenu/verrouillé/en cours sans imposer un sens caché aux seules couleurs.
+
+## 12 — Résultats d’arène
+
+**Asset :** `arena_results_background`. Cible indicative : `ArenaResultsScreen.java`.
+
+Le visuel est neutre : rouge à gauche et bleu à droite. Les deux tableaux restent dessinés en code dans la zone basse calme, avec le vrai vainqueur, les noms, contributions, points et états d’entraînement ou de sortie anticipée. Ne pas peindre un vainqueur fixe dans l’image et ne pas modifier le calcul des récompenses.
+
+Pour dix joueurs ou une fenêtre étroite, prévoir une vraie adaptation : colonnes essentielles puis détail au survol, ou défilement borné. Ne jamais superposer les textes des deux équipes ou cacher Fermer/Marchand. Préserver la livraison du bilan après chargement et `/arene bilan`.
+
 ## Vérification avant livraison
 
-- Vérifier les sept interfaces concernées dans les résolutions et échelles GUI effectivement supportées, dont1280x720 et1920x1080, ainsi qu’une petite fenêtre. Les images ne doivent masquer ni boutons ni données.
+- Vérifier les douze interfaces concernées dans les résolutions et échelles GUI effectivement supportées, dont1280x720 et1920x1080, ainsi qu’une petite fenêtre. Les images ne doivent masquer ni boutons ni données.
 - Tester le recadrage des quatre classes, les libellés uniques des métiers, l’alpha du portrait et le passage du chargement au monde.
 - Les listes, défilements, info-bulles et zones de clic doivent rester cohérents avec ce qui est dessiné. Préserver clavier, Échap, focus, droits OP et fonctionnement hors connexion des assets.
 - Ne pas tester les générateurs Java/Gradle en recompilant pendant un client de QA lancé : un précédent essai a supprimé temporairement des classes chargées tardivement.

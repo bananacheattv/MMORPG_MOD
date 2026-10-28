@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "generation_tool": "image_gen built-in",
   "date": "2026-10-28",
   "namespace_suggestion": "mmorpg:textures/gui/illustrations/",
@@ -215,6 +215,188 @@
       ],
       "sha256": "ad3de3aa5583653de23910db95265bf7dc2e8de25021ffd300a066e8f3bbbb20",
       "contains_embedded_text": false
+    },
+    {
+      "id": "guild_hall_header",
+      "path": "images/guild_hall_header.png",
+      "label": "Hall de guilde",
+      "role": "guild_header",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "e299eb459554973426892ae52d0faa82165274c2d53e38df0dd27b94a4023bdc",
+      "contains_embedded_text": false,
+      "text_safe_rect_uv": [
+        0.04,
+        0.1,
+        0.31,
+        0.75
+      ]
+    },
+    {
+      "id": "forge_header",
+      "path": "images/forge_header.png",
+      "label": "Forge",
+      "role": "crafting_header",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "6529776a932b7e14ed5453a6b8682914a67a05568271d72cf04b1fd6cb78c80a",
+      "contains_embedded_text": false,
+      "text_safe_rect_uv": [
+        0.04,
+        0.1,
+        0.31,
+        0.75
+      ]
+    },
+    {
+      "id": "bestiary_header",
+      "path": "images/bestiary_header.png",
+      "label": "Bestiaire",
+      "role": "bestiary_header",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "41a7f402a20974dd3d8b330c323da01fa9f4675c5d672d738e49cadb6a0ccc94",
+      "contains_embedded_text": false,
+      "text_safe_rect_uv": [
+        0.04,
+        0.1,
+        0.31,
+        0.75
+      ]
+    },
+    {
+      "id": "achievement_medals_atlas",
+      "path": "images/achievement_medals_atlas.png",
+      "label": "Médailles de succès",
+      "role": "six_medal_atlas",
+      "width": 1536,
+      "height": 1024,
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "b23cae509d9ae6913fb74ecbaec860bb16e26be7d49ac4a6619d538cc3c2be63",
+      "contains_embedded_text": false,
+      "regions": [
+        {
+          "id": "mining",
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 512,
+          "uv": [
+            0.0,
+            0.0,
+            0.3333333333333333,
+            0.5
+          ]
+        },
+        {
+          "id": "exploration",
+          "x": 512,
+          "y": 0,
+          "width": 512,
+          "height": 512,
+          "uv": [
+            0.3333333333333333,
+            0.0,
+            0.6666666666666666,
+            0.5
+          ]
+        },
+        {
+          "id": "crafting",
+          "x": 1024,
+          "y": 0,
+          "width": 512,
+          "height": 512,
+          "uv": [
+            0.6666666666666666,
+            0.0,
+            1.0,
+            0.5
+          ]
+        },
+        {
+          "id": "boss",
+          "x": 0,
+          "y": 512,
+          "width": 512,
+          "height": 512,
+          "uv": [
+            0.0,
+            0.5,
+            0.3333333333333333,
+            1.0
+          ]
+        },
+        {
+          "id": "arena",
+          "x": 512,
+          "y": 512,
+          "width": 512,
+          "height": 512,
+          "uv": [
+            0.3333333333333333,
+            0.5,
+            0.6666666666666666,
+            1.0
+          ]
+        },
+        {
+          "id": "harvest",
+          "x": 1024,
+          "y": 512,
+          "width": 512,
+          "height": 512,
+          "uv": [
+            0.6666666666666666,
+            0.5,
+            1.0,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "id": "arena_results_background",
+      "path": "images/arena_results_background.png",
+      "label": "Résultats d’arène",
+      "role": "results_background",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "ec89f047594073eae10cedf758252116788d5656b79c6953017f8a5bf6a13d6f",
+      "contains_embedded_text": false,
+      "table_safe_rects_uv": [
+        [
+          0.04,
+          0.57,
+          0.44,
+          0.37
+        ],
+        [
+          0.52,
+          0.57,
+          0.44,
+          0.37
+        ]
+      ]
     }
   ]
 }
