@@ -28,6 +28,7 @@ public final class DungeonMaster {
     }
 
     private static boolean offers(NpcEntity npc, DungeonType t) {
+        if(npc==null)return true;
         String g = npc.group();
         return g.isEmpty() || g.equals(GROUP_ALL) || g.equals("donjon:" + t.id);
     }
@@ -53,8 +54,8 @@ public final class DungeonMaster {
             list.add(e);
         }
         CompoundTag data = new CompoundTag();
-        data.putInt("npc", npc.getId());
-        data.putString("name", npc.displayName());
+        data.putInt("npc", npc==null?-1:npc.getId());
+        data.putString("name", npc==null?"Portail des donjons":npc.displayName());
         data.putInt("playerLevel", level);
         data.put("dungeons", list);
         Net.toPlayer(p, new S2COpenScreen(S2COpenScreen.DUNGEON_MASTER, data));
@@ -63,7 +64,9 @@ public final class DungeonMaster {
     /** Choix du joueur : verifications cote serveur (distance, niveau, donjon propose) puis entree. */
     public static void enter(ServerPlayer p, Payloads.DungeonEnter packet) {
         Entity e = p.level().getEntity(packet.npc());
-        if (!(e instanceof NpcEntity npc) || npc.role() != NpcEntity.Role.DONJON || npc.distanceToSqr(p) > 100) return;
+        NpcEntity npc=e instanceof NpcEntity n?n:null;
+        if(packet.npc()==-1){if(!com.mmorpg.server.AdventurePortals.nearDungeonMenu(p))return;}
+        else if(npc==null||npc.role()!=NpcEntity.Role.DONJON||npc.distanceToSqr(p)>100||!p.hasLineOfSight(npc))return;
         DungeonType t = DungeonType.byId(packet.dungeon());
         int d = packet.difficulty();
         if (t == null || d < 0 || d > 2 || !offers(npc, t)) return;

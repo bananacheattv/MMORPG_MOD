@@ -18,7 +18,7 @@ import java.util.*;
 /** Item icons and numeric controls, with four real NPC model previews. No item IDs to type. */
 public final class MerchantEditorScreen extends MmoScreen {
     private final int npc;private final String revision;private final ShopConfig shop;
-    private final NpcEntity[] previews=new NpcEntity[4];
+    private final NpcEntity[] previews=new NpcEntity[NpcEntity.SKINS];
     private String merchantName,status,selected="";private int skin,tab,page;private boolean selling=true,buying=true;
     private EditBox search,name,quantity,price,resale,level;
     private record Entry(Item item,String id,String label,String match) { }
@@ -118,18 +118,23 @@ public final class MerchantEditorScreen extends MmoScreen {
         button(g,rx+rw/2+2,toggleY,rw/2-2,16,"Rachat : "+(buying?"oui":"non"),true,Ui.GOLD,()->buying=!buying);
         button(g,rx,top+ph-50,rw,16,"Appliquer l'article",true,Ui.GOLD,this::applyItem);
     }
+    private int skinPage;
     private void drawSkins(GuiGraphicsExtractor g) {
         g.text(font,"Nom du marchand",left+12,top+47,Ui.TEXT,false);
-        int cardW=(pw-32)/4,y=top+83,h=Math.max(75,ph-122);
-        for(int i=0;i<4;i++) {
-            final int choice=i;int x=left+10+i*(cardW+4);
+        int cardW=(pw-32)/4,y=top+83,h=Math.max(60,ph-145);
+        int pages=(NpcEntity.SKINS+3)/4;skinPage=Math.clamp(skinPage,0,pages-1);
+        button(g,left+12,top+ph-56,70,16,"Précédent",skinPage>0,Ui.GOLD,()->skinPage--);
+        button(g,left+pw-82,top+ph-56,70,16,"Suivant",skinPage+1<pages,Ui.GOLD,()->skinPage++);
+        for(int column=0;column<4;column++) {
+            int i=skinPage*4+column;if(i>=NpcEntity.SKINS)break;
+            final int choice=i;int x=left+10+column*(cardW+4);
             Ui.frame(g,x,y,cardW,h,skin==i?Ui.GOLD:Ui.MUTED,hovered(x,y,cardW,h));
             if(previews[i]==null&&Minecraft.getInstance().level!=null) {
                 previews[i]=com.mmorpg.registry.ModEntities.NPC.get().create(Minecraft.getInstance().level,net.minecraft.world.entity.EntitySpawnReason.COMMAND);
                 if(previews[i]!=null){previews[i].setId(-700-i);previews[i].setup(NpcEntity.Role.MARCHAND,"",i,"");}
             }
             if(previews[i]!=null)InventoryScreen.extractEntityInInventoryFollowsMouse(g,x+2,y+2,x+cardW-2,y+h-19,Math.max(20,Math.min(42,(h-22)/2)),.0625f,mouseX,mouseY,previews[i]);
-            g.centeredText(font,Component.literal("Apparence "+(i+1)),x+cardW/2,y+h-13,skin==i?Ui.GOLD:Ui.TEXT);
+            g.centeredText(font,Component.literal(NpcEntity.APPEARANCES[i]),x+cardW/2,y+h-13,skin==i?Ui.GOLD:Ui.TEXT);
             click(x,y,cardW,h,()->skin=choice);
         }
     }

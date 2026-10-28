@@ -22,15 +22,29 @@ public final class DevArenaChecks {
         var opponent=net.neoforged.neoforge.common.util.FakePlayerFactory.get(oldLevel,new com.mojang.authlib.GameProfile(UUID.randomUUID(),"ArenaOpponent"));
         var cfg=com.mmorpg.network.NetworkConfig.current;var local=new com.mmorpg.network.NetworkConfig();com.mmorpg.network.NetworkConfig.current=local;
         try{
+            var defence=new ArenaDefence();var intruder=UUID.randomUUID();
+            check(ArenaDefence.enemyZone(0,40,101,0)&&!ArenaDefence.enemyZone(0,-40,101,0),"red player threatened only in blue camp");
+            check(ArenaDefence.enemyZone(1,-40,101,0)&&!ArenaDefence.enemyZone(1,40,101,0),"blue player threatened only in red camp");
+            check(!ArenaDefence.enemyZone(0,35.99,101,0)&&!ArenaDefence.enemyZone(0,40,101,10.01),"outside red boundary is safe");
+            check(defence.remaining(intruder,101)==60&&defence.remaining(intruder,160)==1&&defence.remaining(intruder,161)==0,"full continuous three seconds before laser");
+            defence.cancel(intruder);check(defence.remaining(intruder,162)==60,"leaving danger resets entire lock");defence.dispose();
+            for(int i=0;i<36;i++)p.getInventory().setItem(i,new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.STONE,64));
+            var coin=new net.minecraft.world.entity.item.ItemEntity(oldLevel,0,100,0,new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.PIECE_OR.get(),7));
+            coin.setNoPickUpDelay();long wallet=playerData.gold;
+            check(com.mmorpg.server.CurrencyPickup.collect(p,coin)&&playerData.gold==wallet+7,"full inventory coin enters wallet");
+            check(!com.mmorpg.server.CurrencyPickup.collect(p,coin)&&playerData.gold==wallet+7,"coin cannot be credited twice");
+            var foreign=new net.minecraft.world.entity.item.ItemEntity(oldLevel,0,100,0,new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.PIECE_OR.get(),3));foreign.setNoPickUpDelay();foreign.setTarget(UUID.randomUUID());
+            check(!com.mmorpg.server.CurrencyPickup.collect(p,foreign)&&foreign.isAlive(),"private coin remains protected");foreign.discard();p.getInventory().clearContent();
             var center=CompetitionWorld.center(0);var job=CompetitionWorld.arena(center,ArenaRules.Kind.FEU);while(!job.done())job.tick(world);
             for(int n=0;n<120;n++){double a=n*Math.PI/60,cx=center.getX()+Math.cos(a)*18+.5,cz=center.getZ()+Math.sin(a)*12+.5;check(world.noCollision(null,new net.minecraft.world.phys.AABB(cx-1.2,101.2,cz-1.2,cx+1.2,104.7,cz+1.2)),"crystal orbit clear of rocks "+n);}
-            check(world.getBlockState(center.offset(46,-1,0)).is(net.minecraft.world.level.block.Blocks.LAVA),"lava basin exists below walking surface");check(world.getBlockState(center.offset(47,-1,0)).getFluidState().isEmpty(),"basin has retaining wall");
+            check(world.getBlockState(center.offset(53,-1,0)).is(net.minecraft.world.level.block.Blocks.LAVA),"lava basin exists below walking surface");check(world.getBlockState(center.offset(54,-1,0)).getFluidState().isEmpty(),"basin has retaining wall");
             session.match.teams.put(p.getUUID(),0);session.match.teams.put(opponent.getUUID(),1);session.active=true;session.returns.put(p.getUUID(),new ArenaManager.Return(oldLevel.dimension(),x,y,z,yaw,pitch));ArenaManager.SESSIONS.put(key,session);
             session.crystal=com.mmorpg.registry.ModEntities.ARENA_CRYSTAL.get().create(world,net.minecraft.world.entity.EntitySpawnReason.COMMAND);session.crystal.match=session.match.id;check(session.crystal.isPersistenceRequired(),"arena crystal survives distance despawn");
             long gold=com.mmorpg.server.RpgPlayers.get(p).gold,xp=com.mmorpg.server.RpgPlayers.get(p).xp;
-            check(ArenaManager.lethal(p,opponent),"lethal hit intercepted");check(p.level()==world&&Math.abs(p.getX()-(center.getX()-32.5))<.01,"respawn at own camp");check(session.match.blue==10,"enemy kill grants ten points");check(com.mmorpg.server.RpgPlayers.get(p).gold==gold&&com.mmorpg.server.RpgPlayers.get(p).xp==xp,"arena death preserves XP and gold");check(ArenaManager.protectedPlayer(p),"respawn protection applied");
+            check(ArenaManager.lethal(p,opponent),"lethal hit intercepted");check(p.level()==world&&Math.abs(p.getX()-(center.getX()-43.5))<.01,"respawn at own camp");check(session.match.blue==10,"enemy kill grants ten points");check(com.mmorpg.server.RpgPlayers.get(p).gold==gold&&com.mmorpg.server.RpgPlayers.get(p).xp==xp,"arena death preserves XP and gold");check(ArenaManager.protectedPlayer(p),"respawn protection applied");
             check(!session.crystal.hurtServer(world,p.damageSources().playerAttack(p),1),"protected player cannot capture");session.protectedUntil.put(p.getUUID(),0L);
-            check(session.crystal.hurtServer(world,p.damageSources().playerAttack(p),1)&&session.crystal.team()==0&&session.match.owner==0,"real attack captures custom crystal");
+            check(session.crystal.hurtServer(world,p.damageSources().playerAttack(p),1)&&session.crystal.team()==-1&&session.match.captureHits==1,"real first attack begins white capture");
+            check(!session.crystal.hurtServer(world,p.damageSources().playerAttack(p),1)&&session.match.captureHits==1,"same-tick damage cannot bypass crystal cooldown");
             ArenaManager.leave(p);check(p.level()==oldLevel&&Math.abs(p.getX()-x)<.01,"leaving restores original position");
             ArenaManager.SESSIONS.remove(key);
             var identity=new net.minecraft.server.players.NameAndId(p.getGameProfile());
@@ -44,7 +58,7 @@ public final class DevArenaChecks {
                     check(dispatcher.execute("aeloriatest arene "+kind.name().toLowerCase(java.util.Locale.ROOT),p.createCommandSourceStack())==1,"admin arena command");
                     var solo=ArenaManager.session(p.getUUID());check(solo!=null&&solo.test&&solo.readyToBuild()&&!solo.forfeited(),"solo starts immediately and does not forfeit");
                     check(solo.center().getX()>=CompetitionWorld.center(10).getX()&&!ArenaManager.queued(p.getUUID()),"test separate from public matchmaking");
-                    solo.active=true;ArenaManager.testTeam(p,1);solo.match.capture(p.getUUID(),0);solo.match.tick(40);check(solo.match.blue==1,"solo blue capture scores");
+                    solo.active=true;ArenaManager.testTeam(p,1);for(int hit=0;hit<50;hit++)solo.match.capture(p.getUUID(),hit*40);solo.match.tick(2000);check(solo.match.blue==1,"solo blue capture scores");
                     solo.returns.put(p.getUUID(),new ArenaManager.Return(oldLevel.dimension(),x,y,z,yaw,pitch));CompetitionAdmin.stop(p);ArenaManager.tick(server);check(ArenaManager.session(p.getUUID())==null,"empty test disposed");
                 }
                 for(int tier:new int[]{0,9}){

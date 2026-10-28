@@ -10,7 +10,10 @@ public enum BuffType {
     TAUNT("Provocation", "provocation", 0xFFFF6040),
     FORTRESS("Forteresse", "forteresse", 0xFFB0B8C8),
     SACRED_AURA("Aura Sacrée", "aura_sacree", 0xFFFFE080),
-    TITAN("Rempart du Titan", "rempart_du_titan", 0xFFFFD040);
+    TITAN("Rempart du Titan", "rempart_du_titan", 0xFFFFD040),
+    ARMOR_FRACTURE("Armure fracturée · Défense -25 %", "cri_de_guerre", 0xFFFF7850),
+    ARCANE_EXHAUSTION("Épuisement arcanique · Drain de mana", "bouclier_de_mana", 0xFFB080FF),
+    MORTAL_WOUND("Plaie profonde · Soins -40 %", "rage_sanguinaire", 0xFFEF5070);
 
     public final String label;
     public final String icon;

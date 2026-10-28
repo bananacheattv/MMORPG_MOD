@@ -188,6 +188,8 @@ public final class RpgPlayers {
                 buffsChanged = true;
             } else if (b.type == BuffType.SACRED_AURA && now % 20 == 0) {
                 heal(player, d.stats.get(Stat.MAX_HP) * b.magnitude, true);
+            } else if (b.type == BuffType.ARCANE_EXHAUSTION && now % 20 == 0) {
+                d.mana=(float)Math.max(0,d.mana-d.stats.get(Stat.MAX_MANA)*.025);
             }
         }
         if (buffsChanged) recompute(player);
@@ -203,7 +205,7 @@ public final class RpgPlayers {
             double maxHp = d.stats.get(Stat.MAX_HP);
             double maxMana = d.stats.get(Stat.MAX_MANA);
             // One discrete pulse every five seconds, independent of food and the old base regen stat.
-            if (player.tickCount % 100 == 0) d.hp = (float) Math.min(maxHp, d.hp + maxHp * 0.01);
+            if (player.tickCount % 100 == 0) d.hp = (float) Math.min(maxHp, d.hp + maxHp * 0.01*com.mmorpg.combat.MobDebuffs.healingMultiplier(player));
             d.mana = (float) Math.min(maxMana, d.mana + d.stats.get(Stat.MANA_REGEN) / 20.0);
             syncVanillaHealth(player);
         }
@@ -245,7 +247,7 @@ public final class RpgPlayers {
         PlayerData d = get(player);
         double max = d.stats.get(Stat.MAX_HP);
         float before = d.hp;
-        d.hp = (float) Math.min(max, d.hp + Math.max(0, amount));
+        d.hp = (float) Math.min(max, d.hp + Math.max(0, amount)*com.mmorpg.combat.MobDebuffs.healingMultiplier(player));
         if (showText && d.hp - before >= 1) {
             CombatTexts.send(player, player.getX(), player.getY() + player.getBbHeight() + 0.3, player.getZ(), d.hp - before, Payloads.CombatText.HEAL);
         }

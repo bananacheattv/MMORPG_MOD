@@ -48,6 +48,7 @@ public final class AdventurePortals {
             case "mine" -> portal.region() < 0 ? "Mines : choix de la région" : com.mmorpg.mine.MineLayout.STYLES.get(portal.region()).name();
             case "plaines" -> portal.region() < 0 ? "Plaines : choix de la région" : com.mmorpg.plains.PlainsLayout.STYLES.get(portal.region()).name();
             case "donjon" -> DungeonType.byId(portal.dungeon()).label + " · " + new String[]{"normal", "héroïque", "mythique"}[portal.difficulty()];
+            case "donjons" -> "Donjons : choix du donjon";
             case "hub" -> "Hub : choix de classe";
             case "spawn" -> "Spawn d'Aeloria";
             default -> "Portail inconnu";
@@ -58,7 +59,7 @@ public final class AdventurePortals {
             case "mine" -> p.region() >= -1 && p.region() < com.mmorpg.mine.MineLayout.SECTORS;
             case "plaines" -> p.region() >= -1 && p.region() < com.mmorpg.plains.PlainsLayout.REGIONS;
             case "donjon" -> DungeonType.byId(p.dungeon()) != null && p.difficulty() >= 0 && p.difficulty() <= 2;
-            case "hub", "spawn" -> true;
+            case "hub", "spawn", "donjons" -> true;
             default -> false;
         };
     }
@@ -153,18 +154,21 @@ public final class AdventurePortals {
         return switch (portal.kind()) {
             case "mine" -> portal.region() < 0 || (portal.region() < RpgPlayers.get(p).minesUnlocked && RpgPlayers.get(p).level >= com.mmorpg.mine.MineLayout.STYLES.get(portal.region()).minLevel());
             case "plaines" -> portal.region() < 0 || (portal.region() < RpgPlayers.get(p).plainsUnlocked && RpgPlayers.get(p).level >= com.mmorpg.plains.PlainsLayout.STYLES.get(portal.region()).minLevel());
+            case "donjons" -> true;
             case "donjon" -> RpgPlayers.get(p).level >= com.mmorpg.dungeon.DungeonMaster.requiredLevel(DungeonType.byId(portal.dungeon()), portal.difficulty());
             default -> false;
         };
     }
+    public static boolean nearDungeonMenu(ServerPlayer p){return AdventurePortalData.get(p.level().getServer()).all().stream().anyMatch(portal->portal.kind().equals("donjons")&&portal.dimension().equals(p.level().dimension())&&allowed(p,portal)&&p.distanceToSqr(portal.pos().getX()+.5,portal.pos().getY(),portal.pos().getZ()+.5)<=100);}
     public static void enter(ServerPlayer p, Portal portal) {
         if (!allowed(p, portal)) { fail(p, "Accès refusé : choisissez votre classe, respectez le niveau et découvrez d'abord cette région. Terminez aussi tout essai, cinématique ou combat PvP."); return; }
-        PortalAccess.grant(p, portal.kind());
+        PortalAccess.grant(p, portal.kind().equals("donjons")?"donjon":portal.kind());
         switch (portal.kind()) {
             case "hub" -> com.mmorpg.hub.HubManager.goToHub(p);
             case "spawn" -> com.mmorpg.hub.HubManager.goToSpawn(p);
             case "mine" -> { if (portal.region() < 0) com.mmorpg.mine.MineManager.open(p, null); else com.mmorpg.mine.MineManager.startTransition(p, portal.region()); }
             case "plaines" -> { if (portal.region() < 0) com.mmorpg.plains.PlainsManager.open(p); else com.mmorpg.plains.PlainsManager.enterChosen(p, portal.region()); }
+            case "donjons" -> com.mmorpg.dungeon.DungeonMaster.open(p,null);
             case "donjon" -> com.mmorpg.dungeon.InstanceManager.enterPool(p, com.mmorpg.dungeon.InstanceManager.pool(DungeonType.byId(portal.dungeon()), portal.difficulty()));
         }
     }
@@ -226,7 +230,7 @@ public final class AdventurePortals {
             final int difficulty = i;
             dungeon.then(Commands.literal(new String[]{"normal", "heroique", "mythique"}[i]).executes(c -> create(c.getSource(), "donjon", -1, StringArgumentType.getString(c, "type"), difficulty)));
         }
-        root.then(Commands.literal("donjon").then(dungeon));
+        root.then(Commands.literal("donjon").executes(c -> create(c.getSource(), "donjons", -1, "", 0)).then(dungeon));
         root.then(Commands.literal("liste").executes(c -> {
             var portals = AdventurePortalData.get(c.getSource().getServer()).all();
             c.getSource().sendSuccess(() -> Component.literal(portals.size() + " portail(s) enregistré(s)."), false);

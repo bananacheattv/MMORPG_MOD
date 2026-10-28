@@ -116,6 +116,7 @@ public final class RpgCombat {
     public static boolean isEnemy(Entity attacker, Entity target) {
         if (!(target instanceof LivingEntity living) || !living.isAlive() || target == attacker) return false;
         if (target instanceof PetEntity) return false;
+        if(attacker instanceof com.mmorpg.competition.GuildGuardian guardian&&target instanceof Player player&&!com.mmorpg.competition.GuildRaids.allowed(guardian,player.getUUID()))return false;
         if (target instanceof Player p) {
             if (p.isCreative() || p.isSpectator()) return false;
             if (attacker instanceof Player ap) {
@@ -342,6 +343,7 @@ public final class RpgCombat {
             return;
         }
         double newHp = h.hp() - damage;
+        if(damage>0&&target instanceof ServerPlayer player&&attacker instanceof LivingEntity mob)MobDebuffs.onHit(mob,player);
         if(newHp<=.01&&target instanceof ServerPlayer arenaPlayer&&(com.mmorpg.competition.ArenaManager.lethal(arenaPlayer,attacker)||com.mmorpg.competition.GuildRaids.testDeath(arenaPlayer))){event.setNewDamage(0F);return;}
         if (newHp <= 0.01) {
             h.setHp(0);
@@ -396,6 +398,7 @@ public final class RpgCombat {
         if (h == null) return;
         double rpg = event.getAmount() / Math.max(1.0F, e.getMaxHealth()) * h.max();
         event.setCanceled(true);
+        if(e instanceof ServerPlayer player)rpg*=MobDebuffs.healingMultiplier(player);
         double newHp = Math.min(h.max(), h.hp() + rpg);
         h.setHp(newHp);
         e.setHealth((float) Math.max(0.5, e.getMaxHealth() * newHp / h.max()));

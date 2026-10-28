@@ -38,6 +38,7 @@ public final class ClientRenderers {
     @SubscribeEvent
     public static void register(EntityRenderersEvent.RegisterRenderers event) {
         for(int i=0;i<10;i++){final int tier=i;event.registerEntityRenderer(ModEntities.GUILD_GUARDIANS.get(i).get(),c->new com.mmorpg.client.model.YggdrasilRenderer(c,tier));}
+        event.registerEntityRenderer(ModEntities.ARENA_DRONE.get(),com.mmorpg.client.model.ArenaDroneRenderer::new);
         event.registerEntityRenderer(ModEntities.ARENA_CRYSTAL.get(),com.mmorpg.client.model.ArenaCrystalRenderer::new);
         ModEntities.IMPORTED.forEach((key, type) -> event.registerEntityRenderer(type.get(), c -> new com.mmorpg.client.model.imported.ImportedMobRenderer(c, key)));
         event.registerEntityRenderer(ModEntities.CRYPT_ZOMBIE.get(),c->new com.mmorpg.client.model.imported.ClassicMobRenderer<>(c,"zombie_des_cryptes"));
@@ -64,7 +65,7 @@ public final class ClientRenderers {
         ModEntities.MOUNTS.forEach((type, entity) -> event.registerEntityRenderer(entity.get(),
                 c -> new com.mmorpg.client.model.mount.MountRenderer(c, type)));     // montures 3D animees
         event.registerEntityRenderer(ModEntities.HUB_GUIDE.get(), com.mmorpg.client.model.imported.HubGuideRenderer::new);
-        event.registerEntityRenderer(ModEntities.NPC.get(), NpcRenderer::new);
+        event.registerEntityRenderer(ModEntities.NPC.get(), com.mmorpg.client.model.imported.AuthoredNpcRenderer::new);
         event.registerEntityRenderer(ModEntities.TRAINING_DUMMY.get(), com.mmorpg.client.model.dummy.DummyRenderer::new);
         event.registerEntityRenderer(ModEntities.CLASS_MASTER.get(), com.mmorpg.client.model.imported.AuthoredMasterRenderer::new);
     }

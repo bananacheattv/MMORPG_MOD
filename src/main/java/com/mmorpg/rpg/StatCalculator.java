@@ -97,6 +97,7 @@ public final class StatCalculator {
                     pct.add(Stat.ATK, b.magnitude);
                     flat.add(Stat.LIFESTEAL, b.magnitude2 * 100);
                 }
+                case ARMOR_FRACTURE -> pct.add(Stat.DEF,-.25);
                 case AGILITY -> flat.add(Stat.SPEED, b.magnitude * 100);
                 case TAUNT -> pct.add(Stat.DEF, b.magnitude);
                 case FORTRESS -> flat.add(Stat.SPEED, -30);

@@ -108,6 +108,6 @@ public final class ArmorModels {
             MODELS.clear();
             bakedFrom = set;
         }
-        return MODELS.computeIfAbsent(panoply + "/" + slot.getName(), k -> new HumanoidModel<>(set.bakeLayer(layer(panoply, slot))));
+        return MODELS.computeIfAbsent(panoply + "/" + slot.getName(), k -> new PosedArmorModel(set.bakeLayer(layer(panoply, slot))));
     }
 }

@@ -20,12 +20,12 @@ public final class CompetitionWorld {
     public static BlockPos center(int pool){return new BlockPos(500+pool*240,100,0);}
     public static Job arena(BlockPos c,ArenaRules.Kind kind){
         Job j=new Job();List<BlockPos> wet=new ArrayList<>();boolean fire=kind==ArenaRules.Kind.FEU;var ground=fire?Blocks.POLISHED_BLACKSTONE:Blocks.SMOOTH_SANDSTONE;var rock=fire?Blocks.BASALT:Blocks.CUT_SANDSTONE;
-        for(int x=-47;x<=47;x++)for(int z=-35;z<=35;z++){
-            for(int y=100;y<=112;y++)j.add(c.getX()+x,y,c.getZ()+z,Blocks.AIR);
+        for(int x=-54;x<=54;x++)for(int z=-40;z<=40;z++){
+            for(int y=100;y<=116;y++)j.add(c.getX()+x,y,c.getZ()+z,Blocks.AIR);
             j.add(c.getX()+x,98,c.getZ()+z,ground);j.add(c.getX()+x,99,c.getZ()+z,ground);
-            boolean boundary=Math.abs(x)==47||Math.abs(z)==35;
+            boolean boundary=Math.abs(x)==54||Math.abs(z)==40;
             if(boundary)for(int y=100;y<108;y++)j.add(c.getX()+x,y,c.getZ()+z,Blocks.BARRIER);
-            if(!boundary&&(Math.abs(x)>43||Math.abs(z)>31))wet.add(new BlockPos(c.getX()+x,99,c.getZ()+z));
+            if(!boundary&&(Math.abs(x)>52||Math.abs(z)>36))wet.add(new BlockPos(c.getX()+x,99,c.getZ()+z));
             int h=rockHeight(x,z,0,0,7,6,9);
             for(int side:new int[]{-1,1})h=Math.max(h,rockHeight(x,z,0,side*22,8,5,7));
             for(int side:new int[]{-1,1})for(int end:new int[]{-1,1})h=Math.max(h,rockHeight(x,z,side*24,end*18,4,4,5));
@@ -37,7 +37,35 @@ public final class CompetitionWorld {
         for(int x:new int[]{-37,37})for(int z:new int[]{-26,26})for(int y=100;y<=111;y++)j.add(c.getX()+x,y,c.getZ()+z,y==111?(fire?Blocks.SHROOMLIGHT:Blocks.SEA_LANTERN):rock);
         for(int x:new int[]{-18,18})for(int z:new int[]{-15,15}){for(int y=100;y<104;y++)j.add(c.getX()+x,y,c.getZ()+z,rock);j.add(c.getX()+x,104,c.getZ()+z,fire?Blocks.SOUL_LANTERN:Blocks.SEA_LANTERN);}
         for(var pos:wet)j.add(pos.getX(),pos.getY(),pos.getZ(),fire?Blocks.LAVA:Blocks.WATER);
+        camps(j,c,fire);
         return j;
+    }
+    private static void camps(Job job,BlockPos center,boolean fire){
+        var stone=fire?Blocks.POLISHED_BLACKSTONE_BRICKS:Blocks.SMOOTH_SANDSTONE;
+        for(int side:new int[]{-1,1}){
+            var team=side<0?net.minecraft.world.item.DyeColor.RED:net.minecraft.world.item.DyeColor.BLUE;
+            for(int x=36;x<=51;x++)for(int z=-10;z<=10;z++){
+                job.add(center.getX()+side*x,99,center.getZ()+z,stone);
+                if(x==36||Math.abs(z)==10)job.add(center.getX()+side*x,99,center.getZ()+z,Blocks.STAINED_GLASS.pick(net.minecraft.world.item.DyeColor.RED));
+                if(x==51||Math.abs(z)==10)for(int y=100;y<=102;y++)job.add(center.getX()+side*x,y,center.getZ()+z,stone);
+            }
+            // Fortified gate, watchtowers, canvas-like team roofs, supply stores and sheltered sleeping quarters.
+            for(int z:new int[]{-6,6}){
+                for(int y=100;y<=106;y++)job.add(center.getX()+side*37,y,center.getZ()+z,stone);
+                job.add(center.getX()+side*37,107,center.getZ()+z,Blocks.SOUL_LANTERN);
+            }
+            for(int x=37;x<=49;x++)for(int z:new int[]{-8,8}){
+                if(x%3==1)for(int y=100;y<=103;y++)job.add(center.getX()+side*x,y,center.getZ()+z,Blocks.DARK_OAK_LOG);
+                job.add(center.getX()+side*x,104,center.getZ()+z,Blocks.CONCRETE.pick(team));
+                job.add(center.getX()+side*x,104,center.getZ()+z+(z<0?1:-1),Blocks.CONCRETE.pick(team));
+            }
+            for(int x=46;x<=49;x+=3)for(int z:new int[]{-6,6}){
+                job.add(center.getX()+side*x,100,center.getZ()+z,Blocks.BARREL);
+                job.add(center.getX()+side*x,101,center.getZ()+z,Blocks.LANTERN);
+            }
+            for(int z=-3;z<=3;z++)job.add(center.getX()+side*49,100,center.getZ()+z,Blocks.DARK_OAK_PLANKS);
+            job.add(center.getX()+side*50,103,center.getZ(),Blocks.CONCRETE.pick(team));
+        }
     }
     private static int rockHeight(int x,int z,int cx,int cz,double rx,double rz,int height){double d=Math.pow((x-cx)/rx,2)+Math.pow((z-cz)/rz,2);return d>=1?0:Math.max(1,(int)(Math.sqrt(1-d)*height)+(Math.floorMod(x*31+z*17,3)-1));}
     /** Vast enclosed root cavern; the central 54-block fight area remains unobstructed. */

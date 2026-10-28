@@ -7,6 +7,7 @@ import net.minecraft.world.phys.Vec3;
 /** Only killer-owned mob drops; no player-thrown items, foreign drops or full-inventory deletion. */
 public final class PetLoot {
     private static boolean canAccept(ServerPlayer p,net.minecraft.world.item.ItemStack wanted) {
+        if(wanted.is(com.mmorpg.registry.ModItems.PIECE_OR.get()))return true;
         for(int i=0;i<36;i++) {var slot=p.getInventory().getItem(i);if(slot.isEmpty()||net.minecraft.world.item.ItemStack.isSameItemSameComponents(slot,wanted)&&slot.getCount()<slot.getMaxStackSize())return true;}return false;
     }
     public static String tag(ServerPlayer p) { return "aeloria_loot:"+p.getUUID(); }
@@ -17,6 +18,7 @@ public final class PetLoot {
     }
     public static void collect(ServerPlayer owner,ItemEntity entity) {
         if(!entity.isAlive()||!entity.entityTags().contains(tag(owner)))return;
+        if(CurrencyPickup.collect(owner,entity))return;
         var stack=entity.getItem();var original=stack.copy();int before=stack.getCount();
         owner.getInventory().add(stack);int taken=before-stack.getCount();
         if(taken>0) {

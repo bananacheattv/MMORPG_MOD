@@ -54,6 +54,10 @@ public abstract class RpgBoss extends RpgMonster {
 
     private final Map<String, Integer> cooldowns = new HashMap<>();
     protected int phase = 1;
+    public int attackStarted=-100,castStarted=-100;
+    private final BossPressure.State pressure=new BossPressure.State();
+    public int combatPhase(){return phase;}
+    void pressureAnimation(){level().broadcastEntityEvent(this,(byte)74);AnimSet a=animSet();if(a!=null)for(int i=0;i<a.lengths().length;i++)if(i!=a.death()&&i!=a.spawn()&&!a.looping()[i]&&!a.hold()[i]){playAnim(i);break;}}
     /** Etats des animations ponctuelles (client), lus par le rendu. */
     public final AnimationState[] animStates = new AnimationState[MAX_ANIMS];
     private int actionEnd;
@@ -125,6 +129,7 @@ public abstract class RpgBoss extends RpgMonster {
     protected int playAnim(int index) {
         AnimSet a = animSet();
         if (a == null || index < 0) return 0;
+        this.level().broadcastEntityEvent(this,(byte)(index==a.melee()?73:74));
         this.level().broadcastEntityEvent(this, (byte) (EVENT_START - index));
         if (!a.looping()[index] && !a.hold()[index]) {
             actionEnd = Math.max(actionEnd, this.tickCount + a.lengths()[index]);
@@ -168,6 +173,7 @@ public abstract class RpgBoss extends RpgMonster {
 
     @Override
     public void handleEntityEvent(byte id) {
+        if(id==73){attackStarted=tickCount;return;}if(id==74){castStarted=tickCount;return;}
         if (id <= EVENT_START && id > EVENT_START - MAX_ANIMS) {
             int index = EVENT_START - id;
             AnimSet a = animSet();
@@ -298,6 +304,10 @@ public abstract class RpgBoss extends RpgMonster {
                 immobile(a.lengths()[a.spawn()]);
             }
         }
+        if(tickCount%20==0&&(getTarget()==null||!getTarget().isAlive()||!com.mmorpg.combat.RpgCombat.isEnemy(this,getTarget()))){
+            var nearest=level.players().stream().filter(p->com.mmorpg.combat.RpgCombat.isEnemy(this,p)&&distanceToSqr(p)<48*48&&hasLineOfSight(p)).min(java.util.Comparator.comparingDouble(this::distanceToSqr));
+            setTarget(nearest.orElse(null));
+        }
         keepInBase(level);
         LivingEntity target = this.getTarget();
         if (target != null && target.isAlive() && busy()) faceTarget(target, 15.0F);
@@ -318,7 +328,7 @@ public abstract class RpgBoss extends RpgMonster {
             onPhaseChange(level, phase);
         }
         if (this.getTarget() != null && this.getTarget().isAlive()) {
-            bossTick(level);
+            if(!BossPressure.tick(this,level,phase,pressure))bossTick(level);
         }
     }
 
