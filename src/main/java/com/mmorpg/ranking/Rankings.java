@@ -2,7 +2,6 @@ package com.mmorpg.ranking;
 
 import com.mmorpg.MMORPG;
 import com.mmorpg.guild.GuildStore;
-import com.mmorpg.network.SharedLedger;
 import com.mmorpg.server.RpgPlayers;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.commands.Commands;
@@ -16,23 +15,43 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import java.util.*;
 
 /**
- * Classements persistants et partagés entre serveurs (registre « rankings »). Chaque serveur y écrit ses joueurs en ligne
- * et l'état des guildes toutes les 10 s ; les panneaux lisent le résultat mis en cache.
+ * Classements affichés sur les panneaux et par /classement. Statistiques des joueurs : table MariaDB {@code leaderboard_stats}
+ * (copie locale sans base), voir {@link com.mmorpg.leaderboard.Leaderboards}. Guildes : registre des guildes, relu toutes les 10 s.
  */
 @EventBusSubscriber(modid = MMORPG.MODID)
 public final class Rankings {
     public static final int TOP = 10;
-    public static final class Row { public String name = ""; public long level, xp, monsters, wins, frags, bank, bosses, members; }
-    public static final class State { public Map<String, Row> players = new HashMap<>(), guilds = new HashMap<>(); }
+    public static final class Row { public String name = ""; public long level, xp, bank, bosses, members; }
     /** value : valeur principale ; tie : départage ; text : valeur affichée. */
     public record Entry(String id, String name, long value, long tie, String text) {}
 
+    /** Classements de guildes (les classements de joueurs sont lus a la demande dans Leaderboards). */
     private static volatile Map<RankingKind, List<Entry>> cache = Map.of();
 
     private Rankings() {}
 
     public static List<Entry> top(RankingKind kind) {
-        return cache.getOrDefault(kind, List.of());
+        var board = kind.board();
+        if (board == null) return cache.getOrDefault(kind, List.of());
+        var out = new ArrayList<Entry>();
+        for (var r : com.mmorpg.leaderboard.Leaderboards.top(board)) out.add(new Entry(r.id(), r.name(), r.value(), r.extra(), text(kind, r.value(), r.extra())));
+        return out;
+    }
+
+    private static String text(RankingKind kind, long value, long tie) {
+        return switch (kind) {
+            case NIVEAU -> "Niv. " + value;
+            case ARENE -> value + " V · " + tie + " frags";
+            case FORTUNE -> grouped(value) + " or";
+            case BOSS -> value + " boss";
+            case DONJONS -> value + (value > 1 ? " victoires" : " victoire");
+            case QUETES -> value + (value > 1 ? " quêtes" : " quête");
+            default -> grouped(value);
+        };
+    }
+
+    private static String grouped(long v) {
+        return String.format(Locale.ROOT, "%,d", v).replace(',', ' ');
     }
 
     public static List<String> lines(RankingKind kind) {
@@ -42,72 +61,48 @@ public final class Rankings {
     }
 
     private static void sample(MinecraftServer server) {
-        var guilds = new HashMap<String, Row>();
+        com.mmorpg.leaderboard.Leaderboards.sample(server);
+        com.mmorpg.leaderboard.Leaderboards.refresh(server);
+        var guilds = new ArrayList<Row>();
+        var ids = new ArrayList<String>();
         try {
             GuildStore.access(server, false, s -> {
                 for (var g : s.guilds) {
                     var r = new Row();
                     r.name = g.name; r.level = g.level; r.xp = g.xp; r.bank = g.gold;
                     r.bosses = Integer.bitCount(g.bosses); r.members = g.members.size();
-                    guilds.put(g.id.toString(), r);
+                    guilds.add(r);
+                    ids.add(g.id.toString());
                 }
                 return null;
             });
         } catch (Exception e) {
-            guilds.clear();
             MMORPG.LOGGER.warn("Rankings: guilds unavailable: {}", e.getMessage());
+            return;
         }
-        var online = new ArrayList<ServerPlayer>(server.getPlayerList().getPlayers());
-        var result = SharedLedger.access(server, "rankings", State.class, State::new, st -> {
-            for (var p : online) {
-                var d = RpgPlayers.get(p);
-                var r = st.players.computeIfAbsent(p.getUUID().toString(), k -> new Row());
-                r.name = p.getName().getString();
-                r.level = d.level;
-                r.xp = d.xp;
-                r.monsters = d.kills.values().stream().mapToLong(Integer::longValue).sum();
-            }
-            if (!guilds.isEmpty()) st.guilds = guilds;
-            return build(st);
-        });
-        cache = result;
-    }
-
-    /** Fin d'un match d'arène classé (appelé une seule fois par joueur et par match). */
-    public static void arena(MinecraftServer server, UUID player, String name, int kills, boolean won) {
-        try {
-            cache = SharedLedger.access(server, "rankings", State.class, State::new, st -> {
-                var r = st.players.computeIfAbsent(player.toString(), k -> new Row());
-                if (r.name.isEmpty()) r.name = name;
-                r.frags += kills;
-                if (won) r.wins++;
-                return build(st);
-            });
-        } catch (Exception e) {
-            MMORPG.LOGGER.warn("Rankings: arena result lost: {}", e.getMessage());
-        }
-    }
-
-    private static Map<RankingKind, List<Entry>> build(State st) {
         var out = new EnumMap<RankingKind, List<Entry>>(RankingKind.class);
         for (var kind : RankingKind.values()) {
+            if (!kind.guild) continue;
             var list = new ArrayList<Entry>();
-            for (var en : (kind.guild ? st.guilds : st.players).entrySet()) {
-                var r = en.getValue();
+            for (int i = 0; i < guilds.size(); i++) {
+                var r = guilds.get(i);
+                String id = ids.get(i);
                 Entry e = switch (kind) {
-                    case NIVEAU -> new Entry(en.getKey(), r.name, r.level, r.xp, "Niv. " + r.level);
-                    case MONSTRES -> new Entry(en.getKey(), r.name, r.monsters, 0, String.valueOf(r.monsters));
-                    case ARENE -> new Entry(en.getKey(), r.name, r.wins, r.frags, r.wins + " V · " + r.frags + " frags");
-                    case GUILDE_NIVEAU -> new Entry(en.getKey(), r.name, r.level, r.xp, "Niv. " + r.level);
-                    case GUILDE_BANQUE -> new Entry(en.getKey(), r.name, r.bank, 0, r.bank + " or");
-                    case GUILDE_GARDIENS -> new Entry(en.getKey(), r.name, r.bosses, r.level, r.bosses + " / 10");
+                    case GUILDE_NIVEAU -> new Entry(id, r.name, r.level, r.xp, "Niv. " + r.level);
+                    case GUILDE_BANQUE -> new Entry(id, r.name, r.bank, 0, r.bank + " or");
+                    default -> new Entry(id, r.name, r.bosses, r.level, r.bosses + " / 10");
                 };
-                if (e.value() > 0 || kind == RankingKind.NIVEAU || kind == RankingKind.GUILDE_NIVEAU) list.add(e);
+                if (e.value() > 0 || kind == RankingKind.GUILDE_NIVEAU) list.add(e);
             }
             list.sort(Comparator.comparingLong(Entry::value).thenComparingLong(Entry::tie).reversed().thenComparing(Entry::name));
             out.put(kind, List.copyOf(list));
         }
-        return out;
+        cache = out;
+    }
+
+    /** Fin d'un match d'arène classé (appelé une seule fois par joueur et par match). */
+    public static void arena(MinecraftServer server, UUID player, String name, int kills, boolean won) {
+        com.mmorpg.leaderboard.Leaderboards.add(server, player, name, com.mmorpg.leaderboard.Board.ARENE, won ? 1 : 0, kills);
     }
 
     @SubscribeEvent

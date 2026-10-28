@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "mmorpg:block/classement_donjons"
+    },
+    "facing=east": {
+      "model": "mmorpg:block/classement_donjons",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "mmorpg:block/classement_donjons",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "mmorpg:block/classement_donjons",
+      "y": 270
+    }
+  }
+}

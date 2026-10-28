@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "mmorpg:block/classement_quetes"
+    },
+    "facing=east": {
+      "model": "mmorpg:block/classement_quetes",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "mmorpg:block/classement_quetes",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "mmorpg:block/classement_quetes",
+      "y": 270
+    }
+  }
+}
