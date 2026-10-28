@@ -304,7 +304,8 @@ for id,cls,kind,rawlevel in weapons:
    E.extend([B([8,9,6.5],[2.6,3,.6],3,'Arena heraldic plate'),B([8,9,6.05],[1.1,1.1,.4],8,'Ruby arena insignia','z',45)])
    for side in [-1,1]:E.append(B([8+side*1.6,8.5,6.2],[.5,4,.5],1,'Crossed arena blades','z',side*45))
   if kind=='BOW':
-   d['display']['thirdperson_righthand'].update(rotation=[-80,80,-85],translation=[-1,-2,2.5],scale=[.55]*3);d['display']['thirdperson_lefthand'].update(rotation=[-80,-100,85],translation=[-1,-2,2.5],scale=[.55]*3);d['display']['firstperson_righthand']['rotation'][1]=90;d['display']['firstperson_lefthand']['rotation'][1]=-90
+   # vanilla bow transforms composed with a 135 deg Z turn (vanilla shoots toward upper-left, ours toward +X)
+   for k,r,t,sc in(('thirdperson_righthand',[100,-80,-85],[-1,-2,2.5],.55),('thirdperson_lefthand',[-80,80,175],[-1,-2,2.5],.55),('firstperson_righthand',[0,-90,160],[1.13,3.2,1.13],.46),('firstperson_lefthand',[0,90,110],[1.13,3.2,1.13],.46)):d['display'][k].update(rotation=r,translation=t,scale=[sc]*3)
   return d
  write(MODELS/f'item/sculpted_{id}.json',weapon())
  if kind=='BOW':
