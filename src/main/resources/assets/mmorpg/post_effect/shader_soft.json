@@ -1,0 +1,72 @@
+{
+  "targets": {
+    "swap": {}
+  },
+  "passes": [
+    {
+      "vertex_shader": "minecraft:core/screenquad",
+      "fragment_shader": "mmorpg:post/aeloria_grade",
+      "inputs": [
+        {
+          "sampler_name": "In",
+          "target": "minecraft:main"
+        }
+      ],
+      "output": "swap",
+      "uniforms": {
+        "GradeConfig": [
+          {
+            "name": "Vignette",
+            "type": "float",
+            "value": 0.25
+          },
+          {
+            "name": "Saturation",
+            "type": "float",
+            "value": 1.08
+          },
+          {
+            "name": "Contrast",
+            "type": "float",
+            "value": 1.04
+          },
+          {
+            "name": "Warmth",
+            "type": "float",
+            "value": 0.02
+          },
+          {
+            "name": "Bloom",
+            "type": "float",
+            "value": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "vertex_shader": "minecraft:core/screenquad",
+      "fragment_shader": "minecraft:post/blit",
+      "inputs": [
+        {
+          "sampler_name": "In",
+          "target": "swap"
+        }
+      ],
+      "output": "minecraft:main",
+      "uniforms": {
+        "BlitConfig": [
+          {
+            "name": "ColorModulate",
+            "type": "vec4",
+            "value": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

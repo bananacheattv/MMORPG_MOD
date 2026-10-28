@@ -23,6 +23,7 @@
     "SlotPositionAccessor",
     "HideFireOverlayMixin",
     "ShiftDragTransferMixin",
-    "CharacterSlotHighlightMixin"
+    "CharacterSlotHighlightMixin",
+    "AeloriaShaderMixin"
   ]
 }

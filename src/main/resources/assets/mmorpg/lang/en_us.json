@@ -413,6 +413,7 @@
   "mmorpg.configuration.hudScale": "Échelle de l'interface MMORPG",
   "mmorpg.configuration.showDamageNumbers": "Afficher les dégâts flottants",
   "mmorpg.configuration.mainMenuServer": "Serveur du bouton « Rejoindre Aeloria » (menu principal)",
+  "mmorpg.configuration.shaderMode": "Shaders intégrés (OFF, SOFT léger, AMBIANCE, CINEMA)",
   "mmorpg.configuration.ambientMusicVolume": "Volume de la musique d'ambiance (hub et donjons)",
   "mmorpg.configuration.showNameplates": "Afficher les barres de vie des monstres",
   "mmorpg.configuration.showOwnCosmetics": "Afficher ses propres cosmétiques",
