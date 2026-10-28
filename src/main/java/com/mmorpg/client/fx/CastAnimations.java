@@ -87,6 +87,7 @@ public final class CastAnimations {
                 if (p < 0.8f) mainArm(s, HumanoidModel.ArmPose.THROW_TRIDENT);
             }
             case CHANNEL, AIM -> mainArm(s, HumanoidModel.ArmPose.BOW_AND_ARROW);
+            case SHIELD -> {if(p<.9f){if(s.mainArm==HumanoidArm.RIGHT)s.leftArmPose=HumanoidModel.ArmPose.BLOCK;else s.rightArmPose=HumanoidModel.ArmPose.BLOCK;}}
             case BASH -> {
                 if (p < 0.7f) mainArm(s, HumanoidModel.ArmPose.CROSSBOW_HOLD);
             }
@@ -108,9 +109,9 @@ public final class CastAnimations {
     @SubscribeEvent
     public static void onRenderHand(RenderHandEvent event) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || event.getHand() != InteractionHand.MAIN_HAND) return;
+        if (mc.player == null) return;
         Anim a = active(mc.player.getId());
-        if (a == null) return;
+        if (a == null||event.getHand()!=(a.kind==com.mmorpg.entity.CastAnim.SHIELD?InteractionHand.OFF_HAND:InteractionHand.MAIN_HAND)) return;
         float p = progress(a);
         PoseStack ps = event.getPoseStack();
         switch (a.kind) {
@@ -123,7 +124,7 @@ public final class CastAnimations {
                 float k = Math.min(1, p * 4) * (p > 0.8f ? (1 - p) / 0.2f : 1);
                 ps.translate(-0.18f * k, 0.1f * k, -0.28f * k);
             }
-            case BASH -> {
+            case BASH, SHIELD -> {
                 float k = Mth.sin(p * Mth.PI);
                 ps.translate(-0.12f * k, 0, -0.5f * k);
             }

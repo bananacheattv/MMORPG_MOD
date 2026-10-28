@@ -15,7 +15,8 @@ public enum CastAnim {
     /** Arme levee puis abattue sur le sol. */
     SLAM,
     /** Deux bras leves (bond, aura). */
-    LEAP;
+    LEAP,
+    SHIELD;
 
     public static CastAnim byId(int id) {
         CastAnim[] v = values();

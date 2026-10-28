@@ -13,6 +13,7 @@ public final class LuckyBlockManager {
                 && p.level().hasChunkAt(pos) && p.level().getBlockState(pos).getBlock() instanceof com.mmorpg.block.LuckyBlock;
     }
     public static void open(ServerPlayer p, BlockPos pos) {
+        if(!FeatureFlags.allow(p,"luckyblocks"))return;
         if (!valid(p, pos)) return;
         var data = new CompoundTag(); data.putLong("pos", pos.asLong());
         var block=(com.mmorpg.block.LuckyBlock)p.level().getBlockState(pos).getBlock();var tier=com.mmorpg.block.LuckyTier.of(block.tier);
@@ -21,6 +22,7 @@ public final class LuckyBlockManager {
         Net.toPlayer(p, new S2COpenScreen(S2COpenScreen.LUCKY_BLOCK, data));
     }
     public static boolean roll(ServerPlayer p, BlockPos pos) {
+        if(!FeatureFlags.allow(p,"luckyblocks")){var error=new CompoundTag();error.putLong("pos",pos.asLong());error.putString("error","Lucky Blocks temporairement désactivés.");Net.toPlayer(p,new S2COpenScreen(S2COpenScreen.LUCKY_RESULT,error));return false;}
         var data = new CompoundTag(); data.putLong("pos", pos.asLong());
         var state=p.level().getBlockState(pos);int tier=state.getBlock() instanceof com.mmorpg.block.LuckyBlock block?block.tier:0;
         if (!valid(p, pos) || !p.level().removeBlock(pos, false)) {

@@ -43,7 +43,7 @@ public final class Bank {
     }
 
     /** @param amount montant (or) ; -1 pour tout. @param page page du coffre. */
-    public static void action(ServerPlayer p, BlockPos pos, int action, long amount, int page) {
+    public static void action(ServerPlayer p, BlockPos pos, int action, long amount, int page) {if(!com.mmorpg.server.FeatureFlags.allow(p,"banque"))return;
         if (!near(p, pos)) return;
         PlayerData d = RpgPlayers.get(p);
         BankData data = BankData.get(p.level().getServer());

@@ -38,7 +38,7 @@ public final class ShopManager {
         return e instanceof NpcEntity npc && npc.role() == NpcEntity.Role.MARCHAND && npc.distanceToSqr(p) < 64;
     }
 
-    public static void buy(ServerPlayer p, int npcId, int index, int times) {
+    public static void buy(ServerPlayer p, int npcId, int index, int times) {if(!FeatureFlags.allow(p,"marchands"))return;
         if (!nearMerchant(p, npcId)) return;
         ShopConfig cfg = MerchantEditor.config((NpcEntity)p.level().getEntity(npcId));
         if (index < 0 || index >= cfg.buy.size()) return;
@@ -62,7 +62,7 @@ public final class ShopManager {
                 + " (-" + cost + " or)").withColor(0xFFD040));
     }
 
-    public static void sell(ServerPlayer p, int npcId, int slot, int amount, boolean all) {
+    public static void sell(ServerPlayer p, int npcId, int slot, int amount, boolean all) {if(!FeatureFlags.allow(p,"marchands"))return;
         if (!nearMerchant(p, npcId)) return;
         Inventory inv = p.getInventory();
         if (slot < 0 || slot >= inv.getContainerSize()) return;

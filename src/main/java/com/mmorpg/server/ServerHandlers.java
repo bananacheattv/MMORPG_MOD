@@ -53,6 +53,7 @@ public final class ServerHandlers {
 
     public static void cosmeticAction(Payloads.CosmeticAction p, IPayloadContext ctx) {
         if (ctx.player() instanceof ServerPlayer sp) {
+            if(!FeatureFlags.allow(sp,"cosmetiques"))return;
             RpgPlayers.equipCosmetic(sp, p.category(), p.cosmetic());
         }
     }
@@ -117,6 +118,7 @@ public final class ServerHandlers {
 
     public static void forgeAction(Payloads.ForgeAction p, IPayloadContext ctx) {
         if (!(ctx.player() instanceof ServerPlayer sp)) return;
+        if(!FeatureFlags.allow(sp,"forge"))return;
         if (p.action() == Payloads.ForgeAction.CRAFT) {
             ForgeManager.craft(sp, p.pos(), p.recipe(), p.value());
         } else if (p.action() == Payloads.ForgeAction.UPGRADE) {

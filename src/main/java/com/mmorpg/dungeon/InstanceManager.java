@@ -139,6 +139,7 @@ public final class InstanceManager {
      * etapes s'il n'existe pas encore. @return vrai si le chargement a commence
      */
     public static boolean enterPool(ServerPlayer player, String pool) {
+        if(!com.mmorpg.server.FeatureFlags.allow(player,"donjons"))return false;
         if (!validPool(pool)) return false;
         if (!com.mmorpg.server.PortalAccess.consume(player,"donjon")) return false;
         if (com.mmorpg.network.GroupTravel.begin(player,"donjon",pool)) return true;
@@ -416,6 +417,9 @@ public final class InstanceManager {
     public static void victoryExit(ServerLevel level, double bossX, double bossZ, net.minecraft.world.phys.Vec3 hall) {
         MinecraftServer server = level.getServer();
         Slot slot = slotAt(server, level, bossX, bossZ);
+        if(slot!=null)for(var mob:level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,areaOf(slot),m->m.isAlive()&&m instanceof net.minecraft.world.entity.monster.Enemy)){
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.POOF,mob.getX(),mob.getY()+1,mob.getZ(),8,.3,.4,.3,.02);mob.discard();
+        }
         java.util.function.Predicate<ServerPlayer> inside = p -> p.level() == level && p.isAlive() && (slot != null
                 ? areaOf(slot).contains(p.position())
                 : Math.abs(p.getX() - hall.x) < 40 && p.getZ() > hall.z - 6 && p.getZ() < hall.z + Layout.LENGTH);

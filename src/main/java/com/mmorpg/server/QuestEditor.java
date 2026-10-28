@@ -68,6 +68,7 @@ public final class QuestEditor {
                         require(npc!=null,"Création du PNJ impossible.");
                         npc.snapTo(p.getX(),p.getY(),p.getZ(),p.getYRot()+180,0);
                     }
+                    String dialogue=data.getStringOr("dialogue","");require(dialogue.length()<=4000,"Dialogue trop long (4000 caractères maximum).");npc.setDialogue(dialogue);
                     npc.setup(NpcEntity.Role.byId(role),name,skin,group);npc.setZone(zone.isEmpty()?"Sans zone":zone);
                     if(id.isEmpty()) require(p.level().addFreshEntity(npc),"Ajout du PNJ impossible.");
                     NpcDirectory.get(p.level().getServer()).record(npc);selectedNpc=npc.getUUID().toString();

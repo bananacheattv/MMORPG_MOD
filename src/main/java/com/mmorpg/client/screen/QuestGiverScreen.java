@@ -20,12 +20,13 @@ public class QuestGiverScreen extends MmoScreen {
     private final int completed;
     private String selected;
     private int scroll;
+    private String greeting;private boolean greetingPage;private int dialogueScroll;
 
     public QuestGiverScreen(CompoundTag data) {
         super("Maître des Quêtes");
         this.npc = data.getIntOr("npc", -1);
         this.npcName = data.getStringOr("name", "Maître des Quêtes");
-        this.completed = data.getIntOr("completed", 0);
+        this.completed = data.getIntOr("completed", 0);greeting=data.getStringOr("dialogue","");greetingPage=!greeting.isBlank();
         ListTag active = data.getListOrEmpty("active");
         List<CompoundTag> ready = new ArrayList<>();
         List<CompoundTag> progress = new ArrayList<>();
@@ -42,7 +43,7 @@ public class QuestGiverScreen extends MmoScreen {
 
     @Override
     public boolean mouseScrolled(double x, double y, double sx, double sy) {
-        scroll = Math.max(0, scroll - (int) Math.signum(sy));
+        if(greetingPage)dialogueScroll=Math.max(0,dialogueScroll-(int)Math.signum(sy));else scroll = Math.max(0, scroll - (int) Math.signum(sy));
         return true;
     }
 
@@ -51,6 +52,7 @@ public class QuestGiverScreen extends MmoScreen {
         Ui.panel(g, left, top, pw, ph);
         Ui.title(g, left + pw / 2, top + 8, npcName.toUpperCase(java.util.Locale.ROOT), Ui.GOLD_LIGHT);
         g.centeredText(font, Component.literal("Maître des Quêtes"), left + pw / 2, top + 19, Ui.MUTED);
+        if(greetingPage){var lines=font.split(Component.literal(greeting),pw-40);int rows=Math.max(1,(ph-85)/12);dialogueScroll=Math.clamp(dialogueScroll,0,Math.max(0,lines.size()-rows));Ui.inset(g,left+10,top+35,pw-20,ph-75);for(int i=0;i<rows&&i+dialogueScroll<lines.size();i++)g.text(font,lines.get(i+dialogueScroll),left+20,top+45+i*12,Ui.TEXT,false);button(g,left+12,top+ph-29,pw-24,20,"Voir les quêtes",true,Ui.GOLD,()->greetingPage=false);return;}
         int x0 = left + 8;
         int y0 = top + 32;
         int lw = 160;

@@ -143,7 +143,7 @@ public final class KillRewards {
         }
         if (!md.boss) {
             if (random.nextDouble() < g.goldDropChance) {
-                loot.add(new ItemStack(ModItems.PIECE_OR.get(), 1 + random.nextInt(1 + md.level / 8)));
+                loot.add(new ItemStack(ModItems.PIECE_OR.get(), 2 + random.nextInt(2 + md.level / 4)));
             }
             // trefles d'amelioration : rares, plus puissants sur les monstres de haut niveau
             if (md.level >= 10 && random.nextDouble() < g.cloverDropChance * dropMultiplier) {
@@ -166,7 +166,7 @@ public final class KillRewards {
             }
         }
         // Thin whole reward rolls, including guaranteed drops and gold: expected quantity is divided by ten.
-        if (dungeonMob(dead)) loot.removeIf(stack -> random.nextInt(10) != 0);
+        if (dungeonMob(dead)) loot.removeIf(stack -> !stack.is(ModItems.PIECE_OR.get())&&random.nextInt(10) != 0);
         for (ItemStack stack : loot) {
             ItemEntity ie = new ItemEntity(level, dead.getX(), dead.getY() + 0.5, dead.getZ(), stack);
             ie.setDefaultPickUpDelay();

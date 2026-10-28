@@ -128,7 +128,7 @@ public final class ArenaEvents {
         var data = boss.getExistingDataOrNull(ModAttachments.MOB);
         if (data == null || !ADDS.containsKey(data.key)) return;
         List<ServerPlayer> near = level.players().stream().filter(p -> p.isAlive() && !p.isSpectator() && p.distanceToSqr(boss) < 48 * 48).toList();
-        int count = Math.min(8, phase + Math.max(0, near.size() - 1));
+        int count = Math.min(8, phase + Math.max(0, near.size() - 1))/3;
         var keys = ADDS.get(data.key);
         var random = level.getRandom();
         int lvl = Math.max(1, data.level - 15);

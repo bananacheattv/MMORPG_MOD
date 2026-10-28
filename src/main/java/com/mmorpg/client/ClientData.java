@@ -31,6 +31,10 @@ public final class ClientData {
     /** Etat du groupe (membres, invitation en attente). */
     public static CompoundTag party = new CompoundTag();
     public static boolean received = false;
+    public static boolean creativeAllowed;public static int guardBroken;
+    public static CompoundTag features=new CompoundTag();
+    public static CompoundTag arenaState=new CompoundTag();
+    public static long arenaUpdated;
     public static String backend="";
     /** Essai de classe en cours (indicateur du HUD). */
     public static boolean trialActive;
@@ -47,7 +51,8 @@ public final class ClientData {
     }
 
     public static void load(CompoundTag t) {
-        DATA.load(t);
+        DATA.load(t);features=t.getCompoundOrEmpty("features");
+        creativeAllowed=t.getBooleanOr("creativeAllowed",false);guardBroken=t.getIntOr("guardBroken",0);
         backend=t.getStringOr("backend","");
         List<Double> raw = t.read("stats", Codec.DOUBLE.listOf()).orElse(List.of());
         double[] arr = new double[raw.size()];

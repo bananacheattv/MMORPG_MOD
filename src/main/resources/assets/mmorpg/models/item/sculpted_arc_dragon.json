@@ -4054,7 +4054,7 @@
     "thirdperson_righthand": {
       "rotation": [
         -80,
-        260,
+        80,
         -85
       ],
       "translation": [
@@ -4071,7 +4071,7 @@
     "thirdperson_lefthand": {
       "rotation": [
         -80,
-        -280,
+        -100,
         85
       ],
       "translation": [
@@ -4088,7 +4088,7 @@
     "firstperson_righthand": {
       "rotation": [
         0,
-        -90,
+        90,
         -15
       ],
       "translation": [
@@ -4105,7 +4105,7 @@
     "firstperson_lefthand": {
       "rotation": [
         0,
-        90,
+        -90,
         15
       ],
       "translation": [

@@ -27,7 +27,8 @@ public final class QuestEditorScreen extends MmoScreen {
     private int mode=1,page,rewardPage,scroll,objective,item,npcSkin,npcRole;
     private int listW,rx,rw,fy;
     private boolean editingNpc,success=true,saving;
-    private String expected="";
+    private String expected="",npcDialogue="";
+    private boolean editingDialogue;
     private final List<Label> fieldLabels=new ArrayList<>();
     private record Label(String text,int x,int y) {}
     public QuestEditorScreen(CompoundTag data) {super("Atelier de quêtes");draft.name="Nouvelle quête";draft.objectives.add(new QuestDef.Objective());receive(data);}
@@ -44,7 +45,7 @@ public final class QuestEditorScreen extends MmoScreen {
         if(!open.isEmpty()) {
             npcs.stream().filter(n->open.equals(n.getStringOr("id",""))).findFirst().ifPresent(n->{
                 mode=0;editingNpc=true;npcId=open;npcName=n.getStringOr("name","");npcZone=n.getStringOr("zone","");
-                npcGroup=n.getStringOr("group","");npcSkin=n.getIntOr("skin",0);npcRole=n.getIntOr("role",0);
+                npcDialogue=n.getStringOr("dialogue","");npcGroup=n.getStringOr("group","");npcSkin=n.getIntOr("skin",0);npcRole=n.getIntOr("role",0);
                 if(width>0) rebuild();
             });
         }
@@ -56,7 +57,9 @@ public final class QuestEditorScreen extends MmoScreen {
         super.init();fieldLabels.clear();
         listW=Math.min(180,Math.max(120,pw/3));rx=left+listW+20;rw=pw-listW-30;fy=top+((!editingNpc&&page==1&&ph<270)?52:60);
         field(left+9,top+50,listW-2,"Recherche",query,v->{query=v;scroll=0;},100,false);
-        if(editingNpc) {
+        if(editingNpc&&editingDialogue){
+            var text=MultiLineEditBox.builder().setX(rx).setY(fy).setShowDecorations(false).setPlaceholder(Component.literal("Dialogue propre à ce PNJ…")).build(font,rw,Math.max(40,top+ph-fy-40),Component.literal("Dialogue du PNJ"));text.setCharacterLimit(4000);text.setValue(npcDialogue);text.setValueListener(v->npcDialogue=v);addRenderableWidget(text);
+        } else if(editingNpc) {
             field(rx,fy,rw,"Nom du PNJ",npcName,v->npcName=v,80,false);
             field(rx,fy+npcOffset(35),rw,"Zone",npcZone,v->npcZone=v,80,false);
             field(rx,fy+npcOffset(70),rw,"Groupe de quêtes (facultatif)",npcGroup,v->npcGroup=v,80,false);
@@ -112,7 +115,7 @@ public final class QuestEditorScreen extends MmoScreen {
     }
     private void selectNpc(CompoundTag n) {
         editingNpc=true;npcId=n.getStringOr("id","");npcName=n.getStringOr("name","");npcZone=n.getStringOr("zone","");
-        npcGroup=n.getStringOr("group","");npcSkin=n.getIntOr("skin",0);npcRole=n.getIntOr("role",0);rebuild();
+        npcDialogue=n.getStringOr("dialogue","");npcGroup=n.getStringOr("group","");npcSkin=n.getIntOr("skin",0);npcRole=n.getIntOr("role",0);rebuild();
     }
     private void selectQuest(String id,boolean template) {
         draft=JSON.fromJson((template?templates:catalogue).getStringOr(id,"{}"),QuestDef.class);
@@ -141,7 +144,7 @@ public final class QuestEditorScreen extends MmoScreen {
         if(saving) return;var data=new CompoundTag();
         if(editingNpc) {
             data.putString("action","save_npc");data.putString("id",npcId);data.putString("name",npcName);data.putString("zone",npcZone);
-            data.putString("group",npcGroup);data.putInt("skin",npcSkin);data.putInt("role",npcRole);
+            data.putString("dialogue",npcDialogue);data.putString("group",npcGroup);data.putInt("skin",npcSkin);data.putInt("role",npcRole);
         } else {
             data.putString("action","save_quest");data.putString("id",questId);data.putString("json",JSON.toJson(draft));
             data.putString("expected",expected);
@@ -178,7 +181,7 @@ public final class QuestEditorScreen extends MmoScreen {
         }
         g.text(font,filtered.size()+" entrée(s) • molette",left+8,top+ph-50,Ui.MUTED,false);
         button(g,left+8,top+ph-35,listW,17,mode==0?"+ Créer un PNJ ici":"+ Nouvelle quête",true,Ui.GREEN,()->{
-            if(mode==0) {npcId="";npcName="Nouveau PNJ";npcZone=zone.equals("Toutes")?"":zone;npcGroup="";npcSkin=0;npcRole=0;editingNpc=true;}
+            if(mode==0) {npcId="";npcName="Nouveau PNJ";npcZone=zone.equals("Toutes")?"":zone;npcGroup="";npcDialogue="";editingDialogue=false;npcSkin=0;npcRole=0;editingNpc=true;}
             else {draft=new QuestDef();draft.name="Nouvelle quête";draft.objectives.add(new QuestDef.Objective());questId=newId();expected="";editingNpc=false;page=0;}rebuild();
         });
         g.fill(rx-6,top+25,rx-5,top+ph-12,Ui.GOLD);
@@ -198,7 +201,7 @@ public final class QuestEditorScreen extends MmoScreen {
     private int npcOffset(int n){return ph<270?Math.round(n*.76f):n;}
     private void npcAction(String action){var data=new CompoundTag();data.putString("action",action);data.putString("id",npcId);ClientNet.send(new Payloads.QuestEdit(data));}
     private void renderNpc(GuiGraphicsExtractor g) {
-        Ui.header(g,rx,top+27,rw,npcId.isEmpty()?"CRÉER UN PNJ":"MODIFIER LE PNJ");
+        Ui.header(g,rx,top+27,rw-100,npcId.isEmpty()?"CRÉER UN PNJ":"MODIFIER LE PNJ");button(g,rx+rw-96,top+25,96,19,editingDialogue?"Fiche / position":"Dialogue",true,Ui.GOLD,()->{editingDialogue=!editingDialogue;rebuild();});if(editingDialogue)return;
         button(g,rx,fy+npcOffset(97),rw/2-3,18,"Apparence : "+com.mmorpg.entity.NpcEntity.APPEARANCES[npcSkin],true,Ui.GOLD,()->npcSkin=(npcSkin+1)%com.mmorpg.entity.NpcEntity.SKINS);
         button(g,rx+rw/2+3,fy+npcOffset(97),rw/2-3,18,com.mmorpg.entity.NpcEntity.Role.byId(npcRole).label,true,Ui.GOLD,()->npcRole=(npcRole+1)%com.mmorpg.entity.NpcEntity.Role.values().length);
         if(!npcId.isEmpty()) npcs.stream().filter(n->npcId.equals(n.getStringOr("id",""))).findFirst().ifPresent(n->{

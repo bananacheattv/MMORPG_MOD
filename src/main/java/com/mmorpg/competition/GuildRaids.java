@@ -20,6 +20,7 @@ public final class GuildRaids {
     public static boolean allowed(GuildGuardian boss,UUID player){var r=of(player);return r!=null&&r.boss==boss;}
     public static void enter(ServerPlayer p){enter(p,-1);}
     public static void enter(ServerPlayer p,int requestedTier){
+        if(!com.mmorpg.server.FeatureFlags.allow(p,"boss_guilde"))return;
         if(ArenaManager.session(p.getUUID())!=null||ArenaManager.queued(p.getUUID())||of(p.getUUID())!=null||com.mmorpg.dungeon.InstanceManager.containsPlayer(p))throw new IllegalArgumentException("Tu participes déjà à un combat.");
         var g=GuildStore.access(p.level().getServer(),false,s->GuildStore.of(s,p.getUUID()));GuildService.require(g!=null,"Rejoins d’abord une guilde.");
         int tier=requestedTier<0?g.level-1:requestedTier;

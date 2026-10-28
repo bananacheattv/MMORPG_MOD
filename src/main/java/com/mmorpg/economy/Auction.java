@@ -106,6 +106,7 @@ public final class Auction {
     }
 
     public static void action(ServerPlayer p, BlockPos pos, int action, long a, String s, int page) {
+        if(!com.mmorpg.server.FeatureFlags.allow(p,"hdv"))return;
         if (!near(p, pos)) return;
         MinecraftServer server = p.level().getServer();
         AuctionData data = AuctionData.get(server);

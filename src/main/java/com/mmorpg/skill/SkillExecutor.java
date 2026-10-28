@@ -52,6 +52,7 @@ public final class SkillExecutor {
     }
 
     public static boolean cast(ServerPlayer player, Skill skill) {
+        if(!com.mmorpg.server.FeatureFlags.allow(player,"competences"))return false;
         if(!com.mmorpg.server.WeaponAccess.allowed(player,player.getMainHandItem(),true))return false;
         PlayerData d = RpgPlayers.get(player);
         if (!player.isAlive() || player.isSpectator() || skill.passive || !d.isSkillUnlocked(skill)) return false;
@@ -364,13 +365,15 @@ public final class SkillExecutor {
             }
             // ============================================================ TANK
             case "coup_de_bouclier" -> {
+                com.mmorpg.server.PaladinOffhand.maintain(p);if(!com.mmorpg.combat.ShieldGuard.canStart(p)){p.sendOverlayMessage(Component.literal("Équipez le bouclier et récupérez votre garde."));return false;}
                 List<LivingEntity> targets = SkillHelper.enemiesInCone(p, s.radius, 45);
                 if (targets.isEmpty()) {
                     p.sendOverlayMessage(Component.literal("Aucune cible à portée").withColor(0xFF7070));
                     return false;
                 }
-                p.swing(net.minecraft.world.InteractionHand.MAIN_HAND, net.minecraft.world.item.component.SwingAnimation.DEFAULT, true);
-                Fx.cast(p, CastAnim.BASH, 10);
+                if(!com.mmorpg.combat.ShieldGuard.spend(p,20))return false;
+                p.swing(net.minecraft.world.InteractionHand.OFF_HAND, net.minecraft.world.item.component.SwingAnimation.DEFAULT, true);
+                Fx.cast(p, CastAnim.SHIELD, 10);
                 Fx.facing(level, FxKind.SHIELD, p, 1.0, 0xFFD040, 10);
                 for (LivingEntity e : targets) {
                     RpgCombat.playerHit(p, e, atk * s.scaled(rank) + def * s.scaled2(rank), false);
@@ -396,7 +399,7 @@ public final class SkillExecutor {
             case "forteresse" -> {
                 int dur = s.duration + 20 * (rank - 1);
                 RpgPlayers.addBuff(p, BuffType.FORTRESS, dur, s.power, 0);
-                Fx.cast(p, CastAnim.BASH, 10);
+                Fx.cast(p, CastAnim.SHIELD, 10);
                 Fx.attach(level, FxKind.DOME, p, 1.5, 0xFFD040, dur);
                 Fx.spawn(level, FxKind.SHOCKWAVE, pos, 2.5, 0xFFD040, 12);
                 sound(p, SoundEvents.ANVIL_LAND, 1f, 0.6f);

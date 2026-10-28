@@ -14,6 +14,7 @@ public final class ExpeditionHazards {
  @SubscribeEvent public static void tick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post e){
   var level=e.getServer().getLevel(InstanceManager.DIM);if(level==null)return;long now=level.getGameTime();
   for(var p:level.players()){
+   if(now%100==0&&p.isAlive()&&InstanceManager.containsPlayer(p))p.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION,300,0,true,false,false));
    if(!p.isAlive()||p.isSpectator()||p.isCreative())continue;var slot=InstanceManager.slotAt(e.getServer(),level,p.getX(),p.getZ());if(slot==null||slot.owner.isEmpty()||!slot.ready||p.getZ()<slot.z+30)continue;
    int mod=DungeonVariants.modifier(slot.variantSeed);long cycle=Math.floorMod(now+slot.variantSeed%240,240);
    if(mod==1&&cycle==0){p.addEffect(new MobEffectInstance(MobEffects.SLOWNESS,40,0));level.addFreshEntity(SkillFxEntity.create(level,FxKind.AURA,p.position(),2,0xA0B0D0,40));p.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Brume dense : déplacement ralenti brièvement."));}

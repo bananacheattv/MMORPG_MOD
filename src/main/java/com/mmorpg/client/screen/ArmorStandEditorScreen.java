@@ -12,6 +12,7 @@ public final class ArmorStandEditorScreen extends MmoScreen {
     private static final String[] SLOTS={"Main droite","Main gauche","Tête","Plastron","Jambières","Bottes"};
     private static final String[] PARTS={"Tête","Corps","Bras gauche","Bras droit","Jambe gauche","Jambe droite"};
     public ArmorStandEditorScreen(CompoundTag data){super("Mise en scène");entity=data.getIntOr("entity",-1);}
+    public void appearanceTab(){mode=2;position=false;}
     @Override protected void init(){super.init();skinName=new net.minecraft.client.gui.components.EditBox(font,left+pw/2+12,top+109,pw/2-28,18,net.minecraft.network.chat.Component.literal("Pseudo du skin"));skinName.setMaxLength(16);skinName.setHint(net.minecraft.network.chat.Component.literal("Pseudo Minecraft"));addRenderableWidget(skinName);}
     @Override protected int panelWidth(){return Math.min(width-12,620);}
     @Override protected int panelHeight(){return Math.min(height-12,340);}
@@ -29,10 +30,10 @@ public final class ArmorStandEditorScreen extends MmoScreen {
         int previewTop=top+114+cell*4;
         net.minecraft.client.gui.screens.inventory.InventoryScreen.extractEntityInInventoryFollowsMouse(g,left+18,previewTop,split-12,top+ph-12,Math.max(20,(top+ph-12-previewTop)/2),.0625f,mouseX,mouseY,stand);
         button(g,split+8,top+35,pw/2-20,18,"Articulation : "+PARTS[part]+" ›",true,Ui.GOLD,()->part=(part+1)%6);
-        button(g,split+10,top+ph-26,pw/2-22,18,new String[]{"Position ›","Apparence ›","Poses ›"}[mode],true,Ui.GOLD,()->{mode=(mode+1)%3;position=mode==1;});
+        for(int i=0;i<3;i++){int selected=i;button(g,split+10+i*(pw/2-22)/3,top+ph-26,(pw/2-22)/3-3,18,new String[]{"Poses","Position","Skin / 3D"}[i],true,mode==i?Ui.GOLD:Ui.MUTED,()->{mode=selected;position=mode==1;});}
         if(mode==2){
          var names=com.mmorpg.entity.NpcEntity.APPEARANCES;
-         button(g,split+12,top+65,pw/2-28,20,"Modèle 3D : "+names[model+4]+" ›",true,Ui.GOLD,()->{model=(model+1)%com.mmorpg.entity.NpcEntity.AUTHORED_MODELS.length;send("appearance",t->t.putString("appearance","guides:"+com.mmorpg.entity.NpcEntity.AUTHORED_MODELS[model]));});
+         button(g,split+12,top+65,pw/2-28,20,"Choisir un modèle 3D",true,Ui.GOLD,()->{var choices=new java.util.ArrayList<EditorChoiceScreen.Choice>();for(int i=0;i<com.mmorpg.entity.NpcEntity.AUTHORED_MODELS.length;i++)choices.add(new EditorChoiceScreen.Choice(com.mmorpg.entity.NpcEntity.AUTHORED_MODELS[i],names[i+4]));minecraft.gui.setScreen(new EditorChoiceScreen(this,"Modèle du porte-armure",choices,id->send("appearance",t->t.putString("appearance","guides:"+id))));});
          g.text(font,"Ou un skin de joueur :",split+12,top+95,Ui.TEXT,false);
          button(g,split+12,top+135,pw/2-28,20,"Appliquer ce skin",skinName.getValue().matches("[A-Za-z0-9_]{3,16}"),Ui.GOLD,()->send("appearance",t->t.putString("appearance","skin:"+skinName.getValue())));
          button(g,split+12,top+164,pw/2-28,18,"Porte-armure classique",true,Ui.MUTED,()->send("appearance",t->t.putString("appearance","")));

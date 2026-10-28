@@ -45,7 +45,7 @@ public final class MobAbilities {
         for (LivingEntity e : enemiesAround(mob, c, radius)) {
             RpgCombat.mobHit(mob, e, damageMult);
             Vec3 push = e.position().subtract(c).normalize().scale(0.9);
-            e.push(push.x, knockUp, push.z);
+            if(com.mmorpg.combat.CrowdControl.allow(e))e.push(push.x, knockUp, push.z);
             e.needsSync = true;
         }
     }

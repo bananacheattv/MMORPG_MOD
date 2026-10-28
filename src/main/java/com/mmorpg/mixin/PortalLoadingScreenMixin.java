@@ -12,7 +12,7 @@ public abstract class PortalLoadingScreenMixin extends Screen {
  @Inject(method="extractRenderState",at=@At("HEAD"),cancellable=true)
  private void aeloria$portal(GuiGraphicsExtractor g,int mx,int my,float a,CallbackInfo ci){
   com.mmorpg.client.ui.PortalLoadingView.draw(g,width,height);
-  for(var child:children())if(child instanceof net.minecraft.client.gui.components.Button button)button.setMessage(Component.literal("Annuler"));
+  for(var child:java.util.List.copyOf(children()))if(child instanceof net.minecraft.client.gui.components.Button button)removeWidget(button);
   for(var widget:renderables)widget.extractRenderState(g,mx,my,a);
   long now=System.nanoTime();if(now-aeloria$lastNarration>3_000_000_000L){aeloria$lastNarration=now;minecraft.getNarrator().saySystemNow(Component.literal("Passage dans le portail. Téléportation en cours."));}
   ci.cancel();

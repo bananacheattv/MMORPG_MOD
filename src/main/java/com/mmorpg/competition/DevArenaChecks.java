@@ -42,9 +42,9 @@ public final class DevArenaChecks {
             session.crystal=com.mmorpg.registry.ModEntities.ARENA_CRYSTAL.get().create(world,net.minecraft.world.entity.EntitySpawnReason.COMMAND);session.crystal.match=session.match.id;check(session.crystal.isPersistenceRequired(),"arena crystal survives distance despawn");
             long gold=com.mmorpg.server.RpgPlayers.get(p).gold,xp=com.mmorpg.server.RpgPlayers.get(p).xp;
             check(ArenaManager.lethal(p,opponent),"lethal hit intercepted");check(p.level()==world&&Math.abs(p.getX()-(center.getX()-43.5))<.01,"respawn at own camp");check(session.match.blue==10,"enemy kill grants ten points");check(com.mmorpg.server.RpgPlayers.get(p).gold==gold&&com.mmorpg.server.RpgPlayers.get(p).xp==xp,"arena death preserves XP and gold");check(ArenaManager.protectedPlayer(p),"respawn protection applied");
-            check(!session.crystal.hurtServer(world,p.damageSources().playerAttack(p),1),"protected player cannot capture");session.protectedUntil.put(p.getUUID(),0L);
+            check(!session.crystal.hurtServer(world,p.damageSources().playerAttack(p),1),"protected player cannot capture");session.protectedUntil.put(p.getUUID(),0L);check(ArenaManager.protectedPlayer(p),"own safe zone stays protected after spawn timer");p.teleportTo(world,center.getX()+1,102,center.getZ(),Set.of(),0,0,true);
             check(session.crystal.hurtServer(world,p.damageSources().playerAttack(p),1)&&session.crystal.team()==-1&&session.match.captureHits==1,"real first attack begins white capture");
-            check(!session.crystal.hurtServer(world,p.damageSources().playerAttack(p),1)&&session.match.captureHits==1,"same-tick damage cannot bypass crystal cooldown");
+            check(session.crystal.hurtServer(world,p.damageSources().playerAttack(p),1)&&session.match.captureHits==2,"same-tick distinct strikes have no artificial cooldown");
             ArenaManager.leave(p);check(p.level()==oldLevel&&Math.abs(p.getX()-x)<.01,"leaving restores original position");
             ArenaManager.SESSIONS.remove(key);
             var identity=new net.minecraft.server.players.NameAndId(p.getGameProfile());
@@ -59,7 +59,7 @@ public final class DevArenaChecks {
                     var solo=ArenaManager.session(p.getUUID());check(solo!=null&&solo.test&&solo.readyToBuild()&&!solo.forfeited(),"solo starts immediately and does not forfeit");
                     check(solo.center().getX()>=CompetitionWorld.center(10).getX()&&!ArenaManager.queued(p.getUUID()),"test separate from public matchmaking");
                     solo.active=true;ArenaManager.testTeam(p,1);for(int hit=0;hit<50;hit++)solo.match.capture(p.getUUID(),hit*40);solo.match.tick(2000);check(solo.match.blue==1,"solo blue capture scores");
-                    solo.returns.put(p.getUUID(),new ArenaManager.Return(oldLevel.dimension(),x,y,z,yaw,pitch));CompetitionAdmin.stop(p);ArenaManager.tick(server);check(ArenaManager.session(p.getUUID())==null,"empty test disposed");
+                    solo.returns.put(p.getUUID(),new ArenaManager.Return(oldLevel.dimension(),x,y,z,yaw,pitch));check(dispatcher.execute("arene victoire rouge",p.createCommandSourceStack())==1&&solo.match.ended&&solo.match.winner()==0,"OP command immediately ends match for chosen team");check(ArenaManager.session(p.getUUID())==null,"forced victory disposes match and restores player");
                 }
                 for(int tier:new int[]{0,9}){
                     check(dispatcher.execute("aeloriatest boss "+(tier+1),p.createCommandSourceStack())==1,"admin boss command");

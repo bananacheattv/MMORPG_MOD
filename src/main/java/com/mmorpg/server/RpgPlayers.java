@@ -102,6 +102,8 @@ public final class RpgPlayers {
         player.refreshTabListName();
         PlayerData d = get(player);
         CompoundTag t = d.save();
+        var features=new CompoundTag();for(String key:FeatureFlags.KEYS)features.putBoolean(key,FeatureFlags.enabled(player.level().getServer(),key));t.put("features",features);
+        t.putBoolean("creativeAllowed",CreativeAccess.allowed(player));t.putInt("guardBroken",com.mmorpg.combat.ShieldGuard.brokenTicks(player));
         t.putString("backend",com.mmorpg.network.NetworkConfig.current.role.name());
         t.store("stats", com.mojang.serialization.Codec.DOUBLE.listOf(), toList(d.stats.raw()));
         t.putLong("xpToNext", LevelSystem.xpToNext(d.level));
@@ -149,7 +151,7 @@ public final class RpgPlayers {
 
     public static void updatePublic(ServerPlayer player) {
         PlayerData d = get(player);
-        PublicPlayerData pub = new PublicPlayerData();pub.rankLabel=d.rankLabel;pub.rankColor=d.rankColor;
+        PublicPlayerData pub = new PublicPlayerData();pub.pvpTitle=d.pvpTitle;pub.rankLabel=d.rankLabel;pub.rankColor=d.rankColor;
         pub.playerClass = d.playerClass.ordinal();
         pub.level = d.level;
         pub.evolution = d.evolutionTier();
@@ -248,6 +250,7 @@ public final class RpgPlayers {
         double max = d.stats.get(Stat.MAX_HP);
         float before = d.hp;
         d.hp = (float) Math.min(max, d.hp + Math.max(0, amount)*com.mmorpg.combat.MobDebuffs.healingMultiplier(player));
+        var arena=com.mmorpg.competition.ArenaManager.session(player.getUUID());if(arena!=null&&arena.active&&player.getLastHurtByPlayer() instanceof ServerPlayer attacker&&arena.match.enemy(player.getUUID(),attacker.getUUID()))arena.match.contribution(player.getUUID()).healing+=Math.max(0,d.hp-before);
         if (showText && d.hp - before >= 1) {
             CombatTexts.send(player, player.getX(), player.getY() + player.getBbHeight() + 0.3, player.getZ(), d.hp - before, Payloads.CombatText.HEAL);
         }

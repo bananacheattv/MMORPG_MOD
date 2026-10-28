@@ -101,6 +101,8 @@ public final class MmoHud {
         int h = g.guiHeight();
         if (!HudLayout.editing) worldOverlays(g, mc, w, h);
         if(!HudLayout.editing)GuidanceArrow.render(g,mc);
+        ArenaHud.draw(g);
+        if(ClientData.received&&ClientData.DATA.playerClass==PlayerClass.TANK&&com.mmorpg.server.PaladinOffhand.shield(mc.player.getOffhandItem())){int gx=w/2-80,gy=h-76;Ui.rounded(g,gx-4,gy-4,168,22,6,0xDB171124);Ui.bar(g,gx,gy,160,14,ClientData.DATA.shieldGuard/100f,ClientData.guardBroken>0?Ui.RED:Ui.GOLD,0xFF493746,ClientData.guardBroken>0?"Garde brisée · Récupération":"Bouclier · Garde "+Math.round(ClientData.DATA.shieldGuard)+" %");}
         if (!ClientData.received) return;
         if (HudLayout.begin(g, HudLayout.JOUEUR)) {
             playerFrame(g, mc);
@@ -324,7 +326,7 @@ public final class MmoHud {
         String hpText;
         boolean bossFlag = false;
         MobData md = t.getExistingDataOrNull(ModAttachments.MOB);
-        if (md != null && md.initialized()) {
+        if(t instanceof com.mmorpg.competition.ArenaCrystal crystal){name="Capture du cristal";level=0;frac=crystal.team()<0?crystal.hits()/50f:1;hpText=crystal.team()<0?crystal.hits()+" / 50 coups":crystal.team()==0?"Contrôle rouge":"Contrôle bleu";}else if (md != null && md.initialized()) {
             name = t instanceof RpgMob rm ? BestiaryScreen.displayName(rm.mobKey()) : t.getName().getString();
             level = md.level;
             frac = md.hpFraction();

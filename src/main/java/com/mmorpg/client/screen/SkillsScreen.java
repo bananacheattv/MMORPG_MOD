@@ -40,7 +40,7 @@ public class SkillsScreen extends MenuScreen {
         int listW = 170;
         Ui.header(g, x0, y0, listW, "COMPÉTENCES — " + d.playerClass.label.toUpperCase(java.util.Locale.ROOT));
         int rowH = 24;
-        int visible = Math.max(1, (ph - 30 - 70 - 16) / rowH);
+        int visible = Math.max(1, (top + ph - 60 - y0 - 14) / rowH);
         scroll = Math.min(scroll, Math.max(0, skills.size() - visible));
         boolean compact = rowH < 22;
         for (int i = 0; i < Math.min(visible, skills.size() - scroll); i++) {
@@ -89,7 +89,7 @@ public class SkillsScreen extends MenuScreen {
         // ------------------------------------------------ details
         int dx = x0 + listW + 10;
         int dw = left + pw - 8 - dx;
-        int dh = ph - 30 - 70;
+        int dh = top + ph - 70 - y0;
         Ui.inset(g, dx, y0, dw, dh);
         Skill s = Skills.get(selected);
         if (s != null) {

@@ -27,6 +27,8 @@ import java.util.UUID;
  * Les champs "transients" (statistiques calculees, recharges, effets) ne sont pas sauvegardes.
  */
 public class PlayerData implements ValueIOSerializable {
+    public float shieldGuard=100;
+    public String pvpTitle="";
     public CompoundTag backpacks=new CompoundTag();
     public CompoundTag adventureSummary = new CompoundTag();
     public String rankLabel="Aelorien";public int rankColor=0xB9AFCC,rankTier,auctionSlots=12;
@@ -185,7 +187,7 @@ public class PlayerData implements ValueIOSerializable {
         CompoundTag t = new CompoundTag();
         t.put("adventure_summary", adventureSummary.copy());
         t.putString("rankLabel",rankLabel);t.putInt("rankColor",rankColor);t.putInt("rankTier",rankTier);t.putInt("auctionSlots",auctionSlots);
-        t.put("backpacks",backpacks.copy());t.put("guild_receipts",guildReceipts.copy());t.putInt("guild_level",guildLevel);
+        t.putFloat("shieldGuard",shieldGuard);t.putString("pvpTitle",pvpTitle);t.put("backpacks",backpacks.copy());t.put("guild_receipts",guildReceipts.copy());t.putInt("guild_level",guildLevel);
         t.putLongArray("guild_buffs",guildBuffs);
         t.store("forgeRecipes",Codec.STRING.listOf(),new ArrayList<>(forgeRecipes));
         t.putString("class", playerClass.name());
@@ -235,7 +237,7 @@ public class PlayerData implements ValueIOSerializable {
     public void load(CompoundTag t) {
         adventureSummary = t.getCompoundOrEmpty("adventure_summary").copy();
         rankLabel=t.getStringOr("rankLabel","Aelorien");rankColor=t.getIntOr("rankColor",0xB9AFCC);rankTier=t.getIntOr("rankTier",0);auctionSlots=t.getIntOr("auctionSlots",12);
-        backpacks=t.getCompoundOrEmpty("backpacks").copy();guildReceipts=t.getCompoundOrEmpty("guild_receipts").copy();guildLevel=Math.clamp(t.getIntOr("guild_level",0),0,10);
+        shieldGuard=Math.clamp(t.getFloatOr("shieldGuard",100),0,100);pvpTitle=t.getStringOr("pvpTitle","");backpacks=t.getCompoundOrEmpty("backpacks").copy();guildReceipts=t.getCompoundOrEmpty("guild_receipts").copy();guildLevel=Math.clamp(t.getIntOr("guild_level",0),0,10);
         guildBuffs=t.getLongArray("guild_buffs").orElse(new long[4]);if(guildBuffs.length!=4)guildBuffs=new long[4];
         forgeRecipes.clear();forgeRecipes.addAll(t.read("forgeRecipes",Codec.STRING.listOf()).orElse(List.of()));
         playerClass = PlayerClass.byName(t.getStringOr("class", "NONE"));

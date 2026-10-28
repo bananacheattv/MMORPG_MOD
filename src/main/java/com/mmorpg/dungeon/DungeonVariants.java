@@ -27,7 +27,7 @@ public final class DungeonVariants {
         for(int z=Layout.C2.z0()+4;z<=Layout.C2.z1()-4;z++)for(int x=-3;x<=3;x++)for(int y=1;y<=3;y++){
             int clear=route(seed)==0?-2:route(seed)==1?2:((z/4)%2==0?-2:2);
             var at=origin.offset(x,y-1,z);
-            level.setBlock(at,Math.abs(x-clear)<=1?Blocks.AIR.defaultBlockState():Blocks.POLISHED_DEEPSLATE.defaultBlockState(),2);
+            level.setBlock(at,Blocks.AIR.defaultBlockState(),2);
         }
         // Ambush positions and difficulty change for every fresh expedition, including reused geometry.
         var slot=InstanceManager.slotAt(level.getServer(),level,origin.getX(),origin.getZ()+12);if(slot==null)return;

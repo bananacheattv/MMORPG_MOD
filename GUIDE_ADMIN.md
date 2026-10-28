@@ -182,8 +182,35 @@ Seul le proprietaire peut monter. La monture invoquee disparait si son proprieta
 
 ## Équipement et Lucky Blocks
 
-Les armures utilisent des silhouettes articulées propres aux quatre classes, avec six paliers de finition : métal simple, renforts, gravures, gemmes, épaulières et ornements de prestige. Les 44 armes ont une géométrie volumétrique ; les armes de début et de fin de progression se distinguent par leurs formes. Les bâtons se tiennent verticalement. L’atlas original de matériaux mesure 1024 × 1024 pixels ; `tools/sculpt-rpg-assets.py` permet de le régénérer avec les modèles d’armes, coffres et Lucky Blocks.
+Les armures utilisent des silhouettes articulées propres aux quatre classes, avec six paliers de finition : métal simple, renforts, gravures, gemmes, épaulières et ornements de prestige. Les 44 armes ont une géométrie volumétrique ; les armes de début et de fin de progression se distinguent par leurs formes. Les bâtons gardent la pose vers l’avant choisie en troisième personne. L’atlas original de matériaux mesure 1024 × 1024 pixels ; `tools/sculpt-rpg-assets.py` permet de le régénérer avec les modèles d’armes, coffres et Lucky Blocks.
 
 Les Lucky Blocks affichent trois cubes 3D marqués « ? », puis des objets 3D tournants. L’interface et les cubes prennent la couleur de leur variante. Le bouton est « Ouvrir le Lucky Block » ; les probabilités ne sont plus affichées dans l’interface. La table et le tirage restent contrôlés par le serveur. Les coffres ont des ferrures, charnières, serrures, pieds et couvercles en volume.
 
 Le launcher Aeloria 1.3.7 propose l’installation facultative d’Iris et Sodium compatibles dans ses Réglages, ainsi que l’ouverture du dossier des shaders. Choisir ensuite son pack dans le menu des shaders en jeu.
+
+
+## Interrupteurs sans redémarrage
+
+Réservé aux opérateurs et à la console : `/fonctionnalite` affiche les états. Exemple : `/fonctionnalite donjons desactiver`, puis `/fonctionnalite donjons activer`. Suggestions automatiques des noms : arenes, donjons, drones, boutique_pvp, boutique, quetes, sacs, hdv, guildes, boss_guilde, cinematique, epreuves_classes, apparition_mobs, competences, bouclier, luckyblocks, coffres, montures, familiers, mines, plaines, forge, banque, marchands, cosmetiques.
+
+Les états sont sauvegardés dans `coordination/features.json`, partagés entre les serveurs et observés sous une seconde. Les menus suivent l’état serveur. Désactiver une activité ferme ses nouvelles entrées ou interactions ; les expéditions et matchs engagés peuvent se terminer. Désactiver drones, bouclier, montures ou familiers agit aussi pendant leur utilisation. Les inventaires, soldes et récompenses déjà achetées restent conservés.
+
+## Personnage, guides et combat
+
+Personnage > Personnaliser : déplacer les panneaux par leur en-tête, agrandir avec la poignée ou la molette, masquer avec ×, réinitialiser puis Terminer. Disposition sauvegardée localement. Les onglets sont sur deux lignes. Le catalogue créatif exige le statut OP réel ; un grade affiché ne suffit pas, et retirer OP retire aussi le créatif.
+
+Maj + clic transfère une pile ; maintenir Maj et glisser le bouton gauche sur plusieurs piles les transfère successivement, y compris dans les sacs. Éditeur de PNJ > Dialogue modifie son accueil indépendamment des autres guides. Porte-armure > Skin / 3D donne un sélecteur de modèles et un champ pseudo pour le skin.
+
+Le Paladin pare avec son bouclier lié, en main secondaire. La garde se consomme en maintenant le bouclier et en absorbant les coups frontaux ; elle se régénère une fois abaissé, après un délai. Épuiser la réserve impose une récupération. Trois projections rapprochées accordent dix secondes d’immunité aux projections des monstres.
+
+Les donjons contiennent au moins trois fois moins d’ennemis dans les vagues et embuscades, ne bloquent plus leur galerie par des rochers, donnent la vision nocturne et davantage d’or. Les difficultés supérieures conseillent le groupe. Tuer le boss élimine les ennemis de son instance. L’écran de connexion ne propose plus Annuler et le feu ne masque plus la vue.
+
+## Arènes et récompenses PvP
+
+`/arene victoire rouge` ou `/arene victoire bleu` termine le match de l’opérateur avec le vainqueur choisi ; ajouter un joueur cible permet de viser son match. Les sessions de test administrateur ne donnent pas de points.
+
+Le cristal compte cinquante coups sans délai artificiel entre les coups, avec jauge de capture et scores des camps. Les drones sont des entités ; entrer dans le camp ennemi annonce trois secondes avant élimination. Sortir de sa zone sûre empêche d’y retourner ; aucun combat ne s’y produit. Le cristal parcourt le terrain au-delà du rocher central.
+
+La fin affiche les deux équipes, éliminations, morts, coups au cristal, dégâts, soins et points. Les contributions donnent des points aux deux camps ; à contribution égale, le vainqueur reçoit le double. Un joueur inactif ne gagne pas de points. Les versements sont protégés contre les doublons.
+
+`/pvp` ou le marchand PvP au spawn ouvre la boutique : potions, titres, Chimère d’arène exclusive, vingt panoplies et vingt armes (quatre classes × cinq tranches de niveau). Les bonus exigent la bonne classe et le niveau requis. Ces équipements favorisent le PvP au prix d’une efficacité réduite contre les monstres. Achat et livraison sont vérifiés côté serveur ; un inventaire plein conserve la livraison en attente.
