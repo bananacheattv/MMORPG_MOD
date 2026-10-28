@@ -45,3 +45,4 @@ __pycache__/
 
 # cache des sources sonores (tools/fetch_sfx_sources.py)
 tools/_sfx_cache/
+docs/screens/**/*.png

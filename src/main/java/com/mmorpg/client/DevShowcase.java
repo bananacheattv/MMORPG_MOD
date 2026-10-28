@@ -694,6 +694,21 @@ public final class DevShowcase {
             if (tick == 100) stop(mc);
             return;
         }
+        if (MODE.equals("onglets")) {          // un cliche par onglet du menu (Metiers, Succes, Bestiaire, Boutique...)
+            if (tick == 5) mc.getWindow().setWindowed(1280, 720);
+            if (tick == 20) { cmd(mc, "gamemode survival " + me); mc.options.guiScale().set(2); mc.resizeGui(); }
+            if (tick == 30 && !ClientData.DATA.playerClass.isPlayable()) ClientNet.send(new com.mmorpg.network.Payloads.SelectClass(com.mmorpg.rpg.PlayerClass.GUERRIER.ordinal()));
+            var tabs = MenuScreen.Tab.values();
+            int i = (tick - 60) / 40;
+            if (tick >= 60 && i < tabs.length) {
+                int phase = (tick - 60) % 40;
+                if (tabs[i] == MenuScreen.Tab.PERSONNAGE || tabs[i] == MenuScreen.Tab.CREATIF) return;
+                if (phase == 0) { mc.gui.setScreen(null); MenuScreen.open(tabs[i]); }
+                if (phase == 30) shot(mc, "onglet_" + tabs[i].name().toLowerCase());
+            }
+            if (i >= tabs.length) { mc.gui.setScreen(null); MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (onglets)"); stop(mc); }
+            return;
+        }
         if (MODE.equals("clic")) {
             clickPhase(mc, me);
             return;
