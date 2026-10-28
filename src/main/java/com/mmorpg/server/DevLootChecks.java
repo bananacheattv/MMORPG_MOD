@@ -34,7 +34,7 @@ public final class DevLootChecks {
             p.level().setBlockAndUpdate(pos, ModBlocks.LUCKY_BLOCK.get().defaultBlockState());
             check(p.gameMode.destroyBlock(pos), "lucky block break");
             check(p.level().getBlockState(pos).isAir(), "lucky block removed");
-            check(inv.countItem(ModItems.LUCKY_BLOCK.get()) == 1, "unopened block recovered once");
+            check(inv.countItem(ModItems.LUCKY_BLOCKS.getFirst().get()) == 1, "unopened block recovered once");
             p.level().setBlockAndUpdate(pos, ModBlocks.LUCKY_BLOCK.get().defaultBlockState());
             check(LuckyBlockManager.roll(p, pos), "opening placed block");
             check(p.level().getBlockState(pos).isAir(), "opened block consumed");

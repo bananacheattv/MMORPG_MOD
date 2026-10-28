@@ -1,25 +1,12 @@
 {
   "providers": [
     {
-      "type": "space",
-      "advances": {
-        " ": 5
-      }
+      "type": "reference",
+      "id": "mmorpg:smooth"
     },
     {
-      "type": "bitmap",
-      "file": "mmorpg:font/aeloria.png",
-      "ascent": 11,
-      "height": 12,
-      "chars": [
-        "ABCDEFGHIJKLMNOP",
-        "QRSTUVWXYZabcdef",
-        "ghijklmnopqrstuv",
-        "wxyz0123456789.,",
-        "!?'-:;()/+%\u2014\u2022\u2726\u00c0\u00c2",
-        "\u00c4\u00c9\u00c8\u00ca\u00cb\u00ce\u00cf\u00d4\u00d6\u00d9\u00db\u00dc\u00c7\u00e0\u00e2\u00e4",
-        "\u00e9\u00e8\u00ea\u00eb\u00ee\u00ef\u00f4\u00f6\u00f9\u00fb\u00fc\u00e7\u0000\u0000\u0000\u0000"
-      ]
+      "type": "reference",
+      "id": "minecraft:default"
     }
   ]
 }

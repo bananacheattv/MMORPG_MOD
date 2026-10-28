@@ -23,7 +23,10 @@ public final class SharedLedger {
                 Path temp = Files.createTempFile(directory, name, ".tmp");
                 try {
                     Files.writeString(temp, JSON.toJson(state));
-                    Files.move(temp, file, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+                    try(var output=FileChannel.open(temp,StandardOpenOption.WRITE)){output.force(true);}
+                    if(Files.exists(file))Files.copy(file,file.resolveSibling(name+".json.bak"),StandardCopyOption.REPLACE_EXISTING);
+                    int retries=0;while(true){try{Files.move(temp,file,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);break;}
+                        catch(AccessDeniedException busy){if(++retries>=4)throw busy;try{Thread.sleep(retries*10L);}catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new java.io.IOException("Écriture interrompue",interrupted);}}}
                 } finally { Files.deleteIfExists(temp); }
                 return result;
             }

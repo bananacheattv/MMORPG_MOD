@@ -2,9 +2,9 @@
   {
     "id": "selene",
     "bones": 7,
-    "meshes": 90,
-    "faces": 540,
-    "vertices": 720,
+    "meshes": 106,
+    "faces": 636,
+    "vertices": 848,
     "emissive": 0,
     "animations": [
       "walk",
@@ -26,23 +26,23 @@
     ],
     "bounds": {
       "min": [
-        -8.55,
+        -9.063,
         0,
-        -4.4
+        -5.5
       ],
       "max": [
-        7.95,
-        33.5,
-        4.4
+        8.427000000000001,
+        32.336,
+        5.5
       ]
     }
   },
   {
     "id": "kael",
     "bones": 7,
-    "meshes": 105,
-    "faces": 630,
-    "vertices": 840,
+    "meshes": 121,
+    "faces": 726,
+    "vertices": 968,
     "emissive": 0,
     "animations": [
       "walk",
@@ -64,23 +64,23 @@
     ],
     "bounds": {
       "min": [
-        -8.85,
+        -9.381,
         0,
-        -4.4
+        -5.5
       ],
       "max": [
-        7.95,
-        33.55,
-        6.2
+        8.427000000000001,
+        32.392399999999995,
+        7.25
       ]
     }
   },
   {
     "id": "borin",
     "bones": 7,
-    "meshes": 82,
-    "faces": 492,
-    "vertices": 656,
+    "meshes": 105,
+    "faces": 630,
+    "vertices": 840,
     "emissive": 0,
     "animations": [
       "walk",
@@ -102,23 +102,23 @@
     ],
     "bounds": {
       "min": [
-        -11.75,
+        -12.455,
         0,
-        -4.699999999999999
+        -5.874999999999999
       ],
       "max": [
-        8.95,
-        28.5,
-        4.4
+        9.487,
+        27.635999999999996,
+        5.5
       ]
     }
   },
   {
     "id": "elyra",
     "bones": 7,
-    "meshes": 108,
-    "faces": 648,
-    "vertices": 864,
+    "meshes": 124,
+    "faces": 744,
+    "vertices": 992,
     "emissive": 1,
     "animations": [
       "walk",
@@ -142,23 +142,23 @@
     ],
     "bounds": {
       "min": [
-        -8.55,
+        -9.08685,
         0,
-        -4.4
+        -5.5
       ],
       "max": [
-        7.95,
-        36.35,
-        4.4
+        9.08685,
+        35.550799999999995,
+        5.5
       ]
     }
   },
   {
     "id": "neria",
     "bones": 7,
-    "meshes": 90,
-    "faces": 540,
-    "vertices": 720,
+    "meshes": 106,
+    "faces": 636,
+    "vertices": 848,
     "emissive": 0,
     "animations": [
       "walk",
@@ -179,23 +179,23 @@
     ],
     "bounds": {
       "min": [
-        -9.5,
+        -10.07,
         0,
-        -4.7
+        -5.875
       ],
       "max": [
-        7.95,
-        37.5,
-        4.5
+        9.659250000000002,
+        36.848,
+        5.625
       ]
     }
   },
   {
     "id": "master_guerrier",
     "bones": 7,
-    "meshes": 121,
-    "faces": 726,
-    "vertices": 968,
+    "meshes": 144,
+    "faces": 864,
+    "vertices": 1152,
     "emissive": 0,
     "animations": [
       "walk",
@@ -216,23 +216,23 @@
     ],
     "bounds": {
       "min": [
-        -10.3,
-        -0.10000000000000009,
-        -4.4
+        -10.918000000000001,
+        -0.09400000000000008,
+        -5.525
       ],
       "max": [
-        10.3,
-        34.1,
-        4.4
+        10.918000000000001,
+        33.012800000000006,
+        5.5
       ]
     }
   },
   {
     "id": "master_mage",
     "bones": 7,
-    "meshes": 118,
-    "faces": 708,
-    "vertices": 944,
+    "meshes": 134,
+    "faces": 804,
+    "vertices": 1072,
     "emissive": 7,
     "animations": [
       "walk",
@@ -254,23 +254,23 @@
     ],
     "bounds": {
       "min": [
-        -8.55,
+        -9.063,
         0,
-        -5
+        -6.25
       ],
       "max": [
-        7.95,
-        45.55,
-        5
+        8.586000000000002,
+        45.928399999999996,
+        6.25
       ]
     }
   },
   {
     "id": "master_archer",
     "bones": 7,
-    "meshes": 117,
-    "faces": 702,
-    "vertices": 936,
+    "meshes": 133,
+    "faces": 798,
+    "vertices": 1064,
     "emissive": 0,
     "animations": [
       "walk",
@@ -292,23 +292,23 @@
     ],
     "bounds": {
       "min": [
-        -8.85,
+        -9.381,
         0,
-        -4.4
+        -5.5
       ],
       "max": [
-        7.95,
-        34.1,
-        6.2
+        8.427000000000001,
+        33.012800000000006,
+        7.25
       ]
     }
   },
   {
     "id": "master_paladin",
     "bones": 7,
-    "meshes": 119,
-    "faces": 714,
-    "vertices": 952,
+    "meshes": 142,
+    "faces": 852,
+    "vertices": 1136,
     "emissive": 1,
     "animations": [
       "walk",
@@ -331,23 +331,23 @@
     ],
     "bounds": {
       "min": [
-        -10,
+        -10.600000000000001,
         0,
-        -4.65
+        -5.525
       ],
       "max": [
-        10,
-        33.5,
-        4.5
+        10.600000000000001,
+        32.336,
+        5.5
       ]
     }
   },
   {
     "id": "master_epreuve",
     "bones": 7,
-    "meshes": 112,
-    "faces": 672,
-    "vertices": 896,
+    "meshes": 128,
+    "faces": 768,
+    "vertices": 1024,
     "emissive": 2,
     "animations": [
       "walk",
@@ -369,14 +369,14 @@
     ],
     "bounds": {
       "min": [
-        -8.5,
+        -9.01,
         0,
-        -4.4
+        -5.5
       ],
       "max": [
-        8.5,
-        36.5,
-        4.4
+        9.01,
+        35.72,
+        5.5
       ]
     }
   }

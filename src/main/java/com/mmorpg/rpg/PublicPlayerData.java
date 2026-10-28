@@ -13,7 +13,7 @@ public class PublicPlayerData {
     public int level = 1;
     public int evolution = 0;
     public List<String> cosmetics = new ArrayList<>();
-    public float hpFraction = 1;
+    public float hpFraction = 1;public String rankLabel="Aelorien";public int rankColor=0xB9AFCC;
 
     public static final StreamCodec<ByteBuf, PublicPlayerData> STREAM_CODEC = StreamCodec.of((buf, d) -> {
         ByteBufCodecs.VAR_INT.encode(buf, d.playerClass);
@@ -21,7 +21,7 @@ public class PublicPlayerData {
         ByteBufCodecs.VAR_INT.encode(buf, d.evolution);
         ByteBufCodecs.VAR_INT.encode(buf, d.cosmetics.size());
         for (String c : d.cosmetics) ByteBufCodecs.STRING_UTF8.encode(buf, c);
-        buf.writeFloat(d.hpFraction);
+        buf.writeFloat(d.hpFraction);ByteBufCodecs.STRING_UTF8.encode(buf,d.rankLabel);buf.writeInt(d.rankColor);
     }, buf -> {
         PublicPlayerData d = new PublicPlayerData();
         d.playerClass = ByteBufCodecs.VAR_INT.decode(buf);
@@ -29,12 +29,12 @@ public class PublicPlayerData {
         d.evolution = ByteBufCodecs.VAR_INT.decode(buf);
         int n = ByteBufCodecs.VAR_INT.decode(buf);
         for (int i = 0; i < n; i++) d.cosmetics.add(ByteBufCodecs.STRING_UTF8.decode(buf));
-        d.hpFraction = buf.readFloat();
+        d.hpFraction = buf.readFloat();d.rankLabel=ByteBufCodecs.STRING_UTF8.decode(buf);d.rankColor=buf.readInt();
         return d;
     });
 
     public boolean sameAs(PublicPlayerData o) {
-        return o != null && o.playerClass == playerClass && o.level == level && o.evolution == evolution && o.cosmetics.equals(cosmetics)
+        return o != null && o.rankLabel.equals(rankLabel)&&o.rankColor==rankColor&& o.playerClass == playerClass && o.level == level && o.evolution == evolution && o.cosmetics.equals(cosmetics)
                 && Math.abs(o.hpFraction - hpFraction) < 0.02f;
     }
 }

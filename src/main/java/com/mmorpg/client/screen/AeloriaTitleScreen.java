@@ -36,18 +36,12 @@ public class AeloriaTitleScreen extends Screen {
     @Override
     protected void init() {
         openedAt = System.nanoTime();
-        int cx = this.width / 2;
-        int bw = 220;
-        int y = Math.max(158, this.height / 4 + 70);
-        boolean multi = this.minecraft.allowsMultiplayer();
-        Button online = this.addRenderableWidget(Button.builder(Component.literal("JOUER"), b -> join(serverAddress()))
-                .bounds(cx - bw / 2, y, bw, 24).build());
-        online.active = multi;
-        if (!multi) online.setTooltip(Tooltip.create(Component.translatable("title.multiplayer.disabled")));
-        y += 28;
-        this.addRenderableWidget(Button.builder(Component.literal("OPTIONS"), b -> this.minecraft.gui.setScreen(new OptionsScreen(this, this.minecraft.options)))
-                .bounds(cx - bw / 2, y, bw / 2 - 2, 20).build());
-        this.addRenderableWidget(Button.builder(Component.literal("QUITTER"), b -> this.minecraft.stop()).bounds(cx + 2, y, bw / 2 - 2, 20).build());
+        int bw=Math.min(220,width-48),x=Math.max(24,width/12),y=Math.max(118,height/2+12);
+        Button online=addRenderableWidget(new com.mmorpg.client.ui.GlassButton(x,y,bw,28,"ENTRER DANS AELORIA",0xFFE2B85A,b->join(serverAddress())));
+        online.active=minecraft.allowsMultiplayer();
+        if(!online.active)online.setTooltip(Tooltip.create(Component.translatable("title.multiplayer.disabled")));
+        addRenderableWidget(new com.mmorpg.client.ui.GlassButton(x,y+35,bw,24,"OPTIONS",0xFFB191ED,b->minecraft.gui.setScreen(new OptionsScreen(this,minecraft.options))));
+        addRenderableWidget(new com.mmorpg.client.ui.GlassButton(width-79,12,67,20,"QUITTER",0xFFB191ED,b->minecraft.stop()));
     }
 
     public static String serverAddress(){String server=System.getProperty("aeloria.server","").trim();if(server.isEmpty())server=ClientConfig.MAIN_MENU_SERVER.get().trim();return server.isEmpty()?"192.168.0.249:25565":server;}
@@ -67,25 +61,19 @@ public class AeloriaTitleScreen extends Screen {
     public void extractRenderState(GuiGraphicsExtractor g, int mx, int my, float a) {
         float t = seconds();
         float fade = Ease.OUT_CUBIC.apply(t / 1.4F);
-        this.extractPanorama(g, a);
-        // voile violet et vignette
-        g.fillGradient(0, 0, width, height, argb(0.28F * fade, 0x120A20), argb(0.62F * fade, 0x050210));
-        g.fillGradient(0, 0, width, height / 4, argb(0.55F * fade, 0x000000), argb(0F, 0x000000));
-        embers(g, t, fade);
-        super.extractRenderState(g, mx, my, a);
-        com.mmorpg.client.ui.Logo.full(g, this.width / 2, 8, 256);
-        int cx = width / 2;
-        // accroche sous le logo et filet d'or
-        String tagline = "CITADELLE DES HÉROS";
-        var comp = AeloriaFont.of(tagline);
-        int tw = font.width(comp);
-        int ty = 126;
-        g.text(font, comp, cx - tw / 2, ty, argb(fade, 0xE2B85A), true);
-        int half = Math.round(Math.min(width * 0.28F, 150F) * Ease.OUT_CUBIC.apply((t - 0.3F) / 1.0F));
-        g.fill(cx - half, ty + 12, cx + half, ty + 13, argb(0.9F * fade, 0x7A5A22));
-        for (int sx : new int[]{cx - half, cx + half}) {
-            for (int i = -3; i <= 3; i++) g.fill(sx - (3 - Math.abs(i)), ty + 12 + i, sx + (3 - Math.abs(i)) + 1, ty + 13 + i, argb(fade, 0xE2B85A));
-        }
+        int iw=1664,ih=941;
+        float scale=Math.max(width/(float)iw,height/(float)ih);
+        int dw=(int)Math.ceil(iw*scale),dh=(int)Math.ceil(ih*scale);
+        g.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED,com.mmorpg.MMORPG.id("textures/gui/brand/citadel_twilight.png"),(width-dw)/2,(height-dh)/2,0,0,dw,dh,iw,ih,iw,ih);
+        g.fillGradient(0,0,width,height,0x150B041B,0x650B041B);
+        int x=Math.max(24,width/12),bw=Math.min(220,width-48),y=Math.max(118,height/2+12);
+        int lw=Math.min(260,(int)((y-40)*com.mmorpg.client.ui.Logo.FULL_RATIO));
+        com.mmorpg.client.ui.Logo.full(g,x+bw/2,y-35-(int)(lw/com.mmorpg.client.ui.Logo.FULL_RATIO),lw);
+        g.text(font,AeloriaFont.of("ÉCRIVEZ VOTRE LÉGENDE"),x+4,y-21,0xFFEED59E,true);
+        embers(g,t,fade);
+        com.mmorpg.client.ui.Ui.rounded(g,12,height-24,145,16,6,0x90180F2B);
+        g.text(font,"AELORIA  ·  MMORPG",20,height-19,0xFFD9C9EE,false);
+        super.extractRenderState(g,mx,my,a);
     }
 
     /** Braises dorees qui montent lentement, deterministes (pas d'etat). */

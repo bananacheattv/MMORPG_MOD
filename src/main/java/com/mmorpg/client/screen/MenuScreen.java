@@ -10,7 +10,7 @@ import net.minecraft.client.input.KeyEvent;
 /** Menu principal a onglets du mod. */
 public abstract class MenuScreen extends MmoScreen {
     public enum Tab {
-        PERSONNAGE("Personnage"), COMPETENCES("Compétences"), QUETES("Quêtes"), GROUPE("Groupe"), GUILDE("Guilde"), ARENE("Arène"), FAMILIERS("Familiers"), MONTURES("Montures"), COSMETIQUES("Cosmétiques"), BESTIAIRE("Bestiaire");
+        PERSONNAGE("Personnage"), COMPETENCES("Compétences"), QUETES("Quêtes"), GROUPE("Groupe"), GUILDE("Guilde"), ARENE("Arène"), FAMILIERS("Familiers"), MONTURES("Montures"), COSMETIQUES("Cosmétiques"), BESTIAIRE("Bestiaire"), BOUTIQUE("Boutique");
 
         public final String label;
 
@@ -29,7 +29,7 @@ public abstract class MenuScreen extends MmoScreen {
     }
 
     public static void open(Tab tab) {
-        if(tab==Tab.GUILDE||tab==Tab.ARENE){var t=new net.minecraft.nbt.CompoundTag();t.putString("action","open");com.mmorpg.client.ClientNet.send(new com.mmorpg.network.Payloads.SocialAction(tab==Tab.GUILDE?"guild":"arena",t));return;}
+        if(tab==Tab.GUILDE||tab==Tab.ARENE||tab==Tab.BOUTIQUE){var t=new net.minecraft.nbt.CompoundTag();t.putString("action","open");com.mmorpg.client.ClientNet.send(new com.mmorpg.network.Payloads.SocialAction(tab==Tab.GUILDE?"guild":tab==Tab.BOUTIQUE?"store":"arena",t));return;}
         if (tab == Tab.PERSONNAGE) {             // personnage + inventaire + equipement (aussi sans classe)
             lastTab = tab;
             Minecraft.getInstance().gui.setScreen(new CharacterScreen(Minecraft.getInstance().player));
@@ -49,7 +49,7 @@ public abstract class MenuScreen extends MmoScreen {
             case MONTURES -> new MountsScreen();
             case COSMETIQUES -> new CosmeticsScreen();
             case BESTIAIRE -> new BestiaryScreen();
-            case GUILDE,ARENE -> throw new IllegalStateException("Server-backed screen");
+            case GUILDE,ARENE,BOUTIQUE -> throw new IllegalStateException("Server-backed screen");
         });
     }
 
@@ -97,8 +97,8 @@ public abstract class MenuScreen extends MmoScreen {
             int ty = top + 6;
             boolean on = t == active;
             boolean hover = Ui.in(mx, my, tx, ty, tw - 2, 18);
-            g.fill(tx, ty, tx + tw - 2, ty + 18, on ? Ui.CARD_HOVER : hover ? Ui.CARD : 0x00000000);
-            if (on) g.fill(tx, ty + 16, tx + tw - 2, ty + 18, Ui.GOLD);
+            Ui.rounded(g,tx,ty,tw-2,18,5,on ? Ui.CARD_HOVER : hover ? Ui.CARD : 0x00000000);
+            if (on) Ui.roundedOutline(g,tx,ty,tw-2,18,5,Ui.GOLD);
             int lw = font.width(t.label);
             float sc = common;
             Ui.scaledText(g, t.label, tx + (tw - 2) / 2f, ty + 9 - 4 * sc, sc, on ? Ui.GOLD_LIGHT : hover ? Ui.TEXT : Ui.MUTED, true);

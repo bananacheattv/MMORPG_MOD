@@ -131,6 +131,7 @@ public final class StyledDungeon {
             }
             steps.add(() -> gameElements(plan));
             steps.add(this::registerZones);
+            steps.add(()->{var slot=InstanceManager.slotAt(level.getServer(),level,o.getX(),o.getZ()+12);if(slot!=null)DungeonVariants.decorate(level,o.above(),slot.variantSeed);});
         }
 
         private void decorRoom(int i, Layout.Room rm) {

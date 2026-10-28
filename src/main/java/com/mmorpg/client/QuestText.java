@@ -30,6 +30,7 @@ public final class QuestText {
         return switch (type) {
             case "collect" -> "Rapporter " + count + " × " + targetName(type, target);
             case "level" -> "Atteindre le niveau " + count;
+            case "visit" -> "Rencontrer / découvrir : "+target;
             default -> count == 1 ? "Vaincre : " + targetName(type, target) : "Vaincre " + count + " × " + targetName(type, target);
         };
     }

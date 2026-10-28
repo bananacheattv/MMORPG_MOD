@@ -155,7 +155,7 @@ def generate(assets_dir):
         {"type": "space", "advances": {" ": 5}},
         {"type": "bitmap", "file": "mmorpg:font/aeloria.png", "ascent": 11, "height": 12, "chars": grid},
     ]}
-    with open(os.path.join(font_dir, 'aeloria.json'), 'w', encoding='utf-8', newline='\n') as f:
+    with open(os.path.join(font_dir, 'aeloria_bitmap.json'), 'w', encoding='utf-8', newline='\n') as f:
         json.dump(definition, f, ensure_ascii=True, indent=2)
         f.write('\n')
     return sheet

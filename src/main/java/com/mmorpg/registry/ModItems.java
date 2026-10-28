@@ -255,6 +255,9 @@ public final class ModItems {
 
     public static final DeferredItem<RpgMaterialItem> CLE_AVENTURE = material("cle_aventure", Rarity.RARE, "Ouvre une caisse d’aventure. Une clé par caisse.");
     public static final DeferredItem<RpgConsumableItem> CAISSE_AVENTURE = consumable("caisse_aventure", Rarity.RARE, RpgConsumableItem.Kind.ADVENTURE_CRATE, 0, "Nécessite une clé d’aventure. Contient un butin aléatoire (potions, pierres, or, charmes...).");
+    public static final java.util.List<DeferredItem<BlockItem>> LUCKY_BLOCKS=new java.util.ArrayList<>();
+    static {for(var tier:com.mmorpg.block.LuckyTier.values())LUCKY_BLOCKS.add(ITEMS.registerSimpleBlockItem(tier.id,ModBlocks.LUCKY_BLOCKS.get(tier.ordinal())));}
+    public static final DeferredItem<RpgConsumableItem> RUNE_CHANGEMENT_CLASSE=consumable("rune_changement_classe",Rarity.EPIQUE,RpgConsumableItem.Kind.CLASS_RUNE,0,"Permet de changer de classe en conservant niveau et expérience. À utiliser au spawn, hors combat.");
     public static final DeferredItem<BlockItem> LUCKY_BLOCK = ITEMS.registerSimpleBlockItem("lucky_block", ModBlocks.LUCKY_BLOCK);
     public static final DeferredItem<RpgMaterialItem> CLE_VOTE = material("cle_vote", Rarity.PEU_COMMUN, "Ouvre une caisse de vote. Obtenue en votant pour le serveur.");
     public static final DeferredItem<RpgMaterialItem> CLE_QUETE = material("cle_quete", Rarity.RARE, "Ouvre une caisse de quête. Récompense de quêtes.");

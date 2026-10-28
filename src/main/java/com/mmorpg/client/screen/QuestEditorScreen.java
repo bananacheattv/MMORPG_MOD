@@ -208,8 +208,8 @@ public final class QuestEditorScreen extends MmoScreen {
     private void renderObjectives(GuiGraphicsExtractor g) {
         if(!draft.objectives.isEmpty()) {
             var o=draft.objectives.get(objective);
-            button(g,rx,fy,rw,19,switch(o.type){case "collect"->"Rapporter des objets ▾";case "level"->"Atteindre un niveau ▾";default->"Vaincre des monstres ▾";},true,Ui.GOLD,
-                    ()->choose("Type d’objectif",List.of(new Choice("kill","Vaincre des monstres"),new Choice("collect","Rapporter des objets"),new Choice("level","Atteindre un niveau")),v->{o.type=v;o.target=v.equals("collect")?"minecraft:iron_ingot":"*";}));
+            button(g,rx,fy,rw,19,switch(o.type){case "collect"->"Rapporter des objets ▾";case "level"->"Atteindre un niveau ▾";case "visit"->"Découvrir un lieu ▾";default->"Vaincre des monstres ▾";},true,Ui.GOLD,
+                    ()->choose("Type d’objectif",List.of(new Choice("kill","Vaincre des monstres"),new Choice("collect","Rapporter des objets"),new Choice("level","Atteindre un niveau"),new Choice("visit","Découvrir un lieu (repère requis)")),v->{o.type=v;o.target=v.equals("collect")?"minecraft:iron_ingot":"*";}));
             if(!o.type.equals("level")) button(g,rx,fy+objectiveOffset(31),rw,ph<270?18:21,font.plainSubstrByWidth(o.type.equals("collect")?itemName(o.target):o.target.equals("*")?"Tous les monstres":o.target.equals("boss")?"Tous les boss":Component.translatable("entity."+o.target.replace(':','.').replaceFirst("^(?!.*\\.).*", "mmorpg."+o.target)).getString(),rw-10),true,Ui.GOLD,()->target(o));
             button(g,rx+94,fy+objectiveOffset(70),25,18,"◀",objective>0,Ui.GOLD,()->{objective--;rebuild();});
             button(g,rx+122,fy+objectiveOffset(70),25,18,"▶",objective+1<draft.objectives.size(),Ui.GOLD,()->{objective++;rebuild();});

@@ -11,11 +11,13 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /** Right click opens the reels. Unopened blocks can be picked back up. */
 public class LuckyBlock extends Block {
-    public LuckyBlock(Properties properties) { super(properties); }
+    public final int tier;
+    public LuckyBlock(Properties properties) { this(properties,0); }
+    public LuckyBlock(Properties properties,int tier){super(properties);this.tier=tier;}
     @Override public void playerDestroy(ServerLevel level, ServerPlayer player, BlockPos pos, BlockState state, BlockEntity entity, ItemStack tool) {
         super.playerDestroy(level, player, pos, state, entity, tool);
         if (player.isAlive() && !player.isSpectator() && !player.hasInfiniteMaterials())
-            com.mmorpg.server.RpgPlayers.give(player, com.mmorpg.registry.ModItems.LUCKY_BLOCK.get(), 1);
+            com.mmorpg.server.RpgPlayers.give(player, com.mmorpg.registry.ModItems.LUCKY_BLOCKS.get(tier).get(), 1);
     }
     @Override protected net.minecraft.world.InteractionResult useWithoutItem(BlockState state, net.minecraft.world.level.Level level,
             BlockPos pos, net.minecraft.world.entity.player.Player player, net.minecraft.world.phys.BlockHitResult hit) {

@@ -39,10 +39,10 @@ public final class AdminConfigs {
     public static final long MAX_BYTES = 3L * 1024 * 1024;
 
     /** Nom affiche -> fichier. */
-    public static final List<String> FILES = List.of("general", "mobs", "quests", "shop", "butins", "mannequin", "cinematique", "spawn");
+    public static final List<String> FILES = List.of("general", "mobs", "quests", "shop", "butins", "mannequin", "cinematique", "spawn", "boutique");
 
     private static Path path(String name) {
-        return ConfigManager.dir().resolve(name + ".json");
+        return name.equals("boutique")&&net.neoforged.neoforge.server.ServerLifecycleHooks.getCurrentServer()!=null?com.mmorpg.store.StoreConfig.path(net.neoforged.neoforge.server.ServerLifecycleHooks.getCurrentServer()):ConfigManager.dir().resolve(name + ".json");
     }
 
     public static boolean known(String name) {
@@ -51,6 +51,7 @@ public final class AdminConfigs {
 
     public static String read(String name) throws IOException {
         if (!known(name)) throw new IOException("fichier inconnu");
+        if(name.equals("boutique")&&net.neoforged.neoforge.server.ServerLifecycleHooks.getCurrentServer()!=null)com.mmorpg.store.StoreConfig.load(net.neoforged.neoforge.server.ServerLifecycleHooks.getCurrentServer());
         if (!Files.exists(path(name))) ConfigManager.load();
         if (name.equals("cinematique") && !Files.exists(path(name))) CinematicConfig.load();
         return Files.readString(path(name), StandardCharsets.UTF_8);
@@ -66,6 +67,7 @@ public final class AdminConfigs {
             JsonElement tree = JsonParser.parseString(text);
             if (tree == null || tree.isJsonNull()) return "fichier vide";
             switch (name) {
+                case "boutique" -> com.mmorpg.store.StoreConfig.validate(GSON.fromJson(text,com.mmorpg.store.StoreConfig.Config.class));
                 case "general" -> require(GSON.fromJson(text, GeneralConfig.class));
                 case "mobs" -> {
                     Map<String, MobConfig> m = GSON.fromJson(text, mapOf(MobConfig.class));
@@ -125,7 +127,7 @@ public final class AdminConfigs {
                 prune(backups, name);
             }
             JsonElement pretty = JsonParser.parseString(text);
-            Path temp = Files.createTempFile(ConfigManager.dir(), name + "-", ".tmp");
+            Path temp = Files.createTempFile(target.getParent(), name + "-", ".tmp");
             try {
                 Files.writeString(temp, GSON.toJson(pretty), StandardCharsets.UTF_8);
                 try {

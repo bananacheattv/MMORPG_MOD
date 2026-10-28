@@ -41,5 +41,26 @@ if(index===6){for(let k=0;k<7;k++)B('Tall_wizard_crown_'+k,[k*.3,headY+8+k*1.3,1
 if(index===7){for(const side of[-1,1]){B('Ranger_hood_side_'+side,[side*4.5,headY+1,1],[1.1,7,7],6,'head');B('Ranger_hood_rim_'+side,[side*4.5,headY+1,-2.6],[1.2,7,.7],8,'head');B('Ranger_mantle_'+side,[side*5.4,23,1],[4.5,3,6],6,'arm_'+side);}B('Ranger_hood_crown',[0,headY+4.4,.9],[10,1.4,8],6,'head');B('Scarf',[0,25,-2.1],[6,2.3,3],4);for(let q=0;q<4;q++)B('Scarf_tail_'+q,[3.5,22-q*2,3.8],[1.6,2.2,.6],4);}
 if(index===8){for(const side of[-1,1]){for(let q=0;q<3;q++)B('Shoulder_wing_'+side+q,[side*(7.8+q*.8),24.8+q*.8,.5],[1.2,2.5-q*.3,4],10,'arm_'+side);B('Temple_guard_'+side,[side*4.3,headY-.4,1],[.7,5,5],12,'head');B('Temple_trim_'+side,[side*4.75,headY+.5,0],[.3,4,3],10,'head');}B('Hammer_core',[-6,18,-4.1],[2.5,2.5,.5],15,'arm_-1',true);B('Cuirass_cross_vertical',[0,19,-4.4],[1,6,.5],10);B('Cuirass_cross_horizontal',[0,20,-4.4],[5,1,.5],10);B('Shield_inner',[8.7,17,0],[.3,11,7],5,'arm_1');B('Shield_boss',[9.1,18,0],[.7,2.3,2.3],10,'arm_1');}
 if(index===9){B('Helmet_crown',[0,headY+4,0],[9,1.6,8],12,'head');for(const side of[-1,1])B('Helmet_cheek_'+side,[side*4.2,headY-.7,1],[1,6,6],12,'head');for(let q=0;q<5;q++)B('Helmet_crest_'+q,[0,headY+5+q*.4,-1+q],[1,1.8,1.3],5,'head');}
+// Layered facial silhouette and costume details for the Aeloria visual refresh.
+for(const side of[-1,1]){
+ B('Brow_tip_'+side,[side*2.9,headY+1.55,-3.87],[.75,.55,.45],hair,'head');
+ B('Eye_glint_'+side,[side*1.85-.16,headY+.62,-3.91],[.23,.25,.12],4,'head');
+ B('Hair_swept_'+side,[side*2.6,headY+3.35,-2.5],[2.7,1.3,2.4],hair,'head');
+ B('Hair_back_lock_'+side,[side*3.4,headY+.2,3.7],[1.8,5.5,1.3],hair,'head');
+ B('Shoulder_piping_'+side,[side*5.5,torsoY+torsoH/2-.7,-2.15],[2.4,.65,.65],metal,'arm_'+side);
+ B('Sleeve_fold_'+side,[side*6.1,torsoY+1,-2.15],[3.1,.6,.6],cloth,'arm_'+side);
+ B('Satchel_strap_'+side,[side*3.2,torsoY,-2.95],[.7,torsoH-.8,.5],8);
+}
+B('Waist_pouch',[3.8,torsoY-torsoH/2-.1,-2],[3,3.3,2.4],8);
+B('Pouch_clasp',[3.8,torsoY-torsoH/2+.6,-3.3],[.6,.8,.35],10);
+if(index===2||index===5||index===8){
+ for(let k=0;k<5;k++)B('Sculpted_beard_'+k,[(k-2)*1.2,headY-2.7-Math.abs(k-2)*.15,-3.7],[1.3,3.8-Math.abs(k-2)*.5,1.25],hair,'head');
+ for(const side of[-1,1])B('Moustache_'+side,[side*.9,headY-1.65,-4.02],[1.8,.65,.8],hair,'head');
+}
+r.anim('idle','head','r',[[0,0,-5,0],[1.5,1,4,1],[3,0,-5,0]]);
+// Broad heads and shoulders create readable, stylised silhouettes at NPC distance.
+for(const mesh of r.groups.get('head').children)if(mesh.vertices)for(const v of Object.values(mesh.vertices)){v[0]*=1.35;v[1]=headY+(v[1]-headY)*1.2;v[2]*=1.25;}
+for(const mesh of r.elements)for(const v of Object.values(mesh.vertices)){v[0]*=1.06;v[1]*=.94;}
+for(const group of r.groups.values()){group.origin[0]*=1.06;group.origin[1]*=.94;}
 r.idle('body',.12);r.anim('idle','arm_-1','r',[[0,-4,0,-3],[1.5,-7,0,-1],[3,-4,0,-3]]);r.anim('idle','arm_1','r',[[0,0,0,2],[1.5,-3,0,4],[3,0,0,2]]);reports.push(r.finish());}
 ids.forEach(make);fs.writeFileSync(path.join(art,'quality-report.json'),JSON.stringify(reports,null,2));console.log(reports.map(r=>r.id+': '+r.meshes+' cuboids').join('\n'));

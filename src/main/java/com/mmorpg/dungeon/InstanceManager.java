@@ -162,7 +162,7 @@ public final class InstanceManager {
         }
         DungeonType t = typeOf(pool);
         String title = t.label + (difficultyOf(pool) == 1 ? " (héroïque)" : difficultyOf(pool) >= 2 ? " (mythique)" : "");
-        String lore = StyledDungeon.loreOf(t);
+        String lore = StyledDungeon.loreOf(t)+" · "+DungeonVariants.description(slot.variantSeed);
         int color = StyledDungeon.colorOf(t);
         long at = server.overworld().getGameTime() + MIN_LOADING_TICKS;
         for (ServerPlayer m : groupEntry ? PartyManager.onlineMembers(player) : java.util.List.of(player)) {
@@ -198,7 +198,7 @@ public final class InstanceManager {
                 b.job.run(b.next++);
             } catch (RuntimeException e) {
                 MMORPG.LOGGER.error("[MMORPG] Construction d'un exemplaire de donjon interrompue", e);
-                b.slot.ready = false; b.slot.owner = "";
+                b.slot.ready = false; DungeonVariants.finish(server,b.slot.pool,b.slot.owner);b.slot.owner = "";
                 BUILDS.remove(key); InstanceData.get(server).dirty();
                 TRANSITIONS.removeIf(transition -> {
                     if (transition.slot() != b.slot) return false;
@@ -255,6 +255,7 @@ public final class InstanceManager {
         List<Slot> slots = data.slotsOf(pool);
         for (Slot s : slots) {
             if (s.owner.equals(owner)) {
+                if(s.variantSeed==0)s.variantSeed=DungeonVariants.preview(server,pool,owner);
                 s.lastBusy = server.getTickCount();
                 data.dirty();
                 return s;
@@ -263,6 +264,7 @@ public final class InstanceManager {
         for (Slot s : slots) {
             if (s.owner.isEmpty()) {
                 s.owner = owner;
+                s.variantSeed= DungeonVariants.preview(server,pool,owner);
                 s.lastBusy = server.getTickCount();
                 data.dirty();
                 if (s.ready) resetSlot(server, s);
@@ -276,6 +278,7 @@ public final class InstanceManager {
             if (TYPES[i] == t) poolIndex = i * 3 + difficultyOf(pool);
         }
         Slot s = new Slot(pool, slots.size(), 200 + slots.size() * 120, 101, Z_BASE + poolIndex * Z_STEP, owner, server.getTickCount(), false);
+        s.variantSeed= DungeonVariants.preview(server,pool,owner);
         data.slots.add(s);
         data.dirty();
         return s;
@@ -317,6 +320,7 @@ public final class InstanceManager {
         List<Slot> slots = data.slotsOf(pool);
         for (Slot s : slots) {
             if (s.owner.equals(owner)) {
+                if(s.variantSeed==0)s.variantSeed=DungeonVariants.preview(server,pool,owner);
                 s.lastBusy = server.getTickCount();
                 data.dirty();
                 return s;
@@ -325,6 +329,7 @@ public final class InstanceManager {
         for (Slot s : slots) {
             if (s.owner.isEmpty()) {
                 s.owner = owner;
+                s.variantSeed= DungeonVariants.preview(server,pool,owner);
                 s.lastBusy = server.getTickCount();
                 data.dirty();
                 if (s.ready) DungeonManager.reset(server, group(pool, s));
@@ -344,6 +349,7 @@ public final class InstanceManager {
             if (TYPES[i] == t) poolIndex = i * 3 + difficultyOf(pool);
         }
         Slot s = new Slot(pool, slots.size(), 200 + slots.size() * 120, 101, Z_BASE + poolIndex * Z_STEP, owner, server.getTickCount());
+        s.variantSeed= DungeonVariants.preview(server,pool,owner);
         data.slots.add(s);
         data.dirty();
         DungeonBuilder.buildDungeon(level, new BlockPos(s.x, s.y, s.z), t, difficultyOf(pool));
@@ -377,7 +383,7 @@ public final class InstanceManager {
                 s.lastBusy = now;
             } else if (now - s.lastBusy > RELEASE_TICKS) {
                 MMORPG.LOGGER.info("[MMORPG] Donjon {} : exemplaire {} libere", s.pool, s.index);
-                s.owner = "";
+                DungeonVariants.finish(server,s.pool,s.owner);s.owner = "";
                 data.dirty();
             }
         }
@@ -431,7 +437,7 @@ public final class InstanceManager {
                 if (inside.test(p)) bringBack(server, p, hall);
             }
             if (slot != null) {
-                slot.owner = "";
+                DungeonVariants.finish(server,slot.pool,slot.owner);slot.owner = "";
                 InstanceData.get(server).dirty();
                 com.mmorpg.server.Scheduler.later(level, 20, () -> resetSlot(server, slot));
             }
@@ -498,6 +504,7 @@ public final class InstanceManager {
         clearEntities(level, s);
         DungeonType t = typeOf(s.pool);
         StyledDungeon.refill(level, new BlockPos(s.x, s.y, s.z), t, difficultyOf(s.pool));
+        DungeonVariants.decorate(level,new BlockPos(s.x,s.y,s.z),s.variantSeed);
     }
 
     private static void clearEntities(ServerLevel level, Slot s) {
@@ -572,7 +579,7 @@ public final class InstanceManager {
                 built++;
             }
         }
-        for (Slot slot : warming) slot.owner = "";
+        for (Slot slot : warming) {DungeonVariants.finish(server,slot.pool,slot.owner);slot.owner = "";}
         InstanceData.get(server).dirty();
         return built;
     }
@@ -599,7 +606,7 @@ public final class InstanceManager {
 
     public static void release(MinecraftServer server, String pool, String owner) {
         for (Slot s : InstanceData.get(server).slotsOf(pool)) {
-            if (s.owner.equals(owner)) s.owner = "";
+            if (s.owner.equals(owner)) {DungeonVariants.finish(server,s.pool,s.owner);s.owner = "";}
         }
         InstanceData.get(server).dirty();
     }

@@ -38,20 +38,22 @@ public final class CinematicConfig {
     }
 
     /** Version du format : 2 = parcours global continu. */
-    public static final int VERSION = 3;
+    public static final int VERSION = 4;
 
     public static final String DEFAULT = """
             {
-              "version": 3,
+              "version": 4,
               "fondEntree": 1.6,
               "fondSortie": 1.4,
               "parcours": [
                 {"t": 0, "camera": [0, 40, 108], "cible": [0, 18, 40], "fov": 76},
-                {"t": 6, "camera": [0, 35, 78], "cible": [0, 27, 36], "fov": 70},
-                {"t": 10, "camera": [-2, 46, 50], "cible": [0, 16, 14], "fov": 68},
-                {"t": 12.8, "camera": [-22, 46, 32], "cible": [-6, 12, 4], "fov": 66},
-                {"t": 15.5, "camera": [-38, 34, 14], "cible": [-14, 9, -6], "fov": 64},
-                {"t": 18.8, "camera": [-26, 20, -2], "cible": [-18, 8, -14], "fov": 62},
+                {"t": 6, "camera": [0, 8, 60], "cible": [0, 8, 20], "fov": 70},
+                {"t": 8, "camera": [0, 8, 46], "cible": [0, 8, 16], "fov": 68},
+                {"t": 9.5, "camera": [0, 8, 40], "cible": [0, 8, 10], "fov": 67},
+                {"t": 10.5, "camera": [0, 8, 32], "cible": [0, 8, 6], "fov": 66},
+                {"t": 12.8, "camera": [0, 8, 22], "cible": [0, 7, 0], "fov": 66},
+                {"t": 15.5, "camera": [0, 8, 12], "cible": [-8, 6, -6], "fov": 64},
+                {"t": 18.8, "camera": [-4, 7, 0], "cible": [-16, 5.5, -16], "fov": 62},
                 {"t": 22.5, "camera": [-7.78, 7.0, -7.78], "cible": [-20.01, 5.5, -20.01], "fov": 60},
                 {"t": 23.25, "camera": [-8.15, 7.12, -7.9], "cible": [-20.47, 5.42, -19.84], "fov": 59},
                 {"t": 24.0, "camera": [-8.52, 7.24, -8.0], "cible": [-20.94, 5.35, -19.66], "fov": 59},

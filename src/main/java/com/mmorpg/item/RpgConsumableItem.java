@@ -24,7 +24,7 @@ public class RpgConsumableItem extends RpgMaterialItem {
     public static final Identifier POTION_GROUP = MMORPG.id("potions");
 
     public enum Kind {
-        ADVENTURE_CRATE, HEAL, MANA, PET_FOOD, XP_CHARM, LUCK_CHARM, ELIXIR, TELEPORT_SCROLL, FORGET_SCROLL, REBIRTH_ORB, COSMETIC_CHEST
+        ADVENTURE_CRATE, HEAL, MANA, PET_FOOD, XP_CHARM, LUCK_CHARM, ELIXIR, TELEPORT_SCROLL, FORGET_SCROLL, REBIRTH_ORB, CLASS_RUNE, COSMETIC_CHEST
     }
 
     private final Kind kind;
@@ -106,13 +106,19 @@ public class RpgConsumableItem extends RpgMaterialItem {
                 sl.sendParticles(ParticleTypes.TOTEM_OF_UNDYING, sp.getX(), sp.getY() + 1, sp.getZ(), 60, 0.5, 1, 0.5, 0.3);
                 sl.playSound(null, sp.blockPosition(), SoundEvents.TOTEM_USE, SoundSource.PLAYERS, 0.8f, 1);
             }
+            case CLASS_RUNE -> {
+                if(!sp.level().dimension().equals(com.mmorpg.hub.SpawnBuilder.DIM)||!data.playerClass.isPlayable()||data.pvpUntilTick>sl.getGameTime()||com.mmorpg.network.NetworkPlayers.inTransit(sp)){
+                    sp.sendSystemMessage(net.minecraft.network.chat.Component.literal("Utilise cette rune au spawn, avec une classe choisie et hors combat."));return InteractionResult.FAIL;
+                }
+                data.resetClass();RpgPlayers.recomputeAndSync(sp);RpgPlayers.openClassSelection(sp);
+            }
             case COSMETIC_CHEST -> {
                 RpgPlayers.unlockRandomCosmetic(sp);
                 sl.playSound(null, sp.blockPosition(), SoundEvents.CHEST_OPEN, SoundSource.PLAYERS, 1, 1);
                 sl.sendParticles(ParticleTypes.FIREWORK, sp.getX(), sp.getY() + 1, sp.getZ(), 30, 0.4, 0.4, 0.4, 0.15);
             }
         }
-        if (consumed && !sp.hasInfiniteMaterials()) {
+        if (consumed && (!sp.hasInfiniteMaterials()||kind==Kind.CLASS_RUNE)) {
             stack.shrink(1);
         }
         return InteractionResult.SUCCESS;

@@ -38,6 +38,7 @@ public final class DungeonMaster {
         var server = p.level().getServer();
         int level = RpgPlayers.get(p).level;
         String owner = InstanceManager.ownerKey(p);
+        var choices=DungeonVariants.choices(server,owner);
         ListTag list = new ListTag();
         for (DungeonType t : DungeonType.values()) {
             if (!offers(npc, t)) continue;
@@ -49,6 +50,7 @@ public final class DungeonMaster {
             e.putInt("color", StyledDungeon.colorOf(t));
             for (int d = 0; d < 3; d++) {
                 e.putInt("need" + d, requiredLevel(t, d));
+                e.putString("variant"+d,DungeonVariants.description(choices.get(InstanceManager.pool(t,d))));
                 e.putBoolean("resume" + d, InstanceManager.hasInstance(server, InstanceManager.pool(t, d), owner));
             }
             list.add(e);

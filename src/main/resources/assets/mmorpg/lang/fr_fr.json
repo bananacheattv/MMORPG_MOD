@@ -640,5 +640,11 @@
   "entity.mmorpg.yggdrasil_papillon_eclipse": "Vespera, Mangeuse de Soleils",
   "entity.mmorpg.yggdrasil_serpent_couronnes": "Azheryn, Spirale des Mondes",
   "entity.mmorpg.yggdrasil_oeil_yggdrasil": "Elyndraxx, Cœur de l’Arbre-Monde",
-  "entity.mmorpg.cristal_arene": "Cristal d’arène"
+  "entity.mmorpg.cristal_arene": "Cristal d’arène",
+  "block.mmorpg.lucky_celeste": "Lucky Block Céleste",
+  "item.mmorpg.rune_changement_classe": "Rune de changement de classe",
+  "block.mmorpg.lucky_sylvestre": "Lucky Block Sylvestre",
+  "block.mmorpg.lucky_infernal": "Lucky Block Infernal",
+  "block.mmorpg.lucky_givre": "Lucky Block Givre",
+  "block.mmorpg.lucky_neant": "Lucky Block Néant"
 }

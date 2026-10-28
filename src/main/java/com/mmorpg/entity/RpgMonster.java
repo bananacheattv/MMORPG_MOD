@@ -68,6 +68,8 @@ public abstract class RpgMonster extends Monster implements RpgMob {
         return data;
     }
 
+    @Override public void aiStep(){super.aiStep();if(level() instanceof ServerLevel server)MobCooperation.tick(this,server);}
+
     public MobData rpgData() {
         return this.getExistingDataOrNull(ModAttachments.MOB);
     }

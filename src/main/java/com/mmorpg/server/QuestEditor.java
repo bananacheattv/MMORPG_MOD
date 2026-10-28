@@ -106,6 +106,7 @@ public final class QuestEditor {
             require(o!=null&&o.type!=null&&o.target!=null&&o.target.length()<=100&&o.count>=1&&o.count<=100000,"Objectif invalide.");
             if(o.navigation!=null){var n=o.navigation;require(n.backend!=null&&(n.backend.isEmpty()||Arrays.stream(NetworkConfig.Role.values()).anyMatch(role->role.name().equals(n.backend))),"Serveur du repère invalide.");require(n.dimension!=null&&Identifier.tryParse(n.dimension)!=null,"Dimension du repère invalide.");require(Double.isFinite(n.x)&&Double.isFinite(n.y)&&Double.isFinite(n.z)&&Math.abs(n.x)<=29999984&&Math.abs(n.z)<=29999984&&n.y>=-2048&&n.y<=2048,"Position du repère invalide.");}
             switch(o.type) {
+                case "visit" -> require(o.navigation!=null,"Un repère est requis pour la découverte.");
                 case "level" -> require(o.count<=100,"Niveau cible : 1 à 100.");
                 case "collect" -> require(validItem(o.target),"Objet à collecter inconnu : "+o.target);
                 case "kill" -> require(o.target.equals("*")||o.target.equals("boss")||ConfigManager.mobs().containsKey(o.target)

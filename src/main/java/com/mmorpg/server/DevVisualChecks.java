@@ -15,6 +15,7 @@ public final class DevVisualChecks {
             var server=p.level().getServer();var level=server.overworld();
             server.getPlayerList().op(new net.minecraft.server.players.NameAndId(p.getGameProfile()));
             com.mmorpg.hub.CinematicManager.finish(p);p.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+            if(Boolean.getBoolean("mmorpg.expansionVisual")){com.mmorpg.dungeon.DevExpansionVisual.install(p);return;}
             if(Boolean.getBoolean("mmorpg.guideVisual")){
                 com.mmorpg.config.ConfigManager.general().customSpawning=false;
                 for(int x=-10;x<=40;x++)for(int z=-5;z<=18;z++)level.setBlockAndUpdate(new BlockPos(x,219,z),net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState());

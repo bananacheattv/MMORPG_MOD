@@ -17,7 +17,7 @@ import sys
 import zipfile
 
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageDraw
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.normpath(os.path.join(HERE, '..', 'src', 'main', 'resources', 'resourcepacks', 'aeloria_ui'))
@@ -30,7 +30,7 @@ GOLD_DARK = (122, 90, 34)
 NIGHT = (10, 7, 18)
 RAMP = [(0.0, (4, 3, 7)), (0.20, (9, 7, 13)), (0.40, (14, 11, 20)), (0.55, (17, 14, 24)), (0.776, (27, 23, 37)),
         (0.90, (62, 54, 82)), (1.0, (122, 110, 152))]
-BORDER = (43, 37, 56)
+BORDER = (122, 98, 154)
 BORDER_HI = (226, 184, 90)
 
 # textures du jeu recolorees (chemins relatifs a assets/minecraft/textures/gui/, motifs de prefixe)
@@ -79,14 +79,19 @@ def flat(w, h, top, bottom, border, accent_bar=None, alpha=255):
     if accent_bar:
         for y in range(1, h - 1):
             px[1, y] = (*accent_bar, alpha)
+    radius=min(5,w//2,h//2)
+    mask=Image.new('L',(w,h),0)
+    ImageDraw.Draw(mask).rounded_rectangle((0,0,w-1,h-1),radius=radius,fill=min(alpha,215))
+    im.putalpha(mask)
+    ImageDraw.Draw(im).rounded_rectangle((0,0,w-1,h-1),radius=radius,outline=(*border,230),width=1)
     return im
 
 
 def make_widgets(out):
     d = os.path.join(out, GUI, 'sprites/widget')
     os.makedirs(d, exist_ok=True)
-    flat(200, 20, (22, 18, 31), (15, 12, 22), BORDER).save(d + '/button.png')
-    flat(200, 20, (34, 27, 48), (24, 19, 35), BORDER_HI).save(d + '/button_highlighted.png')
+    flat(200, 20, (47, 32, 67), (32, 24, 48), BORDER).save(d + '/button.png')
+    flat(200, 20, (68, 44, 92), (44, 29, 65), BORDER_HI).save(d + '/button_highlighted.png')
     flat(200, 20, (12, 10, 17), (10, 8, 14), (28, 24, 38)).save(d + '/button_disabled.png')
     flat(200, 20, (11, 9, 16), (9, 7, 13), BORDER).save(d + '/slider.png')
     flat(200, 20, (14, 11, 20), (11, 9, 16), BORDER_HI).save(d + '/slider_highlighted.png')
@@ -96,6 +101,15 @@ def make_widgets(out):
     flat(200, 20, (7, 5, 11), (7, 5, 11), BORDER_HI).save(d + '/text_field_highlighted.png')
     flat(6, 32, (226, 184, 90), (190, 150, 66), (226, 184, 90)).save(d + '/scroller.png')
     flat(6, 32, (9, 7, 13), (9, 7, 13), (22, 18, 30)).save(d + '/scroller_background.png')
+    for filename in os.listdir(d):
+        if not filename.endswith('.png.mcmeta'):continue
+        file=os.path.join(d,filename)
+        with open(file,encoding='utf-8') as handle:meta=json.load(handle)
+        scaling=meta.get('gui',{}).get('scaling',{})
+        if scaling.get('width')==200 and scaling.get('height')==20:
+            scaling['border']=5
+            with open(file,'w',encoding='utf-8',newline='\n') as handle:json.dump(meta,handle,indent=4)
+
 
 
 def make_tooltip(out):
@@ -129,7 +143,7 @@ def make_backgrounds(out):
 def font_sheet():
     """Glyphes 8 x 12 de la police Aeloria (grille de 16 colonnes) pour composer le logo."""
     sheet = Image.open(os.path.normpath(os.path.join(HERE, '..', 'src', 'main', 'resources', 'assets', 'mmorpg', 'textures', 'font', 'aeloria.png'))).convert('RGBA')
-    j = json.load(open(os.path.normpath(os.path.join(HERE, '..', 'src', 'main', 'resources', 'assets', 'mmorpg', 'font', 'aeloria.json')), encoding='utf-8'))
+    j = json.load(open(os.path.normpath(os.path.join(HERE, '..', 'src', 'main', 'resources', 'assets', 'mmorpg', 'font', 'aeloria_bitmap.json')), encoding='utf-8'))
     grid = next(p['chars'] for p in j['providers'] if p['type'] == 'bitmap')
     return sheet, grid
 

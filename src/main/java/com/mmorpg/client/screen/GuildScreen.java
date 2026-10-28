@@ -13,7 +13,7 @@ import java.util.*;
 public final class GuildScreen extends MmoScreen {
     private final CompoundTag data;private final GuildStore.Guild guild;private final UUID self;private int tab,page,boss;private UUID selected;
     private EditBox name,amount,motto,confirmation;
-    public void showTab(int value){tab=Math.clamp(value,0,5);page=0;}
+    public void showTab(int value){tab=Math.clamp(value,0,6);page=0;}
     public GuildScreen(CompoundTag data){super("Guilde");this.data=data;String json=data.getStringOr("guild","");guild=json.isEmpty()?null:new com.google.gson.Gson().fromJson(json,GuildStore.Guild.class);self=UUID.fromString(data.getStringOr("self",new UUID(0,0).toString()));boss=guild==null?0:guild.level-1;}
     @Override protected int panelWidth(){return Math.min(width-12,720);}
     @Override protected int panelHeight(){return Math.min(height-12,340);}
@@ -28,8 +28,8 @@ public final class GuildScreen extends MmoScreen {
         Ui.frame(g,left,top,pw,ph,Ui.GOLD,false);g.centeredText(font,Component.literal(guild==null?"GUILDES":guild.name+" · Niveau "+guild.level+" / 10"),left+pw/2,top+8,Ui.GOLD);
         for(var f:List.of(name,amount,motto,confirmation)){f.visible=false;f.active=false;}
         if(guild==null)noGuild(g);else{
-            String[] tabs={"Guilde","Membres","Banque","Yggdrasil","Buffs","Journal"};int w=(pw-24)/6;for(int i=0;i<6;i++){int n=i;button(g,left+12+i*w,top+27,w-2,17,tabs[i],true,tab==i?Ui.GOLD:Ui.MUTED,()->{tab=n;page=0;});}
-            switch(tab){case 0->home(g);case 1->members(g);case 2->bank(g);case 3->tree(g);case 4->buffs(g);default->history(g);}
+            String[] tabs={"Guilde","Membres","Banque","Yggdrasil","Buffs","Journal","Identité"};int w=(pw-24)/7;for(int i=0;i<tabs.length;i++){int n=i;button(g,left+12+i*w,top+27,w-2,17,tabs[i],true,tab==i?Ui.GOLD:Ui.MUTED,()->{tab=n;page=0;});}
+            switch(tab){case 0->home(g);case 1->members(g);case 2->bank(g);case 3->tree(g);case 4->buffs(g);case 6->identity(g);default->history(g);}
         }
         text(g,data.getStringOr("status",""),left+12,top+ph-38,Ui.GOLD);
         button(g,left+12,top+ph-23,90,17,"Actualiser",true,Ui.GOLD,()->send("open"));
@@ -64,6 +64,15 @@ public final class GuildScreen extends MmoScreen {
             String buttonLabel=remaining>0?String.format("Actif %02d:%02d",remaining/60000,remaining/1000%60):"Activer · 1 000 or";
             button(g,left+pw-142,y+3,130,18,buttonLabel,unlocked&&remaining==0&&officer()&&guild.gold>=GuildBuffs.COST,Ui.GOLD,()->send("buff",t->t.putString("buff",kind.name())));
         }
+    }
+    private void identity(GuiGraphicsExtractor g){
+        text(g,"BANNIÈRE : "+guild.banner+" · Hall "+guild.hallLevel+" / 3",left+12,top+53,Ui.GOLD);
+        String[] colors={"VIOLET","AZUR","EMERAUDE","CARMIN","OR"};int w=(pw-24)/5;for(int i=0;i<5;i++){String color=colors[i];button(g,left+12+i*w,top+70,w-3,18,color,officer(),Ui.GOLD,()->send("banner",t->t.putString("banner",color)));}
+        button(g,left+12,top+94,pw-24,18,"Emblème : "+guild.bannerPattern+" · Changer",officer(),Ui.GOLD,()->{String[] patterns={"CRISTAL","SOLEIL","LUNE","ARBRE","DRAGON"};int index=java.util.Arrays.asList(patterns).indexOf(guild.bannerPattern);send("bannerPattern",t->t.putString("pattern",patterns[(index+1)%patterns.length]));});
+        button(g,left+12,top+118,pw-24,20,"Entrer dans le hall de guilde",true,Ui.GREEN,()->send("hall"));
+        long cost=5000L*(guild.hallLevel+1);button(g,left+12,top+145,pw-24,20,"Améliorer le hall · "+cost+" or",officer()&&guild.hallLevel<3&&guild.gold>=cost,Ui.GOLD,()->send("hallUpgrade"));
+        text(g,"Trophées : "+Integer.bitCount(guild.bosses)+" / 10 gardiens vaincus",left+12,top+175,Ui.TEXT);
+        if(ph>260)text(g,"Améliorations : bibliothèque, atelier puis galerie royale.",left+12,top+196,Ui.MUTED);
     }
     private void history(GuiGraphicsExtractor g){int rows=Math.max(1,(ph-115)/17);for(int i=0;i<rows&&page*rows+i<guild.history.size();i++)text(g,guild.history.get(page*rows+i),left+12,top+55+i*17,Ui.TEXT);button(g,left+12,top+ph-67,40,16,"‹",page>0,Ui.GOLD,()->page--);button(g,left+58,top+ph-67,40,16,"›",(page+1)*rows<guild.history.size(),Ui.GOLD,()->page++);}
 }

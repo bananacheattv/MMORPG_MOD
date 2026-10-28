@@ -62,17 +62,18 @@ public class DungeonMasterScreen extends MmoScreen {
         int color = 0xFF000000 | d.getIntOr("color", 0xFFC868);
         g.text(font, d.getStringOr("label", "?").toUpperCase(java.util.Locale.ROOT), dx + 8, y0 + 8, color, true);
         Ui.wrap(g, d.getStringOr("lore", ""), dx + 8, y0 + 24, dw - 16, Ui.MUTED);
-        Ui.wrap(g, "Chaque joueur seul, ou chaque groupe, entre dans son propre exemplaire : vous ne croiserez personne d'autre. Une épreuve réussie "
-                + "ouvre la herse suivante, la dernière fait apparaître l'objet qui réveille le boss.", dx + 8, y0 + 56, dw - 16, Ui.TEXT);
-        int by = y0 + dh - 3 * 22 - 4;
+        if(ph>260)Ui.wrap(g,"Survolez une difficulté pour lire son parcours et ses dangers. Une reprise conserve votre expédition.",dx+8,y0+56,dw-16,Ui.TEXT);
+        int by = y0 + dh - 3 * 32 - 4;
         for (int diff = 0; diff < 3; diff++) {
+            g.text(font,font.plainSubstrByWidth(d.getStringOr("variant"+diff,""),dw-20),dx+8,by+diff*32+22,Ui.MUTED,false);
+            if(hovered(dx+8,by+diff*32,dw-16,31))g.setComponentTooltipForNextFrame(font,java.util.List.of(Component.literal(d.getStringOr("variant"+diff,"Dangers non disponibles"))),mx,my);
             int need = d.getIntOr("need" + diff, 1);
             boolean ok = playerLevel >= need;
             boolean resume = d.getBooleanOr("resume" + diff, false);
             String label = (resume ? "Reprendre — " : "Entrer — ") + NAMES[diff] + "  (niv. " + need + ")";
             int d2 = diff;
             String id = selected;
-            button(g, dx + 8, by + diff * 22, dw - 16, 18, ok ? label : NAMES[diff] + " : niveau " + need + " requis", ok, ACCENT[diff], () -> {
+            button(g, dx + 8, by + diff * 32, dw - 16, 18, ok ? label : NAMES[diff] + " : niveau " + need + " requis", ok, ACCENT[diff], () -> {
                 ClientNet.send(new Payloads.DungeonEnter(npc, id, d2));
                 minecraft.gui.setScreen(null);
             });

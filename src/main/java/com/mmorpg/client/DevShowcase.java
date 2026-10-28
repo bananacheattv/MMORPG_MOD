@@ -37,6 +37,56 @@ public final class DevShowcase {
     public static void onTick(ClientTickEvent.Post event) {
         if (!ENABLED) return;
         Minecraft mc = Minecraft.getInstance();
+        if(MODE.equals("graphics")){
+            if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
+            if(tick==80){mc.options.guiScale().set(2);mc.getWindow().setWindowed(1280,720);mc.resizeGui();mc.gui.setScreen(new com.mmorpg.client.screen.AeloriaTitleScreen());}
+            if(tick==110)shot(mc,"graphics_title");
+            if(tick==120)mc.gui.setScreen(new com.mmorpg.client.screen.AeloriaPauseScreen());
+            if(tick==145)shot(mc,"graphics_pause");
+            if(tick==155)mc.gui.setScreen(new com.mmorpg.client.screen.PremiumStoreScreen(expansionStore()));
+            if(tick==180)shot(mc,"graphics_store");
+            if(tick==190){mc.getWindow().setWindowed(854,480);mc.resizeGui();mc.gui.setScreen(new com.mmorpg.client.screen.AeloriaTitleScreen());}
+            if(tick==215)shot(mc,"graphics_title_small");
+            if(tick==225)mc.gui.setScreen(null);
+            if(tick==245)shot(mc,"graphics_hud");
+            if(tick==255){mc.getWindow().setWindowed(1280,720);mc.resizeGui();mc.gui.setScreen(new DevHubGuideGallery());}
+
+            if(tick==315)shot(mc,"graphics_npcs");
+            if(tick==330)stop(mc);return;
+        }
+        if(MODE.equals("expansion_world")){
+            if(mc.player==null||mc.level==null)return;tick++;
+            if(tick==160){mc.options.guiScale().set(2);mc.getWindow().setWindowed(1280,720);mc.resizeGui();cmd(mc,"time set day");cmd(mc,"weather clear");mc.gui.setScreen(null);mc.gui.hud.toggle();}
+            if(tick==175)cmd(mc,"execute in mmorpg:donjons run tp @s 12008 103 10131 -90 8");
+            if(tick==210)shot(mc,"secret_runes");
+            if(tick==220)cmd(mc,"execute in mmorpg:donjons run tp @s 12024 103 10135 180 10");
+            if(tick==250)shot(mc,"secret_class_seal");
+            if(tick==260)cmd(mc,"execute in mmorpg:donjons run tp @s 12000 104 10146 0 16");
+            if(tick==295)shot(mc,"variant_gallery");
+            if(tick==305)cmd(mc,"execute in mmorpg:guildes run tp @s 8180 105 522 180 16");
+            if(tick>=315&&tick<=410)mc.gui.setScreen(null);
+            if(tick==350)shot(mc,"guild_hall");
+            if(tick==365)cmd(mc,"execute in mmorpg:guildes run tp @s 8180 104 520 180 20");
+            if(tick==400)shot(mc,"guild_trophies");
+            if(tick==415){mc.gui.hud.toggle();mc.gui.setScreen(new com.mmorpg.client.screen.PremiumStoreScreen(expansionStore()));}
+            if(tick==440)shot(mc,"store_in_world");
+            for(int i=0;i<5;i++){if(tick==455+i*25){var data=new CompoundTag();data.putInt("tier",i);data.put("table",com.mmorpg.server.AdventureLoot.preview(com.mmorpg.block.LuckyTier.of(i).id));mc.gui.setScreen(new com.mmorpg.client.screen.LuckyBlockScreen(data));}if(tick==475+i*25)shot(mc,"lucky_final_"+i);}
+            if(tick==590){var guild=new com.mmorpg.guild.GuildStore.Guild();guild.name="Les Veilleurs d’Aeloria";guild.hallLevel=2;guild.gold=50000;guild.bosses=7;var self=new java.util.UUID(0,1);guild.members.put(self,new com.mmorpg.guild.GuildStore.Member(self,"Aeloria","CHEF"));var data=new CompoundTag();data.putString("self",self.toString());data.putString("guild",new com.google.gson.Gson().toJson(guild));var screen=new com.mmorpg.client.screen.GuildScreen(data);screen.showTab(6);mc.gui.setScreen(screen);}
+            if(tick==615)shot(mc,"guild_identity_final");if(tick==630)stop(mc);return;
+        }
+        if(MODE.equals("expansion_ui")){
+            if(mc.player==null||mc.level==null)return;tick++;if(tick<90)return;int frame=tick-90;
+            if(frame==0){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();}
+            for(int i=0;i<5;i++){if(frame==10+i*38){var data=new CompoundTag();data.putInt("tier",i);data.put("table",com.mmorpg.server.AdventureLoot.preview(com.mmorpg.block.LuckyTier.of(i).id));mc.gui.setScreen(new com.mmorpg.client.screen.LuckyBlockScreen(data));}if(frame==35+i*38)shot(mc,"lucky_new_"+i);}
+            if(frame==205)mc.gui.setScreen(new com.mmorpg.client.screen.PremiumStoreScreen(expansionStore()));
+            if(frame>=210&&frame<=365&&mc.gui.screen() instanceof com.mmorpg.client.screen.PremiumStoreScreen store){String[] cats={"Clés","Charmes","Runes","Potions","Lucky Blocks","Grades"};for(int i=0;i<cats.length;i++){if(frame==210+i*26)store.previewCategory(cats[i]);if(frame==230+i*26)shot(mc,"store_"+i);}}
+            if(frame==375){var guild=new com.mmorpg.guild.GuildStore.Guild();guild.name="Les Veilleurs d’Aeloria";guild.hallLevel=2;guild.gold=50000;guild.bosses=7;var self=new java.util.UUID(0,1);guild.members.put(self,new com.mmorpg.guild.GuildStore.Member(self,"Aeloria","CHEF"));var data=new CompoundTag();data.putString("self",self.toString());data.putString("guild",new com.google.gson.Gson().toJson(guild));var screen=new com.mmorpg.client.screen.GuildScreen(data);screen.showTab(6);mc.gui.setScreen(screen);}
+            if(frame==395)shot(mc,"guild_identity");
+            if(frame==405){mc.getWindow().setWindowed(854,480);mc.options.guiScale().set(2);mc.resizeGui();mc.gui.setScreen(new com.mmorpg.client.screen.PremiumStoreScreen(expansionStore()));}
+            if(frame==430)shot(mc,"store_small");
+            if(frame==440){var data=new CompoundTag();data.putInt("tier",4);data.put("table",com.mmorpg.server.AdventureLoot.preview("lucky_neant"));mc.gui.setScreen(new com.mmorpg.client.screen.LuckyBlockScreen(data));}
+            if(frame==465)shot(mc,"lucky_small");if(frame==480)stop(mc);return;
+        }
         if(MODE.equals("social_ui")){
             if(mc.gui.screen()==null)return;tick++; if(tick<70)return; int frame=tick-70;
             if(frame==30){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(3);mc.resizeGui();mc.gui.setScreen(new com.mmorpg.client.screen.AeloriaTitleScreen());}
@@ -5022,6 +5072,10 @@ public final class DevShowcase {
         for(var child:screen.children()) if(child instanceof net.minecraft.client.gui.components.EditBox box&&box.getMessage().getString().equals(label)) box.setValue(value);
     }
 
+    private static CompoundTag expansionStore(){
+        var data=new CompoundTag();data.putLong("credits",12000);data.putInt("pending",2);var products=new ListTag();
+        for(var product:com.mmorpg.store.StoreConfig.defaults().products){var v=new CompoundTag();v.putString("id",product.id);v.putString("label",product.label);v.putString("item",product.item);v.putString("category",product.category);v.putLong("price",product.credits);v.putInt("count",product.count);if(product.rank>0)v.putString("benefits","Préfixe coloré · Annonces HDV · Cosmétique exclusif");products.add(v);}data.put("products",products);return data;
+    }
     private static void shot(Minecraft mc, String name) {
         Screenshot.grab(mc.gameDirectory, "showcase_" + name + ".png", mc.gameRenderer.mainRenderTarget(), 1,
                 msg -> MMORPG.LOGGER.info("[MMORPG] Capture {}", name));

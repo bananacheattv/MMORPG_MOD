@@ -137,6 +137,11 @@ public class TrialData extends SavedData {
         }
     }
 
+    void replaceVariant(Trial t,boolean active,int diff){
+        var replacement=new Trial(t.id(),t.kind(),t.dim(),t.box(),t.gate(),t.gateBlock(),t.pos(),t.pads(),t.states(),t.level(),diff,t.mobs(),t.title(),t.hint(),!active);
+        trials.removeIf(old->old.id().equals(t.id()));trials.add(replacement);setDirty();
+    }
+
     void markDone(String id) {
         for (int i = 0; i < trials.size(); i++) {
             if (trials.get(i).id().equals(id)) {

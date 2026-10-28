@@ -141,6 +141,7 @@ public final class DefaultQuests {
             if (tier > 1) license.requires.add("parchemin_forge_" + (tier - 1));
             m.put("parchemin_forge_" + tier, license);
         }
+        m.putAll(SpawnDiscovery.definitions());
         return m;
     }
 
