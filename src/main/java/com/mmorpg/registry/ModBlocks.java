@@ -51,6 +51,18 @@ public final class ModBlocks {
         }
     }
 
+    /** Panneaux de classement (un bloc et un modèle par type), posés par les admins. */
+    public static final java.util.Map<com.mmorpg.ranking.RankingKind, DeferredBlock<com.mmorpg.block.ranking.RankingBoardBlock>> RANKING_BOARDS =
+            new java.util.EnumMap<>(com.mmorpg.ranking.RankingKind.class);
+
+    static {
+        for (var kind : com.mmorpg.ranking.RankingKind.values()) {
+            RANKING_BOARDS.put(kind, BLOCKS.registerBlock(kind.blockId(), p -> new com.mmorpg.block.ranking.RankingBoardBlock(p, kind),
+                    p -> p.mapColor(MapColor.WOOD).strength(3f, 1200f).sound(SoundType.WOOD).lightLevel(s -> 6).noOcclusion()
+                            .pushReaction(PushReaction.IMMOVEABLE)));
+        }
+    }
+
     /** Partie invisible des structures multiblocs (collision et renvoi des clics vers le bloc fonctionnel). */
     public static final DeferredBlock<StructurePartBlock> STRUCTURE_PART = BLOCKS.registerBlock("structure_part", StructurePartBlock::new,
             p -> p.mapColor(MapColor.COLOR_BLACK).strength(5f, 1200f).sound(SoundType.STONE).noOcclusion().noLootTable()
@@ -65,6 +77,11 @@ public final class ModBlocks {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.mmorpg.block.crate.CrateBlockEntity>> CRATE = BLOCK_ENTITIES.register("caisse",
             () -> new BlockEntityType<>(com.mmorpg.block.crate.CrateBlockEntity::new,
                     CRATES.values().stream().map(DeferredBlock::get).toArray(net.minecraft.world.level.block.Block[]::new)));
+
+    /** Panneaux de classement : lignes du top affichées sur le panneau (état synchronisé). */
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.mmorpg.block.ranking.RankingBoardBlockEntity>> RANKING_BOARD = BLOCK_ENTITIES.register("classement",
+            () -> new BlockEntityType<>(com.mmorpg.block.ranking.RankingBoardBlockEntity::new,
+                    RANKING_BOARDS.values().stream().map(DeferredBlock::get).toArray(net.minecraft.world.level.block.Block[]::new)));
 
     private ModBlocks() {
     }

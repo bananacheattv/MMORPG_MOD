@@ -81,6 +81,7 @@ public final class AnimatedModels {
     public static void registerBlockEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlocks.STRUCTURE.get(), StructureRenderer::new);
         event.registerBlockEntityRenderer(ModBlocks.CRATE.get(), com.mmorpg.client.model.crate.CrateRenderer::new);
+        event.registerBlockEntityRenderer(ModBlocks.RANKING_BOARD.get(), com.mmorpg.client.model.ranking.RankingBoardRenderer::new);
     }
 
     @SubscribeEvent

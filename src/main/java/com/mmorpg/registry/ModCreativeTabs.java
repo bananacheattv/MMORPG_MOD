@@ -32,6 +32,7 @@ public final class ModCreativeTabs {
                 out.accept(ModItems.PRESSE_COMPRESSION.get());
                 out.accept(ModItems.BANQUE.get());
                 out.accept(ModItems.HDV.get());
+                ModItems.RANKING_BOARDS.forEach(i -> out.accept(i.get()));
                 ModItems.LUCKY_BLOCKS.forEach(i->out.accept(i.get()));
                 ModItems.CRATE_BLOCKS.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
                 out.accept(ModItems.TELEPORTEUR.get());
