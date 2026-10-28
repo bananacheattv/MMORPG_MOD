@@ -1,0 +1,220 @@
+{
+  "version": 1,
+  "generation_tool": "image_gen built-in",
+  "date": "2026-10-28",
+  "namespace_suggestion": "mmorpg:textures/gui/illustrations/",
+  "assets": [
+    {
+      "id": "professions_background",
+      "path": "images/professions_background.png",
+      "label": "Fond Métiers",
+      "role": "background",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "e6da5c0c8e83c2391ade792ac407998ada177d2ae82c1992a5d6e315c57cf5d2",
+      "contains_embedded_text": false
+    },
+    {
+      "id": "miner_card",
+      "path": "images/miner_card.png",
+      "label": "Mineur",
+      "role": "profession_card_with_title",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "9e59407795b86cef2a60820a03e3a677d2c5ee7635155dff72870a64ab8e8d0d",
+      "contains_embedded_text": true,
+      "illustration_only_crop_uv": [
+        0,
+        0,
+        1,
+        0.71
+      ]
+    },
+    {
+      "id": "fisher_card",
+      "path": "images/fisher_card.png",
+      "label": "Pêcheur",
+      "role": "profession_card_with_title",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "94db12c34548711aff00a190ae5a5f3e4bf4f72d5fa4e40be10c1426a98fd7e0",
+      "contains_embedded_text": true,
+      "illustration_only_crop_uv": [
+        0,
+        0,
+        1,
+        0.71
+      ]
+    },
+    {
+      "id": "farmer_card",
+      "path": "images/farmer_card.png",
+      "label": "Fermier",
+      "role": "profession_card_with_title",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "fcd4abf943827f154f22904ebad3214484707911ba720eb27c0dee0598f9ff85",
+      "contains_embedded_text": true,
+      "illustration_only_crop_uv": [
+        0,
+        0,
+        1,
+        0.71
+      ]
+    },
+    {
+      "id": "dungeon_crypt_cover",
+      "path": "images/dungeon_crypt_cover.png",
+      "label": "Donjons — crypte",
+      "role": "landscape_card",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "5e1a5f004cf3cab099f9df5d1ca14120adade96d7d9eda0645f6c0cdae0403a5",
+      "contains_embedded_text": false
+    },
+    {
+      "id": "classes_atlas",
+      "path": "images/classes_atlas.png",
+      "label": "Guerrier, Mage, Archer, Paladin",
+      "role": "four_portrait_atlas",
+      "width": 1983,
+      "height": 793,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "888409dd023cbb56eb5bf840bf5043b9b68df12f9c3473c53107871c0708846a",
+      "contains_embedded_text": false,
+      "regions": [
+        {
+          "id": "guerrier",
+          "x": 0,
+          "y": 0,
+          "width": 496,
+          "height": 793,
+          "uv": [
+            0.0,
+            0,
+            0.25,
+            1
+          ]
+        },
+        {
+          "id": "mage",
+          "x": 496,
+          "y": 0,
+          "width": 496,
+          "height": 793,
+          "uv": [
+            0.25,
+            0,
+            0.5,
+            1
+          ]
+        },
+        {
+          "id": "archer",
+          "x": 992,
+          "y": 0,
+          "width": 495,
+          "height": 793,
+          "uv": [
+            0.5,
+            0,
+            0.75,
+            1
+          ]
+        },
+        {
+          "id": "tank",
+          "x": 1487,
+          "y": 0,
+          "width": 496,
+          "height": 793,
+          "uv": [
+            0.75,
+            0,
+            1.0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "quest_guide_portrait",
+      "path": "images/quest_guide_portrait.png",
+      "label": "Portrait guide de quêtes",
+      "role": "transparent_portrait",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "8522a375cda1f71552cd4f1aa6461fc81d1be055181f2eb87716cc66345ac004",
+      "contains_embedded_text": false
+    },
+    {
+      "id": "mounts_pets_header",
+      "path": "images/mounts_pets_header.png",
+      "label": "Montures et familiers",
+      "role": "collection_header",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "7b83e963d70a6c2623f678781310fde736254e83443bdc5f42c03aa3b7daa212",
+      "contains_embedded_text": false
+    },
+    {
+      "id": "shop_header",
+      "path": "images/shop_header.png",
+      "label": "Boutique",
+      "role": "shop_header",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "d457366405d3c49415ad3ee0a29123e592061ac29cdf991968bbe3cf47625bed",
+      "contains_embedded_text": false
+    },
+    {
+      "id": "portal_loading_background",
+      "path": "images/portal_loading_background.png",
+      "label": "Chargement / portail",
+      "role": "background",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "ad3de3aa5583653de23910db95265bf7dc2e8de25021ffd300a066e8f3bbbb20",
+      "contains_embedded_text": false
+    }
+  ]
+}
