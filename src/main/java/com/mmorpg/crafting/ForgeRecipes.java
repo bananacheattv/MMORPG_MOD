@@ -165,6 +165,7 @@ public final class ForgeRecipes {
         PlayerClass N = PlayerClass.NONE;
         for(int i=0;i<com.mmorpg.mine.ToolRunes.IDS.length;i++)add(Category.MATERIAUX,com.mmorpg.mine.ToolRunes.IDS[i],1,100,10+i*10,N,"cristal_arcanique",2,"poussiere_ame",8,"lingot_argentite",2);
         add(Category.MATERIAUX, "fiole_runique", 4, 1, 1, N, "lingot_verdite", 1, "poussiere_ame", 1);
+        for(int i=0;i<4;i++)add(Category.CONSOMMABLES,"sac_a_dos_"+i,1,150*(i+1),1+i*15,N,"cuir_renforce",4+i*4,"soie_araignee",2+i*2,"poussiere_ame",2+i*3);
         add(Category.CONSOMMABLES, "charme_experience", 1, 100, 10, N, "poussiere_ame", 8, "poussiere_ame", 4);
         add(Category.CONSOMMABLES, "lucky_celeste", 1, 120, 10, N, "lingot_argentite", 4, "trefle_chance", 1);
         add(Category.CONSOMMABLES, "charme_chance", 1, 100, 10, N, "trefle_chance", 1, "lingot_argentite", 2);

@@ -1,6 +1,19 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "mmorpg:item/charme_chance"
+    "type": "minecraft:select",
+    "property": "minecraft:display_context",
+    "cases": [
+      {
+        "when": "fixed",
+        "model": {
+          "type": "minecraft:model",
+          "model": "mmorpg:item/reel_charme_chance"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "mmorpg:item/charme_chance"
+    }
   }
 }

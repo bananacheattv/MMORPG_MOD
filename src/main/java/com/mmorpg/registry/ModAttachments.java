@@ -15,6 +15,8 @@ public final class ModAttachments {
     public static final Supplier<AttachmentType<Integer>> MINE_DENSITY = ATTACHMENTS.register("mine_density",
             () -> AttachmentType.builder(() -> 0).serialize(com.mojang.serialization.Codec.INT.fieldOf("version")).build());
 
+    public static final Supplier<AttachmentType<String>> STAND_LOOK=ATTACHMENTS.register("stand_appearance",()->AttachmentType.builder(()->"").serialize(com.mojang.serialization.Codec.STRING.fieldOf("appearance")).sync(net.minecraft.network.codec.ByteBufCodecs.STRING_UTF8).build());
+
     /** Donnees RPG du joueur : persistantes et conservees a la mort. */
     public static final Supplier<AttachmentType<PlayerData>> PLAYER = ATTACHMENTS.register("player_data",
             () -> AttachmentType.serializable(PlayerData::new).copyOnDeath().build());

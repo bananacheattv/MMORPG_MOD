@@ -68,15 +68,11 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
 
     @Override
     protected void init() {
-        if (creative()) {
-            openCreative();
-            return;
-        }
         com.mmorpg.server.InventoryRules.apply(this.minecraft.player);
         super.init();
         // meme panneau que les autres onglets ; les emplacements de Minecraft sont places sous les onglets, a gauche
-        this.pw = Math.min(this.width - 12, 440);
-        this.ph = Math.min(this.height - 12, 272);
+        this.pw = Math.min(this.width - 12, 620);
+        this.ph = Math.min(this.height - 12, 310);
         this.px = (this.width - pw) / 2;
         this.py = (this.height - ph) / 2;
         this.leftPos = px + 8;
@@ -86,7 +82,7 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
     @Override
     public void containerTick() {
         super.containerTick();
-        if (creative()) openCreative();
+
     }
 
     @Override
@@ -126,7 +122,8 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
 
     @Override
     public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
-        g.fill(0, 0, this.width, this.height, 0xE609070F);
+        this.extractBlurredBackground(g);
+        g.fill(0,0,width,height,0x700D071C);
         Ui.navBar(g, this.width, py);
         hits.clear();
         PlayerData d = ClientData.DATA;
@@ -148,8 +145,12 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
             boolean result = s.index == InventoryMenu.RESULT_SLOT;
             slotBox(g, x + s.x - 1, y + s.y - 1, equipment ? Ui.GOLD_DARK : result ? Ui.GOLD : 0xFF2B2538, result);
         }
-        g.text(this.font, "Rendez-vous", x + 98, y + 20, Ui.MUTED, false);
-        g.text(this.font, "à la Forge", x + 98, y + 32, Ui.GOLD, false);
+        g.text(font,"SACS À DOS",x+96,y+10,Ui.GOLD,false);
+        button(g,x+96,y+25,75,18,"Ouvrir les sacs",Ui.GOLD,()->ClientNet.send(new Payloads.SocialAction("backpack",new net.minecraft.nbt.CompoundTag())));
+        var stored=ClientData.DATA.backpacks.getListOrEmpty("items");
+        var ops=net.minecraft.resources.RegistryOps.create(net.minecraft.nbt.NbtOps.INSTANCE,minecraft.level.registryAccess());
+        for(int i=0;i<2;i++){int sx=x+99+i*29;Ui.frame(g,sx,y+49,24,24,Ui.GOLD,false);if(i<stored.size()){var bag=net.minecraft.world.item.ItemStack.OPTIONAL_CODEC.parse(ops,stored.get(i)).result().orElse(net.minecraft.world.item.ItemStack.EMPTY);g.item(bag,sx+4,y+53);}}
+
         g.fill(x + 8, y + 139, x + 168, y + 140, Ui.LINE);
 
         // ------------------------------------------------ identite, barres et evolution (sous l'inventaire, selon la place)
@@ -246,7 +247,7 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
 
         // ------------------------------------------------ chemin d'evolution (si la place le permet)
         if (ph >= 258) {
-            int ty = py + ph - 24;
+            int ty = py + ph - 31;
             int tx0 = rx + 8, tx1 = px + pw - 16;
             g.fill(tx0, ty + 4, tx1, ty + 6, Ui.LINE);
             int tier = d.evolutionTier();
@@ -257,16 +258,17 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
                 boolean reached = i <= tier;
                 Ui.diamond(g, nx, ty + 5, i == tier ? 5 : 4, reached ? Ui.GOLD : 0xFF4A4038);
                 Ui.diamond(g, nx, ty + 5, i == tier ? 2 : 1, reached ? (i == tier ? 0xFFFFFFFF : cls.color) : 0xFF201818);
-                int ly = i % 2 == 0 ? ty + 10 : ty - 13;     // etiquettes alternees au-dessus / au-dessous de la ligne
-                Ui.scaledText(g, cls.evolutions[i], nx, ly, 0.6f, i == tier ? cls.color : reached ? Ui.TEXT : Ui.MUTED, true);
-                Ui.scaledText(g, "Niv. " + PlayerClass.EVOLUTION_LEVELS[i], nx, ly + 6, 0.6f, Ui.MUTED, true);
+                int ly = i % 2 == 0 ? ty + 10 : ty - 22;     // etiquettes alternees au-dessus / au-dessous de la ligne
+                int labelX=Math.clamp(nx,rx+font.width(cls.evolutions[i])/2,px+pw-9-font.width(cls.evolutions[i])/2);
+                Ui.scaledText(g, cls.evolutions[i], labelX, ly, 1f, i == tier ? cls.color : reached ? Ui.TEXT : Ui.MUTED, true);
+                Ui.scaledText(g, "Niv. " + PlayerClass.EVOLUTION_LEVELS[i], labelX, ly + 10, 1f, Ui.MUTED, true);
             }
         }
     }
 
     @Override
     protected void extractLabels(GuiGraphicsExtractor g, int xm, int ym) {
-        g.text(this.font, "Artisanat", this.titleLabelX, this.titleLabelY, Ui.GOLD, true);
+        // Crafting is handled at the forge; this space is reserved for equipped backpacks.
     }
 
     @Override

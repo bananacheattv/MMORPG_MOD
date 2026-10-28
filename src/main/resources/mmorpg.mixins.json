@@ -7,9 +7,16 @@
     "InventoryClickMixin",
     "InventoryCraftMixin",
     "ProxyChatSessionMixin",
-    "DisabledFurnaceMixin"
+    "DisabledFurnaceMixin",
+    "BackpackPickupMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "client": [
+    "AeloriaWindowTitleMixin",
+    "PortalLoadingScreenMixin",
+    "AeloriaLoadingOverlayMixin",
+    "AeloriaWindowIconMixin"
+  ]
 }

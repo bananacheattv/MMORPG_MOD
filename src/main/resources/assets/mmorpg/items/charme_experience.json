@@ -1,6 +1,19 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "mmorpg:item/charme_experience"
+    "type": "minecraft:select",
+    "property": "minecraft:display_context",
+    "cases": [
+      {
+        "when": "fixed",
+        "model": {
+          "type": "minecraft:model",
+          "model": "mmorpg:item/reel_charme_experience"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "mmorpg:item/charme_experience"
+    }
   }
 }

@@ -32,7 +32,7 @@ import java.util.Locale;
  * categories a gauche, recherche, et sections de cartes qui menent aux ecrans du mod et de Minecraft. On herite de {@link PauseScreen}
  * pour garder la pause du jeu, la deconnexion et tout ce qu'un autre mod attend de ce menu.
  */
-public class AeloriaDirectoryScreen extends PauseScreen {
+public class AeloriaDirectoryScreen extends net.minecraft.client.gui.screens.Screen {
     private static final int BG = 0x700D071C;
     private static final int BAR = 0xFF0D0B14;
     private static final int LINE = 0xFF2B2538;
@@ -71,19 +71,13 @@ public class AeloriaDirectoryScreen extends PauseScreen {
     private int maxScroll;
 
     public AeloriaDirectoryScreen() {
-        super(true);
+        super(Component.literal("Tous les menus"));
     }
 
     @Override
     protected void init() {
         super.init();
-        this.disconnect = null;
-        for (var child : this.children()) {
-            if (child instanceof Button b && (b.getMessage().equals(CommonComponents.disconnectButtonLabel(true))
-                    || b.getMessage().equals(CommonComponents.disconnectButtonLabel(false)))) {
-                this.disconnect = b;
-            }
-        }
+        this.disconnect=new com.mmorpg.client.ui.GlassButton(0,0,110,20,"Déconnexion",Ui.GOLD,b->minecraft.getReportingContext().draftReportHandled(minecraft,this,()->minecraft.disconnectFromWorld(net.minecraft.client.multiplayer.ClientLevel.DEFAULT_QUIT_MESSAGE),true));
         this.clearWidgets();                         // les boutons de Minecraft sont remplaces par les cartes ci-dessous
         String previous = search == null ? "" : search.getValue();
         this.search = new EditBox(this.font, 0, 0, 130, 16, Component.literal("Rechercher"));
@@ -166,7 +160,6 @@ public class AeloriaDirectoryScreen extends PauseScreen {
     @Override
     public void extractRenderState(GuiGraphicsExtractor g, int mx, int my, float a) {
         hits.clear();
-        extractBackground(g, mx, my, a);
         int w = this.width;
         navBar(g, mx, my);
         boolean side = w >= 330;

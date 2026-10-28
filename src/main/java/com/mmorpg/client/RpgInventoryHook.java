@@ -18,7 +18,10 @@ public final class RpgInventoryHook {
     @SubscribeEvent
     public static void onOpen(ScreenEvent.Opening event) {
         Minecraft mc = Minecraft.getInstance();
-        if (event.getNewScreen() instanceof InventoryScreen && mc.player != null && !mc.player.hasInfiniteMaterials()) {
+        if(event.getNewScreen()==null)return;
+        if(event.getNewScreen() instanceof net.minecraft.client.gui.screens.inventory.ContainerScreen chest&&chest.getTitle().getString().equals(com.mmorpg.server.Backpacks.TITLE.getString())&&mc.player!=null){event.setNewScreen(new com.mmorpg.client.screen.BackpackScreen(chest.getMenu(),mc.player.getInventory(),chest.getTitle()));return;}
+
+        if ((event.getNewScreen() instanceof InventoryScreen || event.getNewScreen().getClass()==net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen.class) && mc.player != null) {
             com.mmorpg.client.screen.MenuScreen.lastTab = com.mmorpg.client.screen.MenuScreen.Tab.PERSONNAGE;
             event.setNewScreen(new CharacterScreen(mc.player));
         }

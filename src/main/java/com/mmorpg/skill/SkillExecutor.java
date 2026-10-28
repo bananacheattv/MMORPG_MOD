@@ -52,6 +52,7 @@ public final class SkillExecutor {
     }
 
     public static boolean cast(ServerPlayer player, Skill skill) {
+        if(!com.mmorpg.server.WeaponAccess.allowed(player,player.getMainHandItem(),true))return false;
         PlayerData d = RpgPlayers.get(player);
         if (!player.isAlive() || player.isSpectator() || skill.passive || !d.isSkillUnlocked(skill)) return false;
         long now = player.level().getGameTime();

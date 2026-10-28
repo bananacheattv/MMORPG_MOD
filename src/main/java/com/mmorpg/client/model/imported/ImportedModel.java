@@ -19,10 +19,12 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
     private final Map<String, KeyframeAnimation> animations = new HashMap<>();
     public final Identifier texture;
     private final ModelPart head;
+    private final Map<String,ModelPart> standBones=new HashMap<>();
     public ImportedModel(String kind, String key) { this(kind, key, read(kind, key),false); }
     public ImportedModel(String kind,String key,boolean emissiveOnly){this(kind,key,read(kind,key),emissiveOnly);}
     private ImportedModel(String kind, String key, JsonObject data,boolean emissiveOnly) {
         super(root(data, kind.equals("cosmetics") ? 0 : 24,emissiveOnly), RenderTypes::entityTranslucent);
+        for(String name:new String[]{"head","body","arm_-1","arm_1","leg_-1","leg_1"}){String id=findNamed(data.getAsJsonArray("parts"),name);if(id!=null)standBones.put(name,root().createPartLookup().apply(id));}
         String headId=findHead(data.getAsJsonArray("parts"));head=headId==null?null:root().createPartLookup().apply(headId);
         texture = data.has("texture")?Identifier.parse(data.get("texture").getAsString()):MMORPG.id("textures/imported/" + kind + "/" + key + ".png");
         for (var value : data.getAsJsonArray("animations")) {
@@ -32,6 +34,8 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
             animations.put(a.get("name").getAsString(), def.bake(root()));
         }
     }
+    private static String findNamed(JsonArray nodes,String name){for(var node:nodes){var n=node.getAsJsonObject();if(n.has("name")&&n.get("name").getAsString().equals(name))return n.get("uuid").getAsString();if(n.has("children")){String id=findNamed(n.getAsJsonArray("children"),name);if(id!=null)return id;}}return null;}
+    private void poseBone(String name,net.minecraft.core.Rotations rotation){var p=standBones.get(name);if(p!=null){p.xRot+=(float)Math.toRadians(rotation.x());p.yRot+=(float)Math.toRadians(rotation.y());p.zRot+=(float)Math.toRadians(rotation.z());}}
     private static String findHead(JsonArray nodes){
         for(var node:nodes){var value=node.getAsJsonObject();if(value.has("name")&&value.get("name").getAsString().equals("head"))return value.get("uuid").getAsString();
             if(value.has("children")){String nested=findHead(value.getAsJsonArray("children"));if(nested!=null)return nested;}}
@@ -133,6 +137,8 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
     }
     @Override public void setupAnim(LivingEntityRenderState state) {
         super.setupAnim(state);
+        if(state instanceof net.minecraft.client.renderer.entity.state.ArmorStandRenderState stand){poseBone("head",stand.headPose);poseBone("body",stand.bodyPose);poseBone("arm_1",stand.leftArmPose);poseBone("arm_-1",stand.rightArmPose);poseBone("leg_1",stand.leftLegPose);poseBone("leg_-1",stand.rightLegPose);return;}
+
         if(state instanceof com.mmorpg.client.model.mount.MountRenderer.State m && m.flying && animations.containsKey("fly")) {
             animate("fly",state.ageInTicks,1);
             return;

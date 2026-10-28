@@ -645,5 +645,10 @@
   "block.mmorpg.lucky_sylvestre": "Lucky Block Sylvestre",
   "block.mmorpg.lucky_infernal": "Lucky Block Infernal",
   "block.mmorpg.lucky_givre": "Lucky Block Givre",
-  "block.mmorpg.lucky_neant": "Lucky Block Néant"
+  "block.mmorpg.lucky_neant": "Lucky Block Néant",
+  "container.mmorpg.backpacks": "Backpacks",
+  "item.mmorpg.sac_a_dos_0": "Backpack tier 1",
+  "item.mmorpg.sac_a_dos_1": "Backpack tier 2",
+  "item.mmorpg.sac_a_dos_2": "Backpack tier 3",
+  "item.mmorpg.sac_a_dos_3": "Backpack tier 4"
 }

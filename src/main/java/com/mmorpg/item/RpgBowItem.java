@@ -39,6 +39,7 @@ public class RpgBowItem extends BowItem implements RpgEquipment {
 
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
+        if(player instanceof net.minecraft.server.level.ServerPlayer p&&!com.mmorpg.server.WeaponAccess.allowed(p,player.getItemInHand(hand),true))return InteractionResult.FAIL;
         player.startUsingItem(hand);
         return InteractionResult.CONSUME;
     }
@@ -48,6 +49,7 @@ public class RpgBowItem extends BowItem implements RpgEquipment {
         if (!(entity instanceof Player player)) {
             return false;
         }
+        if(player instanceof net.minecraft.server.level.ServerPlayer p&&!com.mmorpg.server.WeaponAccess.allowed(p,stack,true))return false;
         int held = this.getUseDuration(stack, entity) - remainingTime;
         float pow = rpgPowerForTime(held);
         if (pow < 0.1F) {
@@ -56,6 +58,7 @@ public class RpgBowItem extends BowItem implements RpgEquipment {
         if (level instanceof ServerLevel) {
             Arrow arrow = new Arrow(level, player, new ItemStack(Items.ARROW), stack);
             arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, pow * 3.2F, 0.8F);
+            arrow.getPersistentData().putString("aeloria_weapon_class",def.playerClass().name());
             arrow.setCritArrow(pow >= 1.0F);
             arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
             RpgCombat.tagArrowMultiplier(arrow, pow >= 1.0F ? 1.15 : pow);
