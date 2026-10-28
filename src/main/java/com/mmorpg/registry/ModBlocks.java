@@ -51,6 +51,18 @@ public final class ModBlocks {
         }
     }
 
+    /** Panneaux de classement (un par classement), poses par les admins. */
+    public static final java.util.Map<com.mmorpg.leaderboard.Board, DeferredBlock<com.mmorpg.leaderboard.LeaderboardBlock>> LEADERBOARDS =
+            new java.util.EnumMap<>(com.mmorpg.leaderboard.Board.class);
+
+    static {
+        for (var board : com.mmorpg.leaderboard.Board.values()) {
+            LEADERBOARDS.put(board, BLOCKS.registerBlock(board.blockId(), p -> new com.mmorpg.leaderboard.LeaderboardBlock(p, board),
+                    p -> p.mapColor(MapColor.WOOD).strength(-1.0f, 3600000f).sound(SoundType.WOOD).lightLevel(s -> 7).noOcclusion()
+                            .noLootTable().pushReaction(PushReaction.IMMOVEABLE)));
+        }
+    }
+
     /** Partie invisible des structures multiblocs (collision et renvoi des clics vers le bloc fonctionnel). */
     public static final DeferredBlock<StructurePartBlock> STRUCTURE_PART = BLOCKS.registerBlock("structure_part", StructurePartBlock::new,
             p -> p.mapColor(MapColor.COLOR_BLACK).strength(5f, 1200f).sound(SoundType.STONE).noOcclusion().noLootTable()
@@ -65,6 +77,11 @@ public final class ModBlocks {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.mmorpg.block.crate.CrateBlockEntity>> CRATE = BLOCK_ENTITIES.register("caisse",
             () -> new BlockEntityType<>(com.mmorpg.block.crate.CrateBlockEntity::new,
                     CRATES.values().stream().map(DeferredBlock::get).toArray(net.minecraft.world.level.block.Block[]::new)));
+
+    /** Entite des panneaux de classement (lignes affichees). */
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.mmorpg.leaderboard.LeaderboardBlockEntity>> LEADERBOARD = BLOCK_ENTITIES.register("classement",
+            () -> new BlockEntityType<>(com.mmorpg.leaderboard.LeaderboardBlockEntity::new,
+                    LEADERBOARDS.values().stream().map(DeferredBlock::get).toArray(net.minecraft.world.level.block.Block[]::new)));
 
     private ModBlocks() {
     }

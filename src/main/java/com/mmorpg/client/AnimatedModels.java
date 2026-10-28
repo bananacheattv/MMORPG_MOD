@@ -80,6 +80,7 @@ public final class AnimatedModels {
     @SubscribeEvent
     public static void registerBlockEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlocks.STRUCTURE.get(), StructureRenderer::new);
+        event.registerBlockEntityRenderer(ModBlocks.LEADERBOARD.get(), com.mmorpg.client.model.leaderboard.LeaderboardRenderer::new);
         event.registerBlockEntityRenderer(ModBlocks.CRATE.get(), com.mmorpg.client.model.crate.CrateRenderer::new);
     }
 

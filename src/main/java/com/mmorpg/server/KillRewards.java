@@ -95,6 +95,7 @@ public final class KillRewards {
             AdventureSummary.count(p,"kills",1);
             d.kills.merge(md.key, 1, Integer::sum);
             QuestManager.onKill(p, md.key, typeId, md.boss);
+            if (md.boss && !com.mmorpg.hub.ClassTrial.active(p)) com.mmorpg.leaderboard.Leaderboards.add(p, com.mmorpg.leaderboard.Board.BOSS, 1);
             if (md.boss && !com.mmorpg.hub.ClassTrial.active(p)) {
                 // Personal reward: each eligible participant gets a scroll, not a shared ground drop.
                 RpgPlayers.give(p, ModItems.get(com.mmorpg.crafting.ForgeProgression.reward(d,com.mmorpg.crafting.ForgeProgression.tier(md.level),new java.util.Random())), 1);

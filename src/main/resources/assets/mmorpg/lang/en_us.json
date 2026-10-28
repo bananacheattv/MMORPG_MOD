@@ -752,5 +752,14 @@
   "item.mmorpg.pvp_tank_4_bottes": "Bottes de Gladiateur Paladin 5",
   "item.mmorpg.pvp_tank_4_arme": "Arme de Gladiateur Paladin 5",
   "item.mmorpg.sceau_chimere_arene": "Sceau de la Chimère des arènes",
-  "entity.mmorpg.monture_chimere_arene": "Chimère des arènes"
+  "entity.mmorpg.monture_chimere_arene": "Chimère des arènes",
+  "block.mmorpg.classement_niveau": "Leaderboard · Level",
+  "block.mmorpg.classement_fortune": "Leaderboard · Wealth",
+  "block.mmorpg.classement_monstres": "Leaderboard · Hunters",
+  "block.mmorpg.classement_boss": "Leaderboard · Boss Slayers",
+  "block.mmorpg.classement_donjons": "Leaderboard · Dungeons",
+  "block.mmorpg.classement_quetes": "Leaderboard · Quests",
+  "block.mmorpg.classement_pvp_victoires": "Leaderboard · Arena: Wins",
+  "block.mmorpg.classement_pvp_elims": "Leaderboard · Arena: Eliminations",
+  "block.mmorpg.classement_guildes": "Leaderboard · Guilds"
 }

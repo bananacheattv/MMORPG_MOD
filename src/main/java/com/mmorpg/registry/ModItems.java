@@ -296,6 +296,14 @@ public final class ModItems {
             CRATE_BLOCKS.add(ITEMS.registerSimpleBlockItem(tier.blockId(), ModBlocks.CRATES.get(tier)));
     }
 
+    /** Panneaux de classement (onglet creatif, reserves aux admins). */
+    public static final java.util.List<DeferredItem<BlockItem>> LEADERBOARD_BLOCKS = new java.util.ArrayList<>();
+
+    static {
+        for (var board : com.mmorpg.leaderboard.Board.values())
+            LEADERBOARD_BLOCKS.add(ITEMS.registerSimpleBlockItem(board.blockId(), ModBlocks.LEADERBOARDS.get(board)));
+    }
+
     // ------------------------------------------------------------------ blocs
     public static final DeferredItem<BlockItem> FORGE_ARCANIQUE = ITEMS.registerSimpleBlockItem("forge_arcanique", ModBlocks.FORGE_ARCANIQUE);
     public static final DeferredItem<BlockItem> PRESSE_COMPRESSION = ITEMS.registerSimpleBlockItem("presse_compression", ModBlocks.PRESSE_COMPRESSION);

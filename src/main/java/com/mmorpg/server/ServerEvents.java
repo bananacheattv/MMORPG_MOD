@@ -65,6 +65,7 @@ public final class ServerEvents {
         com.mmorpg.network.GroupTravel.tick(event.getServer());
         com.mmorpg.network.AdminTravel.tick(event.getServer());
         com.mmorpg.network.NetworkPlayers.tick(event.getServer());
+        com.mmorpg.leaderboard.Leaderboards.tick(event.getServer());
     }
 
     @SubscribeEvent
