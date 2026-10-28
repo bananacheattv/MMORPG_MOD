@@ -68,15 +68,9 @@ public class ClassMasterScreen extends MmoScreen {
         for (int i = 0; i < LEVELS.length; i++) if (LEVELS[i] == trialLevel && inTrial) selectedLevel = i;
     }
 
-    @Override
-    protected int panelWidth() {
-        return Math.min(this.width - 8, 470);
-    }
 
     @Override
-    protected int panelHeight() {
-        return Math.min(this.height - 8, 270);
-    }
+    protected int designHeight(){return 270;}
 
     // ================================================================== utilitaires
 

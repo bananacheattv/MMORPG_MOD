@@ -16,6 +16,8 @@ import java.util.List;
 
 /** Arbre de competences : details, amelioration des rangs et assignation a la barre de raccourcis. */
 public class SkillsScreen extends MenuScreen {
+    @Override protected String backdrop() { return "skills_background"; }
+
     private static String selected;
     private int scroll;
 

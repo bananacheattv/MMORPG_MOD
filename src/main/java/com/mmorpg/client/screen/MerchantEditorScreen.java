@@ -29,8 +29,7 @@ public final class MerchantEditorScreen extends MmoScreen {
         shop=new com.google.gson.Gson().fromJson(data.getStringOr("shop","{}"),ShopConfig.class);
     }
     public void showTab(int value) {tab=Math.clamp(value,0,2);page=0;}
-    @Override protected int panelWidth(){return Math.min(width-12,720);}
-    @Override protected int panelHeight(){return Math.min(height-12,340);}
+    @Override protected int designHeight(){return 340;}
     private int catalogueWidth(){return pw*53/100;}
     private EditBox field(int x,int y,int w,String label,String value,boolean numeric) {
         var box=new EditBox(font,x,y,w,16,Component.literal(label));box.setMaxLength(numeric?8:80);

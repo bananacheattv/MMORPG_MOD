@@ -31,8 +31,7 @@ public class CrateScreen extends MmoScreen {
         keys = data.getIntOr("keys", 0);
     }
 
-    @Override protected int panelWidth() { return Math.min(width - 12, 640); }
-    @Override protected int panelHeight() { return Math.min(height - 12, 380); }
+    @Override protected int designHeight(){return 380;}
 
     @Override
     protected void renderContent(GuiGraphicsExtractor g, int mx, int my, float partial) {

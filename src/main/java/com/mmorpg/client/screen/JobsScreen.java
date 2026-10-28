@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 /** Metiers : trois grandes cartes illustrees (Mineur, Fermier, Pecheur) ; un clic ouvre le detail du metier. */
 public class JobsScreen extends MenuScreen {
     private static final Job[] ORDER = {Job.MINEUR, Job.FERMIER, Job.PECHEUR};
+    @Override protected String backdrop() { return "professions_background"; }
 
     public JobsScreen() {
         super(Tab.METIERS);

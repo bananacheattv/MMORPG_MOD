@@ -9,7 +9,7 @@ public final class PvpStoreScreen extends MmoScreen {
  private final CompoundTag data;private final java.util.List<CompoundTag> products=new java.util.ArrayList<>();private int category,scroll,selected;private final ItemPreview3D preview=new ItemPreview3D();
  public PvpStoreScreen(CompoundTag t){super("Intendant des arènes");data=t;var list=t.getListOrEmpty("products");for(int i=0;i<list.size();i++)products.add(list.getCompoundOrEmpty(i));}
  public void selectCategory(int value){category=Math.clamp(value,0,2);selected=scroll=0;}
- @Override protected int panelWidth(){return Math.min(width-12,800);}@Override protected int panelHeight(){return Math.min(height-12,390);}
+@Override protected int designHeight(){return 390;}
  private java.util.List<CompoundTag> visible(){return products.stream().filter(p->category==0?p.getStringOr("unlock","").isEmpty()&&!p.getStringOr("id","").startsWith("pvp_"):category==1?p.getStringOr("id","").startsWith("pvp_"):!p.getStringOr("unlock","").isEmpty()).toList();}
  @Override public boolean mouseScrolled(double x,double y,double dx,double dy){scroll=Math.max(0,scroll-(int)Math.signum(dy));return true;}
  private void action(String action,CompoundTag product){var t=new CompoundTag();t.putString("action",action);t.putString("product",product.getStringOr("id",""));t.putLong("price",product.getLongOr("price",0));t.putString("request",java.util.UUID.randomUUID().toString());if(action.equals("title"))t.putString("title",product.getStringOr("unlock","").substring(6));ClientNet.send(new Payloads.SocialAction("pvp",t));}

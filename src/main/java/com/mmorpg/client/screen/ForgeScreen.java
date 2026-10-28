@@ -27,6 +27,8 @@ import java.util.Locale;
 
 /** Forge Arcanique : fabrication (recettes par categorie) et amelioration des equipements (+1 a +20). */
 public class ForgeScreen extends MmoScreen {
+    @Override protected String backdrop() { return "forge_header"; }
+
     private static int tab = 0;
     private static boolean classOnly = true;
     private static String selectedRecipe;

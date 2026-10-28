@@ -59,6 +59,7 @@ public final class DevShowcase {
             if(tick==640)stop(mc);
             return;
         }
+        if(MODE.equals("ui_frames")){DevUiFrames.tick(mc);return;}
         if(MODE.equals("pvp_polish")){DevPvpVisual.tick(mc);return;}
         if(MODE.equals("trade")){DevTradeVisual.tick(mc);return;}
         if(MODE.equals("staff_final")){
@@ -5208,7 +5209,7 @@ public final class DevShowcase {
         MMORPG.LOGGER.info("[MMORPG] DUELLISTE {} : vie {} / {}", label, d.hp, max);
     }
 
-    private static void stop(Minecraft mc) {
+    static void stop(Minecraft mc) {
         mc.options.pauseOnLostFocus = true;
         mc.options.save();
         mc.stop();
@@ -5225,11 +5226,11 @@ public final class DevShowcase {
         for(var child:screen.children()) if(child instanceof net.minecraft.client.gui.components.EditBox box&&box.getMessage().getString().equals(label)) box.setValue(value);
     }
 
-    private static CompoundTag expansionStore(){
+    static CompoundTag expansionStore(){
         var data=new CompoundTag();data.putLong("credits",12000);data.putInt("pending",2);var products=new ListTag();
         for(var product:com.mmorpg.store.StoreConfig.defaults().products){var v=new CompoundTag();v.putString("id",product.id);v.putString("label",product.label);v.putString("item",product.item);v.putString("category",product.category);v.putLong("price",product.credits);v.putInt("count",product.count);if(product.rank>0)v.putString("benefits","Préfixe coloré · Annonces HDV · Cosmétique exclusif");products.add(v);}data.put("products",products);return data;
     }
-    private static void shot(Minecraft mc, String name) {
+    static void shot(Minecraft mc, String name) {
         Screenshot.grab(mc.gameDirectory, "showcase_" + name + ".png", mc.gameRenderer.mainRenderTarget(), 1,
                 msg -> MMORPG.LOGGER.info("[MMORPG] Capture {}", name));
     }

@@ -14,8 +14,7 @@ public final class ArmorStandEditorScreen extends MmoScreen {
     public ArmorStandEditorScreen(CompoundTag data){super("Mise en scène");entity=data.getIntOr("entity",-1);}
     public void appearanceTab(){mode=2;position=false;}
     @Override protected void init(){super.init();skinName=new net.minecraft.client.gui.components.EditBox(font,left+pw/2+12,top+109,pw/2-28,18,net.minecraft.network.chat.Component.literal("Pseudo du skin"));skinName.setMaxLength(16);skinName.setHint(net.minecraft.network.chat.Component.literal("Pseudo Minecraft"));addRenderableWidget(skinName);}
-    @Override protected int panelWidth(){return Math.min(width-12,620);}
-    @Override protected int panelHeight(){return Math.min(height-12,340);}
+    @Override protected int designHeight(){return 340;}
     private void send(String action,java.util.function.Consumer<CompoundTag> fill){var t=new CompoundTag();t.putInt("entity",entity);t.putString("action",action);fill.accept(t);ClientNet.send(new Payloads.SocialAction("armorstand",t));}
     @Override protected void renderContent(GuiGraphicsExtractor g,int mx,int my,float a){
         skinName.setVisible(mode==2);

@@ -24,6 +24,8 @@
     "HideFireOverlayMixin",
     "ShiftDragTransferMixin",
     "CharacterSlotHighlightMixin",
-    "AeloriaShaderMixin"
+    "AeloriaShaderMixin",
+    "MmoScreenMouseMixin",
+    "DevNoBlurMixin"
   ]
 }

@@ -34,15 +34,9 @@ public class WeeklyQuestScreen extends MmoScreen {
         for (int i = 0; i < list.size(); i++) tiers.add(list.getCompoundOrEmpty(i));
     }
 
-    @Override
-    protected int panelWidth() {
-        return Math.min(this.width - 12, 440);
-    }
 
     @Override
-    protected int panelHeight() {
-        return Math.min(this.height - 12, 252);
-    }
+    protected int designHeight(){return 252;}
 
     public void send(int action, int tier) {
         ClientNet.send(new Payloads.ServiceAction(Payloads.ServiceAction.WEEKLY, action, tier, "", 0, pos));

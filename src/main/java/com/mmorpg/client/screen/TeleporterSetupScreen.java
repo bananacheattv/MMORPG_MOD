@@ -28,6 +28,9 @@ public class TeleporterSetupScreen extends MmoScreen {
     }
 
     @Override
+    protected boolean compact() { return true; }
+
+    @Override
     protected int panelWidth() {
         return Math.min(this.width - 12, 300);
     }

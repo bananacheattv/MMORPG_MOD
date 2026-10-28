@@ -16,6 +16,8 @@ import java.util.List;
 
 /** Bestiaire : monstres et boss du monde, leurs niveaux, statistiques, butin et le nombre de victoires. */
 public class BestiaryScreen extends MenuScreen {
+    @Override protected String backdrop() { return "bestiary_header"; }
+
     private static String selected;
     private int scroll;
     private int category; // tous, monstres, boss

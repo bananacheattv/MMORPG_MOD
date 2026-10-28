@@ -8,11 +8,12 @@ import net.minecraft.network.chat.Component;
 import java.util.*;
 
 public final class PremiumStoreScreen extends MmoScreen {
+    @Override protected String backdrop() { return "shop_header"; }
+
  private final CompoundTag data;private final List<CompoundTag> products=new ArrayList<>();private String category="Clés";private int page;private String confirm="";private UUID request=UUID.randomUUID();private boolean busy;
  public PremiumStoreScreen(CompoundTag data){super("Boutique d’Aeloria");this.data=data;var list=data.getListOrEmpty("products");for(int i=0;i<list.size();i++)products.add(list.getCompoundOrEmpty(i));}
  public void previewCategory(String value){category=value;page=0;confirm="";}
- @Override protected int panelWidth(){return Math.min(width-12,680);}
- @Override protected int panelHeight(){return Math.min(height-12,350);}
+ @Override protected int designHeight(){return 350;}
  private void send(String action,String product){var t=new CompoundTag();t.putString("action",action);t.putString("product",product);t.putString("request",request.toString());products.stream().filter(p->p.getStringOr("id","").equals(product)).findFirst().ifPresent(p->t.putLong("price",p.getLongOr("price",0)));ClientNet.send(new Payloads.SocialAction("store",t));busy=true;}
  @Override protected void renderContent(GuiGraphicsExtractor g,int mx,int my,float a){
   Ui.frame(g,left,top,pw,ph,Ui.GOLD,false);Ui.title(g,left+pw/2,top+9,"✦ BOUTIQUE D’AELORIA ✦",Ui.GOLD_LIGHT);

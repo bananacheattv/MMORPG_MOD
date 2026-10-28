@@ -339,15 +339,9 @@ public class AdminScreen extends MmoScreen {
 
     // ================================================================== edition
 
-    @Override
-    protected int panelWidth() {
-        return Math.min(this.width - 12, 600);
-    }
 
     @Override
-    protected int panelHeight() {
-        return Math.min(this.height - 12, 340);
-    }
+    protected int designHeight(){return 340;}
 
     @Override
     protected void init() {

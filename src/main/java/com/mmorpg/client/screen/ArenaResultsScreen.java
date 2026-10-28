@@ -5,10 +5,11 @@ import com.mmorpg.network.Payloads;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.*;
 public final class ArenaResultsScreen extends MmoScreen {
+    @Override protected String backdrop() { return "arena_results_background"; }
+
  private final CompoundTag data;
  public ArenaResultsScreen(CompoundTag t){super("Résultats de l’arène");data=t;}
- @Override protected int panelWidth(){return Math.min(width-12,850);}
- @Override protected int panelHeight(){return Math.min(height-12,390);}
+ @Override protected int designHeight(){return 390;}
  @Override protected void renderContent(GuiGraphicsExtractor g,int mx,int my,float a){Ui.panel(g,left,top,pw,ph);int winner=data.getIntOr("winner",-1);Ui.title(g,left+pw/2,top+10,data.getBooleanOr("unfinished",false)?"SORTIE DE L’ARÈNE":data.getBooleanOr("training",false)?"BILAN D’ENTRAÎNEMENT":winner<0?"ÉGALITÉ":winner==0?"VICTOIRE ROUGE":"VICTOIRE BLEUE",winner==0?Ui.RED:winner==1?Ui.BLUE:Ui.GOLD);
   g.centeredText(font,net.minecraft.network.chat.Component.literal(data.getIntOr("red",0)+" — "+data.getIntOr("blue",0)),left+pw/2,top+28,Ui.TEXT);
   var rows=data.getListOrEmpty("rows");long earned=0;int ownTeam=-1;
