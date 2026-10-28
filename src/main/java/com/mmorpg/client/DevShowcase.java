@@ -37,6 +37,14 @@ public final class DevShowcase {
     public static void onTick(ClientTickEvent.Post event) {
         if (!ENABLED) return;
         Minecraft mc = Minecraft.getInstance();
+        if(MODE.equals("staff_final")){
+            if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
+            if(tick==60){mc.options.guiScale().set(2);mc.getWindow().setWindowed(1280,720);mc.resizeGui();cmd(mc,"time set day");cmd(mc,"item replace entity @s weapon.mainhand with mmorpg:baton_archimage");mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);}
+            if(tick==85)shot(mc,"staff_third_person_final");
+            if(tick==95){String[] parts={"head","chest","legs","feet"};for(int i=0;i<4;i++)cmd(mc,"item replace entity @s armor."+parts[i]+" with mmorpg:avatar_arcanique_"+com.mmorpg.item.ItemDefs.PIECES[i]);}
+            if(tick==125)shot(mc,"mage_worn_final");
+            if(tick==145)stop(mc);return;
+        }
         if(MODE.equals("equipment_final")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
             if(tick==60){mc.options.guiScale().set(2);mc.getWindow().setWindowed(1280,720);mc.resizeGui();var gallery=new DevSculptedGallery();gallery.page=4;mc.gui.setScreen(gallery);}

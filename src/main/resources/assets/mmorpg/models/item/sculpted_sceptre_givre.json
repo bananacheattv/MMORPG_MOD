@@ -1280,7 +1280,7 @@
     },
     "thirdperson_righthand": {
       "rotation": [
-        0,
+        90,
         -90,
         0
       ],
@@ -1297,7 +1297,7 @@
     },
     "thirdperson_lefthand": {
       "rotation": [
-        0,
+        90,
         90,
         0
       ],
