@@ -100,6 +100,7 @@ public class AeloriaDirectoryScreen extends net.minecraft.client.gui.screens.Scr
         l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.SADDLE), "Montures", "Chevauchez pour traverser le monde.", () -> MenuScreen.open(MenuScreen.Tab.MONTURES)));
         l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.AMETHYST_SHARD), "Cosmétiques", "Apparences, auras et trophées.", () -> MenuScreen.open(MenuScreen.Tab.COSMETIQUES)));
         l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.ENCHANTED_BOOK), "Bestiaire", "Les créatures que vous avez affrontées.", () -> MenuScreen.open(MenuScreen.Tab.BESTIAIRE)));
+        if (ClientData.features.getBooleanOr("wiki", true)) l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.BOOK), "Wiki", "Le guide du jeu : classes, donjons, économie…", () -> MenuScreen.open(MenuScreen.Tab.WIKI)));
         l.add(new Card(Cat.TRAVEL, new ItemStack(Items.ENDER_PEARL), "Retour au hub", "Rejoignez la Citadelle des héros.", () -> {
             mc.gui.setScreen(null);
             mc.player.connection.sendCommand("hub");

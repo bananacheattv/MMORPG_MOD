@@ -10,7 +10,7 @@ import net.minecraft.client.input.KeyEvent;
 /** Menu principal a onglets du mod. */
 public abstract class MenuScreen extends MmoScreen {
     public enum Tab {
-        PERSONNAGE("Personnage"), COMPETENCES("Compétences"), QUETES("Quêtes"), GROUPE("Groupe"), GUILDE("Guilde"), ARENE("Arène"), FAMILIERS("Familiers"), MONTURES("Montures"), COSMETIQUES("Cosmétiques"), BESTIAIRE("Bestiaire"), METIERS("Métiers"), SUCCES("Succès"), BOUTIQUE("Boutique"), CREATIF("Créatif");
+        PERSONNAGE("Personnage"), COMPETENCES("Compétences"), QUETES("Quêtes"), GROUPE("Groupe"), GUILDE("Guilde"), ARENE("Arène"), FAMILIERS("Familiers"), MONTURES("Montures"), COSMETIQUES("Cosmétiques"), BESTIAIRE("Bestiaire"), METIERS("Métiers"), SUCCES("Succès"), BOUTIQUE("Boutique"), WIKI("Wiki"), CREATIF("Créatif");
 
         public final String label;
 
@@ -36,6 +36,11 @@ public abstract class MenuScreen extends MmoScreen {
             Minecraft.getInstance().gui.setScreen(new CharacterScreen(Minecraft.getInstance().player));
             return;
         }
+        if (tab == Tab.WIKI) {
+            lastTab = tab;
+            Minecraft.getInstance().gui.setScreen(new WikiScreen());
+            return;
+        }
         if (!ClientData.DATA.playerClass.isPlayable()) {
             Minecraft.getInstance().gui.setScreen(new ClassSelectScreen());
             return;
@@ -52,6 +57,7 @@ public abstract class MenuScreen extends MmoScreen {
             case BESTIAIRE -> new BestiaryScreen();
             case METIERS -> new JobsScreen();
             case SUCCES -> new AchievementsScreen();
+            case WIKI -> new WikiScreen();
             case GUILDE,ARENE,BOUTIQUE,CREATIF -> throw new IllegalStateException("Server-backed screen");
         });
     }
@@ -85,7 +91,7 @@ public abstract class MenuScreen extends MmoScreen {
                                 java.util.function.BiConsumer<int[], Runnable> click) {
         var available=new java.util.ArrayList<Tab>(java.util.Arrays.asList(Tab.values()));available.remove(Tab.CREATIF);
         if(Minecraft.getInstance().player!=null&&ClientData.creativeAllowed&&Minecraft.getInstance().player.hasInfiniteMaterials())available.add(1,Tab.CREATIF);
-        available.removeIf(t->{String key=switch(t){case COMPETENCES->"competences";case QUETES->"quetes";case GUILDE->"guildes";case ARENE->"arenes";case FAMILIERS->"familiers";case MONTURES->"montures";case BOUTIQUE->"boutique";case COSMETIQUES->"cosmetiques";case GROUPE->"groupes";case BESTIAIRE->"bestiaire";case METIERS->"metiers";case SUCCES->"succes";default->"";};return !key.isEmpty()&&!ClientData.features.getBooleanOr(key,true);});
+        available.removeIf(t->{String key=switch(t){case COMPETENCES->"competences";case QUETES->"quetes";case GUILDE->"guildes";case ARENE->"arenes";case FAMILIERS->"familiers";case MONTURES->"montures";case BOUTIQUE->"boutique";case COSMETIQUES->"cosmetiques";case GROUPE->"groupes";case BESTIAIRE->"bestiaire";case METIERS->"metiers";case SUCCES->"succes";case WIKI->"wiki";default->"";};return !key.isEmpty()&&!ClientData.features.getBooleanOr(key,true);});
         Tab[] tabs=available.toArray(Tab[]::new);int count=(tabs.length+1)/2;
         int tw=(pw-54)/count;
         // bouton d'edition de l'interface (HUD) au bout de la barre d'onglets
