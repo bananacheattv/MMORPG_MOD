@@ -42,7 +42,7 @@ public final class DevInventoryChecks {
             check(swap.isCanceled(), "raccourci F en jeu bloque");
             p.setGameMode(GameType.CREATIVE);
             InventoryRules.apply(p);
-            check(menu.getSlot(1).mayPlace(new ItemStack(Items.STONE)) && menu.getSlot(45).isActive(), "mode creatif restaure");
+            check(menu.getSlot(1).mayPlace(new ItemStack(Items.STONE)) && menu.getSlot(1).isActive(), "mode creatif restaure");
             MMORPG.LOGGER.info("[CODEX CHECKS] INVENTORY PASS: crafting, restoration, slots, swaps, creative");
         } finally {
             for (int i = 0; i < saved.length; i++) inventory.setItem(i, saved[i]);

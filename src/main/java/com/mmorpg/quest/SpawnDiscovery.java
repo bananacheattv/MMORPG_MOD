@@ -17,8 +17,9 @@ public final class SpawnDiscovery {
     public static UUID id(int i){return QuestNpcPlan.uuid(i);}
     public static Map<String,QuestDef> definitions(){return QuestNpcPlan.discoveryDefinitions();}
     /** Sol libre le plus proche de la cible (rayon 12, hauteur +-24 autour de la base), ou null si le monde n'est pas construit/charge a cet endroit. */
-    private static BlockPos ground(ServerLevel l,BlockPos target,int baseY){
-        for(int r=0;r<=12;r+=3)for(int a=0;a<(r==0?1:8);a++){
+    private static BlockPos ground(ServerLevel l,BlockPos target,int baseY){return ground(l,target,baseY,12);}
+    private static BlockPos ground(ServerLevel l,BlockPos target,int baseY,int maxRadius){
+        for(int r=0;r<=maxRadius;r+=3)for(int a=0;a<(r==0?1:8);a++){
             int x=target.getX()+(int)Math.round(Math.cos(a*Math.PI/4)*r),z=target.getZ()+(int)Math.round(Math.sin(a*Math.PI/4)*r);
             for(int dy=0;dy<=24;dy++)for(int sign=dy==0?1:-1;sign<=1;sign+=2){
                 var p=new BlockPos(x,baseY+dy*sign,z);
@@ -46,6 +47,7 @@ public final class SpawnDiscovery {
             int i=g.index();var existing=l.getEntity(id(i));if(existing instanceof NpcEntity n){actors[i]=n;continue;}
             if(com.mmorpg.world.NpcDirectory.get(l.getServer()).entry(id(i).toString())!=null)continue;
             var at=ground(l,origin.offset(g.dx(),0,g.dz()),origin.getY());
+            if(at==null&&i>=5)at=ground(l,origin.offset(g.dx(),0,g.dz()),origin.getY(),30);
             if(at==null&&i==0)at=safe(l,player.blockPosition(),0);
             if(at==null){missing.add(g.name()+" ("+(origin.getX()+g.dx())+", "+(origin.getZ()+g.dz())+")");continue;}
             var n=com.mmorpg.registry.ModEntities.NPC.get().create(l,net.minecraft.world.entity.EntitySpawnReason.COMMAND);n.setUUID(id(i));n.setup(NpcEntity.Role.QUETES,g.name(),g.skin(),g.group());n.snapTo(at.getX()+.5,at.getY(),at.getZ()+.5,180,0);n.setPersistenceRequired();if(l.addFreshEntity(n))actors[i]=n;
@@ -56,6 +58,7 @@ public final class SpawnDiscovery {
             var at=ground(l,origin.offset(g.dx(),0,g.dz()),origin.getY());if(at==null)continue;
             n.snapTo(at.getX()+.5,at.getY(),at.getZ()+.5,n.getYRot(),0);com.mmorpg.world.NpcDirectory.get(l.getServer()).record(n);
         }
+        if(!missing.isEmpty())MMORPG.LOGGER.warn("[MMORPG] Donneurs de quêtes sans sol : {}",String.join(" ; ",missing));
         if(!missing.isEmpty()&&player.permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_GAMEMASTER))player.sendSystemMessage(Component.literal("Donneurs de quêtes sans sol à leur emplacement prévu : "+String.join(" ; ",missing)+". Construisez à cet endroit ou placez-les avec l’outil PNJ (distance minimale "+QuestNpcPlan.MIN_DISTANCE+" blocs).").withColor(0xFFB060));
         UUID merchantId=UUID.nameUUIDFromBytes("aeloria:spawn-premium-store".getBytes(java.nio.charset.StandardCharsets.UTF_8));
         if(l.getEntity(merchantId)==null&&com.mmorpg.world.NpcDirectory.get(l.getServer()).entry(merchantId.toString())==null){var at=safe(l,player.blockPosition(),5);if(at!=null){var n=com.mmorpg.registry.ModEntities.NPC.get().create(l,net.minecraft.world.entity.EntitySpawnReason.COMMAND);n.setUUID(merchantId);n.setup(NpcEntity.Role.BOUTIQUE,"Céliane · Boutique d’Aeloria",8,"");n.snapTo(at.getX()+.5,at.getY(),at.getZ()+.5,180,0);n.setPersistenceRequired();l.addFreshEntity(n);}}

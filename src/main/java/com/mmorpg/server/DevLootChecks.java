@@ -23,6 +23,12 @@ public final class DevLootChecks {
             p.setGameMode(GameType.SURVIVAL);
             for (int i = 0; i < saved.length; i++) inv.setItem(i, ItemStack.EMPTY);
             var crate = new ItemStack(ModItems.CAISSE_AVENTURE.get(), 2); inv.setItem(0, crate);
+            if (RetiredItems.item(crate.getItem())) { // caisses et Lucky Blocks retires : aucune ouverture possible
+                inv.setItem(1, new ItemStack(ModItems.CLE_AVENTURE.get()));
+                check(!AdventureLoot.openCrate(p, crate) && crate.getCount() == 2, "retired crate cannot be opened");
+                MMORPG.LOGGER.info("[CODEX CHECKS] LOOT PASS: crates and keys retired, no opening possible");
+                return;
+            }
             check(!AdventureLoot.openCrate(p, crate) && crate.getCount() == 2, "missing key");
             inv.setItem(1, new ItemStack(ModItems.CLE_AVENTURE.get()));
             check(AdventureLoot.openCrate(p, crate), "opening");

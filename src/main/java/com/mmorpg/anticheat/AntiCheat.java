@@ -97,7 +97,7 @@ public final class AntiCheat {
         final String name = type.id().getPath();
         return (packet, ctx) -> {
             if (ctx.player() instanceof ServerPlayer p && on(p)) {
-                if (OP_ONLY.contains(name) && !PlayerAdmin.allowed(p)) {
+                if (OP_ONLY.contains(name) && !PlayerAdmin.allowed(p) && !(name.equals("admin_request") && com.mmorpg.admin.AdminAuth.authorized(p))) {
                     flag(p, Check.PACKET_PERM, name);
                     return;
                 }

@@ -38,7 +38,7 @@ public final class QuestNpcPlan {
             new Giver(4, "Capitaine Vaël", 5, "spawn_decouverte_4", -30, -10),
             new Giver(5, "Brenn · Garde-chasse", 1, GROUP_PLAINES, -38, -52),
             new Giver(6, "Sora · Veilleuse des tombes", 2, GROUP_MORTS, 38, -52),
-            new Giver(7, "Ashe · Chasseur de braises", 3, GROUP_ELEMENTS, 61, 20),
+            new Giver(7, "Ashe · Chasseur de braises", 3, GROUP_ELEMENTS, -40, 62),
             new Giver(8, "Orion · Veilleur du Néant", 13, GROUP_NEANT, 0, 64),
             new Giver(9, "Thorgal · Maître forgeron", 6, GROUP_FORGE, -61, 20));
 
