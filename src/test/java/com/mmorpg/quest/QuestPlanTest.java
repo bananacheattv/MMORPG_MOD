@@ -159,7 +159,7 @@ class QuestPlanTest {
             assertTrue(indexes.add(g.get(i).index()));
             for (int j = i + 1; j < g.size(); j++) {
                 double d = QuestNpcPlan.distance(g.get(i), g.get(j));
-                assertTrue(d >= QuestNpcPlan.MIN_DISTANCE, g.get(i).name() + " et " + g.get(j).name() + " ne sont qu'a " + Math.round(d) + " blocs");
+                assertTrue(d > QuestNpcPlan.MIN_DISTANCE, g.get(i).name() + " et " + g.get(j).name() + " ne sont qu'a " + Math.round(d) + " blocs");
             }
         }
         Set<java.util.UUID> uuids = new HashSet<>();

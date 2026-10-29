@@ -15,7 +15,7 @@ public final class QuestNpcPlan {
     }
 
     /** Distance minimale (blocs) entre deux donneurs de quetes du spawn. */
-    public static final int MIN_DISTANCE = 30;
+    public static final int MIN_DISTANCE = 60;
 
     public static final String GROUP_PLAINES = "quetes_plaines", GROUP_MORTS = "quetes_morts_vivants", GROUP_ELEMENTS = "quetes_elements",
             GROUP_NEANT = "quetes_neant", GROUP_FORGE = "quetes_forge";
@@ -27,20 +27,20 @@ public final class QuestNpcPlan {
     }
 
     /**
-     * Les cinq premiers forment la chaine de decouverte (anneau interieur, rayon 32) ; les cinq suivants donnent la campagne (anneau
-     * exterieur, rayon 64, decale de 36 degres), du garde-chasse (niveau 1) a la veilleuse du Neant (niveau 80+).
+     * Les cinq premiers forment la chaine de decouverte (anneau interieur, rayon 54) ; les cinq suivants donnent la campagne (anneau
+     * exterieur, rayon 100, decale de 36 degres), du garde-chasse (niveau 1) a la veilleuse du Neant (niveau 80+).
      */
     public static final List<Giver> GIVERS = List.of(
-            new Giver(0, "Maëlys · Accueil d’Aeloria", 4, "spawn_decouverte_0", 0, -32),
-            new Giver(1, "Orin · Artisan de la cité", 6, "spawn_decouverte_1", 30, -10),
-            new Giver(2, "Lysandre · Intendante", 8, "spawn_decouverte_2", 19, 26),
-            new Giver(3, "Érian · Éclaireur", 7, "spawn_decouverte_3", -19, 26),
-            new Giver(4, "Capitaine Vaël", 5, "spawn_decouverte_4", -30, -10),
-            new Giver(5, "Brenn · Garde-chasse", 1, GROUP_PLAINES, -38, -52),
-            new Giver(6, "Sora · Veilleuse des tombes", 2, GROUP_MORTS, 38, -52),
-            new Giver(7, "Ashe · Chasseur de braises", 3, GROUP_ELEMENTS, 61, 20),
-            new Giver(8, "Orion · Veilleur du Néant", 13, GROUP_NEANT, 0, 64),
-            new Giver(9, "Thorgal · Maître forgeron", 6, GROUP_FORGE, -61, 20));
+            new Giver(0, "Maëlys · Accueil d’Aeloria", 4, "spawn_decouverte_0", 0, -54),
+            new Giver(1, "Orin · Artisan de la cité", 6, "spawn_decouverte_1", 51, -17),
+            new Giver(2, "Lysandre · Intendante", 8, "spawn_decouverte_2", 32, 44),
+            new Giver(3, "Érian · Éclaireur", 7, "spawn_decouverte_3", -32, 44),
+            new Giver(4, "Capitaine Vaël", 5, "spawn_decouverte_4", -51, -17),
+            new Giver(5, "Brenn · Garde-chasse", 1, GROUP_PLAINES, -59, -81),
+            new Giver(6, "Sora · Veilleuse des tombes", 2, GROUP_MORTS, 59, -81),
+            new Giver(7, "Ashe · Chasseur de braises", 3, GROUP_ELEMENTS, 95, 31),
+            new Giver(8, "Orion · Veilleur du Néant", 13, GROUP_NEANT, 0, 100),
+            new Giver(9, "Thorgal · Maître forgeron", 6, GROUP_FORGE, -95, 31));
 
 
     public static UUID uuid(int index) {
