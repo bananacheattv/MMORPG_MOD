@@ -101,8 +101,9 @@ def main(only):
                     d = json.loads(json.dumps(d))
                     if k.startswith('firstperson') and kind != 'STAFF':
                         d['rotation'][2] = -tilt - 5 if 'right' in k else tilt + 5
-                    elif tilt and k.startswith('thirdperson'):
-                        d['rotation'][2] = tilt if 'right' in k else -tilt
+                    elif k.startswith('thirdperson'):
+                        if tilt:
+                            d['rotation'][2] = tilt if 'right' in k else -tilt
                         d['translation'][1] = 1.8  # main sur le manche, pas sur le pommeau
                     display[k] = d
             model = {'credit': 'Aeloria · sprite peint et extrude', 'gui_light': 'front',
