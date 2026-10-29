@@ -530,6 +530,10 @@ public final class DevShowcase {
             weaponPhase(mc, me);
             return;
         }
+        if (MODE.equals("armes_galerie")) {
+            weaponGalleryPhase(mc, me);
+            return;
+        }
         if (MODE.equals("batons")) {
             staffPhase(mc, me);
             return;
@@ -1455,6 +1459,42 @@ public final class DevShowcase {
     }
 
     /** Controle des arcs, marteaux et epees 3D : 3e personne, 1re personne, traction de l'arc et inventaire. */
+    /** Galerie : toutes les armes dans l'inventaire (4 pages de 16), puis une arme de chaque famille en main. */
+    private static void scmd(Minecraft mc, String command) {
+        var server = mc.getSingleplayerServer();
+        if (server != null) server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput(), command));
+    }
+
+    private static void weaponGalleryPhase(Minecraft mc, String me) {
+        java.util.List<String> all = new java.util.ArrayList<>();
+        for (var w : com.mmorpg.item.ItemDefs.WEAPONS) all.add(w.id());
+        for (String c : new String[]{"guerrier", "mage", "archer", "tank"}) for (int b = 0; b < 5; b++) all.add("pvp_" + c + "_" + b + "_arme");
+        int page = (tick - 60) / 80, k = (tick - 60) % 80;
+        if (com.mmorpg.client.cinematic.CinematicClient.active() && tick % 10 == 0) com.mmorpg.client.cinematic.CinematicClient.skip();
+        if (tick == 20) { mc.getWindow().setWindowed(1280, 720); mc.options.guiScale().set(4); mc.resizeGui(); scmd(mc, "time set day"); scmd(mc, "weather clear"); scmd(mc, "gamemode creative VisualChecks"); }
+                if (tick >= 60 && page < 4) {
+            if (k == 0) {
+                mc.gui.setScreen(null);
+                scmd(mc, "clear " + me);
+                for (int i = 0; i < 16 && page * 16 + i < all.size(); i++) scmd(mc, "item replace entity " + me + " inventory." + i + " with mmorpg:" + all.get(page * 16 + i));
+            }
+            if (k == 30) mc.gui.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));
+            if (k == 60) shot(mc, "galerie_" + page);
+            return;
+        }
+        int t = tick - 400;
+        if (t == 0) { mc.gui.setScreen(null); scmd(mc, "clear " + me); }
+        String[] hand = {"excalibur_celeste", "baton_archimage", "marteau_titan", "arc_aube_divine", "lame_runique", "masse_gardien", "arc_faucon", "baton_phenix"};
+        if (t >= 0 && t < hand.length * 60) {
+            int n = t / 60, j = t % 60;
+            if (j == 0) { scmd(mc, "execute in minecraft:overworld run fill 25 219 -5 35 219 5 minecraft:smooth_stone"); scmd(mc, "execute in minecraft:overworld run fill 25 220 -5 35 226 5 minecraft:air"); scmd(mc, "execute in minecraft:overworld run tp VisualChecks 30 220 0 0 10"); scmd(mc, "item replace entity " + me + " weapon.mainhand with mmorpg:" + hand[n]); mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT); }
+            if (j == 25) { mc.gui.hud.getChat().clearMessages(false); shot(mc, "main_" + n + "_" + hand[n] + "_3e"); }
+            if (j == 30) mc.options.setCameraType(CameraType.FIRST_PERSON);
+            if (j == 50) { MMORPG.LOGGER.info("[MMORPG] MAIN {} pos={} inv={} cam={}", mc.player.getMainHandItem(), mc.player.position(), mc.player.isInvisible(), mc.options.getCameraType()); shot(mc, "main_" + n + "_" + hand[n] + "_1re"); }
+        }
+        if (t == hand.length * 60 + 20) stop(mc);
+    }
+
     private static void weaponPhase(Minecraft mc, String me) {
         String[] hot = {"arc_chasseur", "arc_aube_divine", "masse_garde", "marteau_egide", "epee_recrue", "excalibur_celeste"};
         String[] inv = {"arc_elfique", "arc_tempete", "arc_faucon", "arc_spectral", "marteau_bastion", "marteau_colosse", "masse_gardien",
