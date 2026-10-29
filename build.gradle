@@ -220,3 +220,11 @@ idea {
 }
 
 tasks.withType(Test).configureEach { useJUnitPlatform() }
+
+// Le wiki du depot (docs/wiki) est embarque pour l'ecran Wiki en jeu
+tasks.named('processResources') {
+    from('docs/wiki') {
+        include '*.md'
+        into 'assets/mmorpg/wiki'
+    }
+}

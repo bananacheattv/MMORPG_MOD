@@ -40,6 +40,7 @@ public final class FeatureCatalog {
                 new Entry("metiers", "Métiers", "Mineur, pêcheur, etc."),
                 new Entry("peche", "Pêche", "Mini-jeu et butin."),
                 new Entry("succes", "Succès", "Succès et titres."),
+                new Entry("wiki", "Wiki", "Guide consultable en jeu."),
                 new Entry("classements", "Classements", "Tableaux de classement."),
                 new Entry("forge", "Forge", "Fabrication d'équipement.")));
         CATEGORIES.put("Social", List.of(

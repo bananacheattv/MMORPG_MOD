@@ -87,6 +87,7 @@ final class DevUiFrames {
         add("mounts", MountsScreen::new);
         add("cosmetics", CosmeticsScreen::new);
         add("bestiary", BestiaryScreen::new);
+        add("wiki", WikiScreen::new);
         add("class_select", ClassSelectScreen::new);
         add("weekly", () -> {
             var data = new CompoundTag();
