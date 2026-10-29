@@ -1,0 +1,104 @@
+{
+  "panel": {
+    "host": "127.0.0.1",
+    "port": 8090,
+    "resumeOnBoot": true,
+    "schedule": {
+      "enabled": true,
+      "time": "05:00",
+      "warnMinutes": [
+        5,
+        1
+      ]
+    },
+    "security": {
+      "keywords": []
+    }
+  },
+  "services": [
+    {
+      "id": "db",
+      "name": "Base de données",
+      "type": "db",
+      "order": 1,
+      "dir": "servers/db",
+      "command": "bin/mariadbd.exe --defaults-file=my.ini --console",
+      "port": 3306,
+      "stopCommand": "",
+      "stopExec": "bin/mariadb-admin.exe --defaults-file=my.ini shutdown",
+      "stopTimeout": 60,
+      "autoRestart": true,
+      "dailyRestart": false
+    },
+    {
+      "id": "proxy",
+      "name": "Proxy (Velocity)",
+      "type": "proxy",
+      "order": 2,
+      "dir": "servers/proxy",
+      "command": "java -Xms256M -Xmx512M -jar velocity.jar",
+      "port": 25565,
+      "stopCommand": "end",
+      "stopExec": "",
+      "stopTimeout": 30,
+      "autoRestart": true,
+      "dailyRestart": false
+    },
+    {
+      "id": "serveur",
+      "name": "Serveur principal",
+      "type": "game",
+      "order": 3,
+      "dir": "servers/serveur",
+      "command": "java @user_jvm_args.txt @libraries/net/neoforged/neoforge/26.3.0.39-beta/win_args.txt nogui",
+      "port": 25570,
+      "stopCommand": "stop",
+      "stopExec": "",
+      "stopTimeout": 90,
+      "autoRestart": true,
+      "dailyRestart": false
+    },
+    {
+      "id": "hub",
+      "name": "Hub",
+      "type": "game",
+      "order": 4,
+      "dir": "servers/hub",
+      "command": "java @user_jvm_args.txt @libraries/net/neoforged/neoforge/26.3.0.39-beta/win_args.txt nogui",
+      "port": 25571,
+      "stopCommand": "stop",
+      "stopExec": "",
+      "stopTimeout": 60,
+      "autoRestart": true,
+      "dailyRestart": false
+    },
+    {
+      "id": "mines",
+      "name": "Mines",
+      "type": "game",
+      "order": 5,
+      "dir": "servers/mines",
+      "command": "java @user_jvm_args.txt @libraries/net/neoforged/neoforge/26.3.0.39-beta/win_args.txt nogui",
+      "port": 25572,
+      "stopCommand": "stop",
+      "stopExec": "",
+      "stopTimeout": 60,
+      "autoRestart": true,
+      "dailyRestart": false
+    },
+    {
+      "id": "plaines",
+      "name": "Plaines",
+      "type": "game",
+      "order": 6,
+      "dir": "servers/plaines",
+      "command": "java @user_jvm_args.txt @libraries/net/neoforged/neoforge/26.3.0.39-beta/win_args.txt nogui",
+      "port": 25573,
+      "stopCommand": "stop",
+      "stopExec": "",
+      "stopTimeout": 60,
+      "autoRestart": true,
+      "dailyRestart": false
+    }
+  ]
+}

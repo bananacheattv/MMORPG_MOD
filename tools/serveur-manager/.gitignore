@@ -1,0 +1,5 @@
+config.json
+data/
+servers/
+node_modules/
+*.jar
