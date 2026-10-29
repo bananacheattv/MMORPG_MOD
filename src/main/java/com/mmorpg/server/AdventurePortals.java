@@ -31,6 +31,8 @@ public final class AdventurePortals {
     private static final Map<UUID, UUID> INSIDE = new HashMap<>();
     private static final Map<UUID, Deque<Change>> HISTORY = new HashMap<>();
     private static final int MAX_HISTORY = 20;
+    /** Portails dont le cadre a deja ete verifie depuis le demarrage (un cadre cassé ensuite reste cassé : l'arche devient inactive). */
+    private static final Set<UUID> HEALED = new HashSet<>();
     private record Change(Portal portal, boolean placed, Map<BlockPos, BlockState> before, Map<BlockPos, BlockState> after, long order) {
         Change(Portal portal, boolean placed, Map<BlockPos, BlockState> before, Map<BlockPos, BlockState> after) {
             this(portal, placed, before, after, SpawnEditor.nextOrder());
@@ -76,6 +78,19 @@ public final class AdventurePortals {
         }
         return blocks;
     }
+    /** Remet les blocs manquants (air) du cadre d'un portail enregistré ; les blocs différents ne sont jamais remplacés. @return nombre de blocs reposés */
+    public static int heal(ServerLevel level, Portal portal) {
+        if (!valid(portal) || !portal.dimension().equals(level.dimension())) return 0;
+        int n = 0;
+        for (var e : frame(portal).entrySet()) {
+            BlockPos at = e.getKey();
+            if (!level.hasChunkAt(at) || level.isOutsideBuildHeight(at) || !level.getBlockState(at).isAir()) continue;
+            level.setBlockAndUpdate(at, e.getValue());
+            n++;
+        }
+        if (n > 0) MMORPG.LOGGER.info("[MMORPG] Portail {} : {} bloc(s) du cadre rétabli(s) ({})", portal.id().toString().substring(0, 8), n, label(portal));
+        return n;
+    }
     private static void remember(ServerPlayer p, Change change) {
         Deque<Change> history = HISTORY.computeIfAbsent(p.getUUID(), id -> new ArrayDeque<>());
         history.push(change);
@@ -119,6 +134,7 @@ public final class AdventurePortals {
         });
         after.forEach(level::setBlockAndUpdate);
         data.remove(portal.id());
+        HEALED.remove(portal.id());
         remember(player, new Change(portal, false, before, after));
         return true;
     }
@@ -192,6 +208,7 @@ public final class AdventurePortals {
             Portal inside = null;
             for (Portal portal : portals) {
                 if (!valid(portal) || !p.level().dimension().equals(portal.dimension()) || p.distanceToSqr(portal.pos().getX() + .5, portal.pos().getY() + 2, portal.pos().getZ() + .5) > 32 * 32) continue;
+                if (HEALED.add(portal.id())) heal(p.level(), portal);
                 if (!frame(portal).entrySet().stream().allMatch(e -> p.level().getBlockState(e.getKey()).equals(e.getValue()))) continue;
                 int color = portal.kind().equals("mine") ? 0xFFB040 : portal.kind().equals("plaines") ? 0x50E0A0 : 0xB070FF;
                 p.level().sendParticles(p, new DustParticleOptions(color, 1.3f), false, false, portal.pos().getX() + .5, portal.pos().getY() + 2, portal.pos().getZ() + .5, 12, portal.widthX() ? 1.2 : .1, 1.5, portal.widthX() ? .1 : 1.2, 0);
@@ -203,7 +220,7 @@ public final class AdventurePortals {
         }
     }
     @SubscribeEvent public static void logout(PlayerEvent.PlayerLoggedOutEvent event) { INSIDE.remove(event.getEntity().getUUID()); }
-    @SubscribeEvent public static void stopped(ServerStoppedEvent event) { INSIDE.clear(); HISTORY.clear(); }
+    @SubscribeEvent public static void stopped(ServerStoppedEvent event) { INSIDE.clear(); HISTORY.clear(); HEALED.clear(); }
 
     private static int create(net.minecraft.commands.CommandSourceStack source, String kind, int region, String dungeon, int difficulty) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
         ServerPlayer p = source.getPlayerOrException();

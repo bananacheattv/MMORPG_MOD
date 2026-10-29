@@ -34,6 +34,12 @@ public final class DevPortalChecks {
         check(data.find(mine.id()).equals(mine), "persistent registration");
         check(!level.getBlockState(mine.at(-2, 0)).isAir() && level.getBlockState(mine.at(0, 1)).isAir(), "solid frame with walkable opening");
         check(AdventurePortals.passage(mine).contains(48.5, 101, 48.5), "X arch passage");
+        var pillar = mine.at(-2, 1); var pillarState = level.getBlockState(pillar); var other = mine.at(2, 1);
+        level.setBlockAndUpdate(pillar, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+        level.setBlockAndUpdate(other, net.minecraft.world.level.block.Blocks.DIRT.defaultBlockState());
+        check(AdventurePortals.heal(level, mine) == 1 && level.getBlockState(pillar).equals(pillarState), "missing frame block restored");
+        check(level.getBlockState(other).is(net.minecraft.world.level.block.Blocks.DIRT), "foreign block never replaced by heal");
+        level.setBlockAndUpdate(other, pillarState);
         var encoded = AdventurePortalData.CODEC.encodeStart(NbtOps.INSTANCE, data).getOrThrow();
         var reloaded = AdventurePortalData.CODEC.parse(NbtOps.INSTANCE, encoded).getOrThrow();
         check(mine.equals(reloaded.find(mine.id())), "save/load of destination and orientation");

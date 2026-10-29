@@ -16,7 +16,7 @@ Commandes réservées aux opérateurs (permission maître du jeu). L'arche appar
 
 Utiliser les suggestions de commande pour les autres identifiants de donjon. Sans difficulté précisée, le donjon est normal. Les arches utilisent les blocs de marbre et cristaux du mod ; leurs particules sont orange pour les mines, vertes pour les plaines et violettes pour les donjons. Le nom de la destination s'affiche en s'approchant.
 
-Traverser l'ouverture active le portail une seule fois ; il faut ressortir pour le réactiver. Revenir d'une instance à l'intérieur de son portail d'entrée ne relance pas immédiatement une nouvelle instance. Une arche dont le cadre a été cassé devient inactive ; elle peut toujours être supprimée par commande.
+Traverser l'ouverture active le portail une seule fois ; il faut ressortir pour le réactiver. Revenir d'une instance à l'intérieur de son portail d'entrée ne relance pas immédiatement une nouvelle instance. Une arche dont le cadre a été cassé devient inactive ; elle peut toujours être supprimée par commande. Au premier passage d'un joueur après chaque démarrage du serveur, les blocs **manquants** (air) du cadre d'un portail enregistré sont reposés ; un bloc différent n'est jamais remplacé.
 
 Les niveaux, difficultés, choix de classe et découvertes des mines/plaines sont contrôlés côté serveur. Un portail vers une région avancée ne la débloque pas. Les essais, cinématiques et combats PvP empêchent l'entrée. Les voyages utilisent les mécanismes existants (écran de chargement, instance personnelle/de groupe et, en réseau, transfert vers le serveur approprié). Les arches et leurs destinations sont sauvegardées dans les données du monde et conservées au redémarrage.
 
