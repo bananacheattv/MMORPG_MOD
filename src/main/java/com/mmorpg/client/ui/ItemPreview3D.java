@@ -14,6 +14,6 @@ public final class ItemPreview3D {
   var renderer=mc.getEntityRenderDispatcher().getRenderer(entity);var state=(ItemEntityRenderState)renderer.createRenderState(entity,0);state.shadowPieces.clear();state.outlineColor=0;state.shouldBob=false;state.shouldSpread=false;state.count=1;state.ageInTicks=0;state.bobOffset=0;
   mc.getItemModelResolver().updateForTopItem(state.item,stack,ItemDisplayContext.FIXED,mc.level,mc.player,0);
   float size=Math.min(w,h)*.67f;
-  g.entity(state,size,new Vector3f(0,.57f,0),new Quaternionf().rotateZ((float)Math.PI).rotateY(rotationY).rotateX(rotationX),new Quaternionf(),x,y,x+w,y+h);
+  com.mmorpg.client.ui.Ui.entity(g, state,size,new Vector3f(0,.57f,0),new Quaternionf().rotateZ((float)Math.PI).rotateY(rotationY).rotateX(rotationX),new Quaternionf(),x,y,x+w,y+h);
  }
 }

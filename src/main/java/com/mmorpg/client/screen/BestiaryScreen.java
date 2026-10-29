@@ -25,6 +25,8 @@ public class BestiaryScreen extends MenuScreen {
     private int dropdown;
     private int dropdownScroll;
     private List<String> familyOptions = List.of("Toutes");
+    private final java.util.Map<String, net.minecraft.world.entity.LivingEntity> previews = new java.util.HashMap<>();
+    private int previewIds;
 
     public BestiaryScreen() {
         super(Tab.BESTIAIRE);
@@ -37,8 +39,39 @@ public class BestiaryScreen extends MenuScreen {
     }
 
     /** Une fiche reste verrouillee tant que le joueur n'a pas vaincu au moins une de ces creatures. */
+    public static void select(String key) { selected = key; }
+
     private static boolean unlocked(String key) {
         return ClientData.DATA.kills.getOrDefault(key, 0) > 0;
+    }
+
+    private net.minecraft.world.entity.LivingEntity previewEntity(String key) {
+        if (minecraft.level == null) return null;
+        return previews.computeIfAbsent(key, k -> {
+            var type = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getValue(com.mmorpg.MMORPG.id(k));
+            var e = type == null ? null : type.create(minecraft.level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            if (e == null) return null;
+            e.setId(-400 - previewIds++);
+            return e instanceof net.minecraft.world.entity.LivingEntity living ? living : null;
+        });
+    }
+
+    /** Case 3D : la creature qui tourne doucement si elle est decouverte, sinon une silhouette sombre avec « ? ». */
+    private void previewBox(GuiGraphicsExtractor g, int x, int y, int w, int h, String key, boolean open) {
+        Ui.inset(g, x, y, w, h);
+        var entity = open ? previewEntity(key) : null;
+        if (entity == null) {
+            g.fill(x + 3, y + 3, x + w - 3, y + h - 3, 0xB0080510);
+            Ui.scaledText(g, "?", x + w / 2 - 6, y + h / 2 - 14, 4f, Ui.MUTED, false);
+            return;
+        }
+        entity.tickCount = (int) (minecraft.level.getGameTime() % 100000);
+        float height = entity.getBbHeight();
+        for (var entry : com.mmorpg.entity.mob.ImportedMobs.ALL)
+            if (entry.key().equals(key)) height = entry.height() * entry.scale();   // le rendu des modeles importes applique deja leur echelle
+        int size = Math.max(6, Math.min(80, (int) ((h - 14) / Math.max(.5f, height * 1.2f))));
+        float sway = 40f * (float) Math.sin((minecraft.level.getGameTime() % 100000) / 25.0);
+        Ui.entityFollowsAngle(g, x + 4, y + 4, x + w - 4, y + h - 4, size, .0625f, sway, -.1f, entity);
     }
 
     @Override
@@ -106,6 +139,8 @@ public class BestiaryScreen extends MenuScreen {
         Ui.inset(g, dx, y0, dw, dh);
         CompoundTag t = ClientData.mobInfo.getCompoundOrEmpty(selected);
         boolean boss = t.getBooleanOr("boss", false);
+        int boxW = Math.min(130, dw / 3), boxH = Math.min(dh - 16, 170);
+        previewBox(g, dx + dw - boxW - 8, y0 + 8, boxW, boxH, selected, unlocked(selected));
         if (!unlocked(selected)) {
             Ui.scaledText(g, "???", dx + 8, y0 + 8, 1.5f, Ui.MUTED, false);
             Ui.wrap(g, "Fiche verrouillée. Vainquez cette créature pour découvrir son nom, ses statistiques et son butin.", dx + 8, y0 + 30, dw - 16, Ui.MUTED);
@@ -126,7 +161,8 @@ public class BestiaryScreen extends MenuScreen {
         int kills = ClientData.DATA.kills.getOrDefault(selected, 0);
         g.text(font, "Vaincus : " + kills, dx + 8, ty, Ui.GREEN, false);
         ty += 16;
-        Ui.header(g, dx + 8, ty, dw - 16, "BUTIN");
+        int lootW = dw - 16 - boxW - 8;
+        Ui.header(g, dx + 8, ty, lootW, "BUTIN");
         ty += 14;
         ListTag drops = t.getListOrEmpty("drops");
         int col = 0;
@@ -134,12 +170,12 @@ public class BestiaryScreen extends MenuScreen {
             CompoundTag dt = drops.getCompoundOrEmpty(i);
             Item item = ForgeRecipes.resolveItem(dt.getStringOr("item", "minecraft:air"));
             if (item == null || item == Items.AIR) continue;
-            int ix = dx + 8 + col * ((dw - 16) / 2);
+            int ix = dx + 8 + col * (lootW / 2);
             ItemStack stack = new ItemStack(item);
             g.item(stack, ix, ty);
             float chance = dt.getFloatOr("chance", 0) * 100;
             String txt = (chance >= 100 ? "100" : String.format(java.util.Locale.FRANCE, "%.0f", chance)) + " %";
-            g.text(font, font.plainSubstrByWidth(stack.getHoverName().getString(), (dw - 16) / 2 - 22), ix + 18, ty, Ui.TEXT, false);
+            g.text(font, font.plainSubstrByWidth(stack.getHoverName().getString(), lootW / 2 - 22), ix + 18, ty, Ui.TEXT, false);
             g.text(font, txt, ix + 18, ty + 9, Ui.MUTED, false);
             if (hovered(ix, ty, 16, 16)) g.setTooltipForNextFrame(font, stack, mx, my);
             col++;

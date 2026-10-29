@@ -52,7 +52,7 @@ public class MountsScreen extends MenuScreen {
             var state = minecraft.getEntityRenderDispatcher().getRenderer(entity).createRenderState(entity, 1f);
             state.shadowPieces.clear();
             float ew = selected.width * ModEntities.MOUNT_SCALE, eh = selected.height * ModEntities.MOUNT_SCALE;           // la monture est affichee a son echelle reelle (x2)
-            g.entity(state, 34 / Math.max(1f, Math.max(ew, eh) * .8f), new org.joml.Vector3f(0, eh / 2, 0), new org.joml.Quaternionf().rotateZ((float) Math.PI).rotateY(-.7f), null, dx + 5, y + 18, dx + dw - 5, y + 94);
+            com.mmorpg.client.ui.Ui.entity(g, state, 34 / Math.max(1f, Math.max(ew, eh) * .8f), new org.joml.Vector3f(0, eh / 2, 0), new org.joml.Quaternionf().rotateZ((float) Math.PI).rotateY(-.7f), null, dx + 5, y + 18, dx + dw - 5, y + 94);
         }
         int ty = y + 100;
         g.text(font, selected.rarity.label + " • Vitesse : " + Math.round(selected.speed / .225 * 100) + " %", dx + 7, ty, selected.rarity.color, false);

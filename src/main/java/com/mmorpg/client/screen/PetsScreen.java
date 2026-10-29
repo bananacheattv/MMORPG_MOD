@@ -35,7 +35,7 @@ public class PetsScreen extends MenuScreen {
         state.outlineColor = 0;
         float scale = size * (type == PetType.PHENIX ? .55f : type == PetType.DRAGONNET ? .60f : type == PetType.FEE || type == PetType.LOUP_SPECTRAL ? .65f : .85f);
         float center = type == PetType.DRAGONNET ? .65f : .48f;
-        g.entity(state, scale, new org.joml.Vector3f(0, center, 0),
+        com.mmorpg.client.ui.Ui.entity(g, state, scale, new org.joml.Vector3f(0, center, 0),
                 new org.joml.Quaternionf().rotateZ((float) Math.PI), null, x, y, x + size, y + size);
     }
 

@@ -27,7 +27,7 @@ public final class ArmorStandEditorScreen extends MmoScreen {
         for(int i=0;i<36;i++){int index=i,x=left+12+(i%columns)*cell,y=top+79+(i/columns)*cell;Ui.frame(g,x,y,cell-1,cell-1,Ui.MUTED,false);var stack=minecraft.player.getInventory().getItem(i);g.item(stack,x+(cell-16)/2,y+(cell-16)/2);click(x,y,cell-1,cell-1,()->send("equip",t->{t.putInt("slot",slot);t.putInt("inventory",index);}));if(hovered(x,y,cell-1,cell-1)&&!stack.isEmpty())g.setTooltipForNextFrame(font,stack,mouseX,mouseY);}
         button(g,left+12,top+85+cell*4,pw/2-24,17,"Vider cet emplacement",true,Ui.RED,()->send("equip",t->{t.putInt("slot",slot);t.putInt("inventory",-1);}));
         int previewTop=top+114+cell*4;
-        net.minecraft.client.gui.screens.inventory.InventoryScreen.extractEntityInInventoryFollowsMouse(g,left+18,previewTop,split-12,top+ph-12,Math.max(20,(top+ph-12-previewTop)/2),.0625f,mouseX,mouseY,stand);
+        com.mmorpg.client.ui.Ui.entityFollowsMouse(g,left+18,previewTop,split-12,top+ph-12,Math.max(20,(top+ph-12-previewTop)/2),.0625f,mouseX,mouseY,stand);
         button(g,split+8,top+35,pw/2-20,18,"Articulation : "+PARTS[part]+" ›",true,Ui.GOLD,()->part=(part+1)%6);
         for(int i=0;i<3;i++){int selected=i;button(g,split+10+i*(pw/2-22)/3,top+ph-26,(pw/2-22)/3-3,18,new String[]{"Poses","Position","Skin / 3D"}[i],true,mode==i?Ui.GOLD:Ui.MUTED,()->{mode=selected;position=mode==1;});}
         if(mode==2){

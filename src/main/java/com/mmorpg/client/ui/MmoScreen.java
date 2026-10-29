@@ -166,11 +166,16 @@ public abstract class MmoScreen extends Screen {
         }
         g.pose().pushMatrix();
         g.pose().scale(uiScale, uiScale);
-        Ui.suppressPanel(hasNav());
-        renderContent(g, mouseX, mouseY, a);
-        Ui.suppressPanel(false);
-        super.extractRenderState(g, mouseX, mouseY, a);
-        renderOverlay(g, mouseX, mouseY, a);
+        Ui.renderScale = uiScale;
+        try {
+            Ui.suppressPanel(hasNav());
+            renderContent(g, mouseX, mouseY, a);
+            Ui.suppressPanel(false);
+            super.extractRenderState(g, mouseX, mouseY, a);
+            renderOverlay(g, mouseX, mouseY, a);
+        } finally {
+            Ui.renderScale = 1f;
+        }
         g.pose().popMatrix();
     }
 

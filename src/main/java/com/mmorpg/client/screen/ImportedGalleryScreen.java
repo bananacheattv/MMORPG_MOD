@@ -29,7 +29,7 @@ public final class ImportedGalleryScreen extends MmoScreen {
             var mob=mobs.get(i);int x=left+8+i*cw,y=top+30;
             Ui.inset(g,x,y,cw-3,ph-42);
             int scale=(int)Math.min((ph-80)/mob.getBbHeight(),(cw-10)/Math.max(mob.getBbWidth(),1.5f));
-            InventoryScreen.extractEntityInInventoryFollowsMouse(g,x+2,y+5,x+cw-5,top+ph-30,scale,.0625f,x+cw/2-20,y+40,mob);
+            com.mmorpg.client.ui.Ui.entityFollowsMouse(g,x+2,y+5,x+cw-5,top+ph-30,scale,.0625f,x+cw/2-20,y+40,mob);
             String name=ImportedMobs.ALL[zone*5+i].name();
             Ui.wrap(g,name,x+4,top+ph-27,cw-10,Ui.TEXT);
         }

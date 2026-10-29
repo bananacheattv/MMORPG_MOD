@@ -784,6 +784,30 @@ public final class DevShowcase {
             if (tick == 100) stop(mc);
             return;
         }
+        if (MODE.equals("ecrans3d")) {          // familiers, montures, cosmetiques, bestiaire a plusieurs resolutions (cases 3D)
+            int[][] sizes = {{1280, 720}, {1000, 600}, {854, 480}, {1200, 500}};
+            MenuScreen.Tab[] tabs = {MenuScreen.Tab.FAMILIERS, MenuScreen.Tab.MONTURES, MenuScreen.Tab.COSMETIQUES, MenuScreen.Tab.BESTIAIRE};
+            if (tick == 20) { cmd(mc, "gamemode survival " + me); mc.options.guiScale().set(2); }
+            if (tick == 30 && !ClientData.DATA.playerClass.isPlayable()) ClientNet.send(new com.mmorpg.network.Payloads.SelectClass(com.mmorpg.rpg.PlayerClass.GUERRIER.ordinal()));
+            int n = (tick - 60) / 50;
+            if (tick >= 60 && n < sizes.length * tabs.length) {
+                int s = n / tabs.length, tb = n % tabs.length, phase = (tick - 60) % 50;
+                if (phase == 0) { mc.gui.setScreen(null); mc.getWindow().setWindowed(sizes[s][0], sizes[s][1]); mc.resizeGui();
+                    if (tabs[tb] == MenuScreen.Tab.BESTIAIRE) ClientData.mobInfo.keySet().stream().limit(40).forEach(k -> ClientData.DATA.kills.put(k, 3));
+                    if (tabs[tb] == MenuScreen.Tab.COSMETIQUES) mc.gui.setScreen(new com.mmorpg.client.screen.CosmeticsScreen(java.util.Arrays.stream(Cosmetic.values()).filter(Cosmetic::hasModel).findFirst().get()));
+                    else MenuScreen.open(tabs[tb]); }
+                if (tabs[tb] == MenuScreen.Tab.BESTIAIRE && s == 0) {
+                    String[] picks = {"archer_sylvestre", "roi_gobelin", "colosse_racine"};
+                    for (int q = 0; q < picks.length; q++) {
+                        if (phase == 15 + q * 6) com.mmorpg.client.screen.BestiaryScreen.select(picks[q]);
+                        if (phase == 20 + q * 6 && q > 0) shot(mc, "bestiaire_" + picks[q]);
+                    }
+                }
+                if (phase == 35) shot(mc, "r" + sizes[s][0] + "x" + sizes[s][1] + "_" + tabs[tb].name().toLowerCase());
+            }
+            if (n >= sizes.length * tabs.length) { mc.gui.setScreen(null); stop(mc); }
+            return;
+        }
         if (MODE.equals("onglets")) {          // un cliche par onglet du menu (Metiers, Succes, Bestiaire, Boutique...)
             if (tick == 5) mc.getWindow().setWindowed(1280, 720);
             if (tick == 20) { cmd(mc, "gamemode survival " + me); mc.options.guiScale().set(2); mc.resizeGui(); }

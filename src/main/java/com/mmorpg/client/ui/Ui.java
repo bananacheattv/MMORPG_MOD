@@ -14,6 +14,25 @@ import java.util.List;
 
 /** Boite a outils de rendu des interfaces "style MMORPG" : panneaux ornes, barres, boutons, cadres. */
 public final class Ui {
+        /** Echelle appliquee par MmoScreen : les rendus d'entites 3D ignorent la matrice du GUI et doivent etre mis a l'echelle a la main. */
+    public static float renderScale = 1f;
+
+    private static int sx(int v) { return Math.round(v * renderScale); }
+
+    public static void entity(GuiGraphicsExtractor g, net.minecraft.client.renderer.entity.state.EntityRenderState state, float size,
+                              org.joml.Vector3f translation, org.joml.Quaternionf rotation, org.joml.Quaternionf cameraAngle, int x0, int y0, int x1, int y1) {
+        g.entity(state, size * renderScale, translation, rotation, cameraAngle, sx(x0), sx(y0), sx(x1), sx(y1));
+    }
+
+    public static void entityFollowsMouse(GuiGraphicsExtractor g, int x0, int y0, int x1, int y1, int size, float yOffset, float mx, float my,
+                                          net.minecraft.world.entity.LivingEntity e) {
+        net.minecraft.client.gui.screens.inventory.InventoryScreen.extractEntityInInventoryFollowsMouse(g, sx(x0), sx(y0), sx(x1), sx(y1), Math.round(size * renderScale), yOffset, mx, my, e);
+    }
+
+    public static void entityFollowsAngle(GuiGraphicsExtractor g, int x0, int y0, int x1, int y1, int size, float yOffset, float ax, float ay,
+                                          net.minecraft.world.entity.LivingEntity e) {
+        net.minecraft.client.gui.screens.inventory.InventoryScreen.renderEntityInInventoryFollowsAngle(g, sx(x0), sx(y0), sx(x1), sx(y1), Math.round(size * renderScale), yOffset, ax, ay, e);
+    }
     public static final int GOLD = 0xFFE2B85A;
     public static final int GOLD_LIGHT = 0xFFFFE6A0;
     public static final int GOLD_DARK = 0xFF3B3350;          // bordures et filets (violet gris, interface plate)
