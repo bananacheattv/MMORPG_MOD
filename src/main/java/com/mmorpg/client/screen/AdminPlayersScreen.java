@@ -546,11 +546,16 @@ public class AdminPlayersScreen extends MmoScreen {
             });
         }
         if (rows.isEmpty()) g.text(font, "Aucun objet (ou joueur hors ligne).", rx + 3, y0 + 3, Ui.MUTED, false);
-        bar(g, rx, rw, "Donner un objet : identifiant (minecraft:diamond) puis quantité");
+        bar(g, rx, rw, "Donner un objet : choisis-le dans la grille, puis la quantité");
         placeBoxes(rx, rw, rw - 84 - 76, true);
-        key.setWidth(48);
-        value.setX(rx + 52);
-        value.setWidth(rw - 52 - 74);
+        key.setWidth(40);
+        value.setX(rx + 44);
+        value.setWidth(rw - 44 - 158);
+        button(g, rx + rw - 154, top + ph - 31, 80, 15, "Choisir…", true, Ui.GOLD, () ->
+                minecraft.gui.setScreen(new ItemPickerScreen(this, "Donner un objet", true, 64, List.of(), (id, qty) -> {
+                    value.setValue(id);
+                    key.setValue(Integer.toString(qty));
+                })));
         button(g, rx + rw - 70, top + ph - 31, 70, 15, "Donner", true, Ui.GREEN, () -> {
             CompoundTag t = base("act");
             t.putString("what", "give");

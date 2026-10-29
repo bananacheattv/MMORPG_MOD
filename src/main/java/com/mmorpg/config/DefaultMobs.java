@@ -84,7 +84,8 @@ public final class DefaultMobs {
         return c;
     }
 
-    public static Map<String, MobConfig> create() {
+    /** Monstres et boss ecrits a la main (donnees pures, validees par les tests de quetes). */
+    public static Map<String, MobConfig> core() {
         Map<String, MobConfig> m = new LinkedHashMap<>();
         List<String> ow = List.of("minecraft:overworld");
 
@@ -250,6 +251,12 @@ public final class DefaultMobs {
         drop(bandit, "piece_or", .8, 5, 15);
         drop(bandit, "insigne_bandit", .4, 1, 1);
         m.put("bandit_arbaletrier", bandit);
+        return m;
+    }
+
+    public static Map<String, MobConfig> create() {
+        Map<String, MobConfig> m = core();
+        List<String> ow = List.of("minecraft:overworld");
         String[][] biomes = {{"#minecraft:is_forest"}, {"minecraft:swamp", "minecraft:mangrove_swamp"},
                 {"minecraft:dripstone_caves", "minecraft:deep_dark"}, {"minecraft:snowy_plains", "minecraft:ice_spikes", "minecraft:grove"},
                 {"minecraft:desert", "#minecraft:is_badlands"}, {"#minecraft:is_end"}};
