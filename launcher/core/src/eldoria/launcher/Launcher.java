@@ -684,10 +684,12 @@ public final class Launcher {
             if (minBoot > bootVersion)
                 log("! Nouvelle version du launcher disponible : " + Json.str(manifest.get("releaseUrl"), ""));
 
+            checkDisk();
             setupAuth();
             syncMods();
             game = new Game(home.resolve("minecraft"), gameDir, this::log, this::status);
             game.prepare(Json.str(manifest.get("minecraft"), "26.3"), Json.str(manifest.get("neoforge"), ""));
+            cleanup();
             ready = true;
             status("Pret ! Clique sur JOUER.", 1000);
             log("Pret.");
@@ -695,6 +697,38 @@ public final class Launcher {
         } catch (Exception e) {
             error("Erreur pendant la mise a jour", e);
         }
+    }
+
+    /** Premiere installation : ~2 Go ; mise a jour : bien moins. On previent avant de commencer si le disque est trop plein. */
+    private void checkDisk() throws Exception {
+        boolean fresh = !Files.isDirectory(home.resolve("minecraft").resolve("assets"));
+        long need = fresh ? 3L << 30 : 500L << 20;
+        long free = Files.getFileStore(Files.createDirectories(home)).getUsableSpace();
+        log("Espace disque libre : " + (free >> 20) + " Mo");
+        if (free < need) {
+            String msg = "Espace disque insuffisant : " + (free >> 20) + " Mo libres, environ " + (need >> 20)
+                    + " Mo necessaires. Libere de la place sur le disque puis relance le launcher.";
+            if (free < need / 4) throw new IllegalStateException(msg);
+            log("! " + msg);
+        }
+    }
+
+    /** Supprime les telechargements incomplets et installeurs restants. */
+    private void cleanup() {
+        long freed = 0;
+        for (Path root : new Path[]{mods, state, home.resolve("launcher"), home.resolve("minecraft")}) {
+            if (!Files.isDirectory(root)) continue;
+            try (var w = Files.walk(root, root.equals(home.resolve("minecraft")) ? 1 : 2)) {
+                for (Path p : (Iterable<Path>) w.filter(Files::isRegularFile)::iterator) {
+                    String n = p.getFileName().toString();
+                    if (n.endsWith(".part") || n.endsWith("-installer.jar") || n.endsWith("-installer.jar.log")) {
+                        freed += Files.size(p);
+                        Files.deleteIfExists(p);
+                    }
+                }
+            } catch (Exception ignored) {}
+        }
+        if (freed > 0) log("Fichiers temporaires supprimes : " + (freed >> 20) + " Mo liberes");
     }
 
     private void syncMods() throws Exception {
