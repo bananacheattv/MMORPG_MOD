@@ -56,6 +56,7 @@ public final class FeatureCatalog {
         CATEGORIES.put("Monde", List.of(
                 new Entry("mines", "Mines", "Étages miniers."),
                 new Entry("plaines", "Plaines", "Zone des plaines."),
-                new Entry("cinematique", "Cinématique", "Intro du hub.")));
+                new Entry("cinematique", "Cinématique", "Intro du hub."),
+                new Entry("anticheat", "Anticheat", "Limites de débit et détections.")));
     }
 }

@@ -29,49 +29,55 @@ public final class Net {
         r.playToClient(Payloads.Loading.TYPE, Payloads.Loading.CODEC);
         r.playToClient(Payloads.DeathInfo.TYPE, Payloads.DeathInfo.CODEC);
         r.playToClient(Payloads.DungeonMusic.TYPE, Payloads.DungeonMusic.CODEC);
-        r.playToServer(Payloads.DungeonEnter.TYPE, Payloads.DungeonEnter.CODEC, (packet, ctx) -> {
+        srv(r, Payloads.DungeonEnter.TYPE, Payloads.DungeonEnter.CODEC, (packet, ctx) -> {
             if (ctx.player() instanceof ServerPlayer p) com.mmorpg.dungeon.DungeonMaster.enter(p, packet);
         });
-        r.playToServer(Payloads.MineEnter.TYPE, Payloads.MineEnter.CODEC, (packet, ctx) -> {
+        srv(r, Payloads.MineEnter.TYPE, Payloads.MineEnter.CODEC, (packet, ctx) -> {
             if (ctx.player() instanceof ServerPlayer p) com.mmorpg.mine.MineManager.enter(p, packet);
         });
         r.playToClient(Payloads.MobInfo.TYPE, Payloads.MobInfo.CODEC);
         r.playToClient(Payloads.PartySync.TYPE, Payloads.PartySync.CODEC);
 
-        r.playToServer(Payloads.SelectClass.TYPE, Payloads.SelectClass.CODEC, ServerHandlers::selectClass);
-        r.playToServer(Payloads.QuestEdit.TYPE, Payloads.QuestEdit.CODEC, (packet, ctx) -> {
+        srv(r, Payloads.SelectClass.TYPE, Payloads.SelectClass.CODEC, ServerHandlers::selectClass);
+        srv(r, Payloads.QuestEdit.TYPE, Payloads.QuestEdit.CODEC, (packet, ctx) -> {
             if (ctx.player() instanceof ServerPlayer p) com.mmorpg.server.QuestEditor.action(p, packet.data());
         });
-        r.playToServer(Payloads.LootEdit.TYPE, Payloads.LootEdit.CODEC, (packet, ctx) -> {
+        srv(r, Payloads.LootEdit.TYPE, Payloads.LootEdit.CODEC, (packet, ctx) -> {
             if (ctx.player() instanceof ServerPlayer p) com.mmorpg.server.LootEditor.action(p, packet.data());
         });
-        r.playToServer(Payloads.HubAction.TYPE, Payloads.HubAction.CODEC, (packet, ctx) -> {
+        srv(r, Payloads.HubAction.TYPE, Payloads.HubAction.CODEC, (packet, ctx) -> {
             if (ctx.player() instanceof ServerPlayer p) com.mmorpg.hub.HubManager.action(p, packet.action(), packet.a(), packet.b());
         });
-        r.playToServer(Payloads.Allocate.TYPE, Payloads.Allocate.CODEC, ServerHandlers::allocate);
-        r.playToServer(Payloads.SkillAction.TYPE, Payloads.SkillAction.CODEC, ServerHandlers::skillAction);
-        r.playToServer(Payloads.MountAction.TYPE, Payloads.MountAction.CODEC, ServerHandlers::mountAction);
-        r.playToServer(Payloads.LuckyRoll.TYPE, Payloads.LuckyRoll.CODEC, (packet, ctx) -> {
+        srv(r, Payloads.Allocate.TYPE, Payloads.Allocate.CODEC, ServerHandlers::allocate);
+        srv(r, Payloads.SkillAction.TYPE, Payloads.SkillAction.CODEC, ServerHandlers::skillAction);
+        srv(r, Payloads.MountAction.TYPE, Payloads.MountAction.CODEC, ServerHandlers::mountAction);
+        srv(r, Payloads.LuckyRoll.TYPE, Payloads.LuckyRoll.CODEC, (packet, ctx) -> {
             if (ctx.player() instanceof ServerPlayer p) com.mmorpg.server.LuckyBlockManager.roll(p, packet.pos());
         });
-        r.playToServer(Payloads.CrateOpen.TYPE, Payloads.CrateOpen.CODEC, (packet, ctx) -> {
+        srv(r, Payloads.CrateOpen.TYPE, Payloads.CrateOpen.CODEC, (packet, ctx) -> {
             if (ctx.player() instanceof ServerPlayer p) com.mmorpg.server.CrateManager.open(p, packet.pos());
         });
-        r.playToServer(Payloads.PetAction.TYPE, Payloads.PetAction.CODEC, ServerHandlers::petAction);
-        r.playToServer(Payloads.CosmeticAction.TYPE, Payloads.CosmeticAction.CODEC, ServerHandlers::cosmeticAction);
-        r.playToServer(Payloads.Teleport.TYPE, Payloads.Teleport.CODEC, ServerHandlers::teleport);
-        r.playToServer(Payloads.TeleporterSetup.TYPE, Payloads.TeleporterSetup.CODEC, ServerHandlers::teleporterSetup);
-        r.playToServer(Payloads.ForgeAction.TYPE, Payloads.ForgeAction.CODEC, ServerHandlers::forgeAction);
-        r.playToServer(Payloads.AdminRequest.TYPE, Payloads.AdminRequest.CODEC, (packet, ctx) -> {
+        srv(r, Payloads.PetAction.TYPE, Payloads.PetAction.CODEC, ServerHandlers::petAction);
+        srv(r, Payloads.CosmeticAction.TYPE, Payloads.CosmeticAction.CODEC, ServerHandlers::cosmeticAction);
+        srv(r, Payloads.Teleport.TYPE, Payloads.Teleport.CODEC, ServerHandlers::teleport);
+        srv(r, Payloads.TeleporterSetup.TYPE, Payloads.TeleporterSetup.CODEC, ServerHandlers::teleporterSetup);
+        srv(r, Payloads.ForgeAction.TYPE, Payloads.ForgeAction.CODEC, ServerHandlers::forgeAction);
+        srv(r, Payloads.AdminRequest.TYPE, Payloads.AdminRequest.CODEC, (packet, ctx) -> {
             if (ctx.player() instanceof ServerPlayer p) com.mmorpg.admin.Admin.handle(p, packet);
         });
         r.playToClient(Payloads.AdminReply.TYPE, Payloads.AdminReply.CODEC);
-        r.playToServer(Payloads.ServiceAction.TYPE, Payloads.ServiceAction.CODEC, ServerHandlers::serviceAction);
-        r.playToServer(Payloads.QuestAction.TYPE, Payloads.QuestAction.CODEC, ServerHandlers::questAction);
-        r.playToServer(Payloads.ShopAction.TYPE, Payloads.ShopAction.CODEC, ServerHandlers::shopAction);
-        r.playToServer(Payloads.MerchantEdit.TYPE,Payloads.MerchantEdit.CODEC,(packet,ctx)->{if(ctx.player() instanceof ServerPlayer p)com.mmorpg.server.MerchantEditor.action(p,packet.data());});
-        r.playToServer(Payloads.SocialAction.TYPE,Payloads.SocialAction.CODEC,(packet,ctx)->{if(ctx.player() instanceof ServerPlayer p){if(packet.system().equals("pvp"))com.mmorpg.competition.PvpProgression.action(p,packet.data());else if(packet.system().equals("jobs"))com.mmorpg.job.JobSystem.action(p,packet.data());else if(packet.system().equals("backpack"))com.mmorpg.server.Backpacks.open(p);else if(packet.system().equals("store"))com.mmorpg.store.PremiumStore.action(p,packet.data());else if(packet.system().equals("achievements"))com.mmorpg.achievement.Achievements.action(p,packet.data());else if(packet.system().equals("guild"))com.mmorpg.guild.GuildService.action(p,packet.data());else if(packet.system().equals("armorstand"))com.mmorpg.server.ArmorStandEditor.action(p,packet.data());else if(packet.system().equals("arena"))com.mmorpg.competition.ArenaManager.action(p,packet.data());else if(packet.system().equals("trade"))com.mmorpg.economy.TradeManager.action(p,packet.data());else if(packet.system().equals("playeradmin"))com.mmorpg.admin.PlayerAdmin.action(p,packet.data());else if(packet.system().equals("features"))com.mmorpg.admin.FeatureAdmin.action(p,packet.data());}});
-        r.playToServer(Payloads.PartyAction.TYPE, Payloads.PartyAction.CODEC, ServerHandlers::partyAction);
+        srv(r, Payloads.ServiceAction.TYPE, Payloads.ServiceAction.CODEC, ServerHandlers::serviceAction);
+        srv(r, Payloads.QuestAction.TYPE, Payloads.QuestAction.CODEC, ServerHandlers::questAction);
+        srv(r, Payloads.ShopAction.TYPE, Payloads.ShopAction.CODEC, ServerHandlers::shopAction);
+        srv(r, Payloads.MerchantEdit.TYPE,Payloads.MerchantEdit.CODEC,(packet,ctx)->{if(ctx.player() instanceof ServerPlayer p)com.mmorpg.server.MerchantEditor.action(p,packet.data());});
+        srv(r, Payloads.SocialAction.TYPE,Payloads.SocialAction.CODEC,(packet,ctx)->{if(ctx.player() instanceof ServerPlayer p){if(packet.system().equals("pvp"))com.mmorpg.competition.PvpProgression.action(p,packet.data());else if(packet.system().equals("jobs"))com.mmorpg.job.JobSystem.action(p,packet.data());else if(packet.system().equals("backpack"))com.mmorpg.server.Backpacks.open(p);else if(packet.system().equals("store"))com.mmorpg.store.PremiumStore.action(p,packet.data());else if(packet.system().equals("achievements"))com.mmorpg.achievement.Achievements.action(p,packet.data());else if(packet.system().equals("guild"))com.mmorpg.guild.GuildService.action(p,packet.data());else if(packet.system().equals("armorstand"))com.mmorpg.server.ArmorStandEditor.action(p,packet.data());else if(packet.system().equals("arena"))com.mmorpg.competition.ArenaManager.action(p,packet.data());else if(packet.system().equals("trade"))com.mmorpg.economy.TradeManager.action(p,packet.data());else if(packet.system().equals("playeradmin"))com.mmorpg.admin.PlayerAdmin.action(p,packet.data());else if(packet.system().equals("features"))com.mmorpg.admin.FeatureAdmin.action(p,packet.data());}});
+        srv(r, Payloads.PartyAction.TYPE, Payloads.PartyAction.CODEC, ServerHandlers::partyAction);
+    }
+
+    private static <T extends CustomPacketPayload> void srv(PayloadRegistrar r, CustomPacketPayload.Type<T> type,
+            net.minecraft.network.codec.StreamCodec<? super net.minecraft.network.RegistryFriendlyByteBuf, T> codec,
+            net.neoforged.neoforge.network.handling.IPayloadHandler<T> handler) {
+        r.playToServer(type, codec, com.mmorpg.anticheat.AntiCheat.gate(type, handler));
     }
 
     public static void toPlayer(ServerPlayer player, CustomPacketPayload payload) {
