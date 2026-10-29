@@ -27,6 +27,44 @@ public abstract class MmoScreen extends Screen {
     protected int mouseX;
     protected int mouseY;
 
+    /** Zone d'aperçu 3D : clic maintenu + glissement = rotation (yaw/pitch en radians, conservés par clé). */
+    protected record SpinZone(Object key, int x, int y, int w, int h) {
+    }
+
+    protected final List<SpinZone> spinZones = new ArrayList<>();
+    private final java.util.Map<Object, float[]> spinAngles = new java.util.HashMap<>();
+    private Object spinDrag;
+
+    /** Déclare une zone d'aperçu 3D rotative et renvoie son angle {yaw, pitch}. */
+    protected float[] spinZone(Object key, int x, int y, int w, int h) {
+        spinZones.add(new SpinZone(key, x, y, w, h));
+        return spinAngles.computeIfAbsent(key, k -> new float[]{0f, 0f});
+    }
+
+    protected void resetSpin(Object key) {
+        spinAngles.remove(key);
+    }
+
+    @Override
+    public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+        if (spinDrag != null && event.button() == com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT) {
+            float[] a = spinAngles.computeIfAbsent(spinDrag, k -> new float[]{0f, 0f});
+            a[0] += (float) dx * .018f;
+            a[1] = Math.max(-.6f, Math.min(.6f, a[1] + (float) dy * .012f));
+            return true;
+        }
+        return super.mouseDragged(event, dx, dy);
+    }
+
+    @Override
+    public boolean mouseReleased(MouseButtonEvent event) {
+        if (spinDrag != null) {
+            spinDrag = null;
+            return true;
+        }
+        return super.mouseReleased(event);
+    }
+
     protected MmoScreen(String title) {
         super(Component.literal(title));
     }
@@ -152,6 +190,7 @@ public abstract class MmoScreen extends Screen {
         this.mouseX = mouseX;
         this.mouseY = mouseY;
         hits.clear();
+        spinZones.clear();
         navHits.clear();
         if (hasNav()) {
             // passe reelle : cadre + barre de base a la taille exacte de l'inventaire, jamais mis a l'echelle
@@ -228,6 +267,15 @@ public abstract class MmoScreen extends Screen {
                 if (r != null) {
                     playClick();
                     r.run();
+                    return true;
+                }
+            }
+        }
+        if (event.button() == com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT) {
+            for (int i = spinZones.size() - 1; i >= 0; i--) {
+                SpinZone z = spinZones.get(i);
+                if (Ui.in(mx, my, z.x, z.y, z.w, z.h)) {
+                    spinDrag = z.key;
                     return true;
                 }
             }
