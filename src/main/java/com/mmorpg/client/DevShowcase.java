@@ -33,10 +33,25 @@ public final class DevShowcase {
     private DevShowcase() {
     }
 
+    private static int jobTick;
     @SubscribeEvent
     public static void onTick(ClientTickEvent.Post event) {
         if (!ENABLED) return;
         Minecraft mc = Minecraft.getInstance();
+        if (MODE.equals("metiers")) {          // menu Metiers (sans monde) : cartes puis detail de chaque metier
+            int t = ++jobTick;
+            if (t == 5) { mc.getWindow().setWindowed(1280, 720); mc.options.guiScale().set(2); mc.resizeGui(); }
+            if (t == 20) { ClientData.DATA.jobXp.put("mineur", 2600L); ClientData.DATA.jobXp.put("fermier", 900L); ClientData.DATA.jobXp.put("pecheur", 120L); }
+            if (t == 400) mc.gui.setScreen(new com.mmorpg.client.screen.JobsScreen());
+            if (t == 430) shot(mc, "metiers_cartes");
+            com.mmorpg.job.Job[] jobs = {com.mmorpg.job.Job.MINEUR, com.mmorpg.job.Job.FERMIER, com.mmorpg.job.Job.PECHEUR};
+            for (int n = 0; n < 3; n++) {
+                if (t == 440 + n * 40) mc.gui.setScreen(new com.mmorpg.client.screen.JobDetailScreen(jobs[n]));
+                if (t == 465 + n * 40) shot(mc, "metiers_" + jobs[n].id);
+            }
+            if (t == 600) { MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (metiers)"); stop(mc); }
+            return;
+        }
         if(MODE.equals("weekly")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
             var board=com.mmorpg.server.DevWeeklyChecks.VISUAL_BOARD;
