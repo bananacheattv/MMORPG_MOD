@@ -157,7 +157,8 @@ class QuestPlanTest {
         for (int i = 0; i < g.size(); i++) {
             assertEquals(i, g.get(i).index());
             assertTrue(indexes.add(g.get(i).index()));
-            for (int j = i + 1; j < g.size() && i > 0; j++) { // le 1er PNJ (accueil) est colle au spawn : exception                double d = QuestNpcPlan.distance(g.get(i), g.get(j));
+            for (int j = i + 1; j < g.size() && i > 0; j++) { // le 1er PNJ (accueil) est colle au spawn : exception
+                double d = QuestNpcPlan.distance(g.get(i), g.get(j));
                 assertTrue(d > QuestNpcPlan.MIN_DISTANCE, g.get(i).name() + " et " + g.get(j).name() + " ne sont qu'a " + Math.round(d) + " blocs");
             }
         }

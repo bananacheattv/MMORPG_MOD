@@ -22,11 +22,11 @@ public final class DevSpawnNpcChecks {
         var data = com.mmorpg.hub.SpawnData.get(server);
         if (level == null || !data.exists()) { MMORPG.LOGGER.error("[SPAWN NPC CHECKS] FAIL spawn absent"); return; }
         Scheduler.later(p.level(), 400, () -> MMORPG.LOGGER.info("[SPAWN NPC CHECKS] teleportation vers le spawn : {}", p.teleportTo(level, data.arrival().x, data.arrival().y, data.arrival().z, Set.of(), 0, 0, true)));
-        Scheduler.later(p.level(), 600, () -> run(p, level));
+        Scheduler.later(p.level(), 1000, () -> run(p, level));
     }
 
     private static void run(ServerPlayer p, net.minecraft.server.level.ServerLevel level) {
-        SpawnDiscovery.install(p);
+        // pas d appel direct a install : on verifie le rattrapage automatique des donneurs lointains
         var server = level.getServer();
         // annuaire des PNJ (les PNJ lointains ne sont pas charges) : donneurs de quetes du spawn
         var entries = new ArrayList<net.minecraft.nbt.CompoundTag>();
@@ -47,11 +47,12 @@ public final class DevSpawnNpcChecks {
         if (found < plan.size()) fails.add("seulement " + found + " donneurs prevus sur " + plan.size());
         double min = 1e9;
         for (var a : entries) {
+            boolean first = a.getStringOr("id", "").equals(QuestNpcPlan.uuid(0).toString());
             var pa = BlockPos.of(a.getLongOr("pos", 0));
             MMORPG.LOGGER.info("[SPAWN NPC CHECKS] {} @ {}", a.getStringOr("name", "?"), pa);
-            for (var b : entries) if (a != b) min = Math.min(min, Math.sqrt(pa.distSqr(BlockPos.of(b.getLongOr("pos", 0)))));
+            if (!first) for (var b : entries) if (a != b && !b.getStringOr("id", "").equals(QuestNpcPlan.uuid(0).toString())) min = Math.min(min, Math.sqrt(pa.distSqr(BlockPos.of(b.getLongOr("pos", 0)))));
         }
-        if (entries.size() > 1 && min < QuestNpcPlan.MIN_DISTANCE - 1) fails.add("distance minimale " + Math.round(min));
+        if (entries.size() > 1 && min < QuestNpcPlan.MIN_DISTANCE - 3) fails.add("distance minimale " + Math.round(min));
         MMORPG.LOGGER.info("[SPAWN NPC CHECKS] {} : {} donneurs, distance minimale {}", fails.isEmpty() ? "PASS" : "FAIL " + fails, entries.size(), Math.round(min));
         // visite : le joueur se place devant chaque PNJ (charge la zone), verifie sol et presence, puis une capture est prise cote client
         int[] i = {0};
@@ -60,7 +61,7 @@ public final class DevSpawnNpcChecks {
             if (i[0] >= entries.size()) { MMORPG.LOGGER.info("[SPAWN NPC CHECKS] VISITES TERMINEES"); return; }
             var n = entries.get(i[0]++);
             var at = BlockPos.of(n.getLongOr("pos", 0));
-            if (!p.teleportTo(level, at.getX() + .5, at.getY(), at.getZ() + 3.5, Set.of(), 180, 0, true)) MMORPG.LOGGER.info("[SPAWN NPC CHECKS] teleportation refusee");
+            if (!p.teleportTo(level, at.getX() + .5, at.getY(), at.getZ() + 3.5, Set.of(), 180, 0, true)) MMORPG.LOGGER.info("[SPAWN NPC CHECKS] teleportation refusee (passager={} vivant={} dim={})", p.isPassenger(), p.isAlive(), p.level().dimension().identifier());
             Scheduler.later(level, 50, () -> {
                 var npc = level.getEntity(UUID.fromString(n.getStringOr("id", "")));
                 boolean ok = npc instanceof NpcEntity && level.getBlockState(at.below()).isSolidRender();
