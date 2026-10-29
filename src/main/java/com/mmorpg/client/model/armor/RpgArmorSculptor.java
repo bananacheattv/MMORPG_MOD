@@ -49,10 +49,10 @@ public final class RpgArmorSculptor {
     else if(ranger){cube(arm,side*.5f,-1,0,5.8f,2,5.7f,11);cube(arm,0,7.7f,-2.7f,4.2f,3.9f,1.1f,body);}
     else{int layers=1+r/2;for(int j=0;j<layers;j++)cube(arm,side*(.6f+j*.2f),-1.1f-j*.85f,0,5.5f+r*.25f-j*.6f,1.6f,6.4f-j*.35f,j%2==0?body:trim,0,0,side*.07f);cube(arm,0,7.5f,0,5,4.2f,5.3f,body);cube(arm,0,9.5f,0,5.3f,.7f,5.6f,trim);}
     if(r>=3){for(int j=0;j<3;j++)cube(arm,side*1.4f,5.5f+j,-2.8f,.4f,.4f,.4f,trim);cube(arm,0,7.5f,-3,1.3f,1.7f,.8f,gem,0,0,.7854f);}
-    if(r>=4&&!mage){for(int j=0;j<2;j++)cube(arm,side*(2.3f+j*.7f),-2.2f-j*.7f,0,1.1f,3.2f-j*.4f,3.7f,trim,0,0,side*.3f);}
+    if(r>=4&&!mage){for(int j=0;j<2;j++)cube(arm,side*(1.6f+j*.6f),-1.9f-j*.6f,0,1.1f,3.2f-j*.4f,3.7f,trim,0,0,side*.2f);}
     if(r==5){
      if(mage){cube(arm,side*.6f,-2.2f,0,7.4f,1.3f,7.3f,trim);cube(arm,side*.8f,8.7f,0,7,2.1f,7,body);cube(arm,side*.8f,9.9f,0,7.4f,.65f,7.4f,trim);}
-     else for(int j=0;j<3;j++)cube(arm,side*(2.8f+j*.85f),-3-j*.85f,0,1.7f,4-j*.6f,5-j*.5f,ranger?6:trim,0,0,side*.48f);
+     else for(int j=0;j<3;j++)cube(arm,side*(1.9f+j*.6f),-2.4f-j*.7f,0,1.7f,4-j*.6f,5-j*.5f,ranger?6:trim,0,0,side*.3f);
     }
    }
    if(r>=3){for(int side:new int[]{-1,1})cube(torso,side*2.3f,7.7f,3.6f,3.7f,14,1,mage?13:paladin?12:ranger?6:8);}

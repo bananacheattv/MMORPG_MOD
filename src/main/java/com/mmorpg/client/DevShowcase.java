@@ -124,6 +124,17 @@ public final class DevShowcase {
             if(tick==650)mc.gui.setScreen(null);
             if(tick==660)stop(mc);return;
         }
+        if(MODE.equals("armure_bras")){          // armures sculptees : face et profil de chaque panoplie, pour verifier l'ajustement des bras
+            if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();if(com.mmorpg.client.cinematic.CinematicClient.active()){com.mmorpg.client.cinematic.CinematicClient.skip();tick=Math.min(tick,0);return;}
+            String[] sets={"acier_soldat","dieu_guerre","valkyrie","apprenti","archimage","avatar_arcanique","chasseur","tireur_elite","sylvestre","garde","paladin","titan"};
+            if(tick==60){mc.options.guiScale().set(2);mc.getWindow().setWindowed(1280,720);mc.resizeGui();cmd(mc,"time set day");mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);}
+            for(int i=0;i<sets.length;i++){int t=80+i*60;
+                if(tick==t){armureBras(mc,sets[i],0);}
+                if(tick==t+25)shot(mc,"armure_"+sets[i]+"_face");
+                if(tick==t+30)armureBras(mc,null,90);
+                if(tick==t+50)shot(mc,"armure_"+sets[i]+"_profil");}
+            if(tick==80+sets.length*60)stop(mc);return;
+        }
         if(MODE.equals("staff_final")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
             if(tick==60){mc.options.guiScale().set(2);mc.getWindow().setWindowed(1280,720);mc.resizeGui();cmd(mc,"time set day");cmd(mc,"item replace entity @s weapon.mainhand with mmorpg:baton_archimage");mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);}
@@ -5309,6 +5320,23 @@ public final class DevShowcase {
         double max = d.stats.get(com.mmorpg.rpg.Stat.MAX_HP);
         if (setFraction >= 0) d.hp = (float) (max * setFraction);
         MMORPG.LOGGER.info("[MMORPG] DUELLISTE {} : vie {} / {}", label, d.hp, max);
+    }
+
+    /** Equipe la panoplie (si donnee) sur le joueur du serveur solo et le tourne de {@code yaw} degres. */
+    private static void armureBras(Minecraft mc, String set, float yaw) {
+        var server = mc.getSingleplayerServer();
+        if (server == null) return;
+        server.execute(() -> {
+            var sp = server.getPlayerList().getPlayers().get(0);
+            if (set != null) {
+                var slots = new net.minecraft.world.entity.EquipmentSlot[]{net.minecraft.world.entity.EquipmentSlot.HEAD, net.minecraft.world.entity.EquipmentSlot.CHEST, net.minecraft.world.entity.EquipmentSlot.LEGS, net.minecraft.world.entity.EquipmentSlot.FEET};
+                for (int k = 0; k < 4; k++) {
+                    var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(com.mmorpg.MMORPG.id(set + "_" + com.mmorpg.item.ItemDefs.PIECES[k]));
+                    sp.setItemSlot(slots[k], new net.minecraft.world.item.ItemStack(item));
+                }
+            }
+            sp.setYRot(yaw); sp.setYBodyRot(yaw); sp.setYHeadRot(yaw); sp.setXRot(0);
+        });
     }
 
     static void stop(Minecraft mc) {
