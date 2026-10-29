@@ -5,7 +5,11 @@ import com.mmorpg.chat.ChatChannel;
 import com.mmorpg.client.ui.Ui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.neoforged.api.distmarker.Dist;
@@ -72,15 +76,19 @@ public final class ChatChannels {
         return null;
     }
 
+    private static final int ICON = 14;
+    private static final java.util.List<AbstractWidget> WIDGETS = new java.util.ArrayList<>();
+
     private static int prefixWidth(ChatChannel c) {
-        return c == ChatChannel.GENERAL ? 0 : Ui.font().width("[" + c.label + "]") + PREFIX_PAD * 2;
+        int icon = ICON + 3;
+        return c == ChatChannel.GENERAL ? icon : icon + Ui.font().width("[" + c.label + "]") + PREFIX_PAD * 2;
     }
 
     private static int tabWidth(ChatChannel c) {
         return Ui.font().width(c.label) + 12;
     }
 
-    private static int tabX(Screen s, ChatChannel c) {
+    private static int tabX(ChatChannel c) {
         int x = 4;
         for (ChatChannel o : ChatChannel.values()) {
             if (o == c) return x;
@@ -97,28 +105,39 @@ public final class ChatChannels {
         box.setWidth(s.width - 4 - pad);
     }
 
-    @SubscribeEvent
-    public static void onInit(ScreenEvent.Init.Post event) {
-        if (!(event.getScreen() instanceof ChatScreen)) return;
-        active();
-        shiftInput(event.getScreen());
-    }
+    /** Onglet cliquable d'un canal. */
+    private static final class Tab extends AbstractWidget {
+        private final ChatChannel channel;
+        private final Screen screen;
 
-    @SubscribeEvent
-    public static void onRender(ScreenEvent.Render.Post event) {
-        Screen s = event.getScreen();
-        if (!(s instanceof ChatScreen)) return;
-        GuiGraphicsExtractor g = event.getGuiGraphics();
-        int mx = event.getMouseX(), my = event.getMouseY();
-        int y = s.height - 15 - TAB_H;
-        for (ChatChannel c : ChatChannel.values()) {
-            int x = tabX(s, c), w = tabWidth(c);
-            boolean on = c == active(), hover = Ui.in(mx, my, x, y, w, TAB_H);
-            int rgb = 0xFF000000 | c.color;
+        Tab(Screen screen, ChatChannel c) {
+            super(tabX(c), screen.height - 15 - TAB_H, tabWidth(c), TAB_H, Component.literal(c.label));
+            this.channel = c;
+            this.screen = screen;
+        }
+
+        @Override
+        public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+            if (event.button() != 0 || !isMouseOver(event.x(), event.y())) return false;
+            onClick(event, doubleClick);
+            return true;
+        }
+
+        @Override
+        public void onClick(MouseButtonEvent event, boolean doubleClick) {
+            select(channel);
+            shiftInput(screen);
+        }
+
+        @Override
+        protected void extractWidgetRenderState(GuiGraphicsExtractor g, int mx, int my, float partial) {
+            int x = getX(), y = getY(), w = getWidth();
+            boolean on = channel == active(), hover = isHovered();
+            int rgb = 0xFF000000 | channel.color;
             Ui.rounded(g, x, y, w, TAB_H, 5, on ? Ui.mix(Ui.CARD, rgb, 0.35f) : hover ? Ui.CARD_HOVER : Ui.CARD);
             Ui.border(g, x, y, w, TAB_H, on ? rgb : Ui.LINE);
-            g.text(Ui.font(), c.label, x + 6, y + 3, on ? 0xFFFFFFFF : hover ? Ui.TEXT : Ui.MUTED, true);
-            int n = UNREAD[c.ordinal()];
+            g.text(Ui.font(), channel.label, x + 6, y + 3, on ? 0xFFFFFFFF : hover ? Ui.TEXT : Ui.MUTED, true);
+            int n = UNREAD[channel.ordinal()];
             if (n > 0 && !on) {
                 String t = n > 9 ? "9+" : Integer.toString(n);
                 int bw = Ui.font().width(t) + 6;
@@ -126,26 +145,77 @@ public final class ChatChannels {
                 g.text(Ui.font(), t, x + w - bw + 6, y - 3, 0xFFFFFFFF, false);
             }
         }
-        ChatChannel c = active();
-        if (c != ChatChannel.GENERAL) {
-            int w = prefixWidth(c);
-            Ui.rounded(g, 4, s.height - 14, w - 2, 12, 4, Ui.withAlpha(c.color, 150));
-            g.text(Ui.font(), "[" + c.label + "]", 4 + PREFIX_PAD, s.height - 12, 0xFFFFFFFF, true);
+
+        @Override
+        protected void updateWidgetNarration(NarrationElementOutput out) {
+            defaultButtonNarrationText(out);
+        }
+    }
+
+    /** Icone « message » a gauche de la saisie : couleur du canal actif, clic = canal suivant. */
+    private static final class MessageIcon extends AbstractWidget {
+        private final Screen screen;
+
+        MessageIcon(Screen screen) {
+            super(4, screen.height - 14, ICON, 12, Component.literal("Canal"));
+            this.screen = screen;
+        }
+
+        @Override
+        public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+            if (event.button() != 0 || !isMouseOver(event.x(), event.y())) return false;
+            onClick(event, doubleClick);
+            return true;
+        }
+
+        @Override
+        public void onClick(MouseButtonEvent event, boolean doubleClick) {
+            select(active().next(1));
+            shiftInput(screen);
+        }
+
+        @Override
+        protected void extractWidgetRenderState(GuiGraphicsExtractor g, int mx, int my, float partial) {
+            ChatChannel c = active();
+            int x = getX(), y = getY();
+            int rgb = 0xFF000000 | c.color;
+            Ui.rounded(g, x, y, ICON, 12, 4, isHovered() ? Ui.CARD_HOVER : Ui.CARD);
+            Ui.border(g, x, y, ICON, 12, rgb);
+            g.fill(x + 3, y + 3, x + ICON - 3, y + 8, rgb);       // bulle
+            g.fill(x + 4, y + 8, x + 6, y + 10, rgb);              // pointe
+            g.fill(x + 4, y + 4, x + ICON - 4, y + 5, 0xFF000000 | Ui.CARD); // ligne de texte
+            g.fill(x + 4, y + 6, x + ICON - 6, y + 7, 0xFF000000 | Ui.CARD);
+        }
+
+        @Override
+        protected void updateWidgetNarration(NarrationElementOutput out) {
+            defaultButtonNarrationText(out);
         }
     }
 
     @SubscribeEvent
-    public static void onClick(ScreenEvent.MouseButtonPressed.Pre event) {
+    public static void onInit(ScreenEvent.Init.Post event) {
         Screen s = event.getScreen();
-        if (!(s instanceof ChatScreen) || event.getButton() != 0) return;
-        int y = s.height - 15 - TAB_H;
-        for (ChatChannel c : ChatChannel.values()) {
-            if (Ui.in(event.getMouseX(), event.getMouseY(), tabX(s, c), y, tabWidth(c), TAB_H)) {
-                select(c);
-                shiftInput(s);
-                event.setCanceled(true);
-                return;
-            }
+        if (!(s instanceof ChatScreen)) return;
+        active();
+        shiftInput(s);
+        WIDGETS.clear();
+        for (ChatChannel c : ChatChannel.values()) WIDGETS.add(new Tab(s, c));
+        WIDGETS.add(new MessageIcon(s));
+        for (AbstractWidget w : WIDGETS) event.addListener(w);
+    }
+
+    @SubscribeEvent
+    public static void onRender(ScreenEvent.Render.Post event) {
+        Screen s = event.getScreen();
+        if (!(s instanceof ChatScreen)) return;
+        GuiGraphicsExtractor g = event.getGuiGraphics();
+        for (AbstractWidget w : WIDGETS) w.extractRenderState(g, event.getMouseX(), event.getMouseY(), event.getPartialTick());
+        ChatChannel c = active();
+        if (c != ChatChannel.GENERAL) {
+            int x = 4 + ICON + 3, w = prefixWidth(c) - ICON - 3;
+            Ui.rounded(g, x, s.height - 14, w - 2, 12, 4, Ui.withAlpha(c.color, 150));
+            g.text(Ui.font(), "[" + c.label + "]", x + PREFIX_PAD, s.height - 12, 0xFFFFFFFF, true);
         }
     }
 

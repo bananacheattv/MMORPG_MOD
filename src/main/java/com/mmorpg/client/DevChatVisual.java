@@ -30,6 +30,11 @@ public final class DevChatVisual {
         if (!pre.isCanceled()) s.keyPressed(e);
     }
 
+    private static void click(ChatScreen s, double x, double y) {
+        var ev = new net.minecraft.client.input.MouseButtonEvent(x, y, new net.minecraft.client.input.MouseButtonInfo(0, 0));
+        MMORPG.LOGGER.info("[CHAT] screen.mouseClicked={}", s.mouseClicked(ev, false));
+    }
+
     private static EditBox box(ChatScreen s) {
         for (var c : s.children()) if (c instanceof EditBox b) return b;
         return null;
@@ -67,6 +72,13 @@ public final class DevChatVisual {
         if (tick == 560 && mc.gui.screen() instanceof ChatScreen s) key(s, 43, 0);      // Tab : Groupe
         if (tick == 580) shot(mc, "chat_canaux_groupe");
         if (tick == 590 && mc.gui.screen() instanceof ChatScreen s) key(s, 43, 1);      // Maj+Tab : retour Guilde
+        if (tick == 595 && mc.gui.screen() instanceof ChatScreen s) {   // clic reel sur l'onglet General, puis sur l'icone message
+            click(s, 20, s.height - 15 - 13 + 5);
+            MMORPG.LOGGER.info("[CHAT] clic onglet -> {}", ChatChannels.active());
+            click(s, 10, s.height - 8);
+            MMORPG.LOGGER.info("[CHAT] clic icone -> {}", ChatChannels.active());
+            shot(mc, "chat_canaux_icone");
+        }
         if (tick == 600) { MMORPG.LOGGER.info("[CHAT] fin canal={}", ChatChannels.active()); ChatChannels.select(ChatChannel.GENERAL); mc.gui.setScreen(null); }
         if (tick == 620) mc.stop();
     }

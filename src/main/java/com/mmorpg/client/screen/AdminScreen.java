@@ -42,7 +42,7 @@ import java.util.Set;
 public class AdminScreen extends MmoScreen {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Map<String, String> LABELS = Map.of("general", "Général", "mobs", "Monstres et boss", "quests", "Quêtes", "shop", "Boutique",
-            "butins", "Tables de butin", "mannequin", "Mannequins", "cinematique", "Cinématique", "spawn", "Spawn (PNJ et stations)");
+            "butins", "Tables de butin", "mannequin", "Mannequins", "cinematique", "Cinématique", "spawn", "Spawn (PNJ et stations)", "boutique", "Boutique crédits");
     private static final int ROW = 16;
     private static final int DD_ROWS = 9;
 

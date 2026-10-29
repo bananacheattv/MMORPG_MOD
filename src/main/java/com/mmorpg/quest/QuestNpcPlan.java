@@ -27,11 +27,12 @@ public final class QuestNpcPlan {
     }
 
     /**
-     * Les cinq premiers forment la chaine de decouverte (anneau interieur, rayon 54) ; les cinq suivants donnent la campagne (anneau
+     * Le tout premier (Maelys) se tient a cote du point d'arrivee, seule exception a l'espacement. Les cinq premiers forment la chaine de
+     * decouverte (anneau interieur, rayon 54) ; les cinq suivants donnent la campagne (anneau
      * exterieur, rayon 100, decale de 36 degres), du garde-chasse (niveau 1) a la veilleuse du Neant (niveau 80+).
      */
     public static final List<Giver> GIVERS = List.of(
-            new Giver(0, "Maëlys · Accueil d’Aeloria", 4, "spawn_decouverte_0", 0, -54),
+            new Giver(0, "Maëlys · Accueil d’Aeloria", 4, "spawn_decouverte_0", 0, -6),
             new Giver(1, "Orin · Artisan de la cité", 6, "spawn_decouverte_1", 51, -17),
             new Giver(2, "Lysandre · Intendante", 8, "spawn_decouverte_2", 32, 44),
             new Giver(3, "Érian · Éclaireur", 7, "spawn_decouverte_3", -32, 44),

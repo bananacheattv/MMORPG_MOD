@@ -87,6 +87,7 @@ final class DevUiFrames {
         add("mounts", MountsScreen::new);
         add("cosmetics", CosmeticsScreen::new);
         add("bestiary", BestiaryScreen::new);
+        add("wiki", WikiScreen::new);
         add("class_select", ClassSelectScreen::new);
         add("weekly", () -> {
             var data = new CompoundTag();
@@ -281,7 +282,7 @@ final class DevUiFrames {
                 if (!same) gaps++;
                 REPORT.add("  " + NAMES.get(i) + " : cadre " + f[2] + "x" + f[3] + " en (" + f[0] + "," + f[1] + ") barre " + f[4] + (same ? "" : "   <-- ECART"));
             }
-            if (cfg == 0) DevShowcase.shot(mc, "frame_" + NAMES.get(i));
         }
+        if (step == 7 && cfg == 0) DevShowcase.shot(mc, "frame_" + NAMES.get(i)); // capture asynchrone : un tick de recul pour voir le bon ecran
     }
 }

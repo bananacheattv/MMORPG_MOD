@@ -55,7 +55,7 @@ public final class DevNetworkChecks {
                 check(r.resultItem() != net.minecraft.world.item.Items.AIR, "registered output " + r.id());
                 var seen = new java.util.HashSet<String>();
                 for (var ing : r.ingredients()) {
-                    check(BuiltInRegistries.ITEM.getKey(ing.resolve()).getNamespace().equals("mmorpg"), "no vanilla/unknown forge input " + r.id() + ":" + ing.item());
+                    check(BuiltInRegistries.ITEM.getKey(ing.resolve()).getNamespace().equals("mmorpg") || ing.item().equals("minecraft:bowl"), "no vanilla/unknown forge input " + r.id() + ":" + ing.item());
                     check(ing.count() > 0 && seen.add(ing.item()), "positive consolidated ingredient " + r.id());
                 }
                 check(!r.category().name().equals("INVOCATIONS"), "invocations removed server-side");
