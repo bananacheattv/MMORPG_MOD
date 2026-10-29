@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Les trois metiers de recolte : niveaux 1 a 50, paliers tous les 10 niveaux (10 / 20 / 30 / 40 / 50).
+ * Les trois metiers de recolte : niveaux 1 a 50, un bonus de metier tous les 5 niveaux (5 a 50) et une recompense (titre, plat, cosmetique) tous les 10.
  * Classe volontairement sans dependance Minecraft : elle est testee seule (voir JobChecks).
  */
 public enum Job {
@@ -91,14 +91,19 @@ public enum Job {
 
     // ------------------------------------------------------------------ bonus passifs
 
-    /** Chance (0 a 0,30) de doubler la prise / recolte / extraction : 0,2 % par niveau et 4 % par palier. */
-    public static double doubleChance(int level) {
-        return level * 0.002 + tier(level) * 0.04;
+    /** Paliers de bonus impairs atteints (5 / 15 / 25 / 35 / 45) : 0 a 5. */
+    public static int oddSteps(int level) {
+        return Math.min(5, Math.max(0, level + 5) / STEP);
     }
 
-    /** Multiplicateur de vitesse de minage : +0,8 % par niveau et +4 % par palier (x1,60 au niveau 50). */
+    /** Chance (0 a 0,30) de doubler la prise / recolte / extraction : +6 % a chaque palier (mineur : paliers pairs, autres : impairs). */
+    public static double doubleChance(Job job, int level) {
+        return (job == MINEUR ? tier(level) : oddSteps(level)) * 0.06;
+    }
+
+    /** Multiplicateur de vitesse de minage : +12 % aux niveaux 5 / 15 / 25 / 35 / 45 (x1,60 des le niveau 45). */
     public static float miningSpeed(int level) {
-        return 1f + level * 0.008f + tier(level) * 0.04f;
+        return 1f + oddSteps(level) * 0.12f;
     }
 
     /** Chance qu'une prise de peche s'accompagne d'un poisson rare ou d'un tresor marin (des le palier 10). */
@@ -121,17 +126,42 @@ public enum Job {
         return 30 + tier(level) * 30;
     }
 
+    /** Un bonus fonctionnel debloque a un niveau (tous les 5 niveaux). */
+    public record Perk(int level, String text) {
+    }
+
+    /** Les dix bonus d'un metier (niveaux 5, 10, ... 50), avec la valeur cumulee a ce niveau. */
+    public static List<Perk> perks(Job job) {
+        java.util.ArrayList<Perk> out = new java.util.ArrayList<>();
+        for (int l = STEP / 2; l <= MAX_LEVEL; l += STEP / 2) {
+            boolean odd = (l / (STEP / 2)) % 2 == 1;
+            int dbl = (int) Math.round(doubleChance(job, l) * 100);
+            String t = switch (job) {
+                case MINEUR -> odd ? "Vitesse de minage +12 % (total +" + Math.round((miningSpeed(l) - 1) * 100) + " %)"
+                        : "Double minerai +6 % (total " + dbl + " %)";
+                case FERMIER -> odd ? "Double récolte +6 % (total " + dbl + " %)"
+                        : l == STEP ? "Repas du fermier : " + Math.round(mealChance(l) * 100) + " % par récolte, " + mealSeconds(l) + " s"
+                        : "Repas du fermier : " + Math.round(mealChance(l) * 100) + " % par récolte, " + mealSeconds(l) + " s d'effets";
+                case PECHEUR -> odd ? "Double prise +6 % (total " + dbl + " %)"
+                        : l == STEP ? "Poissons rares " + Math.round(rareCatchChance(l) * 100) + " % · ingrédients marins " + Math.round(ingredientChance(l) * 100) + " %"
+                        : "Prise rare " + Math.round(rareCatchChance(l) * 100) + " % · ingrédients " + Math.round(ingredientChance(l) * 100) + " %";
+            };
+            out.add(new Perk(l, t));
+        }
+        return out;
+    }
+
     /** Resume lisible des bonus passifs au niveau donne. */
     public static List<String> bonusLines(Job job, int level) {
-        int pct = (int) Math.round(doubleChance(level) * 100);
+        int pct = (int) Math.round(doubleChance(job, level) * 100);
         return switch (job) {
             case MINEUR -> List.of("Double minerai : " + pct + " % de chance",
                     "Vitesse de minage : +" + Math.round((miningSpeed(level) - 1) * 100) + " %");
             case FERMIER -> List.of("Double récolte : " + pct + " % de chance",
-                    tier(level) == 0 ? "Repas du fermier : dès le palier 10"
+                    tier(level) == 0 ? "Repas du fermier : dès le niveau 10"
                             : "Repas du fermier : " + Math.round(mealChance(level) * 100) + " % par récolte, " + mealSeconds(level) + " s d'effets");
             case PECHEUR -> List.of("Double prise : " + pct + " % de chance",
-                    tier(level) == 0 ? "Poissons rares et ingrédients : dès le palier 10"
+                    tier(level) == 0 ? "Poissons rares et ingrédients : dès le niveau 10"
                             : "Prise rare : " + Math.round(rareCatchChance(level) * 100) + " % · ingrédients : " + Math.round(ingredientChance(level) * 100) + " %");
         };
     }
