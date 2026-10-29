@@ -3,9 +3,13 @@ package com.mmorpg.quest;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.IntFunction;
 
 /** Quetes par defaut : une campagne qui suit la progression des niveaux 1 a 100, plus des quetes journalieres. */
 public final class DefaultQuests {
+    /** Incremente quand les quetes par defaut changent : les quetes d'un quests.json plus ancien sont alors remplacees une fois. */
+    public static final int REVISION = 2;
+
     private DefaultQuests() {
     }
 
@@ -37,87 +41,101 @@ public final class DefaultQuests {
         return d;
     }
 
+    private static QuestDef by(QuestDef d, String group) {
+        d.giver = group;
+        return d;
+    }
+
     public static Map<String, QuestDef> create() {
+        return create(com.mmorpg.crafting.ForgeProgression::scroll);
+    }
+
+    /** {@code scroll} donne l'objet parchemin de forge d'un palier (injecte pour pouvoir valider les quetes sans le registre du jeu). */
+    public static Map<String, QuestDef> create(IntFunction<String> scroll) {
         Map<String, QuestDef> m = new LinkedHashMap<>();
-        // ------------------------------------------------ chapitre 1 : les plaines
-        m.put("premiers_pas", reward(obj(q("Premiers pas", 1,
-                "Les gobelins rôdent autour de la ville. Prouvez votre valeur en éliminant quelques-uns de ces pillards."),
-                "kill", "gobelin", 5), 150, 10, "potion_soin_mineure", 3));
-        m.put("oreilles_pointues", req(reward(obj(q("Oreilles pointues", 3,
+        // Les quetes sont rangees par niveau croissant ; chaque quete exige la precedente de sa chaine (introduction du spawn -> campagne).
+        // ------------------------------------------------ chapitre 1 : les plaines (Brenn)
+        m.put("premiers_pas", req(by(reward(obj(q("Premiers pas", 1,
+                "Brenn, le garde-chasse, a besoin d'aide : les gobelins rôdent autour de la ville. Prouvez votre valeur en éliminant quelques-uns de ces pillards."),
+                "kill", "gobelin", 5), 150, 10, "potion_soin_mineure", 3), QuestNpcPlan.GROUP_PLAINES), "spawn_premiere_chasse"));
+        m.put("oreilles_pointues", req(by(reward(obj(q("Oreilles pointues", 3,
                 "Le capitaine de la garde paie une prime pour chaque oreille de gobelin rapportée."),
-                "collect", "oreille_gobelin", 8), 350, 25, "parchemin_teleportation", 2), "premiers_pas"));
-        m.put("crocs_nuit", reward(obj(q("Les crocs de la nuit", 6,
-                "Des loups sombres attaquent les voyageurs à la tombée de la nuit. Chassez-les."),
-                "kill", "loup_sombre", 6), 800, 30, "potion_soin", 2));
-        m.put("ferraille", req(reward(obj(q("Ferraille et pièces", 8,
-                "Le forgeron manque de métal. Récupérez la ferraille que transportent les gobelins."),
-                "collect", "ferraille_gobeline", 10), 1200, 40, "pierre_amelioration", 2), "oreilles_pointues"));
-        m.put("apprentissage", obj(reward(q("L'heure de l'apprentissage", 1,
+                "collect", "oreille_gobelin", 8), 350, 25, "parchemin_teleportation", 2), QuestNpcPlan.GROUP_PLAINES), "premiers_pas"));
+        m.put("apprentissage", req(by(obj(reward(q("L'heure de l'apprentissage", 4,
                 "Devenez plus fort : atteignez le niveau 10 pour prouver votre engagement."), 1500, 50, "elixir_experience", 1),
-                "level", "niveau", 10));
-        m.put("roi_gobelin", req(reward(obj(q("Le Roi des Gobelins", 18,
+                "level", "niveau", 10), QuestNpcPlan.GROUP_PLAINES), "oreilles_pointues"));
+        m.put("crocs_nuit", req(by(reward(obj(q("Les crocs de la nuit", 6,
+                "Des loups sombres attaquent les voyageurs à la tombée de la nuit. Chassez-les."),
+                "kill", "loup_sombre", 6), 800, 30, "potion_soin", 2), QuestNpcPlan.GROUP_PLAINES), "oreilles_pointues"));
+        m.put("ferraille", req(by(reward(obj(q("Ferraille et pièces", 8,
+                "Le forgeron manque de métal. Récupérez la ferraille que transportent les gobelins."),
+                "collect", "ferraille_gobeline", 10), 1200, 40, "pierre_amelioration", 2), QuestNpcPlan.GROUP_PLAINES), "crocs_nuit"));
+        m.put("nettoyer_cryptes", req(by(reward(obj(q("Les cryptes oubliées", 8, "La garde recherche des volontaires pour éliminer les zombies des cryptes."),
+                "kill", "zombie_des_cryptes", 8), 1800, 60, "potion_soin", 2), QuestNpcPlan.GROUP_PLAINES), "crocs_nuit"));
+        m.put("toiles_venimeuses", req(by(reward(obj(q("Toiles venimeuses", 18, "Après les cryptes, débarrassez les galeries des araignées venimeuses."),
+                "kill", "araignee_venimeuse", 10), 6500, 110, "potion_mana", 3), QuestNpcPlan.GROUP_PLAINES), "nettoyer_cryptes"));
+        m.put("roi_gobelin", req(by(reward(obj(q("Le Roi des Gobelins", 18,
                 "Le Roi Gobelin unit les tribus pour attaquer la ville. Fabriquez un Sceau du Roi Gobelin et terrassez-le sur un autel."),
-                "kill", "roi_gobelin", 1), 6000, 150, "cle_quete", 1), "ferraille"));
-        // ------------------------------------------------ chapitre 2 : les morts-vivants
-        m.put("os_maudits", reward(obj(q("Os maudits", 16,
+                "kill", "roi_gobelin", 1), 6000, 150, "cle_quete", 1), QuestNpcPlan.GROUP_PLAINES), "ferraille"));
+        // ------------------------------------------------ chapitre 2 : les morts-vivants (Sora)
+        m.put("os_maudits", req(by(reward(obj(q("Os maudits", 16,
                 "Des squelettes à la flamme violette sortent des cimetières. Détruisez-les."),
-                "kill", "squelette_maudit", 10), 5000, 60, "potion_mana", 2));
-        m.put("poussiere_ame", req(reward(obj(q("Poussière d'âme", 20,
+                "kill", "squelette_maudit", 10), 5000, 60, "potion_mana", 2), QuestNpcPlan.GROUP_MORTS), "nettoyer_cryptes"));
+        m.put("poussiere_ame", req(by(reward(obj(q("Poussière d'âme", 20,
                 "L'alchimiste a besoin de poussière d'âme pour ses potions."),
-                "collect", "poussiere_ame", 12), 7000, 80, "potion_soin", 4), "os_maudits"));
-        m.put("brutes_orcs", reward(obj(q("Brutes orcs", 28,
+                "collect", "poussiere_ame", 12), 7000, 80, "potion_soin", 4), QuestNpcPlan.GROUP_MORTS), "os_maudits"));
+        m.put("brutes_orcs", req(by(reward(obj(q("Brutes orcs", 28,
                 "Les orcs ont établi un camp dans les collines. Brisez leur avant-garde."),
-                "kill", "orc_guerrier", 10), 18000, 120, "pierre_amelioration", 3));
-        m.put("liche_ancienne", req(reward(obj(q("La Liche Ancienne", 42,
+                "kill", "orc_guerrier", 10), 18000, 120, "pierre_amelioration", 3), QuestNpcPlan.GROUP_MORTS), "poussiere_ame", "roi_gobelin"));
+        m.put("routes_sures", req(by(reward(obj(q("Des routes plus sûres", 30, "Les arbalétriers pillent les caravanes. Rendez les routes aux voyageurs."),
+                "kill", "bandit_arbaletrier", 12), 22000, 180, "cle_quete", 1), QuestNpcPlan.GROUP_MORTS), "toiles_venimeuses", "brutes_orcs"));
+        m.put("liche_ancienne", req(by(reward(obj(q("La Liche Ancienne", 42,
                 "Une liche ancienne commande les morts. Ouvrez le Grimoire Interdit sur un autel et mettez fin à son règne."),
-                "kill", "liche_ancienne", 1), 70000, 300, "elixir_experience", 2, "cle_quete", 1), "poussiere_ame"));
-        // ------------------------------------------------ chapitre 3 : feu et glace
-        m.put("coeur_flammes", reward(obj(q("Cœur de flammes", 45,
+                "kill", "liche_ancienne", 1), 70000, 300, "elixir_experience", 2, "cle_quete", 1), QuestNpcPlan.GROUP_MORTS), "routes_sures"));
+        // ------------------------------------------------ chapitre 3 : feu et glace (Ashe)
+        m.put("coeur_flammes", req(by(reward(obj(q("Cœur de flammes", 45,
                 "Les élémentaires de feu menacent les récoltes. Rapportez leurs noyaux ardents."),
-                "collect", "noyau_flamme", 8), 60000, 200, "potion_soin_majeure", 2));
-        m.put("souffle_givre", reward(obj(q("Le souffle du givre", 55,
+                "collect", "noyau_flamme", 8), 60000, 200, "potion_soin_majeure", 2), QuestNpcPlan.GROUP_ELEMENTS), "liche_ancienne"));
+        m.put("souffle_givre", req(by(reward(obj(q("Le souffle du givre", 55,
                 "Les spectres de givre gèlent les cols de montagne. Dissipez-les."),
-                "kill", "spectre_givre", 12), 100000, 250, "potion_mana_majeure", 3));
-        m.put("seigneur_ignis", req(reward(obj(q("Le Seigneur Démon", 62,
+                "kill", "spectre_givre", 12), 100000, 250, "potion_mana_majeure", 3), QuestNpcPlan.GROUP_ELEMENTS), "coeur_flammes"));
+        m.put("seigneur_ignis", req(by(reward(obj(q("Le Seigneur Démon", 62,
                 "Ignis, seigneur des flammes, s'éveille. Invoquez-le avec la Braise Éternelle et abattez-le."),
-                "kill", "seigneur_ignis", 1), 220000, 600, "cle_quete", 1, "pierre_amelioration_sup", 2), "coeur_flammes"));
-        m.put("cristaux_vivants", reward(obj(q("Cristaux vivants", 65,
+                "kill", "seigneur_ignis", 1), 220000, 600, "cle_quete", 1, "pierre_amelioration_sup", 2), QuestNpcPlan.GROUP_ELEMENTS), "souffle_givre"));
+        m.put("cristaux_vivants", req(by(reward(obj(q("Cristaux vivants", 65,
                 "Des golems de cristal gardent les profondeurs. Récoltez leurs cristaux."),
-                "kill", "golem_cristal", 8), 200000, 350, "pierre_amelioration_sup", 2));
-        m.put("titan_glace", req(reward(obj(q("Le Titan de Glace", 78,
+                "kill", "golem_cristal", 8), 200000, 350, "pierre_amelioration_sup", 2), QuestNpcPlan.GROUP_ELEMENTS), "souffle_givre"));
+        m.put("titan_glace", req(by(reward(obj(q("Le Titan de Glace", 78,
                 "Le Titan de Glace menace de geler le monde. Brisez-le."),
-                "kill", "titan_glace", 1), 450000, 900, "cle_quete", 1), "souffle_givre"));
-        // ------------------------------------------------ chapitre 4 : le Neant
-        m.put("chevaliers_neant", reward(obj(q("Les chevaliers du Néant", 80,
+                "kill", "titan_glace", 1), 450000, 900, "cle_quete", 1), QuestNpcPlan.GROUP_ELEMENTS), "seigneur_ignis", "cristaux_vivants"));
+        // ------------------------------------------------ chapitre 4 : le Neant (Orion)
+        m.put("chevaliers_neant", req(by(reward(obj(q("Les chevaliers du Néant", 80,
                 "Des chevaliers venus du Néant franchissent les failles. Repoussez-les."),
-                "kill", "chevalier_neant", 12), 500000, 800, "pierre_amelioration_sup", 3));
-        m.put("avatar_neant", req(reward(obj(q("L'Avatar du Néant", 95,
+                "kill", "chevalier_neant", 12), 500000, 800, "pierre_amelioration_sup", 3), QuestNpcPlan.GROUP_NEANT), "titan_glace"));
+        m.put("avatar_neant", req(by(reward(obj(q("L'Avatar du Néant", 95,
                 "L'Avatar du Néant est la menace ultime. Ouvrez l'Œil du Néant et sauvez Aeloria."),
-                "kill", "avatar_neant", 1), 1500000, 3000, "fragment_divin", 1, "cle_quete", 2), "chevaliers_neant", "titan_glace"));
+                "kill", "avatar_neant", 1), 1500000, 3000, "fragment_divin", 1, "cle_quete", 2), QuestNpcPlan.GROUP_NEANT), "chevaliers_neant"));
         // ------------------------------------------------ quetes journalieres
         QuestDef daily = q("Contrat de chasse", 1, "Contrat quotidien : éliminez 20 monstres, quels qu'ils soient.");
         daily.daily = true;
         obj(daily, "kill", "*", 20);
         daily.rewards.gold = 40;
         daily.rewards.xpPercentOfLevel = 15;
-        m.put("contrat_chasse", daily);
-        QuestDef supply = q("Approvisionnement", 10, "Contrat quotidien : la ville a besoin de fer pour ses défenses.");
+        m.put("contrat_chasse", by(daily, QuestNpcPlan.GROUP_PLAINES));
+        QuestDef supply = q("Approvisionnement", 10, "Contrat quotidien : la ville a besoin de fer pour ses défenses (en vente chez le marchand de minerais).");
         supply.daily = true;
         obj(supply, "collect", "minecraft:iron_ingot", 10);
         supply.rewards.gold = 80;
         supply.rewards.xpPercentOfLevel = 10;
-        m.put("approvisionnement", supply);
+        m.put("approvisionnement", by(supply, QuestNpcPlan.GROUP_FORGE));
         QuestDef hunt = q("Tueur de géants", 20, "Contrat quotidien : terrassez un boss, n'importe lequel.");
         hunt.daily = true;
         obj(hunt, "kill", "boss", 1);
         hunt.rewards.gold = 200;
         hunt.rewards.xpPercentOfLevel = 30;
         hunt.rewards.items.add(new QuestDef.ItemReward("mmorpg:pierre_amelioration", 2));
-        m.put("tueur_geants", hunt);
-        m.put("nettoyer_cryptes", reward(obj(q("Les cryptes oubliées", 8, "La garde recherche des volontaires pour éliminer les zombies des cryptes."), "kill", "zombie_des_cryptes", 8), 1800, 60, "potion_soin", 2));
-        m.put("toiles_venimeuses", req(reward(obj(q("Toiles venimeuses", 18, "Après les cryptes, débarrassez les galeries des araignées venimeuses."), "kill", "araignee_venimeuse", 10), 6500, 110, "potion_mana", 3), "nettoyer_cryptes"));
-        m.put("routes_sures", req(reward(obj(q("Des routes plus sûres", 30, "Les arbalétriers pillent les caravanes. Rendez les routes aux voyageurs."), "kill", "bandit_arbaletrier", 12), 22000, 180, "cle_quete", 1), "toiles_venimeuses"));
-        // ------------------------------------------------ evolutions de classe (PNJ du groupe « maitre_classes »)
+        m.put("tueur_geants", by(hunt, QuestNpcPlan.GROUP_MORTS));
+        // ------------------------------------------------ evolutions de classe (PNJ du groupe « maitre_classes », dans le hub)
         m.put("evolution_1", evolution(obj(obj(q("Épreuve de l'Initié", 25,
                 "Le Maître des classes jauge votre potentiel. Prouvez votre force sur le terrain et il éveillera votre première évolution."),
                 "level", "niveau", 25), "kill", "*", 60), 1, 8000, 300));
@@ -130,18 +148,19 @@ public final class DefaultQuests {
         m.put("evolution_4", req(evolution(obj(obj(q("Épreuve de la Légende", 100,
                 "L'ultime évolution n'appartient qu'aux légendes. Abattez l'Avatar du Néant et revenez auprès du Maître."),
                 "level", "niveau", 100), "kill", "avatar_neant", 1), 4, 1500000, 10000), "evolution_3"));
-        // Alternative to boss drops: a non-repeatable crafting license at every progression tier.
+        // Alternative to boss drops: a non-repeatable crafting license at every progression tier (Thorgal).
+        String[] targets = {"gobelin", "squelette_maudit", "orc_guerrier", "spectre_givre", "chevalier_neant"};
         for (int tier = 1; tier <= com.mmorpg.crafting.ForgeProgression.TIERS; tier++) {
             int level = (tier - 1) * 20 + 1;
-            String[] targets = {"gobelin", "orc_guerrier", "squelette_maudit", "spectre_givre", "chevalier_neant"};
-            QuestDef license = reward(obj(q("Le savoir du forgeron " + tier, level,
+            QuestDef license = by(reward(obj(q("Le savoir du forgeron " + tier, level,
                     "Aidez les artisans : éliminez " + (tier * 10) + " monstres pour recevoir le parchemin d’une pièce d’armure. Il débloque uniquement cette recette."),
                     "kill", targets[tier - 1], tier * 10), tier * 200L, tier * 25L,
-                    com.mmorpg.crafting.ForgeProgression.scroll(tier), 1);
-            if (tier > 1) license.requires.add("parchemin_forge_" + (tier - 1));
+                    scroll.apply(tier), 1), QuestNpcPlan.GROUP_FORGE);
+            license.requires.add(tier > 1 ? "parchemin_forge_" + (tier - 1) : "spawn_premiere_chasse");
             m.put("parchemin_forge_" + tier, license);
         }
-        m.putAll(SpawnDiscovery.definitions());
+        m.putAll(QuestNpcPlan.discoveryDefinitions());
+        m.values().forEach(d -> d.revision = REVISION);
         return m;
     }
 

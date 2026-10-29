@@ -63,3 +63,11 @@ Le catalogue présente directement les icônes des objets, avec recherche et pag
 L’onglet « Apparence » affiche les quatre modèles existants : cliquer sur un aperçu et modifier le nom si besoin, puis enregistrer. Chaque marchand conserve ses propres articles, prix et apparence après redémarrage. Un marchand jamais personnalisé utilise encore la boutique générale `shop.json`. Deux éditeurs simultanés ne peuvent pas écraser silencieusement les modifications de l’autre. L’import de textures et de modèles 3D personnalisés reste une évolution future.
 
 Les boutiques sont triées automatiquement par catégorie (armes, armures, outils, consommables, matériaux, autres), puis par niveau croissant et identifiant stable. Le tri est appliqué aux anciens marchands aussi, sans changer leurs articles ni leurs prix. Le catalogue visuel de l’éditeur utilise les mêmes catégories.
+
+## PNJ donneurs de quêtes du spawn
+
+Dix PNJ de quêtes sont posés automatiquement autour du point d’arrivée du spawn (jamais de bloc modifié). Cinq forment l’introduction (anneau de 54 blocs : Maëlys, Orin, Lysandre, Érian, Capitaine Vaël) et cinq donnent la campagne (anneau de 100 blocs : Brenn pour les plaines, Sora pour les morts-vivants, Ashe pour le feu et la glace, Orion pour le Néant, Thorgal pour la forge et les contrats de fer). Distance entre deux PNJ : plus de 60 blocs. Les évolutions de classe restent chez le Maître des classes du hub.
+
+Si le sol manque à un emplacement (construction manuelle plus petite), le PNJ n’est pas posé et les opérateurs reçoivent ses coordonnées : construire à cet endroit ou le placer avec l’outil PNJ. Un PNJ déjà posé n’est déplacé que s’il est à 60 blocs ou moins d’un autre donneur. Ordre des quêtes : introduction du spawn, puis plaines (niveaux 1 à 18), morts-vivants (16 à 42), feu et glace (45 à 78), Néant (80 à 95). Le test `QuestPlanTest` valide objectifs réalisables, prérequis sans cycle et espacement.
+
+Les quêtes par défaut ont une révision (`DefaultQuests.REVISION`) : un `quests.json` plus ancien est remplacé une fois pour les quêtes concernées (identifiants inchangés, progression des joueurs conservée).

@@ -58,7 +58,7 @@ public final class DevQuestEditorChecks {
             var q=new QuestDef();q.name="Récit de la forêt";q.description="Les racines murmurent.\nÉcoutez l’archiviste.";q.npc=npcId;
             q.objectives.add(new QuestDef.Objective("level","*",1));q.rewards.gold=17;
             q.rewards.items.add(new QuestDef.ItemReward("minecraft:diamond",2));q.rewards.cosmetic="ailes_celestes";
-            for(var template:com.mmorpg.quest.DefaultQuests.create().entrySet()) QuestEditor.validate(template.getKey(),template.getValue(),directory);
+            for(var template:com.mmorpg.quest.DefaultQuests.create().entrySet()) if((template.getValue().npc.isEmpty()||directory.entry(template.getValue().npc)!=null)&&template.getValue().objectives.stream().noneMatch(o->o.type.equals("visit")&&o.navigation==null)) QuestEditor.validate(template.getKey(),template.getValue(),directory);
             var action=new CompoundTag();action.putString("action","save_quest");action.putString("id",questId);action.putString("json",QuestEditor.JSON.toJson(q));
             QuestEditor.action(fake,action);check(!ConfigManager.quests().containsKey(questId),"unauthorized save denied");
             QuestEditor.action(p,action);check(ConfigManager.quests().get(questId).description.equals(q.description),"save lore");

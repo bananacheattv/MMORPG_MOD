@@ -87,6 +87,24 @@ public final class Achievements {
         return t.isEmpty() ? Component.empty() : Component.literal(" « " + t + " »").withColor(0xE8C36A);
     }
 
+    public static boolean staff(String rankLabel) {
+        return "Fondateur".equals(rankLabel) || "Administrateur".equals(rankLabel);
+    }
+
+    /** Texte d'un message de chat : rouge clair et gras pour les Fondateurs et Administrateurs. */
+    public static Component body(String rankLabel, String text, int color) {
+        var c = Component.literal(text);
+        return staff(rankLabel) ? c.withColor(0xFF6B6B).withStyle(s -> s.withBold(true)) : c.withColor(color);
+    }
+
+    /** Rang + pseudo + titre equipe, pour les chats de groupe et de guilde. */
+    public static Component chatName(String rankLabel, int rankColor, String name, String title) {
+        int color = staff(rankLabel) ? 0xFF6B6B : rankColor;
+        var n = com.mmorpg.store.RankTags.name(rankLabel, color, name).copy();
+        if (title != null && !title.isEmpty()) n.append(Component.literal(" « " + title + " »").withColor(0xE8C36A));
+        return n;
+    }
+
     public static Component suffix(ServerPlayer p) {
         return com.mmorpg.server.FeatureFlags.enabled(p.level().getServer(), "succes") ? suffix(RpgPlayers.get(p)) : Component.empty();
     }
@@ -101,6 +119,7 @@ public final class Achievements {
         }
         d.pvpTitle = title;
         d.dirty = true;
+        p.refreshDisplayName();
         RpgPlayers.updatePublic(p);
         store(p, d);
     }
@@ -125,7 +144,7 @@ public final class Achievements {
                 PlayerData d = RpgPlayers.get(p);
                 loaded.achievements().forEach((k, v) -> d.achievements.putIfAbsent(k, v));
                 loaded.stats().forEach((k, v) -> d.counters.merge(k, v, Math::max));
-                if (d.pvpTitle.isEmpty() && !loaded.title().isEmpty()) d.pvpTitle = loaded.title();
+                if (d.pvpTitle.isEmpty() && !loaded.title().isEmpty()) { d.pvpTitle = loaded.title(); p.refreshDisplayName(); }
                 d.dirty = true;
                 RpgPlayers.updatePublic(p);
                 store(p, d);          // pousse ce que la base ne connaissait pas encore

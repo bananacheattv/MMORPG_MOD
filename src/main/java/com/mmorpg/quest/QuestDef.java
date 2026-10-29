@@ -15,6 +15,8 @@ import java.util.List;
  * </ul>
  */
 public class QuestDef {
+    /** Revision des quetes par defaut (DefaultQuests.REVISION) dont cette quete provient ; une revision plus ancienne est remplacee au chargement. */
+    public int revision = 0;
     public String name = "Quête";
     public String description = "";
     public int minLevel = 1;

@@ -16,7 +16,7 @@ import java.util.List;
 
 /** Garde-robe des cosmetiques animes, avec apercu anime. */
 public class CosmeticsScreen extends MenuScreen {
-    @Override protected String backdrop() { return "shop_header"; }
+    @Override protected String backdrop() { return "cosmetics_stage"; }
     private static Cosmetic.Category category = Cosmetic.Category.AURA;
     private static Cosmetic selected;
 

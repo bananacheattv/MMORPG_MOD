@@ -13,22 +13,19 @@ import java.util.*;
 /** Adds actors and quests only: no edits to the player's spawn architecture or hub tutorial. */
 @EventBusSubscriber(modid=MMORPG.MODID)
 public final class SpawnDiscovery {
-    public static final String[] IDS={"spawn_bienvenue","spawn_artisans","spawn_economie","spawn_expeditions","spawn_premiere_chasse"};
-    private static final String[] NAMES={"Maëlys · Accueil d’Aeloria","Orin · Artisan de la cité","Lysandre · Intendante","Érian · Éclaireur","Capitaine Vaël"};
-    private static final String[] TITLES={"Bienvenue dans la cité","Les mains des artisans","L’économie d’Aeloria","Au-delà des remparts","Votre première mission"};
-    private static final String[] LORE={
-        "Bienvenue au spawn d’Aeloria. Rencontrez Orin, l’artisan : la flèche violette indique votre objectif. Le journal garde vos quêtes et leurs récompenses.",
-        "Vos minerais deviennent des lingots, puis des équipements dans les forges. Les recettes et parchemins se débloquent progressivement. Rencontrez l’intendante pour découvrir le commerce.",
-        "L’or sert aux marchands, à la banque et à l’hôtel des ventes. Les crédits de boutique sont une monnaie distincte. Parlez à l’éclaireur pour préparer votre première sortie.",
-        "Les plaines accueillent les premières chasses ; les mines se débloquent par niveau. Les donjons sont privés pour votre groupe et annoncent leurs dangers. Le capitaine vous attend.",
-        "Éliminez trois gobelins dans les plaines puis revenez au capitaine. Gardez quelques potions : en expédition, le butin de session peut être perdu à la mort. Les groupes facilitent les combats."};
-    public static UUID id(int i){return UUID.nameUUIDFromBytes(("aeloria:spawn-discovery:"+i).getBytes(java.nio.charset.StandardCharsets.UTF_8));}
-    public static Map<String,QuestDef> definitions(){
-        var map=new LinkedHashMap<String,QuestDef>();for(int i=0;i<IDS.length;i++){
-            var q=new QuestDef();q.name=TITLES[i];q.description=LORE[i];q.giver="spawn_decouverte_"+i;q.npc=id(i).toString();q.minLevel=1;
-            if(i>0)q.requires.add(IDS[i-1]);q.objectives.add(new QuestDef.Objective(i==4?"kill":"visit",i==4?"gobelin":NAMES[i+1],i==4?3:1));q.rewards.xp=80+i*40;q.rewards.gold=10+i*5;
-            q.rewards.items.add(new QuestDef.ItemReward("mmorpg:potion_soin_mineure",i==4?3:1));map.put(IDS[i],q);
-        }return map;
+    public static final String[] IDS=QuestNpcPlan.DISCOVERY_IDS;
+    public static UUID id(int i){return QuestNpcPlan.uuid(i);}
+    public static Map<String,QuestDef> definitions(){return QuestNpcPlan.discoveryDefinitions();}
+    /** Sol libre le plus proche de la cible (rayon 12, hauteur +-24 autour de la base), ou null si le monde n'est pas construit/charge a cet endroit. */
+    private static BlockPos ground(ServerLevel l,BlockPos target,int baseY){return ground(l,target,baseY,12);}
+    private static BlockPos ground(ServerLevel l,BlockPos target,int baseY,int maxRadius){
+        for(int r=0;r<=maxRadius;r+=3)for(int a=0;a<(r==0?1:8);a++){
+            int x=target.getX()+(int)Math.round(Math.cos(a*Math.PI/4)*r),z=target.getZ()+(int)Math.round(Math.sin(a*Math.PI/4)*r);
+            for(int dy=0;dy<=24;dy++)for(int sign=dy==0?1:-1;sign<=1;sign+=2){
+                var p=new BlockPos(x,baseY+dy*sign,z);
+                if(l.hasChunkAt(p)&&l.isEmptyBlock(p)&&l.isEmptyBlock(p.above())&&l.getBlockState(p.below()).isSolidRender()&&l.getEntitiesOfClass(NpcEntity.class,new net.minecraft.world.phys.AABB(p).inflate(1.5)).isEmpty())return p;
+            }
+        }return null;
     }
     private static BlockPos safe(ServerLevel l,BlockPos around,int index){
         for(int r=4+index*2;r<=18;r+=2)for(int a=0;a<8;a++){
@@ -36,15 +33,40 @@ public final class SpawnDiscovery {
             for(int y=around.getY()+2;y>=around.getY()-2;y--){var p=new BlockPos(x,y,z);if(l.hasChunkAt(p)&&l.isEmptyBlock(p)&&l.isEmptyBlock(p.above())&&l.getBlockState(p.below()).isSolidRender()&&l.getEntitiesOfClass(NpcEntity.class,new net.minecraft.world.phys.AABB(p).inflate(1.5)).isEmpty())return p;}
         }return null;
     }
+    private static BlockPos base(ServerPlayer player){
+        var data=com.mmorpg.hub.SpawnData.get(player.level().getServer());
+        return data.exists()?BlockPos.containing(data.arrival()):player.blockPosition();
+    }
+    /** Point vise d'un donneur : le premier se tient pres de l'arrivee, les autres sont repartis autour du centre de la cite (l'arrivee est a son bord est). */
+    private static BlockPos target(net.minecraft.server.MinecraftServer server,BlockPos origin,QuestNpcPlan.Giver g){
+        var city=com.mmorpg.hub.SpawnData.get(server).origin();
+        if(g.index()==0||city==null)return origin.offset(g.dx(),0,g.dz());
+        return new BlockPos(city.getX()+com.mmorpg.hub.HubMarket.CX+g.dx(),origin.getY(),city.getZ()+g.dz());
+    }
+    private static boolean tooClose(ServerLevel l,NpcEntity n,java.util.Collection<NpcEntity> others){
+        for(var o:others)if(o!=null&&o!=n&&o.distanceTo(n)<QuestNpcPlan.MIN_DISTANCE)return true;return false;
+    }
+    private static boolean quiet;
     public static void install(ServerPlayer player){
         if(!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.MAIN)||!player.level().dimension().equals(com.mmorpg.hub.SpawnBuilder.DIM))return;
-        var l=player.level();NpcEntity[] actors=new NpcEntity[IDS.length];
-        for(int i=0;i<IDS.length;i++){
-            var existing=l.getEntity(id(i));if(existing instanceof NpcEntity n){actors[i]=n;continue;}
+        var l=player.level();var plan=QuestNpcPlan.GIVERS;NpcEntity[] actors=new NpcEntity[plan.size()];var origin=base(player);var missing=new ArrayList<String>();
+        for(var g:plan){
+            int i=g.index();var existing=l.getEntity(id(i));if(existing instanceof NpcEntity n){actors[i]=n;continue;}
             if(com.mmorpg.world.NpcDirectory.get(l.getServer()).entry(id(i).toString())!=null)continue;
-            var at=safe(l,player.blockPosition(),i);if(at==null)continue;
-            var n=com.mmorpg.registry.ModEntities.NPC.get().create(l,net.minecraft.world.entity.EntitySpawnReason.COMMAND);n.setUUID(id(i));n.setup(NpcEntity.Role.QUETES,NAMES[i],new int[]{4,6,8,7,5}[i],"spawn_decouverte_"+i);n.snapTo(at.getX()+.5,at.getY(),at.getZ()+.5,180,0);n.setPersistenceRequired();if(l.addFreshEntity(n))actors[i]=n;
+            var at=ground(l,target(l.getServer(),origin,g),origin.getY());
+            if(at==null&&i>=5)at=ground(l,target(l.getServer(),origin,g),origin.getY(),30);
+            if(at==null&&i==0)at=safe(l,player.blockPosition(),0);
+            if(at==null){missing.add(g.name()+" ("+target(l.getServer(),origin,g).getX()+", "+target(l.getServer(),origin,g).getZ()+")");continue;}
+            var n=com.mmorpg.registry.ModEntities.NPC.get().create(l,net.minecraft.world.entity.EntitySpawnReason.COMMAND);n.setUUID(id(i));n.setup(NpcEntity.Role.QUETES,g.name(),g.skin(),g.group());n.snapTo(at.getX()+.5,at.getY(),at.getZ()+.5,180,0);n.setPersistenceRequired();if(l.addFreshEntity(n))actors[i]=n;
         }
+        // Donneurs deja poses trop pres d'un autre : replaces a leur emplacement prevu quand le sol existe.
+        var loaded=java.util.Arrays.asList(actors);
+        for(var g:plan){var n=actors[g.index()];if(n==null||!tooClose(l,n,loaded))continue;
+            var at=ground(l,target(l.getServer(),origin,g),origin.getY());if(at==null)continue;
+            n.snapTo(at.getX()+.5,at.getY(),at.getZ()+.5,n.getYRot(),0);com.mmorpg.world.NpcDirectory.get(l.getServer()).record(n);
+        }
+        if(!missing.isEmpty()&&!quiet)MMORPG.LOGGER.warn("[MMORPG] Donneurs de quêtes sans sol : {}",String.join(" ; ",missing));
+        if(!missing.isEmpty()&&!quiet&&player.permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_GAMEMASTER))player.sendSystemMessage(Component.literal("Donneurs de quêtes sans sol à leur emplacement prévu : "+String.join(" ; ",missing)+". Construisez à cet endroit ou placez-les avec l’outil PNJ (distance minimale "+QuestNpcPlan.MIN_DISTANCE+" blocs).").withColor(0xFFB060));
         UUID merchantId=UUID.nameUUIDFromBytes("aeloria:spawn-premium-store".getBytes(java.nio.charset.StandardCharsets.UTF_8));
         if(l.getEntity(merchantId)==null&&com.mmorpg.world.NpcDirectory.get(l.getServer()).entry(merchantId.toString())==null){var at=safe(l,player.blockPosition(),5);if(at!=null){var n=com.mmorpg.registry.ModEntities.NPC.get().create(l,net.minecraft.world.entity.EntitySpawnReason.COMMAND);n.setUUID(merchantId);n.setup(NpcEntity.Role.BOUTIQUE,"Céliane · Boutique d’Aeloria",8,"");n.snapTo(at.getX()+.5,at.getY(),at.getZ()+.5,180,0);n.setPersistenceRequired();l.addFreshEntity(n);}}
         bindDefaults(l.getServer());refreshNavigation(l.getServer());
@@ -79,6 +101,8 @@ public final class SpawnDiscovery {
     @SubscribeEvent public static void login(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent e){if(e.getEntity() instanceof ServerPlayer p)com.mmorpg.server.Scheduler.later(p.level(),60,()->install(p));}
     @SubscribeEvent public static void dimension(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent e){if(e.getEntity() instanceof ServerPlayer p)com.mmorpg.server.Scheduler.later(p.level(),40,()->install(p));}
     @SubscribeEvent public static void tick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post e){
+        // les donneurs lointains manquent tant que leur zone n'est pas chargee a l'arrivee : nouvel essai toutes les 30 s (sans message)
+        if(e.getServer().getTickCount()%600==300){quiet=true;try{for(var p:e.getServer().getPlayerList().getPlayers())if(p.level().dimension().equals(com.mmorpg.hub.SpawnBuilder.DIM)&&p.isAlive()){var found=0;for(var g:QuestNpcPlan.GIVERS)if(p.level().getEntity(id(g.index())) instanceof NpcEntity)found++;if(found<QuestNpcPlan.GIVERS.size())install(p);break;}}finally{quiet=false;}}
         if(e.getServer().getTickCount()%20!=0)return;for(var p:e.getServer().getPlayerList().getPlayers()){
             var d=RpgPlayers.get(p);for(var entry:d.activeQuests.entrySet()){
                 var q=ConfigManager.quests().get(entry.getKey());if(q==null)continue;var progress=entry.getValue();

@@ -93,7 +93,11 @@ public final class PlayerAdmin {
         if (MUTED.containsKey(event.getPlayer().getUUID())) {
             event.setCanceled(true);
             event.getPlayer().sendSystemMessage(Component.literal("Vous avez été réduit au silence par un administrateur.").withColor(0xFF6B6B));
+            return;
         }
+        String label = com.mmorpg.server.RpgPlayers.get(event.getPlayer()).rankLabel;
+        if (com.mmorpg.achievement.Achievements.staff(label))
+            event.setMessage(com.mmorpg.achievement.Achievements.body(label, event.getRawText(), 0xFFFFFF));
     }
 
     public static void open(ServerPlayer p) {

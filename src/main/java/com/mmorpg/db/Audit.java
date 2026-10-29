@@ -16,7 +16,7 @@ public final class Audit {
     public static final String LOGIN = "login", LOGOUT = "logout", LEVEL_UP = "level_up", DEATH = "death", BOSS_KILL = "boss_kill",
             DUNGEON_WIN = "dungeon_win", BANK_DEPOSIT = "bank_deposit", BANK_WITHDRAW = "bank_withdraw", AUCTION_LIST = "auction_list",
             AUCTION_BUY = "auction_buy", AUCTION_SALE = "auction_sale", SHOP_BUY = "shop_buy", SHOP_SELL = "shop_sell", QUEST_DONE = "quest_done",
-            UNLOCK = "unlock", MOUNT = "mount", TRANSFER = "transfer", GOLD_SPENT = "gold_spent", ADMIN = "admin";
+            UNLOCK = "unlock", MOUNT = "mount", TRANSFER = "transfer", GOLD_SPENT = "gold_spent", ADMIN = "admin", ANTICHEAT = "anticheat";
 
     public static void log(ServerPlayer p, String kind, long amount, String detail) {
         log(p == null ? null : p.getUUID(), p == null ? null : p.getGameProfile().name(), kind, amount, detail);

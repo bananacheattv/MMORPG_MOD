@@ -36,7 +36,7 @@ simulation-distance=8
 
 `user_jvm_args.txt` : commencer par `-Xms6G -Xmx6G` et ajuster selon la consommation observée *(non mesuré)* ; ne pas donner toute la mémoire de la machine.
 
-Pare-feu : n'ouvrir que le port **25565 TCP**. Jamais le port RCON (25575) ni le port de gestion.
+Pare-feu : voir `PARE_FEU.md` (commandes ufw, iptables, Windows). N'ouvrir que le port **25565 TCP**. Jamais le port RCON (25575) ni le port de gestion.
 
 Compte : lancer le serveur avec un utilisateur système dédié, sans droits administrateur.
 

@@ -9,7 +9,7 @@ public enum ChatChannel {
     GROUPE("Groupe", 0x60C0FF, "p");
 
     private static final Pattern GUILD_LINE = Pattern.compile("^\\[Guilde] [^:\\n]+ : .*", Pattern.DOTALL);
-    private static final Pattern PARTY_LINE = Pattern.compile("^\\[Groupe] [^ :\\n]+ : .*", Pattern.DOTALL);
+    private static final Pattern PARTY_LINE = Pattern.compile("^\\[Groupe] [^:\\n]+ : .*", Pattern.DOTALL);
 
     public final String label;
     public final int color;
