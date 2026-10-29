@@ -684,12 +684,18 @@ public final class Launcher {
             if (minBoot > bootVersion)
                 log("! Nouvelle version du launcher disponible : " + Json.str(manifest.get("releaseUrl"), ""));
 
+            long t0 = System.nanoTime();
             checkDisk();
             setupAuth();
+            long t1 = System.nanoTime();
             syncMods();
+            long t2 = System.nanoTime();
             game = new Game(home.resolve("minecraft"), gameDir, this::log, this::status);
             game.prepare(Json.str(manifest.get("minecraft"), "26.3"), Json.str(manifest.get("neoforge"), ""));
+            long t3 = System.nanoTime();
             cleanup();
+            log(String.format("Temps : compte %.1f s, mods %.1f s, Minecraft/Java/NeoForge %.1f s, total %.1f s",
+                    (t1 - t0) / 1e9, (t2 - t1) / 1e9, (t3 - t2) / 1e9, (System.nanoTime() - t0) / 1e9));
             ready = true;
             status("Pret ! Clique sur JOUER.", 1000);
             log("Pret.");
@@ -759,8 +765,15 @@ public final class Launcher {
                             log("A jour : " + file);
                         } else {
                             log("Telechargement : " + file);
-                            Net.download(url, target, algo, sha, d -> status("Telechargement de " + file + " (" + d / 1024 + " Ko)", -1));
+                            long start = System.nanoTime();
+                            Net.download(url, target, algo, sha, d -> {
+                                double sec = Math.max(0.2, (System.nanoTime() - start) / 1e9);
+                                status("Telechargement de " + file + " : " + (d >> 20) + " Mo, " + String.format("%.1f", d / sec / 1048576) + " Mo/s", -1);
+                            });
                             Net.remember(target, sha, cache);
+                            long sz = Files.size(target);
+                            log(String.format("  %s : %d Mo en %.1f s (%.1f Mo/s)", file, sz >> 20, (System.nanoTime() - start) / 1e9,
+                                    sz / Math.max(0.1, (System.nanoTime() - start) / 1e9) / 1048576));
                         }
                         int d = done.incrementAndGet();
                         status("Mods (" + d + "/" + total + ")", d * 1000 / total);

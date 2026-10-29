@@ -290,14 +290,19 @@ final class Game {
         log.accept("Telechargement : " + jobs.size() + " fichiers (" + what + ")");
         ExecutorService pool = Executors.newFixedThreadPool(16);
         AtomicInteger done = new AtomicInteger();
+        long start = System.nanoTime();
         try {
             List<Future<?>> fs = new ArrayList<>();
             for (Runnable r : jobs) fs.add(pool.submit(() -> {
                 r.run();
                 int d = done.incrementAndGet();
-                progress.update("Telechargement des " + what + " (" + d + "/" + jobs.size() + ")", d * 1000 / jobs.size());
+                double sec = Math.max(0.5, (System.nanoTime() - start) / 1e9);
+                long eta = (long) (sec / d * (jobs.size() - d));
+                progress.update("Telechargement des " + what + " (" + d + "/" + jobs.size() + ") - reste ~" + (eta >= 60 ? eta / 60 + " min" : eta + " s"),
+                        d * 1000 / jobs.size());
             }));
             for (Future<?> f : fs) f.get();
+            log.accept(String.format("  %s : %d fichiers en %.1f s", what, jobs.size(), (System.nanoTime() - start) / 1e9));
         } finally {
             pool.shutdownNow();
         }
