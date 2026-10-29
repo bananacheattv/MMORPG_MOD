@@ -552,9 +552,9 @@ public class AdminPlayersScreen extends MmoScreen {
         value.setX(rx + 44);
         value.setWidth(rw - 44 - 158);
         button(g, rx + rw - 154, top + ph - 31, 80, 15, "Choisir…", true, Ui.GOLD, () ->
-                minecraft.gui.setScreen(new ItemPickerScreen(this, "Donner un objet", true, 64, List.of(), (id, n) -> {
+                minecraft.gui.setScreen(new ItemPickerScreen(this, "Donner un objet", true, 64, List.of(), (id, qty) -> {
                     value.setValue(id);
-                    key.setValue(Integer.toString(n));
+                    key.setValue(Integer.toString(qty));
                 })));
         button(g, rx + rw - 70, top + ph - 31, 70, 15, "Donner", true, Ui.GREEN, () -> {
             CompoundTag t = base("act");
