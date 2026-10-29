@@ -83,18 +83,25 @@ public class JobDetailScreen extends MenuScreen {
     }
 
     private void rewards(GuiGraphicsExtractor g, int x, int y, int w, int bottom, int lvl) {
-        int rowH = Math.max(22, (bottom - y) / job.rewards.size());
-        for (Job.Reward r : job.rewards) {
-            boolean ok = lvl >= r.level();
+        List<Job.Perk> perks = Job.perks(job);
+        int units = perks.size() + job.rewards.size();
+        int unit = Math.max(11, (bottom - y) / units);
+        for (Job.Perk perk : perks) {
+            Job.Reward r = job.rewards.stream().filter(q -> q.level() == perk.level()).findFirst().orElse(null);
+            boolean ok = lvl >= perk.level();
+            int rowH = unit * (r == null ? 1 : 2);
             int col = ok ? job.color : 0xFF6A6478;
             Ui.frame(g, x, y, w, rowH - 2, col, hovered(x, y, w, rowH - 2));
-            g.text(font, (ok ? "✔ " : "🔒 ") + "Niv. " + r.level() + " — " + r.title(), x + 5, y + 3, ok ? Ui.GOLD_LIGHT : Ui.MUTED, false);
-            if (ok) {
-                boolean on = r.title().equals(ClientData.DATA.pvpTitle);
-                final int level = r.level();
-                button(g, x + w - 4 - 60, y + 2, 60, 12, on ? "Retirer" : "Équiper", true, on ? Ui.GREEN : Ui.GOLD, () -> send(on ? null : job, on ? 0 : level));
+            int ty = r == null ? y + (rowH - 2 - 8) / 2 : y + 3;
+            g.text(font, font.plainSubstrByWidth((ok ? "✔ " : "🔒 ") + "Niv. " + perk.level() + " — " + perk.text(), w - (r != null && ok ? 76 : 10)), x + 5, ty, ok ? Ui.TEXT : Ui.MUTED, false);
+            if (r != null) {
+                if (ok) {
+                    boolean on = r.title().equals(ClientData.DATA.pvpTitle);
+                    final int level = r.level();
+                    button(g, x + w - 4 - 60, y + 2, 60, 12, on ? "Retirer" : "Équiper", true, on ? Ui.GREEN : Ui.GOLD, () -> send(on ? null : job, on ? 0 : level));
+                }
+                g.text(font, font.plainSubstrByWidth("« " + r.title() + " » · " + rewardLine(r), w - 10), x + 5, y + 3 + Math.max(10, unit - 4), ok ? Ui.GOLD_LIGHT : Ui.MUTED, false);
             }
-            g.text(font, font.plainSubstrByWidth(rewardLine(r), w - 10), x + 5, y + 13, ok ? Ui.TEXT : Ui.MUTED, false);
             y += rowH;
         }
     }

@@ -111,7 +111,7 @@ public final class JobSystem {
 
     /** Vrai si la prise / recolte / extraction doit etre doublee. */
     public static boolean rollDouble(ServerPlayer p, Job job, RandomSource random) {
-        return random.nextDouble() < Job.doubleChance(level(p, job));
+        return random.nextDouble() < Job.doubleChance(job, level(p, job));
     }
 
     public static void give(ServerPlayer p, ItemStack stack) {
