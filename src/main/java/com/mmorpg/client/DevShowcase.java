@@ -33,11 +33,26 @@ public final class DevShowcase {
     private DevShowcase() {
     }
 
+    private static int jobTick;
     @SubscribeEvent
     public static void onTick(ClientTickEvent.Post event) {
         if (!ENABLED) return;
         Minecraft mc = Minecraft.getInstance();
         DevFreshWorld.tick(mc);
+        if (MODE.equals("metiers")) {          // menu Metiers (sans monde) : cartes puis detail de chaque metier
+            int t = ++jobTick;
+            if (t == 5) { mc.getWindow().setWindowed(1280, 720); mc.options.guiScale().set(2); mc.resizeGui(); }
+            if (t == 20) { ClientData.DATA.jobXp.put("mineur", 2600L); ClientData.DATA.jobXp.put("fermier", 900L); ClientData.DATA.jobXp.put("pecheur", 120L); }
+            if (t == 400) mc.gui.setScreen(new com.mmorpg.client.screen.JobsScreen());
+            if (t == 430) shot(mc, "metiers_cartes");
+            com.mmorpg.job.Job[] jobs = {com.mmorpg.job.Job.MINEUR, com.mmorpg.job.Job.FERMIER, com.mmorpg.job.Job.PECHEUR};
+            for (int n = 0; n < 3; n++) {
+                if (t == 440 + n * 40) mc.gui.setScreen(new com.mmorpg.client.screen.JobDetailScreen(jobs[n]));
+                if (t == 465 + n * 40) shot(mc, "metiers_" + jobs[n].id);
+            }
+            if (t == 600) { MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (metiers)"); stop(mc); }
+            return;
+        }
         if(MODE.equals("weekly")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
             var board=com.mmorpg.server.DevWeeklyChecks.VISUAL_BOARD;
@@ -63,6 +78,46 @@ public final class DevShowcase {
         if(MODE.equals("ui_frames")){DevUiFrames.tick(mc);return;}
         if(MODE.equals("pvp_polish")){DevPvpVisual.tick(mc);return;}
         if(MODE.equals("trade")){DevTradeVisual.tick(mc);return;}
+        if(MODE.equals("derniers_ajouts")){
+            if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
+            if(tick==60){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();cmd(mc,"gamemode creative");cmd(mc,"time set day");cmd(mc,"tp @s 0 200 0 0 0");}
+            if(tick==70||tick==110||tick==150)com.mmorpg.client.cinematic.CinematicClient.skip();
+            if(tick==185||tick==195)mc.gui.setScreen(null);
+            if(tick==90){cmd(mc,"fill -9 199 -2 9 199 12 minecraft:stone");cmd(mc,"fill -9 200 -2 9 205 12 minecraft:air");}
+            if(tick==110){String[] k={"niveau","monstres","arene","guilde_niveau","guilde_banque","guilde_gardiens"};for(int i=0;i<k.length;i++)cmd(mc,"setblock "+(-5+2*i)+" 200 6 mmorpg:classement_"+k[i]);cmd(mc,"tp @s 0 200 0 0 10");}
+            if(tick==200)shot(mc,"classements");
+            if(tick==210)mc.gui.setScreen(new com.mmorpg.client.screen.JobsScreen());
+            if(tick==240)shot(mc,"metiers");
+            if(tick==245)mc.gui.setScreen(null);
+            if(tick==250){var t=new CompoundTag();t.putString("action","create");t.putString("name","Veilleurs");com.mmorpg.client.ClientNet.send(new com.mmorpg.network.Payloads.SocialAction("guild",t));}
+            if(tick==290)cmd(mc,"g Bonjour la guilde");
+            if(tick==320){cmd(mc,"g Deuxieme message de test");}
+            if(tick==350){mc.gui.setScreen(new net.minecraft.client.gui.screens.ChatScreen("",false));}
+            if(tick==370)shot(mc,"chat_guilde");
+            if(tick==375)mc.gui.setScreen(null);
+            if(tick==375)cmd(mc,"class set @s archer");
+            if(tick==380){cmd(mc,"item replace entity @s weapon.mainhand with mmorpg:arc_chasseur");cmd(mc,"give @s minecraft:arrow 64");mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK);}
+            if(tick==400)mc.options.keyUse.setDown(true);
+            if(tick==440)shot(mc,"arc_tendu_3e_personne");
+            if(tick==445)mc.options.keyUse.setDown(false);
+            if(tick==450)mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            if(tick==460)mc.options.keyUse.setDown(true);
+            if(tick==500)shot(mc,"arc_tendu_1re_personne");
+            if(tick==505)mc.options.keyUse.setDown(false);
+            if(tick==505)cmd(mc,"class set @s tank");
+            if(tick==510){cmd(mc,"item replace entity @s weapon.mainhand with mmorpg:bouclier_paladin_0");mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK);}
+            if(tick==530)mc.options.keyUse.setDown(true);
+            if(tick==560)shot(mc,"bouclier_garde_3e_personne");
+            if(tick==565)mc.options.keyUse.setDown(false);
+            if(tick==570)mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);
+            if(tick==580)mc.options.keyUse.setDown(true);
+            if(tick==610)shot(mc,"bouclier_garde_1re_personne");
+            if(tick==615)mc.options.keyUse.setDown(false);
+            if(tick==620)mc.gui.setScreen(new com.mmorpg.client.screen.AchievementsScreen());
+            if(tick==645)shot(mc,"succes");
+            if(tick==650)mc.gui.setScreen(null);
+            if(tick==660)stop(mc);return;
+        }
         if(MODE.equals("staff_final")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
             if(tick==60){mc.options.guiScale().set(2);mc.getWindow().setWindowed(1280,720);mc.resizeGui();cmd(mc,"time set day");cmd(mc,"item replace entity @s weapon.mainhand with mmorpg:baton_archimage");mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);}
@@ -130,16 +185,16 @@ public final class DevShowcase {
             if(tick==240)stop(mc);return;
         }
         if(MODE.equals("shaders")){
-            if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
-            if(tick==40){mc.getWindow().setWindowed(1280,720);mc.resizeGui();ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.OFF);}
-            if(tick==80)shot(mc,"shaders_off");
-            if(tick==90)ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.SOFT);
-            if(tick==120)shot(mc,"shaders_soft");
-            if(tick==130)ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.AMBIANCE);
-            if(tick==160)shot(mc,"shaders_ambiance");
-            if(tick==170)ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.CINEMA);
-            if(tick==200)shot(mc,"shaders_cinema");
-            if(tick==210){ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.OFF);stop(mc);}return;
+            if(mc.player==null||mc.level==null)return;tick++;if(com.mmorpg.client.cinematic.CinematicClient.active()){com.mmorpg.client.cinematic.CinematicClient.skip();tick=Math.min(tick,0);return;}mc.gui.toastManager().clear();
+            if(tick==160){mc.getWindow().setWindowed(1280,720);mc.resizeGui();ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.OFF);}
+            if(tick==200)shot(mc,"shaders_off");
+            if(tick==210)ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.SOFT);
+            if(tick==240)shot(mc,"shaders_soft");
+            if(tick==250)ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.AMBIANCE);
+            if(tick==280)shot(mc,"shaders_ambiance");
+            if(tick==290)ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.CINEMA);
+            if(tick==320)shot(mc,"shaders_cinema");
+            if(tick==330){ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.OFF);stop(mc);}return;
         }
         if(MODE.equals("graphics")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
