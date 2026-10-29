@@ -78,8 +78,6 @@ public class JobDetailScreen extends MenuScreen {
         y += 3;
         String txt = next == null ? "Tous les paliers sont atteints." : "Prochain palier : niveau " + next.level() + " — « " + next.title() + " »";
         g.text(font, font.plainSubstrByWidth(txt, w), x, y, next == null ? Ui.GREEN : Ui.GOLD_LIGHT, false);
-        y += 13;
-        Ui.wrap(g, "Le niveau 50 demande " + Ui.fmt(Job.totalFor(Job.MAX_LEVEL)) + " XP au total : la progression est longue et s'étale sur de nombreuses heures de jeu.", x, y, w, Ui.MUTED);
     }
 
     private void rewards(GuiGraphicsExtractor g, int x, int y, int w, int bottom, int lvl) {
@@ -127,7 +125,5 @@ public class JobDetailScreen extends MenuScreen {
             }
             g.text(font, font.plainSubstrByWidth(s.note(), colW), cx, cy + 10, Ui.MUTED, false);
         }
-        y += ((list.size() + 1) / 2) * rowH + 2;
-        g.text(font, font.plainSubstrByWidth("Niveau N → N+1 : 60 × 1,13^(N-1) XP · total pour le niveau 50 : " + Ui.fmt(Job.totalFor(Job.MAX_LEVEL)) + " XP", w), x, Math.min(y, bottom - 10), Ui.MUTED, false);
     }
 }
