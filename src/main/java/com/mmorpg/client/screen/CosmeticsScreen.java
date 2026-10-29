@@ -89,11 +89,10 @@ public class CosmeticsScreen extends MenuScreen {
             Minecraft mc = Minecraft.getInstance();
             if (mc.player != null) {
                 com.mmorpg.client.model.imported.ImportedCosmetics.preview = c;
+                float[] spin = spinZone("cosmetic", px + 2, boxY, pwid - 4, boxH);
                 try {
-                    if(c.category==Cosmetic.Category.DOS) {
-                        com.mmorpg.client.ui.Ui.entityFollowsAngle(g,px+2,boxY,px+pwid-2,boxY+boxH,36,.0625f,9,.2f,mc.player);
-                    } else if(c.hasModel()) com.mmorpg.client.ui.Ui.entityFollowsAngle(g,px+2,boxY,px+pwid-2,boxY+boxH,36,.0625f,-.5f,.2f,mc.player);
-                    else com.mmorpg.client.ui.Ui.entityFollowsMouse(g, px + 2, boxY, px + pwid - 2, boxY + boxH, 36, 0.0625F, mx, my, mc.player);
+                    float base = c.category == Cosmetic.Category.DOS ? (float) Math.PI : 0f;
+                    com.mmorpg.client.ui.Ui.entitySpin(g, px + 2, boxY, px + pwid - 2, boxY + boxH, 36, .0625f, base + spin[0], spin[1], mc.player);
                 } finally { com.mmorpg.client.model.imported.ImportedCosmetics.preview = null; }
             }
             if (!c.hasModel()) drawPreview(g, c, px + pwid / 2, boxY + boxH / 2 + 6);

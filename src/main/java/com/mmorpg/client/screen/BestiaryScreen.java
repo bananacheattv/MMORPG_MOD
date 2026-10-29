@@ -70,8 +70,8 @@ public class BestiaryScreen extends MenuScreen {
         for (var entry : com.mmorpg.entity.mob.ImportedMobs.ALL)
             if (entry.key().equals(key)) height = entry.height() * entry.scale();   // le rendu des modeles importes applique deja leur echelle
         int size = Math.max(6, Math.min(80, (int) ((h - 14) / Math.max(.5f, height * 1.2f))));
-        float sway = 40f * (float) Math.sin((minecraft.level.getGameTime() % 100000) / 25.0);
-        Ui.entityFollowsAngle(g, x + 4, y + 4, x + w - 4, y + h - 4, size, .0625f, sway, -.1f, entity);
+        float[] spin = spinZone("bestiary:" + key, x, y, w, h);
+        Ui.entitySpin(g, x + 4, y + 4, x + w - 4, y + h - 4, size, .0625f, spin[0] - .5f, spin[1], entity);
     }
 
     @Override

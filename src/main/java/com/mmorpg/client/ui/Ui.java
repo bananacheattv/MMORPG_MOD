@@ -33,6 +33,25 @@ public final class Ui {
                                           net.minecraft.world.entity.LivingEntity e) {
         net.minecraft.client.gui.screens.inventory.InventoryScreen.renderEntityInInventoryFollowsAngle(g, sx(x0), sx(y0), sx(x1), sx(y1), Math.round(size * renderScale), yOffset, ax, ay, e);
     }
+    /** Entité vivante de face, tournée de {@code yaw}/{@code pitch} (radians) : aperçu rotatif à la souris. */
+    public static void entitySpin(GuiGraphicsExtractor g, int x0, int y0, int x1, int y1, int size, float yOffset, float yaw, float pitch,
+                                  net.minecraft.world.entity.LivingEntity e) {
+        var mc = net.minecraft.client.Minecraft.getInstance();
+        float bodyO = e.yBodyRotO, body = e.yBodyRot, headO = e.yHeadRotO, head = e.yHeadRot, yO = e.yRotO, y = e.getYRot(), xO = e.xRotO, x = e.getXRot();
+        e.yBodyRotO = e.yBodyRot = 180f; e.yHeadRotO = e.yHeadRot = 180f; e.yRotO = 180f; e.setYRot(180f); e.xRotO = 0f; e.setXRot(0f);
+        net.minecraft.client.renderer.entity.state.EntityRenderState state;
+        try {
+            state = mc.getEntityRenderDispatcher().getRenderer(e).createRenderState(e, 1f);
+            state.shadowPieces.clear();
+            state.outlineColor = 0;
+        } finally {
+            e.yBodyRotO = bodyO; e.yBodyRot = body; e.yHeadRotO = headO; e.yHeadRot = head; e.yRotO = yO; e.setYRot(y); e.xRotO = xO; e.setXRot(x);
+        }
+        float scale = e.getScale();
+        entity(g, state, size / scale, new org.joml.Vector3f(0, e.getBbHeight() / 2f + yOffset * scale, 0),
+                new org.joml.Quaternionf().rotateZ((float) Math.PI).rotateX(pitch).rotateY(yaw), null, x0, y0, x1, y1);
+    }
+
     public static final int GOLD = 0xFFE2B85A;
     public static final int GOLD_LIGHT = 0xFFFFE6A0;
     public static final int GOLD_DARK = 0xFF3B3350;          // bordures et filets (violet gris, interface plate)
