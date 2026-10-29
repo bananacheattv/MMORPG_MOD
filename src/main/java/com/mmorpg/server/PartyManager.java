@@ -230,8 +230,9 @@ public final class PartyManager {
             return;
         }
         broadcast(party, p.level().getServer(), Component.literal("[Groupe] ").withColor(0x60C0FF)
-                .append(Component.literal(p.getName().getString() + " : ").withColor(0xFFD040))
-                .append(Component.literal(message).withColor(0xE8F4FF)));
+                .append(com.mmorpg.achievement.Achievements.chatName(RpgPlayers.get(p).rankLabel, RpgPlayers.get(p).rankColor, p.getGameProfile().name(), com.mmorpg.server.FeatureFlags.enabled(p.level().getServer(), "succes") ? RpgPlayers.get(p).pvpTitle : ""))
+                .append(Component.literal(" : ").withColor(0xFFD040))
+                .append(com.mmorpg.achievement.Achievements.body(RpgPlayers.get(p).rankLabel, message, 0xE8F4FF)));
     }
 
     public static void list(ServerPlayer p) {
