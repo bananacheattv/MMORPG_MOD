@@ -700,23 +700,54 @@ public final class Launcher {
     private void syncMods() throws Exception {
         List<Object> list = Json.arr(manifest.get("mods"));
         Set<String> wanted = new LinkedHashSet<>();
-        int k = 0;
-        for (Object o : list) {
-            Map<String, Object> mod = Json.obj(o);
-            String file = Json.str(mod.get("file"), null);
-            String url = Json.str(mod.get("url"), null);
-            if (file == null || url == null || file.contains("/") || file.contains("\\")) continue;
-            String algo = mod.containsKey("sha512") ? "SHA-512" : mod.containsKey("sha1") ? "SHA-1" : "SHA-256";
-            String sha = Json.str(mod.containsKey("sha512") ? mod.get("sha512") : mod.containsKey("sha1") ? mod.get("sha1") : mod.get("sha256"), "");
-            wanted.add(file);
-            Path target = mods.resolve(file);
-            status("Verification de " + file, k++ * 1000 / Math.max(1, list.size()));
-            if (Net.valid(target, algo, sha, 0)) {
-                log("A jour : " + file);
-            } else {
-                log("Telechargement : " + file);
-                Net.download(url, target, algo, sha, done -> status("Telechargement de " + file + " (" + done / 1024 + " Ko)", -1));
+        Path cachePath = state.resolve("hash-cache.json");
+        Map<String, Object> cache = new java.util.concurrent.ConcurrentHashMap<>();
+        try {
+            if (Files.exists(cachePath)) cache.putAll(Json.obj(Json.parse(Files.readString(cachePath))));
+        } catch (Exception ignored) {}
+        java.util.concurrent.ExecutorService pool = java.util.concurrent.Executors.newFixedThreadPool(4);
+        java.util.concurrent.atomic.AtomicInteger done = new java.util.concurrent.atomic.AtomicInteger();
+        List<java.util.concurrent.Future<?>> jobs = new ArrayList<>();
+        int total = Math.max(1, list.size());
+        try {
+            for (Object o : list) {
+                Map<String, Object> mod = Json.obj(o);
+                String file = Json.str(mod.get("file"), null);
+                String url = Json.str(mod.get("url"), null);
+                if (file == null || url == null || file.contains("/") || file.contains("\\")) continue;
+                String algo = mod.containsKey("sha512") ? "SHA-512" : mod.containsKey("sha1") ? "SHA-1" : "SHA-256";
+                String sha = Json.str(mod.containsKey("sha512") ? mod.get("sha512") : mod.containsKey("sha1") ? mod.get("sha1") : mod.get("sha256"), "");
+                wanted.add(file);
+                Path target = mods.resolve(file);
+                jobs.add(pool.submit(() -> {
+                    try {
+                        if (Net.validCached(target, algo, sha, cache)) {
+                            log("A jour : " + file);
+                        } else {
+                            log("Telechargement : " + file);
+                            Net.download(url, target, algo, sha, d -> status("Telechargement de " + file + " (" + d / 1024 + " Ko)", -1));
+                            Net.remember(target, sha, cache);
+                        }
+                        int d = done.incrementAndGet();
+                        status("Mods (" + d + "/" + total + ")", d * 1000 / total);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }));
             }
+            for (java.util.concurrent.Future<?> f : jobs) {
+                try {
+                    f.get();
+                } catch (java.util.concurrent.ExecutionException e) {
+                    Throwable c = e.getCause();
+                    throw c instanceof RuntimeException && c.getCause() instanceof Exception ex ? ex : e;
+                }
+            }
+        } finally {
+            pool.shutdownNow();
+            try {
+                Files.writeString(cachePath, Json.write(new LinkedHashMap<>(cache)));
+            } catch (Exception ignored) {}
         }
         // supprime les anciens fichiers geres par le launcher (les mods ajoutes a la main sont conserves)
         Path managed = state.resolve("managed-mods.txt");

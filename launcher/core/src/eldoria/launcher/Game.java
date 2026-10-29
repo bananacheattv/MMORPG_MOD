@@ -288,7 +288,7 @@ final class Game {
     private void runAll(List<Runnable> jobs, String what) throws Exception {
         if (jobs.isEmpty()) return;
         log.accept("Telechargement : " + jobs.size() + " fichiers (" + what + ")");
-        ExecutorService pool = Executors.newFixedThreadPool(8);
+        ExecutorService pool = Executors.newFixedThreadPool(16);
         AtomicInteger done = new AtomicInteger();
         try {
             List<Future<?>> fs = new ArrayList<>();

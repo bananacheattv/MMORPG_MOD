@@ -76,6 +76,21 @@ final class Net {
         return size <= 0 || Files.size(p) == size;
     }
 
+    /** Comme {@link #valid} mais sans re-hasher un fichier dont taille + date n'ont pas change depuis la derniere verification. */
+    static boolean validCached(Path p, String algo, String expected, Map<String, Object> cache) throws Exception {
+        if (!Files.isRegularFile(p)) return false;
+        String key = p.getFileName().toString();
+        String stamp = Files.size(p) + ":" + Files.getLastModifiedTime(p).toMillis() + ":" + expected;
+        if (stamp.equals(cache.get(key))) return true;
+        if (!valid(p, algo, expected, 0)) return false;
+        cache.put(key, stamp);
+        return true;
+    }
+
+    static void remember(Path p, String expected, Map<String, Object> cache) throws Exception {
+        cache.put(p.getFileName().toString(), Files.size(p) + ":" + Files.getLastModifiedTime(p).toMillis() + ":" + expected);
+    }
+
     static void download(String url, Path target, String algo, String expected, LongConsumer progress) throws Exception {
         Exception last = null;
         for (int attempt = 0; attempt < 3; attempt++) {
@@ -93,15 +108,20 @@ final class Net {
     private static void downloadOnce(String url, Path target, String algo, String expected, LongConsumer progress) throws Exception {
         Files.createDirectories(target.toAbsolutePath().getParent());
         Path tmp = target.resolveSibling(target.getFileName() + ".part");
-        HttpResponse<InputStream> r = HTTP.send(HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofMinutes(5))
-                .header("User-Agent", "EldoriaLauncher").build(), HttpResponse.BodyHandlers.ofInputStream());
-        if (r.statusCode() != 200) {
+        long have = Files.isRegularFile(tmp) ? Files.size(tmp) : 0;
+        HttpRequest.Builder rb = HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofMinutes(5)).header("User-Agent", "EldoriaLauncher");
+        if (have > 0) rb.header("Range", "bytes=" + have + "-");
+        HttpResponse<InputStream> r = HTTP.send(rb.build(), HttpResponse.BodyHandlers.ofInputStream());
+        boolean resumed = r.statusCode() == 206 && have > 0;
+        if (r.statusCode() != 200 && !resumed) {
             r.body().close();
+            if (r.statusCode() == 416) Files.deleteIfExists(tmp);
             throw new IllegalStateException("HTTP " + r.statusCode() + " : " + url);
         }
-        try (InputStream in = r.body(); var out = Files.newOutputStream(tmp)) {
+        try (InputStream in = r.body(); var out = resumed
+                ? Files.newOutputStream(tmp, java.nio.file.StandardOpenOption.APPEND) : Files.newOutputStream(tmp)) {
             byte[] buf = new byte[1 << 16];
-            long done = 0;
+            long done = resumed ? have : 0;
             for (int n; (n = in.read(buf)) > 0; ) {
                 out.write(buf, 0, n);
                 done += n;
