@@ -187,7 +187,8 @@ public class ForgeScreen extends MmoScreen {
         g.enableScissor(dx + 1, contentTop, dx + dw - 1, contentBottom);
         int ty = dy + 44 - detailScroll;
         if (!com.mmorpg.crafting.ForgeProgression.unlocked(ClientData.DATA, r)) {
-            g.text(font, font.plainSubstrByWidth("Parchemin : " + new ItemStack(item).getHoverName().getString(), dw - 12), dx + 6, ty, Ui.RED, false);
+            var gate = com.mmorpg.job.Job.gateFor(r.id());
+            g.text(font, font.plainSubstrByWidth(gate != null ? "Métier requis : " + gate.job().label + " niveau " + gate.level() : "Parchemin : " + new ItemStack(item).getHoverName().getString(), dw - 12), dx + 6, ty, Ui.RED, false);
             ty += 12;
         }
         if (item instanceof RpgEquipment eq) {

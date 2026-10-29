@@ -39,17 +39,22 @@ public final class DevShowcase {
         if (!ENABLED) return;
         Minecraft mc = Minecraft.getInstance();
         DevFreshWorld.tick(mc);
-        if (MODE.equals("metiers")) {          // menu Metiers (sans monde) : cartes puis detail de chaque metier
+        if (MODE.equals("metiers")) {          // menu Metiers (sans monde) : verifications puis captures de chaque onglet
             int t = ++jobTick;
             if (t == 5) { mc.getWindow().setWindowed(1280, 720); mc.options.guiScale().set(2); mc.resizeGui(); }
-            if (t == 20) { ClientData.DATA.jobXp.put("mineur", 2600L); ClientData.DATA.jobXp.put("fermier", 900L); ClientData.DATA.jobXp.put("pecheur", 120L); }
+            if (t == 10) {
+                var fails = com.mmorpg.job.JobChecks.run();
+                MMORPG.LOGGER.info("[MMORPG] JOBCHECKS {} {}", fails.isEmpty() ? "OK" : "ECHEC", fails);
+            }
+            if (t == 20) { ClientData.DATA.jobXp.put("mineur", com.mmorpg.job.Job.totalFor(23) + 300L); ClientData.DATA.jobXp.put("fermier", com.mmorpg.job.Job.totalFor(11)); ClientData.DATA.jobXp.put("pecheur", 120L); }
             if (t == 400) mc.gui.setScreen(new com.mmorpg.client.screen.JobsScreen());
             if (t == 430) shot(mc, "metiers_cartes");
-            com.mmorpg.job.Job[] jobs = {com.mmorpg.job.Job.MINEUR, com.mmorpg.job.Job.FERMIER, com.mmorpg.job.Job.PECHEUR};
-            for (int n = 0; n < 3; n++) {
-                if (t == 440 + n * 40) mc.gui.setScreen(new com.mmorpg.client.screen.JobDetailScreen(jobs[n]));
-                if (t == 465 + n * 40) shot(mc, "metiers_" + jobs[n].id);
+            for (int pg = 0; pg < 3; pg++) {
+                if (t == 440 + pg * 40) mc.gui.setScreen(new com.mmorpg.client.screen.JobDetailScreen(com.mmorpg.job.Job.MINEUR, pg));
+                if (t == 465 + pg * 40) shot(mc, "metiers_mineur_" + pg);
             }
+            if (t == 570) mc.gui.setScreen(new com.mmorpg.client.screen.JobDetailScreen(com.mmorpg.job.Job.PECHEUR, 1));
+            if (t == 595) shot(mc, "metiers_pecheur_paliers");
             if (t == 600) { MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (metiers)"); stop(mc); }
             return;
         }

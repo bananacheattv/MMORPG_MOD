@@ -765,5 +765,14 @@
   "item.mmorpg.pvp_tank_4_arme": "Arme de Gladiateur Paladin 5",
   "item.mmorpg.sceau_chimere_arene": "Sceau de la Chimère des arènes",
   "entity.mmorpg.monture_chimere_arene": "Chimère des arènes",
-  "block.mmorpg.quetes_hebdo": "Pancarte des quêtes hebdomadaires"
+  "block.mmorpg.quetes_hebdo": "Pancarte des quêtes hebdomadaires",
+  "item.mmorpg.tonique_du_mineur": "Tonique du mineur",
+  "item.mmorpg.bouillon_de_roche": "Bouillon de roche",
+  "item.mmorpg.elixir_du_seigneur": "Élixir du Seigneur",
+  "item.mmorpg.soupe_de_racine": "Soupe de racine",
+  "item.mmorpg.tourte_aux_baies": "Tourte aux baies",
+  "item.mmorpg.banquet_des_moissons": "Banquet des moissons",
+  "item.mmorpg.filet_grille": "Filet grillé",
+  "item.mmorpg.ragout_des_profondeurs": "Ragoût des profondeurs",
+  "item.mmorpg.festin_du_leviathan": "Festin du Léviathan"
 }

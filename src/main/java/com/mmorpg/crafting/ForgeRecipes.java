@@ -167,6 +167,16 @@ public final class ForgeRecipes {
         add(Category.MATERIAUX, "fiole_runique", 4, 1, 1, N, "lingot_verdite", 1, "poussiere_ame", 1);
         for(int i=0;i<4;i++)add(Category.CONSOMMABLES,"sac_a_dos_"+i,1,150*(i+1),1+i*15,N,"cuir_renforce",4+i*4,"soie_araignee",2+i*2,"poussiere_ame",2+i*3);
         add(Category.CONSOMMABLES, "charme_experience", 1, 100, 10, N, "poussiere_ame", 8, "poussiere_ame", 4);
+        // plats de metier : recettes debloquees par les paliers 10 / 30 / 50 des metiers (voir Job.gateFor)
+        add(Category.CONSOMMABLES, "tonique_du_mineur", 1, 150, 1, N, "lingot_verdite", 8, "potion_soin_mineure", 1);
+        add(Category.CONSOMMABLES, "bouillon_de_roche", 1, 600, 1, N, "lingot_argentite", 10, "lingot_ambrasite", 4, "racine_lueur", 4);
+        add(Category.CONSOMMABLES, "elixir_du_seigneur", 1, 2500, 1, N, "lingot_glacium", 12, "lingot_neantite", 6, "fleur_givre", 3);
+        add(Category.CONSOMMABLES, "soupe_de_racine", 1, 150, 1, N, "racine_lueur", 12, "minecraft:bowl", 1);
+        add(Category.CONSOMMABLES, "tourte_aux_baies", 1, 600, 1, N, "baie_ambree", 8, "ble_argent", 8);
+        add(Category.CONSOMMABLES, "banquet_des_moissons", 1, 2500, 1, N, "orchidee_neant", 6, "fleur_givre", 8, "baie_ambree", 8);
+        add(Category.CONSOMMABLES, "filet_grille", 1, 150, 1, N, "minecraft:cod", 6, "minecraft:salmon", 3);
+        add(Category.CONSOMMABLES, "ragout_des_profondeurs", 1, 600, 1, N, "minecraft:salmon", 10, "minecraft:tropical_fish", 4, "minecraft:kelp", 6);
+        add(Category.CONSOMMABLES, "festin_du_leviathan", 1, 2500, 1, N, "minecraft:pufferfish", 6, "minecraft:nautilus_shell", 2, "minecraft:prismarine_crystals", 6);
         add(Category.CONSOMMABLES, "lucky_celeste", 1, 120, 10, N, "lingot_argentite", 4, "trefle_chance", 1);
         add(Category.CONSOMMABLES, "charme_chance", 1, 100, 10, N, "trefle_chance", 1, "lingot_argentite", 2);
         // mannequins d'entrainement (hub) : le standard sert de base aux variantes
