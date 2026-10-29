@@ -71,6 +71,13 @@ final class DevUiFrames {
         add("admin_players_data", () -> adminPlayers(1, "skills"));
         add("admin_players_items", () -> adminPlayers(2));
         add("admin_players_actions", () -> adminPlayers(3));
+        add("admin_features", () -> {
+            var flags = new CompoundTag();
+            for (String k : com.mmorpg.server.FeatureFlags.KEYS) flags.putBoolean(k, !k.equals("drones") && !k.equals("luckyblocks") && !k.equals("cinematique"));
+            var t = new CompoundTag();
+            t.put("flags", flags);
+            return new AdminFeaturesScreen(t).preview(0);
+        });
         add("jobs", JobsScreen::new);
         add("achievements", AchievementsScreen::new);
         add("skills", SkillsScreen::new);

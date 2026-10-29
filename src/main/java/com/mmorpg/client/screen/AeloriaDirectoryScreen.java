@@ -128,6 +128,10 @@ public class AeloriaDirectoryScreen extends net.minecraft.client.gui.screens.Scr
             ClientConfig.AMBIENT_MUSIC_VOLUME.save();
             this.cards = buildCards();
         }));
+        if (ClientData.op) {
+            l.add(new Card(Cat.SETTINGS, new ItemStack(Items.REDSTONE_TORCH), "Fonctionnalités", "Activer ou désactiver les systèmes du mod (opérateurs).", () -> mc.player.connection.sendCommand("fonctionnalites")));
+            l.add(new Card(Cat.SETTINGS, new ItemStack(Items.PLAYER_HEAD), "Gestion des joueurs", "Données, objets et sanctions (opérateurs).", () -> mc.player.connection.sendCommand("adminjoueurs")));
+        }
         l.add(new Card(Cat.SESSION, new ItemStack(Items.ARROW), "Reprendre l'aventure", "Revenir en jeu.", () -> mc.gui.setScreen(null)));
         if (disconnect != null) {
             l.add(new Card(Cat.SESSION, new ItemStack(Items.BARRIER), mc.isLocalServer() ? "Quitter Aeloria" : "Se déconnecter", "Retour au menu principal.",

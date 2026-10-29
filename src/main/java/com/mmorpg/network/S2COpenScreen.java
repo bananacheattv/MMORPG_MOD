@@ -39,6 +39,8 @@ public record S2COpenScreen(int screen, CompoundTag extra) implements CustomPack
     public static final int WEEKLY = 32;
     /** Gestion complete d'un joueur par un operateur (/adminjoueurs). */
     public static final int ADMIN_PLAYERS = 34;
+    /** Interrupteurs des fonctionnalites (/fonctionnalites). */
+    public static final int ADMIN_FEATURES = 35;
     public static final int SPAWN_EDITOR = 19;
     public static final int ADVENTURE_SUMMARY = 20;
     public static final int MERCHANT_EDITOR = 21;

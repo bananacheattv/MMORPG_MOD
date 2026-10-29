@@ -88,9 +88,31 @@ public final class DevAdminPlayerChecks {
         check(d.completedQuests.isEmpty() && d.activeQuests.isEmpty(), "quetes reinitialisees");
         var profile = PlayerAdmin.testProfile(p, p);
         check(profile.getCompoundOrEmpty("data").getIntOr("level", 0) == d.level && profile.getListOrEmpty("inventory") != null, "profil complet renvoye");
+        features(p);
         d.gold = oldGold;
         RpgPlayers.setLevel(p, oldLevel);
         com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] ADMIN_PLAYERS PASS: edition generique, bornes, listes, groupes, actions, sourdine, profil");
+    }
+
+    /** Ecran des fonctionnalites : catalogue complet, bascule persistante, cle inconnue refusee, memes valeurs que les commandes. */
+    private static void features(ServerPlayer p) {
+        var all = new java.util.ArrayList<String>();
+        FeatureCatalog.CATEGORIES.values().forEach(l -> l.forEach(e -> all.add(e.key())));
+        check(all.size() == FeatureFlags.KEYS.size() && new java.util.HashSet<>(all).equals(FeatureFlags.KEYS), "catalogue = interrupteurs");
+        var server = p.level().getServer();
+        boolean before = FeatureFlags.enabled(server, "peche");
+        CompoundTag t = new CompoundTag();
+        t.putString("key", "peche");
+        t.putBoolean("value", !before);
+        com.mmorpg.admin.FeatureAdmin.toggle(p, t);
+        check(FeatureFlags.enabled(server, "peche") == !before, "bascule appliquee");
+        check(com.mmorpg.admin.FeatureAdmin.state(p, "", true).getCompoundOrEmpty("flags").getBooleanOr("peche", before) == !before, "etat renvoye au client");
+        t.putString("key", "inconnu");
+        check(!com.mmorpg.admin.FeatureAdmin.toggle(p, t).isEmpty(), "cle inconnue refusee");
+        t.putString("key", "peche");
+        t.putBoolean("value", before);
+        com.mmorpg.admin.FeatureAdmin.toggle(p, t);
+        check(FeatureFlags.enabled(server, "peche") == before, "bascule retablie");
     }
 
     private static int indexOf(PlayerData d, String quest) {

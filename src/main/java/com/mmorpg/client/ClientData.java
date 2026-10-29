@@ -33,6 +33,8 @@ public final class ClientData {
     public static boolean received = false;
     public static boolean creativeAllowed;public static int guardBroken;
     public static CompoundTag features=new CompoundTag();
+    /** Operateur (affichage des cartes d'administration ; le serveur reverifie chaque action). */
+    public static boolean op;
     public static CompoundTag arenaState=new CompoundTag();
     public static long arenaUpdated;
     public static String backend="";
@@ -51,7 +53,7 @@ public final class ClientData {
     }
 
     public static void load(CompoundTag t) {
-        DATA.load(t);features=t.getCompoundOrEmpty("features");
+        DATA.load(t);features=t.getCompoundOrEmpty("features");op=t.getBooleanOr("op",false);
         creativeAllowed=t.getBooleanOr("creativeAllowed",false);guardBroken=t.getIntOr("guardBroken",0);
         backend=t.getStringOr("backend","");
         List<Double> raw = t.read("statBlock", Codec.DOUBLE.listOf()).orElse(List.of());
