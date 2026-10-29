@@ -8,6 +8,7 @@ import net.minecraft.world.item.ItemStack;
 
 public final class AdventureSummaryScreen extends MmoScreen {
     private final CompoundTag data;private int page;
+    @Override protected String backdrop() { return "dungeon_results_background"; }
     public AdventureSummaryScreen(CompoundTag data) {super("Bilan d'aventure");this.data=data;}
     @Override protected void renderContent(GuiGraphicsExtractor g,int mx,int my,float a) {
         Ui.frame(g,left,top,pw,ph,Ui.GOLD,false);
