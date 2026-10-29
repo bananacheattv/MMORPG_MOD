@@ -316,7 +316,7 @@ public final class RpgCombat {
             damage *= 1.0 - reduction;
         }
         if (target instanceof ServerPlayer tp) {
-            damage = incomingModifiers(tp, damage);damage=ShieldGuard.absorb(tp,source,damage);
+            damage = incomingModifiers(tp, damage);damage=ShieldGuard.absorb(tp,source,damage,h.max());
         }
         if(playerAttacker!=null)damage*=com.mmorpg.competition.PvpEquipment.outgoing(playerAttacker,target instanceof ServerPlayer);
         if(target instanceof ServerPlayer pv&&attacker instanceof LivingEntity)damage*=com.mmorpg.competition.PvpEquipment.incoming(pv,playerAttacker!=null);
