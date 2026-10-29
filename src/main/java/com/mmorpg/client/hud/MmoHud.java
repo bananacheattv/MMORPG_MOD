@@ -263,7 +263,7 @@ public final class MmoHud {
             g.text(f, "Appuyez sur [" + Keys.MENU.getTranslatedKeyMessage().getString() + "]", x + 8, y + 24, Ui.TEXT, false);
             return;
         }
-        Ui.icon(g, Ui.classIcon(cls.id(), false), x + 5, y + 5, 22, 32);
+        if (cls != com.mmorpg.rpg.PlayerClass.NONE) Ui.icon(g, Ui.classIcon(cls.id(), false), x + 5, y + 5, 22, 32);
         Ui.border(g, x + 4, y + 4, 24, 24, Ui.GOLD_DARK);
         String lvl = String.valueOf(d.level);
         g.fill(x + 4, y + 22, x + 6 + f.width(lvl) + 2, y + 31, 0xE0101010);
@@ -392,7 +392,7 @@ public final class MmoHud {
         int w = 120;
         int h = 24;
         smallPanel(g, 0, y, w, h, online ? cls.color : 0xFF505050);
-        if (online) Ui.icon(g, Ui.classIcon(cls.id(), false), 3, y + 4, 16, 32, near ? 0xFFFFFFFF : 0xFF808080);
+        if (online && cls != com.mmorpg.rpg.PlayerClass.NONE) Ui.icon(g, Ui.classIcon(cls.id(), false), 3, y + 4, 16, 32, near ? 0xFFFFFFFF : 0xFF808080);
         String label = (leader ? "♛ " : "") + name;
         g.text(f, f.plainSubstrByWidth(label, 70), 22, y + 3, online ? (near ? 0xFFFFFFFF : Ui.MUTED) : 0xFF707070, true);
         if (online) {

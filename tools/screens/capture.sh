@@ -14,13 +14,13 @@ export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:-} -Dneoforge.disableBlaze3DValida
 grep -q '^onboardAccessibility' run/options.txt 2>/dev/null && sed -i 's/^onboardAccessibility:.*/onboardAccessibility:false/' run/options.txt || echo onboardAccessibility:false >> run/options.txt
 G="./gradlew -Dorg.gradle.java.installations.paths=$JDK"
 # Monde solo « dev » : copie du monde du serveur de dev (run/world) s'il n'existe pas
-[ -d run/saves/dev ] || { mkdir -p run/saves; cp -r run/world run/saves/dev; }
+[ -d run/saves/dev ] || { mkdir -p run/saves; [ -d run/world ] && cp -r run/world run/saves/dev; }
 for m in "${MODES[@]}"; do
   echo "== $m"
   rm -f run/screenshots/showcase_*.png
-  # xdotool valide l'avertissement « paramètres expérimentaux » du monde au premier chargement (bouton 798,430)
+  # xdotool valide l'avertissement « paramètres expérimentaux » du monde au premier chargement (bouton Yes 485,410)
   timeout 900 xvfb-run -a -s "-screen 0 1280x720x24 +extension GLX +render -noreset" bash -c \
-    "(for i in \$(seq 1 12); do sleep 15; xdotool mousemove 798 430 click 1 2>/dev/null; done) & \
-     $G runClient -PquickWorld=dev -Pusername=VisualChecks -Pshowcase=$m" > /tmp/screens-client-$m.log 2>&1
+    "(for i in \$(seq 1 12); do sleep 15; xdotool mousemove 485 410 click 1 2>/dev/null; done; xdotool mousemove 1270 710 2>/dev/null) & \
+     $G runClient -PfreshWorld -Pusername=VisualChecks -Pshowcase=$m" > /tmp/screens-client-$m.log 2>&1
   mkdir -p docs/screens/$m && cp run/screenshots/showcase_*.png docs/screens/$m/ 2>/dev/null || echo "  (aucune capture pour $m)"
 done

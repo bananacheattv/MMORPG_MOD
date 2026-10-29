@@ -65,6 +65,7 @@ neoForge {
             if (project.hasProperty('showcase')) {
                 def mode = project.property('showcase').toString()
                 jvmArgument '-Dmmorpg.showcase=' + (mode.isEmpty() ? 'true' : mode)
+                if (project.hasProperty('freshWorld')) jvmArgument '-Dmmorpg.freshWorld=true'
                 if (project.hasProperty('clicsize')) jvmArgument '-Dmmorpg.clicsize=' + project.property('clicsize')
             }
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.

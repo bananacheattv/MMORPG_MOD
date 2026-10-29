@@ -162,7 +162,7 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
         Ui.inset(g, x - 2, y - 2, inventoryWidth, 88);
         Ui.inset(g, x + 31, y + 2, 74, 82);
         InventoryScreen.extractEntityInInventoryFollowsMouse(g, x + 32, y + 3, x + 104, y + 83, 36, 0.0625F, mouseX, mouseY, this.minecraft.player);
-        Ui.icon(g, Ui.classIcon(cls.id(), false), x + 26, y + 8, 12, 32);
+        if (cls != com.mmorpg.rpg.PlayerClass.NONE) Ui.icon(g, Ui.classIcon(cls.id(), false), x + 26, y + 8, 12, 32);
         for (Slot s : this.menu.slots) {
             if (!s.isActive()) continue;
             boolean equipment = (s.index >= InventoryMenu.ARMOR_SLOT_START && s.index < InventoryMenu.ARMOR_SLOT_END) || s.index == InventoryMenu.SHIELD_SLOT;

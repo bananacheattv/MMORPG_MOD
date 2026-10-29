@@ -17,7 +17,7 @@ public class JobDetailScreen extends MenuScreen {
     protected void renderTab(GuiGraphicsExtractor g, int mx, int my, float a) {
         int x0 = left + 8, y0 = contentTop;
         Job j = job;
-        int dx = x0, dw = left + pw - 8 - dx, dh = ph - 30 - 10;
+        int dx = x0, dw = left + pw - 8 - dx, dh = ph - 54 - 10;
         Ui.inset(g, dx, y0, dw, dh);
         long total = JobsScreen.xp(j);
         int lvl = Job.levelFor(total);

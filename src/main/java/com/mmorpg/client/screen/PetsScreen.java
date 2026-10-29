@@ -79,7 +79,7 @@ public class PetsScreen extends MenuScreen {
         // ------------------------------------------------ details
         int dx = left + 214;
         int dw = left + pw - 8 - dx;
-        int dh = ph - 30 - 10;
+        int dh = ph - 54 - 10;
         Ui.inset(g, dx, y0, dw, dh);
         PetType p = selected;
         boolean has = d.petXp.containsKey(p.id);

@@ -67,7 +67,7 @@ public class QuestLogScreen extends MenuScreen {
 
         int dx = x0 + lw + 8;
         int dw = left + pw - 8 - dx;
-        int dh = ph - 30 - 10;
+        int dh = ph - 54 - 10;
         Ui.inset(g, dx, y0, dw, dh);
         CompoundTag q = null;
         for (int i = 0; i < quests.size(); i++) {

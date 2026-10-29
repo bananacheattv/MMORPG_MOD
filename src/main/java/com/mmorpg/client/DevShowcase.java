@@ -37,6 +37,7 @@ public final class DevShowcase {
     public static void onTick(ClientTickEvent.Post event) {
         if (!ENABLED) return;
         Minecraft mc = Minecraft.getInstance();
+        DevFreshWorld.tick(mc);
         if(MODE.equals("weekly")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
             var board=com.mmorpg.server.DevWeeklyChecks.VISUAL_BOARD;

@@ -33,7 +33,70 @@ final class DevUiFrames {
         add("cosmetics", CosmeticsScreen::new);
         add("bestiary", BestiaryScreen::new);
         add("class_select", ClassSelectScreen::new);
-        add("weekly", () -> new WeeklyQuestScreen(new CompoundTag()));
+        add("weekly", () -> {
+            var data = new CompoundTag();
+            data.putLong("reset", 3 * 86400L + 4 * 3600L);
+            data.putInt("doneCount", 1);
+            var tiers = new net.minecraft.nbt.ListTag();
+            String[] names = {"Facile", "Difficile", "Très difficile"};
+            for (int i = 0; i < 3; i++) {
+                var q = new CompoundTag();
+                q.putInt("tier", i);
+                q.putInt("state", i);
+                q.putBoolean("completable", i == 1);
+                q.putString("tierName", names[i]);
+                q.putString("name", "Chasseur de la semaine");
+                var objs = new net.minecraft.nbt.ListTag();
+                var o = new CompoundTag();
+                o.putString("type", i == 2 ? "collect" : "kill");
+                o.putString("target", i == 2 ? "minecraft:diamond" : "*");
+                o.putInt("count", 10 * (i + 1));
+                o.putInt("progress", 4 * i);
+                objs.add(o);
+                q.put("objectives", objs);
+                var rw = new CompoundTag();
+                rw.putLong("gold", 500L * (i + 1));
+                rw.putLong("xp", 1200L * (i + 1));
+                q.put("rewards", rw);
+                tiers.add(q);
+            }
+            data.put("tiers", tiers);
+            return new WeeklyQuestScreen(data);
+        });
+        add("trade", () -> {
+            var data = new CompoundTag();
+            data.putString("partner", "Aelwyn");
+            data.putString("status", "En attente de confirmation");
+            data.putLong("myGold", 250);
+            data.putLong("theirGold", 100);
+            data.putLong("wallet", 1800);
+            return new TradeScreen(data);
+        });
+        add("bank", () -> {
+            var data = new CompoundTag();
+            data.putLong("bank", 12500);
+            data.putLong("wallet", 830);
+            data.putInt("level", 3);
+            return new BankScreen(data);
+        });
+        add("forge", () -> new ForgeScreen(net.minecraft.core.BlockPos.ZERO));
+        add("dungeons", () -> {
+            var data = new CompoundTag();
+            data.putInt("playerLevel", 30);
+            var list = new net.minecraft.nbt.ListTag();
+            String[][] ds = {{"crypte_gobeline", "Crypte gobeline", "10"}, {"catacombes", "Catacombes", "30"}, {"forteresse_infernale", "Forteresse infernale", "50"}};
+            for (var d : ds) {
+                var e = new CompoundTag();
+                e.putString("id", d[0]);
+                e.putString("label", d[1]);
+                e.putInt("level", Integer.parseInt(d[2]));
+                e.putString("lore", "Un donjon rien que pour vous et votre groupe.");
+                for (int k = 0; k < 3; k++) e.putString("variant" + k, "Variante " + k);
+                list.add(e);
+            }
+            data.put("dungeons", list);
+            return new DungeonMasterScreen(data);
+        });
         add("auction", () -> new AuctionScreen(new CompoundTag()));
         add("store", () -> new PremiumStoreScreen(DevShowcase.expansionStore()));
         add("lucky", () -> {
