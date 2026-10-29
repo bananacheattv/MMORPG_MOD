@@ -85,7 +85,7 @@ public abstract class MenuScreen extends MmoScreen {
                                 java.util.function.BiConsumer<int[], Runnable> click) {
         var available=new java.util.ArrayList<Tab>(java.util.Arrays.asList(Tab.values()));available.remove(Tab.CREATIF);
         if(Minecraft.getInstance().player!=null&&ClientData.creativeAllowed&&Minecraft.getInstance().player.hasInfiniteMaterials())available.add(1,Tab.CREATIF);
-        available.removeIf(t->{String key=switch(t){case COMPETENCES->"competences";case QUETES->"quetes";case GUILDE->"guildes";case ARENE->"arenes";case FAMILIERS->"familiers";case MONTURES->"montures";case BOUTIQUE->"boutique";case COSMETIQUES->"cosmetiques";default->"";};return !key.isEmpty()&&!ClientData.features.getBooleanOr(key,true);});
+        available.removeIf(t->{String key=switch(t){case COMPETENCES->"competences";case QUETES->"quetes";case GUILDE->"guildes";case ARENE->"arenes";case FAMILIERS->"familiers";case MONTURES->"montures";case BOUTIQUE->"boutique";case COSMETIQUES->"cosmetiques";case GROUPE->"groupes";case BESTIAIRE->"bestiaire";case METIERS->"metiers";case SUCCES->"succes";default->"";};return !key.isEmpty()&&!ClientData.features.getBooleanOr(key,true);});
         Tab[] tabs=available.toArray(Tab[]::new);int count=(tabs.length+1)/2;
         int tw=(pw-54)/count;
         // bouton d'edition de l'interface (HUD) au bout de la barre d'onglets

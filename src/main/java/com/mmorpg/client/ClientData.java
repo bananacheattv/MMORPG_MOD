@@ -54,7 +54,7 @@ public final class ClientData {
         DATA.load(t);features=t.getCompoundOrEmpty("features");
         creativeAllowed=t.getBooleanOr("creativeAllowed",false);guardBroken=t.getIntOr("guardBroken",0);
         backend=t.getStringOr("backend","");
-        List<Double> raw = t.read("stats", Codec.DOUBLE.listOf()).orElse(List.of());
+        List<Double> raw = t.read("statBlock", Codec.DOUBLE.listOf()).orElse(List.of());
         double[] arr = new double[raw.size()];
         for (int i = 0; i < arr.length; i++) arr[i] = raw.get(i);
         stats = StatBlock.fromRaw(arr);

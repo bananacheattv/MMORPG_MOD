@@ -92,6 +92,7 @@ public final class FishingEvents {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void fished(ItemFishedEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer p) || !(p.level() instanceof ServerLevel level)) return;
+        if (!com.mmorpg.server.FeatureFlags.enabled(p.level().getServer(), "peche")) return;
         FishingHook hook = event.getHookEntity();
         // la prise est geree ici : rien ne tombe de la table vanilla, la canne use toujours un point
         event.setCanceled(true);

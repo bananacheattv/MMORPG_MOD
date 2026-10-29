@@ -79,6 +79,7 @@ public final class PartyManager {
     }
 
     public static void invite(ServerPlayer from, String targetName) {
+        if (!FeatureFlags.allow(from, "groupes")) return;
         ServerPlayer target = from.level().getServer().getPlayerList().getPlayerByName(targetName);
         if (target == null) {
             msg(from, "Joueur introuvable : " + targetName, 0xFF6060);
@@ -115,6 +116,7 @@ public final class PartyManager {
     }
 
     public static void accept(ServerPlayer p) {
+        if (!FeatureFlags.allow(p, "groupes")) return;
         com.mmorpg.network.SharedParties.mutate(p, () -> acceptLocal(p));
     }
     private static void acceptLocal(ServerPlayer p) {

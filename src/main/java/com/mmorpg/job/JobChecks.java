@@ -32,13 +32,27 @@ public final class JobChecks {
         if (mine < 20) fails.add("progression mineur trop courte : " + mine + " h");
         // --- paliers et bonus
         if (Job.tier(9) != 0 || Job.tier(10) != 1 || Job.tier(49) != 4 || Job.tier(50) != 5) fails.add("tier()");
-        double prev = -1;
-        for (int l = 1; l <= Job.MAX_LEVEL; l++) {
-            double c = Job.doubleChance(l);
-            if (c < prev || c > 0.30001) fails.add("doubleChance(" + l + ") = " + c);
-            prev = c;
+        for (Job j : Job.values()) {
+            double prev = -1;
+            for (int l = 1; l <= Job.MAX_LEVEL; l++) {
+                double c = Job.doubleChance(j, l);
+                if (c < prev || c > 0.30001) fails.add("doubleChance(" + j.id + "," + l + ") = " + c);
+                prev = c;
+            }
+            if (Math.abs(Job.doubleChance(j, 50) - 0.30) > 1e-9) fails.add("double " + j.id + " niveau 50");
+            var perks = Job.perks(j);
+            if (perks.size() != 10) fails.add(j.id + " : 10 bonus attendus, " + perks.size());
+            for (int i = 0; i < perks.size(); i++) {
+                int l = (i + 1) * 5;
+                if (perks.get(i).level() != l || perks.get(i).text().isBlank()) fails.add(j.id + " : bonus " + l + " invalide");
+                if (l > 5 && l < 50 && perks.get(i).text().equals(perks.get(i - 1).text())) fails.add(j.id + " : bonus " + l + " identique au precedent");
+                // chaque niveau multiple de 5 doit changer un effet reel par rapport a 5 niveaux plus tot
+                boolean changed = Job.doubleChance(j, l) != Job.doubleChance(j, l - 5) || Job.miningSpeed(l) != Job.miningSpeed(l - 5)
+                        || Job.rareCatchChance(l) != Job.rareCatchChance(l - 5) || Job.mealChance(l) != Job.mealChance(l - 5);
+                if (!changed) fails.add(j.id + " : le bonus du niveau " + l + " ne change aucun effet");
+            }
         }
-        if (Job.miningSpeed(50) < 1.5f) fails.add("vitesse de minage niveau 50");
+        if (Job.miningSpeed(4) != 1f || Job.miningSpeed(5) <= 1f || Job.miningSpeed(50) < 1.5f) fails.add("vitesse de minage");
         // --- recompenses : references valides
         for (Job j : Job.values()) {
             if (j.rewards.size() != 5) fails.add(j.id + " : 5 paliers attendus");

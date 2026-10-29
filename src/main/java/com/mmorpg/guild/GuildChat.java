@@ -30,7 +30,7 @@ public final class GuildChat {
     private GuildChat() {}
 
     public static void send(ServerPlayer p, String raw) {
-        if (!FeatureFlags.allow(p, "guildes")) return;
+        if (!FeatureFlags.allow(p, "guildes") || !FeatureFlags.allow(p, "chat_guilde")) return;
         String text = raw.replaceAll("\\p{Cntrl}", " ").replace('§', ' ').trim();
         if (text.isEmpty()) return;
         if (text.length() > MAX_LENGTH) text = text.substring(0, MAX_LENGTH);

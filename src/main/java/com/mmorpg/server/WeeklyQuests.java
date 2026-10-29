@@ -200,7 +200,7 @@ public final class WeeklyQuests {
     }
 
     public static void action(ServerPlayer p, BlockPos pos, int action, int tier) {
-        if (!FeatureFlags.allow(p, "quetes") || !near(p, pos)) return;
+        if (!FeatureFlags.allow(p, "quetes") || !FeatureFlags.allow(p, "quetes_hebdo") || !near(p, pos)) return;
         if (tier < 0 || tier >= TEMPLATES.length) {
             if (action == ACT_BROWSE) open(p, pos);
             return;

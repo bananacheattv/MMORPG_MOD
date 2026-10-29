@@ -27,7 +27,7 @@ public final class Achievements {
 
     /** Ajoute {@code amount} a un compteur cumulatif. */
     public static void add(ServerPlayer p, String stat, long amount) {
-        if (amount <= 0 || com.mmorpg.hub.ClassTrial.active(p)) return;
+        if (amount <= 0 || com.mmorpg.hub.ClassTrial.active(p) || !com.mmorpg.server.FeatureFlags.enabled(p.level().getServer(), "succes")) return;
         PlayerData d = RpgPlayers.get(p);
         d.counters.merge(stat, amount, Long::sum);
         check(p, d, stat);
@@ -35,6 +35,7 @@ public final class Achievements {
 
     /** Releve un compteur de type "maximum" (niveaux). */
     public static void max(ServerPlayer p, String stat, long value) {
+        if (!com.mmorpg.server.FeatureFlags.enabled(p.level().getServer(), "succes")) return;
         PlayerData d = RpgPlayers.get(p);
         if (d.counters.getOrDefault(stat, 0L) >= value) return;
         d.counters.put(stat, value);
@@ -87,7 +88,7 @@ public final class Achievements {
     }
 
     public static Component suffix(ServerPlayer p) {
-        return suffix(RpgPlayers.get(p));
+        return com.mmorpg.server.FeatureFlags.enabled(p.level().getServer(), "succes") ? suffix(RpgPlayers.get(p)) : Component.empty();
     }
 
     /** Equipe (ou retire, avec "") un titre de succes ou un titre PvP deja possede. */
@@ -105,6 +106,7 @@ public final class Achievements {
     }
 
     public static void action(ServerPlayer p, CompoundTag t) {
+        if (!com.mmorpg.server.FeatureFlags.allow(p, "succes")) return;
         if (t.getStringOr("action", "").equals("equip")) equip(p, t.getStringOr("title", ""));
     }
 
