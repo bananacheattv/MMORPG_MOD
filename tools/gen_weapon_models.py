@@ -103,6 +103,7 @@ def main(only):
                         d['rotation'][2] = -tilt - 5 if 'right' in k else tilt + 5
                     elif tilt and k.startswith('thirdperson'):
                         d['rotation'][2] = tilt if 'right' in k else -tilt
+                        d['translation'][1] = 1.8  # main sur le manche, pas sur le pommeau
                     display[k] = d
             model = {'credit': 'Aeloria · sprite peint et extrude', 'gui_light': 'front',
                      'textures': {'t': f'mmorpg:item/weapons/{name}', 'particle': '#t'}, 'elements': els, 'display': display}
