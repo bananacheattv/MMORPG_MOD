@@ -14,6 +14,8 @@ import java.util.List;
 
 /** Choix de la classe : quatre cartes detaillees (role, description, notes, evolutions, competences). */
 public class ClassSelectScreen extends MmoScreen {
+    @Override protected boolean hasNav() { return false; }
+
     private static final PlayerClass[] CLASSES = {PlayerClass.GUERRIER, PlayerClass.MAGE, PlayerClass.ARCHER, PlayerClass.TANK};
     private static final String[] RATINGS = {"Attaque", "Défense", "Magie", "Mobilité", "Difficulté"};
     private PlayerClass chosen;

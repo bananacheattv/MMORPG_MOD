@@ -5,6 +5,8 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
 public final class HubTutorialScreen extends MmoScreen {
+    @Override protected boolean hasNav() { return false; }
+
     private int page;
     private static final String[][] PAGES={
         {"Bienvenue dans Aeloria","Ton objectif : devenir l’un des meilleurs héros, jusqu’au niveau 100.","Commence dans ce hub en choisissant ta classe."},

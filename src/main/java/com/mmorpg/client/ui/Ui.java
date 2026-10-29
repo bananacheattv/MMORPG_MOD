@@ -106,11 +106,36 @@ public final class Ui {
     }
 
     /** Grand panneau plat : fond sombre et bordure fine. */
+    /** Objet agrandi dans une case a fond clair : les objets sombres (armes, armures) restent lisibles. */
+    public static void itemBox(GuiGraphicsExtractor g, net.minecraft.client.gui.Font f, net.minecraft.world.item.ItemStack stack, int x, int y, int box) {
+        g.fillGradient(x, y, x + box, y + box, 0xFF5E587A, 0xFF3C3756);
+        border(g, x, y, box, box, 0xFF7A7298);
+        if (stack.isEmpty()) return;
+        float k = (box - 4) / 16f;
+        g.pose().pushMatrix();
+        g.pose().translate(x + 2, y + 2);
+        g.pose().scale(k, k);
+        g.item(stack, 0, 0);
+        g.itemDecorations(f, stack, 0, 0);
+        g.pose().popMatrix();
+    }
+
     private static Identifier backdropTex;
 
     /** Illustration d'ambiance du prochain grand panneau (pack d'art) ; null pour aucune. */
     public static void backdrop(String name) {
         backdropTex = name == null ? null : MMORPG.id("textures/gui/illustrations/" + name + ".png");
+    }
+
+    private static boolean suppressPanel;
+
+    /** Le cadre est deja peint par la base (ecrans avec barre d'onglets) : les grands panneaux des ecrans ne se redessinent pas. */
+    public static void suppressPanel(boolean on) {
+        suppressPanel = on;
+    }
+
+    public static void paintBackdropNow(GuiGraphicsExtractor g, int x, int y, int w, int h) {
+        if (backdropTex != null) paintBackdrop(g, x, y, w, h);
     }
 
     private static void paintBackdrop(GuiGraphicsExtractor g, int x, int y, int w, int h) {
@@ -126,6 +151,7 @@ public final class Ui {
     }
 
     public static void panel(GuiGraphicsExtractor g, int x, int y, int w, int h) {
+        if (suppressPanel && w >= 300 && h >= 180) return;
         rounded(g,x,y+3,w,h,10,0x35050010);
         rounded(g,x,y,w,h,10,PANEL_TOP);
         if (backdropTex != null && w >= 300 && h >= 180) paintBackdrop(g, x, y, w, h);

@@ -23,6 +23,7 @@ final class DevUiFrames {
 
     static {
         add("inventory", () -> new CharacterScreen(Minecraft.getInstance().player));
+        add("pause", AeloriaPauseScreen::new);
         add("jobs", JobsScreen::new);
         add("achievements", AchievementsScreen::new);
         add("skills", SkillsScreen::new);
@@ -97,7 +98,21 @@ final class DevUiFrames {
             data.put("dungeons", list);
             return new DungeonMasterScreen(data);
         });
-        add("auction", () -> new AuctionScreen(new CompoundTag()));
+        add("auction", () -> {
+            var screen = new AuctionScreen(auctionData());
+            screen.previewTab(0);
+            return screen;
+        });
+        add("auction_sell", () -> {
+            var screen = new AuctionScreen(auctionData());
+            screen.previewTab(1);
+            return screen;
+        });
+        add("auction_mine", () -> {
+            var screen = new AuctionScreen(auctionData());
+            screen.previewTab(2);
+            return screen;
+        });
         add("store", () -> new PremiumStoreScreen(DevShowcase.expansionStore()));
         add("lucky", () -> {
             var data = new CompoundTag();
@@ -124,35 +139,95 @@ final class DevUiFrames {
         });
     }
 
+    private static CompoundTag auctionData() {
+        var ops = net.minecraft.resources.RegistryOps.create(net.minecraft.nbt.NbtOps.INSTANCE, Minecraft.getInstance().level.registryAccess());
+        net.minecraft.world.item.Item[] items = {net.minecraft.world.item.Items.NETHERITE_SWORD, net.minecraft.world.item.Items.BOW, net.minecraft.world.item.Items.DIAMOND_AXE,
+                net.minecraft.world.item.Items.NETHERITE_CHESTPLATE, net.minecraft.world.item.Items.OAK_PLANKS, net.minecraft.world.item.Items.GOLDEN_APPLE,
+                net.minecraft.world.item.Items.TRIDENT, net.minecraft.world.item.Items.CROSSBOW, net.minecraft.world.item.Items.ENDER_PEARL, net.minecraft.world.item.Items.SHIELD};
+        var data = new CompoundTag();
+        data.putLong("wallet", 54475);
+        data.putInt("pages", 2);
+        data.putInt("total", 12);
+        for (String key : new String[]{"listings", "mine"}) {
+            var list = new net.minecraft.nbt.ListTag();
+            for (int i = 0; i < (key.equals("mine") ? 3 : items.length); i++) {
+                var e = new CompoundTag();
+                e.putLong("id", i + 1);
+                e.putString("seller", "1Touchable");
+                e.putLong("price", 315L * (i + 1) * (i + 1));
+                e.putLong("left", (47L - i) * 3_600_000L);
+                e.put("stack", net.minecraft.world.item.ItemStack.OPTIONAL_CODEC.encodeStart(ops, new net.minecraft.world.item.ItemStack(items[i], i == 4 ? 32 : 1)).getOrThrow());
+                list.add(e);
+            }
+            data.put(key, list);
+        }
+        return data;
+    }
+
     private DevUiFrames() {
+    }
+
+    /** Tailles de fenetre et echelles d'interface testees (0 = automatique). */
+    private static final int[][] CONFIGS = {{1280, 720, 2}, {1280, 720, 1}, {1280, 720, 3}, {1280, 720, 4}, {1280, 720, 0}, {854, 480, 2}, {854, 480, 0}, {1920, 1080, 0}, {1920, 1080, 3}};
+    private static int cfg = -1, cfgTick, reference[];
+    private static final List<String> REPORT = new ArrayList<>();
+    private static int gaps;
+
+    private static int[] frameOf(Screen s) {
+        if (s instanceof com.mmorpg.client.ui.MmoScreen m) return m.realFrame();
+        if (s instanceof CharacterScreen c) return c.realFrame();
+        return null;
     }
 
     static void tick(Minecraft mc) {
         if (mc.player == null || mc.level == null) return;
         tick++;
-        if (tick == 30) {
-            mc.getWindow().setWindowed(1280, 720);
-            mc.options.guiScale().set(2);
-            mc.resizeGui();
-        }
         if (tick < 120) return;
-        int frame = tick - 120, i = frame / 12;
-        if (i >= SCREENS.size()) {
-            DevShowcase.stop(mc);
+        int per = 8;
+        if (cfg < 0 || cfgTick >= SCREENS.size() * per) {
+            cfg++;
+            cfgTick = 0;
+            reference = null;
+            if (cfg >= CONFIGS.length) {
+                REPORT.add(gaps == 0 ? "OK : tous les ecrans ont le meme cadre et la meme barre" : "ECARTS : " + gaps);
+                try {
+                    java.nio.file.Files.write(mc.gameDirectory.toPath().resolve("ui_frames_report.txt"), REPORT);
+                } catch (java.io.IOException e) {
+                    MMORPG.LOGGER.error("[MMORPG][ui_frames] rapport : {}", e.toString());
+                }
+                MMORPG.LOGGER.info("[MMORPG][ui_frames] {}", REPORT.get(REPORT.size() - 1));
+                DevShowcase.stop(mc);
+                return;
+            }
+            var c = CONFIGS[cfg];
+            mc.getWindow().setWindowed(c[0], c[1]);
+            mc.options.guiScale().set(c[2]);
+            mc.resizeGui();
+            REPORT.add("== fenetre " + c[0] + "x" + c[1] + " echelle " + (c[2] == 0 ? "auto" : c[2]) + " (interface " + mc.getWindow().getGuiScaledWidth() + "x" + mc.getWindow().getGuiScaledHeight() + ")");
             return;
         }
-        if (frame % 12 == 0) {
+        int i = cfgTick / per, step = cfgTick % per;
+        cfgTick++;
+        if (step == 0) {
             try {
                 mc.gui.setScreen(SCREENS.get(i).get());
             } catch (Throwable t) {
                 MMORPG.LOGGER.error("[MMORPG][ui_frames] {} : {}", NAMES.get(i), t.toString());
             }
         }
-        if (frame % 12 == 8) {
+        if (step == 5) {
             Screen s = mc.gui.screen();
-            if (s instanceof com.mmorpg.client.ui.MmoScreen m)
-                MMORPG.LOGGER.info("[MMORPG][ui_frames] {} : echelle {} cadre {}x{} (ecran {}x{})", NAMES.get(i), m.uiScale(), m.panelWidthPublic(), m.panelHeightPublic(), s.width, s.height);
-            DevShowcase.shot(mc, "frame_" + NAMES.get(i));
+            int[] f = frameOf(s);
+            if (f == null) {
+                REPORT.add("  " + NAMES.get(i) + " : ecran non mesurable");
+            } else {
+                if (reference == null) reference = f;
+                // meme position, meme taille, meme barre (les ecrans sans barre ne comparent que le cadre)
+                boolean same = f[0] == reference[0] && f[1] == reference[1] && f[2] == reference[2] && f[3] == reference[3] && (f[4] == 0 || f[4] == reference[4]);
+                if (!same) gaps++;
+                REPORT.add("  " + NAMES.get(i) + " : cadre " + f[2] + "x" + f[3] + " en (" + f[0] + "," + f[1] + ") barre " + f[4] + (same ? "" : "   <-- ECART"));
+            }
+            if (cfg == 0) DevShowcase.shot(mc, "frame_" + NAMES.get(i));
         }
     }
 }

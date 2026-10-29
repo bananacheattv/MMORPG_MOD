@@ -63,10 +63,17 @@ public abstract class MenuScreen extends MmoScreen {
     }
 
     @Override
+    protected int bandHeight() {
+        return 54;
+    }
+
+    @Override
+    protected Tab navActive() {
+        return tab;
+    }
+
+    @Override
     protected final void renderContent(GuiGraphicsExtractor g, int mx, int my, float a) {
-        Ui.panel(g, left, top, pw, ph);
-        drawTabs(g, font, left, top, pw, tab, mx, my, (r, action) -> click(r[0], r[1], r[2], r[3], action));
-        g.fill(left + 6, top + 48, left + pw - 6, top + 49, Ui.LINE);
         renderTab(g, mx, my, a);
     }
 
