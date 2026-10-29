@@ -181,6 +181,14 @@ public final class Ui {
         g.blit(RenderPipelines.GUI_TEXTURED, MMORPG.id("textures/gui/illustrations/" + name + ".png"), x, y, 0, 0, s, s, size, size, size, size);
     }
 
+    /** Illustration 836x470 du pack d'art recadree en "cover" (sans etirement) dans la zone donnee. */
+    public static void cover(GuiGraphicsExtractor g, String name, int x, int y, int w, int h) {
+        final int tw = 836, th = 470;
+        float k = Math.max(w / (float) tw, h / (float) th);
+        int sw = Math.min(tw, Math.round(w / k)), sh = Math.min(th, Math.round(h / k));
+        g.blit(RenderPipelines.GUI_TEXTURED, MMORPG.id("textures/gui/illustrations/" + name + ".png"), x, y, (tw - sw) / 2f, (th - sh) / 2f, w, h, sw, sh, tw, th);
+    }
+
     private static boolean suppressPanel;
 
     /** Le cadre est deja peint par la base (ecrans avec barre d'onglets) : les grands panneaux des ecrans ne se redessinent pas. */

@@ -91,6 +91,7 @@ public class WeeklyQuestScreen extends MmoScreen {
         }
         CompoundTag rw = q.getCompoundOrEmpty("rewards");
         int ry = y + h - 62;
+        Ui.squareArt(g, "weekly_reward_chest", 256, x + w - 34, ry - 2, 30);
         g.text(font, "Récompenses", x + 5, ry, Ui.GOLD, false);
         g.text(font, rw.getLongOr("gold", 0) + " or", x + 5, ry + 11, 0xFFFFD040, false);
         g.text(font, rw.getLongOr("xp", 0) + " XP", x + 5, ry + 22, Ui.BLUE, false);
