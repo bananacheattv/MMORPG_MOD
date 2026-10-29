@@ -62,7 +62,7 @@ public class PartyScreen extends MenuScreen {
             String name = m.getStringOr("name", "Hors ligne");
             PlayerClass cls = PlayerClass.byId(m.getIntOr("class", 0));
             Ui.frame(g, x0, ry, lw, 27, online ? cls.color : 0xFF505050, false);
-            if (online) Ui.icon(g, Ui.classIcon(cls.id(), false), x0 + 3, ry + 3, 21, 32);
+            if (online && cls != com.mmorpg.rpg.PlayerClass.NONE) Ui.icon(g, Ui.classIcon(cls.id(), false), x0 + 3, ry + 3, 21, 32);
             String title = (m.getBooleanOr("leader", false) ? "♛ " : "") + name;
             g.text(font, title, x0 + 28, ry + 4, m.getBooleanOr("leader", false) ? Ui.GOLD_LIGHT : Ui.TEXT, true);
             if (online) {

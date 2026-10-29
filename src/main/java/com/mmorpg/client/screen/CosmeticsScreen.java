@@ -79,7 +79,7 @@ public class CosmeticsScreen extends MenuScreen {
         // apercu
         int px = lx + lw + 8;
         int pwid = left + pw - 8 - px;
-        int phei = ph - 30 - 10;
+        int phei = ph - 54 - 10;
         Ui.inset(g, px, y0, pwid, phei);
         if (selected != null) {
             Cosmetic c = selected;

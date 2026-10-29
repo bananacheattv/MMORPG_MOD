@@ -14,6 +14,8 @@ import java.util.List;
 
 /** Dialogue avec le Maitre des donjons : liste des donjons, trois difficultes, entree dans son propre exemplaire. */
 public class DungeonMasterScreen extends MmoScreen {
+    @Override protected String backdrop() { return "dungeon_crypt_cover"; }
+
     private static final String[] NAMES = {"Normal", "Héroïque", "Mythique"};
     private static final int[] ACCENT = {0xFF2A7A3A, 0xFF7A5A1A, 0xFF8A2A5A};
     private final int npc;

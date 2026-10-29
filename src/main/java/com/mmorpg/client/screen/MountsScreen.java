@@ -10,6 +10,8 @@ import com.mmorpg.registry.ModEntities;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class MountsScreen extends MenuScreen {
+    @Override protected String backdrop() { return "mounts_pets_header"; }
+
     private MountType selected = MountType.SANGLIER;
     private int scroll;
     private boolean confirm;

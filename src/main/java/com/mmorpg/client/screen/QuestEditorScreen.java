@@ -33,8 +33,7 @@ public final class QuestEditorScreen extends MmoScreen {
     private record Label(String text,int x,int y) {}
     public QuestEditorScreen(CompoundTag data) {super("Atelier de quêtes");draft.name="Nouvelle quête";draft.objectives.add(new QuestDef.Objective());receive(data);}
     private static String newId() {return "quete_"+Long.toUnsignedString(System.currentTimeMillis(),36);}
-    @Override protected int panelWidth() {return width-12;}
-    @Override protected int panelHeight() {return height-12;}
+    @Override protected int designHeight(){return 340;}
     public void receive(CompoundTag data) {
         saving=false;status=data.getStringOr("status","");success=data.getBooleanOr("success",true);
         if(data.contains("quests")) {catalogue=data.getCompoundOrEmpty("quests");templates=data.getCompoundOrEmpty("templates");npcs=new ArrayList<>();

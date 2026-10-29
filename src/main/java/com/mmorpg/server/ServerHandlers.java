@@ -113,6 +113,8 @@ public final class ServerHandlers {
             com.mmorpg.economy.Bank.action(sp, p.pos(), p.action(), p.amount(), p.page());
         } else if (p.service() == Payloads.ServiceAction.AUCTION) {
             com.mmorpg.economy.Auction.action(sp, p.pos(), p.action(), p.amount(), p.text(), p.page());
+        } else if (p.service() == Payloads.ServiceAction.WEEKLY) {
+            com.mmorpg.server.WeeklyQuests.action(sp, p.pos(), p.action(), (int) p.amount());
         }
     }
 

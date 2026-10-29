@@ -13,8 +13,7 @@ public final class ImportedGalleryScreen extends MmoScreen {
     private final int zone;
     private final java.util.List<com.mmorpg.entity.mob.ImportedMobEntity> mobs=new java.util.ArrayList<>();
     public ImportedGalleryScreen(int zone) { super("Modèles importés");this.zone=zone; }
-    @Override protected int panelWidth() {return width-12;}
-    @Override protected int panelHeight() {return height-12;}
+    @Override protected int designHeight(){return 340;}
     @Override protected void init() {
         super.init();mobs.clear();
         for(var entry:ImportedMobs.ALL) if(entry.zone()==zone) {

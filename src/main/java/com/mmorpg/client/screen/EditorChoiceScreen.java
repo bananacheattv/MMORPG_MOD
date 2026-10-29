@@ -21,8 +21,7 @@ public final class EditorChoiceScreen extends MmoScreen {
     public EditorChoiceScreen(Screen parent,String title,List<Choice> choices,Consumer<String> select) {
         super(title);this.parent=parent;this.heading=title;this.choices=choices;this.select=select;
     }
-    @Override protected int panelWidth() {return Math.min(width-12,600);}
-    @Override protected int panelHeight() {return height-12;}
+    @Override protected int designHeight(){return 340;}
     @Override protected void init() {
         super.init();
         var search=new EditBox(font,left+10,top+29,pw-20,18,Component.literal("Rechercher"));

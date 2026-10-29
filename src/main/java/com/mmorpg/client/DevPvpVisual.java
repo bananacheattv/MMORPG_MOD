@@ -19,6 +19,8 @@ public final class DevPvpVisual {
   if(tick==215)shot(mc,"inventory_small_window");
   if(tick==225){mc.getWindow().setWindowed(1280,720);mc.resizeGui();MenuScreen.open(MenuScreen.Tab.COMPETENCES);}
   if(tick==250)shot(mc,"menus_two_rows");
+  if(tick==251){mc.gui.setScreen(new com.mmorpg.client.screen.AeloriaPauseScreen());}
+  if(tick==258)shot(mc,"pause_return_centered");
   if(tick==260){mc.gui.setScreen(null);var t=new CompoundTag();t.putBoolean("active",true);t.putInt("red",287);t.putInt("blue",195);t.putInt("owner",-1);t.putInt("hits",34);t.putInt("team",0);t.putInt("danger",42);ClientData.arenaState=t;ClientData.arenaUpdated=ClientData.now();}
   if(tick==280)shot(mc,"arena_live_hud");
   if(tick==290){ClientData.arenaState=new CompoundTag();var r=new com.mmorpg.competition.PvpProgression.Report();r.id=java.util.UUID.randomUUID().toString();r.red=500;r.blue=284;r.winner=0;for(int i=0;i<10;i++){var row=new com.mmorpg.competition.PvpProgression.Row();row.id=i==0?mc.player.getUUID().toString():java.util.UUID.randomUUID().toString();row.name=i==0?mc.player.getGameProfile().name():new String[]{"","Lysandre","Orin","Vaël","Élyra","Néria","Kaël","Borin","Sélène","Aëron"}[i];row.team=i<5?0:1;row.kills=5-i%4;row.deaths=i%4;row.strikes=18-i;row.damage=8200-i*430;row.healing=i*210;row.points=i<5?148:74;r.rows.add(row);}mc.gui.setScreen(new ArenaResultsScreen(com.mmorpg.competition.PvpProgression.reportTag(r,mc.player.getUUID())));}
@@ -27,24 +29,26 @@ public final class DevPvpVisual {
   if(tick==355)shot(mc,"pvp_merchant");
   if(tick==365)mc.gui.setScreen(new DevPvpGallery());
   if(tick==400)shot(mc,"pvp_armour_and_mount");
-  if(tick==410){mc.gui.setScreen(null);command(mc,"class set VisualChecks archer");command(mc,"item replace entity @s weapon.mainhand with mmorpg:arc_aube_divine");command(mc,"time set day");}
-  if(tick==435)mc.gameMode.useItem(mc.player,net.minecraft.world.InteractionHand.MAIN_HAND);
+  if(tick==410){mc.gui.setScreen(null);command(mc,"class set VisualChecks archer");command(mc,"item replace entity @s weapon.mainhand with mmorpg:arc_aube_divine");command(mc,"time set day");command(mc,"give @s minecraft:arrow 64");}
+  if(tick==435){mc.options.keyUse.setDown(true);mc.gameMode.useItem(mc.player,net.minecraft.world.InteractionHand.MAIN_HAND); }
   if(tick==450)shot(mc,"bow_aim_first_person");
   if(tick==460)mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
   if(tick==480)shot(mc,"bow_aim_third_person");
-  if(tick==490){mc.gameMode.releaseUsingItem(mc.player);mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);command(mc,"summon minecraft:armor_stand ~ ~ ~2 {ShowArms:true}");}
+  if(tick==490){mc.options.keyUse.setDown(false);mc.gameMode.releaseUsingItem(mc.player);mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON);command(mc,"summon minecraft:armor_stand ~ ~ ~2 {ShowArms:true}");}
   if(tick==515){for(var e:mc.level.entitiesForRendering())if(e instanceof net.minecraft.world.entity.decoration.ArmorStand&&e.distanceToSqr(mc.player)<30){var data=new CompoundTag();data.putInt("entity",e.getId());var screen=new ArmorStandEditorScreen(data);screen.appearanceTab();mc.gui.setScreen(screen);break;}}
   if(tick==540)shot(mc,"armor_stand_skin_3d_editor");
   if(tick==550){mc.gui.setScreen(null);command(mc,"class set VisualChecks paladin");command(mc,"item replace entity @s weapon.mainhand with mmorpg:marteau_egide");}
-  if(tick==575)mc.gameMode.useItem(mc.player,net.minecraft.world.InteractionHand.OFF_HAND);
+  if(tick==575){mc.options.keyUse.setDown(true);mc.gameMode.useItem(mc.player,net.minecraft.world.InteractionHand.OFF_HAND);}
   if(tick==620)shot(mc,"shield_guard_draining");
-  if(tick==630)mc.gameMode.releaseUsingItem(mc.player);
+  if(tick==630){mc.options.keyUse.setDown(false);mc.gameMode.releaseUsingItem(mc.player);}
   if(tick==760)shot(mc,"shield_guard_regenerated");
+  if(tick==761){command(mc,"effect give @s minecraft:slowness 30 0 true");command(mc,"effect give @s minecraft:strength 30 0 true");ClientData.BUFFS.put(com.mmorpg.rpg.BuffType.ARMOR_FRACTURE,new long[]{ClientData.now()+300,400});ClientData.BUFFS.put(com.mmorpg.rpg.BuffType.SACRED_AURA,new long[]{ClientData.now()+400,500});}
+  if(tick==776)shot(mc,"buffs_debuffs_timers");
   if(tick==780){mc.gui.setScreen(null);command(mc,"item replace entity @s inventory.0 with minecraft:diamond 8");command(mc,"item replace entity @s inventory.1 with minecraft:emerald 6");ClientNet.send(new com.mmorpg.network.Payloads.SocialAction("backpack",new CompoundTag()));}
   if(tick==810&&mc.gui.screen() instanceof BackpackScreen screen){var slot=screen.getMenu().getSlot(54);int x=(mc.getWindow().getGuiScaledWidth()-176)/2+slot.x+8,y=(mc.getWindow().getGuiScaledHeight()-222)/2+slot.y+8;screen.mouseClicked(new net.minecraft.client.input.MouseButtonEvent(x,y,new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT,1)),false);}
   if(tick==815&&mc.gui.screen() instanceof BackpackScreen screen){var slot=screen.getMenu().getSlot(55);int x=(mc.getWindow().getGuiScaledWidth()-176)/2+slot.x+8,y=(mc.getWindow().getGuiScaledHeight()-222)/2+slot.y+8;screen.mouseDragged(new net.minecraft.client.input.MouseButtonEvent(x,y,new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT,1)),20,0);}
   if(tick==835&&mc.gui.screen() instanceof BackpackScreen screen){if(screen.getMenu().getSlot(54).hasItem()||screen.getMenu().getSlot(55).hasItem()||!screen.getMenu().getCarried().isEmpty())throw new AssertionError("Shift-click and Shift-drag must quick-move both stacks without cursor pickup");shot(mc,"shift_drag_transfer");com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] SHIFT_DRAG_NATIVE PASS: actual client clicks, real packets, two stacks quick-moved without cursor pickup");}
-  if(tick==845){mc.player.closeContainer();mc.gui.setScreen(new DevSculptedGallery());}
+  if(tick==845){mc.player.closeContainer();mc.gui.setScreen(new DevWeaponIdentities());}
   if(tick==870)shot(mc,"weapons_refined_again");
   if(tick==880)mc.gui.setScreen(new DevChestProof());
   if(tick==910)shot(mc,"chest_hinges_open_closed");

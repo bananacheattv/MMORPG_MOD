@@ -91,7 +91,13 @@ def mask(glyph):
     m = Image.new('L', (S, S), 0)
     d = ImageDraw.Draw(m)
     c = S / 2
-    if glyph == 'sword':
+    if glyph == 'hook':
+        d.line([(80,16),(80,70)],fill=255,width=12);d.arc((28,44,86,108),0,220,fill=255,width=12)
+        d.polygon([(30,78),(14,72),(28,108)],fill=255)
+    elif glyph == 'boot':
+        d.rounded_rectangle((36,20,70,82),6,fill=255);d.rounded_rectangle((36,66,110,104),9,fill=255)
+        for y in (32,48,64):d.line([(18,y),(32,y)],fill=255,width=6)
+    elif glyph == 'sword':
         _sword(d, 40, 88, 100, 28)
     elif glyph == 'crossed':
         _sword(d, 38, 88, 98, 28, 6)
@@ -224,75 +230,19 @@ def _gradient(m, top, bottom):
 
 
 def render(glyph, main, accent, cls_color, size=32, ultimate=False, passive=False, effect=None):
-    light, dark = _hex(cls_color[0]), _hex(cls_color[1])
-    M, A = _hex(main), _hex(accent)
-    img = Image.new('RGBA', (S, S))
-    bd = ImageDraw.Draw(img)
-    # fond : degrade radial a la couleur de la classe + vignette
-    for r in range(S // 2 * 14 // 10, 0, -2):
-        t = r / (S * 0.7)
-        bd.ellipse((S / 2 - r, S / 2 - r - 10, S / 2 + r, S / 2 + r - 10), fill=_mix(light, dark, min(1, t * 1.15)) + (255,))
-    rays = Image.new('L', (S, S), 0)
-    rd = ImageDraw.Draw(rays)
-    for k in range(12):
-        a = k * math.pi / 6
-        rd.polygon([(S / 2, S / 2), (S / 2 + math.cos(a - .1) * S, S / 2 + math.sin(a - .1) * S),
-                    (S / 2 + math.cos(a + .1) * S, S / 2 + math.sin(a + .1) * S)], fill=26)
-    img.alpha_composite(_colored(rays, A))
-    m = mask(glyph)
-    # halo, ombre portee, contour, remplissage degrade, reflet
-    img.alpha_composite(_colored(m.filter(ImageFilter.GaussianBlur(9)), A, 200))
-    img.alpha_composite(_colored(ImageChops.offset(m, 4, 5).filter(ImageFilter.GaussianBlur(2)), (0, 0, 0), 170))
-    outline = m.filter(ImageFilter.MaxFilter(9))
-    img.alpha_composite(_colored(outline, _mix(dark, (0, 0, 0), .55)))
-    img.alpha_composite(_gradient(m, _mix(M, (255, 255, 255), .35), _mix(M, A, .45)))
-    shine = ImageChops.subtract(m, ImageChops.offset(m, 5, 6)).filter(ImageFilter.GaussianBlur(1))
-    img.alpha_composite(_colored(shine, (255, 255, 255), 150))
-    inner = ImageChops.subtract(m, ImageChops.offset(m, -5, -6))
-    img.alpha_composite(_colored(inner, _mix(M, dark, .5), 120))
-    # cadre biseaute
-    fd = ImageDraw.Draw(img)
-    if passive:
-        ring = Image.new('L', (S, S), 0)
-        ImageDraw.Draw(ring).rounded_rectangle((2, 2, S - 3, S - 3), 30, outline=255, width=9)
-        img.alpha_composite(_gradient(ring, (232, 236, 245), (110, 120, 140)))
-        corner = Image.new('L', (S, S), 255)
-        ImageDraw.Draw(corner).rounded_rectangle((0, 0, S - 1, S - 1), 34, fill=0)
-        img.paste((0, 0, 0, 0), mask=corner)
-    else:
-        fr = Image.new('L', (S, S), 0)
-        ImageDraw.Draw(fr).rectangle((0, 0, S - 1, S - 1), outline=255, width=8)
-        top, bottom = ((255, 236, 150), (170, 110, 30)) if ultimate else (_mix(light, (255, 255, 255), .3), _mix(dark, (0, 0, 0), .4))
-        img.alpha_composite(_gradient(fr, top, bottom))
-        fd.rectangle((8, 8, S - 9, S - 9), outline=(0, 0, 0, 160), width=3)
-        if ultimate:
-            for (x, y) in ((4, 4), (S - 5, 4), (4, S - 5), (S - 5, S - 5)):
-                fd.regular_polygon((x, y, 9), 4, fill=(255, 90, 60, 255), outline=(255, 240, 200, 255))
-    # pastille d'effet secondaire (variantes)
+    # Quiet rounded backing and a large, high-contrast pictogram; no decorative rays.
+    ink=_hex(main);edge=_hex(cls_color[0]);bg=_hex(cls_color[1]);img=Image.new('RGBA',(S,S))
+    d=ImageDraw.Draw(img);d.rounded_rectangle((1,1,126,126),20,fill=tuple(int(c*.75)for c in bg)+(255,),outline=(220,178,86,255)if ultimate else edge+(255,),width=5)
+    symbol=mask(glyph)
+    img.alpha_composite(_colored(symbol.filter(ImageFilter.MaxFilter(7)),(6,8,14)))
+    img.alpha_composite(_gradient(symbol,tuple(max(180,c)for c in ink),ink))
     if effect:
-        col = _hex(EFFECT_COLORS[effect])
-        fd.ellipse((S - 50, S - 50, S - 8, S - 8), fill=(12, 14, 24, 235), outline=col + (255,), width=5)
-        em = Image.new('L', (S, S), 0)
-        ed = ImageDraw.Draw(em)
-        cx, cy = S - 29, S - 29
-        if effect in ('heal', 'mana'):
-            ed.rectangle((cx - 3, cy - 12, cx + 3, cy + 12), fill=255)
-            ed.rectangle((cx - 12, cy - 3, cx + 12, cy + 3), fill=255)
-        elif effect in ('pull', 'push', 'speed'):
-            sgn = -1 if effect == 'pull' else 1
-            ed.line([(cx - 8 * sgn, cy - 11), (cx + 6 * sgn, cy), (cx - 8 * sgn, cy + 11)], fill=255, width=6)
-        elif effect == 'slow':
-            for a in range(3):
-                ang = a * math.pi / 3
-                ed.line([(cx - math.cos(ang) * 12, cy - math.sin(ang) * 12), (cx + math.cos(ang) * 12, cy + math.sin(ang) * 12)], fill=255, width=4)
-        elif effect == 'guard':
-            _shield(ed, cx, cy - 1, 10, 13)
-        elif effect in ('poison', 'fire'):
-            _flame(ed, cx, cy + 3, 8)
-        else:
-            ed.line([(cx + 10, cy - 12), (cx - 8, cy + 12)], fill=255, width=6)
-        img.alpha_composite(_colored(em, col))
-    return img.resize((size, size), Image.LANCZOS)
+        color=_hex(EFFECT_COLORS.get(effect,'#ffffff'));d=ImageDraw.Draw(img);d.rounded_rectangle((83,83,125,125),10,fill=(13,14,25,255),outline=color+(255,),width=3)
+        shapes={'heal':'heal','slow':'snow','poison':'drop','fire':'flame','mana':'star','pull':'spiral','guard':'shield','break':'sword','strike':'bolt','push':'back','speed':'dash'}
+        badge=mask(shapes.get(effect,'star')).resize((32,32),Image.Resampling.LANCZOS);layer=Image.new('RGBA',(32,32),color+(0,));layer.putalpha(badge);img.alpha_composite(layer,(88,88))
+    if passive:
+        d=ImageDraw.Draw(img);d.ellipse((7,7,22,22),fill=(200,213,232,255))
+    return img.resize((size,size),Image.Resampling.LANCZOS)
 
 
 EFFECT_COLORS = {'heal': '#75ef88', 'slow': '#80e4ff', 'poison': '#a0e83c', 'fire': '#ff953f',

@@ -69,15 +69,9 @@ public final class LootEditorScreen extends MmoScreen {
         status = "";
     }
 
-    @Override
-    protected int panelWidth() {
-        return Math.min(width - 12, 520);
-    }
 
     @Override
-    protected int panelHeight() {
-        return height - 12;
-    }
+    protected int designHeight(){return 340;}
 
     @Override
     public boolean mouseScrolled(double x, double y, double sx, double sy) {

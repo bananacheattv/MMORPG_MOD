@@ -1,5 +1,7 @@
 # Aeloria MMORPG — mod Minecraft 26.3 (NeoForge)
 
+📖 **[Consulter le wiki complet](docs/wiki/README.md)** — démarrage, classes, compétences, inventaire, donjons, arènes, économie et administration.
+
 Mod MMORPG complet : 4 classes qui évoluent (niveaux 1 à 100), 28 compétences, un système de statistiques, 24 armes et 17 sets d'armure, des monstres et boss entièrement configurables, de l'artisanat, des familiers, des téléporteurs, des donjons, des quêtes et des PNJ, des marchands et une monnaie, des groupes, des cosmétiques animés et des interfaces sur mesure.
 
 ## Installation
@@ -34,9 +36,9 @@ Mod MMORPG complet : 4 classes qui évoluent (niveaux 1 à 100), 28 compétences
 | Archer | Archer | Rôdeur | Tireur d'Élite | Sentinelle Sylvestre | Archer Divin |
 | Paladin | Paladin | Gardien | Templier | Rempart Sacré | Titan Immortel |
 
-### Compétences (7 par classe, rangs 1 à 5)
+### Compétences (11 par classe, rangs 1 à 5)
 
-Une compétence se débloque au rang 1 dès que son niveau est atteint. On gagne 1 point de compétence tous les 4 niveaux, et chaque rang ajoute +15 % d'efficacité.
+Une compétence se débloque au rang 1 dès que son niveau est atteint. Les points progressent jusqu’à 44 au niveau 100, assez pour monter les onze compétences de sa classe au rang 5. Voir le wiki pour le catalogue complet.
 
 - **Guerrier** : Frappe Puissante, Cri de Guerre, Maîtrise des Armes (passif), Tourbillon d'Acier (25), Charge Brutale (50), Rage Sanguinaire (75), Fureur du Dieu de la Guerre (100, ultime).
 - **Mage** : Boule de Feu, Nova de Givre, Flux Arcanique (passif), Éclair en Chaîne (25), Transfert Arcanique (50), Bouclier de Mana (75), Météore Céleste (100, ultime).

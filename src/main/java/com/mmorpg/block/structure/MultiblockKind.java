@@ -27,7 +27,8 @@ public enum MultiblockKind implements StringRepresentable {
     FORGE("forge_arcanique", () -> ModBlocks.FORGE_ARCANIQUE.get()),
     PRESSE("presse_compression", () -> ModBlocks.PRESSE_COMPRESSION.get()),
     BANQUE("banque_aeloria", () -> ModBlocks.BANQUE.get()),
-    HDV("hdv_aeloria", () -> ModBlocks.HDV.get());
+    HDV("hdv_aeloria", () -> ModBlocks.HDV.get()),
+    QUETES_HEBDO("quetes_hebdo", () -> ModBlocks.QUETES_HEBDO.get());
 
     /** Decalage maximal des cellules par rapport au bloc fonctionnel (proprietes du bloc de structure). */
     public static final int RANGE_XZ = 3;

@@ -33,7 +33,7 @@ public final class SpawnEditor {
         List<Entry> all = new ArrayList<>();
         for (var k : MultiblockKind.values()) all.add(new Entry(k.key(), switch(k) {
             case FORGE -> "Forge arcanique"; case BANQUE -> "Banque"; case HDV -> "Hôtel des ventes";
-            case PRESSE -> "Presse de compression"; case TELEPORTEUR -> "Téléporteur"; case AUTEL -> "Autel";
+            case PRESSE -> "Presse de compression"; case TELEPORTEUR -> "Téléporteur"; case AUTEL -> "Autel"; case QUETES_HEBDO -> "Pancarte des quêtes hebdomadaires";
         }, 0));
         for (var t : com.mmorpg.block.crate.CrateTier.values()) all.add(new Entry(t.blockId(), t.label, 0));
         all.add(new Entry("portail:hub", "Vers le hub", 1)); all.add(new Entry("portail:spawn", "Vers le spawn", 1));

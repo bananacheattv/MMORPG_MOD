@@ -29,6 +29,21 @@ public final class ClientConfig {
             .translation("mmorpg.configuration.mainMenuServer")
             .define("mainMenuServer", "");
 
+    public enum ShaderMode {
+        OFF(null), SOFT("shader_soft"), AMBIANCE("shader_ambiance"), CINEMA("shader_cinema");
+
+        public final String effect;
+
+        ShaderMode(String effect) {
+            this.effect = effect;
+        }
+    }
+
+    public static final ModConfigSpec.EnumValue<ShaderMode> SHADER_MODE = BUILDER
+            .comment("Shaders integres : OFF, SOFT (leger), AMBIANCE (couleurs + bloom), CINEMA (fort). Aucun effet sur le serveur.")
+            .translation("mmorpg.configuration.shaderMode")
+            .defineEnum("shaderMode", ShaderMode.OFF);
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 
     /** Volume de la musique d'ambiance entre 0 et 1. */

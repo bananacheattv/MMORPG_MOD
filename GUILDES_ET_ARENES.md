@@ -112,3 +112,9 @@ Le tutoriel se suit automatiquement dès l’arrivée dans le hub, sans `/tuto`.
 Une quête acceptée devient automatiquement la quête suivie. La même flèche violette indique son premier objectif non terminé : repère défini par l’administrateur, cible vivante à proximité, butin accessible, zone de chasse connue ou portail correspondant. Quand la quête est prête à rendre, elle pointe vers son donneur enregistré ; si celui-ci est sur un autre serveur, le guidage commence par le portail de retour. Le suivi choisi dans le journal garde la priorité ; « Ne plus suivre » masque le guidage de quête jusqu’à une nouvelle sélection ou acceptation.
 
 Dans l’éditeur de quêtes, onglet Objectifs, « Repère ici » enregistre la position, la dimension et le serveur actuels pour l’objectif sélectionné ; « Automatique » rétablit la détection normale. Si aucune destination n’est connue, le suivi affiche l’objectif à rechercher sans inventer une direction.
+
+## Chat de guilde et classements
+
+- **Chat de guilde** : `/g <message>` (ou `/guilde chat <message>`) envoie un message à tous les membres connectés, sur tous les serveurs du réseau (registre partagé `guild-chat`, 300 derniers messages, 200 caractères, un message par seconde). Le chef est marqué ★ et les officiers ✦.
+- **Classements** : `/classement [niveau|monstres|arene|guilde_niveau|guilde_banque|guilde_gardiens]` affiche le top 10 et ton rang. Les données sont dans le registre partagé `rankings` (joueurs en ligne échantillonnés toutes les 10 s ; victoires et frags d'arène ajoutés à la fin de chaque match classé).
+- **Panneaux de classement** : un bloc et un modèle par type (`classement_<type>`, onglet créatif admin), 3 × 2 blocs, qui affichent le top 10 en direct ; clic droit = classement dans le chat. Régénération des modèles et textures : `python3 tools/generate_rankings.py`.

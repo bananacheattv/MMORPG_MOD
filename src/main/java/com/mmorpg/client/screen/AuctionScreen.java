@@ -23,6 +23,8 @@ import java.util.List;
 
 /** Hotel des ventes : parcourir et acheter, vendre l'objet en main, gerer ses annonces et recuperer l'or et les objets au comptoir. */
 public class AuctionScreen extends MmoScreen {
+    @Override protected String backdrop() { return "auction_header"; }
+
     private record Row(long id, String seller, long price, long left, ItemStack stack) {
     }
 

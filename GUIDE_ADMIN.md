@@ -79,6 +79,10 @@ Chaque quete possede un identifiant unique, `name`, `description`, `minLevel`, `
 
 **Passeur de sortie des donjons** : a la mort du boss, un PNJ **Passeur** apparait a l'endroit ou il est tombe (`InstanceManager.spawnPasseur`, role `SORTIE`) ; lui parler ramene tout de suite le joueur a l'entree (`InstanceManager.leaveNow`), sans attendre le compte a rebours de `InstanceManager.EXIT_SECONDS` (15 s) ; il disparait quand le compte a rebours ramene tout le monde et n'est pas enregistre dans l'annuaire des PNJ.
 
+**Base de donnees du reseau** (`db/`, desactivee par defaut) : `config/mmorpg/database.json` (`enabled`, `host`, `port`, `database`, `user`, `password` ou variable `AELORIA_DB_PASSWORD`, `serverId` unique par serveur, `autosaveSeconds`, `syncPlayers`, `syncShared`, `audit`) relie le serveur a MariaDB/MySQL (pilote embarque dans le jar, `Database` : un thread et une connexion, jamais d'attente reseau sur le tick sauf la lecture bornee a 3 s a l'arrivee d'un joueur). `PlayerSync` ecrit le profil (`PlayerData.save()` en texte, plus colonnes de recherche) et la banque (`BankData.encode`) a la sortie et toutes les `autosaveSeconds` s s'ils ont change ; a l'arrivee la base fait foi si sa `version` depasse `PlayerData.dbVersion` ; un joueur « tenu » par un autre serveur (`players.server_id`, `online`) est attendu 3 s puis repris, et son ancien serveur ne peut plus l'ecraser. `Audit.log` alimente la table `events` (connexion, niveau, mort, boss, banque, ventes, quetes, deblocages...). Commandes d'operateur `/db etat | sauvegarder | joueur <pseudo> | evenements [n]` (`DbCommands`). Schema et requetes utiles : `tools/serveur/schema.sql` ; mise en place et limites (inventaire non partage, pas de transfert entre serveurs) : `GUIDE_SERVEUR.md` §10. Test automatique contre une vraie base : `-Dmmorpg.checkDb=true` (`DevDbChecks`).
+
+**Reseau de serveurs** : voir `RESEAU_AELORIA.md` (`network/`, `config/mmorpg/network.json`, profils partages, transferts Velocity). La base de donnees y est facultative.
+
 **Couts des armes et armures, experience de recolte** : les armes et armures de la Forge demandent aussi des minerais compresses et des lingots du palier de leur niveau (en plus de leur recette), comme les outils : le surcout croit avec le niveau (`ForgeRecipes.weapon` : x0,25 jusqu'au niveau 5, x1 jusqu'a 40, x1,5 jusqu'a 65, x2 jusqu'a 85, x3 au-dela ; `ForgeRecipes.armorSet` : lingots du palier en plus a chaque piece). Les minerais et cultures donnent **dix fois moins d'experience** (`RpgPlayers.giveGatherXp`) : l'experience vient surtout des combats contre les monstres.
 
 **Enigmes a dalles** : un clic droit arrive deux fois au serveur (main puis main secondaire) ; sans precaution la seconde pression comptait comme une mauvaise dalle et la bonne sequence etait refusee. `TrialManager` ignore maintenant tout clic qui suit le precedent de moins de 6 ticks (verifie avec de vrais evenements de clic : `-Pshowcase=dalles`).
@@ -201,7 +205,7 @@ Personnage > Personnaliser : déplacer les panneaux par leur en-tête, agrandir 
 
 Maj + clic transfère une pile ; maintenir Maj et glisser le bouton gauche sur plusieurs piles les transfère successivement, y compris dans les sacs. Éditeur de PNJ > Dialogue modifie son accueil indépendamment des autres guides. Porte-armure > Skin / 3D donne un sélecteur de modèles et un champ pseudo pour le skin.
 
-Le Paladin pare avec son bouclier lié, en main secondaire. La garde se consomme en maintenant le bouclier et en absorbant les coups frontaux ; elle se régénère une fois abaissé, après un délai. Épuiser la réserve impose une récupération. Trois projections rapprochées accordent dix secondes d’immunité aux projections des monstres.
+Le Paladin pare avec son bouclier lié, en main secondaire. La garde se consomme uniquement sur les coups frontaux bloqués : 25 / 20 / 15 / 10 / 2 points aux niveaux 1 / 25 / 50 / 75 / 100. La tenir ne coûte rien. Après rupture, la réserve doit remonter intégralement à 100 ; la récupération, bouclier abaissé, démarre après deux secondes et rend dix points par seconde. La jauge ne porte plus de texte. Trois projections rapprochées accordent dix secondes d’immunité aux projections des monstres.
 
 Les donjons contiennent au moins trois fois moins d’ennemis dans les vagues et embuscades, ne bloquent plus leur galerie par des rochers, donnent la vision nocturne et davantage d’or. Les difficultés supérieures conseillent le groupe. Tuer le boss élimine les ennemis de son instance. L’écran de connexion ne propose plus Annuler et le feu ne masque plus la vue.
 
@@ -214,3 +218,14 @@ Le cristal compte cinquante coups sans délai artificiel entre les coups, avec j
 La fin affiche les deux équipes, éliminations, morts, coups au cristal, dégâts, soins et points. Les contributions donnent des points aux deux camps ; à contribution égale, le vainqueur reçoit le double. Un joueur inactif ne gagne pas de points. Les versements sont protégés contre les doublons.
 
 `/pvp` ou le marchand PvP au spawn ouvre la boutique : potions, titres, Chimère d’arène exclusive, vingt panoplies et vingt armes (quatre classes × cinq tranches de niveau). Les bonus exigent la bonne classe et le niveau requis. Ces équipements favorisent le PvP au prix d’une efficacité réduite contre les monstres. Achat et livraison sont vérifiés côté serveur ; un inventaire plein conserve la livraison en attente.
+
+
+## Correctifs de lisibilité et wiki
+
+Le cristal suit un circuit au sol contournant les obstacles, à 0,7 bloc par seconde. Sa hauteur ne dépend plus du sommet des rochers. Le bilan attend la fin du transfert au spawn ; les entraînements et sorties anticipées ont aussi leur bilan, sans récompense immédiate. `/arene bilan` rouvre le dernier résultat, même après fermeture.
+
+La roulette des coffres flotte à 3,3 blocs, son titre et son gain sont remontés. L’inventaire dispose d’une colonne plus large et centrée, avec cases, objets et survol cohérents. Revenir au jeu est centré sous le logo. Le budget de compétences atteint 44 points au niveau 100, pour les onze compétences au rang 5.
+
+Les buffs et débuffs affichent un texte de trois mots maximum et le temps restant sous le cadre de mana. Les armes possèdent des atlas individuels et des silhouettes franchement distinctes entre familles et paliers.
+
+Les cadres et porte-armures du spawn refusent les interactions et dégâts des non-OP, ainsi que les dégâts environnementaux. Les OP conservent l’édition. [Wiki complet](docs/wiki/README.md) : 17 pages et catalogues générés depuis les 44 compétences et 44 armes PvE.

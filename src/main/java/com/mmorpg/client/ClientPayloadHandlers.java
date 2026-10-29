@@ -76,6 +76,14 @@ public final class ClientPayloadHandlers {
                 if (mc.gui.screen() instanceof com.mmorpg.client.screen.AuctionScreen screen) screen.receive(payload.extra());
                 else mc.gui.setScreen(new com.mmorpg.client.screen.AuctionScreen(payload.extra()));
             }
+            case S2COpenScreen.WEEKLY -> {
+                if (mc.gui.screen() instanceof com.mmorpg.client.screen.WeeklyQuestScreen screen) screen.receive(payload.extra());
+                else mc.gui.setScreen(new com.mmorpg.client.screen.WeeklyQuestScreen(payload.extra()));
+            }
+            case S2COpenScreen.TRADE -> {
+                if (mc.gui.screen() instanceof com.mmorpg.client.screen.TradeScreen screen) screen.receive(payload.extra());
+                else if (!payload.extra().getBooleanOr("closed", false)) mc.gui.setScreen(new com.mmorpg.client.screen.TradeScreen(payload.extra()));
+            }
             case S2COpenScreen.COMPRESSOR -> mc.gui.setScreen(new com.mmorpg.client.screen.CompressorScreen(BlockPos.of(payload.extra().getLongOr("pos", 0))));
             case S2COpenScreen.QUEST_GIVER -> mc.gui.setScreen(new com.mmorpg.client.screen.QuestGiverScreen(payload.extra()));
             case S2COpenScreen.SHOP -> mc.gui.setScreen(new com.mmorpg.client.screen.ShopScreen(payload.extra()));
@@ -85,7 +93,7 @@ public final class ClientPayloadHandlers {
             case S2COpenScreen.PREMIUM_STORE -> mc.gui.setScreen(new com.mmorpg.client.screen.PremiumStoreScreen(payload.extra()));
             case S2COpenScreen.GUILD -> mc.gui.setScreen(new com.mmorpg.client.screen.GuildScreen(payload.extra()));
             case S2COpenScreen.PVP_STORE -> mc.gui.setScreen(new com.mmorpg.client.screen.PvpStoreScreen(payload.extra()));
-            case S2COpenScreen.ARENA_RESULTS -> mc.gui.setScreen(new com.mmorpg.client.screen.ArenaResultsScreen(payload.extra()));
+            case S2COpenScreen.ARENA_RESULTS -> com.mmorpg.client.ArenaResultDelivery.receive(payload.extra());
             case S2COpenScreen.ARENA_HUD -> {ClientData.arenaState=payload.extra();ClientData.arenaUpdated=ClientData.now();}
             case S2COpenScreen.ARENA -> mc.gui.setScreen(new com.mmorpg.client.screen.ArenaScreen(payload.extra()));
             case S2COpenScreen.ARENA_READY -> mc.gui.setScreen(new com.mmorpg.client.screen.ArenaReadyScreen(payload.extra()));

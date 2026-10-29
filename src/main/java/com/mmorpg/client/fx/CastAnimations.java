@@ -110,6 +110,9 @@ public final class CastAnimations {
     public static void onRenderHand(RenderHandEvent event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
+        if(event.getHand()==InteractionHand.OFF_HAND&&com.mmorpg.server.PaladinOffhand.shield(mc.player.getOffhandItem())&&mc.player.isUsingItem()&&mc.player.getUsedItemHand()==InteractionHand.OFF_HAND){
+            float raised=Math.min(1,mc.player.getTicksUsingItem()/5f);event.getPoseStack().translate(.1f*raised,0,-.12f*raised);
+        }
         Anim a = active(mc.player.getId());
         if (a == null||event.getHand()!=(a.kind==com.mmorpg.entity.CastAnim.SHIELD?InteractionHand.OFF_HAND:InteractionHand.MAIN_HAND)) return;
         float p = progress(a);

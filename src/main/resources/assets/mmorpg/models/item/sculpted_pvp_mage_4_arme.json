@@ -1,7 +1,7 @@
 {
   "credit": "Aeloria · original sculpted geometry",
   "textures": {
-    "atlas": "mmorpg:item/aeloria_materials",
+    "atlas": "mmorpg:item/weapons/pvp_mage_4_arme",
     "particle": "#atlas"
   },
   "elements": [
@@ -696,1371 +696,6 @@
       }
     },
     {
-      "name": "Crown cradle",
-      "from": [
-        5.5,
-        23.95,
-        5.5
-      ],
-      "to": [
-        10.5,
-        24.65,
-        10.5
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          8,
-          24.3,
-          8
-        ],
-        "axis": "y",
-        "angle": 45
-      }
-    },
-    {
-      "name": "Faceted focus",
-      "from": [
-        6.25,
-        24.9,
-        6.25
-      ],
-      "to": [
-        9.75,
-        29.9,
-        9.75
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          8,
-          27.4,
-          8
-        ],
-        "axis": "y",
-        "angle": 45
-      },
-      "light_emission": 12
-    },
-    {
-      "name": "Focus tip",
-      "from": [
-        7.25,
-        29.35,
-        7.25
-      ],
-      "to": [
-        8.75,
-        31.05,
-        8.75
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          8,
-          30.2,
-          8
-        ],
-        "axis": "y",
-        "angle": 45
-      },
-      "light_emission": 12
-    },
-    {
-      "name": "Curved focus prong",
-      "from": [
-        4.65,
-        22.75,
-        7.55
-      ],
-      "to": [
-        5.55,
-        28.25,
-        8.45
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          5.1,
-          25.5,
-          8
-        ],
-        "axis": "z",
-        "angle": 22.5
-      }
-    },
-    {
-      "name": "Crown finial",
-      "from": [
-        4.0,
-        26.6,
-        7.6
-      ],
-      "to": [
-        4.8,
-        29.4,
-        8.4
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
-      }
-    },
-    {
-      "name": "Curved focus prong",
-      "from": [
-        10.45,
-        22.75,
-        7.55
-      ],
-      "to": [
-        11.35,
-        28.25,
-        8.45
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          10.9,
-          25.5,
-          8
-        ],
-        "axis": "z",
-        "angle": -22.5
-      }
-    },
-    {
-      "name": "Crown finial",
-      "from": [
-        11.2,
-        26.6,
-        7.6
-      ],
-      "to": [
-        12.0,
-        29.4,
-        8.4
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
-      }
-    },
-    {
-      "name": "Orbiting focus seal",
-      "from": [
-        10.2,
-        25.25,
-        7.5
-      ],
-      "to": [
-        11.2,
-        26.75,
-        8.5
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          10.7,
-          26,
-          8.0
-        ],
-        "axis": "y",
-        "angle": 45
-      },
-      "light_emission": 12
-    },
-    {
-      "name": "Orbiting focus seal",
-      "from": [
-        7.5,
-        25.25,
-        10.2
-      ],
-      "to": [
-        8.5,
-        26.75,
-        11.2
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          8.0,
-          26,
-          10.7
-        ],
-        "axis": "y",
-        "angle": 45
-      },
-      "light_emission": 12
-    },
-    {
-      "name": "Orbiting focus seal",
-      "from": [
-        4.8,
-        25.25,
-        7.5
-      ],
-      "to": [
-        5.8,
-        26.75,
-        8.5
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          5.3,
-          26,
-          8.0
-        ],
-        "axis": "y",
-        "angle": 45
-      },
-      "light_emission": 12
-    },
-    {
-      "name": "Orbiting focus seal",
-      "from": [
-        7.5,
-        25.25,
-        4.8
-      ],
-      "to": [
-        8.5,
-        26.75,
-        5.8
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            0.12,
-            4.12,
-            3.88,
-            7.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          7.999999999999999,
-          26,
-          5.3
-        ],
-        "axis": "y",
-        "angle": 45
-      },
-      "light_emission": 12
-    },
-    {
-      "name": "Halo side",
-      "from": [
-        3.85,
-        24.0,
-        8.65
-      ],
-      "to": [
-        4.55,
-        30.0,
-        9.35
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
-      }
-    },
-    {
-      "name": "Octagonal focus halo",
-      "from": [
-        4.95,
-        22.25,
-        8.65
-      ],
-      "to": [
-        5.65,
-        25.75,
-        9.35
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          5.3,
-          24,
-          9
-        ],
-        "axis": "z",
-        "angle": 45
-      }
-    },
-    {
-      "name": "Octagonal focus halo",
-      "from": [
-        4.95,
-        28.25,
-        8.65
-      ],
-      "to": [
-        5.65,
-        31.75,
-        9.35
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          5.3,
-          30,
-          9
-        ],
-        "axis": "z",
-        "angle": -45
-      }
-    },
-    {
-      "name": "Halo side",
-      "from": [
-        11.45,
-        24.0,
-        8.65
-      ],
-      "to": [
-        12.15,
-        30.0,
-        9.35
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
-      }
-    },
-    {
-      "name": "Octagonal focus halo",
-      "from": [
-        10.35,
-        22.25,
-        8.65
-      ],
-      "to": [
-        11.05,
-        25.75,
-        9.35
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          10.7,
-          24,
-          9
-        ],
-        "axis": "z",
-        "angle": -45
-      }
-    },
-    {
-      "name": "Octagonal focus halo",
-      "from": [
-        10.35,
-        28.25,
-        8.65
-      ],
-      "to": [
-        11.05,
-        31.75,
-        9.35
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          10.7,
-          30,
-          9
-        ],
-        "axis": "z",
-        "angle": 45
-      }
-    },
-    {
-      "name": "Halo crown",
-      "from": [
-        6.5,
-        30.7,
-        8.65
-      ],
-      "to": [
-        9.5,
-        31.3,
-        9.35
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
-      }
-    },
-    {
       "name": "Inlaid grip sigil",
       "from": [
         7.775,
@@ -2456,472 +1091,548 @@
       "light_emission": 12
     },
     {
-      "name": "Ascended forked crown",
+      "name": "Elemental crystal cluster",
       "from": [
-        5.575,
-        25.15,
-        7.6
+        4.2,
+        25.8,
+        7.2
       ],
       "to": [
-        6.225,
-        26.85,
-        8.4
+        5.8,
+        29.8,
+        8.8
       ],
       "faces": {
         "north": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "south": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "east": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "west": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "up": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "down": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          5.9,
-          26.0,
-          8
-        ],
-        "axis": "z",
-        "angle": 22.5
-      }
-    },
-    {
-      "name": "Ascended forked crown",
-      "from": [
-        5.125,
-        26.25,
-        7.6
-      ],
-      "to": [
-        5.775,
-        27.95,
-        8.4
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
             4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          5.449999999999999,
-          27.1,
-          8
-        ],
-        "axis": "z",
-        "angle": 22.5
-      }
-    },
-    {
-      "name": "Ascended forked crown",
-      "from": [
-        4.675,
-        27.35,
-        7.6
-      ],
-      "to": [
-        5.325,
-        29.05,
-        8.4
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
+            3.88,
+            7.88
           ]
         }
       },
       "rotation": {
         "origin": [
           5.0,
-          28.2,
-          8
+          27.8,
+          8.0
+        ],
+        "axis": "z",
+        "angle": -45.0
+      },
+      "light_emission": 12
+    },
+    {
+      "name": "Elemental crystal cluster",
+      "from": [
+        5.7,
+        24.9,
+        8.4
+      ],
+      "to": [
+        7.3,
+        29.9,
+        10.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "south": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "east": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "west": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "up": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "down": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        }
+      },
+      "rotation": {
+        "origin": [
+          6.5,
+          27.4,
+          9.2
+        ],
+        "axis": "z",
+        "angle": -22.5
+      },
+      "light_emission": 12
+    },
+    {
+      "name": "Elemental crystal cluster",
+      "from": [
+        7.2,
+        24.0,
+        7.2
+      ],
+      "to": [
+        8.8,
+        30.0,
+        8.8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "south": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "east": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "west": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "up": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "down": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        }
+      },
+      "light_emission": 12
+    },
+    {
+      "name": "Elemental crystal cluster",
+      "from": [
+        8.7,
+        24.9,
+        8.4
+      ],
+      "to": [
+        10.3,
+        29.9,
+        10.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "south": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "east": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "west": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "up": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        },
+        "down": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            4.12,
+            3.88,
+            7.88
+          ]
+        }
+      },
+      "rotation": {
+        "origin": [
+          9.5,
+          27.4,
+          9.2
         ],
         "axis": "z",
         "angle": 22.5
-      }
-    },
-    {
-      "name": "Ascended forked crown",
-      "from": [
-        9.775,
-        25.15,
-        7.6
-      ],
-      "to": [
-        10.425,
-        26.85,
-        8.4
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        }
       },
-      "rotation": {
-        "origin": [
-          10.1,
-          26.0,
-          8
-        ],
-        "axis": "z",
-        "angle": -22.5
-      }
+      "light_emission": 12
     },
     {
-      "name": "Ascended forked crown",
+      "name": "Elemental crystal cluster",
       "from": [
-        10.225,
-        26.25,
-        7.6
+        10.2,
+        25.8,
+        7.2
       ],
       "to": [
-        10.875,
-        27.95,
-        8.4
+        11.8,
+        29.8,
+        8.8
       ],
       "faces": {
         "north": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "south": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "east": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "west": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "up": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
+            4.12,
+            3.88,
+            7.88
           ]
         },
         "down": {
           "texture": "#atlas",
           "uv": [
-            4.12,
             0.12,
-            7.88,
-            3.88
-          ]
-        }
-      },
-      "rotation": {
-        "origin": [
-          10.55,
-          27.1,
-          8
-        ],
-        "axis": "z",
-        "angle": -22.5
-      }
-    },
-    {
-      "name": "Ascended forked crown",
-      "from": [
-        10.675,
-        27.35,
-        7.6
-      ],
-      "to": [
-        11.325,
-        29.05,
-        8.4
-      ],
-      "faces": {
-        "north": {
-          "texture": "#atlas",
-          "uv": [
             4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "south": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "east": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "west": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "up": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
-          ]
-        },
-        "down": {
-          "texture": "#atlas",
-          "uv": [
-            4.12,
-            0.12,
-            7.88,
-            3.88
+            3.88,
+            7.88
           ]
         }
       },
       "rotation": {
         "origin": [
           11.0,
-          28.2,
+          27.8,
+          8.0
+        ],
+        "axis": "z",
+        "angle": 45.0
+      },
+      "light_emission": 12
+    },
+    {
+      "name": "Gladiator blade hook",
+      "from": [
+        4.5,
+        9.0,
+        7.5
+      ],
+      "to": [
+        5.5,
+        13.0,
+        8.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            8.12,
+            3.88,
+            11.879999999999999
+          ]
+        },
+        "south": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            8.12,
+            3.88,
+            11.879999999999999
+          ]
+        },
+        "east": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            8.12,
+            3.88,
+            11.879999999999999
+          ]
+        },
+        "west": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            8.12,
+            3.88,
+            11.879999999999999
+          ]
+        },
+        "up": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            8.12,
+            3.88,
+            11.879999999999999
+          ]
+        },
+        "down": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            8.12,
+            3.88,
+            11.879999999999999
+          ]
+        }
+      },
+      "rotation": {
+        "origin": [
+          5,
+          11,
           8
         ],
         "axis": "z",
-        "angle": -22.5
-      }
+        "angle": -45
+      },
+      "light_emission": 12
+    },
+    {
+      "name": "Gladiator blade hook",
+      "from": [
+        10.5,
+        9.0,
+        7.5
+      ],
+      "to": [
+        11.5,
+        13.0,
+        8.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            8.12,
+            3.88,
+            11.879999999999999
+          ]
+        },
+        "south": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            8.12,
+            3.88,
+            11.879999999999999
+          ]
+        },
+        "east": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            8.12,
+            3.88,
+            11.879999999999999
+          ]
+        },
+        "west": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            8.12,
+            3.88,
+            11.879999999999999
+          ]
+        },
+        "up": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            8.12,
+            3.88,
+            11.879999999999999
+          ]
+        },
+        "down": {
+          "texture": "#atlas",
+          "uv": [
+            0.12,
+            8.12,
+            3.88,
+            11.879999999999999
+          ]
+        }
+      },
+      "rotation": {
+        "origin": [
+          11,
+          11,
+          8
+        ],
+        "axis": "z",
+        "angle": 45
+      },
+      "light_emission": 12
     },
     {
       "name": "Arena heraldic plate",

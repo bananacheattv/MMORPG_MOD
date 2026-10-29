@@ -176,6 +176,8 @@ public final class ArenaEvents {
         for (ServerPlayer p : level.players()) {
             if (p.distanceToSqr(boss) < 64 * 64) {
                 Net.toPlayer(p, new Payloads.AreaEntry("VICTOIRE", name + " est tombé !", Payloads.AreaEntry.VICTORY, 0xFFD060, label));
+                com.mmorpg.db.Audit.log(p, com.mmorpg.db.Audit.DUNGEON_WIN, 0, label);
+                com.mmorpg.leaderboard.Leaderboards.add(p, com.mmorpg.leaderboard.Board.DONJONS, 1);
             }
         }
         level.playSound(null, boss.blockPosition(), com.mmorpg.registry.ModSounds.FANFARE.get(), SoundSource.PLAYERS, 1.6F, 1.0F);

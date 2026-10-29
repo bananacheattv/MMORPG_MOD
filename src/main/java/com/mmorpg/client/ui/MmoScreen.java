@@ -30,16 +30,69 @@ public abstract class MmoScreen extends Screen {
         super(Component.literal(title));
     }
 
+    /** Echelle du contenu (1 = interface normale) : le cadre garde la taille de l'inventaire. */
+    private float uiScale = 1f;
+
+    /** Hauteur pour laquelle le contenu de l'ecran a ete concu ; le cadre reel est 900 x 430 (comme l'inventaire). */
+    protected int designHeight() {
+        return UiFrame.DESIGN_H;
+    }
+
+    /** Illustration d'ambiance (pack d'art, textures/gui/illustrations/<nom>.png) peinte discretement dans le panneau. */
+    protected String backdrop() {
+        return null;
+    }
+
+    /** Petite fenetre de dialogue : garde sa propre taille (ni cadre d'inventaire ni mise a l'echelle). */
+    protected boolean compact() {
+        return false;
+    }
+
+    public final int panelWidthPublic() {
+        return pw;
+    }
+
+    public final int panelHeightPublic() {
+        return ph;
+    }
+
+    public final float uiScale() {
+        return uiScale;
+    }
+
+    private void applyScale(int realW, int realH) {
+        this.uiScale = compact() ? 1f : UiFrame.scale(realH, designHeight());
+        this.width = (int) Math.ceil(realW / uiScale);
+        this.height = (int) Math.ceil(realH / uiScale);
+    }
+
+    @Override
+    public void resize(int w, int h) {
+        applyScale(w, h);
+        this.repositionElements();
+    }
+
     protected int panelWidth() {
-        return Math.min(this.width - 12, 440);
+        if (compact()) return Math.min(this.width - 12, 440);
+        return (int) (UiFrame.width(realWidth()) / uiScale);
     }
 
     protected int panelHeight() {
-        return Math.min(this.height - 12, 272);
+        if (compact()) return Math.min(this.height - 12, UiFrame.DESIGN_H);
+        return (int) (UiFrame.height(realHeight()) / uiScale);
+    }
+
+    private int realWidth() {
+        return net.minecraft.client.Minecraft.getInstance().getWindow().getGuiScaledWidth();
+    }
+
+    private int realHeight() {
+        return net.minecraft.client.Minecraft.getInstance().getWindow().getGuiScaledHeight();
     }
 
     @Override
     protected void init() {
+        applyScale(realWidth(), realHeight());
         this.pw = panelWidth();
         this.ph = panelHeight();
         this.left = (this.width - pw) / 2;
@@ -49,8 +102,11 @@ public abstract class MmoScreen extends Screen {
     @Override
     public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
         this.extractBlurredBackground(g);
+        g.pose().pushMatrix();
+        g.pose().scale(uiScale, uiScale);
         g.fill(0, 0, this.width, this.height, 0x700D071C);
         Ui.navBar(g, this.width, this.top);
+        g.pose().popMatrix();
     }
 
     @Override
@@ -58,9 +114,14 @@ public abstract class MmoScreen extends Screen {
         this.mouseX = mouseX;
         this.mouseY = mouseY;
         hits.clear();
+        g.pose().pushMatrix();
+        g.pose().scale(uiScale, uiScale);
+        Ui.backdrop(backdrop());
         renderContent(g, mouseX, mouseY, a);
+        Ui.backdrop(null);
         super.extractRenderState(g, mouseX, mouseY, a);
         renderOverlay(g, mouseX, mouseY, a);
+        g.pose().popMatrix();
     }
 
     protected abstract void renderContent(GuiGraphicsExtractor g, int mouseX, int mouseY, float a);

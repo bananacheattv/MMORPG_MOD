@@ -57,6 +57,7 @@ public final class ShopManager {
             return;
         }
         RpgPlayers.give(p, item, offer.count * times);
+        com.mmorpg.db.Audit.log(p, com.mmorpg.db.Audit.SHOP_BUY, cost, offer.item + " x" + offer.count * times);
         p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.COINS.get(), SoundSource.NEUTRAL, 0.8f, 1f);
         p.sendOverlayMessage(Component.literal("Achat : " + new ItemStack(item).getHoverName().getString() + " x" + offer.count * times
                 + " (-" + cost + " or)").withColor(0xFFD040));
@@ -94,6 +95,7 @@ public final class ShopManager {
         }
         if (sold > 0) {
             RpgPlayers.addGold(p, total, true);
+            com.mmorpg.db.Audit.log(p, com.mmorpg.db.Audit.SHOP_SELL, total, name + " x" + sold);
             p.level().playSound(null, p.blockPosition(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.NEUTRAL, 0.5f, 1.4f);
             p.sendOverlayMessage(Component.literal("Vente : " + name + " x" + sold + " (+" + total + " or)").withColor(0xFFD040));
         }

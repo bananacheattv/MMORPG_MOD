@@ -38,6 +38,7 @@ public final class QuestManager {
     }
 
     public static QuestDef def(String id) {
+        if (id.startsWith(WeeklyQuests.PREFIX)) return WeeklyQuests.def(id);
         return ConfigManager.quests().get(id);
     }
 
@@ -118,6 +119,7 @@ public final class QuestManager {
         t.putBoolean("tracked", id.equals(d.trackedQuest));
         t.putInt("minLevel", q.minLevel);
         t.putBoolean("daily", q.daily);
+        t.putBoolean("weekly", q.weekly);
         boolean active = d.activeQuests.containsKey(id);
         t.putBoolean("active", active);
         ListTag objs = new ListTag();
@@ -254,7 +256,13 @@ public final class QuestManager {
         NpcEntity npc = nearGiver(p, npcId);
         PlayerData d = RpgPlayers.get(p);
         QuestDef q = def(id);
-        if (npc == null || q == null || !matchesNpc(q, npc) || !completable(p, d, id)) return;
+        if (npc == null || q == null || q.weekly || !matchesNpc(q, npc) || !completable(p, d, id)) return;
+        finish(p, d, id, q);
+        openGiver(p, npc);
+    }
+
+    /** Remise d'une quete terminee : objets a rapporter retires, quete cloturee, recompenses versees. */
+    static void finish(ServerPlayer p, PlayerData d, String id, QuestDef q) {
         // objets a rapporter
         for (QuestDef.Objective o : q.objectives) {
             if (!"collect".equals(o.type)) continue;
@@ -273,8 +281,10 @@ public final class QuestManager {
         d.activeQuests.remove(id);
         d.questGivers.remove(id);
         if (id.equals(d.trackedQuest)) d.trackedQuest = "";
-        if (q.daily) d.dailyQuests.put(id, today());
+        if (q.weekly) d.dailyQuests.put(WeeklyQuests.doneKey(id), WeeklyQuests.week());
+        else if (q.daily) d.dailyQuests.put(id, today());
         else d.completedQuests.add(id);
+        com.mmorpg.db.Audit.log(p, com.mmorpg.db.Audit.QUEST_DONE, 0, id);
         // recompenses
         long xp = rewardXp(q, d.level);
         if (q.rewards.gold > 0) RpgPlayers.addGold(p, q.rewards.gold, true);
@@ -287,13 +297,14 @@ public final class QuestManager {
         Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "QUÊTE TERMINÉE", q.name, 0x60FF80));
         p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.SUCCESS.get(), SoundSource.PLAYERS, 1f, 1f);
         if (xp > 0) RpgPlayers.giveXp(p, xp, false);
+        com.mmorpg.achievement.Achievements.add(p, com.mmorpg.achievement.Achievement.QUESTS, 1);
         d.dirty = true;
-        openGiver(p, npc);
     }
 
     /** Progression des objectifs "vaincre" apres une victoire. */
     public static void onKill(ServerPlayer p, String mobKey, String typeId, boolean boss) {
         PlayerData d = RpgPlayers.get(p);
+        WeeklyQuests.purge(d);
         if (d.activeQuests.isEmpty()) return;
         for (Map.Entry<String, int[]> e : d.activeQuests.entrySet()) {
             QuestDef q = def(e.getKey());

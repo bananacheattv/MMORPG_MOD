@@ -14,8 +14,7 @@ public final class ArenaScreen extends MmoScreen {
     private int refreshTicks;
     @Override public void tick(){super.tick();if(++refreshTicks>=40){refreshTicks=0;action("open","");}}
     public ArenaScreen(CompoundTag data){super("Arènes");this.data=data;}
-    @Override protected int panelWidth(){return Math.min(width-12,640);}
-    @Override protected int panelHeight(){return Math.min(height-12,310);}
+    @Override protected int designHeight(){return 310;}
     private void action(String action,String kind){var t=new CompoundTag();t.putString("action",action);t.putString("kind",kind);t.putInt("bracket",data.getIntOr("bracket",0));ClientNet.send(new Payloads.SocialAction("arena",t));}
     @Override protected void renderContent(GuiGraphicsExtractor g,int mx,int my,float a){Ui.frame(g,left,top,pw,ph,Ui.GOLD,false);g.centeredText(font,Component.literal("ARÈNES · NIVEAUX "+ArenaRules.range(data.getIntOr("bracket",0))),left+pw/2,top+9,Ui.GOLD);
         int cw=(pw-32)/2;for(var kind:ArenaRules.Kind.values()){int x=left+12+kind.ordinal()*(cw+8),y=top+36,color=kind==ArenaRules.Kind.FEU?0xFFE87936:0xFF65C9DF;Ui.frame(g,x,y,cw,ph-111,color,false);g.text(font,"◆",x+12,y+15,color,false);g.text(font,kind.label,x+35,y+15,color,false);g.text(font,kind.size+" CONTRE "+kind.size,x+10,y+40,Ui.TEXT,false);g.text(font,"Cristal mobile à capturer",x+10,y+61,Ui.TEXT,false);g.text(font,"Inscrits : "+data.getIntOr(kind.name(),0)+" / "+kind.size*2,x+10,y+77,Ui.GOLD,false);g.text(font,"Tu restes sur place.",x+10,y+94,Ui.MUTED,false);g.text(font,"Départ quand complet.",x+10,y+106,Ui.MUTED,false);button(g,x+8,y+ph-131,cw-16,19,kind.name().equals(data.getStringOr("queueKind",""))?"Inscrit":"S’inscrire",!data.getBooleanOr("queued",false),color,()->action("join",kind.name()));}

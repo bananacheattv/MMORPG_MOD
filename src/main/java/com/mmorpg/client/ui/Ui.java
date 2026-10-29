@@ -106,9 +106,29 @@ public final class Ui {
     }
 
     /** Grand panneau plat : fond sombre et bordure fine. */
+    private static Identifier backdropTex;
+
+    /** Illustration d'ambiance du prochain grand panneau (pack d'art) ; null pour aucune. */
+    public static void backdrop(String name) {
+        backdropTex = name == null ? null : MMORPG.id("textures/gui/illustrations/" + name + ".png");
+    }
+
+    private static void paintBackdrop(GuiGraphicsExtractor g, int x, int y, int w, int h) {
+        Identifier tex = backdropTex;
+        backdropTex = null;
+        final int tw = 836, th = 470;
+        int bx = x + 3, by = y + 3, bw = w - 6, bh = h - 6;
+        // recadrage "cover" sans etirement
+        float k = Math.max(bw / (float) tw, bh / (float) th);
+        int sw = Math.min(tw, Math.round(bw / k)), sh = Math.min(th, Math.round(bh / k));
+        g.blit(RenderPipelines.GUI_TEXTURED, tex, bx, by, (tw - sw) / 2f, (th - sh) / 2f, bw, bh, sw, sh, tw, th, 0x59FFFFFF);
+        g.fill(bx, by, bx + bw, by + bh, 0x40080410);
+    }
+
     public static void panel(GuiGraphicsExtractor g, int x, int y, int w, int h) {
         rounded(g,x,y+3,w,h,10,0x35050010);
         rounded(g,x,y,w,h,10,PANEL_TOP);
+        if (backdropTex != null && w >= 300 && h >= 180) paintBackdrop(g, x, y, w, h);
         border(g, x, y, w, h, LINE);
     }
 

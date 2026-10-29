@@ -371,7 +371,6 @@ public final class SkillExecutor {
                     p.sendOverlayMessage(Component.literal("Aucune cible à portée").withColor(0xFF7070));
                     return false;
                 }
-                if(!com.mmorpg.combat.ShieldGuard.spend(p,20))return false;
                 p.swing(net.minecraft.world.InteractionHand.OFF_HAND, net.minecraft.world.item.component.SwingAnimation.DEFAULT, true);
                 Fx.cast(p, CastAnim.SHIELD, 10);
                 Fx.facing(level, FxKind.SHIELD, p, 1.0, 0xFFD040, 10);

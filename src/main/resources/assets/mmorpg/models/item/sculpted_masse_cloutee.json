@@ -1,7 +1,7 @@
 {
   "credit": "Aeloria · original sculpted geometry",
   "textures": {
-    "atlas": "mmorpg:item/aeloria_materials",
+    "atlas": "mmorpg:item/weapons/masse_cloutee",
     "particle": "#atlas"
   },
   "elements": [

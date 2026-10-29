@@ -61,7 +61,67 @@ public class AuctionData extends SavedData {
     }
 
     public static AuctionData get(MinecraftServer server) {
-        return server.overworld().getDataStorage().computeIfAbsent(TYPE);
+        AuctionData data = server.overworld().getDataStorage().computeIfAbsent(TYPE);
+        if (data.syncedWith != server && com.mmorpg.db.SharedDocs.useDb()) data.syncWithDatabase(server);
+        return data;
+    }
+
+    // ---- base de donnees : le document « auction » fait foi ; s'il n'existe pas encore, les donnees du monde y sont importees
+    private MinecraftServer syncedWith;
+    private MinecraftServer mirrorServer;
+    private boolean loading;
+
+    /** Relit l'hotel des ventes depuis la base (verifications et reprise manuelle). */
+    public void reloadFromDatabase(MinecraftServer server) {
+        mirrorServer = null;
+        syncWithDatabase(server);
+    }
+
+    private void syncWithDatabase(MinecraftServer server) {
+        syncedWith = server;
+        var ops = server.registryAccess().createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE);
+        String json = com.mmorpg.db.SharedDocs.get("auction");
+        if (json == null) {
+            if (!com.mmorpg.db.Database.ready()) { syncedWith = null; return; }                    // base injoignable : on reessaiera, les donnees du monde restent valides
+            mirrorServer = server;
+            push();
+            MMORPG.LOGGER.info("[MMORPG] Base de donnees : hotel des ventes importe depuis le monde ({} annonce(s))", listings.size());
+            return;
+        }
+        try {
+            AuctionData read = CODEC.parse(ops, com.google.gson.JsonParser.parseString(json)).getOrThrow();
+            loading = true;
+            next = read.next;
+            listings.clear();
+            listings.addAll(read.listings);
+            earnings.clear();
+            earnings.putAll(read.earnings);
+            returns.clear();
+            returns.putAll(read.returns);
+            super.setDirty();
+            MMORPG.LOGGER.info("[MMORPG] Base de donnees : hotel des ventes lu ({} annonce(s))", listings.size());
+        } catch (RuntimeException e) {
+            syncedWith = null;
+            MMORPG.LOGGER.error("[MMORPG] Base de donnees : hotel des ventes illisible, donnees du monde conservees", e);
+        } finally {
+            loading = false;
+        }
+        mirrorServer = server;
+    }
+
+    @Override
+    public void setDirty() {
+        super.setDirty();
+        if (!loading && mirrorServer != null) push();
+    }
+
+    private void push() {
+        try {
+            var ops = mirrorServer.registryAccess().createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE);
+            com.mmorpg.db.SharedDocs.put("auction", CODEC.encodeStart(ops, this).getOrThrow().toString());
+        } catch (RuntimeException e) {
+            MMORPG.LOGGER.error("[MMORPG] Base de donnees : hotel des ventes non ecrit", e);
+        }
     }
 
     public List<Listing> listings() {

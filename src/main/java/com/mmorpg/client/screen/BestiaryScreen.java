@@ -16,6 +16,8 @@ import java.util.List;
 
 /** Bestiaire : monstres et boss du monde, leurs niveaux, statistiques, butin et le nombre de victoires. */
 public class BestiaryScreen extends MenuScreen {
+    @Override protected String backdrop() { return "bestiary_header"; }
+
     private static String selected;
     private int scroll;
     private int category; // tous, monstres, boss
@@ -79,7 +81,7 @@ public class BestiaryScreen extends MenuScreen {
         }
         if (selected == null || !keys.contains(selected)) selected = keys.get(0);
         int rowH = 16;
-        int visible = Math.max(1, (ph - 30 - 60) / rowH);
+        int visible = Math.max(1, (ph - 54 - 60) / rowH);
         scroll = Math.min(scroll, Math.max(0, keys.size() - visible));
         for (int i = 0; i < Math.min(visible, keys.size() - scroll); i++) {
             String k = keys.get(i + scroll);
@@ -100,7 +102,7 @@ public class BestiaryScreen extends MenuScreen {
 
         int dx = x0 + lw + 10;
         int dw = left + pw - 8 - dx;
-        int dh = ph - 30 - 10;
+        int dh = ph - 54 - 10;
         Ui.inset(g, dx, y0, dw, dh);
         CompoundTag t = ClientData.mobInfo.getCompoundOrEmpty(selected);
         boolean boss = t.getBooleanOr("boss", false);

@@ -29,7 +29,7 @@ Le fonctionnement solo habituel reste actif tant que `config/mmorpg/network.json
 | mines | MINES | 25572 | Mines uniquement |
 | plaines | PLAINS | 25573 | Plaines uniquement |
 
-Les cinq fichiers doivent désigner **exactement le même dossier partagé sur le disque local**. Ce mécanisme utilise les verrous du système d'exploitation ; il ne constitue pas une configuration multi-machine ou un stockage MariaDB. MariaDB n'est pas nécessaire à ce système.
+Les cinq fichiers doivent désigner **exactement le même dossier partagé sur le disque local**. Ce mécanisme utilise les verrous du système d'exploitation ; il ne constitue pas une configuration multi-machine. Ce partage fichier reste la référence des profils en réseau ; MariaDB (`GUIDE_SERVEUR.md` §10) est facultative : elle reflète profils et banque, journalise et stocke les données partagées (guildes, hôtel des ventes) quand elle est activée.
 
 Les profils transportent données RPG, classe, XP, or, recettes apprises, quêtes, familiers/montures possédés, inventaire, équipement, coffre de l'Ender, banque et contenu de ses trois pages. Les délais de compétences et effets temporaires sont recalés sur l'horloge de destination. Les positions ordinaires et les permissions restent propres à chaque monde. La composition des groupes est maintenant commune au réseau et persiste dans `shared/parties.json`, avec une copie `.bak` et un verrou système pour chaque modification. Un départ, changement de chef ou exclusion relit l'état commun avant de l'enregistrer : une ancienne copie de serveur ne peut pas ressusciter un membre qui a quitté le groupe. Les invitations et le chat restent locaux ; les annonces de l'hôtel des ventes, les zones et les téléporteurs personnels aussi. Utiliser le MAIN pour le commerce.
 

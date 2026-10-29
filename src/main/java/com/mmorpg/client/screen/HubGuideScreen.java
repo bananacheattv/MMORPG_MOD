@@ -17,7 +17,6 @@ public final class HubGuideScreen extends MmoScreen {
         {{"L’épreuve des équipes","Capitaine Néria. L’arène de feu accueille deux équipes de cinq ; les dunes, deux équipes de trois.","Tu affrontes des héros de ta tranche de vingt niveaux. L’inscription te laisse sur place jusqu’au groupe complet."},{"Contrôle le cristal","Une fois le groupe complet, confirme l’invitation. Frappe le cristal mobile pour le prendre aux couleurs de ton équipe.","Le cristal rapporte un point toutes les deux secondes, une élimination dix. La première équipe à 500 points gagne."}}
     };
     public HubGuideScreen(CompoundTag data){super("Conversation");guide=Math.clamp(data.getIntOr("guide",0),0,4);entity=data.getIntOr("entity",-1);completed=data.getIntOr("completed",0);hasClass=data.getBooleanOr("hasClass",false);}
-    @Override protected int panelWidth(){return Math.min(width-12,540);}
     @Override protected void renderContent(GuiGraphicsExtractor g,int mx,int my,float partial){
         Ui.panel(g,left,top,pw,ph);Ui.title(g,left+pw/2,top+12,HubGuides.NAMES[guide],Ui.GOLD);
         int portraitW=Math.min(122,pw/3),x=left+portraitW+20,w=pw-portraitW-34;

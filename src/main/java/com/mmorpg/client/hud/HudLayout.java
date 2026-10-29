@@ -176,7 +176,7 @@ public final class HudLayout {
 
     // ---------------------------------------------------------------- elements du mod (dessines par MmoHud)
     public static final Element JOUEUR = mod("joueur", "Cadre du joueur", (sw, sh) -> new int[]{168, 58}, (sw, sh, w, h) -> new int[]{4, 4});
-    public static final Element BUFFS = mod("buffs", "Effets du personnage", (sw, sh) -> MmoHud.buffsSize(), (sw, sh, w, h) -> new int[]{5, 65});
+    public static final Element BUFFS = mod("buffs", "Effets du personnage", (sw, sh) -> MmoHud.buffsSize(), (sw, sh, w, h) -> {var r=JOUEUR.rect(sw,sh);return new int[]{r[0],r[1]+r[3]+4};});
     public static final Element CIBLE = mod("cible", "Cadre de la cible", (sw, sh) -> new int[]{168, 30}, (sw, sh, w, h) -> new int[]{4, MmoHud.defaultTargetY()});
     public static final Element GROUPE = mod("groupe", "Membres du groupe", (sw, sh) -> MmoHud.partySize(), (sw, sh, w, h) -> new int[]{4, MmoHud.defaultPartyY()});
     public static final Element AELORIA = mod("aeloria", "Tableau Aeloria", (sw, sh) -> new int[]{153, 44}, (sw, sh, w, h) -> new int[]{sw - w - 4, 4});

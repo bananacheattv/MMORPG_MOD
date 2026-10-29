@@ -15,6 +15,8 @@ import java.util.List;
 
 /** Collection de familiers : invocation, niveau, experience et bonus. */
 public class PetsScreen extends MenuScreen {
+    @Override protected String backdrop() { return "mounts_pets_header"; }
+
     private static PetType selected = PetType.FEU_FOLLET;
 
     private final java.util.Map<PetType, com.mmorpg.entity.PetEntity> previews = new java.util.EnumMap<>(PetType.class);
@@ -77,7 +79,7 @@ public class PetsScreen extends MenuScreen {
         // ------------------------------------------------ details
         int dx = left + 214;
         int dw = left + pw - 8 - dx;
-        int dh = ph - 30 - 10;
+        int dh = ph - 54 - 10;
         Ui.inset(g, dx, y0, dw, dh);
         PetType p = selected;
         boolean has = d.petXp.containsKey(p.id);

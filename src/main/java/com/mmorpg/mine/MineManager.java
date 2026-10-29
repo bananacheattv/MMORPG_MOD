@@ -301,10 +301,12 @@ public final class MineManager {
         }
         var random = level.getRandom();
         int count = 1 + (random.nextInt(100) < 12 + ore.tier() * 2 + pick * 4 + com.mmorpg.mine.ToolRunes.rank(tool,0)*10 ? 1 : 0);      // veine riche : un lingot de plus (la pioche aide)
+        if (com.mmorpg.job.JobSystem.rollDouble(p, com.mmorpg.job.Job.MINEUR, random)) count *= 2;
         ItemStack ingot = new ItemStack(ModItems.get(ore.ingotId()), count);
         if (!p.getInventory().add(ingot)) level.addFreshEntity(new net.minecraft.world.entity.item.ItemEntity(level, p.getX(), p.getY() + 0.5, p.getZ(), ingot));
         tool.hurtAndBreak(1, p, EquipmentSlot.MAINHAND);
         RpgPlayers.giveGatherXp(p, 3 + ore.minLevel() / 2L);
+        com.mmorpg.job.JobSystem.addXp(p, com.mmorpg.job.Job.MINEUR, 5 + ore.minLevel() / 2L + ore.tier() * 3L);
         com.mmorpg.server.AdventureSummary.item(p,ModItems.get(ore.ingotId()),count-ingot.getCount());
         p.sendOverlayMessage(Component.literal("+" + count + " Lingot de " + ore.name() + (count > 1 ? "  (veine riche !)" : "")).withColor(ore.color()));
         rareDrop(level, p, pos, ore, pick);

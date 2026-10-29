@@ -102,7 +102,7 @@ public final class MmoHud {
         if (!HudLayout.editing) worldOverlays(g, mc, w, h);
         if(!HudLayout.editing)GuidanceArrow.render(g,mc);
         ArenaHud.draw(g);
-        if(ClientData.received&&ClientData.DATA.playerClass==PlayerClass.TANK&&com.mmorpg.server.PaladinOffhand.shield(mc.player.getOffhandItem())){int gx=w/2-80,gy=h-76;Ui.rounded(g,gx-4,gy-4,168,22,6,0xDB171124);Ui.bar(g,gx,gy,160,14,ClientData.DATA.shieldGuard/100f,ClientData.guardBroken>0?Ui.RED:Ui.GOLD,0xFF493746,ClientData.guardBroken>0?"Garde brisée · Récupération":"Bouclier · Garde "+Math.round(ClientData.DATA.shieldGuard)+" %");}
+        if(ClientData.received&&ClientData.DATA.playerClass==PlayerClass.TANK&&com.mmorpg.server.PaladinOffhand.shield(mc.player.getOffhandItem())){int gx=w/2-80,gy=h-76;Ui.rounded(g,gx-4,gy-4,168,22,6,0xDB171124);Ui.bar(g,gx,gy,160,14,ClientData.DATA.shieldGuard/100f,ClientData.guardBroken>0?Ui.RED:Ui.GOLD,0xFF493746,null);}
         if (!ClientData.received) return;
         if (HudLayout.begin(g, HudLayout.JOUEUR)) {
             playerFrame(g, mc);
@@ -164,13 +164,13 @@ public final class MmoHud {
         for (long[] v : ClientData.BUFFS.values()) {
             if (v[0] - now > 0) n++;
         }
-        return n;
+        var player=Minecraft.getInstance().player;if(player!=null)n+=player.getActiveEffects().size();return n;
     }
 
     static int[] buffsSize() {
         int n = activeBuffs();
         if (n == 0 && HudLayout.editing) n = 3;
-        return new int[]{Math.max(1, n) * 18 - 2, 17};
+        return new int[]{n<=1?168:336,Math.max(1,(n+1)/2)*24};
     }
 
     private static boolean targetShown() {
@@ -263,7 +263,7 @@ public final class MmoHud {
             g.text(f, "Appuyez sur [" + Keys.MENU.getTranslatedKeyMessage().getString() + "]", x + 8, y + 24, Ui.TEXT, false);
             return;
         }
-        Ui.icon(g, Ui.classIcon(cls.id(), false), x + 5, y + 5, 22, 32);
+        if (cls != com.mmorpg.rpg.PlayerClass.NONE) Ui.icon(g, Ui.classIcon(cls.id(), false), x + 5, y + 5, 22, 32);
         Ui.border(g, x + 4, y + 4, 24, 24, Ui.GOLD_DARK);
         String lvl = String.valueOf(d.level);
         g.fill(x + 4, y + 22, x + 6 + f.width(lvl) + 2, y + 31, 0xE0101010);
@@ -292,26 +292,19 @@ public final class MmoHud {
     }
 
     private static void buffs(GuiGraphicsExtractor g) {
-        int x = 0;
-        long now = ClientData.now();
-        for (Map.Entry<BuffType, long[]> e : ClientData.BUFFS.entrySet()) {
-            long rem = e.getValue()[0] - now;
-            if (rem <= 0) continue;
-            buffIcon(g, x, e.getKey(), rem / (float) Math.max(1, e.getValue()[1]), (int) Math.ceil(rem / 20.0));
-            x += 18;
+        int index=0;long now=ClientData.now();
+        for(var e:ClientData.BUFFS.entrySet()){long rem=e.getValue()[0]-now;if(rem<=0)continue;var type=e.getKey();effectCard(g,index++,type.shortLabel(),type.icon,type.color,type.harmful(),(int)Math.ceil(rem/20.0));}
+        var player=Minecraft.getInstance().player;
+        if(player!=null)for(var effect:player.getActiveEffects()){
+            String label=effect.getEffect().value().getDisplayName().getString();var words=label.split("\\s+");label=String.join(" ",java.util.Arrays.copyOf(words,Math.min(3,words.length)));
+            boolean harmful=!effect.getEffect().value().isBeneficial();effectCard(g,index++,label,harmful?"tir_entravant":"garde_partagee",harmful?Ui.RED:Ui.GREEN,harmful,effect.isInfiniteDuration()?-1:(int)Math.ceil(effect.getDuration()/20.0));
         }
-        if (x == 0 && HudLayout.editing) {                    // apercu pour pouvoir placer l'element
-            BuffType[] all = BuffType.values();
-            for (int i = 0; i < 3 && i < all.length; i++, x += 18) buffIcon(g, x, all[i], 0.8f - 0.25f * i, 24 - 7 * i);
-        }
+        if(index==0&&HudLayout.editing){effectCard(g,index++,"Défense réduite","frappe_fragilisante",Ui.RED,true,12);effectCard(g,index++,"Attaque renforcée","cri_de_guerre",Ui.GREEN,false,24);}
     }
-
-    private static void buffIcon(GuiGraphicsExtractor g, int x, BuffType b, float frac, int seconds) {
-        Ui.icon(g, Ui.skillIcon(b.icon), x + 1, 1, 14, 32);
-        Ui.border(g, x, 0, 16, 16, b.color);
-        g.fill(x + 1, 15, x + 1 + (int) (14 * frac), 16, b.color);
-        String s = String.valueOf(seconds);
-        g.text(font(), s, x + 15 - font().width(s), 8, 0xFFFFFFFF, true);
+    private static void effectCard(GuiGraphicsExtractor g,int index,String label,String icon,int color,boolean harmful,int seconds){
+        int x=index%2*168,y=index/2*24;Ui.rounded(g,x,y,164,22,4,harmful?0xDC321528:0xDC162B2A);Ui.border(g,x,y,164,22,color);
+        Ui.icon(g,Ui.skillIcon(icon),x+3,y+3,16,32);g.text(font(),font().plainSubstrByWidth(label,112),x+23,y+3,color,false);
+        g.text(font(),harmful?"DÉBUFF":"BUFF",x+23,y+12,Ui.MUTED,false);String duration=seconds<0?"∞":seconds>=60?seconds/60+":"+String.format(java.util.Locale.ROOT,"%02d",seconds%60):seconds+"s";g.text(font(),duration,x+160-font().width(duration),y+10,Ui.TEXT,true);
     }
 
     private static void targetFrame(GuiGraphicsExtractor g) {
@@ -399,7 +392,7 @@ public final class MmoHud {
         int w = 120;
         int h = 24;
         smallPanel(g, 0, y, w, h, online ? cls.color : 0xFF505050);
-        if (online) Ui.icon(g, Ui.classIcon(cls.id(), false), 3, y + 4, 16, 32, near ? 0xFFFFFFFF : 0xFF808080);
+        if (online && cls != com.mmorpg.rpg.PlayerClass.NONE) Ui.icon(g, Ui.classIcon(cls.id(), false), 3, y + 4, 16, 32, near ? 0xFFFFFFFF : 0xFF808080);
         String label = (leader ? "♛ " : "") + name;
         g.text(f, f.plainSubstrByWidth(label, 70), 22, y + 3, online ? (near ? 0xFFFFFFFF : Ui.MUTED) : 0xFF707070, true);
         if (online) {

@@ -22,15 +22,9 @@ public class ClassSelectScreen extends MmoScreen {
         super("Choix de la classe");
     }
 
-    @Override
-    protected int panelWidth() {
-        return Math.min(this.width - 8, 520);
-    }
 
     @Override
-    protected int panelHeight() {
-        return Math.min(this.height - 8, 300);
-    }
+    protected int designHeight(){return 300;}
 
     @Override
     protected void renderContent(GuiGraphicsExtractor g, int mx, int my, float a) {

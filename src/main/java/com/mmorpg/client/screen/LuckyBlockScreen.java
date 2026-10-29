@@ -14,8 +14,7 @@ import net.minecraft.world.item.ItemStack;
 public class LuckyBlockScreen extends MmoScreen {
  private final BlockPos pos;private final ListTag table;private final LuckyTier tier;private CompoundTag loot;private boolean requested;private int elapsed,page,idle;private String error="";private final ItemPreview3D[] previews={new ItemPreview3D(),new ItemPreview3D(),new ItemPreview3D()};
  public LuckyBlockScreen(CompoundTag data){super("Reliquaire de fortune");pos=BlockPos.of(data.getLongOr("pos",0));table=data.getListOrEmpty("table");tier=LuckyTier.of(data.getIntOr("tier",0));}
- @Override protected int panelWidth(){return Math.min(width-12,780);}
- @Override protected int panelHeight(){return Math.min(height-12,400);}
+ @Override protected int designHeight(){return 400;}
  @Override public void tick(){idle++;if(loot!=null)elapsed++;}
  public void result(CompoundTag data){if(data.getLongOr("pos",Long.MIN_VALUE)!=pos.asLong()||!requested||loot!=null)return;error=data.getStringOr("error","");if(error.isEmpty()){loot=data.getCompoundOrEmpty("loot");elapsed=0;}}
  public void start(){if(requested)return;requested=true;ClientNet.send(new Payloads.LuckyRoll(pos));}

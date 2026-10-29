@@ -493,10 +493,13 @@ public final class PlainsManager {
         int rank = FarmCrops.CROPS.indexOf(crop);
         int count = 1 + (random.nextInt(100) < 12 + rank * 2 + hoe * 4 + com.mmorpg.mine.ToolRunes.rank(p.getMainHandItem(),0)*10 ? 1 : 0);
         for (int i = 0; i < 2; i++) if (random.nextInt(100) < hoe * 10) count++;
+        if (com.mmorpg.job.JobSystem.rollDouble(p, com.mmorpg.job.Job.FERMIER, random)) count *= 2;
         ItemStack drop = new ItemStack(ModItems.get(crop.product()), count);
         if (!p.getInventory().add(drop)) level.addFreshEntity(new ItemEntity(level, p.getX(), p.getY() + 0.5, p.getZ(), drop));
         com.mmorpg.server.AdventureSummary.item(p,ModItems.get(crop.product()),count-drop.getCount());
         RpgPlayers.giveGatherXp(p, 2 + rank * 3L);
+        com.mmorpg.job.JobSystem.addXp(p, com.mmorpg.job.Job.FERMIER, 4 + rank * 4L);
+        com.mmorpg.job.JobSystem.farmerMeal(p, random);
         p.sendOverlayMessage(Component.literal("+" + count + " " + crop.name()).withColor(crop.color()));
         level.setBlock(pos, block.getStateForAge(0), 3);
         level.sendParticles(ParticleTypes.HAPPY_VILLAGER, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 6, 0.3, 0.3, 0.3, 0.0);

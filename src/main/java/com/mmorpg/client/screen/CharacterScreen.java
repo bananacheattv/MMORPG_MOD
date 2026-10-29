@@ -51,8 +51,9 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
     private final List<Hit> hits = new ArrayList<>();
     private int px, py, pw, ph;
     private int mx, my;
-    private int cell=26,inventoryWidth=242;
+    private int cell=26,inventoryWidth=242,leftWidth=250,gridOffset;
     private final java.util.Map<Slot,int[]> originalPositions=new java.util.IdentityHashMap<>(),layoutPositions=new java.util.IdentityHashMap<>();
+    private int attrW;
     private final java.util.EnumMap<Module,CharacterLayout.Rect> layoutRects=new java.util.EnumMap<>(Module.class);
     private final java.util.EnumMap<Module,float[]> layoutDefaults=new java.util.EnumMap<>(Module.class);
     private Module renderingModule,selectedModule;private boolean editingLayout,resizingModule,draggingLayout;private float grabX,grabY,dragStartScale;private double dragStartX,dragStartY;
@@ -81,17 +82,18 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
         com.mmorpg.server.InventoryRules.apply(this.minecraft.player);
         super.init();
         // meme panneau que les autres onglets ; les emplacements de Minecraft sont places sous les onglets, a gauche
-        this.pw = Math.min(this.width - 12, 900);
-        this.ph = Math.min(this.height - 12, 430);
+        this.pw = com.mmorpg.client.ui.UiFrame.width(this.width);
+        this.ph = com.mmorpg.client.ui.UiFrame.height(this.height);
         this.px = (this.width - pw) / 2;
         this.py = (this.height - ph) / 2;
-        this.leftPos = px + 8;
+        attrW = Math.max(104, (int) (pw * .22));
+        this.leftPos = px + 8 + attrW + 10;
         this.topPos = py + 54;
-        cell=Math.clamp((int)(pw*.42)/9,20,30);inventoryWidth=cell*9+4;
+        leftWidth=(int)(pw*.42);cell=Math.clamp((leftWidth-4)/9,20,44);inventoryWidth=cell*9+4;gridOffset=(leftWidth-inventoryWidth)/2;
         for(Slot slot:menu.slots){originalPositions.putIfAbsent(slot,new int[]{slot.x,slot.y});int sx=originalPositions.get(slot)[0],sy=originalPositions.get(slot)[1];
-            if(slot.index>=9&&slot.index<36){sx=(slot.index-9)%9*cell;sy=90+(slot.index-9)/9*cell;}
-            else if(slot.index>=36&&slot.index<45){sx=(slot.index-36)*cell;sy=95+3*cell;}
-            else if(slot.index>=5&&slot.index<9){sx=0;sy=(slot.index-5)*21+4;}
+            if(slot.index>=9&&slot.index<36){sx=gridOffset+(slot.index-9)%9*cell;sy=90+(slot.index-9)/9*cell;}
+            else if(slot.index>=36&&slot.index<45){sx=gridOffset+(slot.index-36)*cell;sy=95+3*cell;}
+            else if(slot.index>=5&&slot.index<9){sx=0;sy=(slot.index-5)*20+4;}
             layoutPositions.put(slot,new int[]{sx,sy});var access=(com.mmorpg.mixin.SlotPositionAccessor)slot;access.aeloria$x(sx);access.aeloria$y(sy);
         }
 
@@ -160,7 +162,7 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
         Ui.inset(g, x - 2, y - 2, inventoryWidth, 88);
         Ui.inset(g, x + 31, y + 2, 74, 82);
         InventoryScreen.extractEntityInInventoryFollowsMouse(g, x + 32, y + 3, x + 104, y + 83, 36, 0.0625F, mouseX, mouseY, this.minecraft.player);
-        Ui.icon(g, Ui.classIcon(cls.id(), false), x + 26, y + 8, 12, 32);
+        if (cls != com.mmorpg.rpg.PlayerClass.NONE) Ui.icon(g, Ui.classIcon(cls.id(), false), x + 26, y + 8, 12, 32);
         for (Slot s : this.menu.slots) {
             if (!s.isActive()) continue;
             boolean equipment = (s.index >= InventoryMenu.ARMOR_SLOT_START && s.index < InventoryMenu.ARMOR_SLOT_END) || s.index == InventoryMenu.SHIELD_SLOT;
@@ -174,9 +176,9 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
         for(int i=0;i<2;i++){int sx=x+inventoryWidth-85+i*29;Ui.frame(g,sx,y+49,24,24,Ui.GOLD,false);if(i<stored.size()){var bag=net.minecraft.world.item.ItemStack.OPTIONAL_CODEC.parse(ops,stored.get(i)).result().orElse(net.minecraft.world.item.ItemStack.EMPTY);g.item(bag,sx+4,y+53);}}
 
         endModule(g);
-        beginModule(g,Module.INVENTORY);Ui.inset(g,x-2,y+88,inventoryWidth,4*cell+13);
+        beginModule(g,Module.INVENTORY);Ui.inset(g,x+gridOffset-2,y+88,inventoryWidth,4*cell+13);
         for(Slot slot:menu.slots)if(slot.isActive()&&slot.index>=9&&slot.index<45){var at=layoutPositions.get(slot);slotBox(g,x+at[0]-1,y+at[1]-1,Ui.LINE,false);}
-        g.fill(x, y + 91+3*cell, x + inventoryWidth-4, y + 92+3*cell, Ui.LINE);
+        g.fill(x+gridOffset, y + 91+3*cell, x+gridOffset + inventoryWidth-4, y + 92+3*cell, Ui.LINE);
         endModule(g);beginModule(g,Module.IDENTITY);
 
         // ------------------------------------------------ identite, barres et evolution (sous l'inventaire, selon la place)
@@ -206,9 +208,8 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
 
         endModule(g);
         // ------------------------------------------------ attributs (repartition des points)
-        int rx = x + inventoryWidth + 10;
-        int rw = px + pw - 8 - rx;
-        int w1 = Math.max(104, (int) (rw * 0.54));
+        int rx = px + 8;
+        int w1 = attrW;
         int y0 = py + 54;
         int avail = (bottom - y0) - (ph >= 258 ? 54 : 0);
         beginModule(g,Module.ATTRIBUTES);
@@ -257,7 +258,7 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
 
         endModule(g);
         // ------------------------------------------------ statistiques
-        int x2 = rx + w1 + 8;
+        int x2 = x + leftWidth + 10;
         int w2 = px + pw - 8 - x2;
         beginModule(g,Module.STATISTICS);Ui.header(g, x2, y0, w2, "STATISTIQUES");
         int step = Math.max(9, Math.min(11, (avail - 14) / 14));
@@ -278,7 +279,7 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
         // ------------------------------------------------ chemin d'evolution (si la place le permet)
         if (ph >= 258||CharacterLayout.box(Module.EVOLUTION).custom) {
             beginModule(g,Module.EVOLUTION);int ty = py + ph - 56;
-            int tx0 = rx + 8, tx1 = px + pw - 16;
+            int tx0 = x2 + 8, tx1 = px + pw - 16;
             g.fill(tx0, ty + 4, tx1, ty + 6, Ui.LINE);
             int tier = d.evolutionTier();
             int reachedX = tx0 + (int) ((tx1 - tx0) * Math.min(1f, (d.level - 1) / 99f));
@@ -289,7 +290,7 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
                 Ui.diamond(g, nx, ty + 5, i == tier ? 5 : 4, reached ? Ui.GOLD : 0xFF4A4038);
                 Ui.diamond(g, nx, ty + 5, i == tier ? 2 : 1, reached ? (i == tier ? 0xFFFFFFFF : cls.color) : 0xFF201818);
                 int ly = i % 2 == 0 ? ty + 10 : ty - 22;     // etiquettes alternees au-dessus / au-dessous de la ligne
-                int labelX=Math.clamp(nx,rx+font.width(cls.evolutions[i])/2,px+pw-9-font.width(cls.evolutions[i])/2);
+                int labelX=Math.clamp(nx,x2+font.width(cls.evolutions[i])/2,px+pw-9-font.width(cls.evolutions[i])/2);
                 Ui.scaledText(g, cls.evolutions[i], labelX, ly, 1f, i == tier ? cls.color : reached ? Ui.TEXT : Ui.MUTED, true);
                 Ui.scaledText(g, "Niv. " + PlayerClass.EVOLUTION_LEVELS[i], labelX, ly + 10, 1f, Ui.MUTED, true);
             }
@@ -327,18 +328,27 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
     }
 
     @Override public void removed(){for(var e:originalPositions.entrySet()){var a=(com.mmorpg.mixin.SlotPositionAccessor)e.getKey();a.aeloria$x(e.getValue()[0]);a.aeloria$y(e.getValue()[1]);}CharacterLayout.save();super.removed();}
-    @Override protected boolean isHovering(int x,int y,int w,int h,double mx,double my){if(editingLayout)return false;if(w==16&&h==16){var slot=menu.slots.stream().filter(v->v.x==x&&v.y==y).findFirst().orElse(null);if(slot!=null){var r=layoutRects.get(slotModule(slot));int size=Math.round((slot.index>=9&&slot.index<45?cell-5:16)*r.scale());return super.isHovering(x,y,size,size,mx,my);}}return super.isHovering(x,y,w,h,mx,my);}
+    @Override protected boolean isHovering(int x,int y,int w,int h,double mx,double my){if(editingLayout)return false;if(w==16&&h==16){var slot=menu.slots.stream().filter(v->v.x==x&&v.y==y).findFirst().orElse(null);if(slot!=null){var r=layoutRects.get(slotModule(slot));int size=Math.round((slot.index>=9&&slot.index<45?cell-2:20)*r.scale());return super.isHovering(x,y,size,size,mx,my);}}return super.isHovering(x,y,w,h,mx,my);}
     @Override protected void renderSlotContents(GuiGraphicsExtractor g,net.minecraft.world.item.ItemStack stack,Slot slot,String count){
         g.pose().pushMatrix();g.pose().translate(slot.x,slot.y);float scale=(slot.index>=9&&slot.index<45?(cell-5)/16f:1f)*layoutRects.get(slotModule(slot)).scale();g.pose().scale(scale,scale);g.pose().translate(-slot.x,-slot.y);super.renderSlotContents(g,stack,slot,count);g.pose().popMatrix();
+    }
+
+    /** Full-sized hover and click target share the same client-side slot coordinates. */
+    public void slotHighlight(GuiGraphicsExtractor g,boolean front){
+        if(editingLayout||hoveredSlot==null||!hoveredSlot.isHighlightable())return;
+        var r=layoutRects.get(slotModule(hoveredSlot));if(r==null||!r.visible())return;
+        int size=Math.round((hoveredSlot.index>=9&&hoveredSlot.index<45?cell-2:20)*r.scale());
+        int x=hoveredSlot.x-Math.round(r.scale()),y=hoveredSlot.y-Math.round(r.scale());
+        if(front)Ui.border(g,x,y,size,size,0xB0D4B2FF);else g.fill(x,y,x+size,y+size,0x303E2B55);
     }
 
     private Module slotModule(Slot slot){return slot.index>=9&&slot.index<45?Module.INVENTORY:Module.EQUIPMENT;}
     private void defaults(Module module,float x,float y,float w,float h){layoutDefaults.put(module,new float[]{x,y,w,h});var r=CharacterLayout.resolve(module,x,y,w,h,width,height);if(module==Module.IDENTITY&&!CharacterLayout.box(module).custom&&y+h>py+ph-29)r=new CharacterLayout.Rect(r.x(),r.y(),r.w(),r.h(),r.scale(),false);if(module==Module.EVOLUTION&&ph<258&&!CharacterLayout.box(module).custom)r=new CharacterLayout.Rect(r.x(),r.y(),r.w(),r.h(),r.scale(),false);layoutRects.put(module,r);}
     private void prepareLayout(){
-        int x=leftPos,y=topPos,rx=x+inventoryWidth+10,rw=px+pw-8-rx,w1=Math.max(104,(int)(rw*.54)),y0=py+54,avail=py+ph-30-y0-(ph>=258?54:0);
+        int x=leftPos,y=topPos,rx=px+8,x2=x+leftWidth+10,w2=px+pw-8-x2,w1=attrW,y0=py+54,avail=py+ph-30-y0-(ph>=258?54:0);
         int rowH=Math.max(11,Math.min(18,(avail-24)/Stat.PRIMARIES_DISPLAY.length)),step=Math.max(9,Math.min(11,(avail-14)/14));
-        defaults(Module.EQUIPMENT,x,y,inventoryWidth,88);defaults(Module.INVENTORY,x,y+90,inventoryWidth,4*cell+12);defaults(Module.IDENTITY,x,y+100+4*cell,inventoryWidth,42);
-        defaults(Module.ATTRIBUTES,rx,y0,w1,24+rowH*Stat.PRIMARIES_DISPLAY.length);defaults(Module.STATISTICS,rx+w1+8,y0,Math.max(30,rw-w1-8),14+step*14);defaults(Module.EVOLUTION,rx,py+ph-78,rw,53);
+        defaults(Module.EQUIPMENT,x,y,inventoryWidth,88);defaults(Module.INVENTORY,x+gridOffset,y+90,inventoryWidth,4*cell+12);defaults(Module.IDENTITY,x,y+100+4*cell,inventoryWidth,34);
+        defaults(Module.ATTRIBUTES,rx,y0,w1,24+rowH*Stat.PRIMARIES_DISPLAY.length);defaults(Module.STATISTICS,x2,y0,Math.max(30,w2),14+step*14);defaults(Module.EVOLUTION,x2,py+ph-78,Math.max(30,w2),53);
         for(var e:layoutPositions.entrySet()){var slot=e.getKey();var module=slotModule(slot);var r=layoutRects.get(module);var d=layoutDefaults.get(module);var a=(com.mmorpg.mixin.SlotPositionAccessor)slot;int[] base=e.getValue();a.aeloria$x(r.visible()?Math.round(r.x()+(leftPos+base[0]-d[0])*r.scale()-leftPos):-10000);a.aeloria$y(r.visible()?Math.round(r.y()+(topPos+base[1]-d[1])*r.scale()-topPos):-10000);}
     }
     private double logicalX(){if(renderingModule==null)return mx;var r=layoutRects.get(renderingModule);return layoutDefaults.get(renderingModule)[0]+(mx-r.x())/r.scale();}

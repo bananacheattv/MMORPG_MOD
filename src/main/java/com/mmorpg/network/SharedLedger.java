@@ -12,6 +12,7 @@ public final class SharedLedger {
     private static final Gson JSON = new Gson();
     public static synchronized <S,T> T access(MinecraftServer server, String name, Class<S> type, Supplier<S> empty, Function<S,T> action) {
         Path directory = com.mmorpg.guild.GuildStore.directory(server).resolveSibling("coordination");
+        if (com.mmorpg.db.SharedDocs.useDb()) return com.mmorpg.db.SharedDocs.access("ledger-" + name, type, empty, directory.resolve(name + ".json"), true, action);
         try {
             Files.createDirectories(directory);
             try (var channel = FileChannel.open(directory.resolve(name + ".lock"), StandardOpenOption.CREATE, StandardOpenOption.WRITE);

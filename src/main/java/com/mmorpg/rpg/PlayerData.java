@@ -28,7 +28,12 @@ import java.util.UUID;
  */
 public class PlayerData implements ValueIOSerializable {
     public float shieldGuard=100;
+    public boolean shieldGuardRecovering;
+    /** Titre affiche apres le pseudo (succes ou PvP). */
     public String pvpTitle="";
+    /** Compteurs des succes et succes debloques (id -> date de deblocage, en secondes). */
+    public final Map<String, Long> counters = new LinkedHashMap<>();
+    public final Map<String, Long> achievements = new LinkedHashMap<>();
     public CompoundTag backpacks=new CompoundTag();
     public CompoundTag adventureSummary = new CompoundTag();
     public String rankLabel="Aelorien";public int rankColor=0xB9AFCC,rankTier,auctionSlots=12;
@@ -97,6 +102,8 @@ public class PlayerData implements ValueIOSerializable {
     public final Map<String, Long> dailyQuests = new HashMap<>();
 
     public final Set<String> mounts = new HashSet<>();
+    /** Experience cumulee des metiers (pecheur, fermier, mineur). */
+    public final Map<String, Long> jobXp = new LinkedHashMap<>();
 
     // --- transient (non sauvegarde)
     public StatBlock stats = new StatBlock();
@@ -111,6 +118,8 @@ public class PlayerData implements ValueIOSerializable {
     public long nextMountTick;
     public UUID petEntity;
     public boolean dirty = true;
+    /** Version du profil dans la base de donnees du reseau a la derniere synchronisation (0 : jamais synchronise ; voir db/PlayerSync). */
+    public long dbVersion;
     public float regenAccumulatorHp;
     public float regenAccumulatorMana;
 
@@ -137,7 +146,7 @@ public class PlayerData implements ValueIOSerializable {
     }
 
     public int availableSkillPoints() {
-        return Math.max(0, LevelSystem.skillPointsAt(level) - spentSkillPoints());
+        return Math.max(0, LevelSystem.skillPointsAt(level, playerClass) - spentSkillPoints());
     }
 
     /** Debloque au rang 1 les competences accessibles et les place dans la barre si une case est libre. */
@@ -187,7 +196,7 @@ public class PlayerData implements ValueIOSerializable {
         CompoundTag t = new CompoundTag();
         t.put("adventure_summary", adventureSummary.copy());
         t.putString("rankLabel",rankLabel);t.putInt("rankColor",rankColor);t.putInt("rankTier",rankTier);t.putInt("auctionSlots",auctionSlots);
-        t.putFloat("shieldGuard",shieldGuard);t.putString("pvpTitle",pvpTitle);t.put("backpacks",backpacks.copy());t.put("guild_receipts",guildReceipts.copy());t.putInt("guild_level",guildLevel);
+        t.putFloat("shieldGuard",shieldGuard);t.putBoolean("shieldGuardRecovering",shieldGuardRecovering);t.putString("pvpTitle",pvpTitle);t.put("backpacks",backpacks.copy());t.put("guild_receipts",guildReceipts.copy());t.putInt("guild_level",guildLevel);
         t.putLongArray("guild_buffs",guildBuffs);
         t.store("forgeRecipes",Codec.STRING.listOf(),new ArrayList<>(forgeRecipes));
         t.putString("class", playerClass.name());
@@ -210,6 +219,9 @@ public class PlayerData implements ValueIOSerializable {
         t.store("equipped", STR_STR_MAP, eq);
         t.store("waypoints", UUIDUtil.CODEC.listOf(), new ArrayList<>(waypoints));
         t.store("kills", STR_INT_MAP, kills);
+        t.store("jobXp", Codec.unboundedMap(Codec.STRING, Codec.LONG), jobXp);
+        t.store("stats", Codec.unboundedMap(Codec.STRING, Codec.LONG), counters);
+        t.store("achievements", Codec.unboundedMap(Codec.STRING, Codec.LONG), achievements);
         t.putBoolean("chosen", classChosenOnce);
         t.putBoolean("starterTools", starterTools);
         t.putInt("forgeBlueprints", forgeBlueprints);
@@ -217,6 +229,7 @@ public class PlayerData implements ValueIOSerializable {
         t.putInt("plainsUnlocked", plainsUnlocked);
         t.putInt("evolution", evolution);
         t.putLong("gold", gold);
+        t.putLong("dbVersion", dbVersion);
         t.putInt("xpCharmSeconds", xpCharmSeconds);
         t.putInt("luckCharmSeconds", luckCharmSeconds);
         Map<String, List<Integer>> aq = new LinkedHashMap<>();
@@ -237,7 +250,7 @@ public class PlayerData implements ValueIOSerializable {
     public void load(CompoundTag t) {
         adventureSummary = t.getCompoundOrEmpty("adventure_summary").copy();
         rankLabel=t.getStringOr("rankLabel","Aelorien");rankColor=t.getIntOr("rankColor",0xB9AFCC);rankTier=t.getIntOr("rankTier",0);auctionSlots=t.getIntOr("auctionSlots",12);
-        shieldGuard=Math.clamp(t.getFloatOr("shieldGuard",100),0,100);pvpTitle=t.getStringOr("pvpTitle","");backpacks=t.getCompoundOrEmpty("backpacks").copy();guildReceipts=t.getCompoundOrEmpty("guild_receipts").copy();guildLevel=Math.clamp(t.getIntOr("guild_level",0),0,10);
+        shieldGuard=Math.clamp(t.getFloatOr("shieldGuard",100),0,100);shieldGuardRecovering=t.getBooleanOr("shieldGuardRecovering",shieldGuard<=0);pvpTitle=t.getStringOr("pvpTitle","");backpacks=t.getCompoundOrEmpty("backpacks").copy();guildReceipts=t.getCompoundOrEmpty("guild_receipts").copy();guildLevel=Math.clamp(t.getIntOr("guild_level",0),0,10);
         guildBuffs=t.getLongArray("guild_buffs").orElse(new long[4]);if(guildBuffs.length!=4)guildBuffs=new long[4];
         forgeRecipes.clear();forgeRecipes.addAll(t.read("forgeRecipes",Codec.STRING.listOf()).orElse(List.of()));
         playerClass = PlayerClass.byName(t.getStringOr("class", "NONE"));
@@ -275,6 +288,12 @@ public class PlayerData implements ValueIOSerializable {
         waypoints.addAll(t.read("waypoints", UUIDUtil.CODEC.listOf()).orElse(List.of()));
         kills.clear();
         kills.putAll(t.read("kills", STR_INT_MAP).orElse(Map.of()));
+        jobXp.clear();
+        jobXp.putAll(t.read("jobXp", Codec.unboundedMap(Codec.STRING, Codec.LONG)).orElse(Map.of()));
+        counters.clear();
+        counters.putAll(t.read("stats", Codec.unboundedMap(Codec.STRING, Codec.LONG)).orElse(Map.of()));
+        achievements.clear();
+        achievements.putAll(t.read("achievements", Codec.unboundedMap(Codec.STRING, Codec.LONG)).orElse(Map.of()));
         classChosenOnce = t.getBooleanOr("chosen", playerClass != PlayerClass.NONE);
         starterTools = t.getBooleanOr("starterTools", false);
         forgeBlueprints = t.getIntOr("forgeBlueprints", 0) & 31;
@@ -288,6 +307,7 @@ public class PlayerData implements ValueIOSerializable {
         evolution = t.getIntOr("evolution", -1);
         if (evolution < 0) evolution = PlayerClass.tier(level);
         gold = t.getLongOr("gold", 0);
+        dbVersion = t.getLongOr("dbVersion", 0);
         xpCharmSeconds = Math.clamp(t.getIntOr("xpCharmSeconds", 0), 0, 1800);
         luckCharmSeconds = Math.clamp(t.getIntOr("luckCharmSeconds", 0), 0, 1800);
         trackedQuest = t.getStringOr("trackedQuest", "");

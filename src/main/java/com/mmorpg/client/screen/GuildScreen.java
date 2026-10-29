@@ -11,12 +11,13 @@ import net.minecraft.network.chat.Component;
 import java.util.*;
 
 public final class GuildScreen extends MmoScreen {
+    @Override protected String backdrop() { return "guild_hall_header"; }
+
     private final CompoundTag data;private final GuildStore.Guild guild;private final UUID self;private int tab,page,boss;private UUID selected;
     private EditBox name,amount,motto,confirmation;
     public void showTab(int value){tab=Math.clamp(value,0,6);page=0;}
     public GuildScreen(CompoundTag data){super("Guilde");this.data=data;String json=data.getStringOr("guild","");guild=json.isEmpty()?null:new com.google.gson.Gson().fromJson(json,GuildStore.Guild.class);self=UUID.fromString(data.getStringOr("self",new UUID(0,0).toString()));boss=guild==null?0:guild.level-1;}
-    @Override protected int panelWidth(){return Math.min(width-12,720);}
-    @Override protected int panelHeight(){return Math.min(height-12,340);}
+    @Override protected int designHeight(){return 340;}
     private EditBox field(int x,int y,int w,int max,String value){var f=new EditBox(font,x,y,w,18,Component.literal("Valeur"));f.setMaxLength(max);f.setValue(value);addRenderableWidget(f);return f;}
     @Override protected void init(){super.init();name=field(left+12,top+66,pw-24,28,"");amount=field(left+12,top+95,Math.min(180,pw-24),10,"1000");motto=field(left+12,top+90,pw-24,120,guild==null?"":guild.motto);confirmation=field(left+12,top+ph-71,pw/2-20,28,"");}
     private void send(String action,java.util.function.Consumer<CompoundTag> fill){var t=new CompoundTag();t.putString("action",action);fill.accept(t);ClientNet.send(new Payloads.SocialAction("guild",t));}

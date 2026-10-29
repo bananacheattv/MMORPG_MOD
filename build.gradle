@@ -28,6 +28,7 @@ sourceSets.main.resources {
 
 repositories {
     // Add here additional repositories if required by some of the dependencies below.
+    mavenCentral()
 }
 
 base {
@@ -64,6 +65,7 @@ neoForge {
             if (project.hasProperty('showcase')) {
                 def mode = project.property('showcase').toString()
                 jvmArgument '-Dmmorpg.showcase=' + (mode.isEmpty() ? 'true' : mode)
+                if (project.hasProperty('freshWorld')) jvmArgument '-Dmmorpg.freshWorld=true'
                 if (project.hasProperty('clicsize')) jvmArgument '-Dmmorpg.clicsize=' + project.property('clicsize')
             }
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
@@ -73,7 +75,10 @@ neoForge {
         server {
             server()
             programArgument '--nogui'
+            if (project.hasProperty('sharedChecks')) systemProperty 'mmorpg.checkShared', 'true'
             if (project.hasProperty('networkChecks')) systemProperty 'mmorpg.checkNetwork', 'true'
+            if (project.hasProperty('weeklyVisual')) systemProperty 'mmorpg.weeklyVisual', 'true'
+            if (project.hasProperty('weeklyChecks')) systemProperty 'mmorpg.checkWeekly', 'true'
             if (project.hasProperty('visualChecks')) systemProperty 'mmorpg.visualChecks', 'true'
             if (project.hasProperty('guidanceVisual')) systemProperty 'mmorpg.guidanceVisual', 'true'
             if (project.hasProperty('guideVisual')) systemProperty 'mmorpg.guideVisual', 'true'
@@ -134,6 +139,10 @@ configurations {
 }
 
 dependencies {
+    // Pilote MariaDB/MySQL (base de donnees du reseau Aeloria) : embarque dans le jar du mod (jar-in-jar)
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.5.3'
+    jarJar('org.mariadb.jdbc:mariadb-java-client:[3.5.3,3.6)')
+
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     // compileOnly "mezz.jei:jei-${mc_version}-common-api:${jei_version}"
