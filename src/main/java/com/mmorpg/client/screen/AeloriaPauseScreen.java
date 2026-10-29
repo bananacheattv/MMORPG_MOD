@@ -14,7 +14,6 @@ public final class AeloriaPauseScreen extends PauseScreen {
   button(x,y+32,w,"MON AVENTURE",()->MenuScreen.open(MenuScreen.Tab.PERSONNAGE));
   button(x,y+64,w,"BOUTIQUE",()->MenuScreen.open(MenuScreen.Tab.BOUTIQUE));
   button(x,y+96,w,"OPTIONS",()->minecraft.gui.setScreen(new OptionsScreen(this,minecraft.options)));
-  button(x,y+128,w,"TOUS LES MENUS",()->minecraft.gui.setScreen(new AeloriaDirectoryScreen()));
  }
  @Override public void extractBackground(GuiGraphicsExtractor g,int mx,int my,float a){extractBlurredBackground(g);g.fill(0,0,width,height,0x800C071A);}
  @Override public void extractRenderState(GuiGraphicsExtractor g,int mx,int my,float a){int by=Math.max(104,height/2-28),lw=Math.min(240,(int)((by-45)*Logo.FULL_RATIO));Logo.full(g,width/2,by-12-(int)(lw/Logo.FULL_RATIO),lw);super.extractRenderState(g,mx,my,a);}

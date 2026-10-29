@@ -54,6 +54,10 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
     private int cell=26,inventoryWidth=242,leftWidth=250,gridOffset;
     private final java.util.Map<Slot,int[]> originalPositions=new java.util.IdentityHashMap<>(),layoutPositions=new java.util.IdentityHashMap<>();
     private int attrW;
+    /** Cadre reel {x, y, largeur, hauteur, barre} pour le test de coherence des ecrans. */
+    public int[] realFrame() {
+        return new int[]{px, py, pw, ph, com.mmorpg.client.ui.UiFrame.NAV_H};
+    }
     private final java.util.EnumMap<Module,CharacterLayout.Rect> layoutRects=new java.util.EnumMap<>(Module.class);
     private final java.util.EnumMap<Module,float[]> layoutDefaults=new java.util.EnumMap<>(Module.class);
     private Module renderingModule,selectedModule;private boolean editingLayout,resizingModule,draggingLayout;private float grabX,grabY,dragStartScale;private double dragStartX,dragStartY;

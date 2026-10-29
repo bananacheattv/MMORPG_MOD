@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "mmorpg:item/tourte_aux_baies"
+  }
+}

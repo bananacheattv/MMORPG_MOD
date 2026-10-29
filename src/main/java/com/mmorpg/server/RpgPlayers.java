@@ -594,6 +594,7 @@ public final class RpgPlayers {
             d.starterTools = true;
             giveStarterTools(player);
         }
+        com.mmorpg.job.JobSystem.syncRewards(player, d);
         sync(player);
         BestiaryInfo.sendTo(player);
         PartyManager.sync(player);
