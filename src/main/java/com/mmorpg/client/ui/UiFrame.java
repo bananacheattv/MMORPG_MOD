@@ -9,6 +9,8 @@ public final class UiFrame {
     public static final int MAX_W = 900;
     public static final int MAX_H = 430;
     public static final int MARGIN = 12;
+    /** Hauteur de la barre d'onglets de base (identique a l'inventaire). */
+    public static final int NAV_H = 54;
     /** Hauteur de conception par defaut des ecrans (ancien panneau 440 x 272). */
     public static final int DESIGN_H = 272;
 

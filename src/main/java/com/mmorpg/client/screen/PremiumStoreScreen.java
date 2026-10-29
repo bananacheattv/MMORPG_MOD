@@ -8,6 +8,8 @@ import net.minecraft.network.chat.Component;
 import java.util.*;
 
 public final class PremiumStoreScreen extends MmoScreen {
+    @Override protected MenuScreen.Tab navActive() { return MenuScreen.Tab.BOUTIQUE; }
+
     @Override protected String backdrop() { return "shop_header"; }
 
  private final CompoundTag data;private final List<CompoundTag> products=new ArrayList<>();private String category="Clés";private int page;private String confirm="";private UUID request=UUID.randomUUID();private boolean busy;

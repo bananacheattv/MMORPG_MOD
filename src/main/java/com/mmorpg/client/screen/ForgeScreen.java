@@ -136,7 +136,7 @@ public class ForgeScreen extends MmoScreen {
             list.add(r);
         }
         list.sort(java.util.Comparator.comparingInt(ForgeRecipes.Recipe::level).thenComparing(ForgeRecipes.Recipe::id));
-        int rowH = 20;
+        int rowH = 30;
         int visible = (top + ph - 10 - listTop) / rowH;
         scroll = Math.min(scroll, Math.max(0, list.size() - visible));
         if (selectedRecipe == null || list.stream().noneMatch(r -> r.id().equals(selectedRecipe))) {
@@ -149,13 +149,13 @@ public class ForgeScreen extends MmoScreen {
             Rarity rar = rarityOf(item);
             boolean sel = r.id().equals(selectedRecipe);
             Ui.frame(g, x0, ry, lw + 56, rowH - 2, rar.color, sel || hovered(x0, ry, lw + 56, rowH - 2));
-            g.item(new ItemStack(item, r.count()), x0 + 2, ry + 1);
+            Ui.itemBox(g, font, new ItemStack(item, r.count()), x0 + 2, ry + 2, rowH - 6);
             String name = new ItemStack(item).getHoverName().getString();
-            g.text(font, font.plainSubstrByWidth(name, lw + 20), x0 + 21, ry + 5, rar.color, false);
+            g.text(font, font.plainSubstrByWidth(name, lw + 20 - 10), x0 + rowH + 3, ry + 10, rar.color, false);
             boolean ok = canCraft(inv, r);
-            Ui.diamond(g, x0 + lw + 50, ry + 8, 2, ok ? Ui.GREEN : 0xFF5A3A3A);
+            Ui.diamond(g, x0 + lw + 50, ry + 13, 2, ok ? Ui.GREEN : 0xFF5A3A3A);
             String lv = String.valueOf(r.level());
-            g.text(font, lv, x0 + lw + 44 - font.width(lv), ry + 5, ClientData.DATA.level >= r.level() ? Ui.MUTED : Ui.RED, false);
+            g.text(font, lv, x0 + lw + 44 - font.width(lv), ry + 10, ClientData.DATA.level >= r.level() ? Ui.MUTED : Ui.RED, false);
             final String id = r.id();
             click(x0, ry, lw + 56, rowH - 2, () -> selectedRecipe = id);
         }
@@ -251,7 +251,7 @@ public class ForgeScreen extends MmoScreen {
             if (inv.getItem(i).getItem() instanceof RpgEquipment || com.mmorpg.mine.ToolRunes.tool(inv.getItem(i))) slots.add(i);
         }
         g.text(font, "Équipements de votre inventaire :", x0, listTop - 2, Ui.GOLD, false);
-        int rowH = 20;
+        int rowH = 30;
         int visible = (top + ph - 10 - listTop - 10) / rowH;
         scroll = Math.min(scroll, Math.max(0, slots.size() - visible));
         if (!slots.contains(upgradeSlot)) upgradeSlot = slots.isEmpty() ? -1 : slots.get(0);
@@ -261,8 +261,8 @@ public class ForgeScreen extends MmoScreen {
             int color=s.getItem() instanceof RpgEquipment equipment?equipment.rpgDef().rarity().color:Ui.GOLD;
             int ry = listTop + 10 + i * rowH;
             Ui.frame(g, x0, ry, lw, rowH - 2, color, slot == upgradeSlot || hovered(x0, ry, lw, rowH - 2));
-            g.item(s, x0 + 2, ry + 1);
-            g.text(font, font.plainSubstrByWidth(s.getHoverName().getString(), lw - 30), x0 + 21, ry + 5, color, false);
+            Ui.itemBox(g, font, s, x0 + 2, ry + 2, rowH - 6);
+            g.text(font, font.plainSubstrByWidth(s.getHoverName().getString(), lw - 40), x0 + rowH + 3, ry + 10, color, false);
             click(x0, ry, lw, rowH - 2, () -> upgradeSlot = slot);
         }
         if (slots.isEmpty()) g.text(font, "Aucun équipement RPG dans l'inventaire.", x0, listTop + 14, Ui.MUTED, false);

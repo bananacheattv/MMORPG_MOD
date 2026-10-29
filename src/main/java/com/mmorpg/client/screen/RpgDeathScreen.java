@@ -14,6 +14,8 @@ import net.minecraft.util.Mth;
  * l'equipement est conserve. Le bouton « Renaitre » n'est actif qu'apres une courte pause, le temps de lire.
  */
 public class RpgDeathScreen extends MmoScreen {
+    @Override protected boolean hasNav() { return false; }
+
     private static final float DELAY = 1.6F;
     private final Payloads.DeathInfo info;
     private long openedAt;

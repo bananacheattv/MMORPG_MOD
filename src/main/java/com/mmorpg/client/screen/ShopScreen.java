@@ -81,7 +81,7 @@ public class ShopScreen extends MmoScreen {
     private void renderBuy(GuiGraphicsExtractor g) {
         int x0 = left + 8;
         int y0 = top + 44;
-        int rowH = 22;
+        int rowH = 32;
         int cols = 2;
         int cw = (pw - 16 - 6) / cols;
         int visibleRows = (top + ph - 8 - y0) / rowH;
@@ -99,17 +99,16 @@ public class ShopScreen extends MmoScreen {
             int color = rarityColor(item);
             boolean levelOk = level >= o.minLevel;
             Ui.frame(g, cx, ry, cw, rowH - 2, color, hovered(cx, ry, cw, rowH - 2));
-            g.item(stack, cx + 2, ry + 2);
-            g.itemDecorations(font, stack, cx + 2, ry + 2);
-            if (hovered(cx + 2, ry + 2, 16, 16)) g.setTooltipForNextFrame(font, stack, mouseX, mouseY);
+            Ui.itemBox(g, font, stack, cx + 2, ry + 2, rowH - 6);
+            if (hovered(cx, ry, cw, rowH - 2)) g.setTooltipForNextFrame(font, stack, mouseX, mouseY);
             String name = stack.getHoverName().getString();
-            g.text(font, font.plainSubstrByWidth(name, cw - 100), cx + 21, ry + 2, levelOk ? color : Ui.MUTED, false);
+            g.text(font, font.plainSubstrByWidth(name, cw - 110), cx + rowH + 3, ry + 5, levelOk ? color : Ui.MUTED, false);
             String price = o.price + " or" + (levelOk ? "" : "  (niv. " + o.minLevel + ")");
-            g.text(font, price, cx + 21, ry + 11, gold >= o.price && levelOk ? 0xFFFFD040 : Ui.RED, false);
+            g.text(font, price, cx + rowH + 3, ry + 17, gold >= o.price && levelOk ? 0xFFFFD040 : Ui.RED, false);
             final int index = i;
-            button(g, cx + cw - 72, ry + 3, 36, 14, "x1", levelOk && gold >= o.price, 0xFF2A6A3A,
+            button(g, cx + cw - 72, ry + 8, 36, 14, "x1", levelOk && gold >= o.price, 0xFF2A6A3A,
                     () -> ClientNet.send(new Payloads.ShopAction(Payloads.ShopAction.BUY, index, 1, npc)));
-            button(g, cx + cw - 34, ry + 3, 30, 14, "x5", levelOk && gold >= (long) o.price * 5, 0xFF2A5A4A,
+            button(g, cx + cw - 34, ry + 8, 30, 14, "x5", levelOk && gold >= (long) o.price * 5, 0xFF2A5A4A,
                     () -> ClientNet.send(new Payloads.ShopAction(Payloads.ShopAction.BUY, index, 5, npc)));
         }
     }
@@ -122,7 +121,7 @@ public class ShopScreen extends MmoScreen {
         for (int i = 0; i < inv.getContainerSize(); i++) {
             if (ShopPricing.sellPrice(inv.getItem(i), shop) > 0) slots.add(i);
         }
-        int rowH = 20;
+        int rowH = 30;
         int visible = (top + ph - 8 - y0) / rowH;
         scroll = Math.min(scroll, Math.max(0, slots.size() - visible));
         if (slots.isEmpty()) {
@@ -137,16 +136,15 @@ public class ShopScreen extends MmoScreen {
             int ry = y0 + i * rowH;
             int color = rarityColor(s.getItem());
             Ui.frame(g, x0, ry, w, rowH - 2, color, hovered(x0, ry, w, rowH - 2));
-            g.item(s, x0 + 2, ry + 1);
-            g.itemDecorations(font, s, x0 + 2, ry + 1);
-            if (hovered(x0 + 2, ry + 1, 16, 16)) g.setTooltipForNextFrame(font, s, mouseX, mouseY);
+            Ui.itemBox(g, font, s, x0 + 2, ry + 2, rowH - 6);
+            if (hovered(x0, ry, w, rowH - 2)) g.setTooltipForNextFrame(font, s, mouseX, mouseY);
             String p = price + " or / u.  •  " + (price * s.getCount()) + " or";
             int priceX = x0 + w - 150 - font.width(p);
-            g.text(font, font.plainSubstrByWidth(s.getHoverName().getString(), priceX - (x0 + 22) - 6), x0 + 22, ry + 5, color, false);
-            g.text(font, p, priceX, ry + 5, 0xFFFFD040, false);
-            button(g, x0 + w - 142, ry + 2, 60, 14, "Vendre 1", true, 0xFFE2B85A,
+            g.text(font, font.plainSubstrByWidth(s.getHoverName().getString(), priceX - (x0 + rowH + 3) - 6), x0 + rowH + 3, ry + 10, color, false);
+            g.text(font, p, priceX, ry + 10, 0xFFFFD040, false);
+            button(g, x0 + w - 142, ry + 7, 60, 14, "Vendre 1", true, 0xFFE2B85A,
                     () -> ClientNet.send(new Payloads.ShopAction(Payloads.ShopAction.SELL, slot, 1, npc)));
-            button(g, x0 + w - 78, ry + 2, 74, 14, "Tout vendre", true, 0xFF7A3A1A,
+            button(g, x0 + w - 78, ry + 7, 74, 14, "Tout vendre", true, 0xFF7A3A1A,
                     () -> ClientNet.send(new Payloads.ShopAction(Payloads.ShopAction.SELL_ALL, slot, 0, npc)));
         }
     }

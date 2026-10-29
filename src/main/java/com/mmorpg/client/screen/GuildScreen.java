@@ -11,6 +11,8 @@ import net.minecraft.network.chat.Component;
 import java.util.*;
 
 public final class GuildScreen extends MmoScreen {
+    @Override protected MenuScreen.Tab navActive() { return MenuScreen.Tab.GUILDE; }
+
     @Override protected String backdrop() { return "guild_hall_header"; }
 
     private final CompoundTag data;private final GuildStore.Guild guild;private final UUID self;private int tab,page,boss;private UUID selected;
