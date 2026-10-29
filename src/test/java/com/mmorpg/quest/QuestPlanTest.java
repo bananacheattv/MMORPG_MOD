@@ -157,13 +157,18 @@ class QuestPlanTest {
         for (int i = 0; i < g.size(); i++) {
             assertEquals(i, g.get(i).index());
             assertTrue(indexes.add(g.get(i).index()));
-            for (int j = i + 1; j < g.size(); j++) {
-                double d = QuestNpcPlan.distance(g.get(i), g.get(j));
-                assertTrue(d >= QuestNpcPlan.MIN_DISTANCE, g.get(i).name() + " et " + g.get(j).name() + " ne sont qu'a " + Math.round(d) + " blocs");
+            for (int j = i + 1; j < g.size() && i > 0; j++) { // le 1er PNJ (accueil) est colle au spawn : exception                double d = QuestNpcPlan.distance(g.get(i), g.get(j));
+                assertTrue(d > QuestNpcPlan.MIN_DISTANCE, g.get(i).name() + " et " + g.get(j).name() + " ne sont qu'a " + Math.round(d) + " blocs");
             }
         }
         Set<java.util.UUID> uuids = new HashSet<>();
         g.forEach(x -> assertTrue(uuids.add(x.uuid())));
+    }
+
+    @Test
+    void firstGiverIsNextToSpawn() {
+        var first = QuestNpcPlan.GIVERS.getFirst();
+        assertTrue(Math.hypot(first.dx(), first.dz()) <= 10, "le 1er PNJ doit etre au spawn");
     }
 
     @Test

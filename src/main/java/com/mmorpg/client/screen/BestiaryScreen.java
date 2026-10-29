@@ -141,25 +141,31 @@ public class BestiaryScreen extends MenuScreen {
         boolean boss = t.getBooleanOr("boss", false);
         int boxW = Math.min(130, dw / 3), boxH = Math.min(dh - 16, 170);
         previewBox(g, dx + dw - boxW - 8, y0 + 8, boxW, boxH, selected, unlocked(selected));
+        int textW = Math.max(40, dw - 16 - boxW - 8);   // le texte reste a gauche de la case 3D
         if (!unlocked(selected)) {
             Ui.scaledText(g, "???", dx + 8, y0 + 8, 1.5f, Ui.MUTED, false);
-            Ui.wrap(g, "Fiche verrouillée. Vainquez cette créature pour découvrir son nom, ses statistiques et son butin.", dx + 8, y0 + 30, dw - 16, Ui.MUTED);
+            Ui.wrap(g, "Fiche verrouillée. Vainquez cette créature pour découvrir son nom, ses statistiques et son butin.", dx + 8, y0 + 30, textW, Ui.MUTED);
             return;
         }
-        Ui.scaledText(g, displayName(selected), dx + 8, y0 + 8, 1.5f, boss ? 0xFFFF6060 : Ui.GOLD_LIGHT, false);
+        String title = displayName(selected);
+        float titleScale = Math.min(1.5f, textW / (float) Math.max(1, font.width(title)));
+        if (titleScale < 1f) {   // trop long : on reduit puis on tronque
+            titleScale = 1f;
+            title = font.plainSubstrByWidth(title, textW);
+        }
+        Ui.scaledText(g, title, dx + 8, y0 + 8, titleScale, boss ? 0xFFFF6060 : Ui.GOLD_LIGHT, false);
         int ty = y0 + 26;
         int min = t.getIntOr("min", 1), max = t.getIntOr("max", 1);
-        g.text(font, (boss ? "Boss — " : "Monstre — ") + "Niveau " + (min == max ? min : min + " à " + max), dx + 8, ty, Ui.TEXT, false);
+        g.text(font, font.plainSubstrByWidth((boss ? "Boss — " : "Monstre — ") + "Niveau " + (min == max ? min : min + " à " + max), textW), dx + 8, ty, Ui.TEXT, false);
         ty += 12;
-        g.text(font, "PV : " + Ui.fmt(t.getFloatOr("hp", 0)) + (min == max ? "" : " → " + Ui.fmt(t.getFloatOr("hpMax", 0))), dx + 8, ty, 0xFFFF7070, false);
+        g.text(font, font.plainSubstrByWidth("PV : " + Ui.fmt(t.getFloatOr("hp", 0)) + (min == max ? "" : " → " + Ui.fmt(t.getFloatOr("hpMax", 0))), textW), dx + 8, ty, 0xFFFF7070, false);
         ty += 11;
-        g.text(font, "Attaque : " + Ui.fmt(t.getFloatOr("atk", 0)) + (min == max ? "" : " → " + Ui.fmt(t.getFloatOr("atkMax", 0))), dx + 8, ty, 0xFFFFA050, false);
+        g.text(font, font.plainSubstrByWidth("Attaque : " + Ui.fmt(t.getFloatOr("atk", 0)) + (min == max ? "" : " → " + Ui.fmt(t.getFloatOr("atkMax", 0))), textW), dx + 8, ty, 0xFFFFA050, false);
         ty += 11;
         String origin = boss ? "Invocation : Autel d'Invocation" : t.getBooleanOr("spawns", false) ? "Apparaît naturellement dans le monde" : "N'apparaît pas naturellement";
-        g.text(font, origin, dx + 8, ty, Ui.MUTED, false);
-        ty += 11;
+        ty += Ui.wrap(g, origin, dx + 8, ty, textW, Ui.MUTED) + 1;
         int kills = ClientData.DATA.kills.getOrDefault(selected, 0);
-        g.text(font, "Vaincus : " + kills, dx + 8, ty, Ui.GREEN, false);
+        g.text(font, font.plainSubstrByWidth("Vaincus : " + kills, textW), dx + 8, ty, Ui.GREEN, false);
         ty += 16;
         int lootW = dw - 16 - boxW - 8;
         Ui.header(g, dx + 8, ty, lootW, "BUTIN");
@@ -170,12 +176,13 @@ public class BestiaryScreen extends MenuScreen {
             CompoundTag dt = drops.getCompoundOrEmpty(i);
             Item item = ForgeRecipes.resolveItem(dt.getStringOr("item", "minecraft:air"));
             if (item == null || item == Items.AIR) continue;
+            if (ty + 16 > y0 + dh - 2) break;
             int ix = dx + 8 + col * (lootW / 2);
             ItemStack stack = new ItemStack(item);
             g.item(stack, ix, ty);
             float chance = dt.getFloatOr("chance", 0) * 100;
             String txt = (chance >= 100 ? "100" : String.format(java.util.Locale.FRANCE, "%.0f", chance)) + " %";
-            g.text(font, font.plainSubstrByWidth(stack.getHoverName().getString(), lootW / 2 - 22), ix + 18, ty, Ui.TEXT, false);
+            g.text(font, font.plainSubstrByWidth(stack.getHoverName().getString(), Math.max(8, lootW / 2 - 22)), ix + 18, ty, Ui.TEXT, false);
             g.text(font, txt, ix + 18, ty + 9, Ui.MUTED, false);
             if (hovered(ix, ty, 16, 16)) g.setTooltipForNextFrame(font, stack, mx, my);
             col++;
