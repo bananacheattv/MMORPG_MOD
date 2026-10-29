@@ -126,13 +126,14 @@ public final class QuestEditorScreen extends MmoScreen {
         npcs.stream().filter(n->n.getIntOr("role",0)==0).sorted(Comparator.comparing(n->n.getStringOr("name","")))
                 .forEach(n->choices.add(new Choice(n.getStringOr("id",""),n.getStringOr("name","")+" — "+n.getStringOr("zone","Sans zone"))));return choices;
     }
+    private void pickItem(String title,Consumer<String> action) {minecraft.gui.setScreen(new ItemPickerScreen(this,title,false,1,List.of(),(id,n)->action.accept(id)));}
     private List<Choice> itemChoices() {
         return BuiltInRegistries.ITEM.stream().filter(i->i!=Items.AIR).map(i->new Choice(BuiltInRegistries.ITEM.getKey(i).toString(),new net.minecraft.world.item.ItemStack(i).getHoverName().getString()))
                 .sorted(Comparator.<Choice,Boolean>comparing(c->!c.id().startsWith("mmorpg:")).thenComparing(Choice::label)).toList();
     }
     private String itemName(String id) {var item=com.mmorpg.crafting.ForgeRecipes.resolveItem(id);return item==null?id:new net.minecraft.world.item.ItemStack(item).getHoverName().getString();}
     private void target(QuestDef.Objective o) {
-        if(o.type.equals("collect")) choose("Objet à rapporter",itemChoices(),id->o.target=id);
+        if(o.type.equals("collect")) pickItem("Objet à rapporter",id->o.target=id);
         else {
             var list=new ArrayList<Choice>();list.add(new Choice("*","Tous les monstres"));list.add(new Choice("boss","Tous les boss"));
             BuiltInRegistries.ENTITY_TYPE.forEach(t->{var id=BuiltInRegistries.ENTITY_TYPE.getKey(t);list.add(new Choice(id.getNamespace().equals("mmorpg")?id.getPath():id.toString(),t.getDescription().getString()));});
@@ -238,7 +239,7 @@ public final class QuestEditorScreen extends MmoScreen {
         for(int i=0;i<3;i++) {int p=i;button(g,rx+i*tw,fy-8,tw-2,17,tabs[i],true,rewardPage==i?Ui.GOLD:Ui.MUTED,()->{rewardPage=p;rebuild();});}
         if(rewardPage==1) {
             if(!draft.rewards.items.isEmpty()) {var r=draft.rewards.items.get(item);
-                button(g,rx,fy+32,rw,24,font.plainSubstrByWidth(itemName(r.item),rw-10),true,Ui.GOLD,()->choose("Récompense : objet",itemChoices(),v->r.item=v));
+                button(g,rx,fy+32,rw,24,font.plainSubstrByWidth(itemName(r.item),rw-10),true,Ui.GOLD,()->pickItem("Récompense : objet",v->r.item=v));
                 button(g,rx+94,fy+85,25,18,"◀",item>0,Ui.GOLD,()->{item--;rebuild();});
                 button(g,rx+122,fy+85,25,18,"▶",item+1<draft.rewards.items.size(),Ui.GOLD,()->{item++;rebuild();});
                 g.text(font,(item+1)+" / "+draft.rewards.items.size(),rx+155,fy+90,Ui.TEXT,false);

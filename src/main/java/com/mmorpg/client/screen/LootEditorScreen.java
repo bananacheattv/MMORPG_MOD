@@ -107,18 +107,8 @@ public final class LootEditorScreen extends MmoScreen {
     }
 
     private void chooseItem() {
-        List<Choice> choices = new ArrayList<>();
-        choices.add(new Choice("or", "Pièces d’or (bourse)"));
-        List<Choice> vanilla = new ArrayList<>();
-        for (Item item : BuiltInRegistries.ITEM) {
-            if (item == Items.AIR) continue;
-            var key = BuiltInRegistries.ITEM.getKey(item);
-            Choice c = new Choice(key.toString(), new ItemStack(item).getHoverName().getString() + "  (" + key + ")");
-            if (key.getNamespace().equals(MMORPG.MODID)) choices.add(c);
-            else vanilla.add(c);
-        }
-        choices.addAll(vanilla);
-        minecraft.gui.setScreen(new EditorChoiceScreen(this, "Ajouter un butin", choices, this::add));
+        minecraft.gui.setScreen(new ItemPickerScreen(this, "Ajouter un butin", false, 1,
+                List.of(new ItemPickerScreen.Extra("or", "Pièces d’or (bourse)", ForgeRecipes.resolveItem("mmorpg:piece_or"))), (id, n) -> add(id)));
     }
 
     private void save() {
