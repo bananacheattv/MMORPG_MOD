@@ -52,7 +52,7 @@ public class QuestGiverScreen extends MmoScreen {
         Ui.panel(g, left, top, pw, ph);
         Ui.title(g, left + pw / 2, top + 8, npcName.toUpperCase(java.util.Locale.ROOT), Ui.GOLD_LIGHT);
         g.centeredText(font, Component.literal("Maître des Quêtes"), left + pw / 2, top + 19, Ui.MUTED);
-        if(greetingPage){var lines=font.split(Component.literal(greeting),pw-40);int rows=Math.max(1,(ph-85)/12);dialogueScroll=Math.clamp(dialogueScroll,0,Math.max(0,lines.size()-rows));Ui.inset(g,left+10,top+35,pw-20,ph-75);for(int i=0;i<rows&&i+dialogueScroll<lines.size();i++)g.text(font,lines.get(i+dialogueScroll),left+20,top+45+i*12,Ui.TEXT,false);button(g,left+12,top+ph-29,pw-24,20,"Voir les quêtes",true,Ui.GOLD,()->greetingPage=false);return;}
+        if(greetingPage){int art=Math.min(ph-75,Math.max(60,pw/3));int tx=left+10+art+6;var lines=font.split(Component.literal(greeting),pw-art-46);int rows=Math.max(1,(ph-85)/12);dialogueScroll=Math.clamp(dialogueScroll,0,Math.max(0,lines.size()-rows));Ui.squareArt(g,"quest_guide_portrait",512,left+10,top+35+(ph-75-art),art);Ui.inset(g,tx,top+35,left+pw-10-tx,ph-75);for(int i=0;i<rows&&i+dialogueScroll<lines.size();i++)g.text(font,lines.get(i+dialogueScroll),tx+10,top+45+i*12,Ui.TEXT,false);button(g,left+12,top+ph-29,pw-24,20,"Voir les quêtes",true,Ui.GOLD,()->greetingPage=false);return;}
         int x0 = left + 8;
         int y0 = top + 32;
         int lw = 160;

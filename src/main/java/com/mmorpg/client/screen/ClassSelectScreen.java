@@ -45,9 +45,10 @@ public class ClassSelectScreen extends MmoScreen {
             if (sel) Ui.border(g, cx + 1, cy + 1, cw - 2, ch - 2, Ui.GOLD_LIGHT);
             g.fillGradient(cx + 1, cy + 1, cx + cw - 1, cy + 52, Ui.withAlpha(c.color, 0x70), 0x00000000);
             int by0 = cy + ch - 24;
-            int iconSize = Math.max(24, Math.min(48, Math.min(cw - 20, ch / 5)));
-            Ui.icon(g, Ui.classIcon(c.id(), true), cx + (cw - iconSize) / 2, cy + 5, iconSize, 64);
-            int ty = cy + 8 + iconSize;
+            int portraitH = Math.max(40, Math.min(84, ch / 4));
+            Ui.classPortrait(g, i, cx + 2, cy + 2, cw - 4, portraitH);
+            g.fillGradient(cx + 2, cy + 2 + portraitH - 18, cx + cw - 2, cy + 2 + portraitH, 0x00000000, 0xB0080410);
+            int ty = cy + 6 + portraitH;
             Ui.scaledText(g, c.label.toUpperCase(java.util.Locale.ROOT), cx + cw / 2f, ty, 1.3f, c.color, true);
             ty += 13;
             int ratingsH = RATINGS.length * 10;

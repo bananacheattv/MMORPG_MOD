@@ -1,0 +1,647 @@
+{
+  "version": 4,
+  "generation_tool": "image_gen built-in",
+  "date": "2026-10-28",
+  "namespace_suggestion": "mmorpg:textures/gui/illustrations/",
+  "assets": [
+    {
+      "id": "professions_background",
+      "path": "images/professions_background.png",
+      "label": "Fond Métiers",
+      "role": "background",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "e6da5c0c8e83c2391ade792ac407998ada177d2ae82c1992a5d6e315c57cf5d2",
+      "contains_embedded_text": false
+    },
+    {
+      "id": "miner_card",
+      "path": "images/miner_card.png",
+      "label": "Mineur",
+      "role": "profession_card_with_title",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "9e59407795b86cef2a60820a03e3a677d2c5ee7635155dff72870a64ab8e8d0d",
+      "contains_embedded_text": true,
+      "illustration_only_crop_uv": [
+        0,
+        0,
+        1,
+        0.71
+      ]
+    },
+    {
+      "id": "fisher_card",
+      "path": "images/fisher_card.png",
+      "label": "Pêcheur",
+      "role": "profession_card_with_title",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "94db12c34548711aff00a190ae5a5f3e4bf4f72d5fa4e40be10c1426a98fd7e0",
+      "contains_embedded_text": true,
+      "illustration_only_crop_uv": [
+        0,
+        0,
+        1,
+        0.71
+      ]
+    },
+    {
+      "id": "farmer_card",
+      "path": "images/farmer_card.png",
+      "label": "Fermier",
+      "role": "profession_card_with_title",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "fcd4abf943827f154f22904ebad3214484707911ba720eb27c0dee0598f9ff85",
+      "contains_embedded_text": true,
+      "illustration_only_crop_uv": [
+        0,
+        0,
+        1,
+        0.71
+      ]
+    },
+    {
+      "id": "dungeon_crypt_cover",
+      "path": "images/dungeon_crypt_cover.png",
+      "label": "Donjons — crypte",
+      "role": "landscape_card",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "5e1a5f004cf3cab099f9df5d1ca14120adade96d7d9eda0645f6c0cdae0403a5",
+      "contains_embedded_text": false
+    },
+    {
+      "id": "classes_atlas",
+      "path": "images/classes_atlas.png",
+      "label": "Guerrier, Mage, Archer, Paladin",
+      "role": "four_portrait_atlas",
+      "width": 1983,
+      "height": 793,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "888409dd023cbb56eb5bf840bf5043b9b68df12f9c3473c53107871c0708846a",
+      "contains_embedded_text": false,
+      "regions": [
+        {
+          "id": "guerrier",
+          "x": 0,
+          "y": 0,
+          "width": 496,
+          "height": 793,
+          "uv": [
+            0.0,
+            0,
+            0.25,
+            1
+          ]
+        },
+        {
+          "id": "mage",
+          "x": 496,
+          "y": 0,
+          "width": 496,
+          "height": 793,
+          "uv": [
+            0.25,
+            0,
+            0.5,
+            1
+          ]
+        },
+        {
+          "id": "archer",
+          "x": 992,
+          "y": 0,
+          "width": 495,
+          "height": 793,
+          "uv": [
+            0.5,
+            0,
+            0.75,
+            1
+          ]
+        },
+        {
+          "id": "tank",
+          "x": 1487,
+          "y": 0,
+          "width": 496,
+          "height": 793,
+          "uv": [
+            0.75,
+            0,
+            1.0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "quest_guide_portrait",
+      "path": "images/quest_guide_portrait.png",
+      "label": "Portrait guide de quêtes",
+      "role": "transparent_portrait",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "8522a375cda1f71552cd4f1aa6461fc81d1be055181f2eb87716cc66345ac004",
+      "contains_embedded_text": false
+    },
+    {
+      "id": "mounts_pets_header",
+      "path": "images/mounts_pets_header.png",
+      "label": "Montures et familiers",
+      "role": "collection_header",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "7b83e963d70a6c2623f678781310fde736254e83443bdc5f42c03aa3b7daa212",
+      "contains_embedded_text": false
+    },
+    {
+      "id": "shop_header",
+      "path": "images/shop_header.png",
+      "label": "Boutique",
+      "role": "shop_header",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "d457366405d3c49415ad3ee0a29123e592061ac29cdf991968bbe3cf47625bed",
+      "contains_embedded_text": false
+    },
+    {
+      "id": "portal_loading_background",
+      "path": "images/portal_loading_background.png",
+      "label": "Chargement / portail",
+      "role": "background",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "ad3de3aa5583653de23910db95265bf7dc2e8de25021ffd300a066e8f3bbbb20",
+      "contains_embedded_text": false
+    },
+    {
+      "id": "guild_hall_header",
+      "path": "images/guild_hall_header.png",
+      "label": "Hall de guilde",
+      "role": "guild_header",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "e299eb459554973426892ae52d0faa82165274c2d53e38df0dd27b94a4023bdc",
+      "contains_embedded_text": false,
+      "text_safe_rect_uv": [
+        0.04,
+        0.1,
+        0.31,
+        0.75
+      ]
+    },
+    {
+      "id": "forge_header",
+      "path": "images/forge_header.png",
+      "label": "Forge",
+      "role": "crafting_header",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "6529776a932b7e14ed5453a6b8682914a67a05568271d72cf04b1fd6cb78c80a",
+      "contains_embedded_text": false,
+      "text_safe_rect_uv": [
+        0.04,
+        0.1,
+        0.31,
+        0.75
+      ]
+    },
+    {
+      "id": "bestiary_header",
+      "path": "images/bestiary_header.png",
+      "label": "Bestiaire",
+      "role": "bestiary_header",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "41a7f402a20974dd3d8b330c323da01fa9f4675c5d672d738e49cadb6a0ccc94",
+      "contains_embedded_text": false,
+      "text_safe_rect_uv": [
+        0.04,
+        0.1,
+        0.31,
+        0.75
+      ]
+    },
+    {
+      "id": "achievement_medals_atlas",
+      "path": "images/achievement_medals_atlas.png",
+      "label": "Médailles de succès",
+      "role": "six_medal_atlas",
+      "width": 1536,
+      "height": 1024,
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "b23cae509d9ae6913fb74ecbaec860bb16e26be7d49ac4a6619d538cc3c2be63",
+      "contains_embedded_text": false,
+      "regions": [
+        {
+          "id": "mining",
+          "x": 0,
+          "y": 0,
+          "width": 512,
+          "height": 512,
+          "uv": [
+            0.0,
+            0.0,
+            0.3333333333333333,
+            0.5
+          ]
+        },
+        {
+          "id": "exploration",
+          "x": 512,
+          "y": 0,
+          "width": 512,
+          "height": 512,
+          "uv": [
+            0.3333333333333333,
+            0.0,
+            0.6666666666666666,
+            0.5
+          ]
+        },
+        {
+          "id": "crafting",
+          "x": 1024,
+          "y": 0,
+          "width": 512,
+          "height": 512,
+          "uv": [
+            0.6666666666666666,
+            0.0,
+            1.0,
+            0.5
+          ]
+        },
+        {
+          "id": "boss",
+          "x": 0,
+          "y": 512,
+          "width": 512,
+          "height": 512,
+          "uv": [
+            0.0,
+            0.5,
+            0.3333333333333333,
+            1.0
+          ]
+        },
+        {
+          "id": "arena",
+          "x": 512,
+          "y": 512,
+          "width": 512,
+          "height": 512,
+          "uv": [
+            0.3333333333333333,
+            0.5,
+            0.6666666666666666,
+            1.0
+          ]
+        },
+        {
+          "id": "harvest",
+          "x": 1024,
+          "y": 512,
+          "width": 512,
+          "height": 512,
+          "uv": [
+            0.6666666666666666,
+            0.5,
+            1.0,
+            1.0
+          ]
+        }
+      ],
+      "usage_note": "Planche de référence uniquement. Utiliser les six fichiers medal_*.png pour intégrer les icônes individuellement."
+    },
+    {
+      "id": "arena_results_background",
+      "path": "images/arena_results_background.png",
+      "label": "Résultats d’arène",
+      "role": "results_background",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "ec89f047594073eae10cedf758252116788d5656b79c6953017f8a5bf6a13d6f",
+      "contains_embedded_text": false,
+      "table_safe_rects_uv": [
+        [
+          0.04,
+          0.57,
+          0.44,
+          0.37
+        ],
+        [
+          0.52,
+          0.57,
+          0.44,
+          0.37
+        ]
+      ]
+    },
+    {
+      "id": "medal_mining",
+      "path": "images/medal_mining.png",
+      "label": "Médaille Mine",
+      "role": "achievement_icon",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha_content_bounds_px": [
+        23,
+        30,
+        1234,
+        1210
+      ],
+      "sha256": "6d9841a999104e439b1b21cd8b2bf50a6c043b5528ec2e50bb116af4ee992c02",
+      "contains_embedded_text": false,
+      "recommended_render_mode": "contain",
+      "recommended_outer_padding": 0.08,
+      "variant_of": "achievement_medals_atlas"
+    },
+    {
+      "id": "medal_exploration",
+      "path": "images/medal_exploration.png",
+      "label": "Médaille Exploration",
+      "role": "achievement_icon",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha_content_bounds_px": [
+        0,
+        23,
+        1229,
+        1226
+      ],
+      "sha256": "1219555f2379f3a9ac12a6b75d622ee702b21c4502c5a2439b1c8f96b8d90fcb",
+      "contains_embedded_text": false,
+      "recommended_render_mode": "contain",
+      "recommended_outer_padding": 0.08,
+      "variant_of": "achievement_medals_atlas"
+    },
+    {
+      "id": "medal_crafting",
+      "path": "images/medal_crafting.png",
+      "label": "Médaille Forge",
+      "role": "achievement_icon",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha_content_bounds_px": [
+        0,
+        6,
+        1254,
+        1254
+      ],
+      "sha256": "6a7699bb930c548b2bce00e6ab04a11ad1aec2d7977e762e0de876d16ca9451c",
+      "contains_embedded_text": false,
+      "recommended_render_mode": "contain",
+      "recommended_outer_padding": 0.08,
+      "variant_of": "achievement_medals_atlas"
+    },
+    {
+      "id": "medal_boss",
+      "path": "images/medal_boss.png",
+      "label": "Médaille Boss",
+      "role": "achievement_icon",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha_content_bounds_px": [
+        0,
+        9,
+        1230,
+        1254
+      ],
+      "sha256": "94ba29ad406f53119974e5bdce3bafc5675856e41e361e5272715f0360575c4b",
+      "contains_embedded_text": false,
+      "recommended_render_mode": "contain",
+      "recommended_outer_padding": 0.08,
+      "variant_of": "achievement_medals_atlas"
+    },
+    {
+      "id": "medal_arena",
+      "path": "images/medal_arena.png",
+      "label": "Médaille Arène",
+      "role": "achievement_icon",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha_content_bounds_px": [
+        0,
+        21,
+        1236,
+        1232
+      ],
+      "sha256": "31c2174aaf774f24a90028b4bbd968ffc55f3cee6069c1cf4013bb5d330047b3",
+      "contains_embedded_text": false,
+      "recommended_render_mode": "contain",
+      "recommended_outer_padding": 0.08,
+      "variant_of": "achievement_medals_atlas"
+    },
+    {
+      "id": "medal_harvest",
+      "path": "images/medal_harvest.png",
+      "label": "Médaille Récolte",
+      "role": "achievement_icon",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "alpha_content_bounds_px": [
+        0,
+        24,
+        1230,
+        1254
+      ],
+      "sha256": "4a39539203bf5b90ead0e32e393e3adfa1cfe5e3ea0d12b07195f8a80b3f381a",
+      "contains_embedded_text": false,
+      "recommended_render_mode": "contain",
+      "recommended_outer_padding": 0.08,
+      "variant_of": "achievement_medals_atlas"
+    },
+    {
+      "id": "auction_header",
+      "path": "images/auction_header.png",
+      "label": "Hôtel des ventes",
+      "role": "auction_header",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "6167c7a759166589db1fddb5dc08880e2110f74afee97ae293cdbbbefba66a1d",
+      "contains_embedded_text": false,
+      "text_safe_rect_uv": [
+        0.04,
+        0.1,
+        0.31,
+        0.75
+      ]
+    },
+    {
+      "id": "storage_header",
+      "path": "images/storage_header.png",
+      "label": "Banque et sacs",
+      "role": "storage_header",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "08b5547612e89d345836cbafe59a48685074c734154b9e6cca572901f29959f3",
+      "contains_embedded_text": false,
+      "text_safe_rect_uv": [
+        0.04,
+        0.1,
+        0.31,
+        0.75
+      ]
+    },
+    {
+      "id": "skills_background",
+      "path": "images/skills_background.png",
+      "label": "Compétences",
+      "role": "skills_background",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "d0a4e3914956d069e408d5a80d9232ef0a22f2401a350f5aa8f0794912708419",
+      "contains_embedded_text": false,
+      "text_safe_rect_uv": [
+        0.04,
+        0.56,
+        0.91,
+        0.36
+      ]
+    },
+    {
+      "id": "dungeon_results_background",
+      "path": "images/dungeon_results_background.png",
+      "label": "Fin de donjon",
+      "role": "results_background",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "dd1d064e7ac00d7b731d4c76c8e7bc0bc26524de38f5681656f2e3183ba6a042",
+      "contains_embedded_text": false,
+      "text_safe_rect_uv": [
+        0.05,
+        0.58,
+        0.9,
+        0.34
+      ]
+    },
+    {
+      "id": "equipment_inspection_background",
+      "path": "images/equipment_inspection_background.png",
+      "label": "Fiche d’équipement",
+      "role": "item_inspection_background",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "8cd7f10d8b56ec3a9b36559a80613eb51bc845aa2178b42da18bfc192e66d21f",
+      "contains_embedded_text": false,
+      "item_preview_rect_uv": [
+        0.14,
+        0.12,
+        0.34,
+        0.55
+      ],
+      "text_safe_rect_uv": [
+        0.53,
+        0.1,
+        0.33,
+        0.62
+      ]
+    }
+  ]
+}

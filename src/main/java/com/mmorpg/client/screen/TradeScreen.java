@@ -24,6 +24,7 @@ import java.util.Set;
 
 /** Echange entre deux joueurs (/trade) : mes offres a gauche, celles du partenaire a droite, mon inventaire dessous ; validation puis confirmation. */
 public class TradeScreen extends MmoScreen {
+    @Override protected String backdrop() { return "auction_header"; }
     private String partner = "?";
     private String status = "";
     private int stage;

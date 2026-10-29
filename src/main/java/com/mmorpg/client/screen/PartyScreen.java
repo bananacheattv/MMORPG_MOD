@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Component;
 
 /** Gestion du groupe : membres, invitations, chef, exclusion. */
 public class PartyScreen extends MenuScreen {
+    @Override protected String backdrop() { return "guild_hall_header"; }
     private EditBox nameBox;
 
     public PartyScreen() {

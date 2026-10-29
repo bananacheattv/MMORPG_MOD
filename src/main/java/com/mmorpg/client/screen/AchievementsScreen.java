@@ -17,6 +17,8 @@ public class AchievementsScreen extends MenuScreen {
     private static Achievement.Category selected = Achievement.Category.PROGRESSION;
     private static boolean titlesPage;
     private int scroll;
+    /** Medaille du pack d'art par categorie (ordre de Achievement.Category). */
+    private static final String[] MEDALS = {"medal_exploration", "medal_boss", "medal_exploration", "medal_arena", "medal_mining", "medal_crafting", "medal_harvest"};
 
     public AchievementsScreen() {
         super(Tab.SUCCES);
@@ -47,7 +49,8 @@ public class AchievementsScreen extends MenuScreen {
             long n = Achievement.all().values().stream().filter(x -> x.category() == c && d.achievements.containsKey(x.id())).count();
             long all = Achievement.all().values().stream().filter(x -> x.category() == c).count();
             Ui.frame(g, x0, ry, lw, 20, c.color, sel || hovered(x0, ry, lw, 20));
-            g.text(font, c.label, x0 + 6, ry + 6, sel ? Ui.GOLD_LIGHT : Ui.TEXT, false);
+            Ui.squareArt(g, MEDALS[c.ordinal()], 128, x0 + 3, ry + 2, 16);
+            g.text(font, c.label, x0 + 23, ry + 6, sel ? Ui.GOLD_LIGHT : Ui.TEXT, false);
             String cnt = n + "/" + all;
             g.text(font, cnt, x0 + lw - 6 - font.width(cnt), ry + 6, n == all ? Ui.GREEN : Ui.MUTED, false);
             final var cc = c;
