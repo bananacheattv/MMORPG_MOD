@@ -104,7 +104,7 @@ def main(only):
                     elif k.startswith('thirdperson'):
                         if tilt:
                             d['rotation'][2] = tilt if 'right' in k else -tilt
-                        d['translation'][1] = 1.8  # main sur le manche, pas sur le pommeau
+                        d['translation'][1] = 3.4 if kind == 'HAMMER' else 1.8  # main sur le manche, pas sur le pommeau
                     display[k] = d
             model = {'credit': 'Aeloria · sprite peint et extrude', 'gui_light': 'front',
                      'textures': {'t': f'mmorpg:item/weapons/{name}', 'particle': '#t'}, 'elements': els, 'display': display}
