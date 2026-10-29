@@ -71,7 +71,7 @@ public class BestiaryScreen extends MenuScreen {
             if (entry.key().equals(key)) height = entry.height() * entry.scale();   // le rendu des modeles importes applique deja leur echelle
         int size = Math.max(6, Math.min(80, (int) ((h - 14) / Math.max(.5f, height * 1.2f))));
         float[] spin = spinZone("bestiary:" + key, x, y, w, h);
-        Ui.entitySpin(g, x + 4, y + 4, x + w - 4, y + h - 4, size, .0625f, spin[0] - .5f, spin[1], entity);
+        Ui.entitySpin(g, x + 4, y + 4, x + w - 4, y + h - 4, size, .0625f, spin[0], spin[1], entity);
     }
 
     @Override
