@@ -55,6 +55,7 @@ public final class BestiaryInfo {
     }
 
     public static void sendTo(ServerPlayer player) {
+        if (!FeatureFlags.enabled(player.level().getServer(), "bestiaire")) return;
         Net.toPlayer(player, new Payloads.MobInfo(build()));
     }
 

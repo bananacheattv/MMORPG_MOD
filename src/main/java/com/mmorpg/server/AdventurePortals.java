@@ -177,6 +177,7 @@ public final class AdventurePortals {
     }
     public static boolean nearDungeonMenu(ServerPlayer p){return AdventurePortalData.get(p.level().getServer()).all().stream().anyMatch(portal->portal.kind().equals("donjons")&&portal.dimension().equals(p.level().dimension())&&allowed(p,portal)&&p.distanceToSqr(portal.pos().getX()+.5,portal.pos().getY(),portal.pos().getZ()+.5)<=100);}
     public static void enter(ServerPlayer p, Portal portal) {
+        if (!FeatureFlags.allow(p, "portails")) return;
         if (!allowed(p, portal)) { fail(p, "Accès refusé : choisissez votre classe, respectez le niveau et découvrez d'abord cette région. Terminez aussi tout essai, cinématique ou combat PvP."); return; }
         PortalAccess.grant(p, portal.kind().equals("donjons")?"donjon":portal.kind());
         switch (portal.kind()) {

@@ -107,7 +107,7 @@ public final class Rankings {
 
     @SubscribeEvent
     public static void tick(ServerTickEvent.Post e) {
-        if (e.getServer().getTickCount() % 200 != 0) return;
+        if (e.getServer().getTickCount() % 200 != 0 || !com.mmorpg.server.FeatureFlags.enabled(e.getServer(), "classements")) return;
         try {
             sample(e.getServer());
         } catch (Exception ex) {
@@ -117,6 +117,7 @@ public final class Rankings {
 
     /** Affiche le top 10 et le rang du joueur dans le chat. */
     public static void show(ServerPlayer p, RankingKind kind) {
+        if (!com.mmorpg.server.FeatureFlags.allow(p, "classements")) return;
         var list = top(kind);
         p.sendSystemMessage(Component.literal("— " + kind.label + " —").withColor(kind.color));
         if (list.isEmpty()) p.sendSystemMessage(Component.literal("Aucune donnée pour l’instant.").withColor(0xB9AFCC));
@@ -145,6 +146,7 @@ public final class Rankings {
     public static void commands(RegisterCommandsEvent e) {
         var root = Commands.literal("classement").executes(c -> {
             var p = c.getSource().getPlayerOrException();
+            if (!com.mmorpg.server.FeatureFlags.allow(p, "classements")) return 0;
             p.sendSystemMessage(Component.literal("Classements : " + String.join(", ", Arrays.stream(RankingKind.values()).map(k -> k.id).toList()) + ". Exemple : /classement niveau").withColor(0xB9AFCC));
             return 1;
         });

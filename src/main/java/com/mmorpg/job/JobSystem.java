@@ -37,7 +37,7 @@ public final class JobSystem {
 
     /** Ajoute de l'experience de metier, gere les niveaux et octroie les recompenses des paliers franchis. */
     public static void addXp(ServerPlayer p, PlayerData d, Job job, long amount) {
-        if (amount <= 0) return;
+        if (amount <= 0 || !com.mmorpg.server.FeatureFlags.enabled(p.level().getServer(), "metiers")) return;
         long max = Job.totalFor(Job.MAX_LEVEL);
         long before = d.jobXp.getOrDefault(job.id, 0L);
         if (before >= max) return;
@@ -92,6 +92,7 @@ public final class JobSystem {
 
     /** Equipe (ou retire) le titre d'un palier de metier. Action envoyee par l'ecran Metiers. */
     public static void action(ServerPlayer p, CompoundTag t) {
+        if (!com.mmorpg.server.FeatureFlags.allow(p, "metiers")) return;
         PlayerData d = RpgPlayers.get(p);
         if (!t.getStringOr("action", "").equals("title")) return;
         Job job = Job.byId(t.getStringOr("job", ""));

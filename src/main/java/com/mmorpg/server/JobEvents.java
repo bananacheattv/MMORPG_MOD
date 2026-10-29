@@ -32,6 +32,7 @@ public final class JobEvents {
     @SubscribeEvent
     public static void fished(ItemFishedEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer p)) return;
+        if (!FeatureFlags.enabled(p.level().getServer(), "peche")) return;
         var random = p.getRandom();
         int lvl = JobSystem.level(p, Job.PECHEUR);
         int tier = Job.tier(lvl);

@@ -49,7 +49,7 @@ public final class Leaderboards {
     }
 
     public static void add(MinecraftServer server, UUID id, String name, Board board, long delta, long extraDelta) {
-        if (delta <= 0 && extraDelta <= 0) return;
+        if (delta <= 0 && extraDelta <= 0 || !com.mmorpg.server.FeatureFlags.enabled(server, "classements")) return;
         final String who = clean(name);
         LeaderboardData.get(server).add(board, id, who, delta, extraDelta);
         if (!Database.enabled()) return;
