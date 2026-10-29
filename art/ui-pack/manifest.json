@@ -1,7 +1,7 @@
 {
-  "version": 4,
+  "version": 5,
   "generation_tool": "image_gen built-in",
-  "date": "2026-10-28",
+  "date": "2026-10-29",
   "namespace_suggestion": "mmorpg:textures/gui/illustrations/",
   "assets": [
     {
@@ -642,6 +642,118 @@
         0.33,
         0.62
       ]
+    },
+    {
+      "id": "yggdrasil_tree",
+      "label": "Yggdrasil — arbre sacré",
+      "role": "transparent_tree",
+      "path": "images/yggdrasil_tree.png",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "45099feae3de3bc12d8d66f9f9e8d02ad7dde48782c5c98aee95c8fbbe313414",
+      "contains_embedded_text": false
+    },
+    {
+      "id": "quest_master",
+      "label": "Maître des Quêtes — état vide",
+      "role": "transparent_portrait",
+      "path": "images/quest_master.png",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "bc286bb1519ed96b8c1c7b7f2bdc4879045be6bf2393d0948d60386bfd49a575",
+      "contains_embedded_text": false
+    },
+    {
+      "id": "quest_parchment",
+      "label": "Parchemin de quête",
+      "role": "transparent_panel",
+      "path": "images/quest_parchment.png",
+      "width": 1024,
+      "height": 1536,
+      "alpha_range": [
+        0,
+        254
+      ],
+      "sha256": "612b14a6cb5b4ec3800bf624a21377ed451404c6ab3f82bddc68caeb5189751a",
+      "contains_embedded_text": false
+    },
+    {
+      "id": "group_banner",
+      "label": "Bannière de groupe",
+      "role": "group_header",
+      "path": "images/group_banner.png",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "cc9364b9f77972b485758312c19d20111d01ee3fe14732e7d6834a0bef22a148",
+      "contains_embedded_text": false
+    },
+    {
+      "id": "arena_fire_cover",
+      "label": "Arène de feu",
+      "role": "arena_card",
+      "path": "images/arena_fire_cover.png",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "3bedf2ffc8a6a8e22684c9638eca1c65cca836161dacc58886f17bb1d204c769",
+      "contains_embedded_text": false
+    },
+    {
+      "id": "arena_dunes_cover",
+      "label": "Arène des dunes",
+      "role": "arena_card",
+      "path": "images/arena_dunes_cover.png",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "696f6fb90516a051495c3bc2e5187445ab958d61b3b543c3d570db08eebcbdc1",
+      "contains_embedded_text": false
+    },
+    {
+      "id": "weekly_reward_chest",
+      "label": "Coffre de récompense hebdomadaire",
+      "role": "transparent_icon",
+      "path": "images/weekly_reward_chest.png",
+      "width": 1254,
+      "height": 1254,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "sha256": "4cd32a91e5cda6ce28feab763370e63781c1fbd04c93b097c204b0545b9cbdc7",
+      "contains_embedded_text": false
+    },
+    {
+      "id": "cosmetics_stage",
+      "label": "Aperçu des cosmétiques",
+      "role": "cosmetics_background",
+      "path": "images/cosmetics_stage.png",
+      "width": 1672,
+      "height": 941,
+      "alpha_range": [
+        255,
+        255
+      ],
+      "sha256": "becc8390c63076e56a08ab7abcc29abfe3a8c09a1d3729bacaa56fe5c16f4a0b",
+      "contains_embedded_text": false
     }
   ]
 }

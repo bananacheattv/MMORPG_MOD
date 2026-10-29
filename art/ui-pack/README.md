@@ -2,6 +2,8 @@
 
 Ce dossier est le **point d’entrée unique pour Claude**. Il regroupe toutes les images, les consignes et les contrôles d’affichage. La branche reste `art/ui-assets-for-claude` ; ce lien sera conservé pour les prochains lots.
 
+Complément demandé : [les dix interfaces et Yggdrasil](COMPLEMENT_INTERFACES.md). Prioritaire pour Claude : ce document précise les éléments à coder en plus des images.
+
 ## État des lots
 
 - Lot1 : Métiers, Donjons, Classes, Quêtes, Montures/Familiers, Boutique, Chargements — livré.
@@ -10,7 +12,7 @@ Ce dossier est le **point d’entrée unique pour Claude**. Il regroupe toutes l
 - Lot3 : HDV, Banque/Sacs, Compétences, Fin de donjon, Fiches d’équipement — livré.
 - **Carte du monde retirée à la demande de l’utilisateur. Aucun fichier de carte ni demande de création de ce menu n’est livré.**
 
-**26 PNG disponibles**, dont les trois métiers de la première série. Les images sont des assets, pas des interfaces déjà fonctionnelles.
+**34 PNG disponibles**, dont les trois métiers de la première série. Les images sont des assets, pas des interfaces déjà fonctionnelles.
 
 ➡️ [Instructions d’intégration pour Claude](BRIEF_CLAUDE.md) · [Contrôles d’affichage obligatoires](DISPLAY_QA.md) · [Manifeste technique](manifest.json) · [Prompts](prompts.json)
 
@@ -156,3 +158,55 @@ Les six médailles individuelles `medal_*.png` sont les fichiers à intégrer. L
 ### Fiche d’équipement
 
 ![Fiche d’équipement](images/equipment_inspection_background.png)
+
+## Complément : interfaces manquantes et Yggdrasil
+
+Huit nouveaux assets générés avec image_gen intégré ; prompts dans prompts.json.
+
+### Yggdrasil — arbre sacré
+
+![Yggdrasil — arbre sacré](images/yggdrasil_tree.png)
+
+1254 × 1254 — alpha [0, 255].
+
+### Maître des Quêtes — état vide
+
+![Maître des Quêtes — état vide](images/quest_master.png)
+
+1254 × 1254 — alpha [0, 255].
+
+### Parchemin de quête
+
+![Parchemin de quête](images/quest_parchment.png)
+
+1024 × 1536 — alpha [0, 254].
+
+### Bannière de groupe
+
+![Bannière de groupe](images/group_banner.png)
+
+1672 × 941 — alpha [255, 255].
+
+### Arène de feu
+
+![Arène de feu](images/arena_fire_cover.png)
+
+1672 × 941 — alpha [255, 255].
+
+### Arène des dunes
+
+![Arène des dunes](images/arena_dunes_cover.png)
+
+1672 × 941 — alpha [255, 255].
+
+### Coffre de récompense hebdomadaire
+
+![Coffre de récompense hebdomadaire](images/weekly_reward_chest.png)
+
+1254 × 1254 — alpha [0, 255].
+
+### Aperçu des cosmétiques
+
+![Aperçu des cosmétiques](images/cosmetics_stage.png)
+
+1672 × 941 — alpha [255, 255].

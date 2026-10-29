@@ -173,3 +173,7 @@ Lier l’ouverture de la fiche à une action explicite et cohérente avec le res
 - Ne pas tester les générateurs Java/Gradle en recompilant pendant un client de QA lancé : un précédent essai a supprimé temporairement des classes chargées tardivement.
 - Joindre des captures réelles des interfaces intégrées. Une image d’illustration seule ne prouve pas qu’une interface fonctionne.
 - Ne pas redémarrer les serveurs s’il y a des joueurs connectés. Ce pack n’a pas été déployé et ne demande aucun changement de launcher.
+# Complément prioritaire
+
+Lire aussi [COMPLEMENT_INTERFACES.md](COMPLEMENT_INTERFACES.md) : demandes précises des dix interfaces signalées manquantes, plus le design Yggdrasil. Ces consignes complètent les sections suivantes.
+

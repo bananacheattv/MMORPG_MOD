@@ -60,3 +60,7 @@ Utiliser des fixtures de QA isolées, sans modifier les profils de production :
 ## Vérification des fichiers du pack
 
 Exécuter `python art/ui-pack/verify_pack.py` depuis la racine du dépôt avec Pillow installé. Ce contrôle vérifie les images, dimensions, SHA, alpha, régions d’atlas et liens documentaires ; il ne remplace pas les essais dans Minecraft.
+# Contrôles supplémentaires du complément
+
+Les onze écrans de [COMPLEMENT_INTERFACES.md](COMPLEMENT_INTERFACES.md) sont tous **à intégrer / non vérifiés en jeu**. Tester particulièrement Succès (route incorrecte vers portail), Trade (slots et clics sur toute la largeur), Groupe (skins et PV réels), Quêtes (texte sur parchemin), Cosmétiques (joueur réellement en 3D), Yggdrasil (couronne/racines entières et actions lisibles).
+
