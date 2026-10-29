@@ -207,7 +207,7 @@ public final class Launcher {
 
     private void show(String page) {
         ((CardLayout) pages.getLayout()).show(pages, page);
-        String[] order = {"home", "news", "changelog", "account"};
+        String[] order = {"home", "news", "changelog", "account", "settings"};
         for (int i = 0; i < nav.size() && i < order.length; i++) nav.get(i).setActive(order[i].equals(page));
         pages.repaint();
     }
@@ -321,6 +321,7 @@ public final class Launcher {
         addNav(items, "News", Theme.Icon.NEWS, "news");
         addNav(items, "Changelog", Theme.Icon.CHANGELOG, "changelog");
         addNav(items, "Compte", Theme.Icon.ACCOUNT, "account");
+        addNav(items, "Journal", Theme.Icon.GEAR, "settings");
         items.add(new Theme.NavItem("Wiki", Theme.Icon.WIKI, true, () -> open(WIKI_URL)));
         side.add(items, BorderLayout.NORTH);
 
