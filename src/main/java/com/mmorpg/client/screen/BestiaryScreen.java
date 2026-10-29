@@ -182,7 +182,7 @@ public class BestiaryScreen extends MenuScreen {
             g.item(stack, ix, ty);
             float chance = dt.getFloatOr("chance", 0) * 100;
             String txt = (chance >= 100 ? "100" : String.format(java.util.Locale.FRANCE, "%.0f", chance)) + " %";
-            g.text(font, font.plainSubstrByWidth(stack.getHoverName().getString(), Math.max(8, lootW / 2 - 22)), ix + 18, ty, Ui.TEXT, false);
+            g.text(font, ellipsis(stack.getHoverName().getString(), Math.max(8, lootW / 2 - 22)), ix + 18, ty, Ui.TEXT, false);
             g.text(font, txt, ix + 18, ty + 9, Ui.MUTED, false);
             if (hovered(ix, ty, 16, 16)) g.setTooltipForNextFrame(font, stack, mx, my);
             col++;
@@ -192,6 +192,12 @@ public class BestiaryScreen extends MenuScreen {
             }
             if (ty > y0 + dh - 20) break;
         }
+    }
+
+    /** Coupe le texte avec « … » pour qu'il tienne dans la largeur donnee. */
+    private String ellipsis(String text, int width) {
+        if (font.width(text) <= width) return text;
+        return font.plainSubstrByWidth(text, Math.max(0, width - font.width("…"))) + "…";
     }
 
     @Override protected void renderOverlay(GuiGraphicsExtractor g, int mx, int my, float a) {
