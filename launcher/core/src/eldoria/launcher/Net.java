@@ -13,13 +13,14 @@ import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.time.Duration;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 import java.util.function.LongConsumer;
 
 /** Acces reseau : JSON, formulaires et telechargements verifies (sha1 / sha256 / sha512). */
 final class Net {
-    static final HttpClient HTTP = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS)
+    static final HttpClient HTTP = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).followRedirects(HttpClient.Redirect.ALWAYS)
             .connectTimeout(Duration.ofSeconds(20)).build();
 
     private Net() {}
@@ -108,6 +109,10 @@ final class Net {
     private static void downloadOnce(String url, Path target, String algo, String expected, LongConsumer progress) throws Exception {
         Files.createDirectories(target.toAbsolutePath().getParent());
         Path tmp = target.resolveSibling(target.getFileName() + ".part");
+        if (!Files.exists(tmp) && parallel(url, tmp, progress)) {
+            verifyAndMove(tmp, target, algo, expected);
+            return;
+        }
         long have = Files.isRegularFile(tmp) ? Files.size(tmp) : 0;
         HttpRequest.Builder rb = HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofMinutes(5)).header("User-Agent", "EldoriaLauncher");
         if (have > 0) rb.header("Range", "bytes=" + have + "-");
@@ -128,10 +133,71 @@ final class Net {
                 if (progress != null) progress.accept(done);
             }
         }
+        verifyAndMove(tmp, target, algo, expected);
+    }
+
+    private static void verifyAndMove(Path tmp, Path target, String algo, String expected) throws Exception {
         if (expected != null && !expected.isEmpty() && !expected.equalsIgnoreCase(hash(tmp, algo))) {
             Files.deleteIfExists(tmp);
             throw new IllegalStateException("Fichier corrompu : " + target.getFileName());
         }
         Files.move(tmp, target, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    /** Gros fichier : 6 connexions en parallele (Range). Beaucoup de reseaux limitent le debit par connexion. Faux si non supporte. */
+    private static boolean parallel(String url, Path tmp, LongConsumer progress) throws Exception {
+        HttpResponse<InputStream> probe = HTTP.send(HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofSeconds(30))
+                .header("User-Agent", "EldoriaLauncher").header("Range", "bytes=0-0").build(), HttpResponse.BodyHandlers.ofInputStream());
+        probe.body().close();
+        String cr = probe.headers().firstValue("Content-Range").orElse("");
+        if (probe.statusCode() != 206 || !cr.contains("/")) return false;
+        long total = Long.parseLong(cr.substring(cr.indexOf('/') + 1).trim());
+        if (total < (8 << 20)) return false;
+        int n = 6;
+        long chunk = (total + n - 1) / n;
+        java.util.concurrent.atomic.AtomicLong done = new java.util.concurrent.atomic.AtomicLong();
+        try (java.io.RandomAccessFile raf = new java.io.RandomAccessFile(tmp.toFile(), "rw")) {
+            raf.setLength(total);
+        }
+        java.util.concurrent.ExecutorService pool = java.util.concurrent.Executors.newFixedThreadPool(n);
+        try {
+            List<java.util.concurrent.Future<?>> fs = new java.util.ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                long from = i * chunk, to = Math.min(total, from + chunk) - 1;
+                if (from > to) break;
+                fs.add(pool.submit(() -> {
+                    for (int attempt = 0; ; attempt++) {
+                        long pos = from;
+                        try (java.io.RandomAccessFile raf = new java.io.RandomAccessFile(tmp.toFile(), "rw")) {
+                            HttpResponse<InputStream> r = HTTP.send(HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofMinutes(10))
+                                    .header("User-Agent", "EldoriaLauncher").header("Range", "bytes=" + from + "-" + to).build(),
+                                    HttpResponse.BodyHandlers.ofInputStream());
+                            if (r.statusCode() != 206) throw new IllegalStateException("HTTP " + r.statusCode());
+                            try (InputStream in = r.body()) {
+                                raf.seek(pos);
+                                byte[] buf = new byte[1 << 16];
+                                for (int k; (k = in.read(buf)) > 0; ) {
+                                    raf.write(buf, 0, k);
+                                    long d = done.addAndGet(k);
+                                    if (progress != null) progress.accept(d);
+                                }
+                            }
+                            return null;
+                        } catch (Exception e) {
+                            if (attempt >= 3) throw e;
+                            done.addAndGet(-(pos - from)); // approximation : on recommence ce morceau
+                            Thread.sleep(1000L << attempt);
+                        }
+                    }
+                }));
+            }
+            for (var f : fs) f.get();
+        } catch (Exception e) {
+            Files.deleteIfExists(tmp);
+            throw e;
+        } finally {
+            pool.shutdownNow();
+        }
+        return true;
     }
 }
