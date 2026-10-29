@@ -105,7 +105,7 @@ public final class RpgPlayers {
         var features=new CompoundTag();for(String key:FeatureFlags.KEYS)features.putBoolean(key,FeatureFlags.enabled(player.level().getServer(),key));t.put("features",features);
         t.putBoolean("creativeAllowed",CreativeAccess.allowed(player));t.putInt("guardBroken",com.mmorpg.combat.ShieldGuard.brokenTicks(player));
         t.putString("backend",com.mmorpg.network.NetworkConfig.current.role.name());
-        t.store("stats", com.mojang.serialization.Codec.DOUBLE.listOf(), toList(d.stats.raw()));
+        t.store("statBlock", com.mojang.serialization.Codec.DOUBLE.listOf(), toList(d.stats.raw()));
         t.putLong("xpToNext", LevelSystem.xpToNext(d.level));
         t.putInt("skillPoints", d.availableSkillPoints());
         long now = player.level().getGameTime();
