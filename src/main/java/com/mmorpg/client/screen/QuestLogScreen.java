@@ -73,7 +73,12 @@ public class QuestLogScreen extends MenuScreen {
         for (int i = 0; i < quests.size(); i++) {
             if (quests.getCompoundOrEmpty(i).getStringOr("id", "").equals(selected)) q = quests.getCompoundOrEmpty(i);
         }
-        if (q == null) return;
+        if (q == null) {
+            int side = Math.max(32, Math.min(Math.min(dw - 16, dh - 40), 128));
+            Ui.squareArt(g, "quest_master", 256, dx + (dw - side) / 2, y0 + (dh - side) / 2 - 8, side);
+            g.centeredText(font, net.minecraft.network.chat.Component.literal("Parlez au Maître des Quêtes"), dx + dw / 2, y0 + (dh + side) / 2 - 2, Ui.MUTED);
+            return;
+        }
         int by = y0 + dh - 22;
         QuestPanel.render(g, q, dx, y0, dw, by - 23, mx, my);
         String id = q.getStringOr("id", "");
