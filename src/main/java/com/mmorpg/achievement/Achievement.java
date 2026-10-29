@@ -22,7 +22,8 @@ public record Achievement(String id, Category category, String name, String desc
 
     /** Statistiques suivies (cle -> libelle) ; "max" = on garde la valeur la plus haute au lieu de cumuler. */
     public static final String LEVEL = "level", KILLS = "kills", BOSS_KILLS = "boss_kills", DUNGEONS = "dungeons", QUESTS = "quests",
-            PVP_KILLS = "pvp_kills", PVP_WINS = "pvp_wins", GOLD_EARNED = "gold_earned";
+            PVP_KILLS = "pvp_kills", PVP_WINS = "pvp_wins", GOLD_EARNED = "gold_earned",
+            FISH_CAUGHT = "fish_caught", TREASURES_FISHED = "treasures_fished";
 
     public static String jobStat(String jobId) {
         return "job_" + jobId;
@@ -69,6 +70,11 @@ public record Achievement(String id, Category category, String name, String desc
         add(Category.METIERS, "fermier_50", "Maître fermier", "Fermier niveau 50.", jobStat("fermier"), 50, "Maître fermier");
         add(Category.METIERS, "pecheur_25", "Pêcheur confirmé", "Pêcheur niveau 25.", jobStat("pecheur"), 25, "Pêcheur émérite");
         add(Category.METIERS, "pecheur_50", "Maître pêcheur", "Pêcheur niveau 50.", jobStat("pecheur"), 50, "Maître pêcheur");
+
+        add(Category.METIERS, "peche_100", "Bon coup de ligne", "Remonter 100 prises (poissons, déchets ou coffres).", FISH_CAUGHT, 100, "");
+        add(Category.METIERS, "peche_1000", "Roi du filet", "Remonter 1 000 prises.", FISH_CAUGHT, 1000, "Roi du filet");
+        add(Category.METIERS, "tresor_1", "Chasseur d’épaves", "Repêcher un coffre.", TREASURES_FISHED, 1, "");
+        add(Category.METIERS, "tresor_25", "Pilleur des abysses", "Repêcher 25 coffres.", TREASURES_FISHED, 25, "Pilleur des abysses");
 
         add(Category.QUETES, "quete_1", "Premier contrat", "Terminer une quête.", QUESTS, 1, "");
         add(Category.QUETES, "quete_25", "Homme de confiance", "Terminer 25 quêtes.", QUESTS, 25, "Homme de confiance");

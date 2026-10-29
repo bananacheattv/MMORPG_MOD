@@ -43,6 +43,7 @@ public final class ModCreativeTabs {
                 ModItems.MATERIALS.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
                 com.mmorpg.mine.MineTools.ITEMS.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
                 com.mmorpg.farm.FarmCrops.SEED_ITEMS.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
+                com.mmorpg.fishing.FishingItems.ALL.forEach(i -> out.accept(i.get()));
                 out.accept(ModItems.PIECE_OR.get());
                 ModItems.CONSUMABLES.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
                 ModItems.SUMMONS.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});

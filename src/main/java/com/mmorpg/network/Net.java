@@ -20,6 +20,7 @@ public final class Net {
         r.playToClient(Payloads.Guidance.TYPE,Payloads.Guidance.CODEC);
         r.playToClient(Payloads.SyncPlayer.TYPE, Payloads.SyncPlayer.CODEC);
         r.playToClient(Payloads.Vitals.TYPE, Payloads.Vitals.CODEC);
+        r.playToClient(Payloads.FishFightState.TYPE, Payloads.FishFightState.CODEC);
         r.playToClient(Payloads.CombatText.TYPE, Payloads.CombatText.CODEC);
         r.playToClient(Payloads.CastAnimation.TYPE, Payloads.CastAnimation.CODEC);
         r.playToClient(Payloads.Notify.TYPE, Payloads.Notify.CODEC);

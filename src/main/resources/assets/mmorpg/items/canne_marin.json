@@ -1,0 +1,14 @@
+{
+  "model": {
+    "type": "minecraft:condition",
+    "property": "minecraft:fishing_rod/cast",
+    "on_false": {
+      "type": "minecraft:model",
+      "model": "mmorpg:item/canne_marin"
+    },
+    "on_true": {
+      "type": "minecraft:model",
+      "model": "mmorpg:item/canne_marin_lancee"
+    }
+  }
+}

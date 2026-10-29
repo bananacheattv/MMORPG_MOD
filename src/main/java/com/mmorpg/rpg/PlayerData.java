@@ -106,6 +106,9 @@ public class PlayerData implements ValueIOSerializable {
     public final Map<String, Long> jobXp = new LinkedHashMap<>();
     /** Recompenses de paliers de metier deja recues (« mineur:20 »). */
     public final Set<String> jobClaimed = new HashSet<>();
+    /** Journal de peche : nombre de prises par espece (poissons, dechets, coffres) et meilleure taille en cm. */
+    public final Map<String, Integer> fishCaught = new LinkedHashMap<>();
+    public final Map<String, Integer> fishBest = new LinkedHashMap<>();
 
     // --- transient (non sauvegarde)
     public StatBlock stats = new StatBlock();
@@ -223,6 +226,8 @@ public class PlayerData implements ValueIOSerializable {
         t.store("kills", STR_INT_MAP, kills);
         t.store("jobXp", Codec.unboundedMap(Codec.STRING, Codec.LONG), jobXp);
         t.store("jobClaimed", Codec.STRING.listOf(), new ArrayList<>(jobClaimed));
+        t.store("fishCaught", STR_INT_MAP, fishCaught);
+        t.store("fishBest", STR_INT_MAP, fishBest);
         t.store("stats", Codec.unboundedMap(Codec.STRING, Codec.LONG), counters);
         t.store("achievements", Codec.unboundedMap(Codec.STRING, Codec.LONG), achievements);
         t.putBoolean("chosen", classChosenOnce);
@@ -295,6 +300,10 @@ public class PlayerData implements ValueIOSerializable {
         jobXp.putAll(t.read("jobXp", Codec.unboundedMap(Codec.STRING, Codec.LONG)).orElse(Map.of()));
         jobClaimed.clear();
         jobClaimed.addAll(t.read("jobClaimed", Codec.STRING.listOf()).orElse(List.of()));
+        fishCaught.clear();
+        fishCaught.putAll(t.read("fishCaught", STR_INT_MAP).orElse(Map.of()));
+        fishBest.clear();
+        fishBest.putAll(t.read("fishBest", STR_INT_MAP).orElse(Map.of()));
         counters.clear();
         counters.putAll(t.read("stats", Codec.unboundedMap(Codec.STRING, Codec.LONG)).orElse(Map.of()));
         achievements.clear();

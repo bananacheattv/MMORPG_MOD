@@ -12,6 +12,9 @@ public final class ClientView {
     /** Nombre de pieces d'un set actuellement equipees par le joueur local. */
     public static volatile ToIntFunction<String> setPieceCounter = s -> 0;
 
+    /** Niveau de metier (« pecheur », « mineur », « fermier ») du joueur local. */
+    public static volatile ToIntFunction<String> jobLevel = s -> 0;
+
     private ClientView() {
     }
 }

@@ -58,6 +58,45 @@ public final class DevShowcase {
             if (t == 600) { MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (metiers)"); stop(mc); }
             return;
         }
+        if(MODE.equals("peche")){
+            if(mc.player==null||mc.level==null)return;mc.gui.toastManager().clear();
+            if(com.mmorpg.client.cinematic.CinematicClient.active()){com.mmorpg.client.cinematic.CinematicClient.skip();return;}
+            if(com.mmorpg.client.LoadingClient.active())return;
+            tick++;String me=mc.player.getName().getString();
+            if(tick==60){mc.options.guiScale().set(2);mc.getWindow().setWindowed(1280,720);mc.resizeGui();scmd(mc,"time set day");scmd(mc,"gamemode creative "+me);scmd(mc,"weather clear");}
+            for(int pg=0;pg<DevFishingGallery.PAGES;pg++){
+                final int page=pg;
+                if(tick==70+pg*40){var gallery=new DevFishingGallery();gallery.page=page;mc.gui.setScreen(gallery);}
+                if(tick==95+pg*40)shot(mc,"peche_planche_"+pg);
+            }
+            if(tick==320){mc.gui.setScreen(null);ClientData.DATA.jobXp.put("pecheur",com.mmorpg.job.Job.totalFor(37));
+                ClientData.DATA.fishCaught.put("gardon_argente",14);ClientData.DATA.fishCaught.put("carpe_doree",5);ClientData.DATA.fishCaught.put("saumon_royal",2);ClientData.DATA.fishCaught.put("coffre_rouille",3);ClientData.DATA.fishCaught.put("botte_rouillee",4);ClientData.DATA.fishCaught.put("thon_aurore",1);
+                ClientData.DATA.fishBest.put("gardon_argente",27);ClientData.DATA.fishBest.put("saumon_royal",104);ClientData.DATA.fishBest.put("thon_aurore",231);
+                mc.gui.setScreen(new com.mmorpg.client.screen.JobDetailScreen(com.mmorpg.job.Job.PECHEUR,3));}
+            if(tick==350)shot(mc,"peche_journal");
+            if(tick==355)mc.gui.setScreen(new com.mmorpg.client.screen.JobDetailScreen(com.mmorpg.job.Job.PECHEUR,2));
+            if(tick==380)shot(mc,"peche_sources");
+            if(tick==385)mc.gui.setScreen(new com.mmorpg.client.screen.JobDetailScreen(com.mmorpg.job.Job.PECHEUR,0));
+            if(tick==410)shot(mc,"peche_apercu");
+            if(tick==415){mc.gui.setScreen(null);scmd(mc,"item replace entity "+me+" weapon.mainhand with mmorpg:canne_marin");mc.options.setCameraType(CameraType.FIRST_PERSON);}
+            if(tick==450)shot(mc,"peche_canne_main_1re");
+            if(tick==455)mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
+            if(tick==490)shot(mc,"peche_canne_main_3e");
+            if(tick==495){mc.options.setCameraType(CameraType.FIRST_PERSON);scmd(mc,"item replace entity "+me+" weapon.mainhand with mmorpg:thon_aurore");}
+            if(tick==530)shot(mc,"peche_poisson_main_1re");
+            if(tick==535){scmd(mc,"item replace entity "+me+" weapon.mainhand with mmorpg:coffre_capitaine");}
+            if(tick==570)shot(mc,"peche_coffre_main_1re");
+            if(tick==575){scmd(mc,"item replace entity "+me+" weapon.mainhand with mmorpg:canne_du_leviathan");}
+            if(tick==580){var t=new CompoundTag();t.putLong("seed",42);t.putInt("rarity",3);t.putInt("rounds",2);t.putInt("round",0);t.putInt("period",30);t.putFloat("half",0.12f);t.putInt("hits",0);t.putInt("misses",0);t.putInt("allowed",1);t.putInt("delay",0);t.putInt("last",-1);t.putInt("status",0);t.putInt("kind",0);FishFightClient.receive(t);}
+            if(tick==583)shot(mc,"peche_jauge_a");
+            if(tick==597)shot(mc,"peche_jauge_b");
+            if(tick==600){var t=new CompoundTag();t.putLong("seed",42);t.putInt("rarity",3);t.putInt("rounds",2);t.putInt("round",1);t.putInt("period",30);t.putFloat("half",0.12f);t.putInt("hits",1);t.putInt("misses",0);t.putInt("allowed",1);t.putInt("delay",0);t.putInt("last",2);t.putInt("status",0);t.putInt("kind",0);FishFightClient.receive(t);}
+            if(tick==608)shot(mc,"peche_jauge_manche2");
+            if(tick==620){var t=new CompoundTag();t.putLong("seed",42);t.putInt("rarity",3);t.putInt("rounds",2);t.putInt("round",1);t.putInt("period",30);t.putFloat("half",0.12f);t.putInt("hits",2);t.putInt("misses",0);t.putInt("allowed",1);t.putInt("delay",0);t.putInt("last",2);t.putInt("status",1);t.putInt("kind",0);t.putString("name","Thon de l'aurore");FishFightClient.receive(t);}
+            if(tick==626)shot(mc,"peche_jauge_reussie");
+            if(tick==640){FishFightClient.reset();stop(mc);}
+            return;
+        }
         if(MODE.equals("weekly")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
             var board=com.mmorpg.server.DevWeeklyChecks.VISUAL_BOARD;

@@ -31,6 +31,7 @@ public final class MMORPG {
         com.mmorpg.mine.MineBlocks.init();
         com.mmorpg.mine.MineTools.init();
         com.mmorpg.farm.FarmCrops.init();
+        com.mmorpg.fishing.FishingItems.init();
         ModBlocks.BLOCKS.register(modBus);
         ModBlocks.BLOCK_ENTITIES.register(modBus);
         ModEntities.ENTITIES.register(modBus);

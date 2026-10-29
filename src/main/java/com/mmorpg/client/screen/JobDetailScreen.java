@@ -52,9 +52,10 @@ public class JobDetailScreen extends MenuScreen {
         Ui.bar(g, x0 + 86, y0 + 40, w - 94, 10, max ? 1f : (float) cur / need, j.color, Ui.darker(j.color, 0.6f),
                 max ? "Niveau maximal" : Ui.fmt(cur) + " / " + Ui.fmt(need) + " XP");
 
-        String[] names = {"Aperçu", "Paliers", "Sources d'XP"};
-        int tw = (w - 16 - 8) / 3, ty = y0 + 64;
-        for (int i = 0; i < 3; i++) {
+        String[] names = j == Job.PECHEUR ? new String[]{"Aperçu", "Paliers", "Sources d'XP", "Journal de pêche"} : new String[]{"Aperçu", "Paliers", "Sources d'XP"};
+        int tw = (w - 16 - 4 * (names.length - 1)) / names.length, ty = y0 + 64;
+        if (page >= names.length) page = 0;
+        for (int i = 0; i < names.length; i++) {
             final int pg = i;
             button(g, x0 + 8 + i * (tw + 4), ty, tw, 14, names[i], true, page == i ? Ui.GOLD : Ui.LINE, () -> page = pg);
         }
@@ -62,6 +63,7 @@ public class JobDetailScreen extends MenuScreen {
         switch (page) {
             case 0 -> overview(g, cx, cy, cw, bottom, lvl);
             case 1 -> rewards(g, cx, cy, cw, bottom, lvl);
+            case 3 -> journal(g, cx, cy, cw, bottom, mx, my);
             default -> sources(g, cx, cy, cw, bottom);
         }
     }
@@ -125,5 +127,46 @@ public class JobDetailScreen extends MenuScreen {
             }
             g.text(font, font.plainSubstrByWidth(s.note(), colW), cx, cy + 10, Ui.MUTED, false);
         }
+    }
+
+    /** Journal de peche : une case par prise possible (poissons, coffres, dechets), grisee tant qu'elle n'a pas ete remontee. */
+    private void journal(GuiGraphicsExtractor g, int x, int y, int w, int bottom, int mx, int my) {
+        var all = com.mmorpg.fishing.FishCatalog.ALL;
+        int found = 0;
+        for (var e : all) if (ClientData.DATA.fishCaught.getOrDefault(e.id(), 0) > 0) found++;
+        Ui.header(g, x, y, w, "JOURNAL DE PÊCHE — " + found + " / " + all.size() + " prises découvertes");
+        y += 15;
+        int cols = 9, cell = Math.min(w / cols, 36), rows = (all.size() + cols - 1) / cols;
+        int gx = x + (w - cols * cell) / 2;
+        cell = Math.max(24, Math.min(cell, (bottom - y - 12) / rows));
+        java.util.List<net.minecraft.network.chat.Component> tip = null;
+        for (int i = 0; i < all.size(); i++) {
+            var e = all.get(i);
+            int cx = gx + (i % cols) * cell, cy = y + (i / cols) * cell;
+            int n = ClientData.DATA.fishCaught.getOrDefault(e.id(), 0);
+            int col = n > 0 ? 0xFF000000 | e.rarity().rgb() : 0xFF4A4658;
+            Ui.frame(g, cx, cy, cell - 2, cell - 2, col, hovered(cx, cy, cell - 2, cell - 2));
+            var item = ModItems.get(e.id());
+            if (item != null && n > 0) g.item(new net.minecraft.world.item.ItemStack(item), cx + (cell - 18) / 2, cy + 2);
+            else g.centeredText(font, "?", cx + (cell - 2) / 2, cy + (cell - 10) / 2 - 1, 0xFF6A6478);
+            if (n > 0) g.text(font, "×" + n, cx + 3, cy + cell - 12, Ui.MUTED, false);
+            if (hovered(cx, cy, cell - 2, cell - 2)) {
+                tip = new java.util.ArrayList<>();
+                if (n > 0) {
+                    tip.add(net.minecraft.network.chat.Component.translatable("item.mmorpg." + e.id()).withColor(e.rarity().rgb()));
+                    tip.add(net.minecraft.network.chat.Component.literal(e.rarity().label + " · " + (e.fish() ? "Poisson" : e.kind() == com.mmorpg.fishing.FishCatalog.Kind.TRESOR ? "Coffre" : "Déchet")).withColor(0xFF9A9488));
+                    tip.add(net.minecraft.network.chat.Component.literal("Remonté " + n + " fois").withColor(0xFFB9ABCF));
+                    int best = ClientData.DATA.fishBest.getOrDefault(e.id(), 0);
+                    if (best > 0) tip.add(net.minecraft.network.chat.Component.literal("Record : " + best + " cm").withColor(0xFFE2B85A));
+                } else {
+                    tip.add(net.minecraft.network.chat.Component.literal("Prise inconnue").withColor(0xFF9A9488));
+                    String hab = e.habitats().size() >= com.mmorpg.fishing.FishCatalog.Habitat.values().length ? "partout"
+                            : e.habitats().stream().map(hh -> hh.label).collect(java.util.stream.Collectors.joining(", "));
+                    tip.add(net.minecraft.network.chat.Component.literal("Indice : " + hab + " · " + e.moment().label).withColor(0xFF7FD0F0));
+                    tip.add(net.minecraft.network.chat.Component.literal("Pêcheur niveau " + e.minLevel()).withColor(0xFF9A9488));
+                }
+            }
+        }
+        if (tip != null) g.setComponentTooltipForNextFrame(font, tip, mx, my);
     }
 }

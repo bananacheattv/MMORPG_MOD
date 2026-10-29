@@ -37,6 +37,17 @@ public final class Payloads {
         }
     }
 
+    /** Etat du mini-jeu de peche (aiguille, zone, manche, resultat) : voir FishingEvents. */
+    public record FishFightState(CompoundTag data) implements CustomPacketPayload {
+        public static final Type<FishFightState> TYPE = new Type<>(MMORPG.id("fish_fight_state"));
+        public static final StreamCodec<ByteBuf, FishFightState> CODEC = StreamCodec.composite(ByteBufCodecs.COMPOUND_TAG, FishFightState::data, FishFightState::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
     /** Mise a jour legere des barres de vie / mana. */
     public record Vitals(float hp, float maxHp, float mana, float maxMana) implements CustomPacketPayload {
         public static final Type<Vitals> TYPE = new Type<>(MMORPG.id("vitals"));

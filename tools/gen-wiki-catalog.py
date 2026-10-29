@@ -25,6 +25,22 @@ for identity,cls,kind,level,rarity,lore in weapons:
     name=lang.get('item.mmorpg.'+identity,identity)
     page+=f'| {classes[cls]} | {name} | {level} | {types[kind]} | {lore} |\n'
 (out/'catalogue-armes.md').write_text(page,encoding='utf-8')
+
+source=(root/'src/main/java/com/mmorpg/fishing/FishCatalog.java').read_text(encoding='utf-8')
+fishes=re.findall(r'fish\("([^"]+)",\s*"([^"]+)",\s*"[^"]+",\s*Rarity\.(\w+),\s*(\d+),\s*([^;]*?),\s*Moment\.(\w+),\s*(\d+),\s*(\d+),\s*(\d+)',source,re.S)
+rods=re.findall(r'new Rod\((\d+),\s*"([^"]+)",\s*"([^"]+)",\s*"[^"]+",\s*(\d+),\s*(\d+)',source)
+assert len(fishes)==27,len(fishes)
+assert len(rods)==6,len(rods)
+moments={'TOUJOURS':'Toujours','JOUR':'Jour','NUIT':'Nuit','PLUIE':'Pluie'}
+rar={'COMMUN':'Commun','PEU_COMMUN':'Peu commun','RARE':'Rare','EPIQUE':'Épique','LEGENDAIRE':'Légendaire','MYTHIQUE':'Mythique'}
+page='# Pêche\n\n[Accueil](README.md) · [Métiers](metiers.md)\n\nCode : `fishing/` (catalogue, règles, mini-jeu, événements), `item/AeloriaRodItem.java`, `item/TreasureChestItem.java`. Un lancer ramène un poisson, un déchet ou un coffre selon le lieu, l’heure, la météo, le niveau de Pêcheur et la canne. Une prise rare demande de réussir le mini-jeu de la jauge (clic droit quand l’aiguille est dans la zone).\n\n## Cannes\n\n| Rang | Canne | Niveau de Pêcheur | Durabilité |\n|---:|---|---:|---:|\n'
+for tier,rid,name,lvl,dur in rods:
+    page+=f'| {tier} | {name} | {lvl} | {dur} |\n'
+page+='\n## Poissons\n\n| Poisson | Rareté | Niveau | Moment |\n|---|---|---:|---|\n'
+for f in fishes:
+    page+=f'| {f[1]} | {rar[f[2]]} | {f[3]} | {moments[f[5]]} |\n'
+page+='\nLes coffres (rouillé, de corail, du capitaine, abyssal) donnent de l’or et des objets selon leur rang ; ils se pêchent plus souvent sous la pluie et avec une meilleure canne.\n'
+(out/'peche.md').write_text(page,encoding='utf-8')
 for file in out.glob('*.md'):
     for link in re.findall(r'\]\(([^)]+)\)',file.read_text(encoding='utf-8')):
         if '://' not in link and not (file.parent/link.split('#')[0]).exists():raise ValueError(f'Broken link: {file}: {link}')

@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public enum Job {
     PECHEUR("pecheur", "Pêcheur", 0xFF4FB3E8,
-            "Lancez votre canne dans les lacs d'Aeloria. Chaque prise rapporte de l'expérience de pêche ; plus votre niveau monte, plus les poissons rares, les ingrédients marins et les doubles prises deviennent fréquents.",
+            "Lancez votre canne dans les lacs, rivières, mers, marais et abysses d'Aeloria : quand ça mord, cliquez dans la zone de la jauge pour ramener la prise. Chaque prise rapporte de l'expérience ; plus votre niveau monte, plus les cannes, les poissons rares, les coffres, les ingrédients marins et les doubles prises deviennent accessibles.",
             List.of(new Reward(10, "Pêcheur de l'Aube", "filet_grille", "Filet grillé", null, "potion_soin_majeure", 3, 0),
                     new Reward(20, "Marin des Lacs", null, null, "aura_givre", "charme_experience", 1, 2000),
                     new Reward(30, "Maître des Eaux", "ragout_des_profondeurs", "Ragoût des profondeurs", null, "elixir_experience", 1, 0),
@@ -132,7 +132,11 @@ public enum Job {
                             : "Repas du fermier : " + Math.round(mealChance(level) * 100) + " % par récolte, " + mealSeconds(level) + " s d'effets");
             case PECHEUR -> List.of("Double prise : " + pct + " % de chance",
                     tier(level) == 0 ? "Poissons rares et ingrédients : dès le palier 10"
-                            : "Prise rare : " + Math.round(rareCatchChance(level) * 100) + " % · ingrédients : " + Math.round(ingredientChance(level) * 100) + " %");
+                            : "Prise rare : " + Math.round(rareCatchChance(level) * 100) + " % · ingrédients : " + Math.round(ingredientChance(level) * 100) + " %",
+                    "Zone du mini-jeu : +" + Math.round((com.mmorpg.fishing.FishingRules.jobZoneBonus(level) - 1) * 100) + " % · expérience de pêche : +"
+                            + Math.round((com.mmorpg.fishing.FishingRules.jobXpBonus(level) - 1) * 100) + " %",
+                    "Attente avant la touche : -" + com.mmorpg.fishing.FishingRules.jobLure(level) * 5 + " s · coffres : +"
+                            + Math.round(tier(level) * 0.4 * 10) / 10.0 + " %");
         };
     }
 
@@ -142,7 +146,7 @@ public enum Job {
     public static final int[] ORE_XP = {3, 7, 14, 24, 40};
     public static final String[] CROP_NAMES = {"Racine de Lueur", "Blé d'Argent", "Baie Ambrée", "Fleur de Givre", "Orchidée du Néant"};
     public static final int[] CROP_XP = {3, 6, 11, 18, 28};
-    public static final int FISH_COMMON_XP = 12, FISH_RARE_XP = 20, FISH_TREASURE_XP = 45, FISH_JUNK_XP = 5;
+    public static final int FISH_COMMON_XP = com.mmorpg.fishing.FishCatalog.FISH_XP[0], FISH_JUNK_XP = com.mmorpg.fishing.FishCatalog.JUNK_XP;
 
     public static int oreXp(int tier) {
         return ORE_XP[Math.clamp(tier, 0, ORE_XP.length - 1)];
@@ -169,10 +173,15 @@ public enum Job {
                     new Source("Orchidée du Néant", CROP_XP[4], "par plante mûre récoltée"),
                     new Source("Récolte en zone", 0, "chaque plante du rayon compte"));
             case PECHEUR -> List.of(
-                    new Source("Poisson commun", FISH_COMMON_XP, "morue, saumon"),
-                    new Source("Poisson rare", FISH_RARE_XP, "poisson tropical, poisson-globe"),
-                    new Source("Trésor", FISH_TREASURE_XP, "livre, selle, nautile, canne..."),
-                    new Source("Déchet", FISH_JUNK_XP, "bottes, ficelle, os..."),
+                    new Source("Poisson commun", com.mmorpg.fishing.FishCatalog.FISH_XP[0], "gardon, carpe, maquereau..."),
+                    new Source("Poisson peu commun", com.mmorpg.fishing.FishCatalog.FISH_XP[1], "truite, brochet, anguille..."),
+                    new Source("Poisson rare", com.mmorpg.fishing.FishCatalog.FISH_XP[2], "saumon royal, esturgeon, raie..."),
+                    new Source("Poisson épique", com.mmorpg.fishing.FishCatalog.FISH_XP[3], "thon, baudroie, dragon des lacs..."),
+                    new Source("Poisson légendaire", com.mmorpg.fishing.FishCatalog.FISH_XP[4], "poisson-étoile, kraken, léviathan nain"),
+                    new Source("Poisson mythique", com.mmorpg.fishing.FishCatalog.FISH_XP[5], "carpe du Néant"),
+                    new Source("Coffre repêché", com.mmorpg.fishing.FishCatalog.CHEST_XP[0], com.mmorpg.fishing.FishCatalog.CHEST_XP[0] + " à " + com.mmorpg.fishing.FishCatalog.CHEST_XP[3] + " selon le coffre"),
+                    new Source("Déchet", com.mmorpg.fishing.FishCatalog.JUNK_XP, "botte, filet, bouteille..."),
+                    new Source("Touche parfaite", 0, "+25 % d'expérience sur la prise"),
                     new Source("Prise bonus", 0, "poisson rare ou ingrédient : sans XP en plus"));
         };
     }
@@ -184,6 +193,8 @@ public enum Job {
     }
 
     public static Gate gateFor(String recipeId) {
+        com.mmorpg.fishing.FishCatalog.Rod rod = com.mmorpg.fishing.FishCatalog.rodById(recipeId);
+        if (rod != null) return rod.minJobLevel() > 1 ? new Gate(PECHEUR, rod.minJobLevel()) : null;
         for (Job j : values()) {
             for (Reward r : j.rewards) {
                 if (recipeId.equals(r.recipeId())) return new Gate(j, r.level());

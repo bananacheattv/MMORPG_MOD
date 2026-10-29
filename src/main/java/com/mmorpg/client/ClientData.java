@@ -83,6 +83,7 @@ public final class ClientData {
         received = true;
         ClientView.playerClass = DATA.playerClass;
         ClientView.level = DATA.level;
+        ClientView.jobLevel = id -> com.mmorpg.job.Job.levelFor(DATA.jobXp.getOrDefault(id, 0L));
         ClientView.setPieceCounter = id -> {
             Minecraft mc = Minecraft.getInstance();
             return mc.player == null ? 0 : StatCalculator.setPieces(mc.player, id);

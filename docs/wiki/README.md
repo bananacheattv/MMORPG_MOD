@@ -21,5 +21,7 @@ Le guide du MMORPG Aeloria : prise en main, progression, activités et administr
 - [Succès et titres](succes-titres.md)
 - [Catalogue des compétences](catalogue-competences.md)
 - [Catalogue des armes PvE](catalogue-armes.md)
+- [Pêche](peche.md) : cannes, poissons, mini-jeu, coffres
+- [Métiers](metiers.md)
 
 Ce wiki suit le code du serveur. Les catalogues se régénèrent avec `python tools/gen-wiki-catalog.py`.
