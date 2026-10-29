@@ -67,7 +67,7 @@ public class WikiScreen extends MenuScreen {
                 boolean header = true;
                 for (String raw : text.split("\\R")) {
                     String l = raw.strip();
-                    if (l.isEmpty() || l.startsWith("[Accueil]")) {
+                    if (l.isEmpty() || l.startsWith("[Accueil")) {
                         header = true;
                         continue;
                     }
