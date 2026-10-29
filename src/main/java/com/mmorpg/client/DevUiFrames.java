@@ -21,9 +21,56 @@ final class DevUiFrames {
         SCREENS.add(s);
     }
 
+    private static Screen adminPlayers(int page, String... path) {
+        var data = new com.mmorpg.rpg.PlayerData();
+        data.playerClass = com.mmorpg.rpg.PlayerClass.MAGE;
+        data.level = 42;
+        data.gold = 18250;
+        data.skillRanks.put("meteor", 3);
+        data.skillRanks.put("blizzard", 2);
+        data.jobXp.put("mineur", 4200L);
+        var tag = new CompoundTag();
+        tag.putString("kind", "profile");
+        tag.putString("id", "00000000-0000-0000-0000-000000000001");
+        tag.putString("name", "Aelwyn");
+        tag.putBoolean("online", true);
+        tag.put("data", data.save());
+        tag.putLong("bankGold", 12500);
+        var inv = new net.minecraft.nbt.ListTag();
+        for (int i = 0; i < 6; i++) {
+            var e = new CompoundTag();
+            e.putInt("slot", i);
+            e.putString("item", i % 2 == 0 ? "minecraft:diamond" : "mmorpg:verdite");
+            e.putInt("count", 8 + i);
+            inv.add(e);
+        }
+        tag.put("inventory", inv);
+        var list = new CompoundTag();
+        list.putString("kind", "list");
+        var players = new net.minecraft.nbt.ListTag();
+        String[][] ps = {{"Aelwyn", "MAGE", "42", "1"}, {"Borin", "GUERRIER", "17", "1"}, {"Cyra", "ARCHER", "63", "0"}};
+        for (int i = 0; i < ps.length; i++) {
+            var e = new CompoundTag();
+            e.putString("id", "00000000-0000-0000-0000-00000000000" + (i + 1));
+            e.putString("name", ps[i][0]);
+            e.putString("class", ps[i][1]);
+            e.putInt("level", Integer.parseInt(ps[i][2]));
+            e.putBoolean("online", ps[i][3].equals("1"));
+            players.add(e);
+        }
+        list.put("players", players);
+        var screen = new AdminPlayersScreen(list);
+        screen.receive(tag);
+        return screen.preview(page, path);
+    }
+
     static {
         add("inventory", () -> new CharacterScreen(Minecraft.getInstance().player));
         add("pause", AeloriaPauseScreen::new);
+        add("admin_players", () -> adminPlayers(0));
+        add("admin_players_data", () -> adminPlayers(1, "skills"));
+        add("admin_players_items", () -> adminPlayers(2));
+        add("admin_players_actions", () -> adminPlayers(3));
         add("jobs", JobsScreen::new);
         add("achievements", AchievementsScreen::new);
         add("skills", SkillsScreen::new);

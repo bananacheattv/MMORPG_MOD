@@ -39,6 +39,7 @@ public final class DevNetworkChecks {
         Path directory = Files.createTempDirectory("aeloria-network-checks-");
         NetworkConfig original = NetworkConfig.current;
         try {
+            DevAdminPlayerChecks.run(p);
             UUID id = UUID.randomUUID();
             try (ProfileStore a = ProfileStore.acquire(directory, id)) {
                 check(a != null && a.read() == null, "fresh profile");
