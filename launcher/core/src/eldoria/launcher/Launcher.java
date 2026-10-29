@@ -629,8 +629,13 @@ public final class Launcher {
     }
 
     /** Message d'etat sous le bouton ; tant que le jeu n'est pas pret, le bouton JOUER se transforme en jauge. */
+    private volatile long lastStatus;
+
     private void status(String s, int permille) {
         if (status == null) return;
+        long now = System.nanoTime();
+        if (permille < 0 && now - lastStatus < 100_000_000L) return; // evite de saturer le fil d'affichage a chaque bloc recu
+        lastStatus = now;
         SwingUtilities.invokeLater(() -> {
             status.setText(s);
             if (!ready) play.loading(permille < 0 ? "MISE A JOUR EN COURS..." : "CHARGEMENT... " + permille / 10 + "%", permille);
@@ -687,6 +692,7 @@ public final class Launcher {
 
             long t0 = System.nanoTime();
             checkDisk();
+            speedTests();
             setupAuth();
             long t1 = System.nanoTime();
             syncMods();
@@ -717,6 +723,17 @@ public final class Launcher {
                     + " Mo necessaires. Libere de la place sur le disque puis relance le launcher.";
             if (free < need / 4) throw new IllegalStateException(msg);
             log("! " + msg);
+        }
+    }
+
+    /** Debit mesure vers chaque hebergeur de mods : indique si le goulot est la source ou le reseau. */
+    private void speedTests() {
+        Set<String> hosts = new LinkedHashSet<>();
+        for (Object o : Json.arr(manifest.get("mods"))) {
+            String url = Json.str(Json.obj(o).get("url"), null);
+            if (url == null) continue;
+            String host = URI.create(url).getHost();
+            if (hosts.add(host)) log("Test de debit " + host + " : " + Net.speedTest(url));
         }
     }
 
@@ -773,7 +790,7 @@ public final class Launcher {
                             });
                             Net.remember(target, sha, cache);
                             long sz = Files.size(target);
-                            log(String.format("  %s : %d Mo en %.1f s (%.1f Mo/s)", file, sz >> 20, (System.nanoTime() - start) / 1e9,
+                            log(String.format("  %s <- %s : %d Mo en %.1f s (%.1f Mo/s)", file, url, sz >> 20, (System.nanoTime() - start) / 1e9,
                                     sz / Math.max(0.1, (System.nanoTime() - start) / 1e9) / 1048576));
                         }
                         int d = done.incrementAndGet();

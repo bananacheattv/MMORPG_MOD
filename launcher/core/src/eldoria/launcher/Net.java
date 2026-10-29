@@ -92,6 +92,30 @@ final class Net {
         cache.put(p.getFileName().toString(), Files.size(p) + ":" + Files.getLastModifiedTime(p).toMillis() + ":" + expected);
     }
 
+    /** Mesure le debit vers une URL (jusqu'a 6 Mo, 15 s max) : "X.X Mo/s, connexion Y ms" ou le message d'erreur. */
+    static String speedTest(String url) {
+        long t0 = System.nanoTime();
+        try {
+            HttpResponse<InputStream> r = HTTP.send(HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofSeconds(15))
+                    .header("User-Agent", "EldoriaLauncher").header("Range", "bytes=0-6291455").build(), HttpResponse.BodyHandlers.ofInputStream());
+            long first = -1, got = 0;
+            try (InputStream in = r.body()) {
+                byte[] buf = new byte[1 << 16];
+                for (int n; (n = in.read(buf)) > 0; ) {
+                    if (first < 0) first = System.nanoTime();
+                    got += n;
+                    if (System.nanoTime() - t0 > 12_000_000_000L) break;
+                }
+            }
+            if (first < 0) return "HTTP " + r.statusCode() + ", aucune donnee";
+            double sec = Math.max(0.05, (System.nanoTime() - first) / 1e9);
+            return String.format("%.1f Mo/s (%d Ko en %.1f s), reponse en %d ms, HTTP %d", got / sec / 1048576, got >> 10, sec,
+                    (first - t0) / 1_000_000, r.statusCode());
+        } catch (Exception e) {
+            return "echec : " + e;
+        }
+    }
+
     static void download(String url, Path target, String algo, String expected, LongConsumer progress) throws Exception {
         Exception last = null;
         for (int attempt = 0; attempt < 3; attempt++) {
