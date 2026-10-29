@@ -83,6 +83,7 @@ public final class DevShowcase {
         if(MODE.equals("ui_frames")){DevUiFrames.tick(mc);return;}
         if(MODE.equals("pvp_polish")){DevPvpVisual.tick(mc);return;}
         if(MODE.equals("trade")){DevTradeVisual.tick(mc);return;}
+        if(MODE.equals("chat_canaux")){DevChatVisual.tick(mc);return;}
         if(MODE.equals("derniers_ajouts")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
             if(tick==60){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();cmd(mc,"gamemode creative");cmd(mc,"time set day");cmd(mc,"tp @s 0 200 0 0 0");}

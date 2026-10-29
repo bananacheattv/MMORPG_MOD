@@ -52,10 +52,13 @@ public final class PlayerCommands {
                     return 1;
                 }))));
 
-        d.register(Commands.literal("g").then(Commands.argument("message", StringArgumentType.greedyString()).executes(c -> {
-            PartyManager.chat(c.getSource().getPlayerOrException(), StringArgumentType.getString(c, "message"));
-            return 1;
-        })));
+        // /p : chat de groupe (/g est reserve au chat de guilde, voir GuildChat)
+        for (String alias : new String[]{"p", "gr"}) {
+            d.register(Commands.literal(alias).then(Commands.argument("message", StringArgumentType.greedyString()).executes(c -> {
+                PartyManager.chat(c.getSource().getPlayerOrException(), StringArgumentType.getString(c, "message"));
+                return 1;
+            })));
+        }
 
         d.register(Commands.literal("or").executes(c -> {
             ServerPlayer p = c.getSource().getPlayerOrException();

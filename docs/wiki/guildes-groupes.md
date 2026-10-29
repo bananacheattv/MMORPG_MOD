@@ -13,3 +13,7 @@ Les boss de guilde sont des activités exigeantes. Le niveau, l’équipement et
 La guilde possède une identité collective et ses objectifs. Les options de gestion, améliorations, invitations, contributions et récompenses sont consultables dans son menu. Les permissions d’administration du serveur restent distinctes du rôle dans une guilde et du grade affiché à côté du pseudo.
 
 Pour les règles et paramètres détaillés d’administration, voir [Guildes et arènes](../../GUILDES_ET_ARENES.md).
+
+## Sélecteur de canal du chat
+
+Ouvre le chat (T) : trois onglets Général, Guilde et Groupe sont au-dessus de la saisie. Clique un onglet, ou utilise Tab / Maj+Tab / Alt+flèches. Le canal actif est rappelé par un préfixe coloré dans le champ de saisie et mémorisé entre deux sessions. Ce que tu tapes part dans le canal choisi sans `/g` ni `/p` ; une commande commençant par `/` reste inchangée. Chaque onglet n’affiche que ses messages, et une pastille rouge compte les messages non lus des autres canaux. `/g` = guilde, `/p` (ou `/gr`) = groupe.
