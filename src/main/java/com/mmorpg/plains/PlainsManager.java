@@ -498,7 +498,7 @@ public final class PlainsManager {
         if (!p.getInventory().add(drop)) level.addFreshEntity(new ItemEntity(level, p.getX(), p.getY() + 0.5, p.getZ(), drop));
         com.mmorpg.server.AdventureSummary.item(p,ModItems.get(crop.product()),count-drop.getCount());
         RpgPlayers.giveGatherXp(p, 2 + rank * 3L);
-        com.mmorpg.job.JobSystem.addXp(p, com.mmorpg.job.Job.FERMIER, 4 + rank * 4L);
+        com.mmorpg.job.JobSystem.addXp(p, com.mmorpg.job.Job.FERMIER, com.mmorpg.job.Job.cropXp(rank));
         com.mmorpg.job.JobSystem.farmerMeal(p, random);
         p.sendOverlayMessage(Component.literal("+" + count + " " + crop.name()).withColor(crop.color()));
         level.setBlock(pos, block.getStateForAge(0), 3);

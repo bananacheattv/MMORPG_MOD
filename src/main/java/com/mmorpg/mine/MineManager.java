@@ -306,7 +306,7 @@ public final class MineManager {
         if (!p.getInventory().add(ingot)) level.addFreshEntity(new net.minecraft.world.entity.item.ItemEntity(level, p.getX(), p.getY() + 0.5, p.getZ(), ingot));
         tool.hurtAndBreak(1, p, EquipmentSlot.MAINHAND);
         RpgPlayers.giveGatherXp(p, 3 + ore.minLevel() / 2L);
-        com.mmorpg.job.JobSystem.addXp(p, com.mmorpg.job.Job.MINEUR, 5 + ore.minLevel() / 2L + ore.tier() * 3L);
+        com.mmorpg.job.JobSystem.addXp(p, com.mmorpg.job.Job.MINEUR, com.mmorpg.job.Job.oreXp(ore.tier()));
         com.mmorpg.server.AdventureSummary.item(p,ModItems.get(ore.ingotId()),count-ingot.getCount());
         p.sendOverlayMessage(Component.literal("+" + count + " Lingot de " + ore.name() + (count > 1 ? "  (veine riche !)" : "")).withColor(ore.color()));
         rareDrop(level, p, pos, ore, pick);

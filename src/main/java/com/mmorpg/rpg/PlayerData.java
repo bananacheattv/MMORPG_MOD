@@ -104,6 +104,8 @@ public class PlayerData implements ValueIOSerializable {
     public final Set<String> mounts = new HashSet<>();
     /** Experience cumulee des metiers (pecheur, fermier, mineur). */
     public final Map<String, Long> jobXp = new LinkedHashMap<>();
+    /** Recompenses de paliers de metier deja recues (« mineur:20 »). */
+    public final Set<String> jobClaimed = new HashSet<>();
 
     // --- transient (non sauvegarde)
     public StatBlock stats = new StatBlock();
@@ -220,6 +222,7 @@ public class PlayerData implements ValueIOSerializable {
         t.store("waypoints", UUIDUtil.CODEC.listOf(), new ArrayList<>(waypoints));
         t.store("kills", STR_INT_MAP, kills);
         t.store("jobXp", Codec.unboundedMap(Codec.STRING, Codec.LONG), jobXp);
+        t.store("jobClaimed", Codec.STRING.listOf(), new ArrayList<>(jobClaimed));
         t.store("stats", Codec.unboundedMap(Codec.STRING, Codec.LONG), counters);
         t.store("achievements", Codec.unboundedMap(Codec.STRING, Codec.LONG), achievements);
         t.putBoolean("chosen", classChosenOnce);
@@ -290,6 +293,8 @@ public class PlayerData implements ValueIOSerializable {
         kills.putAll(t.read("kills", STR_INT_MAP).orElse(Map.of()));
         jobXp.clear();
         jobXp.putAll(t.read("jobXp", Codec.unboundedMap(Codec.STRING, Codec.LONG)).orElse(Map.of()));
+        jobClaimed.clear();
+        jobClaimed.addAll(t.read("jobClaimed", Codec.STRING.listOf()).orElse(List.of()));
         counters.clear();
         counters.putAll(t.read("stats", Codec.unboundedMap(Codec.STRING, Codec.LONG)).orElse(Map.of()));
         achievements.clear();

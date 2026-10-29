@@ -22,7 +22,7 @@ public final class HubGuideScreen extends MmoScreen {
         int portraitW=Math.min(122,pw/3),x=left+portraitW+20,w=pw-portraitW-34;
         Ui.inset(g,left+10,top+36,portraitW,ph-77);
         if(portrait==null&&minecraft.level!=null){portrait=com.mmorpg.registry.ModEntities.HUB_GUIDE.get().create(minecraft.level,net.minecraft.world.entity.EntitySpawnReason.COMMAND);portrait.setId(130000+guide);portrait.guide(guide);portrait.setCustomNameVisible(false);}
-        if(portrait!=null)net.minecraft.client.gui.screens.inventory.InventoryScreen.extractEntityInInventoryFollowsMouse(g,left+12,top+39,left+portraitW+8,top+ph-45,Math.max(15,(ph-105)/3),.0625f,mx,my,portrait);
+        if(portrait!=null)com.mmorpg.client.ui.Ui.entityFollowsMouse(g,left+12,top+39,left+portraitW+8,top+ph-45,Math.max(15,(ph-105)/3),.0625f,mx,my,portrait);
         var text=DIALOGUE[guide][page];Ui.wrap(g,text[0],x,top+42,w,Ui.GOLD_LIGHT);int y=top+66;
         for(int i=1;i<text.length;i++){Ui.wrap(g,text[i],x,y,w,Ui.TEXT);y+=font.split(net.minecraft.network.chat.Component.literal(text[i]),w).size()*10+12;}
         String footer=(Integer.bitCount(completed&31))+" / 5 guides rencontrés";g.text(font,footer,left+12,top+ph-14,Ui.MUTED,false);

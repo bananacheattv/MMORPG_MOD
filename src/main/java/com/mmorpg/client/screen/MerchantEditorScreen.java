@@ -132,7 +132,7 @@ public final class MerchantEditorScreen extends MmoScreen {
                 previews[i]=com.mmorpg.registry.ModEntities.NPC.get().create(Minecraft.getInstance().level,net.minecraft.world.entity.EntitySpawnReason.COMMAND);
                 if(previews[i]!=null){previews[i].setId(-700-i);previews[i].setup(NpcEntity.Role.MARCHAND,"",i,"");}
             }
-            if(previews[i]!=null)InventoryScreen.extractEntityInInventoryFollowsMouse(g,x+2,y+2,x+cardW-2,y+h-19,Math.max(20,Math.min(42,(h-22)/2)),.0625f,mouseX,mouseY,previews[i]);
+            if(previews[i]!=null)com.mmorpg.client.ui.Ui.entityFollowsMouse(g,x+2,y+2,x+cardW-2,y+h-19,Math.max(20,Math.min(42,(h-22)/2)),.0625f,mouseX,mouseY,previews[i]);
             g.centeredText(font,Component.literal(NpcEntity.APPEARANCES[i]),x+cardW/2,y+h-13,skin==i?Ui.GOLD:Ui.TEXT);
             click(x,y,cardW,h,()->skin=choice);
         }

@@ -34,7 +34,7 @@ public final class DevBestiaryScreen extends MmoScreen {
             if(id.startsWith("monture_"))height=Math.max(height,4);
             for(var entry:com.mmorpg.entity.mob.ImportedMobs.ALL)if(entry.key().equals(id))height=entry.height()*entry.scale()+entry.hover();
             int scale=Math.max(6,Math.min(70,(int)((h-30)/height)));
-            net.minecraft.client.gui.screens.inventory.InventoryScreen.extractEntityInInventoryFollowsMouse(g,x+4,y+19,x+w-4,y+h-4,scale,.0625f,x+w/2f+35,y+h/2f-5,entity);
+            com.mmorpg.client.ui.Ui.entityFollowsMouse(g,x+4,y+19,x+w-4,y+h-4,scale,.0625f,x+w/2f+35,y+h/2f-5,entity);
         }
     }
 }

@@ -248,6 +248,17 @@ public final class ModItems {
     public static final DeferredItem<RpgConsumableItem> ORBE_RENAISSANCE = consumable("orbe_renaissance", Rarity.LEGENDAIRE, RpgConsumableItem.Kind.REBIRTH_ORB, 0, "Permet de choisir une nouvelle classe.\nVotre niveau et votre expérience sont remis à zéro (niveau 1).");
     public static final DeferredItem<RpgConsumableItem> COFFRE_COSMETIQUE = consumable("coffre_cosmetique", Rarity.EPIQUE, RpgConsumableItem.Kind.COSMETIC_CHEST, 0, "Débloque un cosmétique animé aléatoire.");
 
+    // ---- plats de metier (recettes de la Forge debloquees par les paliers des metiers)
+    public static final DeferredItem<RpgConsumableItem> TONIQUE_DU_MINEUR = consumable("tonique_du_mineur", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.DISH, 0, "Rend 800 PV. Célérité II et vision nocturne pendant 3 minutes.\nRecette du métier de mineur (niveau 10).");
+    public static final DeferredItem<RpgConsumableItem> BOUILLON_DE_ROCHE = consumable("bouillon_de_roche", Rarity.RARE, RpgConsumableItem.Kind.DISH, 0, "Rend 2000 PV. Célérité III et résistance pendant 5 minutes.\nRecette du métier de mineur (niveau 30).");
+    public static final DeferredItem<RpgConsumableItem> ELIXIR_DU_SEIGNEUR = consumable("elixir_du_seigneur", Rarity.EPIQUE, RpgConsumableItem.Kind.DISH, 0, "Rend 4500 PV. Célérité IV, résistance II, régénération et vision nocturne pendant 10 minutes.\nRecette du métier de mineur (niveau 50).");
+    public static final DeferredItem<RpgConsumableItem> SOUPE_DE_RACINE = consumable("soupe_de_racine", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.DISH, 0, "Rend 800 PV. Vitesse et régénération pendant 3 minutes.\nRecette du métier de fermier (niveau 10).");
+    public static final DeferredItem<RpgConsumableItem> TOURTE_AUX_BAIES = consumable("tourte_aux_baies", Rarity.RARE, RpgConsumableItem.Kind.DISH, 0, "Rend 2000 PV. Vitesse II, régénération II et absorption pendant 5 minutes.\nRecette du métier de fermier (niveau 30).");
+    public static final DeferredItem<RpgConsumableItem> BANQUET_DES_MOISSONS = consumable("banquet_des_moissons", Rarity.EPIQUE, RpgConsumableItem.Kind.DISH, 0, "Rend 4500 PV. Vitesse II, force, absorption II et régénération pendant 10 minutes.\nRecette du métier de fermier (niveau 50).");
+    public static final DeferredItem<RpgConsumableItem> FILET_GRILLE = consumable("filet_grille", Rarity.PEU_COMMUN, RpgConsumableItem.Kind.DISH, 0, "Rend 800 PV. Respiration aquatique et grâce du dauphin.\nRecette du métier de pêcheur (niveau 10).");
+    public static final DeferredItem<RpgConsumableItem> RAGOUT_DES_PROFONDEURS = consumable("ragout_des_profondeurs", Rarity.RARE, RpgConsumableItem.Kind.DISH, 0, "Rend 2000 PV. Respiration aquatique, grâce du dauphin et chance pendant 5 minutes.\nRecette du métier de pêcheur (niveau 30).");
+    public static final DeferredItem<RpgConsumableItem> FESTIN_DU_LEVIATHAN = consumable("festin_du_leviathan", Rarity.EPIQUE, RpgConsumableItem.Kind.DISH, 0, "Rend 4500 PV. Puissance de conduit, chance II et régénération pendant 10 minutes.\nRecette du métier de pêcheur (niveau 50).");
+
     public static final DeferredItem<RpgConsumableItem> NOURRITURE_FAMILIER = consumable("nourriture_familier", Rarity.PEU_COMMUN,
             RpgConsumableItem.Kind.PET_FOOD, 25, "Restaure 25 points de bonheur au familier invoqué.\nLes bonus varient de 50 % à 100 % selon son bonheur.");
 

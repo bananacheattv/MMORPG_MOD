@@ -24,7 +24,7 @@ public class RpgConsumableItem extends RpgMaterialItem {
     public static final Identifier POTION_GROUP = MMORPG.id("potions");
 
     public enum Kind {
-        ADVENTURE_CRATE, HEAL, MANA, PET_FOOD, XP_CHARM, LUCK_CHARM, ELIXIR, TELEPORT_SCROLL, FORGET_SCROLL, REBIRTH_ORB, CLASS_RUNE, COSMETIC_CHEST
+        ADVENTURE_CRATE, HEAL, MANA, PET_FOOD, XP_CHARM, LUCK_CHARM, ELIXIR, TELEPORT_SCROLL, FORGET_SCROLL, REBIRTH_ORB, CLASS_RUNE, COSMETIC_CHEST, DISH
     }
 
     private final Kind kind;
@@ -111,6 +111,12 @@ public class RpgConsumableItem extends RpgMaterialItem {
                     sp.sendSystemMessage(net.minecraft.network.chat.Component.literal("Utilise cette rune au spawn, avec une classe choisie et hors combat."));return InteractionResult.FAIL;
                 }
                 data.resetClass();RpgPlayers.recomputeAndSync(sp);RpgPlayers.openClassSelection(sp);
+            }
+            case DISH -> {
+                String id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(this).getPath();
+                if (!com.mmorpg.job.JobSystem.eatDish(sp, id)) return InteractionResult.FAIL;
+                sl.playSound(null, sp.blockPosition(), SoundEvents.GENERIC_EAT.value(), SoundSource.PLAYERS, 1, 1);
+                sl.sendParticles(ParticleTypes.HAPPY_VILLAGER, sp.getX(), sp.getY() + 1.2, sp.getZ(), 8, 0.4, 0.4, 0.4, 0.02);
             }
             case COSMETIC_CHEST -> {
                 RpgPlayers.unlockRandomCosmetic(sp);

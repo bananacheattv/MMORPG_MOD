@@ -10,6 +10,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
 
 public final class ArenaScreen extends MmoScreen {
+    @Override protected MenuScreen.Tab navActive() { return MenuScreen.Tab.ARENE; }
+
     private final CompoundTag data;
     private int refreshTicks;
     @Override public void tick(){super.tick();if(++refreshTicks>=40){refreshTicks=0;action("open","");}}

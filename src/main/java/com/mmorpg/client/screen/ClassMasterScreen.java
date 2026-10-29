@@ -187,7 +187,7 @@ public class ClassMasterScreen extends MmoScreen {
         ClassMasterEntity e = portrait(selectedClass);
         if (e != null) {
             int size = Math.min(h - 26, 118);
-            InventoryScreen.extractEntityInInventoryFollowsMouse(g, px + 2, py + 4, px + w - 2, py + 4 + size + 40, Math.round(size * 0.42F), 0.0625F, mx, my, e);
+            com.mmorpg.client.ui.Ui.entityFollowsMouse(g, px + 2, py + 4, px + w - 2, py + 4 + size + 40, Math.round(size * 0.42F), 0.0625F, mx, my, e);
         }
         g.centeredText(font, Component.literal(cls.label), px + w / 2, py + h - 22, cls.color);
         float rs = Math.min(0.8F, (w - 8) / (float) Math.max(1, font.width(cls.role)));

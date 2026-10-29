@@ -50,7 +50,7 @@ public class AeloriaCropBlock extends CropBlock {
         int hoe = MineTools.hoeTier(tool);
         int rank = FarmCrops.CROPS.indexOf(crop);
         RpgPlayers.giveGatherXp(player, 2 + rank * 3L);
-        com.mmorpg.job.JobSystem.addXp(player, com.mmorpg.job.Job.FERMIER, 4 + rank * 4L);
+        com.mmorpg.job.JobSystem.addXp(player, com.mmorpg.job.Job.FERMIER, com.mmorpg.job.Job.cropXp(rank));
         if (com.mmorpg.job.JobSystem.rollDouble(player, com.mmorpg.job.Job.FERMIER, level.getRandom())) {
             net.minecraft.world.level.block.Block.dropResources(state, level, pos, null, player, tool);
             player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Double récolte !").withColor(crop.color()));
@@ -74,7 +74,7 @@ public class AeloriaCropBlock extends CropBlock {
                 cb.bonus(level, at, hoe,com.mmorpg.mine.ToolRunes.rank(tool,0));
                 level.setBlock(at, cb.getStateForAge(0), 3);
                 RpgPlayers.giveGatherXp(player, 2 + FarmCrops.CROPS.indexOf(cb.crop) * 3L);
-                com.mmorpg.job.JobSystem.addXp(player, com.mmorpg.job.Job.FERMIER, 4 + FarmCrops.CROPS.indexOf(cb.crop) * 4L);
+                com.mmorpg.job.JobSystem.addXp(player, com.mmorpg.job.Job.FERMIER, com.mmorpg.job.Job.cropXp(FarmCrops.CROPS.indexOf(cb.crop)));
                 n++;
             }
         }

@@ -23,6 +23,7 @@ public final class ForgeProgression {
         };
     }
     public static boolean unlocked(PlayerData data, ForgeRecipes.Recipe recipe) {
+        if (!com.mmorpg.job.Job.recipeUnlocked(data.jobXp, recipe.id())) return false;
         int tier = required(recipe);
         return tier == 0 || data.forgeRecipes.contains(recipe.id());
     }

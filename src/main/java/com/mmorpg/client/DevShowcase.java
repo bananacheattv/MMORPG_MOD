@@ -39,17 +39,22 @@ public final class DevShowcase {
         if (!ENABLED) return;
         Minecraft mc = Minecraft.getInstance();
         DevFreshWorld.tick(mc);
-        if (MODE.equals("metiers")) {          // menu Metiers (sans monde) : cartes puis detail de chaque metier
+        if (MODE.equals("metiers")) {          // menu Metiers (sans monde) : verifications puis captures de chaque onglet
             int t = ++jobTick;
             if (t == 5) { mc.getWindow().setWindowed(1280, 720); mc.options.guiScale().set(2); mc.resizeGui(); }
-            if (t == 20) { ClientData.DATA.jobXp.put("mineur", 2600L); ClientData.DATA.jobXp.put("fermier", 900L); ClientData.DATA.jobXp.put("pecheur", 120L); }
+            if (t == 10) {
+                var fails = com.mmorpg.job.JobChecks.run();
+                MMORPG.LOGGER.info("[MMORPG] JOBCHECKS {} {}", fails.isEmpty() ? "OK" : "ECHEC", fails);
+            }
+            if (t == 20) { ClientData.DATA.jobXp.put("mineur", com.mmorpg.job.Job.totalFor(23) + 300L); ClientData.DATA.jobXp.put("fermier", com.mmorpg.job.Job.totalFor(11)); ClientData.DATA.jobXp.put("pecheur", 120L); }
             if (t == 400) mc.gui.setScreen(new com.mmorpg.client.screen.JobsScreen());
             if (t == 430) shot(mc, "metiers_cartes");
-            com.mmorpg.job.Job[] jobs = {com.mmorpg.job.Job.MINEUR, com.mmorpg.job.Job.FERMIER, com.mmorpg.job.Job.PECHEUR};
-            for (int n = 0; n < 3; n++) {
-                if (t == 440 + n * 40) mc.gui.setScreen(new com.mmorpg.client.screen.JobDetailScreen(jobs[n]));
-                if (t == 465 + n * 40) shot(mc, "metiers_" + jobs[n].id);
+            for (int pg = 0; pg < 3; pg++) {
+                if (t == 440 + pg * 40) mc.gui.setScreen(new com.mmorpg.client.screen.JobDetailScreen(com.mmorpg.job.Job.MINEUR, pg));
+                if (t == 465 + pg * 40) shot(mc, "metiers_mineur_" + pg);
             }
+            if (t == 570) mc.gui.setScreen(new com.mmorpg.client.screen.JobDetailScreen(com.mmorpg.job.Job.PECHEUR, 1));
+            if (t == 595) shot(mc, "metiers_pecheur_paliers");
             if (t == 600) { MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (metiers)"); stop(mc); }
             return;
         }
@@ -78,6 +83,7 @@ public final class DevShowcase {
         if(MODE.equals("ui_frames")){DevUiFrames.tick(mc);return;}
         if(MODE.equals("pvp_polish")){DevPvpVisual.tick(mc);return;}
         if(MODE.equals("trade")){DevTradeVisual.tick(mc);return;}
+        if(MODE.equals("chat_canaux")){DevChatVisual.tick(mc);return;}
         if(MODE.equals("derniers_ajouts")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
             if(tick==60){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();cmd(mc,"gamemode creative");cmd(mc,"time set day");cmd(mc,"tp @s 0 200 0 0 0");}
@@ -117,6 +123,17 @@ public final class DevShowcase {
             if(tick==645)shot(mc,"succes");
             if(tick==650)mc.gui.setScreen(null);
             if(tick==660)stop(mc);return;
+        }
+        if(MODE.equals("armure_bras")){          // armures sculptees : face et profil de chaque panoplie, pour verifier l'ajustement des bras
+            if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();if(com.mmorpg.client.cinematic.CinematicClient.active()){com.mmorpg.client.cinematic.CinematicClient.skip();tick=Math.min(tick,0);return;}
+            String[] sets={"acier_soldat","dieu_guerre","valkyrie","apprenti","archimage","avatar_arcanique","chasseur","tireur_elite","sylvestre","garde","paladin","titan"};
+            if(tick==60){mc.options.guiScale().set(2);mc.getWindow().setWindowed(1280,720);mc.resizeGui();cmd(mc,"time set day");mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT);}
+            for(int i=0;i<sets.length;i++){int t=80+i*60;
+                if(tick==t){armureBras(mc,sets[i],0);}
+                if(tick==t+25)shot(mc,"armure_"+sets[i]+"_face");
+                if(tick==t+30)armureBras(mc,null,90);
+                if(tick==t+50)shot(mc,"armure_"+sets[i]+"_profil");}
+            if(tick==80+sets.length*60)stop(mc);return;
         }
         if(MODE.equals("staff_final")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
@@ -530,6 +547,10 @@ public final class DevShowcase {
             weaponPhase(mc, me);
             return;
         }
+        if (MODE.equals("armes_galerie")) {
+            weaponGalleryPhase(mc, me);
+            return;
+        }
         if (MODE.equals("batons")) {
             staffPhase(mc, me);
             return;
@@ -761,6 +782,30 @@ public final class DevShowcase {
                 MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (ecrans)");
             }
             if (tick == 100) stop(mc);
+            return;
+        }
+        if (MODE.equals("ecrans3d")) {          // familiers, montures, cosmetiques, bestiaire a plusieurs resolutions (cases 3D)
+            int[][] sizes = {{1280, 720}, {1000, 600}, {854, 480}, {1200, 500}};
+            MenuScreen.Tab[] tabs = {MenuScreen.Tab.FAMILIERS, MenuScreen.Tab.MONTURES, MenuScreen.Tab.COSMETIQUES, MenuScreen.Tab.BESTIAIRE};
+            if (tick == 20) { cmd(mc, "gamemode survival " + me); mc.options.guiScale().set(2); }
+            if (tick == 30 && !ClientData.DATA.playerClass.isPlayable()) ClientNet.send(new com.mmorpg.network.Payloads.SelectClass(com.mmorpg.rpg.PlayerClass.GUERRIER.ordinal()));
+            int n = (tick - 60) / 50;
+            if (tick >= 60 && n < sizes.length * tabs.length) {
+                int s = n / tabs.length, tb = n % tabs.length, phase = (tick - 60) % 50;
+                if (phase == 0) { mc.gui.setScreen(null); mc.getWindow().setWindowed(sizes[s][0], sizes[s][1]); mc.resizeGui();
+                    if (tabs[tb] == MenuScreen.Tab.BESTIAIRE) ClientData.mobInfo.keySet().stream().limit(40).forEach(k -> ClientData.DATA.kills.put(k, 3));
+                    if (tabs[tb] == MenuScreen.Tab.COSMETIQUES) mc.gui.setScreen(new com.mmorpg.client.screen.CosmeticsScreen(java.util.Arrays.stream(Cosmetic.values()).filter(Cosmetic::hasModel).findFirst().get()));
+                    else MenuScreen.open(tabs[tb]); }
+                if (tabs[tb] == MenuScreen.Tab.BESTIAIRE && s == 0) {
+                    String[] picks = {"archer_sylvestre", "roi_gobelin", "colosse_racine"};
+                    for (int q = 0; q < picks.length; q++) {
+                        if (phase == 15 + q * 6) com.mmorpg.client.screen.BestiaryScreen.select(picks[q]);
+                        if (phase == 20 + q * 6 && q > 0) shot(mc, "bestiaire_" + picks[q]);
+                    }
+                }
+                if (phase == 35) shot(mc, "r" + sizes[s][0] + "x" + sizes[s][1] + "_" + tabs[tb].name().toLowerCase());
+            }
+            if (n >= sizes.length * tabs.length) { mc.gui.setScreen(null); stop(mc); }
             return;
         }
         if (MODE.equals("onglets")) {          // un cliche par onglet du menu (Metiers, Succes, Bestiaire, Boutique...)
@@ -1455,6 +1500,42 @@ public final class DevShowcase {
     }
 
     /** Controle des arcs, marteaux et epees 3D : 3e personne, 1re personne, traction de l'arc et inventaire. */
+    /** Galerie : toutes les armes dans l'inventaire (4 pages de 16), puis une arme de chaque famille en main. */
+    private static void scmd(Minecraft mc, String command) {
+        var server = mc.getSingleplayerServer();
+        if (server != null) server.execute(() -> server.getCommands().performPrefixedCommand(server.createCommandSourceStack().withSuppressedOutput(), command));
+    }
+
+    private static void weaponGalleryPhase(Minecraft mc, String me) {
+        java.util.List<String> all = new java.util.ArrayList<>();
+        for (var w : com.mmorpg.item.ItemDefs.WEAPONS) all.add(w.id());
+        for (String c : new String[]{"guerrier", "mage", "archer", "tank"}) for (int b = 0; b < 5; b++) all.add("pvp_" + c + "_" + b + "_arme");
+        int page = (tick - 60) / 80, k = (tick - 60) % 80;
+        if (com.mmorpg.client.cinematic.CinematicClient.active() && tick % 10 == 0) com.mmorpg.client.cinematic.CinematicClient.skip();
+        if (tick == 20) { mc.getWindow().setWindowed(1280, 720); mc.options.guiScale().set(4); mc.resizeGui(); scmd(mc, "time set day"); scmd(mc, "weather clear"); scmd(mc, "gamemode creative VisualChecks"); }
+                if (tick >= 60 && page < 4) {
+            if (k == 0) {
+                mc.gui.setScreen(null);
+                scmd(mc, "clear " + me);
+                for (int i = 0; i < 16 && page * 16 + i < all.size(); i++) scmd(mc, "item replace entity " + me + " inventory." + i + " with mmorpg:" + all.get(page * 16 + i));
+            }
+            if (k == 30) mc.gui.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player));
+            if (k == 60) shot(mc, "galerie_" + page);
+            return;
+        }
+        int t = tick - 400;
+        if (t == 0) { mc.gui.setScreen(null); scmd(mc, "clear " + me); }
+        String[] hand = {"excalibur_celeste", "baton_archimage", "marteau_titan", "arc_aube_divine", "lame_runique", "masse_gardien", "arc_faucon", "baton_phenix"};
+        if (t >= 0 && t < hand.length * 60) {
+            int n = t / 60, j = t % 60;
+            if (j == 0) { scmd(mc, "execute in minecraft:overworld run fill 25 219 -5 35 219 5 minecraft:smooth_stone"); scmd(mc, "execute in minecraft:overworld run fill 25 220 -5 35 226 5 minecraft:air"); scmd(mc, "execute in minecraft:overworld run tp VisualChecks 30 220 0 0 10"); scmd(mc, "item replace entity " + me + " weapon.mainhand with mmorpg:" + hand[n]); mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT); }
+            if (j == 25) { mc.gui.hud.getChat().clearMessages(false); shot(mc, "main_" + n + "_" + hand[n] + "_3e"); }
+            if (j == 30) mc.options.setCameraType(CameraType.FIRST_PERSON);
+            if (j == 50) { MMORPG.LOGGER.info("[MMORPG] MAIN {} pos={} inv={} cam={}", mc.player.getMainHandItem(), mc.player.position(), mc.player.isInvisible(), mc.options.getCameraType()); shot(mc, "main_" + n + "_" + hand[n] + "_1re"); }
+        }
+        if (t == hand.length * 60 + 20) stop(mc);
+    }
+
     private static void weaponPhase(Minecraft mc, String me) {
         String[] hot = {"arc_chasseur", "arc_aube_divine", "masse_garde", "marteau_egide", "epee_recrue", "excalibur_celeste"};
         String[] inv = {"arc_elfique", "arc_tempete", "arc_faucon", "arc_spectral", "marteau_bastion", "marteau_colosse", "masse_gardien",
@@ -5263,6 +5344,23 @@ public final class DevShowcase {
         double max = d.stats.get(com.mmorpg.rpg.Stat.MAX_HP);
         if (setFraction >= 0) d.hp = (float) (max * setFraction);
         MMORPG.LOGGER.info("[MMORPG] DUELLISTE {} : vie {} / {}", label, d.hp, max);
+    }
+
+    /** Equipe la panoplie (si donnee) sur le joueur du serveur solo et le tourne de {@code yaw} degres. */
+    private static void armureBras(Minecraft mc, String set, float yaw) {
+        var server = mc.getSingleplayerServer();
+        if (server == null) return;
+        server.execute(() -> {
+            var sp = server.getPlayerList().getPlayers().get(0);
+            if (set != null) {
+                var slots = new net.minecraft.world.entity.EquipmentSlot[]{net.minecraft.world.entity.EquipmentSlot.HEAD, net.minecraft.world.entity.EquipmentSlot.CHEST, net.minecraft.world.entity.EquipmentSlot.LEGS, net.minecraft.world.entity.EquipmentSlot.FEET};
+                for (int k = 0; k < 4; k++) {
+                    var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(com.mmorpg.MMORPG.id(set + "_" + com.mmorpg.item.ItemDefs.PIECES[k]));
+                    sp.setItemSlot(slots[k], new net.minecraft.world.item.ItemStack(item));
+                }
+            }
+            sp.setYRot(yaw); sp.setYBodyRot(yaw); sp.setYHeadRot(yaw); sp.setXRot(0);
+        });
     }
 
     static void stop(Minecraft mc) {

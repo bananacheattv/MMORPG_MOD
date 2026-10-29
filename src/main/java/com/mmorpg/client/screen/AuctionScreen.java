@@ -80,12 +80,12 @@ public class AuctionScreen extends MmoScreen {
     @Override
     protected void init() {
         super.init();
-        search = new EditBox(this.font, left + 10, top + 46, 190, 14, Component.literal("Recherche"));
+        search = new EditBox(this.font, left + 10, top + 45, 230, 16, Component.literal("Recherche"));
         search.setHint(Component.literal("Rechercher un objet...").withColor(0xFF807868));
         search.setMaxLength(40);
         search.setValue(query);
         this.addRenderableWidget(search);
-        price = new EditBox(this.font, left + 20, top + 140, 120, 16, Component.literal("Prix"));
+        price = new EditBox(this.font, left + 12, top + 190, 150, 18, Component.literal("Prix"));
         price.setHint(Component.literal("Prix total (or)").withColor(0xFF807868));
         price.setMaxLength(9);
         price.setResponder(s -> {
@@ -121,29 +121,43 @@ public class AuctionScreen extends MmoScreen {
         button(g, left + pw - 8 - 150, top + 24, 150, 16, claim, waiting, 0xFF2A6A3A, () -> send(Auction.ACT_CLAIM, 0, search.getValue(), page));
         search.visible = tab == 0;
         price.visible = tab == 1;
+        price.setY(top + 190);
         if (tab == 0) renderBrowse(g);
         else if (tab == 1) renderSell(g);
         else renderMine(g);
     }
 
+    private void bigItem(GuiGraphicsExtractor g, ItemStack stack, int x, int y, int box, boolean selected) {
+        Ui.itemBox(g, font, stack, x, y, box);
+        if (selected) Ui.border(g, x, y, box, box, Ui.GOLD);
+    }
+
+    private void listCard(GuiGraphicsExtractor g, Row r, int x, int y, int w, int h, String line2, boolean affordable, String buttonLabel, boolean buttonOn, int buttonAccent, Runnable action) {
+        boolean hov = hovered(x, y, w, h);
+        Ui.frame(g, x, y, w, h, r.stack.isEmpty() ? 0xFF50484A : 0xFF5A5470, hov);
+        int box = h - 4;
+        bigItem(g, r.stack, x + 2, y + 2, box, false);
+        int tx = x + box + 8, bw = 64;
+        g.text(font, font.plainSubstrByWidth(r.stack.getHoverName().getString(), w - box - 14 - bw - 6), tx, y + 5, Ui.TEXT, false);
+        g.text(font, font.plainSubstrByWidth(line2, w - box - 14 - bw - 6), tx, y + h - 14, Ui.MUTED, false);
+        String p = r.price + " or";
+        g.text(font, p, x + w - 6 - font.width(p), y + 5, affordable ? 0xFFFFD040 : Ui.RED, true);
+        button(g, x + w - 6 - bw, y + h - 17, bw, 14, buttonLabel, buttonOn, buttonAccent, action);
+        if (hov && !r.stack.isEmpty()) g.setTooltipForNextFrame(font, r.stack, mouseX, mouseY);
+    }
+
     private void renderBrowse(GuiGraphicsExtractor g) {
-        button(g, left + 204, top + 45, 52, 16, "Chercher", true, 0xFF2A5A4A, () -> send(Auction.ACT_BROWSE, 0, search.getValue(), 0));
-        g.text(font, total + " annonce(s)", left + 262, top + 49, Ui.MUTED, false);
-        int rowH = 18;
-        int y0 = top + 66;
+        button(g, left + 244, top + 45, 56, 16, "Chercher", true, 0xFF2A5A4A, () -> send(Auction.ACT_BROWSE, 0, search.getValue(), 0));
+        g.text(font, total + " annonce(s)", left + 308, top + 49, Ui.MUTED, false);
+        int ch = 36, y0 = top + 66, avail = ph - 66 - 24;
+        int perCol = Math.max(1, avail / ch);
+        int cols = rows.size() > perCol * 2 ? 3 : 2, gap = 6, cw = (pw - 16 - gap * (cols - 1)) / cols;
         if (rows.isEmpty()) g.centeredText(font, Component.literal("Aucune annonce pour le moment."), left + pw / 2, y0 + 40, Ui.MUTED);
-        for (int i = 0; i < rows.size(); i++) {
+        for (int i = 0; i < rows.size() && i < perCol * cols; i++) {
             Row r = rows.get(i);
-            int ry = y0 + i * rowH;
-            Ui.frame(g, left + 8, ry, pw - 16, rowH - 2, r.stack.isEmpty() ? 0xFF50484A : 0xFF5A5470, hovered(left + 8, ry, pw - 16, rowH - 2));
-            g.item(r.stack, left + 11, ry);
-            g.itemDecorations(font, r.stack, left + 11, ry);
-            g.text(font, font.plainSubstrByWidth(r.stack.getHoverName().getString(), 140), left + 32, ry + 5, Ui.TEXT, false);
-            g.text(font, font.plainSubstrByWidth(r.seller + " · " + timeLeft(r.left), 100), left + 180, ry + 5, Ui.MUTED, false);
-            String p = r.price + " or";
-            g.text(font, p, left + pw - 90 - font.width(p), ry + 5, wallet >= r.price ? 0xFFFFD040 : Ui.RED, true);
-            button(g, left + pw - 84, ry + 1, 70, 14, "Acheter", wallet >= r.price, 0xFF2A6A3A, () -> send(Auction.ACT_BUY, r.id, search.getValue(), page));
-            if (hovered(left + 11, ry, 16, 16) && !r.stack.isEmpty()) g.setTooltipForNextFrame(font, r.stack, mouseX, mouseY);
+            int x = left + 8 + (i % cols) * (cw + gap), y = y0 + (i / cols) * ch;
+            listCard(g, r, x, y, cw, ch - 2, r.seller + " · " + timeLeft(r.left), wallet >= r.price, "Acheter", wallet >= r.price, 0xFF2A6A3A,
+                    () -> send(Auction.ACT_BUY, r.id, search.getValue(), page));
         }
         int py = top + ph - 18;
         button(g, left + pw / 2 - 70, py, 40, 14, "◀", page > 0, 0xFF3B3350, () -> send(Auction.ACT_BROWSE, 0, query, page - 1));
@@ -157,50 +171,63 @@ public class AuctionScreen extends MmoScreen {
         var bags=com.mmorpg.server.Backpacks.decode(com.mmorpg.client.ClientData.DATA.backpacks,player.level().registryAccess());
         int inventorySize=36+com.mmorpg.server.Backpacks.capacity(bags),invPages=(inventorySize+35)/36;inventoryPage=Math.clamp(inventoryPage,0,invPages-1);if(sellSlot>=inventorySize)sellSlot=0;
         java.util.function.IntFunction<ItemStack> stackAt=slot->slot<36?player.getInventory().getItem(slot):bags.getItem(slot-34);
-        ItemStack held=stackAt.apply(sellSlot);int x0=left+12;
-        Ui.inset(g,x0,top+48,pw-24,83);
-        g.text(font,"CHOISIR DANS MON INVENTAIRE",x0+7,top+53,Ui.GOLD,false);
-        if(invPages>1){button(g,x0+150,top+50,15,13,"‹",inventoryPage>0,Ui.GOLD,()->inventoryPage--);button(g,x0+167,top+50,15,13,"›",inventoryPage+1<invPages,Ui.GOLD,()->inventoryPage++);}
+        ItemStack held=stackAt.apply(sellSlot);
+        int x0=left+8, cell=26, gridW=9*cell+14, top0=top+46, panelH=4*cell+34;
+        // colonne gauche : inventaire (grandes cases)
+        Ui.inset(g,x0,top0,gridW,panelH);
+        g.text(font,"CHOISIR DANS MON INVENTAIRE",x0+7,top0+6,Ui.GOLD,false);
+        if(invPages>1){button(g,x0+gridW-38,top0+4,15,13,"‹",inventoryPage>0,Ui.GOLD,()->inventoryPage--);button(g,x0+gridW-21,top0+4,15,13,"›",inventoryPage+1<invPages,Ui.GOLD,()->inventoryPage++);}
         for(int i=0;i<36&&inventoryPage*36+i<inventorySize;i++){
-            int slot=inventoryPage==0?(i<27?i+9:i-27):inventoryPage*36+i,sx=x0+7+(i%9)*19,sy=top+65+(i/9)*16;
-            ItemStack stack=stackAt.apply(slot);Ui.frame(g,sx,sy,18,16,slot==sellSlot?Ui.GOLD:Ui.LINE,slot==sellSlot);
-            g.item(stack,sx+1,sy);g.itemDecorations(font,stack,sx+1,sy);
-            if(!stack.isEmpty()){click(sx,sy,18,16,()->sellSlot=slot);if(hovered(sx,sy,18,16))g.setTooltipForNextFrame(font,stack,mouseX,mouseY);}
+            int slot=inventoryPage==0?(i<27?i+9:i-27):inventoryPage*36+i,sx=x0+7+(i%9)*cell,sy=top0+22+(i/9)*cell;
+            ItemStack stack=stackAt.apply(slot);
+            bigItem(g,stack,sx,sy,cell-2,slot==sellSlot);
+            if(!stack.isEmpty()){click(sx,sy,cell-2,cell-2,()->sellSlot=slot);if(hovered(sx,sy,cell-2,cell-2))g.setTooltipForNextFrame(font,stack,mouseX,mouseY);}
         }
-        int tx=x0+186,tw=pw-218;
-        g.text(font,font.plainSubstrByWidth(held.isEmpty()?"Choisissez un objet":held.getHoverName().getString(),Math.max(40,tw)),tx,top+69,Ui.TEXT,false);
-        if(!held.isEmpty())g.text(font,"Pile : "+held.getCount()+" objet(s)",tx,top+83,Ui.MUTED,false);
-        g.text(font,"48 h · taxe : 5 %",tx,top+99,Ui.MUTED,false);
-        g.text(font,"Toute la pile sélectionnée sera vendue.",left+20,top+188,Ui.MUTED,false);
+        // colonne droite : detail de l'objet choisi
+        int dx=x0+gridW+8, dw=left+pw-8-dx;
+        Ui.inset(g,dx,top0,dw,panelH);
+        int pv=Math.min(64,panelH-16);
+        bigItem(g,held,dx+8,top0+8,pv,false);
+        int tx=dx+pv+18, tw=Math.max(40,dw-pv-26);
+        g.text(font,font.plainSubstrByWidth(held.isEmpty()?"Choisissez un objet":held.getHoverName().getString(),tw),tx,top0+10,Ui.TEXT,false);
+        if(!held.isEmpty())g.text(font,"Pile : "+held.getCount()+" objet(s)",tx,top0+24,Ui.MUTED,false);
+        g.text(font,"Durée : 48 h",tx,top0+40,Ui.MUTED,false);
+        g.text(font,"Taxe : "+Math.round(Auction.TAX*100)+" %",tx,top0+54,Ui.MUTED,false);
+        g.text(font,"Toute la pile sélectionnée sera vendue.",dx+8,top0+panelH-14,Ui.MUTED,false);
+        // ligne de prix : libelle, champ, raccourcis
+        int py=top+190;
+        g.text(font,"PRIX TOTAL (OR)",x0+4,py-12,Ui.GOLD,false);
         long value = 0;
         try {
             value = price.getValue().isEmpty() ? 0 : Long.parseLong(price.getValue());
         } catch (NumberFormatException ignored) {
         }
         final long p = value;
-        if (p > 0) g.text(font, "Vous recevrez " + Math.max(1, p - Math.round(p * Auction.TAX)) + " or", left + 150, top + 144, 0xFF7CE08A, false);
-        button(g, left + 20, top + 164, 180, 18, "Mettre en vente", !held.isEmpty() && p > 0 && p <= Auction.MAX_PRICE, 0xFF2A6A3A, () -> {
+        int bx=x0+4+150+6;
+        long[] steps={10,100,1000,10000};
+        for(long st:steps){String lb="+"+(st>=1000?st/1000+"k":st);button(g,bx,py,40,18,lb,true,0xFF3B3350,()->setPrice(Math.min(Auction.MAX_PRICE,p+st)));bx+=43;}
+        button(g,bx,py,48,18,"Effacer",p>0,0xFF6A3A2A,()->price.setValue(""));
+        if (p > 0) g.text(font, "Vous recevrez " + Math.max(1, p - Math.round(p * Auction.TAX)) + " or", dx+8, py-12, 0xFF7CE08A, false);
+        // action principale
+        boolean can=!held.isEmpty() && p > 0 && p <= Auction.MAX_PRICE;
+        button(g, left + 8, top + ph - 36, pw - 16, 26, "Mettre en vente", can, 0xFF2A8A4A, () -> {
             send(Auction.ACT_SELL,p,"slot:"+sellSlot+":"+Auction.saleFingerprint(held,player.level().registryAccess()),0);
             price.setValue("");
         });
+        if(!can)g.centeredText(font,Component.literal(held.isEmpty()?"Choisissez un objet puis indiquez son prix.":"Indiquez un prix pour mettre en vente."),left+pw/2,top+ph-46,Ui.MUTED);
+    }
+
+    private void setPrice(long v) {
+        price.setValue(Long.toString(v));
     }
 
     private void renderMine(GuiGraphicsExtractor g) {
-        int rowH = 18;
-        int y0 = top + 50;
+        int ch = 36, y0 = top + 50;
         if (mine.isEmpty()) g.centeredText(font, Component.literal("Vous n'avez aucune annonce en cours."), left + pw / 2, y0 + 40, Ui.MUTED);
-        for (int i = 0; i < mine.size(); i++) {
+        int fit = Math.max(1, (ph - 50 - 8) / ch);
+        for (int i = 0; i < mine.size() && i < fit; i++) {
             Row r = mine.get(i);
-            int ry = y0 + i * rowH;
-            Ui.frame(g, left + 8, ry, pw - 16, rowH - 2, 0xFF5A5470, hovered(left + 8, ry, pw - 16, rowH - 2));
-            g.item(r.stack, left + 11, ry);
-            g.itemDecorations(font, r.stack, left + 11, ry);
-            g.text(font, font.plainSubstrByWidth(r.stack.getHoverName().getString(), 150), left + 32, ry + 5, Ui.TEXT, false);
-            g.text(font, "Reste " + timeLeft(r.left), left + 190, ry + 5, Ui.MUTED, false);
-            String p = r.price + " or";
-            g.text(font, p, left + pw - 100 - font.width(p), ry + 5, 0xFFFFD040, true);
-            button(g, left + pw - 94, ry + 1, 80, 14, "Annuler", true, 0xFF6A3A2A, () -> send(Auction.ACT_CANCEL, r.id, "", 0));
-            if (hovered(left + 11, ry, 16, 16) && !r.stack.isEmpty()) g.setTooltipForNextFrame(font, r.stack, mouseX, mouseY);
+            listCard(g, r, left + 8, y0 + i * ch, pw - 16, ch - 2, "Reste " + timeLeft(r.left), true, "Annuler", true, 0xFF6A3A2A, () -> send(Auction.ACT_CANCEL, r.id, "", 0));
         }
     }
 

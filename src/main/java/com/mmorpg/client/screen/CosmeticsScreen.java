@@ -91,9 +91,9 @@ public class CosmeticsScreen extends MenuScreen {
                 com.mmorpg.client.model.imported.ImportedCosmetics.preview = c;
                 try {
                     if(c.category==Cosmetic.Category.DOS) {
-                        InventoryScreen.renderEntityInInventoryFollowsAngle(g,px+2,boxY,px+pwid-2,boxY+boxH,36,.0625f,9,.2f,mc.player);
-                    } else if(c.hasModel()) InventoryScreen.renderEntityInInventoryFollowsAngle(g,px+2,boxY,px+pwid-2,boxY+boxH,36,.0625f,-.5f,.2f,mc.player);
-                    else InventoryScreen.extractEntityInInventoryFollowsMouse(g, px + 2, boxY, px + pwid - 2, boxY + boxH, 36, 0.0625F, mx, my, mc.player);
+                        com.mmorpg.client.ui.Ui.entityFollowsAngle(g,px+2,boxY,px+pwid-2,boxY+boxH,36,.0625f,9,.2f,mc.player);
+                    } else if(c.hasModel()) com.mmorpg.client.ui.Ui.entityFollowsAngle(g,px+2,boxY,px+pwid-2,boxY+boxH,36,.0625f,-.5f,.2f,mc.player);
+                    else com.mmorpg.client.ui.Ui.entityFollowsMouse(g, px + 2, boxY, px + pwid - 2, boxY + boxH, 36, 0.0625F, mx, my, mc.player);
                 } finally { com.mmorpg.client.model.imported.ImportedCosmetics.preview = null; }
             }
             if (!c.hasModel()) drawPreview(g, c, px + pwid / 2, boxY + boxH / 2 + 6);
