@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS players (
   plains_unlocked INT NOT NULL,
   evolution INT NOT NULL,
   data MEDIUMTEXT NOT NULL,
+  inventory MEDIUMTEXT NULL,                  -- schema v2 : inventaire du profil
   version BIGINT NOT NULL DEFAULT 1,
   server_id VARCHAR(32) NOT NULL,
   online TINYINT(1) NOT NULL DEFAULT 0,
@@ -57,6 +58,15 @@ CREATE TABLE IF NOT EXISTS events (
   detail VARCHAR(512) NULL,
   KEY idx_events_player (uuid, ts),
   KEY idx_events_kind (kind, ts)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Transferts en attente entre serveurs (schema v2) : serveur de destination et type de voyage d'un joueur.
+CREATE TABLE IF NOT EXISTS transfers (
+  uuid CHAR(36) NOT NULL PRIMARY KEY,
+  dest_server VARCHAR(32) NOT NULL,
+  kind VARCHAR(16) NOT NULL,
+  arg INT NOT NULL DEFAULT 0,
+  created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Documents JSON partages (guildes, hotel des ventes, registres de coordination, groupes) : cree automatiquement par le mod.

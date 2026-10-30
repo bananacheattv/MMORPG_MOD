@@ -233,7 +233,7 @@ public class AuctionScreen extends MmoScreen {
 
     @Override
     public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
-        if (tab == 0 && search.isFocused() && event.key() == 257) {      // Entree : lancer la recherche
+        if (tab == 0 && search.isFocused() && event.isConfirmation()) {      // Entree : lancer la recherche
             send(Auction.ACT_BROWSE, 0, search.getValue(), 0);
             return true;
         }

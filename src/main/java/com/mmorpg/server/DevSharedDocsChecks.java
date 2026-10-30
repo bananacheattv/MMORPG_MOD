@@ -141,6 +141,30 @@ public final class DevSharedDocsChecks {
             int delivered = 0;
             for (long until = System.currentTimeMillis() + 3000; delivered == 0 && System.currentTimeMillis() < until; Thread.sleep(100)) delivered = Math.max(0, com.mmorpg.guild.GuildChat.poll(server));
             check(got == 0 && delivered == 1, "chat de guilde relu depuis la base (" + got + ", " + delivered + ")");
+            // base lente : la lecture abandonnee (delai depasse) prend le verrou plus tard ; il doit etre rendu, sinon les autres
+            // serveurs attendent ce document pour toujours
+            Database.fire("lenteur", c -> {
+                try (var st = c.createStatement()) {
+                    st.executeQuery("SELECT SLEEP(5)").close();
+                }
+                return null;
+            });
+            boolean abandoned = false;
+            try {
+                com.mmorpg.db.SharedDocs.access("test-lent", Counter.class, Counter::new, null, false, c -> c.n);
+            } catch (IllegalStateException e) {
+                abandoned = true;
+            }
+            Database.await("barriere", 10000, c -> null);                // file a un seul fil : la lecture abandonnee est passee
+            Long holder = Database.await("test", 5000, c -> {
+                try (var ps = c.prepareStatement("SELECT IS_USED_LOCK('aeloria:test-lent')"); var rs = ps.executeQuery()) {
+                    rs.next();
+                    long v = rs.getLong(1);
+                    return rs.wasNull() ? 0L : v;
+                }
+            });
+            check(abandoned && holder != null && holder == 0, "verrou rendu apres une lecture abandonnee (" + abandoned + ", " + holder + ")");
+            check(com.mmorpg.db.SharedDocs.access("test-lent", Counter.class, Counter::new, null, true, c -> ++c.n) == 1, "document utilisable ensuite");
         } catch (Exception e) {
             failed = true;
             MMORPG.LOGGER.error("[CODEX CHECKS] SHARED exception", e);

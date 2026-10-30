@@ -197,6 +197,7 @@ public final class FishingEvents {
             ServerPlayer p = event.getServer().getPlayerList().getPlayer(e.getKey());
             if (p == null || !p.isAlive()) {
                 it.remove();
+                if (p != null) send(p, e.getValue(), 2);         // mort pendant la touche : la jauge du client se ferme (prise perdue)
                 continue;
             }
             Session s = e.getValue();

@@ -7,7 +7,7 @@ Mod MMORPG complet : 4 classes qui évoluent (niveaux 1 à 100), 28 compétences
 ## Installation
 
 1. Installer **NeoForge 26.3.0.39-beta** (ou plus récent) pour **Minecraft 26.3**. Minecraft 26.3 utilise Java 25.
-2. Copier `build/libs/mmorpg-1.0.0.jar` dans le dossier `mods`.
+2. Copier `build/libs/aeloria-0.0.0.jar` dans le dossier `mods`.
 3. Le mod doit être installé **sur le serveur et sur chaque client**.
 4. Pour un serveur public (sauvegardes, sécurité, mises à jour) : voir `GUIDE_SERVEUR.md`.
 5. Pour le réseau hub / serveur principal / mines / plaines, le partage des personnages et les parchemins de forge : voir `RESEAU_AELORIA.md`.

@@ -558,6 +558,7 @@
   "block.mmorpg.minerai_neantite": "Voidite Ore",
   "item.mmorpg.lingot_neantite": "Voidite Ingot",
   "block.mmorpg.veine_epuisee": "Depleted Vein",
+  "item.mmorpg.pioche_mineur_info": "A pickaxe is needed to mine this ore.",
   "item.mmorpg.lingot_aelium": "Aelium Ingot",
   "item.mmorpg.lingot_orichalque": "Orichalcum Ingot",
   "item.mmorpg.lingot_astralium": "Astralium Ingot",

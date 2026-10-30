@@ -39,8 +39,8 @@ public final class LootEditor {
         if (!QuestEditor.allowed(p)) return;
         String status;
         boolean ok = false;
+        String table = data.getStringOr("table", "");
         try {
-            String table = data.getStringOr("table", "");
             if (!LootTables.ALL.contains(table)) throw new IllegalArgumentException("Table inconnue.");
             String json = data.getStringOr("json", "");
             if (json.length() > 20000) throw new IllegalArgumentException("Table trop grande.");
@@ -55,6 +55,7 @@ public final class LootEditor {
         CompoundTag reply = snapshot();
         reply.putString("status", status);
         reply.putBoolean("ok", ok);
+        reply.putString("table", table);                     // le client ne recharge que la table enregistree
         Net.toPlayer(p, new S2COpenScreen(S2COpenScreen.LOOT_EDITOR, reply));
     }
 

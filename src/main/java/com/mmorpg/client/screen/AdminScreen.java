@@ -372,12 +372,12 @@ public class AdminScreen extends MmoScreen {
         edit.setX(x);
         edit.setY(y);
         edit.setWidth(Math.max(60, w));
-        edit.setValue(value.getAsString());
+        edit.setValue(value.isJsonNull() ? "" : value.getAsString());       // valeur null : champ vide (getAsString leverait une exception)
         edit.visible = true;
         edit.setFocused(true);
         this.setFocused(edit);
         JsonElement cur = current();
-        options = value.getAsJsonPrimitive().isString() && cur != null ? optionsFor(cur, key, value) : List.of();
+        options = value.isJsonPrimitive() && value.getAsJsonPrimitive().isString() && cur != null ? optionsFor(cur, key, value) : List.of();
         ddScroll = 0;
         ddSel = -1;
         if (!options.isEmpty() && options.size() < 200) {
@@ -404,10 +404,13 @@ public class AdminScreen extends MmoScreen {
         }
         JsonElement old = child(cur, editKey);
         String t = edit.getValue();
+        if (old == null || (old.isJsonNull() && t.isEmpty())) {           // valeur null laissee vide : rien ne change
+            stopEdit();
+            return;
+        }
         try {
-            JsonPrimitive p = old.getAsJsonPrimitive();
-            if (p.isNumber()) {
-                String o = p.getAsString();
+            if (old.isJsonPrimitive() && old.getAsJsonPrimitive().isNumber()) {
+                String o = old.getAsString();
                 boolean decimal = o.contains(".") || o.contains("e") || o.contains("E");
                 setChild(cur, editKey, new JsonPrimitive(decimal ? (Number) Double.parseDouble(t.strip().replace(',', '.')) : (Number) Long.parseLong(t.strip())));
             } else {
@@ -677,17 +680,17 @@ public class AdminScreen extends MmoScreen {
     public boolean keyPressed(KeyEvent event) {
         if (edit != null && edit.visible && edit.isFocused()) {
             List<String> list = options.isEmpty() ? List.of() : filtered();
-            if (event.key() == 257 || event.key() == 335) {
+            if (event.isConfirmation()) {
                 if (ddSel >= 0 && ddSel < list.size()) pick(list.get(ddSel));
                 else commitEdit();
                 return true;
             }
-            if (event.key() == 256) {
+            if (event.isEscape()) {
                 stopEdit();
                 return true;
             }
-            if (!list.isEmpty() && (event.key() == 264 || event.key() == 265)) {            // fleches bas / haut
-                ddSel = Math.max(0, Math.min(list.size() - 1, ddSel + (event.key() == 264 ? 1 : -1)));
+            if (!list.isEmpty() && (event.isDown() || event.isUp())) {                     // fleches bas / haut
+                ddSel = Math.max(0, Math.min(list.size() - 1, ddSel + (event.isDown() ? 1 : -1)));
                 if (ddSel < ddScroll) ddScroll = ddSel;
                 if (ddSel >= ddScroll + DD_ROWS) ddScroll = ddSel - DD_ROWS + 1;
                 return true;

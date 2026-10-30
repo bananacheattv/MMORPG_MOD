@@ -34,6 +34,7 @@ public final class LootEditorScreen extends MmoScreen {
     private final Map<String, List<LootTables.Entry>> tables = new LinkedHashMap<>();
     private final Map<String, Boolean> modified = new LinkedHashMap<>();
     private String current = LootTables.CRATE;
+    private String saving = "";                 // derniere table envoyee (l'onglet courant a pu changer avant la reponse)
     private String status = "";
     private boolean statusOk = true;
     private int scroll;
@@ -45,7 +46,7 @@ public final class LootEditorScreen extends MmoScreen {
 
     /** Reponse du serveur apres un enregistrement : la table enregistree est rechargee, les autres modifications sont gardees. */
     public void receive(CompoundTag data) {
-        load(data, data.getBooleanOr("ok", false) ? current : "");
+        load(data, data.getBooleanOr("ok", false) ? data.getStringOr("table", saving) : "");
         status = data.getStringOr("status", "");
         statusOk = data.getBooleanOr("ok", false);
     }
@@ -115,6 +116,7 @@ public final class LootEditorScreen extends MmoScreen {
         CompoundTag t = new CompoundTag();
         t.putString("table", current);
         t.putString("json", JSON.toJson(entries()));
+        saving = current;
         ClientNet.send(new Payloads.LootEdit(t));
         status = "Enregistrement…";
         statusOk = true;

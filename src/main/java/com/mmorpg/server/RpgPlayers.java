@@ -102,6 +102,7 @@ public final class RpgPlayers {
         player.refreshTabListName();
         PlayerData d = get(player);
         CompoundTag t = d.save();
+        t.remove("guild_receipts");                                // recus de guilde : serveur seulement (le client ne s'en sert pas)
         var features=new CompoundTag();for(String key:FeatureFlags.KEYS)features.putBoolean(key,FeatureFlags.enabled(player.level().getServer(),key));t.put("features",features);t.putBoolean("op",com.mmorpg.admin.PlayerAdmin.allowed(player));
         t.putBoolean("creativeAllowed",CreativeAccess.allowed(player));t.putInt("guardBroken",com.mmorpg.combat.ShieldGuard.brokenTicks(player));
         t.putString("backend",com.mmorpg.network.NetworkConfig.current.role.name());

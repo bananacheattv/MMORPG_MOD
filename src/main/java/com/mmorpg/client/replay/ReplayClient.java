@@ -96,8 +96,10 @@ public final class ReplayClient {
         });
     }
     private static void startRecord(){
+        // The server has already ended the spectator session: playback cannot continue in the restored game mode.
+        if(playing)stop(false);
         if(!authorized()||busy)return;
-        if(playing||recording){message="Arrêtez la prise en cours avant d'en créer une autre.";return;}
+        if(recording){message="Arrêtez la prise en cours avant d'en créer une autre.";return;}
         take=new ReplayTake();take.name="prise-"+java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
         take.server=server();take.dimension=dimension();take.registry=registry();
         tracks.clear();metadata.clear();lastState.clear();failed.clear();file=folder().resolve(take.name+"-"+UUID.randomUUID().toString().substring(0,8)+".aereplay");
@@ -149,7 +151,8 @@ public final class ReplayClient {
                 Integer actor=tracks.get(e.getUUID());
                 if(actor==null){
                     if(tracks.size()>=ReplayTake.MAX_ACTORS)continue;
-                    byte[] initial=tagBytes(initial(e));if(initial.length>65536)continue;
+                    // Oversized actors are skipped once, not serialized again on every tick.
+                    byte[] initial=tagBytes(initial(e));if(initial.length>65536){failed.add(e.getId());continue;}
                     actor=take.actors.size();tracks.put(e.getUUID(),actor);
                     take.actors.add(new ReplayTake.Actor(BuiltInRegistries.ENTITY_TYPE.getKey(e.getType()).toString(),e.getUUID(),e instanceof Player p?p.getGameProfile().name():e.getName().getString(),initial));
                 }
@@ -279,10 +282,12 @@ public final class ReplayClient {
     @SubscribeEvent public static void input(InputEvent.InteractionKeyMappingTriggered e){if(playing){e.setCanceled(true);e.setSwingHand(false);}}
     @SubscribeEvent public static void modifiers(RegisterRenderStateModifiersEvent e){
         e.registerEntityModifier(new TypeToken<LivingEntityRenderer<LivingEntity,LivingEntityRenderState,?>>(){},(entity,state)->{
+            // Render states are reused between entities: always reset the flag, and skip the rest outside playback.
+            if(!playing){state.setRenderData(HIDE,false);return;}
             var view=mc().getCameraEntity();
             boolean inside=view!=null&&entity.getBoundingBox().contains(view.getEyePosition());
-            state.setRenderData(HIDE,playing&&(!ghostPoses.containsKey(entity.getId())||inside));
-            var p=ghostPoses.get(entity.getId());if(playing&&p!=null){
+            state.setRenderData(HIDE,!ghostPoses.containsKey(entity.getId())||inside);
+            var p=ghostPoses.get(entity.getId());if(p!=null){
                 state.walkAnimationPos=p.walk();state.walkAnimationSpeed=p.walkSpeed();state.ageInTicks=p.age();
                 if(state instanceof net.minecraft.client.renderer.entity.state.ArmedEntityRenderState armed){
                     armed.swingAnimation=p.attack();

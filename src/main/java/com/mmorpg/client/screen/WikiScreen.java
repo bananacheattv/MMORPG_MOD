@@ -44,9 +44,16 @@ public class WikiScreen extends MenuScreen {
     @Override
     public boolean mouseScrolled(double x, double y, double sx, double sy) {
         int lx = left + 8;
-        if (x < lx + 130) listScroll = Math.max(0, listScroll - (int) Math.signum(sy) * 2);
+        if (x < lx + 130) listScroll = Math.max(0, Math.min(maxListScroll(), listScroll - (int) Math.signum(sy) * 2));
         else textScroll = Math.max(0, textScroll - (int) Math.signum(sy) * 24);
         return true;
+    }
+
+    /** Hauteur de la liste moins la place visible, en crans de 8 px : la molette s'arrete sur la derniere page. */
+    private int maxListScroll() {
+        int listH = 0;
+        for (Page[] pages : PAGES) listH += 13 + pages.length * 18 + 4;
+        return Math.max(0, (listH - (ph - 54 - 10 - 18) + 7) / 8);
     }
 
     private static String inline(String s) {
@@ -63,7 +70,10 @@ public class WikiScreen extends MenuScreen {
             if (res.isEmpty()) {
                 out.add(new Line('t', "Page introuvable."));
             } else {
-                String text = new String(res.get().open().readAllBytes(), StandardCharsets.UTF_8);
+                String text;
+                try (var in = res.get().open()) {                       // flux ferme a chaque page
+                    text = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+                }
                 boolean header = true;
                 for (String raw : text.split("\\R")) {
                     String l = raw.strip();
@@ -119,6 +129,7 @@ public class WikiScreen extends MenuScreen {
     protected void renderTab(GuiGraphicsExtractor g, int mx, int my, float a) {
         int x0 = left + 8, y0 = contentTop, lw = 130, dh = ph - 54 - 10;
         Ui.header(g, x0, y0, lw, "WIKI");
+        listScroll = Math.min(listScroll, maxListScroll());              // fenetre agrandie : la liste ne reste pas decalee
         int ly = y0 + 18 - listScroll * 8;
         g.enableScissor(x0, y0 + 16, x0 + lw, y0 + dh);
         for (int c = 0; c < CATEGORIES.length; c++) {

@@ -66,6 +66,8 @@ public final class ReplayExporter {
         ReplayClient.clean=oldClean;ReplayClient.pathCamera=oldPath;ReplayClient.paused=oldPause;
     }
     public static void cancel(){
+        // Finalizing: every frame already reached FFmpeg, so leaving playback must not destroy the clip.
+        if(!active&&stream!=null)return;
         job++;if(stream!=null){stream.abort();stream=null;}encoding=false;
         if(active)endCapture();
     }

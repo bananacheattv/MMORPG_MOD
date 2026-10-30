@@ -89,9 +89,54 @@ public final class DevAdminPlayerChecks {
         var profile = PlayerAdmin.testProfile(p, p);
         check(profile.getCompoundOrEmpty("data").getIntOr("level", 0) == d.level && profile.getListOrEmpty("inventory") != null, "profil complet renvoye");
         features(p);
+        guildLeave(p);
         d.gold = oldGold;
         RpgPlayers.setLevel(p, oldLevel);
         com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] ADMIN_PLAYERS PASS: edition generique, bornes, listes, groupes, actions, sourdine, profil");
+    }
+
+    /** « Retirer de la guilde » : la guilde garde exactement un chef (seul le rang de chef se transmet, a un officier de preference). */
+    private static void guildLeave(ServerPlayer p) {
+        var server = p.level().getServer();
+        java.util.UUID a = java.util.UUID.randomUUID(), b = java.util.UUID.randomUUID(), c = java.util.UUID.randomUUID(), e = java.util.UUID.randomUUID();
+        boolean free = com.mmorpg.guild.GuildStore.access(server, false, s -> com.mmorpg.guild.GuildStore.of(s, p.getUUID()) == null);
+        if (!free) return;                                     // joueur de test deja en guilde : rien a verifier sans la casser
+        var g1 = new com.mmorpg.guild.GuildStore.Guild();
+        var g2 = new com.mmorpg.guild.GuildStore.Guild();
+        try {
+            // 1) seul MEMBRE retire : le chef ne doit pas recevoir son rang
+            com.mmorpg.guild.GuildStore.access(server, true, s -> {
+                g1.name = "RevueChefA";
+                g1.members.put(a, new com.mmorpg.guild.GuildStore.Member(a, "ChefA", "CHEF"));
+                g1.members.put(b, new com.mmorpg.guild.GuildStore.Member(b, "OffB", "OFFICIER"));
+                g1.members.put(p.getUUID(), new com.mmorpg.guild.GuildStore.Member(p.getUUID(), p.getGameProfile().name(), "MEMBRE"));
+                s.guilds.add(g1);
+                return null;
+            });
+            PlayerAdmin.testAct(p, p, act("guildleave", ""));
+            String ranks = com.mmorpg.guild.GuildStore.access(server, false, s -> {
+                var g = com.mmorpg.guild.GuildStore.byId(s, g1.id);
+                return g.members.get(a).rank + "," + g.members.get(b).rank + "," + g.members.containsKey(p.getUUID());
+            });
+            check(ranks.equals("CHEF,OFFICIER,false"), "retrait d'un membre : rangs " + ranks);
+            // 2) chef retire : l'officier prend la tete, le membre reste membre
+            com.mmorpg.guild.GuildStore.access(server, true, s -> {
+                g2.name = "RevueChefB";
+                g2.members.put(p.getUUID(), new com.mmorpg.guild.GuildStore.Member(p.getUUID(), p.getGameProfile().name(), "CHEF"));
+                g2.members.put(c, new com.mmorpg.guild.GuildStore.Member(c, "MembreC", "MEMBRE"));
+                g2.members.put(e, new com.mmorpg.guild.GuildStore.Member(e, "OffE", "OFFICIER"));
+                s.guilds.add(g2);
+                return null;
+            });
+            PlayerAdmin.testAct(p, p, act("guildleave", ""));
+            ranks = com.mmorpg.guild.GuildStore.access(server, false, s -> {
+                var g = com.mmorpg.guild.GuildStore.byId(s, g2.id);
+                return g.members.get(c).rank + "," + g.members.get(e).rank;
+            });
+            check(ranks.equals("MEMBRE,CHEF"), "retrait du chef : rangs " + ranks);
+        } finally {
+            com.mmorpg.guild.GuildStore.access(server, true, s -> s.guilds.removeIf(g -> g.id.equals(g1.id) || g.id.equals(g2.id)));
+        }
     }
 
     /** Ecran des fonctionnalites : catalogue complet, bascule persistante, cle inconnue refusee, memes valeurs que les commandes. */
