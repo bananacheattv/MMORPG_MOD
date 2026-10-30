@@ -44,6 +44,15 @@ public final class ClientConfig {
             .translation("mmorpg.configuration.shaderMode")
             .defineEnum("shaderMode", ShaderMode.OFF);
 
+    public static final ModConfigSpec.BooleanValue DISCORD_ENABLED = BUILDER
+            .comment("Affiche Aeloria, votre classe et votre zone sur Discord (Rich Presence). Sans effet si Discord est absent.")
+            .translation("mmorpg.configuration.discordEnabled")
+            .define("discordEnabled", true);
+    public static final ModConfigSpec.ConfigValue<String> DISCORD_APP_ID = BUILDER
+            .comment("ID d'application Discord (portail developpeur). Vide = Rich Presence desactivee.")
+            .translation("mmorpg.configuration.discordAppId")
+            .define("discordAppId", "");
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 
     /** Volume de la musique d'ambiance entre 0 et 1. */

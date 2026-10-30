@@ -38,6 +38,7 @@ public final class AreaEntryClient {
     }
 
     public static void start(Payloads.AreaEntry p) {
+        DiscordPresence.onArea(p);
         title = p.title().toUpperCase(java.util.Locale.ROOT);
         subtitle = p.subtitle();
         lore = p.lore();
