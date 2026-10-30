@@ -54,8 +54,13 @@ public final class QuestOffers {
         return best;
     }
 
+    /** Pas de fenetre en plein combat (coup recu ou donne il y a moins de 10 s) : elle bloquerait les commandes du joueur. */
+    private static boolean fighting(ServerPlayer p) {
+        return p.tickCount - p.getLastHurtByMobTimestamp() < 200 || p.tickCount - p.getLastHurtMobTimestamp() < 200;
+    }
+
     private static boolean busy(ServerPlayer p) {
-        return !p.isAlive() || p.isSpectator() || p.containerMenu != p.inventoryMenu
+        return !p.isAlive() || p.isSpectator() || p.containerMenu != p.inventoryMenu || fighting(p)
                 || MountManager.inDungeon(p) || com.mmorpg.hub.ClassTrial.active(p) || com.mmorpg.hub.CinematicManager.isLocked(p);
     }
 
@@ -82,7 +87,7 @@ public final class QuestOffers {
         Offer o = OFFERS.get(p.getUUID());
         PlayerData d = RpgPlayers.get(p);
         QuestDef q = QuestManager.def(id);
-        if (o == null || !o.quest.equals(id) || !campaign(id, q) || !QuestManager.isAvailable(d, id, q, q.giver)) return;
+        if (!FeatureFlags.allow(p, "quetes") || o == null || !o.quest.equals(id) || !campaign(id, q) || !QuestManager.isAvailable(d, id, q, q.giver)) return;
         if (d.activeQuests.size() >= QuestManager.MAX_ACTIVE) {
             p.sendOverlayMessage(Component.literal("Journal de quêtes plein (" + QuestManager.MAX_ACTIVE + " quêtes maximum).").withColor(0xFF5050));
             return;
