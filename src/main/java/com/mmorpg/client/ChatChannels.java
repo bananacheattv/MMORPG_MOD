@@ -245,6 +245,6 @@ public final class ChatChannels {
         Screen s = event.getScreen();
         if (!(s instanceof ChatScreen)) return;
         EditBox box = input(s);
-        if (box != null && !box.isFocused()) s.setFocused(box);
+        if (box != null && s.getFocused() != box) s.setFocused(box);
     }
 }
