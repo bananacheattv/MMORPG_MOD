@@ -238,4 +238,13 @@ public final class ChatChannels {
         }
         if (k.isConfirmation()) box.setValue(active().route(box.getValue()));
     }
+
+    /** Les onglets sont des widgets focusables : les fleches de l'historique pouvaient leur voler le focus de la saisie. */
+    @SubscribeEvent
+    public static void onKeyPost(ScreenEvent.KeyPressed.Post event) {
+        Screen s = event.getScreen();
+        if (!(s instanceof ChatScreen)) return;
+        EditBox box = input(s);
+        if (box != null && !box.isFocused()) s.setFocused(box);
+    }
 }
