@@ -795,7 +795,11 @@ public final class PlayerAdmin {
             removed[0] = true;
             g.log((m == null ? "Un membre" : m.name) + " a été retiré par un administrateur.");
             if (g.members.isEmpty()) s.guilds.remove(g);
-            else if (m != null && !g.members.values().stream().anyMatch(x -> x.rank.equals(m.rank))) g.members.values().iterator().next().rank = m.rank;
+            else if (m != null && m.rank.equals("CHEF")) {           // seul le chef se transmet (un officier de preference) : la guilde garde exactement 1 chef
+                var heir = g.members.values().stream().filter(x -> x.rank.equals("OFFICIER")).findFirst().orElse(g.members.values().iterator().next());
+                heir.rank = "CHEF";
+                g.log(heir.name + " devient chef de la guilde.");
+            }
             return null;
         });
         require(removed[0], "Ce joueur n'est dans aucune guilde.");

@@ -14,6 +14,7 @@ import net.minecraft.world.item.FishingRodItem;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 /**
@@ -25,6 +26,8 @@ public final class FishFightClient {
     public static final Identifier LAYER = MMORPG.id("fish_fight");
     private static final long TICK_NANOS = 50_000_000L;
     private static final long RESULT_NANOS = 2_200_000_000L;
+    /** Sans nouvelles du serveur ROUND_TIMEOUT (+ marge) apres le debut de la manche, la touche est perdue (session retiree, changement de serveur). */
+    private static final long STALE_NANOS = (FishFight.ROUND_TIMEOUT + 60) * TICK_NANOS;
 
     private static boolean active;
     private static long seed;
@@ -38,6 +41,7 @@ public final class FishFightClient {
     }
 
     public static boolean active() {
+        if (active && status == 0 && System.nanoTime() > roundStartNanos + STALE_NANOS) active = false;
         return active && status == 0;
     }
 
@@ -73,6 +77,11 @@ public final class FishFightClient {
         active = false;
     }
 
+    @SubscribeEvent
+    public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
+        reset();
+    }
+
     /** Pendant la touche, un clic droit ne doit pas relancer la ligne : le serveur le prend comme clic sur la jauge. */
     @SubscribeEvent
     public static void rightClick(PlayerInteractEvent.RightClickItem event) {
@@ -84,7 +93,7 @@ public final class FishFightClient {
     public static void render(GuiGraphicsExtractor g, DeltaTracker delta) {
         if (!active) return;
         long now = System.nanoTime();
-        if (status != 0 && now > endNanos) {
+        if (status != 0 && now > endNanos || status == 0 && now > roundStartNanos + STALE_NANOS) {
             active = false;
             return;
         }

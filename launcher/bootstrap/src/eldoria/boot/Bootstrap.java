@@ -71,12 +71,20 @@ public final class Bootstrap {
             String sha = field(manifest, "launcherCoreSha256");
             if (url != null && sha != null && !(Files.exists(core) && sha.equalsIgnoreCase(sha256(core)))) {
                 Path tmp = dir.resolve("launcher-core.jar.part");
-                try (InputStream in = http.send(HttpRequest.newBuilder(URI.create(url)).build(),
-                        HttpResponse.BodyHandlers.ofInputStream()).body()) {
-                    Files.copy(in, tmp, StandardCopyOption.REPLACE_EXISTING);
+                try {
+                    HttpResponse<InputStream> r = http.send(HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofMinutes(2)).build(),
+                            HttpResponse.BodyHandlers.ofInputStream());
+                    try (InputStream in = r.body()) {
+                        if (r.statusCode() != 200) throw new IllegalStateException("HTTP " + r.statusCode() + " : " + url);
+                        Files.copy(in, tmp, StandardCopyOption.REPLACE_EXISTING);
+                    }
+                    if (!sha.equalsIgnoreCase(sha256(tmp))) throw new IllegalStateException("Somme de controle du launcher invalide");
+                    Files.move(tmp, core, StandardCopyOption.REPLACE_EXISTING);
+                } catch (Exception e) {
+                    Files.deleteIfExists(tmp);
+                    if (!Files.exists(core)) throw e;                     // rien en cache : impossible de continuer
+                    System.err.println("Mise a jour du launcher impossible, version en cache utilisee : " + e);
                 }
-                if (!sha.equalsIgnoreCase(sha256(tmp))) throw new IllegalStateException("Somme de controle du launcher invalide");
-                Files.move(tmp, core, StandardCopyOption.REPLACE_EXISTING);
             }
         }
         if (!Files.exists(core)) throw new IllegalStateException("Pas de connexion et aucun launcher en cache.\n" + MANIFEST_URL);

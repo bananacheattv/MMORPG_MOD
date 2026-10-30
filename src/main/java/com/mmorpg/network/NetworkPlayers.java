@@ -160,7 +160,12 @@ public final class NetworkPlayers {
         }
         var buffs = tag.getCompoundOrEmpty("buffs");
         for (String id : buffs.keySet()) {
-            var type = com.mmorpg.rpg.BuffType.valueOf(id);
+            com.mmorpg.rpg.BuffType type;
+            try {
+                type = com.mmorpg.rpg.BuffType.valueOf(id);
+            } catch (IllegalArgumentException retired) {              // effet retire du jeu depuis la sauvegarde : ignore (sinon connexion refusee a vie)
+                continue;
+            }
             var entry = buffs.getCompoundOrEmpty(id);
             long remaining = entry.getIntOr("remaining", 0) - elapsed;
             if (remaining > 0) parsed.buffs.put(type, new com.mmorpg.rpg.Buff(type, entry.getDoubleOr("magnitude", 0), entry.getDoubleOr("magnitude2", 0), time + remaining, entry.getIntOr("total", 0)));
@@ -175,7 +180,13 @@ public final class NetworkPlayers {
         p.getEnderChestInventory().clearContent();
         ender.forEach((i, item) -> p.getEnderChestInventory().setItem(i, item));
         eq.forEach(p::setItemSlot);
-        if (!cursor.isEmpty() && !p.getInventory().add(cursor)) throw new IOException("Cannot restore held inventory item");
+        if (!cursor.isEmpty() && !p.getInventory().add(cursor)) {
+            // inventaire plein : rendu apres l'arrivee (teleportation a 5 ticks), au sol si toujours plein ; refuser la connexion bloquerait le joueur a chaque essai
+            final ItemStack held = cursor;
+            Scheduler.later(p.level(), 6, () -> {
+                if (!p.isRemoved() && !p.getInventory().add(held)) p.drop(held, false, net.minecraft.util.Prediction.SERVER_ONLY);
+            });
+        }
         p.getInventory().setSelectedSlot(Math.clamp(tag.getIntOr("selected", 0), 0, 8));
         p.setData(ModAttachments.PLAYER, parsed);
         DungeonTravel.restore(p, returnPoint);

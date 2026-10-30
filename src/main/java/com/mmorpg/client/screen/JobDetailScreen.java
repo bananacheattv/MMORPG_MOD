@@ -144,8 +144,8 @@ public class JobDetailScreen extends MenuScreen {
         Ui.header(g, x, y, w, "JOURNAL DE PÊCHE — " + found + " / " + all.size() + " prises découvertes");
         y += 15;
         int cols = 9, cell = Math.min(w / cols, 36), rows = (all.size() + cols - 1) / cols;
-        int gx = x + (w - cols * cell) / 2;
         cell = Math.max(24, Math.min(cell, (bottom - y - 12) / rows));
+        int gx = x + (w - cols * cell) / 2;                              // centree avec la taille de case finale
         java.util.List<net.minecraft.network.chat.Component> tip = null;
         for (int i = 0; i < all.size(); i++) {
             var e = all.get(i);

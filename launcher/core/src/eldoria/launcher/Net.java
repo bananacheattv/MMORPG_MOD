@@ -191,7 +191,7 @@ final class Net {
                 if (from > to) break;
                 fs.add(pool.submit(() -> {
                     for (int attempt = 0; ; attempt++) {
-                        long pos = from;
+                        long pos = from, wrote = 0;
                         try (java.io.RandomAccessFile raf = new java.io.RandomAccessFile(tmp.toFile(), "rw")) {
                             HttpResponse<InputStream> r = HTTP.send(HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofMinutes(10))
                                     .header("User-Agent", "EldoriaLauncher").header("Range", "bytes=" + from + "-" + to).build(),
@@ -202,6 +202,7 @@ final class Net {
                                 byte[] buf = new byte[1 << 16];
                                 for (int k; (k = in.read(buf)) > 0; ) {
                                     raf.write(buf, 0, k);
+                                    wrote += k;
                                     long d = done.addAndGet(k);
                                     if (progress != null) progress.accept(d);
                                 }
@@ -209,7 +210,7 @@ final class Net {
                             return null;
                         } catch (Exception e) {
                             if (attempt >= 3) throw e;
-                            done.addAndGet(-(pos - from)); // approximation : on recommence ce morceau
+                            done.addAndGet(-wrote);        // on recommence ce morceau : la progression ne compte pas deux fois ces octets
                             Thread.sleep(1000L << attempt);
                         }
                     }

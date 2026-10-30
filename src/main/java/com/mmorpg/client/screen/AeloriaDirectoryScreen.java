@@ -8,7 +8,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.achievement.StatsScreen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.options.OptionsScreen;
@@ -29,8 +28,9 @@ import java.util.Locale;
 
 /**
  * « Menu Aeloria » : le menu Echap du jeu, en interface plate (voir {@link com.mmorpg.client.UiPack}). Barre de navigation en haut,
- * categories a gauche, recherche, et sections de cartes qui menent aux ecrans du mod et de Minecraft. On herite de {@link PauseScreen}
- * pour garder la pause du jeu, la deconnexion et tout ce qu'un autre mod attend de ce menu.
+ * categories a gauche, recherche, et sections de cartes qui menent aux ecrans du mod et de Minecraft. Ecran simple (pas un PauseScreen) :
+ * il met le jeu en pause comme tout ecran, et son bouton Deconnexion reprend celui du menu vanilla. Les cartes des fonctionnalites
+ * coupees (/fonctionnalites) sont masquees, comme les onglets du menu.
  */
 public class AeloriaDirectoryScreen extends net.minecraft.client.gui.screens.Screen {
     private static final int BG = 0x700D071C;
@@ -93,19 +93,19 @@ public class AeloriaDirectoryScreen extends net.minecraft.client.gui.screens.Scr
         Minecraft mc = this.minecraft;
         List<Card> l = new ArrayList<>();
         l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.IRON_CHESTPLATE), "Personnage", "Équipement, caractéristiques et inventaire.", () -> MenuScreen.open(MenuScreen.Tab.PERSONNAGE)));
-        l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.DIAMOND_SWORD), "Compétences", "Vos sorts et capacités de classe.", () -> MenuScreen.open(MenuScreen.Tab.COMPETENCES)));
-        l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.WRITABLE_BOOK), "Quêtes", "Journal des quêtes en cours et terminées.", () -> MenuScreen.open(MenuScreen.Tab.QUETES)));
-        l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.GOLDEN_HELMET), "Groupe", "Invitez des amis et partez en donjon.", () -> MenuScreen.open(MenuScreen.Tab.GROUPE)));
-        l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.BONE), "Familiers", "Compagnons qui vous suivent au combat.", () -> MenuScreen.open(MenuScreen.Tab.FAMILIERS)));
-        l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.SADDLE), "Montures", "Chevauchez pour traverser le monde.", () -> MenuScreen.open(MenuScreen.Tab.MONTURES)));
-        l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.AMETHYST_SHARD), "Cosmétiques", "Apparences, auras et trophées.", () -> MenuScreen.open(MenuScreen.Tab.COSMETIQUES)));
-        l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.ENCHANTED_BOOK), "Bestiaire", "Les créatures que vous avez affrontées.", () -> MenuScreen.open(MenuScreen.Tab.BESTIAIRE)));
-        if (ClientData.features.getBooleanOr("wiki", true)) l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.BOOK), "Wiki", "Le guide du jeu : classes, donjons, économie…", () -> MenuScreen.open(MenuScreen.Tab.WIKI)));
+        if (MenuScreen.enabled(MenuScreen.Tab.COMPETENCES)) l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.DIAMOND_SWORD), "Compétences", "Vos sorts et capacités de classe.", () -> MenuScreen.open(MenuScreen.Tab.COMPETENCES)));
+        if (MenuScreen.enabled(MenuScreen.Tab.QUETES)) l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.WRITABLE_BOOK), "Quêtes", "Journal des quêtes en cours et terminées.", () -> MenuScreen.open(MenuScreen.Tab.QUETES)));
+        if (MenuScreen.enabled(MenuScreen.Tab.GROUPE)) l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.GOLDEN_HELMET), "Groupe", "Invitez des amis et partez en donjon.", () -> MenuScreen.open(MenuScreen.Tab.GROUPE)));
+        if (MenuScreen.enabled(MenuScreen.Tab.FAMILIERS)) l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.BONE), "Familiers", "Compagnons qui vous suivent au combat.", () -> MenuScreen.open(MenuScreen.Tab.FAMILIERS)));
+        if (MenuScreen.enabled(MenuScreen.Tab.MONTURES)) l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.SADDLE), "Montures", "Chevauchez pour traverser le monde.", () -> MenuScreen.open(MenuScreen.Tab.MONTURES)));
+        if (MenuScreen.enabled(MenuScreen.Tab.COSMETIQUES)) l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.AMETHYST_SHARD), "Cosmétiques", "Apparences, auras et trophées.", () -> MenuScreen.open(MenuScreen.Tab.COSMETIQUES)));
+        if (MenuScreen.enabled(MenuScreen.Tab.BESTIAIRE)) l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.ENCHANTED_BOOK), "Bestiaire", "Les créatures que vous avez affrontées.", () -> MenuScreen.open(MenuScreen.Tab.BESTIAIRE)));
+        if (MenuScreen.enabled(MenuScreen.Tab.WIKI)) l.add(new Card(Cat.ADVENTURE, new ItemStack(Items.BOOK), "Wiki", "Le guide du jeu : classes, donjons, économie…", () -> MenuScreen.open(MenuScreen.Tab.WIKI)));
         l.add(new Card(Cat.TRAVEL, new ItemStack(Items.ENDER_PEARL), "Retour au hub", "Rejoignez la Citadelle des héros.", () -> {
             mc.gui.setScreen(null);
             mc.player.connection.sendCommand("hub");
         }));
-        l.add(new Card(Cat.TRAVEL, new ItemStack(Items.IRON_PICKAXE), "Les mines", "Descendez extraire des lingots rares.", () -> {
+        if (ClientData.features.getBooleanOr("mines", true)) l.add(new Card(Cat.TRAVEL, new ItemStack(Items.IRON_PICKAXE), "Les mines", "Descendez extraire des lingots rares.", () -> {
             mc.gui.setScreen(null);
             mc.player.connection.sendCommand("mine");
         }));
@@ -243,6 +243,7 @@ public class AeloriaDirectoryScreen extends net.minecraft.client.gui.screens.Scr
         int x = 36 + Math.round(lw * sc) + 18;
         String[] tabs = {"Menu", "Personnage", "Quêtes", "Groupe", "Options"};
         for (String t : tabs) {
+            if (t.equals("Quêtes") && !MenuScreen.enabled(MenuScreen.Tab.QUETES) || t.equals("Groupe") && !MenuScreen.enabled(MenuScreen.Tab.GROUPE)) continue;
             int tw = font.width(t);
             if (x + tw + 10 > w - 190) break;
             boolean on = t.equals("Menu");

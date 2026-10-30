@@ -139,7 +139,7 @@ public class ClassMasterScreen extends MmoScreen {
     @Override
     public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float a) {
         float open = easeOutCubic(since(openedAt, 0.3F));
-        g.fillGradient(0, 0, this.width, this.height, Ui.alpha(0xA0080610, open), Ui.alpha(0xD0080610, open));
+        g.fillGradient(0, 0, g.guiWidth(), g.guiHeight(), Ui.alpha(0xA0080610, open), Ui.alpha(0xD0080610, open));   // hors mise a l'echelle : taille reelle
     }
 
     @Override

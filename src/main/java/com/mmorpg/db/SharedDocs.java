@@ -44,6 +44,8 @@ public final class SharedDocs {
      */
     public static <S, T> T access(String name, Type type, Supplier<S> empty, Path legacy, boolean write, Function<S, T> action) {
         final String lock = "aeloria:" + name;
+        // lecture abandonnee (delai depasse) mais finie plus tard : le verrou pris doit etre rendu, par la tache ou par l'appelant
+        final java.util.concurrent.atomic.AtomicBoolean claimed = new java.util.concurrent.atomic.AtomicBoolean();
         Row row = Database.await("lecture de " + name, WAIT_MS + 1000, c -> {
             try (PreparedStatement ps = c.prepareStatement("SELECT GET_LOCK(?, 3)")) {
                 ps.setString(1, lock);
@@ -51,14 +53,23 @@ public final class SharedDocs {
                     if (!rs.next() || rs.getInt(1) != 1) throw new SQLException("document « " + name + " » occupe");
                 }
             }
+            Row r;
             try (PreparedStatement ps = c.prepareStatement("SELECT data, revision FROM shared_docs WHERE name = ?")) {
                 ps.setString(1, name);
                 try (ResultSet rs = ps.executeQuery()) {
-                    return rs.next() ? new Row(rs.getString(1), rs.getLong(2)) : new Row(null, 0);
+                    r = rs.next() ? new Row(rs.getString(1), rs.getLong(2)) : new Row(null, 0);
                 }
             }
+            if (!claimed.compareAndSet(false, true)) release(c, lock);    // l'appelant a deja abandonne
+            return r;
         });
-        if (row == null) throw new IllegalStateException("Base de donnees indisponible : " + name);
+        if (row == null) {
+            if (!claimed.compareAndSet(false, true)) Database.fire("liberation de " + name, c -> {   // lecture finie juste apres le delai
+                release(c, lock);
+                return null;
+            });
+            throw new IllegalStateException("Base de donnees indisponible : " + name);
+        }
         boolean released = false;
         try {
             String json = row.data();
@@ -114,12 +125,16 @@ public final class SharedDocs {
             return result;
         } finally {
             if (!released) Database.await("liberation de " + name, WAIT_MS, c -> {
-                try (PreparedStatement ps = c.prepareStatement("SELECT RELEASE_LOCK(?)")) {
-                    ps.setString(1, lock);
-                    ps.executeQuery().close();
-                }
+                release(c, lock);
                 return null;
             });
+        }
+    }
+
+    private static void release(java.sql.Connection c, String lock) throws SQLException {
+        try (PreparedStatement ps = c.prepareStatement("SELECT RELEASE_LOCK(?)")) {
+            ps.setString(1, lock);
+            ps.executeQuery().close();
         }
     }
 

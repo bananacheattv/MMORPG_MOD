@@ -1,10 +1,17 @@
 param(
     [Parameter(Mandatory = $true)][string]$PanelRoot,
-    [string]$ModJar = (Join-Path $PSScriptRoot '../build/libs/mmorpg-1.0.0.jar'),
+    [string]$ModJar = '',
     [switch]$AddDungeons
 )
 $ErrorActionPreference = 'Stop'
 $panelPath = (Resolve-Path -LiteralPath $PanelRoot).Path
+if (-not $ModJar) {
+    # jar produit par ./gradlew build (aeloria-<version>.jar), hors sources/javadoc
+    $built = Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot '../build/libs') -Filter 'aeloria-*.jar' -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -notmatch '-(sources|javadoc)\.jar$' } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    if (-not $built) { throw 'Aucun jar du mod dans build/libs : lancez ./gradlew build ou passez -ModJar.' }
+    $ModJar = $built.FullName
+}
 $jarPath = (Resolve-Path -LiteralPath $ModJar).Path
 $configPath = Join-Path $panelPath 'config.json'
 $panelConfig = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
@@ -114,7 +121,12 @@ foreach ($service in $panelConfig.services) {
         dungeonMaxInstancesPerPool = 8; dungeonBuildBudgetMs = 8
     }
     $network | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $modConfig 'network.json') -Encoding utf8
-    Copy-Item -LiteralPath $jarPath -Destination (Join-Path $serverPath 'mods/mmorpg-1.0.0.jar')
+    $modsPath = Join-Path $serverPath 'mods'
+    New-Item -ItemType Directory -Path $modsPath -Force | Out-Null
+    # un seul jar du mod : une ancienne version laissee a cote ferait refuser le demarrage (mod en double)
+    Get-ChildItem -LiteralPath $modsPath -File | Where-Object { $_.Name -match '^(mmorpg|aeloria)-.*\.jar$' -and $_.FullName -ne $jarPath } | Remove-Item -Force
+    $modTarget = Join-Path $modsPath (Split-Path -Leaf $jarPath)
+    if ($modTarget -ne $jarPath) { Copy-Item -LiteralPath $jarPath -Destination $modTarget }
 }
 foreach ($guide in @('RESEAU_AELORIA.md', 'PORTAILS_ET_UNDO.md')) {
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot "../$guide") -Destination (Join-Path $panelPath $guide)

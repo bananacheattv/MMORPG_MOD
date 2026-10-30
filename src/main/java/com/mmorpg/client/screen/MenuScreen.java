@@ -85,13 +85,16 @@ public abstract class MenuScreen extends MmoScreen {
 
     protected abstract void renderTab(GuiGraphicsExtractor g, int mx, int my, float a);
 
+    /** Onglet visible : sa fonctionnalite n'est pas coupee par les operateurs (/fonctionnalites). */
+    public static boolean enabled(Tab t){String key=switch(t){case COMPETENCES->"competences";case QUETES->"quetes";case GUILDE->"guildes";case ARENE->"arenes";case FAMILIERS->"familiers";case MONTURES->"montures";case BOUTIQUE->"boutique";case COSMETIQUES->"cosmetiques";case GROUPE->"groupes";case BESTIAIRE->"bestiaire";case METIERS->"metiers";case SUCCES->"succes";case WIKI->"wiki";default->"";};return key.isEmpty()||ClientData.features.getBooleanOr(key,true);}
+
     /** Barre d'onglets du menu (partagee avec l'ecran Personnage, qui est un ecran d'inventaire). */
     private static int navPage;private static Tab navActive;
     public static void drawTabs(GuiGraphicsExtractor g, net.minecraft.client.gui.Font font, int left, int top, int pw, Tab active, int mx, int my,
                                 java.util.function.BiConsumer<int[], Runnable> click) {
         var available=new java.util.ArrayList<Tab>(java.util.Arrays.asList(Tab.values()));available.remove(Tab.CREATIF);
         if(Minecraft.getInstance().player!=null&&ClientData.creativeAllowed&&Minecraft.getInstance().player.hasInfiniteMaterials())available.add(1,Tab.CREATIF);
-        available.removeIf(t->{String key=switch(t){case COMPETENCES->"competences";case QUETES->"quetes";case GUILDE->"guildes";case ARENE->"arenes";case FAMILIERS->"familiers";case MONTURES->"montures";case BOUTIQUE->"boutique";case COSMETIQUES->"cosmetiques";case GROUPE->"groupes";case BESTIAIRE->"bestiaire";case METIERS->"metiers";case SUCCES->"succes";case WIKI->"wiki";default->"";};return !key.isEmpty()&&!ClientData.features.getBooleanOr(key,true);});
+        available.removeIf(t->!enabled(t));
         Tab[] tabs=available.toArray(Tab[]::new);int count=(tabs.length+1)/2;
         int tw=(pw-54)/count;
         // bouton d'edition de l'interface (HUD) au bout de la barre d'onglets

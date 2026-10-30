@@ -8,6 +8,19 @@ import java.util.*;
 /** Regression coverage for the beta queue, cooldowns and group authority. */
 public final class DevBetaChecks {
     private static void check(boolean ok,String message){if(!ok)throw new AssertionError("beta: "+message);}
+    /** Profil partage avec un effet retire du jeu et un objet tenu au curseur, inventaire plein : la connexion n'est pas refusee. */
+    private static void restoreTolerant(ServerPlayer p)throws Exception{
+        var inv=p.getInventory();var saved=new ArrayList<net.minecraft.world.item.ItemStack>();for(int i=0;i<inv.getContainerSize();i++)saved.add(inv.getItem(i).copy());
+        try{
+            for(int i=0;i<36;i++)inv.setItem(i,new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.COBBLESTONE,64));
+            var tag=NetworkPlayers.snapshot(p);var retired=new net.minecraft.nbt.CompoundTag();retired.putInt("remaining",400);tag.getCompoundOrEmpty("buffs").put("EFFET_RETIRE",retired);
+            if(!tag.contains("buffs")){var b=new net.minecraft.nbt.CompoundTag();b.put("EFFET_RETIRE",retired);tag.put("buffs",b);}
+            var ops=net.minecraft.resources.RegistryOps.create(net.minecraft.nbt.NbtOps.INSTANCE,p.registryAccess());
+            tag.put("cursor",net.minecraft.world.item.ItemStack.CODEC.encodeStart(ops,new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.FEATHER,3)).getOrThrow());
+            NetworkPlayers.restore(p,tag);
+            check(inv.getItem(0).is(net.minecraft.world.item.Items.COBBLESTONE)&&inv.countItem(net.minecraft.world.item.Items.FEATHER)==0,"profile restored, held item kept aside for the arrival");
+        }finally{for(int i=0;i<saved.size();i++)inv.setItem(i,saved.get(i));}
+    }
     public static void run(ServerPlayer p)throws Exception {
         var old=NetworkConfig.current;var cfg=new NetworkConfig();cfg.enabled=true;cfg.role=NetworkConfig.Role.MAIN;
         cfg.sharedDirectory=java.nio.file.Files.createTempDirectory("aeloria-beta-checks-").resolve("players").toString();
@@ -20,6 +33,7 @@ public final class DevBetaChecks {
             p.tickCount=100;RpgPlayers.tick(p);check(Math.abs(data.hp-max*.51)<.001,"exact one percent pulse");p.tickCount=oldTick;
             p.getInventory().clearContent();RpgPlayers.giveStarterTools(p);check(!p.getInventory().contains(new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("graine_lueur"))),"starter has no glow seeds");
             check(NetworkPlayers.login(p),"arrival fixture login");check(NetworkPlayers.portalBlocked(p),"saved backend position cannot trigger return portal on login");NetworkPlayers.logout(p);
+            restoreTolerant(p);
             for(int region=0;region<com.mmorpg.mine.MineLayout.SECTORS;region++)com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] Mine entry {} {}",region,java.util.Arrays.toString(com.mmorpg.mine.MineManager.spawnPoint(region)));
             for(var destination:List.of("mine:0","plains:0","dungeon:crypte_gobeline:0")){
                 cfg.role=NetworkConfig.Role.MAIN;check(NetworkPlayers.login(p),"travel source acquires session");RpgPlayers.get(p).playerClass=com.mmorpg.rpg.PlayerClass.GUERRIER;RpgPlayers.get(p).level=100;

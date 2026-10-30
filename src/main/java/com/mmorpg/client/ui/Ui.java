@@ -119,7 +119,6 @@ public final class Ui {
             g.fill(x+dx,y+i,x+w-dx,y+i+1,color);
             g.fill(x+dx,y+h-i-1,x+w-dx,y+h-i,color);
         }
-        if(r==0)g.fill(x,y,x+w,y+h,color);
     }
     public static void roundedOutline(GuiGraphicsExtractor g,int x,int y,int w,int h,int radius,int color){
         if(w<2||h<2)return;

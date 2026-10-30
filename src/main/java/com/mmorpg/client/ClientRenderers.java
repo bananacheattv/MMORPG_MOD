@@ -1,33 +1,11 @@
 package com.mmorpg.client;
 
 import com.mmorpg.MMORPG;
-import com.mmorpg.entity.mob.CrystalGolemEntity;
 import com.mmorpg.registry.ModEntities;
-import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.animal.golem.IronGolemModel;
-import net.minecraft.client.model.animal.wolf.AdultWolfModel;
-import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.model.monster.blaze.BlazeModel;
-import net.minecraft.client.model.monster.skeleton.SkeletonModel;
-import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
-import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
-import net.minecraft.client.renderer.entity.state.IronGolemRenderState;
-import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
-import net.minecraft.client.renderer.entity.state.SkeletonRenderState;
-import net.minecraft.client.renderer.entity.state.WolfRenderState;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.item.Items;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 /** Un renderer pour chaque type du registre ModEntities, avec les textures du mod. */
 @EventBusSubscriber(modid = MMORPG.MODID, value = Dist.CLIENT)
@@ -68,122 +46,5 @@ public final class ClientRenderers {
         event.registerEntityRenderer(ModEntities.NPC.get(), com.mmorpg.client.model.imported.AuthoredNpcRenderer::new);
         event.registerEntityRenderer(ModEntities.TRAINING_DUMMY.get(), com.mmorpg.client.model.dummy.DummyRenderer::new);
         event.registerEntityRenderer(ModEntities.CLASS_MASTER.get(), com.mmorpg.client.model.imported.AuthoredMasterRenderer::new);
-    }
-
-    private static <T extends Mob> HumanoidRenderer<T, HumanoidRenderState> humanoid(EntityRendererProvider.Context c, String texture) {
-        return new HumanoidRenderer<>(c, new HumanoidModel<HumanoidRenderState>(c.bakeLayer(ModelLayers.ZOMBIE)),
-                HumanoidRenderState::new, texture);
-    }
-
-    private static <T extends Mob> TexturedMobRenderer<T, IronGolemRenderState, IronGolemModel> golem(EntityRendererProvider.Context c, String texture) {
-        return new TexturedMobRenderer<T, IronGolemRenderState, IronGolemModel>(c, new IronGolemModel(c.bakeLayer(ModelLayers.IRON_GOLEM)),
-                IronGolemRenderState::new, texture, 0.7F)
-                .extra((entity, state) -> {
-                    int anim = entity instanceof CrystalGolemEntity g ? g.attackAnim : 0;
-                    state.attackTicksRemaining = anim;
-                });
-    }
-
-    private static final class HumanoidRenderer<T extends Mob, S extends HumanoidRenderState>
-            extends HumanoidMobRenderer<T, S, HumanoidModel<S>> {
-        private final Supplier<S> states;
-        private final Identifier texture;
-
-        private HumanoidRenderer(EntityRendererProvider.Context c, HumanoidModel<S> model, Supplier<S> states, String texture) {
-            super(c, model, 0.5F);
-            this.states = states;
-            this.texture = MMORPG.id("textures/entity/" + texture + ".png");
-        }
-
-        @Override
-        public S createRenderState() {
-            return states.get();
-        }
-
-        @Override
-        public Identifier getTextureLocation(S state) {
-            return texture;
-        }
-
-        @Override
-        protected HumanoidModel.ArmPose getArmPose(T mob, net.minecraft.world.entity.HumanoidArm arm) {
-            HumanoidModel.ArmPose pose = super.getArmPose(mob, arm);
-            if (pose == HumanoidModel.ArmPose.EMPTY && !mob.getItemHeldByArm(arm).isEmpty()) {
-                return mob.getItemHeldByArm(arm).is(Items.BOW) && mob.isAggressive() ? HumanoidModel.ArmPose.BOW_AND_ARROW : HumanoidModel.ArmPose.ITEM;
-            }
-            return pose;
-        }
-
-        @Override
-        public void extractRenderState(T entity, S state, float partialTicks) {
-            super.extractRenderState(entity, state, partialTicks);
-            if (state instanceof SkeletonRenderState skeleton) {
-                skeleton.isAggressive = entity.isAggressive();
-                skeleton.isHoldingBow = entity.getMainHandItem().is(Items.BOW);
-            }
-        }
-    }
-
-    /** Etat de rendu d'un PNJ : apparence choisie. */
-    public static final class NpcRenderState extends HumanoidRenderState {
-        public int skin;
-    }
-
-    private static final class NpcRenderer extends HumanoidMobRenderer<com.mmorpg.entity.NpcEntity, NpcRenderState, HumanoidModel<NpcRenderState>> {
-        private NpcRenderer(EntityRendererProvider.Context c) {
-            super(c, new HumanoidModel<NpcRenderState>(c.bakeLayer(ModelLayers.ZOMBIE)), 0.5F);
-        }
-
-        @Override
-        public NpcRenderState createRenderState() {
-            return new NpcRenderState();
-        }
-
-        @Override
-        public void extractRenderState(com.mmorpg.entity.NpcEntity entity, NpcRenderState state, float partialTicks) {
-            super.extractRenderState(entity, state, partialTicks);
-            state.skin = entity.skin();
-        }
-
-        @Override
-        public Identifier getTextureLocation(NpcRenderState state) {
-            return MMORPG.id("textures/entity/pnj_" + state.skin + ".png");
-        }
-    }
-
-    private static final class TexturedMobRenderer<T extends Mob, S extends LivingEntityRenderState, M extends EntityModel<? super S>>
-            extends MobRenderer<T, S, M> {
-        private final Supplier<S> states;
-        private final Identifier texture;
-
-        private BiConsumer<T, S> extra = (e, s) -> {
-        };
-
-        private TexturedMobRenderer(EntityRendererProvider.Context c, M model, Supplier<S> states, String texture, float shadow) {
-            super(c, model, shadow);
-            this.states = states;
-            this.texture = MMORPG.id("textures/entity/" + texture + ".png");
-        }
-
-        private TexturedMobRenderer<T, S, M> extra(BiConsumer<T, S> extra) {
-            this.extra = extra;
-            return this;
-        }
-
-        @Override
-        public void extractRenderState(T entity, S state, float partialTicks) {
-            super.extractRenderState(entity, state, partialTicks);
-            extra.accept(entity, state);
-        }
-
-        @Override
-        public S createRenderState() {
-            return states.get();
-        }
-
-        @Override
-        public Identifier getTextureLocation(S state) {
-            return texture;
-        }
     }
 }

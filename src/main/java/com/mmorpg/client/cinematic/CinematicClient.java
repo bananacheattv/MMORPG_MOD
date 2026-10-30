@@ -250,6 +250,12 @@ public final class CinematicClient {
             for (Object o : tgt) if (o instanceof Vec3 v) preload.add(v);
             t += dur;
         }
+        // un fichier incomplet doit echouer ici (dans le try de start) et pas plus tard pendant la lecture
+        if (SHOTS.isEmpty()) throw new IllegalArgumentException("aucun plan");
+        for (Shot s : SHOTS) {
+            if (!(s.duration > 0F)) throw new IllegalArgumentException("plan " + s.name + " : duree invalide");
+            if (PARCOURS.isEmpty() && (s.cam.isEmpty() || s.target.isEmpty())) throw new IllegalArgumentException("plan " + s.name + " : camera ou cible manquante");
+        }
         total = PARCOURS.isEmpty() ? t : PARCOURS.get(PARCOURS.size() - 1).t;
         buildWarm();
     }

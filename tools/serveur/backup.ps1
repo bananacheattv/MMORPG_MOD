@@ -5,6 +5,8 @@
 # A lancer serveur ARRETE (ex. : juste apres le redemarrage quotidien), ou apres « save-off » puis « save-all flush » dans la console
 # (et « save-on » ensuite) : copier un monde en cours d'ecriture peut donner une sauvegarde inutilisable.
 # Sauvegarde : world\ (monde et donnees des joueurs), config\mmorpg\ (reglages, admin.json compris), server.properties, ops, whitelist, bans.
+# Reseau actif (config\mmorpg\network.json, "enabled": true) : aussi le dossier partage entre les serveurs (parent de sharedDirectory :
+# personnages, guildes, hotel des ventes...), range dans l'archive sous son propre nom. Le lancer alors serveurs du reseau arretes.
 param(
     [Parameter(Mandatory = $true)][string]$Serveur,
     [Parameter(Mandatory = $true)][string]$Destination,
@@ -23,6 +25,22 @@ try {
     if ($LASTEXITCODE -ge 8) { throw "Copie du monde en echec (robocopy $LASTEXITCODE)" }
     robocopy (Join-Path $Serveur 'config\mmorpg') (Join-Path $tmp 'config\mmorpg') /E /NFL /NDL /NJH /NJS /NP | Out-Null
     if ($LASTEXITCODE -ge 8) { throw "Copie des reglages en echec (robocopy $LASTEXITCODE)" }
+    # dossier partage du reseau : chemin relatif au dossier du serveur, comme le fait le mod
+    $net = Join-Path $Serveur 'config\mmorpg\network.json'
+    if (Test-Path $net) {
+        $cfg = Get-Content -LiteralPath $net -Raw | ConvertFrom-Json
+        if ($cfg.enabled -eq $true) {
+            $dir = if ($cfg.sharedDirectory) { [string]$cfg.sharedDirectory } else { '../../shared/players' }
+            if (-not [System.IO.Path]::IsPathRooted($dir)) { $dir = Join-Path (Resolve-Path -LiteralPath $Serveur).Path $dir }
+            $parent = Split-Path -Parent ([System.IO.Path]::GetFullPath($dir))
+            if (Test-Path -LiteralPath $parent) {
+                robocopy $parent (Join-Path $tmp (Split-Path -Leaf $parent)) /E /NFL /NDL /NJH /NJS /NP | Out-Null
+                if ($LASTEXITCODE -ge 8) { throw "Copie du dossier partage en echec (robocopy $LASTEXITCODE)" }
+                Write-Host "Reseau actif : dossier partage $parent inclus"
+            }
+            else { Write-Warning "Reseau actif mais dossier partage introuvable ($dir) : non sauvegarde" }
+        }
+    }
     foreach ($f in 'server.properties', 'ops.json', 'whitelist.json', 'banned-players.json', 'banned-ips.json') {
         $p = Join-Path $Serveur $f
         if (Test-Path $p) { Copy-Item $p $tmp }

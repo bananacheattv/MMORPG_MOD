@@ -220,7 +220,7 @@ public class TradeScreen extends MmoScreen {
 
     @Override
     public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
-        if (gold.isFocused() && event.key() == 257) {                                     // Entree : fixer l'or
+        if (gold.isFocused() && event.isConfirmation()) {                                     // Entree : fixer l'or
             sendGold();
             return true;
         }

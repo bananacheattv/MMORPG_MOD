@@ -259,6 +259,7 @@ def generate(ga=None, root=None):
     fr[f'block.{MODID}.veine_epuisee'] = 'Veine épuisée'
     en[f'block.{MODID}.veine_epuisee'] = 'Depleted Vein'
     fr[f'item.{MODID}.pioche_mineur_info'] = 'Il faut une pioche pour extraire ce minerai.'
+    en[f'item.{MODID}.pioche_mineur_info'] = 'A pickaxe is needed to mine this ore.'
     # le bloc de la mine ne donne rien quand on le casse a la main d'un operateur : table de butin vide
     for bid in [f'minerai_{o[0]}' for o in ORES] + ['veine_epuisee']:
         write_json(os.path.join(data, MODID, 'loot_table', 'blocks', bid + '.json'),

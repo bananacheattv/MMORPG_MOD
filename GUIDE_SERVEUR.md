@@ -17,7 +17,7 @@ Perdre `world/` fait perdre toute la progression. Rien n'est partagé entre deux
 
 1. **Java 25** sur la machine.
 2. **NeoForge 26.3.0.39-beta** (Minecraft 26.3) : lancer l'installeur de cette version en mode serveur dans un dossier vide. Il crée les scripts de lancement (`run.sh` / `run.bat`) et `user_jvm_args.txt`.
-3. Déposer le jar du mod dans `mods/`. La dernière version est dans la release `latest` du dépôt (fichier `mmorpg-*.jar`, la même que celle que le launcher installe chez les joueurs). **Le mod doit être de la même version sur le serveur et chez les clients** : après chaque fusion sur `main`, mettre à jour le jar du serveur.
+3. Déposer le jar du mod dans `mods/`. La dernière version est dans la release `latest` du dépôt (fichier `aeloria-*.jar`, la même que celle que le launcher installe chez les joueurs). **Le mod doit être de la même version sur le serveur et chez les clients** : après chaque fusion sur `main`, mettre à jour le jar du serveur.
 4. Lire et accepter l'EULA de Minecraft (`eula.txt` après un premier lancement à vide), puis démarrer.
 
 ## 3. Réglages recommandés
@@ -54,7 +54,7 @@ Copier un monde pendant que le serveur écrit peut donner une sauvegarde inutili
 - **Recommandé** : redémarrage quotidien (à l'heure creuse) : arrêt (`stop`), sauvegarde, démarrage.
 - **À chaud** : `save-off`, `save-all flush`, sauvegarde, puis `save-on` (depuis la console ou RCON local).
 
-Scripts fournis (`tools/serveur/`) : une archive datée de `world/`, `config/mmorpg/` et des listes, vérifiée à la relecture, avec rotation (14 par défaut). Une sauvegarde qui échoue ne laisse pas d'archive partielle.
+Scripts fournis (`tools/serveur/`) : une archive datée de `world/`, `config/mmorpg/` et des listes, vérifiée à la relecture, avec rotation (14 par défaut). Une sauvegarde qui échoue ne laisse pas d'archive partielle. Si le réseau est actif (`config/mmorpg/network.json`, `"enabled": true`), l'archive contient aussi le dossier partagé entre les serveurs (le parent de `sharedDirectory` : personnages, guildes, hôtel des ventes…) : lancer alors la sauvegarde **serveurs du réseau arrêtés**.
 
 ```bash
 # Linux

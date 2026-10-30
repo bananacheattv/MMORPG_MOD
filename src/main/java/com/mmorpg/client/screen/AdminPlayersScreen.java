@@ -90,17 +90,22 @@ public class AdminPlayersScreen extends MmoScreen {
     @Override
     protected void init() {
         super.init();
+        // init() repasse au retour du selecteur d'objets (et au redimensionnement) : garder ce qui etait saisi
+        String oldSearch = search == null ? "" : search.getValue(), oldValue = value == null ? "" : value.getValue(), oldKey = key == null ? "" : key.getValue();
         search = new EditBox(this.font, left + 6, top + 6, 140, 14, Component.literal("Recherche"));
         search.setHint(Component.literal("Rechercher un joueur...").withColor(0xFF807868));
         search.setMaxLength(16);
+        search.setValue(oldSearch);
         search.setResponder(s -> requestList());
         this.addRenderableWidget(search);
         value = new EditBox(this.font, left, top, 100, 14, Component.literal("Valeur"));
         value.setMaxLength(2000);
+        value.setValue(oldValue);
         value.visible = false;
         this.addRenderableWidget(value);
         key = new EditBox(this.font, left, top, 100, 14, Component.literal("Nom"));
         key.setMaxLength(128);
+        key.setValue(oldKey);
         key.visible = false;
         this.addRenderableWidget(key);
     }

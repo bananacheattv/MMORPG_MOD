@@ -117,5 +117,12 @@ public final class ClientData {
         party = new CompoundTag();
         received = false;
         trialActive = false;
+        // rien ne doit survivre d'un serveur a l'autre (droits d'operateur, fonctionnalites coupees, arene, bestiaire)
+        op = false;
+        creativeAllowed = false;
+        guardBroken = 0;
+        features = new CompoundTag();
+        arenaState = new CompoundTag();
+        mobInfo = new CompoundTag();
     }
 }
