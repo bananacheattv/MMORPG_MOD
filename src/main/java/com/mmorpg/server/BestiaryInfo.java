@@ -32,6 +32,7 @@ public final class BestiaryInfo {
             t.putBoolean("spawns", c.spawn.enabled && !c.boss);
             ListTag drops = new ListTag();
             for (MobConfig.Drop d : c.drops) {
+                if (VanillaMobDrops.vanilla(d.item)) continue;
                 CompoundTag dt = new CompoundTag();
                 dt.putString("item", d.item);
                 dt.putFloat("chance", (float) d.chance);

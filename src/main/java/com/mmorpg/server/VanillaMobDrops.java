@@ -11,6 +11,8 @@ import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 /** Final filter includes equipment drops and configured vanilla items; player inventories are untouched. */
 @EventBusSubscriber(modid=MMORPG.MODID)
 public final class VanillaMobDrops {
+    /** Objet vanilla de mobs.json : jamais laisse par un monstre (filtre ci-dessous), donc ni affiche au bestiaire ni propose par le guidage. */
+    public static boolean vanilla(String item){return item!=null&&item.startsWith("minecraft:");}
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void drops(LivingDropsEvent event) {
         if(event.getEntity() instanceof Player)return;
