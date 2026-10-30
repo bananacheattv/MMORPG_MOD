@@ -1,6 +1,6 @@
 # Atelier Replay Aeloria — première version sur serveur
 
-Branche : `feature/admin-replay`, base `0e486f1` de `main`. Travail isolé du checkout de Claude. Aucune installation en production effectuée par ce chantier.
+Branche : `feature/admin-replay`, base `0e486f1` de `main`. Code `db825a2` intégré dans `main`, publié et installé le 30 octobre 2026 : **build 87-db825a2**, sur serveur / hub / mines / plaines / donjons. Empreinte du jar publié et vérifié sur les cinq cibles : `e9fa35a9a1cdacdb06f67ad06f07040d445e2f9e81593c65559c3e7e9f12e27b`. Le launcher pointe vers cette même release ; les joueurs doivent mettre leur client à jour et relancer Minecraft.
 
 ## Utilisation
 
@@ -58,4 +58,4 @@ Avant publication : tester un combat complet, les armures/modèles custom, le bo
 - Vrai client Minecraft 26.3 / NeoForge 26.3.0.39-beta, fenêtre 960×600 : enregistrement, sauvegarde/rechargement, acteurs locaux, curseur, trajectoire, export MP4, nettoyage après retrait OP, retour à la position et mode survie : PASS.
 - Export vertical de contrôle : H.264 YUV420p, 338×600, 87 images, 1,45 seconde à 60 images/s. Décodage complet FFmpeg réussi. Première image vérifiée : pas de notification Minecraft incrustée.
 - Interface divisée en page Caméra et page Prises pour éviter le chevauchement constaté sur petite fenêtre.
-- Aucun test complet de restitution de tous les boss/sorts, ni promesse de prise en charge des éléments explicitement exclus ci-dessus. Aucune installation en production.
+- Aucun test complet de restitution de tous les boss/sorts, ni promesse de prise en charge des éléments explicitement exclus ci-dessus. Après ces essais, déploiement du build 87 sur les cinq serveurs, tous en ligne ; commande `help replay` vérifiée sur le principal.
