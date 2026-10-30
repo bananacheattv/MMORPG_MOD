@@ -27,6 +27,7 @@ public final class GuildChat {
     private static final Gson JSON = new Gson();
     private static final Map<UUID, Long> LAST_SEND = new HashMap<>();
     private static long seen = -1;
+    private static final com.mmorpg.db.SharedDocs.Poller POLLER = new com.mmorpg.db.SharedDocs.Poller("ledger-guild-chat");
 
     private GuildChat() {}
 
@@ -73,20 +74,32 @@ public final class GuildChat {
         }
     }
 
+    /** Etat du chat ; {@code null} tant que la lecture en base (en arriere-plan, jamais d'attente) n'est pas arrivee. */
     private static State read(MinecraftServer server) throws java.io.IOException {
+        if (com.mmorpg.db.SharedDocs.useDb()) {
+            // send() ecrit dans la base (registre partage) : le fichier n'est plus que l'ancienne copie a importer
+            var doc = POLLER.poll();
+            if (doc == null) return null;
+            if (doc.data() != null) {
+                State s = JSON.fromJson(doc.data(), State.class);
+                return s == null ? new State() : s;
+            }
+        }
         var file = GuildStore.directory(server).resolveSibling("coordination").resolve("guild-chat.json");
         if (!Files.exists(file)) return new State();
         State s = JSON.fromJson(Files.readString(file), State.class);
         return s == null ? new State() : s;
     }
 
-    private static void poll(MinecraftServer server) throws java.io.IOException {
+    /** Distribue les nouveaux messages aux membres connectes ici ; rend leur nombre, -1 si l'etat n'est pas encore lisible. */
+    public static int poll(MinecraftServer server) throws java.io.IOException {
         State state = read(server);
-        if (seen < 0) { seen = state.next - 1; return; }
+        if (state == null) return -1;
+        if (seen < 0) { seen = state.next - 1; return 0; }
         long from = seen;
         var fresh = state.messages.stream().filter(m -> m.id > from).toList();
         seen = Math.max(seen, state.next - 1);
-        if (fresh.isEmpty()) return;
+        if (fresh.isEmpty()) return 0;
         Map<UUID, String> guildOf = GuildStore.access(server, false, s -> {
             var out = new HashMap<UUID, String>();
             for (var g : s.guilds) for (UUID id : g.members.keySet()) out.put(id, g.id.toString());
@@ -102,6 +115,7 @@ public final class GuildChat {
             for (ServerPlayer p : server.getPlayerList().getPlayers())
                 if (m.guild.equals(guildOf.get(p.getUUID()))) p.sendSystemMessage(line);
         }
+        return fresh.size();
     }
 
     @SubscribeEvent

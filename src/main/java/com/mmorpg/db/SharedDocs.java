@@ -159,6 +159,51 @@ public final class SharedDocs {
         return r == null ? -1 : r;
     }
 
+    /**
+     * Sondage periodique d'un document sans jamais attendre la base sur le thread du serveur : chaque appel a {@link #poll()}
+     * rend la lecture arrivee depuis l'appel precedent (ou {@code null}) et en relance une si aucune n'est en cours.
+     */
+    public static final class Poller {
+        private final String name;
+        private volatile Doc fetched;
+        private volatile boolean fetching;
+        private volatile long epoch;
+
+        public Poller(String name) {
+            this.name = name;
+        }
+
+        /** Derniere lecture arrivee ({@code data} nul si le document est absent), {@code null} si rien de neuf. */
+        public Doc poll() {
+            Doc d = fetched;
+            fetched = null;
+            if (!fetching) {
+                fetching = true;
+                final long launched = epoch;
+                var task = Database.async("lecture de " + name, c -> {
+                    try (PreparedStatement ps = c.prepareStatement("SELECT data, revision FROM shared_docs WHERE name = ?")) {
+                        ps.setString(1, name);
+                        try (ResultSet rs = ps.executeQuery()) {
+                            Doc doc = rs.next() ? new Doc(rs.getString(1), rs.getLong(2)) : new Doc(null, 0);
+                            if (epoch == launched) fetched = doc;
+                        }
+                        return null;
+                    } finally {
+                        fetching = false;
+                    }
+                });
+                if (task == null) fetching = false;
+            }
+            return d;
+        }
+
+        /** Ignore les lectures en cours ou arrivees : le document vient d'etre modifie ici, elles sont perimees. */
+        public void discard() {
+            epoch++;
+            fetched = null;
+        }
+    }
+
     /** Ecrit (remplace) un document sans attendre : pour les donnees tenues par un seul serveur (hotel des ventes). */
     public static void put(String name, String json) {
         Database.fire("ecriture de " + name, c -> {
