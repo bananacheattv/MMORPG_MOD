@@ -452,6 +452,20 @@ public final class DevShowcase {
         mc.options.pauseOnLostFocus = false;
         if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.PauseScreen && !MODE.equals("interface")) mc.gui.setScreen(null);
         String me = mc.player.getName().getString();
+        if (MODE.equals("offre_quete")) {    // fenetre de proposition automatique de quete
+            if (tick == 5) {
+                var q = new net.minecraft.nbt.CompoundTag();
+                q.putString("id", "premiers_pas"); q.putString("name", "Premiers pas"); q.putInt("minLevel", 1);
+                q.putString("desc", "Brenn, le garde-chasse, a besoin d'aide : les gobelins rôdent autour de la ville. Prouvez votre valeur en éliminant quelques-uns de ces pillards.");
+                var o = new net.minecraft.nbt.CompoundTag(); o.putString("type", "kill"); o.putString("target", "gobelin"); o.putInt("count", 5);
+                var l = new net.minecraft.nbt.ListTag(); l.add(o); q.put("objectives", l);
+                var rw = new net.minecraft.nbt.CompoundTag(); rw.putLong("xp", 150); rw.putLong("gold", 10); q.put("rewards", rw);
+                mc.gui.setScreen(new com.mmorpg.client.screen.QuestOfferScreen(q));
+            }
+            if (tick == 25) shot(mc, "offre_quete");
+            if (tick == 35) stop(mc);
+            return;
+        }
         if (MODE.equals("revue")) {          // plantages corriges par la revue du code (bouton Personnage, fenetre 4:3)
             DevReviewChecks.tick(mc);
             return;
