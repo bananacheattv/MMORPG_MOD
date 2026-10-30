@@ -125,6 +125,16 @@ public final class SharedDocs {
 
     /** Lit un document sans verrou ; {@code null} s'il est absent ou si la base est indisponible. */
     public static String get(String name) {
+        Doc d = read(name);
+        return d == null ? null : d.data();
+    }
+
+    /** Contenu ({@code null} si absent) et revision (0 si absent) d'un document. */
+    public record Doc(String data, long revision) {
+    }
+
+    /** Lit un document et sa revision sans verrou ; {@code null} si la base est indisponible. */
+    public static Doc read(String name) {
         Row r = Database.await("lecture de " + name, WAIT_MS, c -> {
             try (PreparedStatement ps = c.prepareStatement("SELECT data, revision FROM shared_docs WHERE name = ?")) {
                 ps.setString(1, name);
@@ -133,7 +143,20 @@ public final class SharedDocs {
                 }
             }
         });
-        return r == null ? null : r.data();
+        return r == null ? null : new Doc(r.data(), r.revision());
+    }
+
+    /** Revision d'un document (0 s'il est absent), -1 si la base ne repond pas : dit si une copie en memoire est perimee. */
+    public static long revision(String name) {
+        Long r = Database.await("revision de " + name, WAIT_MS, c -> {
+            try (PreparedStatement ps = c.prepareStatement("SELECT revision FROM shared_docs WHERE name = ?")) {
+                ps.setString(1, name);
+                try (ResultSet rs = ps.executeQuery()) {
+                    return rs.next() ? rs.getLong(1) : 0L;
+                }
+            }
+        });
+        return r == null ? -1 : r;
     }
 
     /** Ecrit (remplace) un document sans attendre : pour les donnees tenues par un seul serveur (hotel des ventes). */

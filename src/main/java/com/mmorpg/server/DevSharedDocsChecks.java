@@ -107,6 +107,13 @@ public final class DevSharedDocsChecks {
             a.listings().clear();                                      // etat du monde « perdu » : la base doit le restituer
             a.reloadFromDatabase(server);
             check(a.listings().size() == 1 && a.listings().get(0).stack().getCount() == 5 && a.earnings(chef) == 40, "hotel des ventes relu depuis la base");
+            // 5) un autre serveur ecrit le document (menu d'administration) : la copie en memoire est relue avant usage
+            com.mmorpg.db.SharedDocs.put("auction", doc("auction").replace("\"Vendeur\"", "\"Autre serveur\""));
+            Database.await("barriere", 5000, c -> null);
+            check(AuctionData.get(server).listings().get(0).sellerName().equals("Autre serveur"), "hotel des ventes relu apres l'ecriture d'un autre serveur");
+            a.addEarnings(chef, 2);
+            Database.await("barriere", 5000, c -> null);
+            check(AuctionData.get(server).earnings(chef) == 42 && doc("auction").contains("Autre serveur"), "notre propre ecriture reste en memoire et en base");
         } catch (Exception e) {
             failed = true;
             MMORPG.LOGGER.error("[CODEX CHECKS] SHARED exception", e);
