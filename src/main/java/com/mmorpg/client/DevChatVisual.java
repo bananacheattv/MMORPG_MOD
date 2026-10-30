@@ -24,10 +24,15 @@ public final class DevChatVisual {
     }
 
     private static void key(ChatScreen s, int key, int mods) {
-        KeyEvent e = new KeyEvent(key, 0, mods);
+        key(s, key, mods, 0);
+    }
+
+    private static void key(ChatScreen s, int key, int mods, int keycode) {
+        KeyEvent e = new KeyEvent(key, keycode, mods);
         ScreenEvent.KeyPressed.Pre pre = new ScreenEvent.KeyPressed.Pre(s, e);
         ChatChannels.onKey(pre);
         if (!pre.isCanceled()) s.keyPressed(e);
+        ChatChannels.onKeyPost(new ScreenEvent.KeyPressed.Post(s, e));
     }
 
     private static void click(ChatScreen s, double x, double y) {
@@ -67,7 +72,14 @@ public final class DevChatVisual {
         if (tick == 430 && mc.gui.screen() instanceof ChatScreen s) box(s).setValue("Message tape sans /g");
         if (tick == 450) { shot(mc, "chat_canaux_guilde_saisie"); MMORPG.LOGGER.info("[CHAT] canal={} route={}", ChatChannels.active(), ChatChannels.active().route("Message tape sans /g")); }
         if (tick == 455 && mc.gui.screen() instanceof ChatScreen s) key(s, 40, 0);      // Entree : part dans /g
+        if (tick == 515) mc.gui.hud.getChat().addRecentChat("/g ancien message");
         if (tick == 520) mc.gui.setScreen(new ChatScreen("", false));
+        if (tick == 530 && mc.gui.screen() instanceof ChatScreen s) {   // fleche haut (historique) puis edition
+            key(s, 82, 0, 1073741906);
+            MMORPG.LOGGER.info("[CHAT] apres haut: valeur='{}' focus={} focusedWidget={}", box(s).getValue(), box(s).isFocused(), s.getFocused());
+            s.charTyped(new net.minecraft.client.input.CharacterEvent('X'));
+            MMORPG.LOGGER.info("[CHAT] apres frappe: valeur='{}'", box(s).getValue());
+        }
         if (tick == 550) shot(mc, "chat_canaux_guilde");
         if (tick == 560 && mc.gui.screen() instanceof ChatScreen s) key(s, 43, 0);      // Tab : Groupe
         if (tick == 580) shot(mc, "chat_canaux_groupe");
