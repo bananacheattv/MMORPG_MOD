@@ -663,11 +663,21 @@ public final class RpgPlayers {
 
     // ================================================================== or
 
+    /** Or gagne (butin, quetes, ventes) : compte pour les succes de richesse et le bilan d'aventure. */
     public static void addGold(ServerPlayer player, long amount, boolean showText) {
         if (amount <= 0) return;
-        PlayerData d = get(player);
         AdventureSummary.count(player,"gold",amount);
         com.mmorpg.achievement.Achievements.add(player, com.mmorpg.achievement.Achievement.GOLD_EARNED, amount);
+        transferGold(player, amount, showText);
+    }
+
+    /**
+     * Or qui change seulement de poche (retrait de banque, echange, paiement entre joueurs) : credite sans compter comme gagne,
+     * sinon deposer puis retirer le meme or a la banque suffirait a obtenir « Magnat ».
+     */
+    public static void transferGold(ServerPlayer player, long amount, boolean showText) {
+        if (amount <= 0) return;
+        PlayerData d = get(player);
         d.gold += amount;
         d.dirty = true;
         if (showText) {

@@ -373,8 +373,8 @@ public final class TradeManager {
         RpgPlayers.takeGold(pb, s.b.gold);
         give(pa, fromB);
         give(pb, fromA);
-        RpgPlayers.addGold(pa, s.b.gold, false);
-        RpgPlayers.addGold(pb, s.a.gold, false);
+        RpgPlayers.transferGold(pa, s.b.gold, false);
+        RpgPlayers.transferGold(pb, s.a.gold, false);
         journal(pa.level().getServer(), s, "trade", gaveA, gaveB);
         finish(s, pa, pb, "Échange terminé.", 0x60E060);
     }

@@ -212,7 +212,8 @@ public final class ImportedSpells {
                 BuiltInRegistries.ENTITY_TYPE.getOptional(MMORPG.id(s.minion())).ifPresent(t -> {
                     @SuppressWarnings("unchecked")
                     var typed = (net.minecraft.world.entity.EntityType<? extends Mob>) t;
-                    MobAbilities.summon(mob, typed, s.count(), s.minion(), -3);
+                    // comme le Roi gobelin : pas plus de 8 serviteurs autour, sinon un combat qui s'eternise remplit la zone
+                    if (level.getEntitiesOfClass(Mob.class, mob.getBoundingBox().inflate(24), m -> m.getType() == typed && m.isAlive()).size() < 8) MobAbilities.summon(mob, typed, s.count(), s.minion(), -3);
                 });
                 level.playSound(null, mob.blockPosition(), SoundEvents.EVOKER_PREPARE_SUMMON, SoundSource.HOSTILE, 1f, 0.9f);
             }

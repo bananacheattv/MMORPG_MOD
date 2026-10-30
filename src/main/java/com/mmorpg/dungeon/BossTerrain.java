@@ -49,15 +49,19 @@ public final class BossTerrain {
     }
     @SubscribeEvent public static void start(net.neoforged.neoforge.event.server.ServerStartedEvent e){
         if(!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.DUNGEONS))return;
-        var ids=com.mmorpg.network.SharedLedger.access(e.getServer(),"boss-terrain",Journal.class,Journal::new,j->new ArrayList<>(j.battles.keySet()));for(var id:ids)restore(e.getServer(),id);
+        try{var ids=com.mmorpg.network.SharedLedger.access(e.getServer(),"boss-terrain",Journal.class,Journal::new,j->new ArrayList<>(j.battles.keySet()));for(var id:ids)restore(e.getServer(),id);}
+        catch(IllegalStateException ex){com.mmorpg.MMORPG.LOGGER.warn("[MMORPG] Terrain des boss : journal indisponible ({}), restauration plus tard",ex.getMessage());}
     }
     @SubscribeEvent public static void tick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post e){
         if(e.getServer().getTickCount()%10!=0)return;
-        for(var id:new ArrayList<>(PENDING.keySet())){var p=PENDING.get(id);var boss=p.level().getEntity(id);if(boss==null||!boss.isAlive()){PENDING.remove(id);continue;}if(p.level().getGameTime()>=p.at()){change(p,id);PENDING.remove(id);}}
+        // journal injoignable (base coupee) : le terrain ne change pas et la restauration reessaie, sans arreter le serveur
+        try{
+        for(var id:new ArrayList<>(PENDING.keySet())){var p=PENDING.get(id);var boss=p.level().getEntity(id);if(boss==null||!boss.isAlive()){PENDING.remove(id);continue;}if(p.level().getGameTime()>=p.at()){PENDING.remove(id);change(p,id);}}
         if(e.getServer().getTickCount()%100==0&&com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.DUNGEONS)){
             var ids=com.mmorpg.network.SharedLedger.access(e.getServer(),"boss-terrain",Journal.class,Journal::new,j->new ArrayList<>(j.battles.keySet()));
             for(var id:ids){boolean alive=false;for(var level:e.getServer().getAllLevels()){var boss=level.getEntity(UUID.fromString(id));if(boss!=null&&boss.isAlive()){alive=true;break;}}if(!alive)restore(e.getServer(),id);}
         }
+        }catch(IllegalStateException ex){com.mmorpg.MMORPG.LOGGER.warn("[MMORPG] Terrain des boss : journal indisponible ({})",ex.getMessage());}
     }
     @SubscribeEvent public static void stop(net.neoforged.neoforge.event.server.ServerStoppedEvent e){PENDING.clear();}
 }

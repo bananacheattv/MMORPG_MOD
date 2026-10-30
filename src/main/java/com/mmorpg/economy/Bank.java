@@ -73,7 +73,7 @@ public final class Bank {
                     a.gold -= n;
                     data.setDirty();
                     com.mmorpg.db.Audit.log(p, com.mmorpg.db.Audit.BANK_WITHDRAW, n, "solde " + a.gold);
-                    RpgPlayers.addGold(p, n, false);
+                    RpgPlayers.transferGold(p, n, false);
                     level.playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.COINS.get(), SoundSource.NEUTRAL, 0.8f, 1.1f);
                     p.sendOverlayMessage(Component.literal("Retrait de " + n + " or. Solde en banque : " + a.gold).withColor(0xFFD040));
                 }

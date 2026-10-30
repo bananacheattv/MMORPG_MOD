@@ -89,7 +89,7 @@ public final class ImportedMobEntity extends RpgMonster {
 
     private void spellTick() {
         List<ImportedSpells.Spell> list = spells();
-        if (list.isEmpty()) return;
+        if (list.isEmpty() || !this.isAlive()) return;                     // pas de sort pendant l'animation de mort
         LivingEntity target = this.getTarget();
         if (target == null || !target.isAlive()) {
             pending = null;

@@ -45,9 +45,13 @@ public class MountEntity extends Horse {
     // The type must be serializable for Minecraft to allow riding. Suppress instance saves instead.
     @Override public boolean shouldBeSaved() { return false; }
     @Override public boolean saveAsPassenger(net.minecraft.world.level.storage.ValueOutput output) { return false; }
-    /** La monture est invulnerable : les coups (fleches, monstres) touchent le cavalier a sa place. */
+    /**
+     * La monture est invulnerable : les coups (fleches, monstres) touchent le cavalier a sa place. Les chutes, explosions et degats du
+     * decor ne sont pas renvoyes : le cavalier les subit deja lui-meme.
+     */
     @Override public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
-        if (getFirstPassenger() instanceof net.minecraft.world.entity.LivingEntity rider && source.getEntity() != rider) rider.hurtServer(level, source, amount);
+        if (getFirstPassenger() instanceof net.minecraft.world.entity.LivingEntity rider && source.getEntity() != null && source.getEntity() != rider
+                && !source.is(net.minecraft.tags.DamageTypeTags.IS_EXPLOSION)) rider.hurtServer(level, source, amount);
         return false;
     }
     /** Descendre de la monture la renvoie. */
