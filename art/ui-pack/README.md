@@ -8,7 +8,7 @@ Code livré séparément, sans modifier le checkout de Claude : branche `feature
 
 Relecture sur le serveur demandée par l'utilisateur : commandes OP `/replay`, prises locales, caméra libre/points clés, pause/ralenti/curseur, export PNG ou MP4 H.264 à 60 images/s via FFmpeg local. Le guide précise les éléments encore exclus (sons, particules, projectiles, certains effets custom) et le décor actuel utilisé pendant la relecture.
 
-Validation : build complet et 42 tests passent, serveur dédié et vrai client de test vérifiés, MP4 produit puis décodé, retrait OP pendant lecture testé avec retour en survie et restauration de position. **Non installé en production.** Récupérer le commit sur la branche actuelle de Claude, vérifier les conflits et la même version client/serveur ; ne pas remplacer `main` par l'ancienne base de la branche de fonctionnalité. Aucun exécutable FFmpeg inclus dans Git.
+Validation : build complet et 42 tests passent, serveur dédié et vrai client de test vérifiés, MP4 produit puis décodé, retrait OP pendant lecture testé avec retour en survie et restauration de position. **Intégré dans main et installé sur les cinq serveurs le 30 octobre 2026 : build 87-db825a2.** Tous redémarrés et vérifiés, `help replay` reconnu sur le principal ; launcher publié avec la même version. Mettre à jour le client et relancer Minecraft. Claude doit repartir du main actuel, sans réintroduire une ancienne base. Aucun exécutable FFmpeg inclus dans Git.
 
 Complément demandé : [les dix interfaces et Yggdrasil](COMPLEMENT_INTERFACES.md). Prioritaire pour Claude : ce document précise les éléments à coder en plus des images.
 
