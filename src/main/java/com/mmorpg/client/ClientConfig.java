@@ -49,9 +49,9 @@ public final class ClientConfig {
             .translation("mmorpg.configuration.discordEnabled")
             .define("discordEnabled", true);
     public static final ModConfigSpec.ConfigValue<String> DISCORD_APP_ID = BUILDER
-            .comment("ID d'application Discord (portail developpeur). Vide = Rich Presence desactivee.")
+            .comment("ID d'application Discord (portail developpeur). Vide = Rich Presence desactivee (par defaut : ID d'Aeloria).")
             .translation("mmorpg.configuration.discordAppId")
-            .define("discordAppId", "");
+            .define("discordAppId", "1565874848167755776");
 
     public static final ModConfigSpec SPEC = BUILDER.build();
 
