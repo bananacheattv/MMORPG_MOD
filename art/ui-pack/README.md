@@ -2,6 +2,14 @@
 
 Ce dossier est le **point d’entrée unique pour Claude**. Il regroupe toutes les images, les consignes et les contrôles d’affichage. La branche reste `art/ui-assets-for-claude` ; ce lien sera conservé pour les prochains lots.
 
+## Nouveau : atelier Replay administrateur et export MP4
+
+Code livré séparément, sans modifier le checkout de Claude : branche `feature/admin-replay`, commit **db825a2**. [Guide d'intégration et d'utilisation du Replay](https://github.com/bananacheattv/MMORPG_MOD/blob/feature/admin-replay/docs/REPLAY_ADMIN.md).
+
+Relecture sur le serveur demandée par l'utilisateur : commandes OP `/replay`, prises locales, caméra libre/points clés, pause/ralenti/curseur, export PNG ou MP4 H.264 à 60 images/s via FFmpeg local. Le guide précise les éléments encore exclus (sons, particules, projectiles, certains effets custom) et le décor actuel utilisé pendant la relecture.
+
+Validation : build complet et 42 tests passent, serveur dédié et vrai client de test vérifiés, MP4 produit puis décodé, retrait OP pendant lecture testé avec retour en survie et restauration de position. **Non installé en production.** Récupérer le commit sur la branche actuelle de Claude, vérifier les conflits et la même version client/serveur ; ne pas remplacer `main` par l'ancienne base de la branche de fonctionnalité. Aucun exécutable FFmpeg inclus dans Git.
+
 Complément demandé : [les dix interfaces et Yggdrasil](COMPLEMENT_INTERFACES.md). Prioritaire pour Claude : ce document précise les éléments à coder en plus des images.
 
 ## État des lots
