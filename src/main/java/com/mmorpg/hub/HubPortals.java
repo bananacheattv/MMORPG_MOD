@@ -10,7 +10,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -113,10 +112,11 @@ public final class HubPortals {
             boolean inSpawn = spawn.exists() && level.dimension().equals(SpawnBuilder.DIM);
             if (inSpawn && com.mmorpg.config.ConfigManager.spawn().manualBuild) continue;
             if (!inHub && !inSpawn) continue;
-            AABB gate = inHub ? hubGate(hub.origin()) : spawnGate(spawn.origin());
-            double planeX = inHub ? hub.origin().getX() + HUB_GATE_X + 0.5 : spawn.origin().getX() + HubMarket.CX + 37.5;
-            double baseY = inHub ? hub.origin().getY() : spawn.origin().getY();
-            double midZ = inHub ? hub.origin().getZ() + 0.5 : spawn.origin().getZ() + 0.5;
+            BlockPos home = inHub ? hub.originAt(p.getX()) : null;          // chaque copie du hub (Hub 2, 3...) a son propre portail
+            AABB gate = inHub ? hubGate(home) : spawnGate(spawn.origin());
+            double planeX = inHub ? home.getX() + HUB_GATE_X + 0.5 : spawn.origin().getX() + HubMarket.CX + 37.5;
+            double baseY = inHub ? home.getY() : spawn.origin().getY();
+            double midZ = inHub ? home.getZ() + 0.5 : spawn.origin().getZ() + 0.5;
             if (p.distanceToSqr(planeX, baseY + 5, midZ) < 30 * 30) {
                 level.sendParticles(ParticleTypes.PORTAL, planeX, baseY + 5, midZ, 10, 0.4, 4, 3, 0.1);
             }
@@ -129,9 +129,5 @@ public final class HubPortals {
             boolean ok = inHub ? HubManager.goToSpawn(p) : HubManager.goToHubFromSpawn(p);
             if (!ok) p.sendOverlayMessage(Component.literal("Le portail est encore en cours de construction.").withColor(0xFFC060));
         }
-    }
-
-    static Entity unused() {
-        return null;
     }
 }
