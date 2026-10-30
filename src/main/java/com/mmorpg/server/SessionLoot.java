@@ -107,26 +107,25 @@ public final class SessionLoot {
         boolean bagChanged = false;
         StringBuilder sb = new StringBuilder();
         for (var e : lost.entrySet()) {
-            int left = e.getValue();
-            ItemStack drop = ItemStack.EMPTY;
+            int left = e.getValue(), dropped = 0;
             for (Container c : new Container[]{inv, bag}) {                    // l'inventaire d'abord, puis les sacs
                 for (int i = c == bag ? BAG_FIRST : 0; i < c.getContainerSize() && left > 0; i++) {
                     ItemStack st = c.getItem(i);
                     if (st.isEmpty() || !BuiltInRegistries.ITEM.getKey(st.getItem()).toString().equals(e.getKey())) continue;
                     int take = Math.min(left, st.getCount());
-                    if (drop.isEmpty()) drop = st.copyWithCount(take);
-                    else drop.grow(take);
+                    // une pile par case : jamais plus qu'une pile pleine, et chaque objet garde ses propres donnees
+                    var item = new ItemEntity(p.level(), p.getX(), p.getY() + 0.5, p.getZ(), st.copyWithCount(take));
+                    item.setDefaultPickUpDelay();
+                    p.level().addFreshEntity(item);
                     st.shrink(take);
                     left -= take;
+                    dropped += take;
                     bagChanged |= c == bag;
                 }
             }
-            if (!drop.isEmpty()) {
-                var item = new ItemEntity(p.level(), p.getX(), p.getY() + 0.5, p.getZ(), drop);
-                item.setDefaultPickUpDelay();
-                p.level().addFreshEntity(item);
+            if (dropped > 0) {
                 if (sb.length() > 0) sb.append(';');
-                sb.append(e.getKey()).append('*').append(drop.getCount());
+                sb.append(e.getKey()).append('*').append(dropped);
             }
         }
         if (bagChanged) bag.setChanged();                                  // reecrit les sacs dans la fiche du joueur
