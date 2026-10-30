@@ -63,8 +63,8 @@ public final class KillRewards {
             RpgPlayers.onDeath(sp, event.getSource().getLocalizedDeathMessage(sp).getString());
             return;
         }
-        if (dead instanceof com.mmorpg.entity.dummy.TrainingDummyEntity) return;
-        if (event.getSource().getEntity() instanceof ServerPlayer trial && com.mmorpg.hub.ClassTrial.active(trial)) return;   // essai : ni XP, ni or, ni butin      // le mannequin ne donne ni XP ni butin
+        if (dead instanceof com.mmorpg.entity.dummy.TrainingDummyEntity) return;                 // le mannequin ne donne ni XP ni butin
+        if (event.getSource().getEntity() instanceof ServerPlayer trial && com.mmorpg.hub.ClassTrial.active(trial)) return;   // essai : ni XP, ni or, ni butin
         MobData md = dead.getExistingDataOrNull(ModAttachments.MOB);
         if (md == null || !md.initialized()) return;
         ServerPlayer killer = killer(dead, event.getSource().getEntity());
@@ -170,7 +170,7 @@ public final class KillRewards {
                 loot.add(new ItemStack(potion));
             }
         }
-        // Thin whole reward rolls, including guaranteed drops and gold: expected quantity is divided by ten.
+        // Thin whole reward rolls, guaranteed drops included but gold coins kept: expected quantity is divided by ten.
         if (dungeonMob(dead)) loot.removeIf(stack -> !stack.is(ModItems.PIECE_OR.get())&&random.nextInt(10) != 0);
         for (ItemStack stack : loot) {
             ItemEntity ie = new ItemEntity(level, dead.getX(), dead.getY() + 0.5, dead.getZ(), stack);

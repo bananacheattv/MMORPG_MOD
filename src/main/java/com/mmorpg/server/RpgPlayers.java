@@ -652,7 +652,7 @@ public final class RpgPlayers {
     }
 
     public static void onLogout(ServerPlayer player) {
-        SessionLoot.forget(player);
+        SessionLoot.logout(player);
         PetManager.despawn(player);
         PartyManager.onLogout(player);
         ClickInteractions.forget(player);
