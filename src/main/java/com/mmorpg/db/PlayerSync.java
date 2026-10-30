@@ -40,10 +40,6 @@ public final class PlayerSync {
     private PlayerSync() {
     }
 
-    /** Transfert vers un autre serveur : ecrit avec le profil, dans la meme transaction . */
-    public record Move(String targetServer, String kind, int arg) {
-    }
-
     private static boolean active() {
         return Database.enabled() && Database.config().syncPlayers && Database.ready();
     }
@@ -172,31 +168,12 @@ public final class PlayerSync {
         return n;
     }
 
-    /** Un transfert qui n'a pas abouti : ce serveur reprend le joueur (il avait ete libere) et efface l'arrivee notee. */
-    public static void reclaim(ServerPlayer p) {
-        final String id = p.getUUID().toString();
-        Database.fire("arrivee annulee", c -> {
-            try (PreparedStatement ps = c.prepareStatement("DELETE FROM transfers WHERE uuid = ?")) {
-                ps.setString(1, id);
-                ps.executeUpdate();
-            }
-            return null;
-        });
-        LAST_HASH.remove(p.getUUID());
-        push(p, false);
-    }
-
-    public static Future<Boolean> push(ServerPlayer p, boolean logout) {
-        return push(p, logout, null);
-    }
-
     /**
      * Serialise le profil, la banque et l'inventaire sur le thread du serveur, puis les envoie a la base sans attendre.
      *
-     * @param move transfert vers un autre serveur : le joueur est libere (hors ligne) et l'arrivee notee dans la meme transaction
      * @return l'operation en cours (vrai quand tout est ecrit), ou {@code null} si rien n'a ete envoye
      */
-    public static Future<Boolean> push(ServerPlayer p, boolean logout, Move move) {
+    public static Future<Boolean> push(ServerPlayer p, boolean logout) {
         if (!Database.enabled() || !Database.config().syncPlayers) return null;
         PlayerData d = RpgPlayers.get(p);
         MinecraftServer server = p.level().getServer();
@@ -215,7 +192,7 @@ public final class PlayerSync {
         final int level = d.level, minesU = d.minesUnlocked, plainsU = d.plainsUnlocked, evo = d.evolution;
         final long xp = d.xp, gold = d.gold;
         Integer before = LAST_HASH.get(id);
-        if (!logout && move == null && before != null && before == hash) {     // rien n'a change : on signale seulement que le joueur est toujours la
+        if (!logout && before != null && before == hash) {     // rien n'a change : on signale seulement que le joueur est toujours la
             return Database.async("presence", c -> {
                 try (PreparedStatement ps = c.prepareStatement("UPDATE players SET last_seen = NOW() WHERE uuid = ? AND server_id = ?")) {
                     ps.setString(1, id.toString());
@@ -291,16 +268,6 @@ public final class PlayerSync {
                         ps.setLong(2, bankGold);
                         ps.setString(3, bank);
                         ps.setLong(4, version);
-                        ps.executeUpdate();
-                    }
-                }
-                if (move != null) {                                   // le joueur est libere ET l'arrivee notee, ou rien du tout
-                    try (PreparedStatement ps = c.prepareStatement("INSERT INTO transfers (uuid, dest_server, kind, arg) VALUES (?,?,?,?) "
-                            + "ON DUPLICATE KEY UPDATE dest_server = VALUES(dest_server), kind = VALUES(kind), arg = VALUES(arg), created = NOW()")) {
-                        ps.setString(1, id.toString());
-                        ps.setString(2, move.targetServer());
-                        ps.setString(3, move.kind());
-                        ps.setInt(4, move.arg());
                         ps.executeUpdate();
                     }
                 }
