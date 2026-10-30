@@ -13,8 +13,9 @@ import java.util.*;
 @EventBusSubscriber(modid=MMORPG.MODID)
 public final class PremiumStore {
     public static final Set<String> STAFF=Set.of("aucun","fondateur","administrateur","moderateur","builder");
-    public static void refresh(ServerPlayer p){
-        var cfg=StoreConfig.load(p.level().getServer());var account=StoreLedger.access(p.level().getServer(),s->StoreLedger.account(s,p.getUUID()));var rank=cfg.ranks.get(Math.clamp(account.rank,0,4));var d=RpgPlayers.get(p);
+    public static void refresh(ServerPlayer p){var server=p.level().getServer();refresh(p,StoreConfig.load(server),StoreLedger.read(server,s->StoreLedger.account(s,p.getUUID())));}
+    private static void refresh(ServerPlayer p,StoreConfig.Config cfg,StoreLedger.Account account){
+        var rank=cfg.ranks.get(Math.clamp(account.rank,0,4));var d=RpgPlayers.get(p);
         String label=account.staff.isEmpty()?rank.label:switch(account.staff){case "fondateur"->"Fondateur";case "administrateur"->"Administrateur";case "moderateur"->"Modérateur";case "builder"->"Builder";default->rank.label;};
         int color=account.staff.isEmpty()?rank.color:switch(account.staff){case "moderateur"->0x55AFFF;case "builder"->0x58DE87;default->0xFF5555;};boolean changed=!d.rankLabel.equals(label)||d.rankColor!=color||d.rankTier!=account.rank;
         d.rankLabel=label;d.rankColor=color;d.rankTier=account.rank;d.auctionSlots=rank.auctionSlots;
@@ -22,7 +23,7 @@ public final class PremiumStore {
         if(changed){d.dirty=true;p.refreshDisplayName();p.refreshTabListName();RpgPlayers.updatePublic(p);}
     }
     public static void deliver(ServerPlayer p){
-        var list=StoreLedger.access(p.level().getServer(),s->new ArrayList<>(StoreLedger.account(s,p.getUUID()).pending));
+        var list=StoreLedger.read(p.level().getServer(),s->new ArrayList<>(StoreLedger.account(s,p.getUUID()).pending));
         for(var delivery:list){var d=RpgPlayers.get(p);String receipt="store:"+delivery.id;
             if(!d.guildReceipts.getBooleanOr(receipt,false)){
                 var item=com.mmorpg.crafting.ForgeRecipes.resolveItem(delivery.item);if(item==net.minecraft.world.item.Items.AIR)throw new IllegalArgumentException("Livraison : objet inconnu.");
@@ -38,7 +39,7 @@ public final class PremiumStore {
         }
     }
     public static void open(ServerPlayer p,String message){try{
-        refresh(p);deliver(p);var cfg=StoreConfig.load(p.level().getServer());var a=StoreLedger.access(p.level().getServer(),s->StoreLedger.account(s,p.getUUID()));var t=new CompoundTag();
+        refresh(p);deliver(p);var cfg=StoreConfig.load(p.level().getServer());var a=StoreLedger.read(p.level().getServer(),s->StoreLedger.account(s,p.getUUID()));var t=new CompoundTag();
         t.putLong("credits",a.credits);t.putInt("rank",a.rank);t.putInt("pending",a.pending.size());t.putString("status",message);t.putString("website",cfg.websiteUrl);t.putBoolean("payments",cfg.paymentBridgeEnabled&&!cfg.websiteUrl.isEmpty());
         var products=new ListTag();for(var product:cfg.products){var v=new CompoundTag();v.putString("id",product.id);v.putString("label",product.label);v.putString("item",product.item);v.putString("category",product.category);v.putLong("price",StoreLedger.price(cfg,product,a));v.putInt("count",product.count);v.putBoolean("owned",product.rank>=0&&a.rank>=product.rank);
             if(product.rank>0){var r=cfg.ranks.get(product.rank);v.putString("benefits","Préfixe coloré · "+r.auctionSlots+" annonces HDV · Cosmétique de grade");}products.add(v);}t.put("products",products);
@@ -49,7 +50,12 @@ public final class PremiumStore {
         try{String action=data.getStringOr("action","");if(action.equals("buy")){if(!com.mmorpg.server.FeatureFlags.allow(p,"boutique"))return;StoreLedger.buy(p.level().getServer(),p.getUUID(),data.getStringOr("product",""),UUID.fromString(data.getStringOr("request","")),data.getLongOr("price",-1));open(p,"Achat enregistré. Les objets sans place restent en attente.");}else if(action.equals("open")||action.equals("claim"))open(p,"");}catch(Exception e){open(p,e.getMessage());}
     }
     @SubscribeEvent public static void login(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent e){if(e.getEntity() instanceof ServerPlayer p)com.mmorpg.server.Scheduler.later(p.level(),30,()->{try{refresh(p);p.refreshDisplayName();p.refreshTabListName();}catch(Exception ex){MMORPG.LOGGER.warn("Grade temporairement indisponible : {}",ex.getMessage());}});}
-    @SubscribeEvent public static void tick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post e){if(e.getServer().getTickCount()%100==0)for(var p:e.getServer().getPlayerList().getPlayers())try{refresh(p);deliver(p);}catch(Exception ex){MMORPG.LOGGER.warn("Boutique : {}",ex.getMessage());}}
+    /** Toutes les 5 s : une seule lecture du registre pour tous les joueurs ; l'ecriture n'a lieu que s'il y a une livraison en attente. */
+    @SubscribeEvent public static void tick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post e){
+        var server=e.getServer();var players=server.getPlayerList().getPlayers();if(server.getTickCount()%100!=0||players.isEmpty())return;
+        try{var cfg=StoreConfig.load(server);var accounts=StoreLedger.read(server,s->{var found=new java.util.HashMap<UUID,StoreLedger.Account>();for(var p:players){var a=s.accounts.get(p.getUUID().toString());found.put(p.getUUID(),a==null?new StoreLedger.Account():a);}return found;});
+            for(var p:players)try{var account=accounts.get(p.getUUID());if(account==null)continue;refresh(p,cfg,account);if(!account.pending.isEmpty())deliver(p);}catch(Exception ex){MMORPG.LOGGER.warn("Boutique : {}",ex.getMessage());}
+        }catch(Exception ex){MMORPG.LOGGER.warn("Boutique : {}",ex.getMessage());}}
     @SubscribeEvent public static void name(net.neoforged.neoforge.event.entity.player.PlayerEvent.NameFormat e){if(e.getEntity() instanceof ServerPlayer p){var d=RpgPlayers.get(p);e.setDisplayname(RankTags.name(d.rankLabel,d.rankColor,e.getUsername().getString()).copy().append(com.mmorpg.achievement.Achievements.suffix(d)));}}
     @SubscribeEvent public static void tab(net.neoforged.neoforge.event.entity.player.PlayerEvent.TabListNameFormat e){if(e.getEntity() instanceof ServerPlayer p){var d=RpgPlayers.get(p);e.setDisplayName(RankTags.name(d.rankLabel,d.rankColor,p.getGameProfile().name()));}}
     @SubscribeEvent public static void commands(net.neoforged.neoforge.event.RegisterCommandsEvent e){var d=e.getDispatcher();

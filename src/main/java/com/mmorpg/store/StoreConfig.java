@@ -20,9 +20,14 @@ public final class StoreConfig {
         c.creditPacks.put("decouverte",500L);c.creditPacks.put("aventurier",1200L);c.creditPacks.put("legende",3000L);return c;
     }
     public static Path path(MinecraftServer server){return com.mmorpg.guild.GuildStore.directory(server).resolveSibling("commerce").resolve("boutique.json");}
+    /** Dernier catalogue lu, relu seulement quand le fichier change (date ou taille) : le grade de chaque joueur est verifie toutes les 5 s. */
+    private static Config cached;private static Path cachedPath;private static java.nio.file.attribute.FileTime cachedTime;private static long cachedSize=-1;
     public static synchronized Config load(MinecraftServer server){try{
-        Path p=path(server);Files.createDirectories(p.getParent());try(var channel=java.nio.channels.FileChannel.open(p.resolveSibling("boutique.lock"),StandardOpenOption.CREATE,StandardOpenOption.WRITE);var lock=channel.lock()){if(!Files.exists(p))try{Files.writeString(p,new GsonBuilder().setPrettyPrinting().create().toJson(defaults()),StandardOpenOption.CREATE_NEW);}catch(FileAlreadyExistsException ignored){}
-        var c=new com.google.gson.Gson().fromJson(Files.readString(p),Config.class);validate(c);return c;}
+        Path p=path(server);
+        if(cached!=null&&p.equals(cachedPath)&&Files.exists(p)){var attrs=Files.readAttributes(p,java.nio.file.attribute.BasicFileAttributes.class);if(attrs.lastModifiedTime().equals(cachedTime)&&attrs.size()==cachedSize)return cached;}
+        Files.createDirectories(p.getParent());try(var channel=java.nio.channels.FileChannel.open(p.resolveSibling("boutique.lock"),StandardOpenOption.CREATE,StandardOpenOption.WRITE);var lock=channel.lock()){if(!Files.exists(p))try{Files.writeString(p,new GsonBuilder().setPrettyPrinting().create().toJson(defaults()),StandardOpenOption.CREATE_NEW);}catch(FileAlreadyExistsException ignored){}
+        var attrs=Files.readAttributes(p,java.nio.file.attribute.BasicFileAttributes.class);
+        var c=new com.google.gson.Gson().fromJson(Files.readString(p),Config.class);validate(c);cached=c;cachedPath=p;cachedTime=attrs.lastModifiedTime();cachedSize=attrs.size();return c;}
     }catch(java.io.IOException e){throw new IllegalStateException("Catalogue indisponible",e);}}
     public static void validate(Config c){
         if(c==null||c.ranks==null||c.ranks.size()!=5||!"aelorien".equals(c.ranks.getFirst().id)||c.products==null||c.products.size()>150||c.creditPacks==null)throw new IllegalArgumentException("Catalogue : cinq grades dont Aelorien sont requis.");
