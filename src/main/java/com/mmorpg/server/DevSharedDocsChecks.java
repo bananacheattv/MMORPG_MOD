@@ -95,6 +95,8 @@ public final class DevSharedDocsChecks {
             // 3) registre de coordination
             for (int i = 0; i < 2; i++) SharedLedger.access(server, "test-ledger", Counter.class, Counter::new, c -> ++c.n);
             check(SharedLedger.access(server, "test-ledger", Counter.class, Counter::new, c -> c.n) == 2, "registre de coordination (2)");
+            check(SharedLedger.read(server, "test-ledger", Counter.class, Counter::new, c -> ++c.n) == 3
+                    && SharedLedger.access(server, "test-ledger", Counter.class, Counter::new, c -> c.n) == 2, "lecture seule du registre : rien n'est ecrit");
             // 4) hotel des ventes
             AuctionData a = AuctionData.get(server);
             a.listings().clear();                                      // le monde de test peut garder des annonces d'une execution precedente
