@@ -95,6 +95,8 @@ public final class DevSharedDocsChecks {
             // 3) registre de coordination
             for (int i = 0; i < 2; i++) SharedLedger.access(server, "test-ledger", Counter.class, Counter::new, c -> ++c.n);
             check(SharedLedger.access(server, "test-ledger", Counter.class, Counter::new, c -> c.n) == 2, "registre de coordination (2)");
+            check(SharedLedger.read(server, "test-ledger", Counter.class, Counter::new, c -> ++c.n) == 3
+                    && SharedLedger.access(server, "test-ledger", Counter.class, Counter::new, c -> c.n) == 2, "lecture seule du registre : rien n'est ecrit");
             // 4) hotel des ventes
             AuctionData a = AuctionData.get(server);
             a.listings().clear();                                      // le monde de test peut garder des annonces d'une execution precedente
@@ -107,6 +109,13 @@ public final class DevSharedDocsChecks {
             a.listings().clear();                                      // etat du monde « perdu » : la base doit le restituer
             a.reloadFromDatabase(server);
             check(a.listings().size() == 1 && a.listings().get(0).stack().getCount() == 5 && a.earnings(chef) == 40, "hotel des ventes relu depuis la base");
+            // 5) un autre serveur ecrit le document (menu d'administration) : la copie en memoire est relue avant usage
+            com.mmorpg.db.SharedDocs.put("auction", doc("auction").replace("\"Vendeur\"", "\"Autre serveur\""));
+            Database.await("barriere", 5000, c -> null);
+            check(AuctionData.get(server).listings().get(0).sellerName().equals("Autre serveur"), "hotel des ventes relu apres l'ecriture d'un autre serveur");
+            a.addEarnings(chef, 2);
+            Database.await("barriere", 5000, c -> null);
+            check(AuctionData.get(server).earnings(chef) == 42 && doc("auction").contains("Autre serveur"), "notre propre ecriture reste en memoire et en base");
         } catch (Exception e) {
             failed = true;
             MMORPG.LOGGER.error("[CODEX CHECKS] SHARED exception", e);

@@ -10,9 +10,12 @@ public final class StoreLedger {
     public static class CreditReceipt {public String player;public long amount;}
     public static class State {public Map<String,Account> accounts=new HashMap<>();public Map<String,CreditReceipt> credits=new HashMap<>();public Set<String> purchases=new HashSet<>();}
     public static Account account(State s,UUID player){return s.accounts.computeIfAbsent(player.toString(),k->new Account());}
-    public static <T>T access(MinecraftServer server,java.util.function.Function<State,T> work){return SharedLedger.access(server,"credit-store",State.class,State::new,s->{if(s.accounts==null||s.credits==null||s.purchases==null)throw new IllegalStateException("Registre crédits corrompu.");for(var entry:s.accounts.entrySet()){UUID.fromString(entry.getKey());var a=entry.getValue();if(a==null||a.credits<0||a.rank<0||a.rank>4||a.staff==null||!a.staff.isEmpty()&&!PremiumStore.STAFF.contains(a.staff)||a.pending==null||a.pending.size()>1000)throw new IllegalStateException("Compte crédits corrompu.");
+    public static <T>T access(MinecraftServer server,java.util.function.Function<State,T> work){return SharedLedger.access(server,"credit-store",State.class,State::new,checked(work));}
+    /** Lecture seule (grade, livraisons en attente) : rien n'est ecrit, a utiliser pour les consultations periodiques. */
+    public static <T>T read(MinecraftServer server,java.util.function.Function<State,T> work){return SharedLedger.read(server,"credit-store",State.class,State::new,checked(work));}
+    private static <T>java.util.function.Function<State,T> checked(java.util.function.Function<State,T> work){return s->{if(s.accounts==null||s.credits==null||s.purchases==null)throw new IllegalStateException("Registre crédits corrompu.");for(var entry:s.accounts.entrySet()){UUID.fromString(entry.getKey());var a=entry.getValue();if(a==null||a.credits<0||a.rank<0||a.rank>4||a.staff==null||!a.staff.isEmpty()&&!PremiumStore.STAFF.contains(a.staff)||a.pending==null||a.pending.size()>1000)throw new IllegalStateException("Compte crédits corrompu.");
             Set<String> ids=new HashSet<>();for(var delivery:a.pending)if(delivery==null||delivery.id==null||!ids.add(delivery.id)||delivery.item==null||delivery.count<1||delivery.count>64)throw new IllegalStateException("Livraison corrompue.");}
-        return work.apply(s);});}
+        return work.apply(s);};}
     public static void credit(MinecraftServer server,UUID player,long amount,String reference){
         if(amount<=0||amount>1000000||reference==null||!reference.matches("[A-Za-z0-9:_-]{3,120}"))throw new IllegalArgumentException("Crédit ou référence invalide.");
         access(server,s->{var old=s.credits.get(reference);if(old!=null){if(!old.player.equals(player.toString())||old.amount!=amount)throw new IllegalArgumentException("Référence déjà utilisée pour une autre transaction.");return null;}

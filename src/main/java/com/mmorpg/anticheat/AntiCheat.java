@@ -62,7 +62,7 @@ public final class AntiCheat {
         int[] flagCounts = new int[Check.values().length];
         double lastX, lastY, lastZ, safeX, safeY, safeZ;
         boolean hasLast;
-        long lastTick, lastHurtTick, lastTeleportTick;
+        long lastTick, lastHurtTick, lastTeleportTick, graceUntil;
         int hover, climb, sinceCheck;
         double window;
         long[] attacks = new long[24];
@@ -90,6 +90,12 @@ public final class AntiCheat {
 
     private static Profile of(ServerPlayer p) {
         return PROFILES.computeIfAbsent(p.getUUID(), u -> new Profile());
+    }
+
+    /** Deplacement voulu par le serveur (charge, saut, teleportation d'une competence) : vitesse et vol ignores pendant {@code ticks}. */
+    public static void grace(ServerPlayer p, int ticks) {
+        Profile pr = of(p);
+        pr.graceUntil = Math.max(pr.graceUntil, p.level().getServer().getTickCount() + (long) ticks);
     }
 
     /** Enveloppe d'un gestionnaire serveur : controle de permission puis limite de debit. */
@@ -189,7 +195,7 @@ public final class AntiCheat {
         Profile pr = of(p);
         long tick = p.level().getServer().getTickCount();
         boolean exempt = p.isCreative() || p.isSpectator() || p.getAbilities().mayfly || p.isPassenger() || p.isFallFlying() || p.isAutoSpinAttack()
-                || p.hurtTime > 0 || p.isDeadOrDying();
+                || p.hurtTime > 0 || p.isDeadOrDying() || tick < pr.graceUntil;
         if (p.hurtTime > 0) pr.lastHurtTick = tick;
         if (!pr.hasLast) {
             remember(pr, p, tick);
@@ -212,6 +218,14 @@ public final class AntiCheat {
             return;
         }
         pr.lastTick = tick;
+        if (exempt) {
+            // monture, elytre, competence... : la seconde de mesure repart de zero, sinon la distance parcourue en selle
+            // est comptee comme de la course a pied des que le joueur descend.
+            pr.hover = 0;
+            pr.window = 0;
+            pr.sinceCheck = 0;
+            return;
+        }
         boolean recentHit = tick - pr.lastHurtTick < 40;
         boolean fluid = p.isInWater() || p.isInLava() || p.onClimbable() || p.isInPowderSnow || p.hasEffect(MobEffects.LEVITATION) || p.hasEffect(MobEffects.SLOW_FALLING)
                 || p.hasEffect(MobEffects.JUMP_BOOST);
@@ -224,7 +238,10 @@ public final class AntiCheat {
         if (++pr.sinceCheck >= 20) {
             double speed = p.getAttributeValue(Attributes.MOVEMENT_SPEED);
             double max = Math.max(speed, 0.1) * 43 * 1.7 + 4;
-            if (!exempt && !recentHit && pr.window > max) flag(p, Check.SPEED, String.format("%.1f blocs/s (max %.1f)", pr.window, max));
+            // glace (course sautee) et nage avec Grace du dauphin / Agilite aquatique depassent la course normale
+            var below = p.getBlockPosBelowThatAffectsMyMovement();
+            boolean slide = p.level().getBlockState(below).getFriction(p.level(), below, p) > 0.6f || p.isInWater() || p.hasEffect(MobEffects.DOLPHINS_GRACE);
+            if (!exempt && !recentHit && !slide && pr.window > max) flag(p, Check.SPEED, String.format("%.1f blocs/s (max %.1f)", pr.window, max));
             pr.window = 0;
             pr.sinceCheck = 0;
             if (p.onGround() && !exempt) remember(pr, p, tick);
@@ -276,8 +293,9 @@ public final class AntiCheat {
         long now = System.currentTimeMillis();
         pr.breaks[pr.breakIdx++ % pr.breaks.length] = now;
         long oldest = pr.breaks[pr.breakIdx % pr.breaks.length];
-        // 40 blocs en moins de 2 s : nuker / casse en masse.
-        if (oldest != 0 && now - oldest < 2000) {
+        // 40 blocs en moins de 1,5 s : nuker / casse en masse. Un minage instantane legitime (Efficacite V + Celerite II
+        // sur la pierre) casse un bloc par tick, soit 40 blocs en 1,95 s : le seuil reste au-dessus de 20 blocs/s.
+        if (oldest != 0 && now - oldest < 1500) {
             flag(p, Check.BREAK_RATE, "40 blocs en " + (now - oldest) + " ms");
             pr.breaks = new long[40];
             if (!PlayerAdmin.allowed(p)) e.setCanceled(true);

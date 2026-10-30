@@ -143,6 +143,18 @@ public final class TeleportManager {
 
     public static void travel(ServerPlayer player, String idString) {
         if (classRequired(player)) return;
+        // memes interdictions que les portails et les changements de serveur : un parchemin ne doit pas sortir
+        // d'une arene, d'une epreuve, d'une cinematique ou d'un combat contre un joueur
+        if (!player.isAlive() || player.isSpectator() || com.mmorpg.hub.ClassTrial.active(player) || com.mmorpg.hub.CinematicManager.isLocked(player)
+                || com.mmorpg.network.NetworkPlayers.inTransit(player)) return;
+        if (com.mmorpg.competition.ArenaManager.session(player.getUUID()) != null || com.mmorpg.competition.GuildRaids.of(player.getUUID()) != null) {
+            player.sendOverlayMessage(Component.literal("Quittez votre arène ou votre épreuve de guilde avant de voyager.").withColor(0xFF5050));
+            return;
+        }
+        if (RpgPlayers.get(player).pvpUntilTick > player.level().getServer().getTickCount()) {
+            player.sendOverlayMessage(Component.literal("Impossible de voyager pendant un combat contre un joueur.").withColor(0xFF5050));
+            return;
+        }
         UUID id;
         try {
             id = UUID.fromString(idString);

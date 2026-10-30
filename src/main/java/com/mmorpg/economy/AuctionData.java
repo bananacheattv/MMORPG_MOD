@@ -62,14 +62,21 @@ public class AuctionData extends SavedData {
 
     public static AuctionData get(MinecraftServer server) {
         AuctionData data = server.overworld().getDataStorage().computeIfAbsent(TYPE);
-        if (data.syncedWith != server && com.mmorpg.db.SharedDocs.useDb()) data.syncWithDatabase(server);
+        if (com.mmorpg.db.SharedDocs.useDb() && (data.syncedWith != server || data.outdated())) data.syncWithDatabase(server);
         return data;
+    }
+
+    /** Un autre serveur (menu d'administration, autre hotel des ventes) a ecrit le document depuis notre derniere lecture ou ecriture. */
+    private boolean outdated() {
+        return com.mmorpg.db.SharedDocs.revision("auction") > syncedRevision;
     }
 
     // ---- base de donnees : le document « auction » fait foi ; s'il n'existe pas encore, les donnees du monde y sont importees
     private MinecraftServer syncedWith;
     private MinecraftServer mirrorServer;
     private boolean loading;
+    /** Revision du document en base correspondant a notre copie (chaque ecriture l'augmente de 1). */
+    private long syncedRevision = -1;
 
     /** Relit l'hotel des ventes depuis la base (verifications et reprise manuelle). */
     public void reloadFromDatabase(MinecraftServer server) {
@@ -80,10 +87,12 @@ public class AuctionData extends SavedData {
     private void syncWithDatabase(MinecraftServer server) {
         syncedWith = server;
         var ops = server.registryAccess().createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE);
-        String json = com.mmorpg.db.SharedDocs.get("auction");
+        var doc = com.mmorpg.db.SharedDocs.read("auction");
+        String json = doc == null ? null : doc.data();
         if (json == null) {
-            if (!com.mmorpg.db.Database.ready()) { syncedWith = null; return; }                    // base injoignable : on reessaiera, les donnees du monde restent valides
+            if (doc == null || !com.mmorpg.db.Database.ready()) { syncedWith = null; return; }   // base injoignable : on reessaiera, les donnees du monde restent valides
             mirrorServer = server;
+            syncedRevision = doc.revision();
             push();
             MMORPG.LOGGER.info("[MMORPG] Base de donnees : hotel des ventes importe depuis le monde ({} annonce(s))", listings.size());
             return;
@@ -98,6 +107,7 @@ public class AuctionData extends SavedData {
             earnings.putAll(read.earnings);
             returns.clear();
             returns.putAll(read.returns);
+            syncedRevision = doc.revision();
             super.setDirty();
             MMORPG.LOGGER.info("[MMORPG] Base de donnees : hotel des ventes lu ({} annonce(s))", listings.size());
         } catch (RuntimeException e) {
@@ -119,6 +129,7 @@ public class AuctionData extends SavedData {
         try {
             var ops = mirrorServer.registryAccess().createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE);
             com.mmorpg.db.SharedDocs.put("auction", CODEC.encodeStart(ops, this).getOrThrow().toString());
+            syncedRevision++;                                     // notre propre ecriture ne doit pas declencher de relecture
         } catch (RuntimeException e) {
             MMORPG.LOGGER.error("[MMORPG] Base de donnees : hotel des ventes non ecrit", e);
         }

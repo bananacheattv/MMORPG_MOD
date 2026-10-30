@@ -33,4 +33,18 @@ public final class SharedLedger {
             }
         } catch (java.io.IOException e) { throw new IllegalStateException("Coordination indisponible : " + name, e); }
     }
+
+    /** Consultation sans ecriture (ni sauvegarde ni synchronisation disque) : les modifications faites par {@code action} sont perdues. */
+    public static synchronized <S,T> T read(MinecraftServer server, String name, Class<S> type, Supplier<S> empty, Function<S,T> action) {
+        Path directory = com.mmorpg.guild.GuildStore.directory(server).resolveSibling("coordination");
+        if (com.mmorpg.db.SharedDocs.useDb()) return com.mmorpg.db.SharedDocs.access("ledger-" + name, type, empty, directory.resolve(name + ".json"), false, action);
+        Path file = directory.resolve(name + ".json");
+        if (!Files.exists(file)) return action.apply(empty.get());
+        try (var channel = FileChannel.open(directory.resolve(name + ".lock"), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+             var lock = channel.lock()) {
+            S state = JSON.fromJson(Files.readString(file), type);
+            if (state == null) throw new IllegalStateException("Registre vide : " + name);
+            return action.apply(state);
+        } catch (java.io.IOException e) { throw new IllegalStateException("Coordination indisponible : " + name, e); }
+    }
 }

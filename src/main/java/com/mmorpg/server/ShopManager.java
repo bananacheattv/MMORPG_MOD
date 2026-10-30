@@ -81,6 +81,8 @@ public final class ShopManager {
             Item item = stack.getItem();
             for (int i = 0; i < inv.getContainerSize(); i++) {
                 ItemStack s = inv.getItem(i);
+                // l'equipement porte n'est vendu que si c'est la ligne choisie : « Tout vendre » ne deshabille pas le joueur
+                if (i >= Inventory.INVENTORY_SIZE && i != slot) continue;
                 if (s.is(item) && ShopPricing.sellPrice(s, cfg) == price) {
                     total += (long) price * s.getCount();
                     sold += s.getCount();

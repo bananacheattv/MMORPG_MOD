@@ -107,7 +107,7 @@ public class RpgConsumableItem extends RpgMaterialItem {
                 sl.playSound(null, sp.blockPosition(), SoundEvents.TOTEM_USE, SoundSource.PLAYERS, 0.8f, 1);
             }
             case CLASS_RUNE -> {
-                if(!sp.level().dimension().equals(com.mmorpg.hub.SpawnBuilder.DIM)||!data.playerClass.isPlayable()||data.pvpUntilTick>sl.getGameTime()||com.mmorpg.network.NetworkPlayers.inTransit(sp)){
+                if(!sp.level().dimension().equals(com.mmorpg.hub.SpawnBuilder.DIM)||!data.playerClass.isPlayable()||data.pvpUntilTick>sl.getServer().getTickCount()||com.mmorpg.network.NetworkPlayers.inTransit(sp)){
                     sp.sendSystemMessage(net.minecraft.network.chat.Component.literal("Utilise cette rune au spawn, avec une classe choisie et hors combat."));return InteractionResult.FAIL;
                 }
                 data.resetClass();RpgPlayers.recomputeAndSync(sp);RpgPlayers.openClassSelection(sp);

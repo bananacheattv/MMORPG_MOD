@@ -136,6 +136,7 @@ public final class SkillExecutor {
                 double dist = Math.max(2, Math.min(s.radius, end.subtract(p.getEyePosition()).length()));
                 p.setDeltaMovement(dir.scale(dist * 0.32).add(0, 0.15, 0));
                 p.needsSync = true;
+                com.mmorpg.anticheat.AntiCheat.grace(p, 30);
                 Fx.cast(p, CastAnim.BASH, 10);
                 Fx.attach(level, FxKind.TRAIL, p, 1, 0xFF7040, 14);
                 Set<Integer> hit = new HashSet<>();
@@ -165,6 +166,7 @@ public final class SkillExecutor {
             case "fureur_divine" -> {
                 p.setDeltaMovement(p.getLookAngle().multiply(1, 0, 1).normalize().scale(0.6).add(0, 1.1, 0));
                 p.needsSync = true;
+                com.mmorpg.anticheat.AntiCheat.grace(p, 50);
                 Fx.cast(p, CastAnim.LEAP, 22);
                 Fx.attach(level, FxKind.TRAIL, p, 1, 0xFFD060, 22);
                 sound(p, SoundEvents.ENDER_DRAGON_FLAP, 1f, 0.8f);
@@ -259,6 +261,7 @@ public final class SkillExecutor {
                 Fx.spawn(level, FxKind.BLINK, from, 1.6, 0xC070FF, 10);
                 p.teleportTo(dest.x, Math.max(dest.y - 1, p.getY() - 0.5), dest.z);
                 p.fallDistance = 0;
+                com.mmorpg.anticheat.AntiCheat.grace(p, 30);
                 Fx.spawn(level, FxKind.BLINK, p.position(), 1.6, 0xE0A0FF, 10);
                 Fx.path(level, FxKind.BEAM, List.of(from.add(0, 1, 0), p.position().add(0, 1, 0)), 0.35, 0xC070FF, 9);
                 RpgPlayers.addBuff(p, BuffType.ARCANE_GUARD, s.duration, 0.3, 0);
@@ -317,6 +320,7 @@ public final class SkillExecutor {
                 Vec3 back = p.getLookAngle().multiply(1, 0, 1).normalize().scale(-1.3);
                 p.setDeltaMovement(back.x, 0.55, back.z);
                 p.needsSync = true;
+                com.mmorpg.anticheat.AntiCheat.grace(p, 40);
                 Fx.attach(level, FxKind.TRAIL, p, 1, 0xD8F0FF, 12);
                 Fx.spawn(level, FxKind.RING, pos, s.radius, 0xD8F0FF, 12);
                 for (LivingEntity e : SkillHelper.enemiesInRadius(p, pos.add(0, 1, 0), s.radius)) {
