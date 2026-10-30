@@ -165,14 +165,14 @@ public final class Ui {
         backdropTex = name == null ? null : MMORPG.id("textures/gui/illustrations/" + name + ".png");
     }
 
-    /** Portrait d'une classe (atlas du pack d'art, ordre Guerrier, Mage, Archer, Paladin), recadre en "cover" sur le haut de la region. */
+    /** Portrait d'une classe (atlas du pack d'art, ordre Guerrier, Mage, Archer, Paladin), recadre en "cover" centre sur le visage. */
     public static void classPortrait(GuiGraphicsExtractor g, int index, int x, int y, int w, int h) {
         final int[] rx = {0, 496, 992, 1487}, rw = {496, 496, 495, 496};
         final int tw = 1983, th = 793;
         int i = Math.max(0, Math.min(3, index));
         float k = Math.max(w / (float) rw[i], h / (float) th);
         int sw = Math.min(rw[i], Math.round(w / k)), sh = Math.min(th, Math.round(h / k));
-        g.blit(RenderPipelines.GUI_TEXTURED, MMORPG.id("textures/gui/illustrations/classes_atlas.png"), x, y, rx[i] + (rw[i] - sw) / 2f, 0, w, h, sw, sh, tw, th);
+        g.blit(RenderPipelines.GUI_TEXTURED, MMORPG.id("textures/gui/illustrations/classes_atlas.png"), x, y, rx[i] + (rw[i] - sw) / 2f, Math.max(0, Math.min(th - sh, Math.round(th * 0.34f - sh / 2f))), w, h, sw, sh, tw, th);
     }
 
     /** Image carree du pack d'art (portrait ou medaille a fond transparent), contenue sans etirement dans la boite donnee. */
