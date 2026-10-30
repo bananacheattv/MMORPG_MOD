@@ -101,7 +101,7 @@ public final class ReplayClient {
         take=new ReplayTake();take.name="prise-"+java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
         take.server=server();take.dimension=dimension();take.registry=registry();
         tracks.clear();metadata.clear();lastState.clear();failed.clear();file=folder().resolve(take.name+"-"+UUID.randomUUID().toString().substring(0,8)+".aereplay");
-        levelId=dimension();cursor=0;recording=true;message="REC — acteurs visibles, rayon 96 blocs, maximum 3 minutes";
+        levelId=dimension();cursor=0;recording=true;message="REC — acteurs visibles, rayon 96 blocs, maximum 5 minutes";
         mc().gui.setScreen(null);
     }
     private static byte[] tagBytes(CompoundTag tag)throws IOException{

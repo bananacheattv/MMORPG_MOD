@@ -5,12 +5,12 @@ Branche : `feature/admin-replay`, base `0e486f1` de `main`. Code `db825a2` inté
 ## Utilisation
 
 1. Installer la même version du mod côté serveur et côté client. Seuls les opérateurs Minecraft ayant la permission `COMMANDS_GAMEMASTER` peuvent utiliser l'atelier ; un grade cosmétique ne donne aucun droit.
-2. Aller sur le lieu du tournage et exécuter `/replay record`, ou `/replay` puis **Enregistrer**. Jouer la scène normalement. Les prises suivent les acteurs vivants visibles dans un rayon de 96 blocs, à 20 échantillons/s, jusqu'à 3 minutes et 128 acteurs.
+2. Aller sur le lieu du tournage et exécuter `/replay record`, ou `/replay` puis **Enregistrer**. Jouer la scène normalement. Les prises suivent les acteurs vivants visibles dans un rayon de 96 blocs, à 20 échantillons/s, jusqu'à 5 minutes et 128 acteurs.
 3. Appuyer sur **F8** pour ouvrir l'atelier, puis **Arrêter / quitter**, ou `/replay stop`. La prise est sauvegardée localement dans `<dossier du jeu>/aeloria-replays/*.aereplay`.
 4. Revenir près du tournage, sur le même serveur et dans la même dimension, sélectionner la prise, puis **Revoir la prise**. L'OP passe temporairement en spectateur. Les acteurs de relecture sont locaux et ne remplacent jamais les entités du serveur.
 5. Utiliser pause, curseur, ±5 s et vitesse ×0,25 / ×0,5 / ×1 / ×2. Fermer l'atelier pour voler avec les commandes spectateur habituelles ; **F8** le rouvre.
 6. Placer le curseur à un instant, cadrer, puis **Point caméra**. Répéter aux instants suivants ; **Trajectoire : oui** anime la caméra entre ces points. **Sauver les points** les conserve dans la prise. Le FOV des points est celui réglé dans les options au moment de leur création.
-7. Choisir 16:9, 9:16 ou carré, puis **Exporter les 10 prochaines secondes — MP4 / 60 fps**. Si la prise se termine avant, seul le reste est exporté. Les clips partent de la position actuelle du curseur et respectent la vitesse choisie.
+7. Choisir 16:9, 9:16 ou carré, régler **Durée** (10 s, 30 s, 1 min, 2 min ou 5 min), puis **Exporter MP4**. La durée par défaut est cinq minutes. Si la prise se termine avant, seul le reste est exporté. Les clips partent de la position actuelle du curseur et respectent la vitesse choisie.
 8. Le fichier final est `<dossier du jeu>/aeloria-replays/exports/<date numérique>/clip.mp4`. On peut aussi choisir l'export PNG pour un montage plus poussé.
 9. **Arrêter / quitter** restaure le mode de jeu, la position et l'orientation d'avant la lecture. Si l'OP a été retiré entre-temps, un ancien mode créatif/spectateur revient en survie. Un marqueur persistant permet également de récupérer cet état après une reconnexion interrompue.
 
@@ -22,9 +22,9 @@ Recherche dans cet ordre : propriété Java `aeloria.replay.ffmpeg`, chemin enre
 
 Le bouton de configuration écrit uniquement `aeloria-replays/ffmpeg-path.txt`. Choisir le chemin de l'exécutable réel, sans ajouter d'arguments. Les processus sont lancés avec `ProcessBuilder` et une liste d'arguments ; aucune chaîne n'est exécutée dans un shell.
 
-Le rendu écrit chaque PNG avant d'avancer la scène, puis encode en H.264, 60 images/s, CRF 18, YUV420p, MP4 faststart. Le recadrage central est réellement appliqué aux images pour le vertical/carré. La résolution est limitée à celle de la fenêtre de rendu ; aucune promesse de 1080×1920 depuis une petite fenêtre. Les dimensions impaires sont complétées d'un pixel lors de l'encodage.
+Le MP4 est encodé directement par un flux RGBA vers FFmpeg, une image à la fois, en H.264 à 60 images/s, CRF 18, YUV420p, MP4 faststart. La scène n'avance qu'après l'envoi de l'image à l'encodeur ; aucune file non bornée et aucun PNG intermédiaire en mode MP4. Le recadrage central est réellement appliqué aux images pour le vertical/carré. La résolution est limitée à celle de la fenêtre de rendu ; aucune promesse de 1080×1920 depuis une petite fenêtre. Les dimensions impaires sont complétées d'un pixel lors de l'encodage.
 
-Les PNG restent disponibles si FFmpeg échoue. Le journal est `encoding.log`. Une estimation prudente vérifie l'espace disque avant la capture. Le délai d'encodage maximal est cinq minutes. Les clips de dix secondes limitent les volumes intermédiaires ; monter plusieurs clips pour une vidéo longue.
+La prise originale reste disponible si FFmpeg échoue ; il faut relancer le rendu. Les PNG ne sont créés qu'en choisissant explicitement le mode PNG. Le journal est `encoding.log`. Une estimation prudente vérifie l'espace disque avant la capture ; un contrôle régulier interrompt l'export si le disque est presque plein. La finalisation du MP4 est limitée à dix minutes après le dernier envoi d'image. L'atelier autorise jusqu'à deux heures de session pour laisser le temps aux rendus longs. Cinq minutes de sortie à 60 fps représentent 18 000 images encodées, sans les stocker sur disque.
 
 ## Périmètre réel
 
@@ -33,7 +33,7 @@ Les PNG restent disponibles si FFmpeg échoue. Le journal est `encoding.log`. Un
 - Les skins des joueurs utilisent les informations encore disponibles dans la connexion courante ; ils ne sont pas archivés comme un pack de skins indépendant.
 - Les projectiles, objets au sol, particules, sons et certaines animations propres aux systèmes Aeloria ne sont pas encore archivés. Le MP4 est **muet**. Ajouter la musique/les sons au montage. Ne pas présenter cette version comme une reproduction intégrale des sorts ou des combats.
 - Les autres joueurs continuent leur partie ; leur combat n'est ni ralenti ni modifié. Les prises n'enregistrent que ce que le client a reçu, pas les acteurs dans des chunks déchargés.
-- La lecture nécessite une autorisation serveur renouvelée ; révocation OP, déconnexion, dimension différente ou fin de session interrompent l'atelier. La session spectateur est limitée à trente minutes.
+- La lecture nécessite une autorisation serveur renouvelée ; révocation OP, déconnexion, dimension différente ou fin de session interrompent l'atelier. La session spectateur est limitée à deux heures.
 - Le verrou OP protège cet outil et ses commandes. Il ne peut pas empêcher un joueur d'utiliser un logiciel externe d'enregistrement d'écran.
 
 ## Intégration pour Claude
@@ -59,3 +59,9 @@ Avant publication : tester un combat complet, les armures/modèles custom, le bo
 - Export vertical de contrôle : H.264 YUV420p, 338×600, 87 images, 1,45 seconde à 60 images/s. Décodage complet FFmpeg réussi. Première image vérifiée : pas de notification Minecraft incrustée.
 - Interface divisée en page Caméra et page Prises pour éviter le chevauchement constaté sur petite fenêtre.
 - Aucun test complet de restitution de tous les boss/sorts, ni promesse de prise en charge des éléments explicitement exclus ci-dessus. Après ces essais, déploiement du build 87 sur les cinq serveurs, tous en ligne ; commande `help replay` vérifiée sur le principal.
+
+## Extension cinq minutes
+
+Enregistrement : 6 001 échantillons à 20 Hz, soit 300 secondes exactes, sous les limites de 128 acteurs et 64 Mio de données visuelles. Les positions sont bornées séparément par la durée et le nombre d’acteurs ; le lecteur limite aussi la taille décompressée à 256 Mio. Les anciens fichiers restent lisibles.
+
+Exports : durée sélectionnable jusqu’à 300 secondes de vidéo, y compris au ralenti. Le début est le curseur courant ; la fin ne dépasse jamais les données disponibles. Flux direct pour le MP4, sortie PNG distincte. Test réel de 18 000 images 32×18 encodées puis décodées, durée vérifiée 00:05:00.000000, sans fichier PNG ; test de sauvegarde/rechargement de la prise de 300 s et tests de limites/vitesses. Le long métrage de test valide l’encodeur et le comptage ; le test natif de jeu reste une courte scène de contrôle.

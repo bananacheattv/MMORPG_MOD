@@ -28,4 +28,27 @@ class ReplayMp4Test {
         assertTrue(b.length>32);assertEquals("ftyp",new String(b,4,4,java.nio.charset.StandardCharsets.US_ASCII));
         assertTrue(Files.exists(dir.resolve("image-000005.png")));assertFalse(Files.exists(dir.resolve("clip-encoding.mp4")));
     }
+    @Test void streamsACompleteFiveMinuteMp4WithoutPngIntermediates()throws Exception{
+        assumeTrue(Files.isExecutable(Path.of("run/aeloria-replays/ffmpeg.exe")));
+        String encoder=ReplayMp4.encoder(Path.of("run"));
+        var pixels=java.nio.ByteBuffer.allocateDirect(32*18*4);
+        for(int i=0;i<32*18;i++)pixels.putInt(0xFF30A0FF);pixels.flip();
+        Path file;
+        try(var stream=new ReplayMp4.StreamEncoder(encoder,dir,32,18)){
+            for(int frame=0;frame<18000;frame++){pixels.put(0,(byte)frame);stream.write(pixels.duplicate());}
+            file=stream.finish();
+        }
+        assertTrue(Files.size(file)>32);
+        try(var files=Files.list(dir)){assertEquals(0,files.filter(p->p.toString().endsWith(".png")).count());}
+        Path progress=dir.resolve("decode-progress.txt");
+        var decode=new ProcessBuilder(encoder,"-nostdin","-v","error","-i",file.toString(),"-f","null","-","-progress",progress.toString()).redirectOutput(ProcessBuilder.Redirect.DISCARD).redirectError(dir.resolve("decode.log").toFile()).start();
+        assertTrue(decode.waitFor(90,java.util.concurrent.TimeUnit.SECONDS));assertEquals(0,decode.exitValue());
+        String report=Files.readString(progress);assertTrue(report.contains("frame=18000"),report);assertTrue(report.contains("out_time=00:05:00.000000"),report);
+    }
+    @Test void streamRejectsWrongPixelCountAndAbortDoesNotPublishAnMp4()throws Exception{
+        assumeTrue(Files.isExecutable(Path.of("run/aeloria-replays/ffmpeg.exe")));
+        try(var stream=new ReplayMp4.StreamEncoder(ReplayMp4.encoder(Path.of("run")),dir,32,18)){
+            assertThrows(java.io.IOException.class,()->stream.write(java.nio.ByteBuffer.allocate(4)));stream.abort();
+        }assertFalse(Files.exists(dir.resolve("clip.mp4")));
+    }
 }

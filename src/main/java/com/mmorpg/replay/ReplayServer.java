@@ -62,7 +62,7 @@ public final class ReplayServer {
                     return;
                 }
                 SESSIONS.computeIfAbsent(p.getUUID(), id -> new Session(p.gameMode.getGameModeForPlayer(),
-                        p.level().dimension(), p.position(), p.getYRot(), p.getXRot(), now + 30 * 60_000));
+                        p.level().dimension(), p.position(), p.getYRot(), p.getXRot(), now + 120 * 60_000));
                 Session s=SESSIONS.get(p.getUUID());
                 CompoundTag saved=new CompoundTag();saved.putString("mode",s.mode().getName());saved.putString("dimension",s.dimension().identifier().toString());
                 saved.putDouble("x",s.position().x);saved.putDouble("y",s.position().y);saved.putDouble("z",s.position().z);saved.putFloat("yaw",s.yaw());saved.putFloat("pitch",s.pitch());

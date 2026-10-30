@@ -7,7 +7,8 @@ import java.util.zip.*;
 
 /** Bounded, versioned local visual takes. Contains no server instructions and is never uploaded. */
 public final class ReplayTake {
-    public static final int MAX_FRAMES = 3600, MAX_ACTORS = 128, MAX_STATES = 16384;
+    // Include both endpoints: 6001 samples at 20 Hz cover exactly 300 seconds.
+    public static final int MAX_FRAMES = 6001, MAX_ACTORS = 128, MAX_STATES = 65536;
     public static final long MAX_BYTES = 64L * 1024 * 1024;
     public record Actor(String type, UUID uuid, String name, byte[] initial) {}
     public record State(byte[] synced, byte[] gear) {}
@@ -64,7 +65,7 @@ public final class ReplayTake {
     public static ReplayTake read(Path path) throws IOException {
         ReplayTake t=new ReplayTake();
         // Limit the decompressed stream as well as individual collections (zip bombs / malformed local files).
-        try(var in=new DataInputStream(new BufferedInputStream(new Limited(new GZIPInputStream(Files.newInputStream(path)),128L*1024*1024)))) {
+        try(var in=new DataInputStream(new BufferedInputStream(new Limited(new GZIPInputStream(Files.newInputStream(path)),256L*1024*1024)))) {
             if(in.readInt()!=0x41455250||in.readInt()!=1)throw new IOException("Format de replay incompatible");
             t.server=in.readUTF();t.dimension=in.readUTF();t.name=in.readUTF();t.registry=in.readUTF();
             int actors=count(in,MAX_ACTORS);

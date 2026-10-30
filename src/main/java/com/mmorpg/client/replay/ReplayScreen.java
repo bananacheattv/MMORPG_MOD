@@ -51,8 +51,9 @@ public final class ReplayScreen extends MmoScreen {
         button(g,x,y,col,19,"Caméra libre [F8]",playing,Ui.GOLD,()->Minecraft.getInstance().gui.setScreen(null));
         button(g,x+col+6,y,col,19,ReplayClient.clean?"HUD : masqué":"HUD : visible",playing,Ui.GOLD,()->ReplayClient.clean=!ReplayClient.clean);
         button(g,x+2*(col+6),y,col,19,"Cadre : "+new String[]{"16:9","9:16","carré"}[ReplayClient.framing],playing,Ui.GOLD,()->ReplayClient.framing=(ReplayClient.framing+1)%3);y+=24;
-        button(g,x,y,w,19,"Exporter PNG · 10 s · 60 fps",playing&&!ReplayExporter.encoding,Ui.GOLD,ReplayExporter::start);y+=24;
-        button(g,x,y,w-128,19,ReplayExporter.encoding?"Encodage MP4…":"Exporter MP4 · 10 s · 60 fps",playing&&!ReplayExporter.encoding,Ui.GOLD,ReplayExporter::startMp4);
+        button(g,x,y,w-128,19,"Exporter PNG · "+ReplayExporter.durationLabel()+" · 60 fps",playing&&!ReplayExporter.encoding,Ui.GOLD,ReplayExporter::start);
+        button(g,x+w-122,y,122,19,"Durée : "+ReplayExporter.durationLabel(),!ReplayExporter.active&&!ReplayExporter.encoding,Ui.GOLD,ReplayExporter::nextDuration);y+=24;
+        button(g,x,y,w-128,19,ReplayExporter.encoding?"Encodage MP4…":"Exporter MP4 · "+ReplayExporter.durationLabel()+" · 60 fps",playing&&!ReplayExporter.encoding,Ui.GOLD,ReplayExporter::startMp4);
         button(g,x+w-122,y,122,19,"Configurer FFmpeg",!ReplayExporter.encoding,Ui.GOLD,()->Minecraft.getInstance().gui.setScreen(new ReplayEncoderScreen()));
         button(g,x,top+ph-30,w,19,"Prises sauvegardées",true,Ui.GOLD,()->{files=ReplayClient.files();library=true;});
     }

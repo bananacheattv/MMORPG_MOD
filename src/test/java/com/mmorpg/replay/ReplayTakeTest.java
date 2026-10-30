@@ -46,4 +46,10 @@ class ReplayTakeTest {
     @Test void rejectsTruncatedArchive()throws Exception{
         Path p=dir.resolve("short.aereplay");scene().write(p);byte[] bytes=Files.readAllBytes(p);Files.write(p,Arrays.copyOf(bytes,bytes.length/2));assertThrows(IOException.class,()->ReplayTake.read(p));
     }
+    @Test void exactFiveMinuteTakeCanBeSavedAndReopened()throws Exception{
+        var t=scene();var pose=t.frames.getFirst();t.frames.clear();
+        for(int i=0;i<ReplayTake.MAX_FRAMES;i++)t.frames.add(pose);
+        assertEquals(300,t.duration());Path p=dir.resolve("five-minutes.aereplay");t.write(p);
+        assertEquals(6001,ReplayTake.read(p).frames.size());assertEquals(300,ReplayTake.read(p).duration());
+    }
 }
