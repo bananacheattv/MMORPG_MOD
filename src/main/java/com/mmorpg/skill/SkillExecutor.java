@@ -26,7 +26,6 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.entity.projectile.arrow.Arrow;
 import net.minecraft.world.item.ItemStack;
@@ -109,11 +108,9 @@ public final class SkillExecutor {
                 Fx.cast(p, CastAnim.LEAP, 16);
                 Fx.attach(level, FxKind.PILLAR, p, 0.8, 0xFF5020, 24);
                 Fx.spawn(level, FxKind.SHOCKWAVE, pos, s.radius, 0xFF6030, 16);
-                for (Player ally : level.getEntitiesOfClass(Player.class, p.getBoundingBox().inflate(s.radius))) {
-                    if (ally instanceof ServerPlayer sp) {
-                        RpgPlayers.addBuff(sp, BuffType.WAR_CRY, s.duration, bonus, s.power2);
-                        Fx.attach(level, FxKind.HALO, sp, 0.9, 0xFF8040, 30);
-                    }
+                for (ServerPlayer sp : SkillHelper.alliesInRadius(p, s.radius)) {
+                    RpgPlayers.addBuff(sp, BuffType.WAR_CRY, s.duration, bonus, s.power2);
+                    Fx.attach(level, FxKind.HALO, sp, 0.9, 0xFF8040, 30);
                 }
                 sound(p, SoundEvents.RAVAGER_ROAR, 1f, 1.1f);
             }
@@ -428,12 +425,10 @@ public final class SkillExecutor {
                 Fx.cast(p, CastAnim.LEAP, 14);
                 Fx.spawn(level, FxKind.PILLAR, pos, 1.0, 0xFFF0A0, 22);
                 Fx.attach(level, FxKind.HALO, p, 1.6, 0xFFE080, s.duration);
-                for (Player ally : level.getEntitiesOfClass(Player.class, p.getBoundingBox().inflate(s.radius))) {
-                    if (ally instanceof ServerPlayer sp) {
-                        RpgPlayers.healPercent(sp, total * 0.4);
-                        RpgPlayers.addBuff(sp, BuffType.SACRED_AURA, s.duration, total * 0.6 / (s.duration / 20.0), 0);
-                        if (sp != p) Fx.attach(level, FxKind.HALO, sp, 1.0, 0xFFE080, 40);
-                    }
+                for (ServerPlayer sp : SkillHelper.alliesInRadius(p, s.radius)) {
+                    RpgPlayers.healPercent(sp, total * 0.4);
+                    RpgPlayers.addBuff(sp, BuffType.SACRED_AURA, s.duration, total * 0.6 / (s.duration / 20.0), 0);
+                    if (sp != p) Fx.attach(level, FxKind.HALO, sp, 1.0, 0xFFE080, 40);
                 }
                 Fx.spawn(level, FxKind.RING, pos, s.radius, 0xFFE080, 18);
                 sound(p, SoundEvents.BEACON_POWER_SELECT, 1f, 1.2f);
