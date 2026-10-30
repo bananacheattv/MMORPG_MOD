@@ -2,9 +2,9 @@
 
 ## Expéditions variables
 
-Chaque nouvelle réservation reçoit une graine persistante. Le menu des donjons annonce le parcours et le modificateur avant l’entrée (survoler une difficulté pour la description complète). Revenir dans la même réservation conserve le parcours ; libérer ou terminer l’expédition prépare une nouvelle variante.
+Chaque nouvelle réservation reçoit une graine persistante. Le menu des donjons annonce le modificateur avant l’entrée (survoler une difficulté pour la description complète). Revenir dans la même réservation conserve la variante ; libérer ou terminer l’expédition prépare une nouvelle variante.
 
-Trois galeries : ouest, est et sinueuse. Les obstacles changent le passage sans contourner les herses ni les épreuves obligatoires. Les embuscades changent d’activation et de difficulté. Les modificateurs sont : renforts (+20 % de vie), brume (ralentissement bref périodique), surcharge (cercle annoncé pendant deux secondes, puis décharge évitable).
+Les embuscades changent d’activation et de difficulté. Les modificateurs sont : renforts (+20 % de vie), brume (ralentissement bref périodique), surcharge (cercle annoncé pendant deux secondes, puis décharge évitable).
 
 Une alcôve runique facultative est ajoutée dans la deuxième salle. Tourner les trois runes 3D selon la gravure ouvre un passage et débloque l’aura arcanique. Deux classes distinctes placées sur les deux socles ouvrent le second sceau et débloquent une traînée d’étoiles. Ces secrets ne bloquent jamais la progression principale et leurs récompenses ne sont données qu’une fois par joueur et expédition.
 
