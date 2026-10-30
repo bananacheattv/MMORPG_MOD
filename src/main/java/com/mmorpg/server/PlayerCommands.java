@@ -76,6 +76,7 @@ public final class PlayerCommands {
                         c.getSource().sendFailure(Component.literal("Vous ne pouvez pas vous payer vous-même."));
                         return 0;
                     }
+                    if (com.mmorpg.hub.ClassTrial.refuseTransfer(from, to)) return 0;
                     RpgPlayers.depositCoins(from);
                     if (!RpgPlayers.takeGold(from, amount)) {
                         c.getSource().sendFailure(Component.literal("Or insuffisant."));

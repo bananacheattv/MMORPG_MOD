@@ -156,10 +156,32 @@ public final class DevTradeChecks {
             check(!TradeManager.active(a), "trop loin : pas d'echange");
             b.snapTo(host.getX() + 2, host.getY(), host.getZ());
 
+            // --- essai de classe : or et sac sont restaures a la fin de l'essai, aucun echange ni paiement possible
+            com.mmorpg.hub.ClassTrial.data(a).inTrial = true;
+            try {
+                TradeManager.request(a, b, "TradeB");
+                TradeManager.accept(b);
+                check(!TradeManager.active(a), "essai de classe : demande d'echange refusee");
+                TradeManager.request(b, a, "TradeA");
+                TradeManager.accept(a);
+                check(!TradeManager.active(a) && !TradeManager.active(b), "essai de classe : impossible d'accepter un echange");
+                check(com.mmorpg.hub.ClassTrial.refuseTransfer(b, a) && com.mmorpg.hub.ClassTrial.refuseTransfer(a, null), "essai de classe : paiement refuse dans les deux sens");
+            } finally {
+                com.mmorpg.hub.ClassTrial.data(a).inTrial = false;
+            }
+            open(a, b);
+            com.mmorpg.hub.ClassTrial.data(b).inTrial = true;
+            try {
+                act(a, "gold", 0, 10);
+                check(!TradeManager.active(a) && !TradeManager.active(b), "joueur en essai pendant un echange : echange annule");
+            } finally {
+                com.mmorpg.hub.ClassTrial.data(b).inTrial = false;
+            }
+
             // --- conservation : total d'objets et d'or identique a la fin de tous les scenarios
             check(count(a, Items.NETHERITE_SWORD) + count(b, Items.NETHERITE_SWORD) == 1, "une seule epee existe encore");
             check(RpgPlayers.get(a).gold + RpgPlayers.get(b).gold == 600, "l'or total est conserve");
-            MMORPG.LOGGER.info("[TRADE CHECKS] TRADE_PASS: demande/acceptation, double confirmation, delai de securite, annulation sans perte, objet deplace ou remplace, inventaire plein, or conserve");
+            MMORPG.LOGGER.info("[TRADE CHECKS] TRADE_PASS: demande/acceptation, double confirmation, delai de securite, annulation sans perte, objet deplace ou remplace, inventaire plein, essai de classe, or conserve");
         } finally {
             TradeManager.clear();
         }

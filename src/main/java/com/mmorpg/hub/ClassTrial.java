@@ -70,6 +70,17 @@ public final class ClassTrial {
         return p != null && data(p).inTrial;
     }
 
+    /**
+     * Refuse un transfert d'or ou d'objets (paiement, echange, banque, hotel des ventes) si l'un des joueurs est en essai : son or et
+     * son sac sont restaures a la fin de l'essai, le transfert serait donc duplique (ou perdu).
+     */
+    public static boolean refuseTransfer(ServerPlayer p, @Nullable ServerPlayer other) {
+        String why = active(p) ? "Impossible pendant un essai de classe." : other != null && active(other) ? other.getGameProfile().name() + " est en essai de classe." : null;
+        if (why == null) return false;
+        p.sendOverlayMessage(Component.literal(why).withColor(0xFF8080));
+        return true;
+    }
+
     // ================================================================== demarrage
 
     /** Demarre (ou change) l'essai d'une classe. Renvoie un message d'erreur, ou null en cas de succes. */
@@ -83,6 +94,7 @@ public final class ClassTrial {
         if (!hub.exists() || hubLevel == null) return "Le hub n'a pas été construit (/mmorpg hub).";
         if (p.isSpectator()) return "Impossible en mode spectateur.";
         if (CinematicManager.isLocked(p)) return "Patientez, la cinématique est en cours.";
+        if (com.mmorpg.economy.TradeManager.active(p)) return "Terminez d'abord votre échange en cours.";
         HubPlayerData hd = data(p);
         PlayerData d = RpgPlayers.get(p);
         boolean fresh = !hd.inTrial;

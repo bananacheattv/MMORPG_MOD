@@ -98,7 +98,7 @@ public final class Leaderboards {
     }
 
     public static void sample(MinecraftServer server, ServerPlayer p) {
-        if (com.mmorpg.network.NetworkPlayers.inTransit(p)) return;
+        if (com.mmorpg.network.NetworkPlayers.inTransit(p) || com.mmorpg.hub.ClassTrial.active(p)) return;      // essai : niveau et equipement d'emprunt
         var d = RpgPlayers.get(p);
         if (!d.playerClass.isPlayable()) return;
         UUID id = p.getUUID();
