@@ -28,6 +28,8 @@ import java.util.*;
 public final class ReplayServer {
     private static final Map<UUID, Session> SESSIONS = new HashMap<>();
     private static final Map<UUID, Long> REQUESTS = new HashMap<>();
+    /** Players who received a lease: only they need a revocation (no packet every second to every other player). */
+    private static final Set<UUID> LEASED = new HashSet<>();
     private static final String RECOVERY="aeloria_replay_return";
     private record Session(GameType mode, ResourceKey<Level> dimension, Vec3 position, float yaw, float pitch, long deadline) {}
     public static boolean allowed(ServerPlayer p) {
@@ -92,14 +94,15 @@ public final class ReplayServer {
             Session s = SESSIONS.get(p.getUUID());
             if (!allowed(p) || (s != null && (now > s.deadline() || p.level().dimension() != s.dimension()
                     || p.gameMode.getGameModeForPlayer() != GameType.SPECTATOR))) {
-                if (s != null) { restore(p); reply(p, "revoked"); }
-                // A permission revocation must also stop a client-side recording/menu.
-                else reply(p, "revoked");
-            } else reply(p, "lease");
+                boolean leased = LEASED.remove(p.getUUID());
+                if (s != null) restore(p);
+                // A permission revocation must also stop a client-side recording/menu (sent once).
+                if (s != null || leased) reply(p, "revoked");
+            } else { LEASED.add(p.getUUID()); reply(p, "lease"); }
         }
     }
     @SubscribeEvent public static void logout(PlayerEvent.PlayerLoggedOutEvent e) {
-        if (e.getEntity() instanceof ServerPlayer p) { restore(p); REQUESTS.remove(p.getUUID()); }
+        if (e.getEntity() instanceof ServerPlayer p) { restore(p); REQUESTS.remove(p.getUUID()); LEASED.remove(p.getUUID()); }
     }
     @SubscribeEvent public static void login(PlayerEvent.PlayerLoggedInEvent e) {
         if(!(e.getEntity() instanceof ServerPlayer p)||!p.getPersistentData().contains(RECOVERY))return;
@@ -111,5 +114,5 @@ public final class ReplayServer {
         }catch(Exception ex){MMORPG.LOGGER.error("Replay : récupération de session impossible pour {}",p.getUUID(),ex);}
     }
     @SubscribeEvent public static void stopping(ServerStoppingEvent e){for(var p:e.getServer().getPlayerList().getPlayers())restore(p);}
-    @SubscribeEvent public static void stopped(ServerStoppedEvent e) { SESSIONS.clear(); REQUESTS.clear(); }
+    @SubscribeEvent public static void stopped(ServerStoppedEvent e) { SESSIONS.clear(); REQUESTS.clear(); LEASED.clear(); }
 }

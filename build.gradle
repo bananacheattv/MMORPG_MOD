@@ -68,6 +68,8 @@ neoForge {
                 if (project.hasProperty('freshWorld')) jvmArgument '-Dmmorpg.freshWorld=true'
                 if (project.hasProperty('clicsize')) jvmArgument '-Dmmorpg.clicsize=' + project.property('clicsize')
             }
+            // Atelier replay (dev uniquement, jamais en production) : -PreplayClientChecks -PmpServer=localhost -Pusername=ReplayChecks
+            if (project.hasProperty('replayClientChecks')) jvmArgument '-Dmmorpg.replayClientChecks=true'
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
@@ -85,6 +87,9 @@ neoForge {
             if (project.hasProperty('guideVisual')) systemProperty 'mmorpg.guideVisual', 'true'
             if (project.hasProperty('socialVisual')) systemProperty 'mmorpg.socialVisual', 'true'
             if (project.hasProperty('expansionVisual')) systemProperty 'mmorpg.expansionVisual', 'true'
+            // Atelier replay : controles serveur (-PreplayChecks), puis attente du client de test (-PreplayClientChecks)
+            if (project.hasProperty('replayChecks')) systemProperty 'mmorpg.replayChecks', 'true'
+            if (project.hasProperty('replayClientChecks')) systemProperty 'mmorpg.replayClientChecks', 'true'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 

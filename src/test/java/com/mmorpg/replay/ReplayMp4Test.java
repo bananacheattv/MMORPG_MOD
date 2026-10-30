@@ -10,6 +10,10 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 class ReplayMp4Test {
     @TempDir Path dir;
+    /** Same local file name as ReplayMp4.encoder: ffmpeg.exe on Windows, ffmpeg elsewhere. */
+    private static boolean provisioned(){
+        return Files.isExecutable(Path.of("run/aeloria-replays/"+(System.getProperty("os.name").startsWith("Windows")?"ffmpeg.exe":"ffmpeg")));
+    }
     @Test void configuredPathWithShellCharactersIsNotExecutedAsAShellCommand()throws Exception{
         Files.createDirectories(dir.resolve("aeloria-replays"));
         Files.writeString(dir.resolve("aeloria-replays/ffmpeg-path.txt"),"missing-encoder & echo should-not-run");
@@ -17,7 +21,7 @@ class ReplayMp4Test {
     }
     @Test void actualEncoderProducesMp4AndRetainsFrames()throws Exception{
         // Optional integration dependency; native replay QA also exercises this with a provisioned encoder.
-        assumeTrue(Files.isExecutable(Path.of("run/aeloria-replays/ffmpeg.exe")));
+        assumeTrue(provisioned());
         String encoder=ReplayMp4.encoder(Path.of("run"));
         for(int f=0;f<6;f++){
             var im=new BufferedImage(33,19,BufferedImage.TYPE_INT_RGB);
@@ -29,7 +33,7 @@ class ReplayMp4Test {
         assertTrue(Files.exists(dir.resolve("image-000005.png")));assertFalse(Files.exists(dir.resolve("clip-encoding.mp4")));
     }
     @Test void streamsACompleteFiveMinuteMp4WithoutPngIntermediates()throws Exception{
-        assumeTrue(Files.isExecutable(Path.of("run/aeloria-replays/ffmpeg.exe")));
+        assumeTrue(provisioned());
         String encoder=ReplayMp4.encoder(Path.of("run"));
         var pixels=java.nio.ByteBuffer.allocateDirect(32*18*4);
         for(int i=0;i<32*18;i++)pixels.putInt(0xFF30A0FF);pixels.flip();
@@ -43,10 +47,13 @@ class ReplayMp4Test {
         Path progress=dir.resolve("decode-progress.txt");
         var decode=new ProcessBuilder(encoder,"-nostdin","-v","error","-i",file.toString(),"-f","null","-","-progress",progress.toString()).redirectOutput(ProcessBuilder.Redirect.DISCARD).redirectError(dir.resolve("decode.log").toFile()).start();
         assertTrue(decode.waitFor(90,java.util.concurrent.TimeUnit.SECONDS));assertEquals(0,decode.exitValue());
-        String report=Files.readString(progress);assertTrue(report.contains("frame=18000"),report);assertTrue(report.contains("out_time=00:05:00.000000"),report);
+        String report=Files.readString(progress);assertTrue(report.contains("frame=18000"),report);
+        // Depending on the FFmpeg version, out_time is the start (299.983 s) or the end (300 s) of the last frame.
+        long micros=Long.parseLong(report.lines().filter(l->l.startsWith("out_time_us=")).reduce((a,b)->b).orElseThrow().substring(12).trim());
+        assertTrue(Math.abs(micros-300_000_000L)<=1_000_000/60+1,report);
     }
     @Test void streamRejectsWrongPixelCountAndAbortDoesNotPublishAnMp4()throws Exception{
-        assumeTrue(Files.isExecutable(Path.of("run/aeloria-replays/ffmpeg.exe")));
+        assumeTrue(provisioned());
         try(var stream=new ReplayMp4.StreamEncoder(ReplayMp4.encoder(Path.of("run")),dir,32,18)){
             assertThrows(java.io.IOException.class,()->stream.write(java.nio.ByteBuffer.allocate(4)));stream.abort();
         }assertFalse(Files.exists(dir.resolve("clip.mp4")));

@@ -14,6 +14,11 @@ public final class ReplayScreen extends MmoScreen {
     public ReplayScreen(){super("Atelier Replay — administrateur");}
     @Override protected boolean hasNav(){return false;}
     @Override protected int designHeight(){return 272;}
+    // Key mappings never fire while a screen is open: F8 closes the workshop here, as the status bar says.
+    @Override public boolean keyPressed(net.minecraft.client.input.KeyEvent event){
+        if(ReplayControls.MENU.matches(event)){onClose();return true;}
+        return super.keyPressed(event);
+    }
     @Override protected void renderContent(GuiGraphicsExtractor g,int mx,int my,float partial){
         Ui.panel(g,left,top,pw,ph);
         int x=left+12,y=top+10,w=pw-24,col=(w-12)/3;

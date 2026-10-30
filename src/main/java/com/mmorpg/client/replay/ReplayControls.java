@@ -12,13 +12,12 @@ import net.neoforged.neoforge.client.event.*;
 
 @EventBusSubscriber(modid=MMORPG.MODID,value=Dist.CLIENT)
 public final class ReplayControls {
-    private static final KeyMapping MENU=new KeyMapping("key.mmorpg.replay",InputConstants.KEY_F8,Keys.CATEGORY);
+    static final KeyMapping MENU=new KeyMapping("key.mmorpg.replay",InputConstants.KEY_F8,Keys.CATEGORY);
     @SubscribeEvent public static void keys(RegisterKeyMappingsEvent e){e.register(MENU);}
     @SubscribeEvent public static void tick(ClientTickEvent.Post e){
         while(MENU.consumeClick()){
             var mc=Minecraft.getInstance();
-            if(mc.gui.screen() instanceof ReplayScreen)mc.gui.setScreen(null);
-            else if(ReplayClient.authorized()&&mc.gui.screen()==null)ReplayClient.request("open");
+            if(ReplayClient.authorized()&&mc.gui.screen()==null)ReplayClient.request("open");
         }
     }
     @SubscribeEvent public static void layers(RenderGuiLayerEvent.Pre e){
