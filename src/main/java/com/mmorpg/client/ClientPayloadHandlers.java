@@ -94,6 +94,7 @@ public final class ClientPayloadHandlers {
                 else mc.gui.setScreen(new com.mmorpg.client.screen.AdminFeaturesScreen(payload.extra()));
             }
             case S2COpenScreen.COMPRESSOR -> mc.gui.setScreen(new com.mmorpg.client.screen.CompressorScreen(BlockPos.of(payload.extra().getLongOr("pos", 0))));
+            case S2COpenScreen.QUEST_OFFER -> { if (mc.gui.screen() == null) mc.gui.setScreen(new com.mmorpg.client.screen.QuestOfferScreen(payload.extra())); }
             case S2COpenScreen.QUEST_GIVER -> mc.gui.setScreen(new com.mmorpg.client.screen.QuestGiverScreen(payload.extra()));
             case S2COpenScreen.SHOP -> mc.gui.setScreen(new com.mmorpg.client.screen.ShopScreen(payload.extra()));
             case S2COpenScreen.DUNGEON_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.DungeonMasterScreen(payload.extra()));

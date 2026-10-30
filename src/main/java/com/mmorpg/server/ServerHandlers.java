@@ -73,10 +73,11 @@ public final class ServerHandlers {
     public static void questAction(Payloads.QuestAction p, IPayloadContext ctx) {
         if (!(ctx.player() instanceof ServerPlayer sp)) return;
         switch (p.action()) {
-            case Payloads.QuestAction.ACCEPT -> QuestManager.accept(sp, p.quest(), p.npc());
+            case Payloads.QuestAction.ACCEPT -> { if (p.npc() < 0) QuestOffers.accept(sp, p.quest()); else QuestManager.accept(sp, p.quest(), p.npc()); }
             case Payloads.QuestAction.COMPLETE -> QuestManager.complete(sp, p.quest(), p.npc());
             case Payloads.QuestAction.ABANDON -> QuestManager.abandon(sp, p.quest());
             case Payloads.QuestAction.TRACK -> QuestManager.track(sp, p.quest());
+            case Payloads.QuestAction.DECLINE -> QuestOffers.decline(sp, p.quest());
             default -> {
             }
         }
