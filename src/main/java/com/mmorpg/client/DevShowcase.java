@@ -452,6 +452,10 @@ public final class DevShowcase {
         mc.options.pauseOnLostFocus = false;
         if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.PauseScreen && !MODE.equals("interface")) mc.gui.setScreen(null);
         String me = mc.player.getName().getString();
+        if (MODE.equals("revue")) {          // plantages corriges par la revue du code (bouton Personnage, fenetre 4:3)
+            DevReviewChecks.tick(mc);
+            return;
+        }
         if (MODE.equals("orientation_scene")) {
             if(tick==0)mc.getSingleplayerServer().execute(()->{
                 var server=mc.getSingleplayerServer();var p=server.getPlayerList().getPlayerByName(me);var level=server.overworld();

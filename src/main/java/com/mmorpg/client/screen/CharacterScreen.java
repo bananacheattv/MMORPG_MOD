@@ -100,7 +100,8 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
             else if(slot.index>=5&&slot.index<9){sx=0;sy=(slot.index-5)*20+4;}
             layoutPositions.put(slot,new int[]{sx,sy});var access=(com.mmorpg.mixin.SlotPositionAccessor)slot;access.aeloria$x(sx);access.aeloria$y(sy);
         }
-
+        // un clic rapide sur l'onglet arrive avant la premiere image (relachement du bouton) : la disposition doit deja exister
+        prepareLayout();
     }
 
     @Override
@@ -288,13 +289,18 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
             int tier = d.evolutionTier();
             int reachedX = tx0 + (int) ((tx1 - tx0) * Math.min(1f, (d.level - 1) / 99f));
             g.fillGradient(tx0, ty + 4, reachedX, ty + 6, Ui.GOLD_LIGHT, Ui.GOLD_DARK);
+            int widest = 0;
+            for (String evolution : cls.evolutions) widest = Math.max(widest, font.width(evolution));
+            boolean compact = widest > (tx1 - tx0) / 2;     // fenetre etroite : les etiquettes se chevauchent, seul le palier actuel est ecrit
             for (int i = 0; i < 5; i++) {
                 int nx = tx0 + (tx1 - tx0) * i / 4;
                 boolean reached = i <= tier;
                 Ui.diamond(g, nx, ty + 5, i == tier ? 5 : 4, reached ? Ui.GOLD : 0xFF4A4038);
                 Ui.diamond(g, nx, ty + 5, i == tier ? 2 : 1, reached ? (i == tier ? 0xFFFFFFFF : cls.color) : 0xFF201818);
-                int ly = i % 2 == 0 ? ty + 10 : ty - 22;     // etiquettes alternees au-dessus / au-dessous de la ligne
-                int labelX=Math.clamp(nx,x2+font.width(cls.evolutions[i])/2,px+pw-9-font.width(cls.evolutions[i])/2);
+                if (compact && i != tier) continue;
+                int ly = compact || i % 2 == 0 ? ty + 10 : ty - 22;     // etiquettes alternees au-dessus / au-dessous de la ligne
+                int half=font.width(cls.evolutions[i])/2,lo=x2+half,hi=px+pw-9-half;
+                int labelX=lo>hi?(lo+hi)/2:Math.clamp(nx,lo,hi);          // fenetre etroite : Math.clamp refuse un minimum superieur au maximum
                 Ui.scaledText(g, cls.evolutions[i], labelX, ly, 1f, i == tier ? cls.color : reached ? Ui.TEXT : Ui.MUTED, true);
                 Ui.scaledText(g, "Niv. " + PlayerClass.EVOLUTION_LEVELS[i], labelX, ly + 10, 1f, Ui.MUTED, true);
             }
