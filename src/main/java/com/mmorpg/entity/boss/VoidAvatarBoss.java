@@ -87,7 +87,7 @@ public class VoidAvatarBoss extends RpgBoss {
                         }
                         for (LivingEntity e : MobAbilities.enemiesAround(this, c, 14)) {
                             Vec3 pull = c.subtract(e.position()).normalize().scale(0.25);
-                            if(com.mmorpg.combat.CrowdControl.allow(e))e.push(pull.x, 0.02, pull.z);
+                            if(com.mmorpg.combat.CrowdControl.allow(e)){e.push(pull.x, 0.02, pull.z);if(e instanceof net.minecraft.server.level.ServerPlayer sp)com.mmorpg.anticheat.AntiCheat.grace(sp, 40);}
                             e.needsSync = true;
                         }
                     });
