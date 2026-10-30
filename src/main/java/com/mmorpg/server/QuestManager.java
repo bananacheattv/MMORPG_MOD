@@ -218,7 +218,8 @@ public final class QuestManager {
         NpcEntity npc = nearGiver(p, npcId);
         PlayerData d = RpgPlayers.get(p);
         QuestDef q = def(id);
-        if (npc == null || q == null || !matchesNpc(q, npc) || !isAvailable(d, id, q, npc.group())) return;
+        // les quetes hebdomadaires ne se prennent qu'a la pancarte (tirage de la semaine, une par palier)
+        if (npc == null || q == null || q.weekly || !matchesNpc(q, npc) || !isAvailable(d, id, q, npc.group())) return;
         if (d.activeQuests.size() >= MAX_ACTIVE) {
             p.sendOverlayMessage(Component.literal("Journal de quêtes plein (" + MAX_ACTIVE + " quêtes maximum).").withColor(0xFF5050));
             return;
