@@ -8,7 +8,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -112,10 +111,5 @@ public final class DungeonManager {
             }
         }
         level.sendParticles(ParticleTypes.SMOKE, (t.gate().get(0) + t.gate().get(3)) / 2.0, t.gate().get(1) + 1.5, (t.gate().get(2) + t.gate().get(5)) / 2.0, 12, 1.5, 1, 0.3, 0.01);
-    }
-
-    @SuppressWarnings("unused")
-    private static Entity unused() {
-        return null;
     }
 }
