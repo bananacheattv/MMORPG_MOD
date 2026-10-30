@@ -163,6 +163,7 @@ public final class TradeManager {
             msg(from, "Vous ne pouvez pas échanger avec vous-même.", 0xFF6060);
             return;
         }
+        if (com.mmorpg.hub.ClassTrial.refuseTransfer(from, target)) return;
         if (SESSIONS.containsKey(from.getUUID())) {
             msg(from, "Vous êtes déjà en train d'échanger.", 0xFF6060);
             return;
@@ -203,6 +204,7 @@ public final class TradeManager {
             msg(p, "Ce joueur n'est plus connecté.", 0xFF6060);
             return;
         }
+        if (com.mmorpg.hub.ClassTrial.refuseTransfer(p, from)) return;
         if (SESSIONS.containsKey(p.getUUID()) || SESSIONS.containsKey(from.getUUID())) {
             msg(p, "Un des deux joueurs est déjà en train d'échanger.", 0xFF6060);
             return;
@@ -245,6 +247,10 @@ public final class TradeManager {
         ServerPlayer pb = resolve(server, s.b.id);
         if (pa == null || pb == null) {
             cancel(s, "L'autre joueur n'est plus là.");
+            return;
+        }
+        if (com.mmorpg.hub.ClassTrial.active(pa) || com.mmorpg.hub.ClassTrial.active(pb)) {
+            cancel(s, "Échange annulé : essai de classe en cours.");
             return;
         }
         Side me = s.of(p.getUUID());
@@ -367,8 +373,8 @@ public final class TradeManager {
         RpgPlayers.takeGold(pb, s.b.gold);
         give(pa, fromB);
         give(pb, fromA);
-        RpgPlayers.addGold(pa, s.b.gold, false);
-        RpgPlayers.addGold(pb, s.a.gold, false);
+        RpgPlayers.transferGold(pa, s.b.gold, false);
+        RpgPlayers.transferGold(pb, s.a.gold, false);
         journal(pa.level().getServer(), s, "trade", gaveA, gaveB);
         finish(s, pa, pb, "Échange terminé.", 0x60E060);
     }

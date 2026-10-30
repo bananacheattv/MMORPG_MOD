@@ -4,7 +4,6 @@ import com.mmorpg.MMORPG;
 import com.mmorpg.dungeon.InstanceData.Slot;
 import com.mmorpg.network.Net;
 import com.mmorpg.network.Payloads;
-import com.mmorpg.rpg.PlayerData;
 import com.mmorpg.server.PartyManager;
 import com.mmorpg.server.RpgPlayers;
 import com.mmorpg.world.DungeonBuilder;
@@ -614,10 +613,5 @@ public final class InstanceManager {
             if (s.owner.equals(owner)) {DungeonVariants.finish(server,s.pool,s.owner);s.owner = "";}
         }
         InstanceData.get(server).dirty();
-    }
-
-    @SuppressWarnings("unused")
-    private static PlayerData unused(ServerPlayer p) {
-        return RpgPlayers.get(p);
     }
 }

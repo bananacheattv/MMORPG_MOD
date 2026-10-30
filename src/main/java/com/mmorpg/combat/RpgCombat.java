@@ -115,7 +115,7 @@ public final class RpgCombat {
     /** Une competence peut-elle toucher cette cible ? (evite de blesser animaux, villageois, familiers et allies) */
     public static boolean isEnemy(Entity attacker, Entity target) {
         if (!(target instanceof LivingEntity living) || !living.isAlive() || target == attacker) return false;
-        if (target instanceof PetEntity) return false;
+        if (target instanceof PetEntity || target instanceof com.mmorpg.entity.MountEntity) return false;   // la monture renvoie deja les coups a son cavalier
         if(attacker instanceof com.mmorpg.competition.GuildGuardian guardian&&target instanceof Player player&&!com.mmorpg.competition.GuildRaids.allowed(guardian,player.getUUID()))return false;
         if (target instanceof Player p) {
             if (p.isCreative() || p.isSpectator()) return false;

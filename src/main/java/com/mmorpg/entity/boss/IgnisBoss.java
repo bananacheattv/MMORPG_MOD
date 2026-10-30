@@ -81,6 +81,7 @@ public class IgnisBoss extends RpgBoss {
                         Scheduler.later(level, t, () -> level.sendParticles(ParticleTypes.LAVA, impact.x, impact.y + 12 - tt * 0.6, impact.z, 3, 0.2, 0.2, 0.2, 0));
                     }
                     Scheduler.later(level, 20, () -> {
+                        if (!this.isAlive() || this.isRemoved()) return;          // boss vaincu pendant la chute : plus de meteore
                         level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, impact.x, impact.y, impact.z, 1, 0, 0, 0, 0);
                         level.playSound(null, impact.x, impact.y, impact.z, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.HOSTILE, 2f, 0.8f);
                         for (LivingEntity v : MobAbilities.enemiesAround(this, impact, 3.5)) {

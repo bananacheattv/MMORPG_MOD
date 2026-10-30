@@ -35,6 +35,19 @@ public final class SkillHelper {
                 e -> e.position().add(0, e.getBbHeight() / 2, 0).distanceTo(center) <= radius + e.getBbWidth() / 2 && RpgCombat.isEnemy(p, e));
     }
 
+    /** Joueurs que les soins et renforts de zone visent : le lanceur, ses coequipiers en arene, ailleurs ceux qu'il ne peut pas frapper (groupe, zone sans PvP). */
+    public static List<ServerPlayer> alliesInRadius(ServerPlayer p, double radius) {
+        var arena = com.mmorpg.competition.ArenaManager.session(p.getUUID());
+        List<ServerPlayer> out = new ArrayList<>();
+        for (var e : p.level().getEntitiesOfClass(ServerPlayer.class, p.getBoundingBox().inflate(radius))) {
+            if (e != p && (!e.isAlive() || e.isSpectator())) continue;
+            var other = com.mmorpg.competition.ArenaManager.session(e.getUUID());
+            boolean ally = e == p || (arena != null || other != null ? arena == other && !arena.match.enemy(p.getUUID(), e.getUUID()) : !RpgCombat.isEnemy(p, e));
+            if (ally) out.add(e);
+        }
+        return out;
+    }
+
     public static List<LivingEntity> enemiesInCone(ServerPlayer p, double range, double angleDeg) {
         Vec3 eye = p.getEyePosition();
         Vec3 look = p.getLookAngle();

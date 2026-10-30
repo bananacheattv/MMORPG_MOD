@@ -271,8 +271,8 @@ public final class FishingEvents {
                     .append(p.getDisplayName().copy().withColor(0xFFFFFFFF)).append(Component.literal(" a pêché ").withColor(0xFFB9ABCF))
                     .append(name.copy()).append(Component.literal(size > 0 ? " (" + size + " cm) !" : " !").withColor(0xFFB9ABCF)), false);
         }
-        com.mmorpg.achievement.Achievements.add(p, entry.kind() == FishCatalog.Kind.TRESOR ? com.mmorpg.achievement.Achievement.TREASURES_FISHED
-                : com.mmorpg.achievement.Achievement.FISH_CAUGHT, count);
+        com.mmorpg.achievement.Achievements.add(p, com.mmorpg.achievement.Achievement.FISH_CAUGHT, count);      // toute prise compte, coffres compris
+        if (entry.kind() == FishCatalog.Kind.TRESOR) com.mmorpg.achievement.Achievements.add(p, com.mmorpg.achievement.Achievement.TREASURES_FISHED, count);
 
         if (entry.kind() == FishCatalog.Kind.DECHET) return;
         // prises bonus du metier : poisson rare, ingredient marin (sans experience en plus)

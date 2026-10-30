@@ -16,8 +16,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -117,7 +115,7 @@ public final class TrialManager {
         }
         BARS.entrySet().removeIf(entry->{if(active.contains(entry.getKey()))return false;entry.getValue().removeAllPlayers();return true;});
     }
-    @SubscribeEvent public static void stopped(net.neoforged.neoforge.event.server.ServerStoppedEvent event){BARS.values().forEach(net.minecraft.server.level.ServerBossEvent::removeAllPlayers);BARS.clear();WAVES.clear();SIMON.clear();ORDER.clear();HITS.clear();SEEN.clear();}
+    @SubscribeEvent public static void stopped(net.neoforged.neoforge.event.server.ServerStoppedEvent event){BARS.values().forEach(net.minecraft.server.level.ServerBossEvent::removeAllPlayers);BARS.clear();WAVES.clear();SIMON.clear();ORDER.clear();HITS.clear();SEEN.clear();JUMP_PROGRESS.clear();JUMP_LAST.clear();LAST_CLICK.clear();}
 
     private static List<ServerPlayer> inside(ServerLevel level, Trial t) {
         List<ServerPlayer> out = new ArrayList<>();
@@ -175,9 +173,13 @@ public final class TrialManager {
         }
     }
 
-    /** Quatre vagues, cinq aux difficultes elevees. */
     static int waveCount(Trial t) {
-        return 5 + (t.diff() >= 2 ? 1 : 0);
+        return waveCount(t.diff());
+    }
+
+    /** Cinq vagues, six aux difficultes elevees. */
+    static int waveCount(int diff) {
+        return 5 + (diff >= 2 ? 1 : 0);
     }
 
     // ================================================================== gardien d'elite et embuscades
@@ -339,8 +341,8 @@ public final class TrialManager {
         JUMP_PROGRESS.computeIfAbsent(t.id(), k -> new HashMap<>()).put(p.getUUID(), 0);
     }
 
-    /** Derniere position (x, z, dans le parcours ?) vue pour chaque joueur, pour detecter les deplacements instantanes. */
-    private static final Map<UUID, double[]> JUMP_LAST = new HashMap<>();
+    /** Derniere position (x, z) vue dans chaque parcours pour chaque joueur, pour detecter les deplacements instantanes. */
+    private static final Map<String, Map<UUID, double[]>> JUMP_LAST = new HashMap<>();
 
     /** Parcours de saut non termine qui contient ce point (null sinon). */
     private static Trial jumpAt(ServerLevel level, double x, double y, double z) {
@@ -379,14 +381,14 @@ public final class TrialManager {
         double fallY = t.box().get(1);
         int last = (z1 - z0) / JUMP_SPAN;
         Map<UUID, Integer> progress = JUMP_PROGRESS.computeIfAbsent(t.id(), k -> new HashMap<>());
+        Map<UUID, double[]> seen = JUMP_LAST.computeIfAbsent(t.id(), k -> new HashMap<>());
         for (ServerPlayer p : level.players()) {
             if (!p.isAlive() || p.isSpectator() || p.getAbilities().flying) continue;
             int reached = progress.getOrDefault(p.getUUID(), 0);
             boolean inBox = p.getX() >= x0 && p.getX() < x1 + 1 && p.getZ() >= z0 && p.getZ() < z1 + 1;
-            double[] before = JUMP_LAST.get(p.getUUID());
-            JUMP_LAST.put(p.getUUID(), new double[]{p.getX(), p.getZ(), inBox ? 1 : 0});
+            double[] before = inBox ? seen.put(p.getUUID(), new double[]{p.getX(), p.getZ()}) : seen.remove(p.getUUID());
             // deplacement impossible a pied en 0,25 s (perle, fruit de chorus, commande...) : on ne gagne pas de terrain ainsi
-            if (!t.done() && inBox && before != null && before[2] == 1 && Math.hypot(p.getX() - before[0], p.getZ() - before[1]) > 7) {
+            if (!t.done() && inBox && before != null && Math.hypot(p.getX() - before[0], p.getZ() - before[1]) > 7) {
                 backToStart(level, t, p, "Le parcours doit être traversé à pied : retour au départ.");
                 continue;
             }
@@ -575,6 +577,7 @@ public final class TrialManager {
     /** Oublie l'etat en cours d'une epreuve (remise a zero du donjon). */
     static void forget(String id) {
         JUMP_PROGRESS.remove(id);
+        JUMP_LAST.remove(id);
         WAVES.remove(id);
         SIMON.remove(id);
         ORDER.remove(id);
@@ -727,10 +730,5 @@ public final class TrialManager {
         }
         BlockPos mid = new BlockPos((t.gate().get(0) + t.gate().get(3)) / 2, t.gate().get(1) + 1, (t.gate().get(2) + t.gate().get(5)) / 2);
         level.playSound(null, mid, com.mmorpg.registry.ModSounds.DOOR.get(), SoundSource.BLOCKS, 1.4F, 0.7F);
-    }
-
-    @SuppressWarnings("unused")
-    private static SoundEvent unused() {
-        return SoundEvents.ANVIL_BREAK;
     }
 }

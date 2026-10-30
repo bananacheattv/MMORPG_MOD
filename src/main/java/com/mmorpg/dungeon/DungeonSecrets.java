@@ -33,8 +33,9 @@ public final class DungeonSecrets {
     }
     private static void door(ServerLevel l,BlockPos o,Block block){for(int z=-1;z<=1;z++)for(int y=0;y<3;y++)l.setBlock(o.offset(17,y,Layout.R2.z()+z),block.defaultBlockState(),2);}
     private static void reward(ServerPlayer p,long seed,String kind){
-        var d=RpgPlayers.get(p);String receipt="secret:"+seed+":"+kind;if(d.guildReceipts.getBooleanOr(receipt,false))return;
-        String id=kind.equals("runes")?"aura_arcane":"trainee_etoiles";d.cosmetics.add(id);d.guildReceipts.putBoolean(receipt,true);d.dirty=true;RpgPlayers.sync(p);
+        var d=RpgPlayers.get(p);String id=kind.equals("runes")?"aura_arcane":"trainee_etoiles";
+        if(!d.cosmetics.add(id))return;          // deja debloque : rien a redire (le sceau de classes est reverifie chaque seconde)
+        d.dirty=true;RpgPlayers.sync(p);
         p.sendSystemMessage(Component.literal("Secret découvert : "+(kind.equals("runes")?"Aura arcanique":"Traînée d’étoiles")+" débloquée !").withColor(0xC090FF));
     }
     @SubscribeEvent public static void interact(PlayerInteractEvent.RightClickBlock e){

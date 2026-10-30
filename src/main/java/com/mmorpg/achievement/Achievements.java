@@ -35,7 +35,7 @@ public final class Achievements {
 
     /** Releve un compteur de type "maximum" (niveaux). */
     public static void max(ServerPlayer p, String stat, long value) {
-        if (!com.mmorpg.server.FeatureFlags.enabled(p.level().getServer(), "succes")) return;
+        if (com.mmorpg.hub.ClassTrial.active(p) || !com.mmorpg.server.FeatureFlags.enabled(p.level().getServer(), "succes")) return;
         PlayerData d = RpgPlayers.get(p);
         if (d.counters.getOrDefault(stat, 0L) >= value) return;
         d.counters.put(stat, value);

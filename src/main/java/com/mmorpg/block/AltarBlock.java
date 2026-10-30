@@ -65,7 +65,9 @@ public class AltarBlock extends MultiblockMasterBlock {
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (stack.getItem() instanceof SummonKeyItem key) {
             if (player instanceof ServerPlayer sp && level instanceof ServerLevel sl) {
-                if (BossManager.summon(sl, pos, key.bossKey(), sp)) {
+                if (state.getValue(ACTIVE)) {                                   // rituel en cours : le boss n'est pas encore apparu
+                    sp.sendOverlayMessage(Component.literal("Une invocation est déjà en cours sur cet autel.").withColor(0xFF5050));
+                } else if (BossManager.summon(sl, pos, key.bossKey(), sp)) {
                     if (!sp.hasInfiniteMaterials()) stack.shrink(1);
                 }
             }

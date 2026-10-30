@@ -117,7 +117,7 @@ final class Trials {
     static void waves(HubCtx c, ServerLevel level, TrialData data, Palette pal, String id, int cz, int gateZ0, int gateZ1, int diff, int lvl) {
         int[] g = gate(c, gateZ0, gateZ1, pal.gate());
         BlockPos o = c.O;
-        int waves = 4 + (diff >= 2 ? 1 : 0);
+        int waves = TrialManager.waveCount(diff);
         data.add(new Trial(id, TrialData.WAVES, level.dimension(), box(o, -13, 1, cz - 13, 13, 9, cz + 13), abs(o, g), id(pal.gate()),
                 List.of(o.getX(), o.getY() + 1, o.getZ() + cz), List.of(), List.of(), lvl, diff, pal.mobs(),
                 pal.title(TrialData.WAVES), "Survivez à " + waves + " vagues : la herse s'ouvrira", false));
@@ -328,7 +328,7 @@ final class Trials {
             int len = diff <= 0 ? 3 : diff == 1 ? 2 : 1 + r.nextInt(2);
             int wid = diff <= 0 ? 3 : diff == 1 ? 2 : 1 + r.nextInt(2);
             int zs = cursor + gap + 1;
-            if (zs + len - 1 > to) break;
+            if (zs + len - 1 > to) len = to - zs + 1;          // derniere plateforme raccourcie : l'ecart avec l'arrivee ne depasse jamais maxGap
             int cx = Math.max(-2, Math.min(2, prevX + r.nextInt(5) - 2));
             for (int dx = 0; dx < wid; dx++) {
                 for (int dz = 0; dz < len; dz++) {

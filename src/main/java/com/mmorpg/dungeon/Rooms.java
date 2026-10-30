@@ -2,7 +2,6 @@ package com.mmorpg.dungeon;
 
 import com.mmorpg.hub.HubCtx;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.Blocks;
 
 /**
  * Decors generiques des salles et couloirs supplementaires d'un donjon, habilles avec les blocs d'accent de l'ambiance
@@ -143,10 +142,5 @@ final class Rooms {
             int z = (int) Math.round(cz + Math.sin(a) * (r - 1.4));
             if (c.air(x, 1, z)) c.set(x, 1, z, k.lamp());
         }
-    }
-
-    @SuppressWarnings("unused")
-    private static Object unused() {
-        return Blocks.AIR;
     }
 }

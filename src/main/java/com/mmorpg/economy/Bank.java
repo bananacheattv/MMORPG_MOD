@@ -44,7 +44,7 @@ public final class Bank {
 
     /** @param amount montant (or) ; -1 pour tout. @param page page du coffre. */
     public static void action(ServerPlayer p, BlockPos pos, int action, long amount, int page) {if(!com.mmorpg.server.FeatureFlags.allow(p,"banque"))return;
-        if (!near(p, pos)) return;
+        if (!near(p, pos) || com.mmorpg.hub.ClassTrial.refuseTransfer(p, null)) return;
         PlayerData d = RpgPlayers.get(p);
         BankData data = BankData.get(p.level().getServer());
         BankData.Account a = data.account(p.getUUID());
@@ -73,7 +73,7 @@ public final class Bank {
                     a.gold -= n;
                     data.setDirty();
                     com.mmorpg.db.Audit.log(p, com.mmorpg.db.Audit.BANK_WITHDRAW, n, "solde " + a.gold);
-                    RpgPlayers.addGold(p, n, false);
+                    RpgPlayers.transferGold(p, n, false);
                     level.playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.COINS.get(), SoundSource.NEUTRAL, 0.8f, 1.1f);
                     p.sendOverlayMessage(Component.literal("Retrait de " + n + " or. Solde en banque : " + a.gold).withColor(0xFFD040));
                 }

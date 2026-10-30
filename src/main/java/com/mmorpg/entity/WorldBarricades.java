@@ -14,11 +14,14 @@ public final class WorldBarricades {
  public static final class State {public List<Cell> cells=new ArrayList<>();}
  private static boolean pending=true;
  public static void place(ServerLevel level,List<BlockPos> positions){if(positions.isEmpty())return;
-  com.mmorpg.network.SharedLedger.access(level.getServer(),"mob-barricades",State.class,State::new,s->{for(var p:positions){var c=new Cell();c.dim=level.dimension().identifier().toString();c.x=p.getX();c.y=p.getY();c.z=p.getZ();c.expires=System.currentTimeMillis()+6000;s.cells.add(c);}return null;});
+  // registre injoignable (base coupee) : pas de barricade, plutot qu'une exception dans l'IA du monstre
+  try{com.mmorpg.network.SharedLedger.access(level.getServer(),"mob-barricades",State.class,State::new,s->{for(var p:positions){var c=new Cell();c.dim=level.dimension().identifier().toString();c.x=p.getX();c.y=p.getY();c.z=p.getZ();c.expires=System.currentTimeMillis()+6000;s.cells.add(c);}return null;});}
+  catch(IllegalStateException e){com.mmorpg.MMORPG.LOGGER.warn("[MMORPG] Barricades : registre indisponible ({})",e.getMessage());return;}
   for(var p:positions)if(level.isEmptyBlock(p))level.setBlock(p,Blocks.OAK_FENCE.defaultBlockState(),2);pending=true;
  }
  private static void clean(net.minecraft.server.MinecraftServer server,boolean force){
-  com.mmorpg.network.SharedLedger.access(server,"mob-barricades",State.class,State::new,s->{s.cells.removeIf(c->{if(!force&&System.currentTimeMillis()<c.expires)return false;var level=server.getLevel(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION,net.minecraft.resources.Identifier.parse(c.dim)));if(level==null)return false;var p=new BlockPos(c.x,c.y,c.z);if(level.getBlockState(p).is(Blocks.OAK_FENCE))level.removeBlock(p,false);return true;});pending=!s.cells.isEmpty();return null;});
+  try{com.mmorpg.network.SharedLedger.access(server,"mob-barricades",State.class,State::new,s->{s.cells.removeIf(c->{if(!force&&System.currentTimeMillis()<c.expires)return false;var level=server.getLevel(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION,net.minecraft.resources.Identifier.parse(c.dim)));if(level==null)return false;var p=new BlockPos(c.x,c.y,c.z);if(level.getBlockState(p).is(Blocks.OAK_FENCE))level.removeBlock(p,false);return true;});pending=!s.cells.isEmpty();return null;});}
+  catch(IllegalStateException e){com.mmorpg.MMORPG.LOGGER.warn("[MMORPG] Barricades : registre indisponible ({}), nouvel essai plus tard",e.getMessage());}
  }
  @SubscribeEvent public static void tick(net.neoforged.neoforge.event.tick.ServerTickEvent.Post e){if(pending&&e.getServer().getTickCount()%20==0&&com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.DUNGEONS))clean(e.getServer(),false);}
  @SubscribeEvent public static void started(net.neoforged.neoforge.event.server.ServerStartedEvent e){pending=true;}

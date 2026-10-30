@@ -76,12 +76,13 @@ public final class PlayerCommands {
                         c.getSource().sendFailure(Component.literal("Vous ne pouvez pas vous payer vous-même."));
                         return 0;
                     }
+                    if (com.mmorpg.hub.ClassTrial.refuseTransfer(from, to)) return 0;
                     RpgPlayers.depositCoins(from);
                     if (!RpgPlayers.takeGold(from, amount)) {
                         c.getSource().sendFailure(Component.literal("Or insuffisant."));
                         return 0;
                     }
-                    RpgPlayers.addGold(to, amount, true);
+                    RpgPlayers.transferGold(to, amount, true);
                     from.sendSystemMessage(Component.literal("Vous avez envoyé " + amount + " or à " + to.getName().getString() + ".").withColor(0xFFD040));
                     to.sendSystemMessage(Component.literal(from.getName().getString() + " vous a envoyé " + amount + " or.").withColor(0xFFD040));
                     return 1;

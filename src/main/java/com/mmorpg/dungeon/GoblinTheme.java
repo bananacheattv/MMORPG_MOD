@@ -3,7 +3,6 @@ package com.mmorpg.dungeon;
 import com.mmorpg.hub.HubCtx;
 import com.mmorpg.world.DungeonBuilder.DungeonType;
 import net.minecraft.core.Direction;
-import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -300,10 +299,5 @@ class GoblinTheme extends Theme {
     @Override
     String arenaName() {
         return "Antre du Roi Gobelin";
-    }
-
-    @SuppressWarnings("unused")
-    private static DyeColor unused() {
-        return DyeColor.GREEN;
     }
 }

@@ -44,6 +44,12 @@ public class AeloriaCropBlock extends CropBlock {
     }
 
     @Override
+    public boolean isValidBonemealTarget(net.minecraft.world.level.LevelReader level, BlockPos pos, BlockState state, net.minecraft.world.level.block.BonemealSource source) {
+        if (level instanceof net.minecraft.world.level.Level l && com.mmorpg.plains.PlainsManager.inPlains(l, pos)) return false;   // pas de poudre d'os pour sauter la repousse
+        return super.isValidBonemealTarget(level, pos, state, source);
+    }
+
+    @Override
     public void playerDestroy(ServerLevel level, ServerPlayer player, BlockPos pos, BlockState state, BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
         if (!isMaxAge(state)) return;

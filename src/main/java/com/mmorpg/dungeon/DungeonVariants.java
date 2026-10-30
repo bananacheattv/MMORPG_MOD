@@ -18,14 +18,12 @@ public final class DungeonVariants {
     }
     public static void finish(MinecraftServer server,String pool,String owner){if(!owner.isEmpty())SharedLedger.access(server,"expedition-plans",Plans.class,Plans::new,s->s.seeds.remove(pool+"/"+owner));}
     public static boolean active(ServerLevel level){return level.dimension().equals(InstanceManager.DIM);}
-    public static int route(long seed){return (int)Math.floorMod(seed,3);}
     public static int modifier(long seed){return (int)Math.floorMod(seed/3,3);}
-    public static String description(long seed){return new String[]{"Galerie ouest","Galerie est","Galerie sinueuse"}[route(seed)]+" · "+new String[]{"Renforts : +20 % de vie","Brume : ralentissements brefs","Surcharge : éclairs annoncés"}[modifier(seed)]+" · Secrets runiques";}
+    public static String description(long seed){return new String[]{"Renforts : +20 % de vie","Brume : ralentissements brefs","Surcharge : éclairs annoncés"}[modifier(seed)]+" · Secrets runiques";}
     public static long seedAt(ServerLevel level,BlockPos origin){var s=InstanceManager.slotAt(level.getServer(),level,origin.getX(),origin.getZ()+12);return s==null?Math.max(1,Math.abs(origin.asLong())):s.variantSeed;}
     public static void decorate(ServerLevel level,BlockPos origin,long seed){
-        // Alternate passage through the same bounded gallery. No gate, pit or authored room is bypassed.
+        // The gallery is cleared the same way for every expedition: no gate, pit or authored room is bypassed.
         for(int z=Layout.C2.z0()+4;z<=Layout.C2.z1()-4;z++)for(int x=-3;x<=3;x++)for(int y=1;y<=3;y++){
-            int clear=route(seed)==0?-2:route(seed)==1?2:((z/4)%2==0?-2:2);
             var at=origin.offset(x,y-1,z);
             level.setBlock(at,Blocks.AIR.defaultBlockState(),2);
         }

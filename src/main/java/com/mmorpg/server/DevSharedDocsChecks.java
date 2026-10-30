@@ -116,6 +116,31 @@ public final class DevSharedDocsChecks {
             a.addEarnings(chef, 2);
             Database.await("barriere", 5000, c -> null);
             check(AuctionData.get(server).earnings(chef) == 42 && doc("auction").contains("Autre serveur"), "notre propre ecriture reste en memoire et en base");
+            // 6) interrupteurs : ecrits dans la base, relus par les autres serveurs (et apres un redemarrage), sans redemarrage
+            FeatureFlags.set(server, "drones", false);
+            FeatureFlags.forget(server);
+            check(!FeatureFlags.enabled(server, "drones"), "interrupteur relu depuis la base (autre serveur ou redemarrage)");
+            com.mmorpg.db.SharedDocs.put("ledger-features", doc("ledger-features").replace("\"drones\":false", "\"drones\":true"));
+            Database.await("barriere", 5000, c -> null);
+            boolean flagSeen = false;
+            for (long until = System.currentTimeMillis() + 6000; !flagSeen && System.currentTimeMillis() < until; Thread.sleep(100)) flagSeen = FeatureFlags.enabled(server, "drones");
+            check(flagSeen, "interrupteur change par un autre serveur pris en compte sans redemarrage");
+            // 7) chat de guilde : les messages ecrits dans la base sont distribues
+            int got = -1;
+            for (long until = System.currentTimeMillis() + 3000; got < 0 && System.currentTimeMillis() < until; Thread.sleep(100)) got = com.mmorpg.guild.GuildChat.poll(server);
+            SharedLedger.access(server, "guild-chat", com.mmorpg.guild.GuildChat.State.class, com.mmorpg.guild.GuildChat.State::new, st -> {
+                var m = new com.mmorpg.guild.GuildChat.Message();
+                m.id = st.next++;
+                m.guild = g.id.toString();
+                m.name = "Chef";
+                m.rank = "CHEF";
+                m.text = "bonjour";
+                st.messages.add(m);
+                return null;
+            });
+            int delivered = 0;
+            for (long until = System.currentTimeMillis() + 3000; delivered == 0 && System.currentTimeMillis() < until; Thread.sleep(100)) delivered = Math.max(0, com.mmorpg.guild.GuildChat.poll(server));
+            check(got == 0 && delivered == 1, "chat de guilde relu depuis la base (" + got + ", " + delivered + ")");
         } catch (Exception e) {
             failed = true;
             MMORPG.LOGGER.error("[CODEX CHECKS] SHARED exception", e);

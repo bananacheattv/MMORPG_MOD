@@ -68,7 +68,7 @@ public final class GuidanceManager {
             if(dropped.isPresent())return new Target("quest",q.name,"Ramasser les objets",dim(p),dropped.get().position());
         }
         Set<String> wanted=new HashSet<>();if(o.type.equals("kill"))wanted.add(o.target.replace("mmorpg:",""));
-        else if(o.type.equals("collect"))ConfigManager.mobs().forEach((key,cfg)->{if(cfg.drops.stream().anyMatch(drop->drop.chance>0&&sameItem(drop.item,o.target)))wanted.add(key);});
+        else if(o.type.equals("collect"))ConfigManager.mobs().forEach((key,cfg)->{if(cfg.drops.stream().anyMatch(drop->drop.chance>0&&!VanillaMobDrops.vanilla(drop.item)&&sameItem(drop.item,o.target)))wanted.add(key);});
         if(!wanted.isEmpty()){
             var mob=p.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class,p.getBoundingBox().inflate(80,40,80),m->m.isAlive()&&!(m instanceof com.mmorpg.entity.NpcEntity)&&!(m instanceof com.mmorpg.entity.hub.ClassMasterEntity)&&!(m instanceof com.mmorpg.entity.dummy.TrainingDummyEntity)&&matches(m,wanted)).stream().min(Comparator.comparingDouble(p::distanceToSqr));
             if(mob.isPresent())return new Target("quest",q.name,o.type.equals("collect")?"Récupérer le butin":"Vaincre la cible",dim(p),mob.get().position());
