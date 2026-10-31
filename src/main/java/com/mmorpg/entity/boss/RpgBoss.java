@@ -12,6 +12,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
@@ -304,12 +305,22 @@ public abstract class RpgBoss extends RpgMonster {
                 immobile(a.lengths()[a.spawn()]);
             }
         }
-        if(tickCount%20==0&&(getTarget()==null||!getTarget().isAlive()||!com.mmorpg.combat.RpgCombat.isEnemy(this,getTarget()))){
-            var nearest=level.players().stream().filter(p->com.mmorpg.combat.RpgCombat.isEnemy(this,p)&&distanceToSqr(p)<48*48&&hasLineOfSight(p)).min(java.util.Comparator.comparingDouble(this::distanceToSqr));
+        // cible persistante : on garde la cible tant qu'elle est valide, sinon le joueur le plus proche (sans ligne de vue exigee)
+        LivingEntity cur = getTarget();
+        if (tickCount % 10 == 0 && (cur == null || !cur.isAlive() || !com.mmorpg.combat.RpgCombat.isEnemy(this, cur) || distanceToSqr(cur) > 64 * 64
+                || (cur instanceof ServerPlayer sp && (sp.isCreative() || sp.isSpectator())))) {
+            var nearest = level.players().stream().filter(p -> p.isAlive() && !p.isCreative() && !p.isSpectator()
+                    && com.mmorpg.combat.RpgCombat.isEnemy(this, p) && distanceToSqr(p) < 56 * 56)
+                    .min(java.util.Comparator.comparingDouble(this::distanceToSqr));
             setTarget(nearest.orElse(null));
         }
         keepInBase(level);
         LivingEntity target = this.getTarget();
+        // poursuite active : si la cible s'eloigne et que le boss est libre, il la rejoint
+        if (target != null && target.isAlive() && !busy() && this.tickCount >= immobileEnd && this.tickCount % 10 == 0
+                && distanceToSqr(target) > 4.5 * 4.5 && (this.getNavigation().isDone() || this.getNavigation().getTargetPos() == null)) {
+            this.getNavigation().moveTo(target, 1.2);
+        }
         if (target != null && target.isAlive() && busy()) faceTarget(target, 15.0F);
         if (this.tickCount < immobileEnd) {
             this.getNavigation().stop();

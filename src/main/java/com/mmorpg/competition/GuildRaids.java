@@ -65,7 +65,7 @@ public final class GuildRaids {
                 if(r.defeated&&!r.rewarded)reward(r,server);
                 r.players.removeIf(id->{var p=server.getPlayerList().getPlayer(id);return p==null||!CompetitionTravel.inside(p);});
                 if(r.boss!=null&&r.boss.isAlive()){
-                    var target=r.players.stream().map(server.getPlayerList()::getPlayer).filter(Objects::nonNull).filter(p->!p.isSpectator()&&!p.isCreative()).min(Comparator.comparingDouble(r.boss::distanceToSqr)).orElse(null);r.boss.setTarget(target);
+                    var current=r.boss.getTarget();if(current==null||!current.isAlive()||!r.players.contains(current.getUUID())||((current instanceof ServerPlayer cp)&&(cp.isSpectator()||cp.isCreative()))){var target=r.players.stream().map(server.getPlayerList()::getPlayer).filter(Objects::nonNull).filter(p->p.isAlive()&&!p.isSpectator()&&!p.isCreative()).min(Comparator.comparingDouble(r.boss::distanceToSqr)).orElse(null);r.boss.setTarget(target);}
                     if(r.boss.distanceToSqr(r.center().getX(),100,r.center().getZ())>32*32)r.boss.setPos(r.center().getX()+.5,100,r.center().getZ()+.5);
                 }
                 for(UUID id:r.players){var p=server.getPlayerList().getPlayer(id);if(p!=null){if(p.getY()<97||p.distanceToSqr(r.center().getX(),100,r.center().getZ())>42*42)arrive(p,r);var md=r.boss==null?null:r.boss.rpgData();p.sendOverlayMessage(Component.literal(r.rewarded?"Victoire ! Retour à votre départ dans "+Math.max(0,(r.returnAt-server.getTickCount()+19)/20)+" s":"Yggdrasil · "+Yggdrasil.ALL[r.tier].name()+" · "+(md==null?"":Math.round(md.hp)+" / "+Math.round(md.maxHp)+" PV")));}}

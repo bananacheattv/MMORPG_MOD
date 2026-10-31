@@ -12,7 +12,7 @@ public final class GuildGuardian extends com.mmorpg.entity.boss.RpgBoss {
     private boolean attackQueued;private int casts;
     public GuildGuardian(EntityType<? extends Monster> type,Level level,int tier){super(type,level,"yggdrasil_"+Yggdrasil.ALL[tier].id());this.tier=tier;setCustomName(net.minecraft.network.chat.Component.literal(Yggdrasil.ALL[tier].name()));}
     @Override protected void registerGoals(){super.registerGoals();}
-    public void initialize(){var md=new com.mmorpg.rpg.MobData();md.key=mobKey();md.level=Math.min(100,(tier+1)*10);md.boss=true;md.maxHp=14000*(tier+1)*(tier+1);md.hp=md.maxHp;md.atk=(float)(65*Math.pow(tier+1,1.55));md.def=10*(tier+1);md.xpMultiplier=0;setData(com.mmorpg.registry.ModAttachments.MOB,md);setHealth(getMaxHealth());}
+    public void initialize(){setHomeTo(blockPosition(),34);var md=new com.mmorpg.rpg.MobData();md.key=mobKey();md.level=Math.min(100,(tier+1)*10);md.boss=true;md.maxHp=14000*(tier+1)*(tier+1);md.hp=md.maxHp;md.atk=(float)(65*Math.pow(tier+1,1.55));md.def=10*(tier+1);md.xpMultiplier=0;setData(com.mmorpg.registry.ModAttachments.MOB,md);setHealth(getMaxHealth());}
     @Override public boolean hurtServer(ServerLevel level,net.minecraft.world.damagesource.DamageSource source,float amount){if(!(source.getEntity() instanceof ServerPlayer p)||!GuildRaids.allowed(this,p.getUUID()))return false;return super.hurtServer(level,source,amount);}
     @Override public void die(net.minecraft.world.damagesource.DamageSource source){if(source.getEntity() instanceof ServerPlayer p)GuildRaids.killed(this,p);super.die(source);}
     @Override public void handleEntityEvent(byte event){if(event==73)attackStarted=tickCount;else if(event==74)castStarted=tickCount;else super.handleEntityEvent(event);}
