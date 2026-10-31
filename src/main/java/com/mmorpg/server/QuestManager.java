@@ -56,6 +56,7 @@ public final class QuestManager {
     }
 
     public static boolean matchesNpc(QuestDef q, NpcEntity npc) {
+        if (npc instanceof com.mmorpg.entity.MascotEntity) return q.giver.equalsIgnoreCase(npc.group());
         if(npc.level().dimension().equals(com.mmorpg.hub.SpawnBuilder.DIM)&&(q.npc==null||q.npc.isEmpty())&&q.giver.isEmpty())return false;
         return (q.npc == null || q.npc.isEmpty() || q.npc.equals(npc.getUUID().toString()))
                 && (q.giver.isEmpty() || q.giver.equalsIgnoreCase(npc.group()));
@@ -215,15 +216,19 @@ public final class QuestManager {
     // ================================================================== actions
 
     public static void accept(ServerPlayer p, String id, int npcId) {
-        if(!FeatureFlags.allow(p,"quetes"))return;
+        doAccept(p, id, npcId, true);
+    }
+
+    private static boolean doAccept(ServerPlayer p, String id, int npcId, boolean menu) {
+        if(!FeatureFlags.allow(p,"quetes"))return false;
         NpcEntity npc = nearGiver(p, npcId);
         PlayerData d = RpgPlayers.get(p);
         QuestDef q = def(id);
         // les quetes hebdomadaires ne se prennent qu'a la pancarte (tirage de la semaine, une par palier)
-        if (npc == null || q == null || q.weekly || !matchesNpc(q, npc) || !isAvailable(d, id, q, npc.group())) return;
+        if (npc == null || q == null || q.weekly || !matchesNpc(q, npc) || !isAvailable(d, id, q, npc.group())) return false;
         if (d.activeQuests.size() >= MAX_ACTIVE) {
             p.sendOverlayMessage(Component.literal("Journal de quêtes plein (" + MAX_ACTIVE + " quêtes maximum).").withColor(0xFF5050));
-            return;
+            return false;
         }
         d.activeQuests.put(id, new int[q.objectives.size()]);
         d.trackedQuest=id;d.questGuidanceMuted=false;
@@ -231,8 +236,10 @@ public final class QuestManager {
         Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "QUÊTE ACCEPTÉE", q.name, 0xFFD040));
         p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.QUEST_ACCEPT.get(), SoundSource.PLAYERS, 1f, 1f);
         d.dirty = true;
-        if (!q.speech.isEmpty()) MascotGuide.say(p, q.speech);
-        openGiver(p, npc);
+        if (!menu) MascotGuide.say(p, npc.displayName(), q.speech.isEmpty() ? q.description : q.speech);
+        else if (!q.speech.isEmpty()) MascotGuide.say(p, npc.displayName(), q.speech);
+        if (menu) openGiver(p, npc);
+        return true;
     }
 
     public static void track(ServerPlayer p, String id) {
@@ -260,12 +267,63 @@ public final class QuestManager {
         PlayerData d = RpgPlayers.get(p);
         QuestDef q = def(id);
         if (npc == null || q == null || q.weekly || !matchesNpc(q, npc) || !completable(p, d, id)) return;
-        finish(p, d, id, q);
+        finish(p, d, id, q, npc.displayName());
         openGiver(p, npc);
+    }
+
+    /** Clic sur un PNJ de quetes : pas de menu, une bulle de dialogue (remise, quete en cours ou nouvelle quete) et la fleche de guidage. */
+    public static void talk(ServerPlayer p, NpcEntity npc) {
+        PlayerData d = RpgPlayers.get(p);
+        if (!d.playerClass.isPlayable()) {
+            RpgPlayers.openClassSelection(p);
+            return;
+        }
+        if (!FeatureFlags.allow(p, "quetes")) return;
+        String name = npc.displayName();
+        boolean turnedIn = false;
+        for (Map.Entry<String, QuestDef> e : ConfigManager.quests().entrySet()) {
+            QuestDef q = e.getValue();
+            if (d.activeQuests.containsKey(e.getKey()) && !q.weekly && matchesNpc(q, npc) && completable(p, d, e.getKey())) {
+                finish(p, d, e.getKey(), q, name);
+                turnedIn = true;
+            }
+        }
+        if (turnedIn) {
+            // la replique de fin reste affichee un instant, puis le PNJ enchaine sur la quete suivante
+            var level = p.level();
+            com.mmorpg.server.Scheduler.later(level, 90, () -> {
+                if (npc.isAlive() && p.isAlive() && p.level() == level && p.distanceToSqr(npc) < 144) talk(p, npc);
+            });
+            return;
+        }
+        String active = null, available = null;
+        for (Map.Entry<String, QuestDef> e : ConfigManager.quests().entrySet()) {
+            QuestDef q = e.getValue();
+            if (!matchesNpc(q, npc) || q.weekly) continue;
+            if (d.activeQuests.containsKey(e.getKey())) {
+                if (active == null) active = e.getKey();
+            } else if (available == null && isAvailable(d, e.getKey(), q, npc.group())) available = e.getKey();
+        }
+        if (active != null) {
+            QuestDef q = def(active);
+            d.trackedQuest = active;
+            d.questGuidanceMuted = false;
+            d.dirty = true;
+            GuidanceManager.refresh(p);
+            MascotGuide.say(p, name, q.speech.isEmpty() ? q.description : q.speech);
+        } else if (available != null) {
+            if (doAccept(p, available, npc.getId(), false)) GuidanceManager.refresh(p);
+        } else {
+            MascotGuide.say(p, name, npc.dialogue().isEmpty() ? "Je n'ai rien de plus à te confier pour l'instant. Reviens me voir plus tard !" : npc.dialogue());
+        }
     }
 
     /** Remise d'une quete terminee : objets a rapporter retires, quete cloturee, recompenses versees. */
     static void finish(ServerPlayer p, PlayerData d, String id, QuestDef q) {
+        finish(p, d, id, q, null);
+    }
+
+    static void finish(ServerPlayer p, PlayerData d, String id, QuestDef q, String speaker) {
         // objets a rapporter
         for (QuestDef.Objective o : q.objectives) {
             if (!"collect".equals(o.type)) continue;
@@ -301,7 +359,8 @@ public final class QuestManager {
         p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.SUCCESS.get(), SoundSource.PLAYERS, 1f, 1f);
         if (xp > 0) RpgPlayers.giveXp(p, xp, false);
         com.mmorpg.achievement.Achievements.add(p, com.mmorpg.achievement.Achievement.QUESTS, 1);
-        if (!q.speechDone.isEmpty()) MascotGuide.say(p, q.speechDone);
+        if (speaker != null) MascotGuide.say(p, speaker, q.speechDone.isEmpty() ? "Bien joué, voici ta récompense !" : q.speechDone);
+        else if (!q.speechDone.isEmpty()) MascotGuide.say(p, q.speechDone);
         d.dirty = true;
     }
 

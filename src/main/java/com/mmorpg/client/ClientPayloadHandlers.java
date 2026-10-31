@@ -37,7 +37,7 @@ public final class ClientPayloadHandlers {
         event.register(Payloads.FishFightState.TYPE, (payload, context) -> FishFightClient.receive(payload.data()));
         event.register(Payloads.MobInfo.TYPE, (payload, context) -> ClientData.mobInfo = payload.data().copy());
         event.register(Payloads.Notify.TYPE, (payload, context) -> {
-            if (payload.kind() == Payloads.Notify.MASCOT) com.mmorpg.client.model.pet.MascotRenderer.say(payload.title());
+            if (payload.kind() == Payloads.Notify.MASCOT) com.mmorpg.client.MascotDialogClient.say(payload.subtitle(), payload.title());
             else HudEffects.addBanner(payload);
         });
         event.register(Payloads.AreaEntry.TYPE, (payload, context) -> com.mmorpg.client.AreaEntryClient.start(payload));

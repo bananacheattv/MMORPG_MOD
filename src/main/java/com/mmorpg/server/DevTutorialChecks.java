@@ -80,7 +80,7 @@ public final class DevTutorialChecks {
         var level = p.level();
         level.setBlock(forgePos, ModBlocks.FORGE_ARCANIQUE.get().defaultBlockState(), 3);
         var mascot = ModEntities.MASCOT.get().create(level, EntitySpawnReason.COMMAND);
-        mascot.init();
+        mascot.initFor(p);
         mascot.snapTo(p.getX(), p.getY(), p.getZ() + 1, 0, 0);
         level.addFreshEntity(mascot);
         try {

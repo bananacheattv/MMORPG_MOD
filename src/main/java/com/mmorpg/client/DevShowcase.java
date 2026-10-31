@@ -3969,14 +3969,14 @@ public final class DevShowcase {
         if (t == 5) mc.getWindow().setWindowed(1280, 720);
         if (t == 60) {
             var e = new com.mmorpg.entity.MascotEntity(com.mmorpg.registry.ModEntities.MASCOT.get(), mc.level);
-            e.init();
+            e.setOwnerId(mc.player.getId());
             e.setId(-6000);                                     // entite purement cliente
             var look = mc.player.getLookAngle();                // devant le joueur, sans commande (le joueur de test n'est pas operateur)
             e.setPos(mc.player.getX() + look.x * 4.5, mc.player.getY() + 0.2, mc.player.getZ() + look.z * 4.5);
             e.setYBodyRot(mc.player.getYRot() + 180);
             e.yBodyRotO = e.yBodyRot;
             mc.level.addEntity(e);
-            com.mmorpg.client.model.pet.MascotRenderer.say("Salut, voyageur ! Je suis la Mascotte, ton guide. Ici, tout se fabrique : suis mes missions !");
+            com.mmorpg.client.MascotDialogClient.say("Mascotte", "Salut, voyageur ! Je suis la Mascotte, ton guide. Rends-toi à la forge du spawn pour fabriquer ta première pioche.");
         }
         if (t == 140) shot(mc, "mascotte");
         if (t == 150) stop(mc);
