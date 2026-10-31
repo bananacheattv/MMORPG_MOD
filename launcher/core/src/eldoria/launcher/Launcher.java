@@ -86,6 +86,7 @@ public final class Launcher {
     private Map<String, Object> manifest;
     private Map<String, Object> settings = new LinkedHashMap<>();
     private Game game;
+    private final Presence presence = new Presence(System.getProperty("eldoria.discordAppId", Presence.DEFAULT_APP_ID));
     private MsAuth auth;
     private volatile MsAuth.Account msAccount;
     private volatile boolean ready;
@@ -109,6 +110,7 @@ public final class Launcher {
         }
         SwingUtilities.invokeLater(() -> {
             l.buildUi();
+            l.presence.start();
             Thread t = new Thread(() -> l.update(manifestJson), "eldoria-update");
             t.setDaemon(true);
             t.start();
@@ -932,6 +934,7 @@ public final class Launcher {
         ui(() -> play.launched("MINECRAFT EST LANCE"));
         try {
             List<String> jvm = new ArrayList<>(List.of("-Xmx" + go + "G"));
+            presence.setActive(false); // le mod prend le relais en jeu
             Process p = game.launch(acc, jvm);
             status("Minecraft est lance.", 1000);
             ui(() -> frame.setState(JFrame.ICONIFIED));
@@ -949,6 +952,7 @@ public final class Launcher {
         } catch (Exception e) {
             error("Lancement impossible", e);
         } finally {
+            presence.setActive(true);
             ui(() -> play.ready());
         }
     }
