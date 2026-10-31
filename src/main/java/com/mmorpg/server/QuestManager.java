@@ -165,6 +165,20 @@ public final class QuestManager {
         return list;
     }
 
+    /** Quetes refusees encore disponibles (onglet Important du journal). */
+    public static ListTag declinedTag(ServerPlayer p, PlayerData d) {
+        ListTag list = new ListTag();
+        d.declinedQuests.removeIf(id -> {
+            QuestDef q = def(id);
+            return q == null || d.completedQuests.contains(id) || d.activeQuests.containsKey(id);
+        });
+        for (String id : d.declinedQuests) {
+            QuestDef q = def(id);
+            if (q != null && d.level >= q.minLevel) list.add(questTag(p, d, id, q));
+        }
+        return list;
+    }
+
     /** Empreinte de la progression des objectifs "collecter" (detecte les changements d'inventaire). */
     public static int collectSignature(ServerPlayer p, PlayerData d) {
         int h = 0;
@@ -230,6 +244,7 @@ public final class QuestManager {
             p.sendOverlayMessage(Component.literal("Journal de quêtes plein (" + MAX_ACTIVE + " quêtes maximum).").withColor(0xFF5050));
             return false;
         }
+        d.declinedQuests.remove(id);
         d.activeQuests.put(id, new int[q.objectives.size()]);
         d.trackedQuest=id;d.questGuidanceMuted=false;
         var giver=new CompoundTag();giver.putString("backend",com.mmorpg.network.NetworkConfig.current.role.name());giver.putString("id",npc.getUUID().toString());giver.putString("name",npc.displayName());giver.putString("dimension",npc.level().dimension().identifier().toString());giver.putLong("pos",npc.blockPosition().asLong());d.questGivers.put(id,giver);

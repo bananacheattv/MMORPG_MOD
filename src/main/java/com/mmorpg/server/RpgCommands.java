@@ -299,7 +299,7 @@ public final class RpgCommands {
                         .then(Commands.literal("reset").executes(c -> {
                             ServerPlayer p = EntityArgument.getPlayer(c, "joueur");
                             PlayerData data = RpgPlayers.get(p);
-                            data.activeQuests.clear();
+                            data.activeQuests.clear();data.declinedQuests.clear();
                             data.questGivers.clear();data.questGuidanceMuted=false;
                             GuidanceManager.refresh(p);
                             data.trackedQuest = "";

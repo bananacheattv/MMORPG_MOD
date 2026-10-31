@@ -28,6 +28,7 @@ public final class ClientData {
     public static CompoundTag mobInfo = new CompoundTag();
     /** Quetes en cours (avec progression), recues a chaque synchronisation. */
     public static net.minecraft.nbt.ListTag quests = new net.minecraft.nbt.ListTag();
+    public static net.minecraft.nbt.ListTag declined = new net.minecraft.nbt.ListTag();
     /** Etat du groupe (membres, invitation en attente). */
     public static CompoundTag party = new CompoundTag();
     public static boolean received = false;
@@ -80,6 +81,7 @@ public final class ClientData {
             }
         }
         quests = t.getListOrEmpty("quests");
+        declined = t.getListOrEmpty("declined");
         maxHp = (float) stats.get(Stat.MAX_HP);
         maxMana = (float) stats.get(Stat.MAX_MANA);
         received = true;
@@ -114,6 +116,7 @@ public final class ClientData {
         COOLDOWNS.clear();
         BUFFS.clear();
         quests = new net.minecraft.nbt.ListTag();
+        declined = new net.minecraft.nbt.ListTag();
         party = new CompoundTag();
         received = false;
         trialActive = false;

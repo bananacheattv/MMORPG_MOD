@@ -13,7 +13,7 @@ public class QuestLogScreen extends MenuScreen {
     private static String selected;
     private boolean confirmAbandon;
     private int page, filter;
-    private static final String[] FILTERS = {"Toutes", "Campagne", "Journalières", "À rendre"};
+    private static final String[] FILTERS = {"Toutes", "Campagne", "Journalières", "À rendre", "Important"};
 
     public QuestLogScreen() {
         super(Tab.QUETES);
@@ -22,10 +22,11 @@ public class QuestLogScreen extends MenuScreen {
     @Override
     protected void renderTab(GuiGraphicsExtractor g, int mx, int my, float a) {
         ListTag quests = new ListTag();
-        for (int i = 0; i < ClientData.quests.size(); i++) {
-            CompoundTag entry = ClientData.quests.getCompoundOrEmpty(i);
+        ListTag source = filter == 4 ? ClientData.declined : ClientData.quests;
+        for (int i = 0; i < source.size(); i++) {
+            CompoundTag entry = source.getCompoundOrEmpty(i);
             boolean daily = entry.getBooleanOr("daily", false);
-            if (filter == 0 || filter == 1 && !daily || filter == 2 && daily || filter == 3 && entry.getBooleanOr("completable", false)) quests.add(entry);
+            if (filter == 4 || filter == 0 || filter == 1 && !daily || filter == 2 && daily || filter == 3 && entry.getBooleanOr("completable", false)) quests.add(entry);
         }
         int x0 = left + 8;
         int y0 = contentTop;
@@ -33,7 +34,7 @@ public class QuestLogScreen extends MenuScreen {
         int lw = 160;
         Ui.header(g, x0, y0, lw, "JOURNAL (" + ClientData.quests.size() + "/10)");
         if (quests.isEmpty()) {
-            Ui.wrap(g, "Aucune quête dans cette catégorie. Parlez à un Maître des Quêtes pour en obtenir.", x0, y0 + 36, lw, Ui.MUTED);
+            Ui.wrap(g, (filter == 4 ? "Aucune quête refusée. Celles que vous repoussez avec « Plus tard » arrivent ici." : "Aucune quête dans cette catégorie. Parlez à un Maître des Quêtes pour en obtenir."), x0, y0 + 36, lw, Ui.MUTED);
         }
         boolean found = false;
         for (int i = 0; i < quests.size(); i++) {
@@ -82,6 +83,10 @@ public class QuestLogScreen extends MenuScreen {
         int by = y0 + dh - 22;
         QuestPanel.render(g, q, dx, y0, dw, by - 23, mx, my);
         String id = q.getStringOr("id", "");
+        if (filter == 4) {
+            button(g, dx + 6, by, dw - 12, 16, "Accepter la quête", ClientData.quests.size() < 10, 0xFF7A5A1A, () -> ClientNet.send(new Payloads.QuestAction(Payloads.QuestAction.ACCEPT, id, -1)));
+            return;
+        }
         boolean tracked = q.getBooleanOr("tracked", false);
         button(g, dx + 6, by - 20, dw - 12, 16, tracked ? "Ne plus suivre en priorité" : "Suivre en priorité", true, 0xFF2A3420, () -> ClientNet.send(new Payloads.QuestAction(Payloads.QuestAction.TRACK, tracked ? "" : id, -1)));
         if (q.getBooleanOr("completable", false)) {

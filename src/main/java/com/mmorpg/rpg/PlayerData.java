@@ -100,6 +100,8 @@ public class PlayerData implements ValueIOSerializable {
     public final Map<String,CompoundTag> questGivers=new LinkedHashMap<>();
     public final Map<String, int[]> activeQuests = new LinkedHashMap<>();
     public final Set<String> completedQuests = new HashSet<>();
+    /** Quetes proposees puis refusees (« Plus tard ») : onglet Important du journal, jamais reproposees automatiquement. */
+    public final Set<String> declinedQuests = new java.util.LinkedHashSet<>();
     /** Quetes journalieres : jour (numero de jour du monde) de la derniere realisation. */
     public final Map<String, Long> dailyQuests = new HashMap<>();
 
@@ -254,6 +256,7 @@ public class PlayerData implements ValueIOSerializable {
         t.store("questGivers",Codec.unboundedMap(Codec.STRING,CompoundTag.CODEC),questGivers);
         t.store("activeQuests", Codec.unboundedMap(Codec.STRING, Codec.INT.listOf()), aq);
         t.store("completedQuests", Codec.STRING.listOf(), new ArrayList<>(completedQuests));
+        t.store("declinedQuests", Codec.STRING.listOf(), new ArrayList<>(declinedQuests));
         t.store("dailyQuests", Codec.unboundedMap(Codec.STRING, Codec.LONG), dailyQuests);
         return t;
     }
@@ -341,6 +344,8 @@ public class PlayerData implements ValueIOSerializable {
             for (int i = 0; i < arr.length; i++) arr[i] = v.get(i);
             activeQuests.put(k, arr);
         });
+        declinedQuests.clear();
+        declinedQuests.addAll(t.read("declinedQuests", Codec.STRING.listOf()).orElse(List.of()));
         completedQuests.clear();
         completedQuests.addAll(t.read("completedQuests", Codec.STRING.listOf()).orElse(List.of()));
         dailyQuests.clear();

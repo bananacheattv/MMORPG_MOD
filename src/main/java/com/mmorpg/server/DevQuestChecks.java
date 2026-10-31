@@ -58,6 +58,15 @@ public final class DevQuestChecks {
             check(d.gold == gold + 123 && inv.countItem(Items.IRON_INGOT) == 10 && d.trackedQuest.isEmpty(), "reward and collection");
             QuestManager.complete(p, id, npc.getId());
             check(d.gold == gold + 123 && inv.countItem(Items.IRON_INGOT) == 10, "no duplicate reward");
+            d.completedQuests.remove(id); d.activeQuests.clear(); d.declinedQuests.clear();
+            var cq = ConfigManager.quests().get(id); cq.giver = ""; cq.minLevel = 1; cq.objectives.clear();
+            QuestOffers.decline(p, id);
+            check(d.declinedQuests.contains(id) && QuestManager.declinedTag(p, d).size() == 1, "decline stored");
+            check(!id.equals(QuestOffers.next(d)), "declined not re-offered");
+            var reload = new PlayerData(); reload.load(d.save());
+            check(reload.declinedQuests.contains(id), "declined persistence");
+            QuestOffers.accept(p, id);
+            check(d.activeQuests.containsKey(id) && d.declinedQuests.isEmpty(), "re-accept from Important");
             MMORPG.LOGGER.info("[CODEX CHECKS] QUESTS PASS: prerequisites, tracking, aggregate collection, giver, unique reward");
         } finally {
             if (npc != null) npc.discard();

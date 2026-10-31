@@ -45,7 +45,7 @@ public final class QuestOffers {
         int bestLevel = Integer.MAX_VALUE;
         for (Map.Entry<String, QuestDef> e : ConfigManager.quests().entrySet()) {
             QuestDef q = e.getValue();
-            if (!campaign(e.getKey(), q) || !QuestManager.isAvailable(d, e.getKey(), q, q.giver)) continue;
+            if (d.declinedQuests.contains(e.getKey()) || !campaign(e.getKey(), q) || !QuestManager.isAvailable(d, e.getKey(), q, q.giver)) continue;
             if (q.minLevel < bestLevel) {
                 bestLevel = q.minLevel;
                 best = e.getKey();
@@ -87,15 +87,17 @@ public final class QuestOffers {
         Offer o = OFFERS.get(p.getUUID());
         PlayerData d = RpgPlayers.get(p);
         QuestDef q = QuestManager.def(id);
-        if (!FeatureFlags.allow(p, "quetes") || o == null || !o.quest.equals(id) || !campaign(id, q) || !QuestManager.isAvailable(d, id, q, q.giver)) return;
+        boolean fromJournal = RpgPlayers.get(p).declinedQuests.contains(id);
+        if (!FeatureFlags.allow(p, "quetes") || !fromJournal && (o == null || !o.quest.equals(id)) || !campaign(id, q) || !QuestManager.isAvailable(d, id, q, q.giver)) return;
         if (d.activeQuests.size() >= QuestManager.MAX_ACTIVE) {
             p.sendOverlayMessage(Component.literal("Journal de quêtes plein (" + QuestManager.MAX_ACTIVE + " quêtes maximum).").withColor(0xFF5050));
             return;
         }
+        d.declinedQuests.remove(id);
         d.activeQuests.put(id, new int[q.objectives.size()]);
         d.trackedQuest = id;
         d.questGuidanceMuted = false;
-        OFFERS.put(p.getUUID(), new Offer("", p.level().getServer().getTickCount() + 100));
+        if (!fromJournal) OFFERS.put(p.getUUID(), new Offer("", p.level().getServer().getTickCount() + 100));
         Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "QUÊTE ACCEPTÉE", q.name, 0xFFD040));
         p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.QUEST_ACCEPT.get(), SoundSource.PLAYERS, 1f, 1f);
         GuidanceManager.refresh(p);
@@ -106,6 +108,14 @@ public final class QuestOffers {
     public static void decline(ServerPlayer p, String id) {
         Offer o = OFFERS.get(p.getUUID());
         if (o != null && o.quest.equals(id)) OFFERS.put(p.getUUID(), new Offer("", p.level().getServer().getTickCount() + DECLINE_COOLDOWN));
+        {
+            PlayerData d = RpgPlayers.get(p);
+            QuestDef q = QuestManager.def(id);
+            if (campaign(id, q) && QuestManager.isAvailable(d, id, q, q.giver) && d.declinedQuests.add(id)) {
+                d.dirty = true;
+                p.sendOverlayMessage(Component.literal("Quête gardée dans le journal, onglet Important.").withColor(0xFFD040));
+            }
+        }
     }
 
     @SubscribeEvent

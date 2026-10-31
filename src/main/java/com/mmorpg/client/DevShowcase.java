@@ -725,6 +725,22 @@ public final class DevShowcase {
             if (tick == 140) { mc.options.keyPlayerList.setDown(false); stop(mc); }
             return;
         }
+        if (MODE.equals("quetes_refusees")) {
+            if (tick == 5) {
+                mc.getWindow().setWindowed(1280, 720); mc.gui.setScreen(null);
+                var t = new net.minecraft.nbt.CompoundTag();
+                t.putString("id", "demo_refusee"); t.putString("name", "Le Pacte des Cryptes"); t.putString("desc", "Quête refusée, à réaccepter plus tard.");
+                t.putString("giver", "Maître des Quêtes"); t.putInt("minLevel", 5); t.put("objectives", new net.minecraft.nbt.ListTag()); t.put("rewards", new net.minecraft.nbt.CompoundTag());
+                ClientData.declined = new net.minecraft.nbt.ListTag(); ClientData.declined.add(t);
+            }
+            if (tick == 15) {
+                var log = new com.mmorpg.client.screen.QuestLogScreen(); mc.gui.setScreen(log);
+                try { var f = com.mmorpg.client.screen.QuestLogScreen.class.getDeclaredField("filter"); f.setAccessible(true); f.setInt(log, 4); } catch (ReflectiveOperationException ex) { throw new IllegalStateException(ex); }
+            }
+            if (tick == 30) shot(mc, "quetes_refusees");
+            if (tick == 40) stop(mc);
+            return;
+        }
         if (MODE.equals("reprise_quetes")) {
             if (tick == 5) { mc.getWindow().setWindowed(1280, 720); mc.gui.setScreen(null); cmd(mc, "mmorpg pnj quetes_groupe cryptes 2 Gardien des Cryptes"); }
             if (tick == 15) MenuScreen.open(MenuScreen.Tab.QUETES);
