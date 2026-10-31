@@ -30,7 +30,7 @@ public class MascotRenderer extends EntityRenderer<MascotEntity, MascotRenderer.
     private static long speechUntil;
 
     public static class State extends PetRenderState {
-        public List<String> bubble = List.of();
+        public boolean mine;
     }
 
     private final PetModel model;
@@ -81,11 +81,13 @@ public class MascotRenderer extends EntityRenderer<MascotEntity, MascotRenderer.
         state.still = 0.0F;
         state.fly = 1.0F;
         state.yRot = Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
-        state.bubble = System.currentTimeMillis() < speechUntil ? wrap(speech) : List.of();
+        var me = Minecraft.getInstance().player;
+        state.mine = me != null && me.getId() == entity.ownerId();
     }
 
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+        if (!state.mine) return;
         poseStack.pushPose();
         poseStack.translate(0.0F, 0.25F * Mth.sin(state.ageInTicks * 0.1F) + 0.25F, 0.0F);
         poseStack.pushPose();
@@ -100,7 +102,6 @@ public class MascotRenderer extends EntityRenderer<MascotEntity, MascotRenderer.
         }
         poseStack.popPose();
         poseStack.popPose();
-        if (!state.bubble.isEmpty()) bubble(state.bubble, poseStack, collector, camera);
         super.submit(state, poseStack, collector, camera);
     }
 
