@@ -323,7 +323,7 @@ public final class Launcher {
         addNav(items, "News", Theme.Icon.NEWS, "news");
         addNav(items, "Changelog", Theme.Icon.CHANGELOG, "changelog");
         addNav(items, "Compte", Theme.Icon.ACCOUNT, "account");
-        addNav(items, "Journal", Theme.Icon.GEAR, "settings");
+        addNav(items, "Logs", Theme.Icon.GEAR, "settings");
         items.add(new Theme.NavItem("Wiki", Theme.Icon.WIKI, true, () -> open(WIKI_URL)));
         side.add(items, BorderLayout.NORTH);
 
@@ -576,7 +576,7 @@ public final class Launcher {
         page.setBorder(BorderFactory.createEmptyBorder(26, 34, 20, 34));
         JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
         top.setOpaque(false);
-        top.add(text("REGLAGES", 24f, Font.BOLD, Theme.TEXT));
+        top.add(text("LOGS", 24f, Font.BOLD, Theme.TEXT));
         page.add(top, BorderLayout.NORTH);
         JPanel body = new JPanel(new BorderLayout(0, 12));
         body.setOpaque(false);
@@ -589,7 +589,16 @@ public final class Launcher {
         ram.setForeground(Theme.TEXT);
         row.add(ram);
         row.add(new Theme.FlatButton("Ouvrir le dossier du jeu").icon(Theme.Icon.FOLDER).onClick(() -> open(gameDir.toUri().toString())));
-        body.add(row, BorderLayout.NORTH);
+        row.add(new Theme.FlatButton("Copier les logs").onClick(() -> {
+            java.awt.Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new java.awt.datatransfer.StringSelection(log.getText()), null);
+            log("Logs copies dans le presse-papiers.");
+        }));
+        row.add(new Theme.FlatButton("Ouvrir le dossier des logs").icon(Theme.Icon.FOLDER).onClick(() -> open(state.toUri().toString())));
+        JPanel north = new JPanel(new BorderLayout(0, 6));
+        north.setOpaque(false);
+        north.add(row, BorderLayout.NORTH);
+        north.add(text("Fichier : " + state.resolve("launcher.log"), 12f, Font.PLAIN, Theme.MUTED), BorderLayout.SOUTH);
+        body.add(north, BorderLayout.NORTH);
         log = new JTextArea();
         log.setEditable(false);
         log.setLineWrap(true);
@@ -620,8 +629,22 @@ public final class Launcher {
         }
     }
 
+    private PrintWriter logFile;
+
+    private synchronized void logToFile(String s) {
+        try {
+            if (logFile == null) {
+                Files.createDirectories(state);
+                logFile = new PrintWriter(Files.newBufferedWriter(state.resolve("launcher.log")), true); // ecrase a chaque ouverture
+            }
+            logFile.println(s);
+        } catch (Exception ignored) {
+        }
+    }
+
     private void log(String s) {
         System.out.println(s);
+        logToFile(s);
         if (log == null) return;
         SwingUtilities.invokeLater(() -> {
             log.append(s + "\n");
