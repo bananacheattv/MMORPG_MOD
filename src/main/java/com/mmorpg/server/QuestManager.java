@@ -128,6 +128,7 @@ public final class QuestManager {
             CompoundTag ot = new CompoundTag();
             ot.putString("type", o.type);
             ot.putString("target", o.target);
+            ot.putString("label", actionLabel(o, d));
             ot.putInt("count", o.count);
             ot.putInt("progress", active ? progress(p, d, id, i) : 0);
             objs.add(ot);
@@ -138,7 +139,7 @@ public final class QuestManager {
         rw.putLong("xp", rewardXp(q, d.level));
         rw.putLong("gold", q.rewards.gold);
         ListTag items = new ListTag();
-        for (QuestDef.ItemReward ir : q.rewards.items) {
+        for (QuestDef.ItemReward ir : TutorialKit.rewards(q, d.playerClass)) {
             CompoundTag it = new CompoundTag();
             it.putString("item", ir.item);
             it.putInt("count", ir.count);
@@ -230,6 +231,7 @@ public final class QuestManager {
         Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "QUÊTE ACCEPTÉE", q.name, 0xFFD040));
         p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.QUEST_ACCEPT.get(), SoundSource.PLAYERS, 1f, 1f);
         d.dirty = true;
+        if (!q.speech.isEmpty()) MascotGuide.say(p, q.speech);
         openGiver(p, npc);
     }
 
@@ -289,7 +291,7 @@ public final class QuestManager {
         // recompenses
         long xp = rewardXp(q, d.level);
         if (q.rewards.gold > 0) RpgPlayers.addGold(p, q.rewards.gold, true);
-        for (QuestDef.ItemReward ir : q.rewards.items) {
+        for (QuestDef.ItemReward ir : TutorialKit.rewards(q, d.playerClass)) {
             Item item = ForgeRecipes.resolveItem(ir.item);
             if (item != null && item != Items.AIR && !CrateOnly.is(item)) RpgPlayers.give(p, item, ir.count);
         }
@@ -299,7 +301,51 @@ public final class QuestManager {
         p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.SUCCESS.get(), SoundSource.PLAYERS, 1f, 1f);
         if (xp > 0) RpgPlayers.giveXp(p, xp, false);
         com.mmorpg.achievement.Achievements.add(p, com.mmorpg.achievement.Achievement.QUESTS, 1);
+        if (!q.speechDone.isEmpty()) MascotGuide.say(p, q.speechDone);
         d.dirty = true;
+    }
+
+    /** Libelle affiche d'un objectif « action » (partie apres la barre verticale de la cible), jetons de classe resolus. */
+    static String actionLabel(QuestDef.Objective o, PlayerData d) {
+        int bar = o.target.indexOf('|');
+        return bar < 0 ? "" : o.target.substring(bar + 1);
+    }
+
+    /**
+     * Progression des objectifs « action » (decouverte d'une fonctionnalite). Cles : {@code open:<ecran>} (ouverture d'une interface),
+     * {@code craft:<objet>} (fabrication a la forge), {@code stat:<compteur>} (compteur de succes : kills, fish_caught...), {@code job:<metier>}
+     * (experience de metier). Les jetons @arme / @casque... designent la piece de la classe du joueur.
+     */
+    public static void onAction(ServerPlayer p, String key, int amount) {
+        PlayerData d = RpgPlayers.get(p);
+        if (d.activeQuests.isEmpty() || amount <= 0) return;
+        for (Map.Entry<String, int[]> e : d.activeQuests.entrySet()) {
+            QuestDef q = def(e.getKey());
+            if (q == null) continue;
+            int[] prog = e.getValue();
+            if (prog.length < q.objectives.size()) {
+                prog = java.util.Arrays.copyOf(prog, q.objectives.size());
+                e.setValue(prog);
+            }
+            boolean wasComplete = completable(p, d, e.getKey());
+            for (int i = 0; i < q.objectives.size(); i++) {
+                QuestDef.Objective o = q.objectives.get(i);
+                if (!"action".equals(o.type) || prog[i] >= o.count) continue;
+                String target = o.target.contains("|") ? o.target.substring(0, o.target.indexOf('|')) : o.target;
+                if (!TutorialKit.resolve(target, d.playerClass).equalsIgnoreCase(key)) continue;
+                prog[i] = Math.min(o.count, prog[i] + amount);
+                p.sendOverlayMessage(Component.literal("✦ " + q.name + " — ").withColor(0xFFD040)
+                        .append(Component.literal(actionLabel(o, d)).withColor(0xFFFFFF))
+                        .append(Component.literal(" : " + prog[i] + "/" + o.count).withColor(0xFFFFFF)));
+                d.dirty = true;
+            }
+            if (!wasComplete && completable(p, d, e.getKey())) {
+                Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "OBJECTIFS ACCOMPLIS",
+                        q.name + " — retournez voir " + (q.giver.equals(MascotGuide.GROUP) ? "la Mascotte" : "un Maître des Quêtes"), 0x60FF80));
+                p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.CHIME.get(), SoundSource.PLAYERS, 0.9f, 1.1f);
+                if (q.giver.equals(MascotGuide.GROUP)) MascotGuide.say(p, "Bravo ! Reviens me voir pour ta récompense.");
+            }
+        }
     }
 
     /** Progression des objectifs "vaincre" apres une victoire. */

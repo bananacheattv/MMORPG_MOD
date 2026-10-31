@@ -7,7 +7,7 @@ mkdir -p run /tmp/xdg; chmod 700 /tmp/xdg
 sed -i 's/^white-list=.*/white-list=false/;s/^enforce-whitelist=.*/enforce-whitelist=false/' run/server.properties 2>/dev/null
 G="./gradlew -Dorg.gradle.java.installations.paths=$JDK"
 $G classes --console=plain -q >/dev/null 2>&1   # compiler AVANT de lancer quoi que ce soit
-CH="-Dmmorpg.checkQuests=true -Dmmorpg.checkLoot=true -Dmmorpg.checkInventory=true -Dmmorpg.checkQuestEditor=true -Dmmorpg.checkSpawnNpcs=true"
+CH="-Dmmorpg.checkQuests=true -Dmmorpg.checkLoot=true -Dmmorpg.checkInventory=true -Dmmorpg.checkQuestEditor=true -Dmmorpg.checkSpawnNpcs=true -Dmmorpg.checkTutorial=true"
 JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:-} $CH" timeout "${T:-300}" $G runServer --console=plain > /tmp/mp-server.log 2>&1 &
 for i in $(seq 1 60); do grep -aq 'Done (' /tmp/mp-server.log && break; sleep 3; done
 SC=""; [ -n "${1:-}" ] && SC="-Pshowcase=$1"

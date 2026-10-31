@@ -100,6 +100,7 @@ public final class QuestOffers {
         p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.QUEST_ACCEPT.get(), SoundSource.PLAYERS, 1f, 1f);
         GuidanceManager.refresh(p);
         d.dirty = true;
+        if (!q.speech.isEmpty()) MascotGuide.say(p, q.speech);
     }
 
     public static void decline(ServerPlayer p, String id) {

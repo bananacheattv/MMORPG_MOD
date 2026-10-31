@@ -12,6 +12,7 @@ import java.util.List;
  *     ("minecraft:zombie"), "*" pour n'importe quel monstre, ou "boss" pour n'importe quel boss.</li>
  *     <li>{@code collect} : rapporter des objets (retires de l'inventaire a la remise). Cible : identifiant d'objet.</li>
  *     <li>{@code level} : atteindre un niveau (la quantite est le niveau).</li>
+ *     <li>{@code action} : faire decouvrir une fonctionnalite. Cible : {@code cle|libelle} (cle d'action, voir QuestManager#onAction).</li>
  * </ul>
  */
 public class QuestDef {
@@ -30,6 +31,8 @@ public class QuestDef {
     public String giver = "";
     /** Optional exact NPC UUID; empty retains the historical group-based behaviour. */
     public String npc = "";
+    /** Replique de la Mascotte a l'acceptation / a la remise (tutoriel ; vide = aucune). */
+    public String speech = "", speechDone = "";
     public List<Objective> objectives = new ArrayList<>();
     public Rewards rewards = new Rewards();
 

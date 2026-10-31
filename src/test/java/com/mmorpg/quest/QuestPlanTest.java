@@ -27,7 +27,7 @@ class QuestPlanTest {
     }
 
     private static boolean itemExists(String id) {
-        if (itemKey(id).startsWith("parchemin_plan_test_")) return true;
+        if (itemKey(id).startsWith("parchemin_plan_test_") || itemKey(id).startsWith("@mat_")) return true;
         return QuestPlanTest.class.getResource("/assets/mmorpg/items/" + itemKey(id) + ".json") != null;
     }
 
@@ -79,6 +79,7 @@ class QuestPlanTest {
                         assertTrue(dropped, where + " : aucun monstre accessible ne le laisse");
                     }
                     case "level" -> assertTrue(o.count <= 100 && o.count >= q.minLevel, where + " : niveau cible incoherent");
+                    case "action" -> assertTrue(o.target.contains("|") && !o.target.substring(o.target.indexOf('|') + 1).isBlank(), where + " : action sans libelle");
                     case "visit" -> assertTrue(q.npc != null && !q.npc.isEmpty(), where + " : lieu sans PNJ");
                     default -> throw new AssertionError(where + " : type inconnu");
                 }
@@ -133,6 +134,7 @@ class QuestPlanTest {
         Set<String> groups = new HashSet<>();
         for (var g : QuestNpcPlan.GIVERS) assertTrue(groups.add(g.group()), "groupe de PNJ en double : " + g.group());
         groups.add("maitre_classes"); // PNJ du hub (HubBuilder)
+        groups.add(QuestNpcPlan.GROUP_TUTORIAL); // la Mascotte du tutoriel
         for (var e : QUESTS.entrySet()) {
             assertFalse(e.getValue().giver.isEmpty(), e.getKey() + " sans donneur");
             assertTrue(groups.contains(e.getValue().giver), e.getKey() + " : donneur inconnu " + e.getValue().giver);
@@ -181,5 +183,27 @@ class QuestPlanTest {
                 "toiles_venimeuses", "routes_sures", "evolution_1", "evolution_4", "parchemin_forge_1", "parchemin_forge_5", "spawn_bienvenue")) {
             assertTrue(QUESTS.containsKey(id), id + " a disparu");
         }
+    }
+
+    @Test
+    void tutorialIsAChainStartedByTheMascot() {
+        var tuto = DefaultQuests.tutorial();
+        assertTrue(tuto.size() >= 30, "tutoriel trop court : " + tuto.size());
+        String previous = null;
+        for (var e : tuto.entrySet()) {
+            var q = e.getValue();
+            assertEquals(QuestNpcPlan.GROUP_TUTORIAL, q.giver, e.getKey());
+            assertEquals(QuestNpcPlan.MASCOT_ID.toString(), q.npc, e.getKey());
+            assertFalse(q.speech.isBlank() || q.speechDone.isBlank(), e.getKey() + " : repliques de la Mascotte manquantes");
+            assertEquals(previous == null ? List.of() : List.of(previous), q.requires, e.getKey() + " : chaine rompue");
+            previous = e.getKey();
+        }
+        assertEquals("tuto_fin", previous);
+        assertTrue(QUESTS.get("spawn_bienvenue").requires.contains("tuto_fin"), "la decouverte du spawn suit le tutoriel");
+        // la premiere arme et la premiere armure se fabriquent : recettes novices presentes, aucune piece offerte
+        assertTrue(tuto.get("tuto_arme").objectives.get(0).target.startsWith("craft:@arme"));
+        assertEquals(4, tuto.get("tuto_armure").objectives.size());
+        assertTrue(tuto.values().stream().flatMap(q -> q.rewards.items.stream()).noneMatch(r -> itemKey(r.item).matches(".*(epee_recrue|baton_apprenti|arc_chasseur|masse_garde|pioche_debutant|houe_debutant).*")),
+                "le tutoriel ne doit rien offrir de fini");
     }
 }

@@ -90,7 +90,7 @@ public final class Payloads {
 
     /** Banniere d'annonce (montee de niveau, evolution, decouverte...). */
     public record Notify(int kind, String title, String subtitle, int color) implements CustomPacketPayload {
-        public static final int LEVEL_UP = 0, EVOLUTION = 1, INFO = 2, DISCOVERY = 3, BOSS = 4, LOOT = 5, QUEST = 6;
+        public static final int LEVEL_UP = 0, EVOLUTION = 1, INFO = 2, DISCOVERY = 3, BOSS = 4, LOOT = 5, QUEST = 6, MASCOT = 7;
         public static final Type<Notify> TYPE = new Type<>(MMORPG.id("notify"));
         public static final StreamCodec<ByteBuf, Notify> CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, Notify::kind, ByteBufCodecs.STRING_UTF8, Notify::title,

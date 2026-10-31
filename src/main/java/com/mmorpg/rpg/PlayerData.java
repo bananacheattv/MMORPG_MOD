@@ -72,6 +72,8 @@ public class PlayerData implements ValueIOSerializable {
     public boolean classChosenOnce = false;
     /** Pioche et houe du debutant deja remises (une seule fois ; /outils en redonne si elles sont perdues). */
     public boolean starterTools = false;
+    /** Vrai une fois la migration du tutoriel faite (les anciens joueurs ont le tutoriel termine d'office). */
+    public boolean tutorialInit = false;
     /** Permanent forge scroll licenses (bits 0..4); preserved by save/load, death and network travel. */
     public int forgeBlueprints = 0;
     /** Nombre de mines et de plaines ouvertes au joueur : la premiere l'est d'office, les suivantes se debloquent en trouvant le portail cache de la precedente. */
@@ -232,6 +234,7 @@ public class PlayerData implements ValueIOSerializable {
         t.store("achievements", Codec.unboundedMap(Codec.STRING, Codec.LONG), achievements);
         t.putBoolean("chosen", classChosenOnce);
         t.putBoolean("starterTools", starterTools);
+        t.putBoolean("tutorialInit", tutorialInit);
         t.putInt("forgeBlueprints", forgeBlueprints);
         t.putInt("minesUnlocked", minesUnlocked);
         t.putInt("plainsUnlocked", plainsUnlocked);
@@ -310,6 +313,7 @@ public class PlayerData implements ValueIOSerializable {
         achievements.putAll(t.read("achievements", Codec.unboundedMap(Codec.STRING, Codec.LONG)).orElse(Map.of()));
         classChosenOnce = t.getBooleanOr("chosen", playerClass != PlayerClass.NONE);
         starterTools = t.getBooleanOr("starterTools", false);
+        tutorialInit = t.getBooleanOr("tutorialInit", false);
         forgeBlueprints = t.getIntOr("forgeBlueprints", 0) & 31;
         if (forgeBlueprints != 0) {
             for (var recipe : com.mmorpg.crafting.ForgeRecipes.all()) {int tier=com.mmorpg.crafting.ForgeProgression.required(recipe);if(tier>0&&(forgeBlueprints&(1<<(tier-1)))!=0)forgeRecipes.add(recipe.id());}

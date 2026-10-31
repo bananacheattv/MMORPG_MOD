@@ -31,6 +31,10 @@ public final class QuestText {
             case "collect" -> "Rapporter " + count + " × " + targetName(type, target);
             case "level" -> "Atteindre le niveau " + count;
             case "visit" -> "Rencontrer / découvrir : "+target;
+            case "action" -> {
+                String label = o.getStringOr("label", "");
+                yield (label.isEmpty() ? target : label) + (count > 1 ? " (" + count + "×)" : "");
+            }
             default -> count == 1 ? "Vaincre : " + targetName(type, target) : "Vaincre " + count + " × " + targetName(type, target);
         };
     }

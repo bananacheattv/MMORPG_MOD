@@ -43,6 +43,7 @@ public final class ClientRenderers {
         ModEntities.MOUNTS.forEach((type, entity) -> event.registerEntityRenderer(entity.get(),
                 c -> new com.mmorpg.client.model.mount.MountRenderer(c, type)));     // montures 3D animees
         event.registerEntityRenderer(ModEntities.HUB_GUIDE.get(), com.mmorpg.client.model.imported.HubGuideRenderer::new);
+        event.registerEntityRenderer(ModEntities.MASCOT.get(), com.mmorpg.client.model.pet.MascotRenderer::new);
         event.registerEntityRenderer(ModEntities.NPC.get(), com.mmorpg.client.model.imported.AuthoredNpcRenderer::new);
         event.registerEntityRenderer(ModEntities.TRAINING_DUMMY.get(), com.mmorpg.client.model.dummy.DummyRenderer::new);
         event.registerEntityRenderer(ModEntities.CLASS_MASTER.get(), com.mmorpg.client.model.imported.AuthoredMasterRenderer::new);

@@ -18,7 +18,7 @@ public final class ForgeProgression {
     public static int required(ForgeRecipes.Recipe recipe) {
         return switch (recipe.category()) {
             case ARMES, ARMURES -> recipe.level() <= 1 ? 0 : tier(recipe.level());
-            case OUTILS -> tier(recipe.level());
+            case OUTILS -> recipe.result().endsWith("_debutant") ? 0 : tier(recipe.level());
             default -> 0;
         };
     }

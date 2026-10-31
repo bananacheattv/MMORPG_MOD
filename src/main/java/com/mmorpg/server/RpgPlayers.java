@@ -420,10 +420,7 @@ public final class RpgPlayers {
         for (Cosmetic c : Cosmetic.values()) {
             if (c.unlockLevel > 0 && c.unlockLevel <= d.level) d.cosmetics.add(c.id);
         }
-        if (!d.classChosenOnce) {
-            d.classChosenOnce = true;
-            giveStarterKit(player, cls);
-        }
+        d.classChosenOnce = true;     // plus d'equipement offert : la Mascotte guide le joueur qui fabrique sa premiere arme et sa premiere armure
         d.hp = -1;
         d.mana = -1;
         recompute(player);
@@ -445,35 +442,6 @@ public final class RpgPlayers {
                 .append(Component.literal(" et une ").withColor(0xE0D8C0))
                 .append(Component.literal("houe du débutant").withColor(0xFFD040))
                 .append(Component.literal(" : les mines et les terres labourées vous attendent.").withColor(0xE0D8C0)));
-    }
-
-    private static void giveStarterKit(ServerPlayer player, PlayerClass cls) {
-        String weapon = switch (cls) {
-            case GUERRIER -> "epee_recrue";
-            case MAGE -> "baton_apprenti";
-            case ARCHER -> "arc_chasseur";
-            default -> "masse_garde";
-        };
-        give(player, ModItems.get(weapon), 1);
-        String set = switch (cls) {
-            case GUERRIER -> "acier_soldat"; case MAGE -> "apprenti";
-            case ARCHER -> "chasseur"; default -> "garde";
-        };
-        net.minecraft.world.entity.EquipmentSlot[] slots = {
-                net.minecraft.world.entity.EquipmentSlot.HEAD, net.minecraft.world.entity.EquipmentSlot.CHEST,
-                net.minecraft.world.entity.EquipmentSlot.LEGS, net.minecraft.world.entity.EquipmentSlot.FEET};
-        for (int i = 0; i < com.mmorpg.item.ItemDefs.PIECES.length; i++) {
-            var item = ModItems.get(set + "_" + com.mmorpg.item.ItemDefs.PIECES[i]);
-            if (player.getItemBySlot(slots[i]).isEmpty()) player.setItemSlot(slots[i], new ItemStack(item));
-            else give(player, item, 1);
-        }
-        give(player, ModItems.POTION_SOIN_MINEURE.get(), 5);
-        give(player, ModItems.POTION_MANA_MINEURE.get(), 3);
-        give(player, ModItems.PARCHEMIN_TELEPORTATION.get(), 2);
-        give(player, ModItems.PIECE_OR.get(), 10);
-        player.sendSystemMessage(Component.literal("Vous avez reçu votre équipement de départ. Appuyez sur ").withColor(0xE0D8C0)
-                .append(Component.literal("[M]").withColor(0xFFD040))
-                .append(Component.literal(" pour ouvrir le menu du personnage.").withColor(0xE0D8C0)));
     }
 
     public static void give(ServerPlayer player, Item item, int count) {
@@ -591,9 +559,10 @@ public final class RpgPlayers {
         });
         recompute(player);
         if (d.hp <= 0) d.hp = (float) d.stats.get(Stat.MAX_HP);
-        if (!d.starterTools) {
+        if (!d.tutorialInit) {      // les joueurs deja en jeu avant le tutoriel le considerent termine ; les nouveaux commencent sans rien
+            d.tutorialInit = true;
+            if (d.starterTools || d.classChosenOnce) MascotGuide.skipTutorial(d);
             d.starterTools = true;
-            giveStarterTools(player);
         }
         com.mmorpg.job.JobSystem.syncRewards(player, d);
         sync(player);

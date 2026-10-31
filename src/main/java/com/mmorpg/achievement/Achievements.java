@@ -27,6 +27,7 @@ public final class Achievements {
 
     /** Ajoute {@code amount} a un compteur cumulatif. */
     public static void add(ServerPlayer p, String stat, long amount) {
+        if (amount > 0) com.mmorpg.server.QuestManager.onAction(p, "stat:" + stat, (int) Math.min(amount, 100_000));      // objectifs de decouverte du tutoriel
         if (amount <= 0 || com.mmorpg.hub.ClassTrial.active(p) || !com.mmorpg.server.FeatureFlags.enabled(p.level().getServer(), "succes")) return;
         PlayerData d = RpgPlayers.get(p);
         d.counters.merge(stat, amount, Long::sum);
