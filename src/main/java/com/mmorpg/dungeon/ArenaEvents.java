@@ -128,17 +128,7 @@ public final class ArenaEvents {
         var data = boss.getExistingDataOrNull(ModAttachments.MOB);
         if (data == null || !ADDS.containsKey(data.key)) return;
         List<ServerPlayer> near = level.players().stream().filter(p -> p.isAlive() && !p.isSpectator() && p.distanceToSqr(boss) < 48 * 48).toList();
-        int count = Math.min(8, phase + Math.max(0, near.size() - 1))/3;
-        var keys = ADDS.get(data.key);
-        var random = level.getRandom();
-        int lvl = Math.max(1, data.level - 15);
-        for (int i = 0; i < count; i++) {
-            double a = random.nextDouble() * Math.PI * 2;
-            double r = 6 + random.nextDouble() * 5;
-            BlockPos p = BlockPos.containing(boss.getX() + Math.cos(a) * r, boss.getY(), boss.getZ() + Math.sin(a) * r);
-            var e = MobSpawner.spawnForCommand(level, keys.get(i % keys.size()), p, lvl);
-            if (e != null) level.sendParticles(ParticleTypes.PORTAL, e.getX(), e.getY() + 1, e.getZ(), 12, 0.3, 0.6, 0.3, 0.4);
-        }
+        // les renforts sont invoques par BossFury.onPhase (tous les boss, nombre selon les joueurs)
         for (int i = 0; i < 24; i++) {
             double a = Math.PI * 2 * i / 24;
             level.sendParticles(ParticleTypes.FLAME, boss.getX() + Math.cos(a) * 3, boss.getY() + 0.3, boss.getZ() + Math.sin(a) * 3, 1, 0, 0.05, 0, 0.02);

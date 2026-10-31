@@ -52,6 +52,17 @@ public final class DevSpawnEditorChecks {
             drops.add(new net.minecraft.world.entity.item.ItemEntity(level,70,100,70,new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.PIECE_OR.get())));
             VanillaMobDrops.drops(new net.neoforged.neoforge.event.entity.living.LivingDropsEvent(mob,p.damageSources().playerAttack(p),drops,true));
             check(drops.size()==1&&drops.getFirst().entityTags().contains(PetLoot.tag(p)),"vanilla drops removed, mod loot assigned to killer");
+            {var pl=server.getLevel(com.mmorpg.dungeon.InstanceManager.DIM);if(pl!=null){var pat=new BlockPos(40150,90,40100);
+              for(int cx=-1;cx<=1;cx++)for(int cz=-1;cz<=1;cz++)pl.setChunkForced((pat.getX()>>4)+cx,(pat.getZ()>>4)+cz,true);
+              pl.getChunkSource().tick(()->true,true);pl.getChunkAt(pat);
+              var box=new net.minecraft.world.phys.AABB(40130,80,40080,40170,110,40120);
+              var oldLv=p.level();var oldPos=p.position();p.teleportTo(pl,pat.getX(),pat.getY(),pat.getZ(),java.util.Set.of(),0,0,true);
+              int inv0=0;for(int i=0;i<36;i++)inv0+=p.getInventory().getItem(i).getCount();long gold0=RpgPlayers.get(p).gold;
+              for(int i=0;i<40;i++){var gob=MobSpawner.spawnForCommand(pl,"gobelin",pat,5);if(gob instanceof net.minecraft.world.entity.LivingEntity le)com.mmorpg.combat.RpgCombat.dealDamage(p,le,1e7,false,false);}
+              int inv1=0;for(int i=0;i<36;i++)inv1+=p.getInventory().getItem(i).getCount();
+              
+              check(pl.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,box).isEmpty(),"plains mobs leave no item on the ground");
+              check(inv1>inv0&&RpgPlayers.get(p).gold>gold0,"plains loot and gold go straight to the killer");p.teleportTo((net.minecraft.server.level.ServerLevel)oldLv,oldPos.x,oldPos.y,oldPos.z,java.util.Set.of(),0,0,true);}}
             p.getFoodData().setFoodLevel(4);ServerEvents.onPlayerTick(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(p));
             check(p.getFoodData().getFoodLevel()==20,"hunger restored in every world");
             int kept=0;for(int i=0;i<10000;i++)if(com.mmorpg.mine.MineDensity.keep(new BlockPos(i,100,22000)))kept++;
