@@ -26,7 +26,7 @@ public class WikiScreen extends MenuScreen {
             {new Page("quetes-hebdomadaires", "Quêtes hebdo"), new Page("donjons", "Donjons et boss"), new Page("arenes", "Arènes"), new Page("recompenses-pvp", "Équipement PvP"), new Page("metiers", "Métiers"), new Page("peche", "Pêche")},
             {new Page("economie", "Or, HDV, banque"), new Page("echanges", "Échanges"), new Page("guildes-groupes", "Guildes et groupes"), new Page("coffres-boutique", "Coffres et boutique")},
             {new Page("montures-cosmetiques", "Montures et apparences"), new Page("succes-titres", "Succès et titres")},
-            {new Page("catalogue-competences", "Catalogue compétences"), new Page("catalogue-armes", "Catalogue armes"), new Page("commandes-aide", "Commandes"), new Page("administration", "Administration")}};
+            {new Page("catalogue-competences", "Catalogue compétences"), new Page("catalogue-armes", "Catalogue armes"), new Page("commandes-aide", "Commandes")}};
 
     private static Page selected = PAGES[0][0];
     private int listScroll;

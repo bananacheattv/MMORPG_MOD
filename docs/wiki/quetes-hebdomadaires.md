@@ -23,10 +23,3 @@ Vaincre des monstres, vaincre des boss, rapporter des ressources (charbon, fer, 
 | Facile | 150 | 40 % | 3 |
 | Difficile | 450 | 110 % | 10 |
 | Très difficile | 1 200 | 260 % | 28 |
-
-## Administration
-
-- Le bloc s’obtient dans l’onglet créatif des structures (`mmorpg:quetes_hebdo`) ; il est posé par défaut au Spawn (`config/mmorpg/spawn.json`, station `quetes_hebdo`, activée par `/spawn stations`). Il apparaît aussi dans l’éditeur du Spawn.
-- La fonctionnalité suit l’interrupteur « quetes ». Les quêtes sont générées par le code (`WeeklyQuests`), elles ne sont pas dans `quests.json`.
-- Progression, acceptation et quêtes terminées sont stockées dans le profil du joueur (base MariaDB) : `activeQuests` (identifiant `weekly:<semaine>:<difficulté>:<modèle>`) et `dailyQuests` (clé `weeklydone:<semaine>:<difficulté>`).
-- Test serveur : `./gradlew runServer -PweeklyChecks` (cherche `WEEKLY PASS`).

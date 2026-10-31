@@ -12,4 +12,4 @@ Observe les annonces et les changements de phase des boss. Adapte ton placement 
 
 Lorsque le boss d’une instance meurt, les autres ennemis de cette même instance sont éliminés. Cela n’efface pas les monstres d’un autre groupe dans son propre exemplaire du donjon.
 
-Les secrets runiques et puzzles sont des objectifs facultatifs. Les récompenses exactes et la difficulté dépendent de la configuration du serveur ; les descriptions affichées en jeu font référence.
+Les secrets runiques et puzzles sont des objectifs facultatifs. Les récompenses et la difficulté exactes sont affichées en jeu.
