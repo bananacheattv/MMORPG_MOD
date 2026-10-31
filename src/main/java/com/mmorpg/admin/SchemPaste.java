@@ -36,8 +36,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 @EventBusSubscriber(modid = MMORPG.MODID)
 public final class SchemPaste {
-    private static final int MAX_BLOCKS_PER_TICK = 6000;
-    private static final long BUDGET_NANOS = 8_000_000L;
+    private static int perTick = 1500;
+    private static final long BUDGET_NANOS = 4_000_000L;
     /** 2 = envoi aux clients, 16 = pas de mise a jour de forme : pas de cascade de voisins. */
     private static final int FLAGS = 2 | 16;
 
@@ -67,7 +67,7 @@ public final class SchemPaste {
             var p = new java.util.Properties();
             p.setProperty("file", j.file.getFileName().toString());
             p.setProperty("x", "" + j.origin.getX()); p.setProperty("y", "" + j.origin.getY()); p.setProperty("z", "" + j.origin.getZ());
-            p.setProperty("skipAir", "" + j.skipAir);
+            p.setProperty("skipAir", "" + j.skipAir); p.setProperty("rate", "" + perTick);
             p.setProperty("consumed", "" + (j.dataLen - j.remaining));
             p.setProperty("index", "" + j.index); p.setProperty("placed", "" + j.placed);
             Files.createDirectories(stateFile(server).getParent());
@@ -83,20 +83,40 @@ public final class SchemPaste {
 
     /** Reprise automatique au demarrage apres un arret ou un crash (monde principal). */
     @SubscribeEvent public static void started(net.neoforged.neoforge.event.server.ServerStartedEvent e) {
-        var server = e.getServer();
-        if (!Files.isRegularFile(stateFile(server))) return;
-        var src = server.createCommandSourceStack();
+        resume(e.getServer().createCommandSourceStack());
+    }
+
+    static boolean resume(CommandSourceStack src) {
+        var server = src.getServer();
+        if (!Files.isRegularFile(stateFile(server)) || !JOBS.isEmpty()) return false;
         CompletableFuture.runAsync(() -> {
             try {
                 var p = new java.util.Properties();
                 try (var in = Files.newInputStream(stateFile(server))) { p.load(in); }
+                perTick = Integer.parseInt(p.getProperty("rate", "" + perTick));
                 Path file = dir(src).resolve(p.getProperty("file"));
                 var origin = new BlockPos(Integer.parseInt(p.getProperty("x")), Integer.parseInt(p.getProperty("y")), Integer.parseInt(p.getProperty("z")));
                 MMORPG.LOGGER.info("[schem] reprise de {} a {} %", file.getFileName(), p.getProperty("index"));
                 READY.add(load(src, server.overworld(), file, origin, Boolean.parseBoolean(p.getProperty("skipAir")),
                     Long.parseLong(p.getProperty("consumed")), Long.parseLong(p.getProperty("index")), Long.parseLong(p.getProperty("placed"))));
-            } catch (Exception ex) { MMORPG.LOGGER.warn("[schem] reprise impossible : {}", ex.toString()); }
+            } catch (Exception ex) {
+                MMORPG.LOGGER.warn("[schem] reprise impossible : {}", ex.toString());
+                server.execute(() -> src.sendFailure(Component.literal("Reprise impossible : " + ex)));
+            }
         });
+        return true;
+    }
+
+    private static int status(CommandSourceStack src) {
+        var j = JOBS.peek();
+        String msg;
+        if (j != null) msg = j.name + " : " + (100L * j.index / j.total) + " % (" + j.placed + " blocs posés), en cours. Vitesse max " + perTick + " blocs/tick.";
+        else if (!READY.isEmpty()) msg = "Chargement du schematic en cours...";
+        else if (Files.isRegularFile(stateFile(src.getServer()))) msg = "Collage interrompu sauvegardé : /schem resume pour le reprendre.";
+        else msg = "Aucun collage en cours ni sauvegardé.";
+        final String m = msg;
+        src.sendSuccess(() -> Component.literal(m), false);
+        return 1;
     }
 
     @SubscribeEvent public static void stopping(net.neoforged.neoforge.event.server.ServerStoppingEvent e) {
@@ -198,7 +218,7 @@ public final class SchemPaste {
 
     @SubscribeEvent public static void tick(ServerTickEvent.Post e) {
         for (Job j; (j = READY.poll()) != null; ) {
-            JOBS.add(j);
+            JOBS.add(j); save(e.getServer(), j);
             MMORPG.LOGGER.info("[schem] {} {}x{}x{} depuis {},{},{}", j.name, j.w, j.h, j.l, j.ox, j.oy, j.oz);
             final Job fj = j;
             fj.source.sendSuccess(() -> Component.literal(fj.name + " : " + fj.w + "x" + fj.h + "x" + fj.l + ", collage progressif lance."), true);
@@ -208,7 +228,7 @@ public final class SchemPaste {
         long end = System.nanoTime() + BUDGET_NANOS; int n = 0; var pos = new BlockPos.MutableBlockPos();
         int loops = 0;
         try {
-            while (j.index < j.total && j.remaining > 0 && n < MAX_BLOCKS_PER_TICK && ((++loops & 8191) != 0 || System.nanoTime() < end)) {
+            while (j.index < j.total && j.remaining > 0 && n < perTick && ((++loops & 8191) != 0 || System.nanoTime() < end)) {
                 int v = 0, shift = 0, b;
                 do { b = nextByte(j); if (b < 0) { j.remaining = 0; break; } j.remaining--; v |= (b & 0x7F) << shift; shift += 7; } while ((b & 0x80) != 0 && j.remaining > 0);
                 if (b < 0) break;
@@ -221,7 +241,7 @@ public final class SchemPaste {
             }
         } catch (java.io.IOException ex) { j.remaining = 0; }
         if (j.remaining <= 0) j.index = j.total;
-        else if (e.getServer().getTickCount() % 100 == 0) save(e.getServer(), j);
+        else if (e.getServer().getTickCount() % 20 == 0) save(e.getServer(), j);
         if (j.index >= j.total) {
             JOBS.poll(); close(j); clearState(e.getServer());
             final Job fj = j;
@@ -238,6 +258,13 @@ public final class SchemPaste {
         var nom = Commands.argument("nom", StringArgumentType.string()).suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(files(c.getSource()), b));
         var root = Commands.literal("schem").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
             .then(Commands.literal("list").executes(c -> { c.getSource().sendSuccess(() -> Component.literal("Schematics : " + String.join(", ", files(c.getSource()))), false); return 1; }))
+            .then(Commands.literal("rate").then(Commands.argument("blocs", com.mojang.brigadier.arguments.IntegerArgumentType.integer(10, 20000)).executes(c -> {
+                perTick = com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(c, "blocs");
+                c.getSource().sendSuccess(() -> Component.literal("Vitesse : " + perTick + " blocs par tick maximum."), true); return 1; })))
+            .then(Commands.literal("status").executes(c -> status(c.getSource())))
+            .then(Commands.literal("resume").executes(c -> {
+                if (resume(c.getSource())) { c.getSource().sendSuccess(() -> Component.literal("Reprise lancée."), true); return 1; }
+                c.getSource().sendFailure(Component.literal("Rien à reprendre (ou un collage est déjà en cours).")); return 0; }))
             .then(Commands.literal("stop").executes(c -> { int k = JOBS.size(); JOBS.forEach(SchemPaste::close); JOBS.clear(); clearState(c.getSource().getServer()); c.getSource().sendSuccess(() -> Component.literal(k + " collage(s) arrete(s)."), true); return 1; }))
             .then(Commands.literal("paste").then(nom
                 .executes(c -> paste(c, null, true))
