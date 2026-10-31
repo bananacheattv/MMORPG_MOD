@@ -71,3 +71,6 @@ Dix PNJ de quêtes sont posés automatiquement autour du point d’arrivée du s
 Si le sol manque à un emplacement (construction manuelle plus petite), le PNJ n’est pas posé et les opérateurs reçoivent ses coordonnées : construire à cet endroit ou le placer avec l’outil PNJ. Un PNJ déjà posé n’est déplacé que s’il est à 60 blocs ou moins d’un autre donneur. Ordre des quêtes : introduction du spawn, puis plaines (niveaux 1 à 18), morts-vivants (16 à 42), feu et glace (45 à 78), Néant (80 à 95). Le test `QuestPlanTest` valide objectifs réalisables, prérequis sans cycle et espacement.
 
 Les quêtes par défaut ont une révision (`DefaultQuests.REVISION`) : un `quests.json` plus ancien est remplacé une fois pour les quêtes concernées (identifiants inchangés, progression des joueurs conservée).
+
+
+**Gros schematics sans surcharge** : `/schem list`, `/schem paste <nom> [x y z] [air]` (OP) lit `config/worldedit/schematics/<nom>.schem` (Sponge v2/v3, ex. `cite_celeste_26_3.schem`) et colle par petits lots a chaque tick (8 ms max, sans mise a jour de voisins), sans WorldEdit. `/schem stop` arrete. Le fichier est lu entierement en memoire (cite_celeste : ~400 Mo decompresses), prevoir assez de RAM.
