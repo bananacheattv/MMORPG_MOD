@@ -27,7 +27,7 @@ import java.util.function.Consumer;
  */
 final class Presence {
     static final String DEFAULT_APP_ID = "1565874848167755776";
-    private static final long RETRY_MS = 30_000L, POLL_MS = 1_000L;
+    private static final long RETRY_MS = 10_000L, POLL_MS = 1_000L;
 
     private final String clientId;
     private final long start = System.currentTimeMillis() / 1000L;
@@ -64,6 +64,15 @@ final class Presence {
     }
 
     private void run() {
+        try {
+            say("Presence demarree (application " + clientId + ", systeme " + System.getProperty("os.name") + ", Java " + System.getProperty("java.version") + ")");
+            loop();
+        } catch (Throwable t) {
+            say("Presence arretee par une erreur : " + t);
+        }
+    }
+
+    private void loop() {
         AutoCloseable conn = null;
         OutputStream out = null;
         InputStream in = null;
@@ -78,7 +87,7 @@ final class Presence {
                 if (conn == null) {
                     Object[] c = connect();
                     if (c == null) {
-                        say("Discord introuvable (aucun discord-ipc-0..9). Discord doit etre lance avant le launcher ; nouvel essai toutes les 30 s.");
+                        say("Discord introuvable (aucun discord-ipc-0..9). Discord doit etre lance avant le launcher ; nouvel essai toutes les 10 s.");
                         Thread.sleep(RETRY_MS);
                         continue;
                     }
@@ -86,8 +95,10 @@ final class Presence {
                     in = (InputStream) c[1];
                     out = (OutputStream) c[2];
                     say("Connecte a Discord (" + c[3] + "), application " + clientId);
+                    say("Handshake envoye, attente de la reponse de Discord...");
                     write(out, 0, "{\"v\":1,\"client_id\":\"" + clientId + "\"}");
                     say("Handshake : " + read(in));
+                    say("Envoi du statut, attente de la reponse...");
                     write(out, 1, activity());
                     say("Statut envoye : " + read(in));
                 }
