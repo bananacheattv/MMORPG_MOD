@@ -164,9 +164,12 @@ public final class DiscordPresence {
         for (int i = 0; i < 10; i++) {
             try {
                 if (windows) {
-                    File pipe = new File("\\\\.\\pipe\\discord-ipc-" + i);
-                    if (!pipe.exists()) continue;
-                    RandomAccessFile f = new RandomAccessFile(pipe, "rw");
+                    RandomAccessFile f;
+                    try {
+                        f = new RandomAccessFile("\\\\.\\pipe\\discord-ipc-" + i, "rw"); // pas de exists() : peu fiable sur les pipes Windows
+                    } catch (IOException e) {
+                        continue;
+                    }
                     return new Object[]{f, Channels.newInputStream(f.getChannel()), Channels.newOutputStream(f.getChannel())};
                 }
                 for (String dir : unixDirs()) {

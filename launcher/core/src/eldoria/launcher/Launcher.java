@@ -86,7 +86,7 @@ public final class Launcher {
     private Map<String, Object> manifest;
     private Map<String, Object> settings = new LinkedHashMap<>();
     private Game game;
-    private final Presence presence = new Presence(System.getProperty("eldoria.discordAppId", Presence.DEFAULT_APP_ID));
+    private final Presence presence = new Presence(System.getProperty("eldoria.discordAppId", Presence.DEFAULT_APP_ID), this::log);
     private MsAuth auth;
     private volatile MsAuth.Account msAccount;
     private volatile boolean ready;

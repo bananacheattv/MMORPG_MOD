@@ -1,7 +1,6 @@
 package eldoria.launcher;
 
 import java.io.DataInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Presence Discord du launcher : meme application que le jeu (« Joue a Aeloria », temps ecoule), detail « Dans le launcher ».
@@ -34,8 +34,18 @@ final class Presence {
     private volatile boolean active = true;
     private volatile boolean stopped;
 
-    Presence(String clientId) {
+    private final Consumer<String> log;
+    private String lastLog = "";
+
+    Presence(String clientId, Consumer<String> log) {
+        this.log = log == null ? x -> { } : log;
         this.clientId = clientId == null || clientId.isBlank() ? DEFAULT_APP_ID : clientId.trim();
+    }
+
+    private void say(String m) {
+        if (m.equals(lastLog)) return; // pas de repetition toutes les 30 s
+        lastLog = m;
+        log.accept("[Discord] " + m);
     }
 
     void start() {
@@ -68,21 +78,24 @@ final class Presence {
                 if (conn == null) {
                     Object[] c = connect();
                     if (c == null) {
+                        say("Discord introuvable (aucun discord-ipc-0..9). Discord doit etre lance avant le launcher ; nouvel essai toutes les 30 s.");
                         Thread.sleep(RETRY_MS);
                         continue;
                     }
                     conn = (AutoCloseable) c[0];
                     in = (InputStream) c[1];
                     out = (OutputStream) c[2];
+                    say("Connecte a Discord (" + c[3] + "), application " + clientId);
                     write(out, 0, "{\"v\":1,\"client_id\":\"" + clientId + "\"}");
-                    read(in);
+                    say("Handshake : " + read(in));
                     write(out, 1, activity());
-                    read(in);
+                    say("Statut envoye : " + read(in));
                 }
                 Thread.sleep(POLL_MS);
             } catch (InterruptedException e) {
                 break;
             } catch (Exception e) {
+                say("Erreur Discord : " + e);
                 close(conn);
                 conn = null;
                 try {
@@ -114,10 +127,14 @@ final class Presence {
         for (int i = 0; i < 10; i++) {
             try {
                 if (windows) {
-                    File pipe = new File("\\\\.\\pipe\\discord-ipc-" + i);
-                    if (!pipe.exists()) continue;
-                    RandomAccessFile f = new RandomAccessFile(pipe, "rw");
-                    return new Object[]{f, Channels.newInputStream(f.getChannel()), Channels.newOutputStream(f.getChannel())};
+                    String name = "\\\\.\\pipe\\discord-ipc-" + i;
+                    RandomAccessFile f; // pas de exists() : peu fiable sur les pipes nommes Windows
+                    try {
+                        f = new RandomAccessFile(name, "rw");
+                    } catch (IOException e) {
+                        continue;
+                    }
+                    return new Object[]{f, Channels.newInputStream(f.getChannel()), Channels.newOutputStream(f.getChannel()), name};
                 }
                 for (String dir : unixDirs()) {
                     Path p = Path.of(dir, "discord-ipc-" + i);
@@ -129,7 +146,7 @@ final class Presence {
                         ch.close();
                         continue;
                     }
-                    return new Object[]{ch, Channels.newInputStream(ch), Channels.newOutputStream(ch)};
+                    return new Object[]{ch, Channels.newInputStream(ch), Channels.newOutputStream(ch), p.toString()};
                 }
             } catch (IOException | RuntimeException ignored) {
             }
