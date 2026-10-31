@@ -12,4 +12,4 @@ Chaque pièce utilisable donne une protection PvP supplémentaire et améliore l
 
 Les achats sont contrôlés par le serveur et protégés contre les doublons. Un inventaire plein ne détruit pas un achat : la livraison reste en attente puis arrive lorsqu’une case se libère. Les montures acquises rejoignent la collection permanente ; les titres débloqués s’équipent depuis leur interface.
 
-Les prix affichés dans le menu font autorité : ils peuvent être ajustés par la configuration et l’équilibrage du serveur.
+Les prix affichés dans le menu font foi.

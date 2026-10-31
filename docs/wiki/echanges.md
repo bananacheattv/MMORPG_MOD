@@ -11,4 +11,4 @@
 
 Les objets restent dans ton inventaire jusqu’au dernier instant : annuler, fermer l’écran (Échap), se déconnecter, mourir ou s’éloigner annule l’échange sans aucune perte. À la confirmation, le serveur revérifie chaque objet (un objet déplacé ou remplacé fait refuser l’échange), l’or disponible et la place libre dans les deux inventaires, puis échange tout en une seule fois.
 
-Les objets réservés aux caisses ne peuvent pas être échangés. Chaque échange terminé ou annulé est journalisé dans la table `events` de la base (types `trade` et `trade_cancel`). Un administrateur peut couper la fonction avec `/fonctionnalite echange desactiver`.
+Les objets réservés aux caisses ne peuvent pas être échangés.

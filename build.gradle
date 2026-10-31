@@ -230,6 +230,7 @@ tasks.withType(Test).configureEach { useJUnitPlatform() }
 tasks.named('processResources') {
     from('docs/wiki') {
         include '*.md'
+        exclude 'administration.md', 'wiki-en-jeu.md', 'cadre-des-interfaces.md', 'README.md'  // doc depot : pas pour les joueurs
         into 'assets/mmorpg/wiki'
     }
 }

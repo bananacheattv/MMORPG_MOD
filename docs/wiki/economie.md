@@ -12,4 +12,4 @@ La Forge présente les recettes disponibles et leurs composants. Les sacs à dos
 
 Une apparence ou un grade ne remplace pas les conditions de classe et de niveau d’une arme. L’équipement PvP provient de son marchand dédié et possède un compromis différent du matériel PvE.
 
-Si une fonctionnalité est temporairement désactivée, le serveur refuse son interaction. Tes objets, soldes et livraisons déjà achetées restent conservés. Signale un problème avec la version du client, l’activité et l’heure approximative.
+Si une activité est temporairement indisponible, ses interactions sont refusées. Tes objets, soldes et livraisons déjà achetées restent conservés. Signale un problème avec la version du client, l’activité et l’heure approximative.
