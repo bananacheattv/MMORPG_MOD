@@ -18,6 +18,7 @@ public final class RpgArmorSculptor {
   var mesh=new MeshDefinition();var root=mesh.getRoot();var head=root.addOrReplaceChild("head",CubeListBuilder.create(),PartPose.ZERO);head.addOrReplaceChild("hat",CubeListBuilder.create(),PartPose.ZERO);
   var torso=root.addOrReplaceChild("body",CubeListBuilder.create(),PartPose.ZERO);
   var arms=new PartDefinition[]{root.addOrReplaceChild("right_arm",CubeListBuilder.create(),PartPose.offset(-5,2,0)),root.addOrReplaceChild("left_arm",CubeListBuilder.create(),PartPose.offset(5,2,0))};
+  for(int i=0;i<2;i++)arms[i]=arms[i].addOrReplaceChild("sleeve",CubeListBuilder.create(),PartPose.offset(i==0?-1:1,0,0)); // le bras vanilla est centre a +-1 du pivot : sans ce decalage 0,65 du bras depasse cote exterieur
   var legs=new PartDefinition[]{root.addOrReplaceChild("right_leg",CubeListBuilder.create(),PartPose.offset(-1.9f,12,0)),root.addOrReplaceChild("left_leg",CubeListBuilder.create(),PartPose.offset(1.9f,12,0))};
   if(slot==EquipmentSlot.HEAD){
    if(mage&&r>=2){cube(head,0,-7.8f,0,12.5f,.9f,11,body);for(int i=0;i<4;i++)cube(head,i*.25f,-9.2f-i*1.5f,.5f,8.8f-i*1.8f,1.7f,7.8f-i*1.6f,body);cube(head,0,-8.6f,-4.2f,8,.6f,.5f,trim);if(r>=4)cube(head,0,-10.8f,-3.3f,1.3f,1.8f,.7f,gem,0,0,.7854f);}
