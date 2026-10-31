@@ -43,13 +43,20 @@ public final class SchemPaste {
 
     private static final class Job {
         final ServerLevel level; final Path file; final String name;
-        final int w, h, l; final int ox, oy, oz; final BlockState[] palette; final byte[] raw; final int total; int pos;
-        final boolean skipAir; int index; long placed; final CommandSourceStack source;
-        Job(CommandSourceStack s, ServerLevel level, Path file, int w, int h, int l, int ox, int oy, int oz, BlockState[] palette, byte[] raw, int total, boolean skipAir) {
+        final int w, h, l; final int ox, oy, oz; final BlockState[] palette; final java.io.InputStream in; final long total; final byte[] buf = new byte[1 << 16]; int bufLen, bufPos; long remaining;
+        final boolean skipAir; long index; long placed; final CommandSourceStack source;
+        Job(CommandSourceStack s, ServerLevel level, Path file, int w, int h, int l, int ox, int oy, int oz, BlockState[] palette, java.io.InputStream in, long total, boolean skipAir) {
             this.source = s; this.level = level; this.file = file; this.name = file.getFileName().toString();
-            this.w = w; this.h = h; this.l = l; this.ox = ox; this.oy = oy; this.oz = oz; this.palette = palette; this.raw = raw; this.total = total; this.skipAir = skipAir;
+            this.w = w; this.h = h; this.l = l; this.ox = ox; this.oy = oy; this.oz = oz; this.palette = palette; this.in = in; this.total = total; this.remaining = total; this.skipAir = skipAir;
         }
     }
+
+    private static int nextByte(Job j) throws java.io.IOException {
+        if (j.bufPos >= j.bufLen) { j.bufLen = j.in.read(j.buf); j.bufPos = 0; if (j.bufLen <= 0) return -1; }
+        return j.buf[j.bufPos++] & 0xFF;
+    }
+
+    private static void close(Job j) { try { j.in.close(); } catch (Exception ignored) { } }
 
     private static final ArrayDeque<Job> JOBS = new ArrayDeque<>();
     private static final ConcurrentLinkedQueue<Job> READY = new ConcurrentLinkedQueue<>();
@@ -83,32 +90,68 @@ public final class SchemPaste {
         return 1;
     }
 
+    private static final class Hdr { int w, h, l; int[] off = {0, 0, 0}; java.util.Map<String, Integer> pal = new java.util.LinkedHashMap<>(); long dataLen = -1; }
+
+    /** Lit l'en-tete NBT en flux et s'arrete au debut du tableau BlockData : les ~400 Mo ne sont jamais charges en memoire. */
     private static Job load(CommandSourceStack src, ServerLevel level, Path file, BlockPos origin, boolean skipAir) throws Exception {
-        CompoundTag root = NbtIo.readCompressed(file, NbtAccounter.unlimitedHeap());
-        if (root.contains("Schematic")) root = root.getCompoundOrEmpty("Schematic");
-        int w = root.getShortOr("Width", (short) 0) & 0xFFFF, h = root.getShortOr("Height", (short) 0) & 0xFFFF, l = root.getShortOr("Length", (short) 0) & 0xFFFF;
-        CompoundTag pal; byte[] raw;
-        if (root.contains("Blocks")) { // v3
-            var b = root.getCompoundOrEmpty("Blocks"); pal = b.getCompoundOrEmpty("Palette"); raw = b.getByteArray("Data").orElse(new byte[0]);
-        } else { pal = root.getCompoundOrEmpty("Palette"); raw = root.getByteArray("BlockData").orElse(new byte[0]); }
-        if (w * h * l == 0 || raw.length == 0) throw new IllegalStateException("schematic vide ou format non Sponge");
-        int[] off = root.getIntArray("Offset").orElse(new int[]{0, 0, 0});
-        int max = 0;
-        for (String k : pal.keySet()) max = Math.max(max, pal.getIntOr(k, 0));
-        BlockState[] palette = new BlockState[max + 1];
-        java.util.Arrays.fill(palette, Blocks.AIR.defaultBlockState());
-        for (String k : pal.keySet()) {
-            try { palette[pal.getIntOr(k, 0)] = BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK, k, false).blockState(); }
-            catch (Exception e) { palette[pal.getIntOr(k, 0)] = Blocks.AIR.defaultBlockState(); }
+        var in = new java.io.DataInputStream(new java.io.BufferedInputStream(new java.util.zip.GZIPInputStream(Files.newInputStream(file), 1 << 16), 1 << 16));
+        try {
+            in.readByte(); in.readUTF();
+            var h = new Hdr();
+            header(in, h, false);
+            if (h.dataLen < 0) throw new IllegalStateException("BlockData introuvable (format non Sponge ou Data avant Palette)");
+            long total = (long) h.w * h.h * h.l;
+            if (total == 0 || h.pal.isEmpty()) throw new IllegalStateException("schematic vide");
+            int max = 0; for (int v : h.pal.values()) max = Math.max(max, v);
+            BlockState[] palette = new BlockState[max + 1];
+            java.util.Arrays.fill(palette, Blocks.AIR.defaultBlockState());
+            for (var en : h.pal.entrySet()) {
+                try { palette[en.getValue()] = BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK, en.getKey(), false).blockState(); }
+                catch (Exception ex) { palette[en.getValue()] = Blocks.AIR.defaultBlockState(); }
+            }
+            var j = new Job(src, level, file, h.w, h.h, h.l, origin.getX() + h.off[0], origin.getY() + h.off[1], origin.getZ() + h.off[2], palette, in, total, skipAir);
+            j.remaining = h.dataLen;
+            return j;
+        } catch (Exception ex) { in.close(); throw ex; }
+    }
+
+    /** Parcourt un compound ; retourne true quand le tableau de blocs est atteint (flux positionne sur ses octets). */
+    private static boolean header(java.io.DataInputStream in, Hdr h, boolean inBlocks) throws java.io.IOException {
+        while (true) {
+            int t = in.readByte();
+            if (t == 0) return false;
+            String n = in.readUTF();
+            if (t == 7 && ((inBlocks && n.equals("Data")) || n.equals("BlockData"))) { h.dataLen = in.readInt(); return true; }
+            if (t == 10 && (n.equals("Schematic") || n.equals("Blocks"))) { if (header(in, h, n.equals("Blocks"))) return true; continue; }
+            if (t == 2 && n.equals("Width")) h.w = in.readShort() & 0xFFFF;
+            else if (t == 2 && n.equals("Height")) h.h = in.readShort() & 0xFFFF;
+            else if (t == 2 && n.equals("Length")) h.l = in.readShort() & 0xFFFF;
+            else if (t == 11 && n.equals("Offset") ) { int c = in.readInt(); for (int i = 0; i < c; i++) { int v = in.readInt(); if (i < 3) h.off[i] = v; } }
+            else if (t == 10 && n.equals("Palette")) { for (int pt; (pt = in.readByte()) != 0; ) { String k = in.readUTF(); if (pt == 3) h.pal.put(k, in.readInt()); else skip(in, pt); } }
+            else skip(in, t);
         }
-        long tot = (long) w * h * l; if (tot > Integer.MAX_VALUE) throw new IllegalStateException("trop grand");
-        int total = (int) tot;
-        return new Job(src, level, file, w, h, l, origin.getX() + off[0], origin.getY() + off[1], origin.getZ() + off[2], palette, raw, total, skipAir);
+    }
+
+    private static void skip(java.io.DataInputStream in, int t) throws java.io.IOException {
+        switch (t) {
+            case 1 -> in.skipNBytes(1);
+            case 2 -> in.skipNBytes(2);
+            case 3, 5 -> in.skipNBytes(4);
+            case 4, 6 -> in.skipNBytes(8);
+            case 7 -> in.skipNBytes(in.readInt());
+            case 8 -> in.skipNBytes(in.readUnsignedShort());
+            case 9 -> { int et = in.readByte(), c = in.readInt(); for (int i = 0; i < c; i++) skip(in, et); }
+            case 10 -> { for (int ct; (ct = in.readByte()) != 0; ) { in.readUTF(); skip(in, ct); } }
+            case 11 -> in.skipNBytes(4L * in.readInt());
+            case 12 -> in.skipNBytes(8L * in.readInt());
+            default -> throw new java.io.IOException("tag NBT inconnu " + t);
+        }
     }
 
     @SubscribeEvent public static void tick(ServerTickEvent.Post e) {
         for (Job j; (j = READY.poll()) != null; ) {
             JOBS.add(j);
+            MMORPG.LOGGER.info("[schem] {} {}x{}x{} depuis {},{},{}", j.name, j.w, j.h, j.l, j.ox, j.oy, j.oz);
             final Job fj = j;
             fj.source.sendSuccess(() -> Component.literal(fj.name + " : " + fj.w + "x" + fj.h + "x" + fj.l + ", collage progressif lance."), true);
         }
@@ -116,22 +159,27 @@ public final class SchemPaste {
         if (j == null) return;
         long end = System.nanoTime() + BUDGET_NANOS; int n = 0; var pos = new BlockPos.MutableBlockPos();
         int loops = 0;
-        while (j.index < j.total && n < MAX_BLOCKS_PER_TICK && ((++loops & 8191) != 0 || System.nanoTime() < end)) {
-            int i = j.index++;
-            int v = 0, shift = 0, b;
-            do { b = j.raw[j.pos++]; v |= (b & 0x7F) << shift; shift += 7; } while ((b & 0x80) != 0 && j.pos < j.raw.length);
-            int x = i % j.w, z = (i / j.w) % j.l, y = i / (j.w * j.l);
-            var st = j.palette[Math.min(v, j.palette.length - 1)];
-            if (j.skipAir && st.isAir()) continue;
-            j.level.setBlock(pos.set(j.ox + x, j.oy + y, j.oz + z), st, FLAGS);
-            n++; j.placed++;
-            if (j.pos >= j.raw.length) { j.index = j.total; break; }
-        }
+        try {
+            while (j.index < j.total && j.remaining > 0 && n < MAX_BLOCKS_PER_TICK && ((++loops & 8191) != 0 || System.nanoTime() < end)) {
+                int v = 0, shift = 0, b;
+                do { b = nextByte(j); if (b < 0) { j.remaining = 0; break; } j.remaining--; v |= (b & 0x7F) << shift; shift += 7; } while ((b & 0x80) != 0 && j.remaining > 0);
+                if (b < 0) break;
+                long i = j.index++;
+                int x = (int) (i % j.w), z = (int) ((i / j.w) % j.l), y = (int) (i / ((long) j.w * j.l));
+                var st = j.palette[Math.min(v, j.palette.length - 1)];
+                if (j.skipAir && st.isAir()) continue;
+                j.level.setBlock(pos.set(j.ox + x, j.oy + y, j.oz + z), st, FLAGS);
+                n++; j.placed++;
+            }
+        } catch (java.io.IOException ex) { j.remaining = 0; }
+        if (j.remaining <= 0) j.index = j.total;
         if (j.index >= j.total) {
-            JOBS.poll();
+            JOBS.poll(); close(j);
             final Job fj = j;
             fj.source.sendSuccess(() -> Component.literal(fj.name + " : termine, " + fj.placed + " blocs poses."), true);
+            MMORPG.LOGGER.info("[schem] {} termine : {} blocs", fj.name, fj.placed);
         } else if (e.getServer().getTickCount() % 200 == 0) {
+            MMORPG.LOGGER.info("[schem] {} : {} % ({} blocs)", j.name, 100L * j.index / j.total, j.placed);
             final Job fj = j;
             fj.source.sendSuccess(() -> Component.literal(fj.name + " : " + (100L * fj.index / fj.total) + " %"), false);
         }
@@ -141,7 +189,7 @@ public final class SchemPaste {
         var nom = Commands.argument("nom", StringArgumentType.string()).suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(files(c.getSource()), b));
         var root = Commands.literal("schem").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
             .then(Commands.literal("list").executes(c -> { c.getSource().sendSuccess(() -> Component.literal("Schematics : " + String.join(", ", files(c.getSource()))), false); return 1; }))
-            .then(Commands.literal("stop").executes(c -> { int k = JOBS.size(); JOBS.clear(); c.getSource().sendSuccess(() -> Component.literal(k + " collage(s) arrete(s)."), true); return 1; }))
+            .then(Commands.literal("stop").executes(c -> { int k = JOBS.size(); JOBS.forEach(SchemPaste::close); JOBS.clear(); c.getSource().sendSuccess(() -> Component.literal(k + " collage(s) arrete(s)."), true); return 1; }))
             .then(Commands.literal("paste").then(nom
                 .executes(c -> paste(c, null, true))
                 .then(Commands.argument("pos", BlockPosArgument.blockPos())
