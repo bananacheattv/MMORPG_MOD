@@ -453,6 +453,11 @@ public final class InstanceManager {
      *
      * @param hall point d'arrivee hors instance, « x,y,z » (celui du compte a rebours)
      */
+    /** Mort / respawn : le point de retour de l'instance n'est plus valable, le joueur repart au spawn. */
+    public static void forgetReturn(ServerPlayer p) {
+        RETURNS.remove(p.getUUID());
+    }
+
     public static void leaveNow(ServerPlayer p, String hall) {
         String[] c = hall.split(",");
         if (c.length != 3) return;

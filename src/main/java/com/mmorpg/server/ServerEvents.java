@@ -107,6 +107,10 @@ public final class ServerEvents {
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
             RpgPlayers.onRespawn(sp);
+            if (sp.level().dimension().equals(com.mmorpg.dungeon.InstanceManager.DIM)) {
+                com.mmorpg.dungeon.InstanceManager.forgetReturn(sp);
+                com.mmorpg.hub.HubManager.goToSpawn(sp);
+            }
             if (!event.isEndConquered()) Scheduler.later(sp.level(), 5, () -> {
                 if (!sp.isRemoved()) com.mmorpg.hub.HubManager.goToSpawn(sp);
             });
