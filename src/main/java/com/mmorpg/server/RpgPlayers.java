@@ -592,6 +592,9 @@ public final class RpgPlayers {
         }
     }
 
+    /** Zone (mines ou plaines) ou le joueur est mort : il y reapparait au lieu du spawn principal. */
+    private static final java.util.Map<java.util.UUID, int[]> DEATH_ZONE = new java.util.concurrent.ConcurrentHashMap<>();
+
     public static void onRespawn(ServerPlayer player) {
         PlayerData d = get(player);
         d.buffs.clear();
@@ -599,11 +602,19 @@ public final class RpgPlayers {
         recompute(player);
         fullRestore(player);
         sync(player);
+        int[] z = DEATH_ZONE.remove(player.getUUID());
+        if (z != null) {
+            if (z[0] == 0) com.mmorpg.mine.MineManager.enterNow(player, z[1]);
+            else com.mmorpg.plains.PlainsManager.enter(player, z[1]);
+        }
     }
 
     public static void onDeath(ServerPlayer player, String cause) {
         PlayerData d = get(player);
         d.hp = 0;
+        int mr = com.mmorpg.mine.MineManager.regionOf(player), pr = com.mmorpg.plains.PlainsManager.regionOf(player);
+        if (mr >= 0) DEATH_ZONE.put(player.getUUID(), new int[]{0, mr});
+        else if (pr >= 0) DEATH_ZONE.put(player.getUUID(), new int[]{1, pr});
         double loss = ConfigManager.general().deathXpLossPercent;
         long lost = 0;
         if (loss > 0 && d.playerClass.isPlayable() && d.level < LevelSystem.MAX_LEVEL) {

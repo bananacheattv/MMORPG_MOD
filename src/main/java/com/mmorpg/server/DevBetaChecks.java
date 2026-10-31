@@ -65,7 +65,7 @@ public final class DevBetaChecks {
             check(SharedLedger.access(server,"arena-queue",SharedArenaQueue.State.class,SharedArenaQueue.State::new,s->s.matches.getFirst().travel),"ten acceptances authorize transfer");
             SharedArenaQueue.finish(server,match.id);
             var group=new PartyManager.Party();group.leader=players.get(1).getUUID();group.members.add(group.leader);group.members.add(p.getUUID());SharedParties.mutate(p,()->PartyManager.installShared(List.of(group)));
-            check(GroupTravel.begin(p,"mine","0"),"member entry intercepted");
+            check(GroupTravel.begin(p,"donjon","x"),"member entry intercepted");
             check(SharedLedger.access(server,"group-travel",GroupTravel.State.class,GroupTravel.State::new,s->s.trips.isEmpty()),"non-leader cannot schedule group departure");
             var guild=new com.mmorpg.guild.GuildStore.Guild();guild.name="Recharge";guild.level=2;guild.members.put(p.getUUID(),new com.mmorpg.guild.GuildStore.Member(p.getUUID(),"Test","CHEF"));
             com.mmorpg.guild.GuildStore.access(server,true,s->{s.guilds.add(guild);return null;});
