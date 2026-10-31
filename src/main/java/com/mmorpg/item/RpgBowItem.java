@@ -18,6 +18,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.function.Consumer;
 
@@ -58,6 +59,14 @@ public class RpgBowItem extends BowItem implements RpgEquipment {
         if (level instanceof ServerLevel) {
             Arrow arrow = new Arrow(level, player, new ItemStack(Items.ARROW), stack);
             arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, pow * 3.2F, 0.8F);
+            if (player instanceof net.minecraft.server.level.ServerPlayer sp) {
+                var target = com.mmorpg.combat.AutoLock.find(sp);
+                if (target != null) {
+                    Vec3 d = com.mmorpg.combat.AutoLock.aimPoint(target).subtract(arrow.position());
+                    double t = d.length() / Math.max(0.5, pow * 3.2F);
+                    arrow.shoot(d.x, d.y + 0.025 * t * t, d.z, pow * 3.2F, 0.0F);
+                }
+            }
             arrow.getPersistentData().putString("aeloria_weapon_class",def.playerClass().name());
             arrow.setCritArrow(pow >= 1.0F);
             arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;

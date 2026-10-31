@@ -17,6 +17,7 @@ public final class FeatureCatalog {
 
     static {
         CATEGORIES.put("Combat", List.of(
+                new Entry("autolock", "Autolock à distance", "Arc et bâton visent les ennemis (PVE)."),
                 new Entry("arenes", "Arènes PvP", "Matchs classés et files d'attente."),
                 new Entry("donjons", "Donjons", "Instances de groupe et portails."),
                 new Entry("portails", "Portails d'aventure", "Portails vers les expéditions."),

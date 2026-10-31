@@ -11,7 +11,7 @@ import java.util.*;
 /** Shared runtime switches. File replacement is atomic and backends observe changes within one second. */
 @EventBusSubscriber(modid=MMORPG.MODID)
 public final class FeatureFlags {
- public static final Set<String> KEYS=new LinkedHashSet<>(List.of("wiki","arenes","donjons","drones","boutique_pvp","boutique","quetes","sacs","hdv","guildes","boss_guilde","cinematique","epreuves_classes","apparition_mobs","competences","bouclier","luckyblocks","coffres","montures","familiers","mines","plaines","forge","banque","marchands","cosmetiques","echange","metiers","peche","succes","classements","groupes","bestiaire","portails","quetes_hebdo","chat_guilde","anticheat"));
+ public static final Set<String> KEYS=new LinkedHashSet<>(List.of("wiki","arenes","donjons","drones","boutique_pvp","boutique","quetes","sacs","hdv","guildes","boss_guilde","cinematique","epreuves_classes","apparition_mobs","competences","bouclier","luckyblocks","coffres","montures","familiers","mines","plaines","forge","banque","marchands","cosmetiques","echange","metiers","peche","succes","classements","groupes","bestiaire","portails","quetes_hebdo","chat_guilde","anticheat","autolock"));
  public static final class State{public Map<String,Boolean> enabled=new HashMap<>();}
  private static final class Cache{State state=new State();long checked;final com.mmorpg.db.SharedDocs.Poller poller=new com.mmorpg.db.SharedDocs.Poller("ledger-features");}
  private static final Map<MinecraftServer,Cache> CACHE=new WeakHashMap<>();

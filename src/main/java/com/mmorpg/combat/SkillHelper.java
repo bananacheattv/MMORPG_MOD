@@ -138,6 +138,8 @@ public final class SkillHelper {
         double dmg = d.stats.get(Stat.MAG) * 0.8;
         MagicProjectile p = MagicProjectile.create(player.level(), player, staff.element(), dmg, 0);
         p.shootFromRotation(player, player.getXRot(), player.getYRot(), 0, 1.8F, 0.5F);
+        var locked = AutoLock.find(player);
+        if (locked != null) p.homing(locked);
         player.level().addFreshEntity(p);
         player.level().playSound(null, player.blockPosition(), SoundEvents.EVOKER_CAST_SPELL, SoundSource.PLAYERS, 0.5f, 1.6f);
         RpgPlayers.sendVitals(player, true);
