@@ -61,14 +61,14 @@ public final class ChatChannels {
 
     private static void applyFilter() {
         ChatChannel c = active;
-        Minecraft.getInstance().gui.hud.getChat().setVisibleMessageFilter(m -> ChatChannel.classify(m.content().getString()) == c);
+        Minecraft.getInstance().gui.hud.getChat().setVisibleMessageFilter(m -> c.shows(ChatChannel.classify(m.content().getString())));
     }
 
     @SubscribeEvent
     public static void onReceived(ClientChatReceivedEvent event) {
         ChatChannel shown = active();
         ChatChannel of = ChatChannel.classify(event.getMessage().getString());
-        if (of != shown) UNREAD[of.ordinal()]++;
+        if (!shown.shows(of)) UNREAD[of.ordinal()]++;
     }
 
     private static EditBox input(Screen s) {
@@ -203,6 +203,19 @@ public final class ChatChannels {
         for (ChatChannel c : ChatChannel.values()) WIDGETS.add(new Tab(s, c));
         WIDGETS.add(new MessageIcon(s));
         for (AbstractWidget w : WIDGETS) event.addListener(w);
+    }
+
+    /** Clic gere ici : l'ecran de chat ne transmet pas toujours les clics aux widgets ajoutes par evenement. */
+    @SubscribeEvent
+    public static void onMouseClick(ScreenEvent.MouseButtonPressed.Pre event) {
+        if (!(event.getScreen() instanceof ChatScreen) || event.getButton() != 0) return;
+        for (AbstractWidget w : WIDGETS) {
+            if (w.isMouseOver(event.getMouseX(), event.getMouseY())) {
+                w.mouseClicked(event.getMouseButtonEvent(), event.isDoubleClick());
+                event.setCanceled(true);
+                return;
+            }
+        }
     }
 
     @SubscribeEvent

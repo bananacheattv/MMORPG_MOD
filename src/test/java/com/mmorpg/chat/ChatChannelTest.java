@@ -1,6 +1,8 @@
 package com.mmorpg.chat;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -28,6 +30,14 @@ class ChatChannelTest {
         assertEquals(ChatChannel.GENERAL, ChatChannel.classify("[Groupe] Bob vous invite dans son groupe. [Accepter] [Refuser]"));
         assertEquals(ChatChannel.GENERAL, ChatChannel.classify("<Bob> [Guilde] : faux"));
         assertEquals(ChatChannel.GENERAL, ChatChannel.classify(null));
+    }
+
+    @Test
+    void generalShowsEveryChannelOthersStayFiltered() {
+        for (ChatChannel line : ChatChannel.values()) assertTrue(ChatChannel.GENERAL.shows(line));
+        assertTrue(ChatChannel.GUILDE.shows(ChatChannel.GUILDE));
+        assertFalse(ChatChannel.GUILDE.shows(ChatChannel.GENERAL));
+        assertFalse(ChatChannel.GROUPE.shows(ChatChannel.GUILDE));
     }
 
     @Test

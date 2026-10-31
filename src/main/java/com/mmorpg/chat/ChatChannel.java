@@ -30,6 +30,11 @@ public enum ChatChannel {
         return GENERAL;
     }
 
+    /** Un onglet affiche son propre canal ; « Général » regroupe tous les canaux. */
+    public boolean shows(ChatChannel line) {
+        return this == GENERAL || this == line;
+    }
+
     /** Texte réellement envoyé : les commandes restent intactes, le reste part dans le canal choisi. */
     public String route(String input) {
         if (input == null) return "";
