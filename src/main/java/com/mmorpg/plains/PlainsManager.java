@@ -296,7 +296,6 @@ public final class PlainsManager {
     /** Choix du joueur dans le menu : verifications cote serveur puis arrivee sur la place d'entree de la plaine. */
     public static void enterChosen(ServerPlayer p, int region) {
         if (!com.mmorpg.server.PortalAccess.consume(p,"plaines")) return;
-        if (com.mmorpg.network.GroupTravel.begin(p,"plaines",Integer.toString(region))) return;
         com.mmorpg.server.AdventureSummary.begin(p,"plaines");
         if (region < 0 || region >= REGIONS) return;
         if (region >= RpgPlayers.get(p).plainsUnlocked) {
