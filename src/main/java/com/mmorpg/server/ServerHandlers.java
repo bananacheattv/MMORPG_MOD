@@ -78,6 +78,8 @@ public final class ServerHandlers {
             case Payloads.QuestAction.ABANDON -> QuestManager.abandon(sp, p.quest());
             case Payloads.QuestAction.TRACK -> QuestManager.track(sp, p.quest());
             case Payloads.QuestAction.DECLINE -> QuestOffers.decline(sp, p.quest());
+            case Payloads.QuestAction.RAID_JOIN -> com.mmorpg.competition.GuildRaids.answer(sp, true);
+            case Payloads.QuestAction.RAID_REFUSE -> com.mmorpg.competition.GuildRaids.answer(sp, false);
             default -> {
             }
         }

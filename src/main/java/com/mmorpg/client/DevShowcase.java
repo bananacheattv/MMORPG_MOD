@@ -452,6 +452,16 @@ public final class DevShowcase {
         mc.options.pauseOnLostFocus = false;
         if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.PauseScreen && !MODE.equals("interface")) mc.gui.setScreen(null);
         String me = mc.player.getName().getString();
+        if (MODE.equals("invitation_boss")) {    // invitation au boss de guilde
+            if (tick == 5) {
+                var q = new net.minecraft.nbt.CompoundTag();
+                q.putString("boss", "Gardien de l'Arbre-Monde"); q.putString("from", "Copassist"); q.putString("guild", "Les Aigles"); q.putInt("tier", 0); q.putInt("color", 0x66DD88);
+                mc.gui.setScreen(new com.mmorpg.client.screen.GuildRaidInviteScreen(q));
+            }
+            if (tick == 25) shot(mc, "invitation_boss");
+            if (tick == 35) stop(mc);
+            return;
+        }
         if (MODE.equals("offre_quete")) {    // fenetre de proposition automatique de quete
             if (tick == 5) {
                 var q = new net.minecraft.nbt.CompoundTag();
