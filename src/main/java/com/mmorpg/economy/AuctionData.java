@@ -9,6 +9,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,11 +37,52 @@ public class AuctionData extends SavedData {
         ).apply(i, Listing::new));
     }
 
+    /** Liste lue element par element : un element illisible (objet retire, format change) est garde tel quel au lieu de faire perdre toute la liste. */
+    private record Lenient<T>(List<T> ok, List<Dynamic<?>> lost) {
+    }
+
+    private static <T> Codec<Lenient<T>> lenient(Codec<T> element, String what) {
+        return new Codec<>() {
+            @Override
+            public <O> DataResult<Pair<Lenient<T>, O>> decode(DynamicOps<O> ops, O input) {
+                var items = ops.getStream(input);
+                if (items.error().isPresent()) return DataResult.error(() -> "liste attendue");
+                List<T> ok = new ArrayList<>();
+                List<Dynamic<?>> lost = new ArrayList<>();
+                items.getOrThrow().forEach(e -> {
+                    var r = element.parse(ops, e);
+                    if (r.result().isPresent()) ok.add(r.result().get());
+                    else {
+                        lost.add(new Dynamic<>(ops, e));
+                        MMORPG.LOGGER.error("[MMORPG] Hotel des ventes : {} illisible, conserve tel quel ({})", what, r.error().map(DataResult.Error::message).orElse("?"));
+                    }
+                });
+                return DataResult.success(Pair.of(new Lenient<>(ok, lost), ops.empty()));
+            }
+
+            @Override
+            public <O> DataResult<O> encode(Lenient<T> in, DynamicOps<O> ops, O prefix) {
+                List<O> out = new ArrayList<>();
+                for (T t : in.ok()) {
+                    var r = element.encodeStart(ops, t);
+                    if (r.result().isPresent()) out.add(r.result().get());
+                }
+                for (Dynamic<?> d : in.lost()) out.add(d.convert(ops).getValue());
+                return DataResult.success(ops.createList(out.stream()));
+            }
+        };
+    }
+
     private static final Codec<AuctionData> CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.LONG.optionalFieldOf("next", 1L).forGetter(d -> d.next),
-            Listing.CODEC.listOf().optionalFieldOf("listings", List.of()).forGetter(d -> d.listings),
+            lenient(Listing.CODEC, "annonce").optionalFieldOf("listings", new Lenient<>(List.of(), List.of())).forGetter(d -> new Lenient<>(d.listings, d.lostListings)),
             Codec.unboundedMap(UUIDUtil.STRING_CODEC, Codec.LONG).optionalFieldOf("earnings", Map.of()).forGetter(d -> d.earnings),
-            Codec.unboundedMap(UUIDUtil.STRING_CODEC, ItemStack.CODEC.listOf()).optionalFieldOf("returns", Map.of()).forGetter(d -> d.returns)
+            Codec.unboundedMap(UUIDUtil.STRING_CODEC, lenient(ItemStack.CODEC, "objet rendu")).optionalFieldOf("returns", Map.of()).forGetter(d -> {
+                Map<UUID, Lenient<ItemStack>> m = new HashMap<>();
+                d.returns.forEach((k, v) -> m.put(k, new Lenient<>(v, d.lostReturns.getOrDefault(k, List.of()))));
+                d.lostReturns.forEach((k, v) -> m.putIfAbsent(k, new Lenient<>(List.of(), v)));
+                return m;
+            })
     ).apply(i, AuctionData::new));
     public static final SavedDataType<AuctionData> TYPE = new SavedDataType<>(MMORPG.id("hdv"), AuctionData::new, CODEC);
 
@@ -44,6 +90,9 @@ public class AuctionData extends SavedData {
     private final List<Listing> listings;
     private final Map<UUID, Long> earnings;
     private final Map<UUID, List<ItemStack>> returns;
+    /** Elements illisibles gardes tels quels (jamais perdus) : annonces et objets rendus. */
+    private final List<Dynamic<?>> lostListings = new ArrayList<>();
+    private final Map<UUID, List<Dynamic<?>>> lostReturns = new HashMap<>();
 
     public AuctionData() {
         this.next = 1;
@@ -52,12 +101,16 @@ public class AuctionData extends SavedData {
         this.returns = new HashMap<>();
     }
 
-    private AuctionData(long next, List<Listing> listings, Map<UUID, Long> earnings, Map<UUID, List<ItemStack>> returns) {
+    private AuctionData(long next, Lenient<Listing> listings, Map<UUID, Long> earnings, Map<UUID, Lenient<ItemStack>> returns) {
         this.next = next;
-        this.listings = new ArrayList<>(listings);
+        this.listings = new ArrayList<>(listings.ok());
+        this.lostListings.addAll(listings.lost());
         this.earnings = new HashMap<>(earnings);
         this.returns = new HashMap<>();
-        returns.forEach((k, v) -> this.returns.put(k, new ArrayList<>(v)));
+        returns.forEach((k, v) -> {
+            this.returns.put(k, new ArrayList<>(v.ok()));
+            if (!v.lost().isEmpty()) lostReturns.put(k, new ArrayList<>(v.lost()));
+        });
     }
 
     public static AuctionData get(MinecraftServer server) {
@@ -107,6 +160,10 @@ public class AuctionData extends SavedData {
             earnings.putAll(read.earnings);
             returns.clear();
             returns.putAll(read.returns);
+            lostListings.clear();
+            lostListings.addAll(read.lostListings);
+            lostReturns.clear();
+            lostReturns.putAll(read.lostReturns);
             syncedRevision = doc.revision();
             super.setDirty();
             MMORPG.LOGGER.info("[MMORPG] Base de donnees : hotel des ventes lu ({} annonce(s))", listings.size());

@@ -116,6 +116,14 @@ public final class DevSharedDocsChecks {
             a.addEarnings(chef, 2);
             Database.await("barriere", 5000, c -> null);
             check(AuctionData.get(server).earnings(chef) == 42 && doc("auction").contains("Autre serveur"), "notre propre ecriture reste en memoire et en base");
+            // 5b) un objet devenu illisible (retire du mod) ne fait pas perdre les autres annonces et reste conserve
+            com.mmorpg.db.SharedDocs.put("auction", doc("auction").replaceFirst("\"listings\":\\[", "\"listings\":[{\"id\":99,\"seller\":\"" + UUID.randomUUID() + "\",\"sellerName\":\"Perdu\",\"stack\":{\"id\":\"mmorpg:objet_supprime\",\"count\":1},\"price\":5,\"expires\":9999999999999},"));
+            Database.await("barriere", 5000, c -> null);
+            a.reloadFromDatabase(server);
+            check(a.listings().size() == 1, "annonce illisible : les autres annonces survivent");
+            a.addEarnings(chef, 1);
+            Database.await("barriere", 5000, c -> null);
+            check(doc("auction").contains("objet_supprime"), "annonce illisible conservee en base, pas detruite");
             // 6) interrupteurs : ecrits dans la base, relus par les autres serveurs (et apres un redemarrage), sans redemarrage
             FeatureFlags.set(server, "drones", false);
             FeatureFlags.forget(server);
