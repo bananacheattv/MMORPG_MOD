@@ -47,6 +47,7 @@ public final class GuidanceManager {
     }
     public static int nextGuide(int mask){for(int i=0;i<5;i++)if((mask&(1<<i))==0)return i;return -1;}
     private static Target giver(ServerPlayer p,QuestDef q,String quest){
+        if(q.giver.equals(MascotGuide.GROUP))return new Target("quest",q.name,"Retourne voir la Mascotte",dim(p),null,NetworkConfig.current.role.name());
         var binding=RpgPlayers.get(p).questGivers.get(quest);
         if(binding!=null&&(q.npc==null||q.npc.isEmpty()||q.npc.equals(binding.getStringOr("id","")))){var current=com.mmorpg.world.NpcDirectory.get(p.level().getServer()).entry(binding.getStringOr("id",""));var actor=current==null?binding:current;return route(p,new Target("quest",q.name,"Rendre : "+actor.getStringOr("name","Maître des Quêtes"),actor.getStringOr("dimension",""),Vec3.atCenterOf(BlockPos.of(actor.getLongOr("pos",0))),actor.getStringOr("backend",NetworkConfig.current.role.name())));}
 
