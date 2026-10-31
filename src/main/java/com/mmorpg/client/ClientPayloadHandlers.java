@@ -37,7 +37,7 @@ public final class ClientPayloadHandlers {
         event.register(Payloads.FishFightState.TYPE, (payload, context) -> FishFightClient.receive(payload.data()));
         event.register(Payloads.MobInfo.TYPE, (payload, context) -> ClientData.mobInfo = payload.data().copy());
         event.register(Payloads.Notify.TYPE, (payload, context) -> {
-            if (payload.kind() == Payloads.Notify.MASCOT) com.mmorpg.client.model.pet.MascotRenderer.say(payload.title());
+            if (payload.kind() == Payloads.Notify.MASCOT) com.mmorpg.client.MascotDialogClient.say(payload.subtitle(), payload.title());
             else HudEffects.addBanner(payload);
         });
         event.register(Payloads.AreaEntry.TYPE, (payload, context) -> com.mmorpg.client.AreaEntryClient.start(payload));
@@ -98,6 +98,7 @@ public final class ClientPayloadHandlers {
             }
             case S2COpenScreen.COMPRESSOR -> mc.gui.setScreen(new com.mmorpg.client.screen.CompressorScreen(BlockPos.of(payload.extra().getLongOr("pos", 0))));
             case S2COpenScreen.QUEST_OFFER -> { if (mc.gui.screen() == null) mc.gui.setScreen(new com.mmorpg.client.screen.QuestOfferScreen(payload.extra())); }
+            case S2COpenScreen.GUILD_RAID_INVITE -> { if (mc.gui.screen() == null) mc.gui.setScreen(new com.mmorpg.client.screen.GuildRaidInviteScreen(payload.extra())); }
             case S2COpenScreen.QUEST_GIVER -> mc.gui.setScreen(new com.mmorpg.client.screen.QuestGiverScreen(payload.extra()));
             case S2COpenScreen.SHOP -> mc.gui.setScreen(new com.mmorpg.client.screen.ShopScreen(payload.extra()));
             case S2COpenScreen.DUNGEON_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.DungeonMasterScreen(payload.extra()));

@@ -2,6 +2,7 @@ package com.mmorpg.competition;
 
 import com.mmorpg.guild.*;
 import com.mmorpg.network.*;
+import com.mmorpg.network.Net;
 import com.mmorpg.server.RpgPlayers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
@@ -29,10 +30,27 @@ public final class GuildRaids {
         GuildService.require(remaining<=0,"Gardien disponible dans "+Math.max(1,(remaining+59999)/60000)+" min (recharge de 6 heures après victoire).");
         GuildService.require(RpgPlayers.get(p).playerClass.isPlayable()&&!com.mmorpg.hub.ClassTrial.active(p),"Termine le choix de classe.");
         if(CompetitionTravel.route(p,"guild-raid:"+tier))return;
-        var server=p.level().getServer();Raid r=RAIDS.get(g.id);
+        var server=p.level().getServer();Raid r=RAIDS.get(g.id);boolean created=r==null;
         if(r==null){GuildService.require(RAIDS.size()<8,"Les huit instances de l’Arbre-Monde sont occupées.");r=new Raid();r.guild=g.id;r.tier=tier;r.started=server.getTickCount();int slot=0;while(true){int n=slot;if(RAIDS.values().stream().noneMatch(v->v.slot==n))break;slot++;}r.slot=slot;r.build=CompetitionWorld.raid(r.center(),tier);RAIDS.put(g.id,r);}
         GuildService.require(r.tier==tier&&!r.rewarded&&r.players.size()<20,"Instance complète ou palier modifié.");r.players.add(p.getUUID());r.returns.put(p.getUUID(),new ArenaManager.Return(p.level().dimension(),p.getX(),p.getY(),p.getZ(),p.getYRot(),p.getXRot()));
         if(r.build.done())arrive(p,r);else p.sendSystemMessage(Component.literal("Préparation de l’instance de l’Arbre-Monde…"));
+        if(created)invite(p,g,tier);
+    }
+    private record Invite(UUID guild,int tier,long until){}
+    private static final Map<UUID,Invite> INVITES=new HashMap<>();
+    /** Propose aux membres en ligne de la guilde de rejoindre le combat (fenêtre Accepter / Refuser). */
+    private static void invite(ServerPlayer leader,GuildStore.Guild g,int tier){
+        var server=leader.level().getServer();long until=server.getTickCount()+20*120;
+        for(UUID id:g.members.keySet()){if(id.equals(leader.getUUID()))continue;var m=server.getPlayerList().getPlayer(id);if(m==null||!m.isAlive()||of(id)!=null||ArenaManager.session(id)!=null||com.mmorpg.dungeon.InstanceManager.containsPlayer(m))continue;
+            INVITES.put(id,new Invite(g.id,tier,until));
+            var tag=new net.minecraft.nbt.CompoundTag();tag.putString("boss",Yggdrasil.ALL[tier].name());tag.putString("from",leader.getGameProfile().name());tag.putString("guild",g.name);tag.putInt("tier",tier);tag.putInt("color",Yggdrasil.ALL[tier].color());
+            Net.toPlayer(m,new S2COpenScreen(S2COpenScreen.GUILD_RAID_INVITE,tag));}
+    }
+    public static void answer(ServerPlayer p,boolean accept){
+        var inv=INVITES.remove(p.getUUID());if(inv==null||!accept)return;
+        if(p.level().getServer().getTickCount()>inv.until()){p.sendSystemMessage(Component.literal("L’invitation a expiré."));return;}
+        var r=RAIDS.get(inv.guild());if(r==null||r.tier!=inv.tier()||r.rewarded){p.sendSystemMessage(Component.literal("Le combat est terminé."));return;}
+        try{enter(p,inv.tier());}catch(IllegalArgumentException e){p.sendSystemMessage(Component.literal(e.getMessage()));}
     }
     public static void test(ServerPlayer p,int tier){
         CompetitionAdmin.require(p);CompetitionAdmin.available(p);
@@ -65,7 +83,7 @@ public final class GuildRaids {
                 if(r.defeated&&!r.rewarded)reward(r,server);
                 r.players.removeIf(id->{var p=server.getPlayerList().getPlayer(id);return p==null||!CompetitionTravel.inside(p);});
                 if(r.boss!=null&&r.boss.isAlive()){
-                    var target=r.players.stream().map(server.getPlayerList()::getPlayer).filter(Objects::nonNull).filter(p->!p.isSpectator()&&!p.isCreative()).min(Comparator.comparingDouble(r.boss::distanceToSqr)).orElse(null);r.boss.setTarget(target);
+                    var current=r.boss.getTarget();if(current==null||!current.isAlive()||!r.players.contains(current.getUUID())||((current instanceof ServerPlayer cp)&&(cp.isSpectator()||cp.isCreative()))){var target=r.players.stream().map(server.getPlayerList()::getPlayer).filter(Objects::nonNull).filter(p->p.isAlive()&&!p.isSpectator()&&!p.isCreative()).min(Comparator.comparingDouble(r.boss::distanceToSqr)).orElse(null);r.boss.setTarget(target);}
                     if(r.boss.distanceToSqr(r.center().getX(),100,r.center().getZ())>32*32)r.boss.setPos(r.center().getX()+.5,100,r.center().getZ()+.5);
                 }
                 for(UUID id:r.players){var p=server.getPlayerList().getPlayer(id);if(p!=null){if(p.getY()<97||p.distanceToSqr(r.center().getX(),100,r.center().getZ())>42*42)arrive(p,r);var md=r.boss==null?null:r.boss.rpgData();p.sendOverlayMessage(Component.literal(r.rewarded?"Victoire ! Retour à votre départ dans "+Math.max(0,(r.returnAt-server.getTickCount()+19)/20)+" s":"Yggdrasil · "+Yggdrasil.ALL[r.tier].name()+" · "+(md==null?"":Math.round(md.hp)+" / "+Math.round(md.maxHp)+" PV")));}}

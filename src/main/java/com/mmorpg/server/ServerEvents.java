@@ -107,6 +107,10 @@ public final class ServerEvents {
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
             RpgPlayers.onRespawn(sp);
+            if (sp.level().dimension().equals(com.mmorpg.dungeon.InstanceManager.DIM)) {
+                com.mmorpg.dungeon.InstanceManager.forgetReturn(sp);
+                com.mmorpg.hub.HubManager.goToSpawn(sp);
+            }
             if (!event.isEndConquered()) Scheduler.later(sp.level(), 5, () -> {
                 if (!sp.isRemoved()) com.mmorpg.hub.HubManager.goToSpawn(sp);
             });
@@ -128,5 +132,15 @@ public final class ServerEvents {
             MobLevels.initialize(mob, level);
             com.mmorpg.dungeon.DungeonVariants.scaleMob(mob,level);
         }
+    }
+
+    /** Interdit de jeter des objets (sauf admins) ; interrupteur « drop_objets » (actif = drop interdit). */
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void onTossForbidden(net.neoforged.neoforge.event.entity.item.ItemTossEvent event) {
+        if (!(event.getPlayer() instanceof net.minecraft.server.level.ServerPlayer p)) return;
+        if (com.mmorpg.admin.PlayerAdmin.allowed(p)) return;
+        if (!FeatureFlags.enabled(p.level().getServer(), "drop_objets")) return;
+        event.setCanceled(true);
+        p.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Il est interdit de jeter des objets.").withColor(0xFF8080));
     }
 }

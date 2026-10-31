@@ -452,6 +452,16 @@ public final class DevShowcase {
         mc.options.pauseOnLostFocus = false;
         if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.PauseScreen && !MODE.equals("interface")) mc.gui.setScreen(null);
         String me = mc.player.getName().getString();
+        if (MODE.equals("invitation_boss")) {    // invitation au boss de guilde
+            if (tick == 5) {
+                var q = new net.minecraft.nbt.CompoundTag();
+                q.putString("boss", "Gardien de l'Arbre-Monde"); q.putString("from", "Copassist"); q.putString("guild", "Les Aigles"); q.putInt("tier", 0); q.putInt("color", 0x66DD88);
+                mc.gui.setScreen(new com.mmorpg.client.screen.GuildRaidInviteScreen(q));
+            }
+            if (tick == 25) shot(mc, "invitation_boss");
+            if (tick == 35) stop(mc);
+            return;
+        }
         if (MODE.equals("offre_quete")) {    // fenetre de proposition automatique de quete
             if (tick == 5) {
                 var q = new net.minecraft.nbt.CompoundTag();
@@ -3959,14 +3969,14 @@ public final class DevShowcase {
         if (t == 5) mc.getWindow().setWindowed(1280, 720);
         if (t == 60) {
             var e = new com.mmorpg.entity.MascotEntity(com.mmorpg.registry.ModEntities.MASCOT.get(), mc.level);
-            e.init();
+            e.setOwnerId(mc.player.getId());
             e.setId(-6000);                                     // entite purement cliente
             var look = mc.player.getLookAngle();                // devant le joueur, sans commande (le joueur de test n'est pas operateur)
             e.setPos(mc.player.getX() + look.x * 4.5, mc.player.getY() + 0.2, mc.player.getZ() + look.z * 4.5);
             e.setYBodyRot(mc.player.getYRot() + 180);
             e.yBodyRotO = e.yBodyRot;
             mc.level.addEntity(e);
-            com.mmorpg.client.model.pet.MascotRenderer.say("Salut, voyageur ! Je suis la Mascotte, ton guide. Ici, tout se fabrique : suis mes missions !");
+            com.mmorpg.client.MascotDialogClient.say("Mascotte", "Salut, voyageur ! Je suis la Mascotte, ton guide. Rends-toi à la forge du spawn pour fabriquer ta première pioche.");
         }
         if (t == 140) shot(mc, "mascotte");
         if (t == 150) stop(mc);

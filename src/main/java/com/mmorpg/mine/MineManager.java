@@ -487,7 +487,6 @@ public final class MineManager {
         if(!com.mmorpg.server.FeatureFlags.allow(p,"mines"))return;
         if (k < 0 || k >= MineLayout.SECTORS || k >= RpgPlayers.get(p).minesUnlocked) return;
         if (!com.mmorpg.server.PortalAccess.consume(p,"mine")) return;
-        if (com.mmorpg.network.GroupTravel.begin(p,"mine",Integer.toString(k))) return;
         com.mmorpg.server.AdventureSummary.begin(p,"mine");
         if (com.mmorpg.network.NetworkPlayers.route(p, com.mmorpg.network.NetworkConfig.Role.MINES, "mine:" + k)) return;
         MinecraftServer server = p.level().getServer();

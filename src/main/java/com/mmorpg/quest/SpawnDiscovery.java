@@ -75,12 +75,10 @@ public final class SpawnDiscovery {
     }
     /** Decalage de la Mascotte (est, sud) depuis le point d'arrivee du spawn : a cote de la sortie, en x +5 / z -2. */
     public static final int MASCOT_DX=5,MASCOT_DZ=-2;
-    /** Pose la Mascotte du tutoriel a cote de la sortie du spawn ; les quetes du groupe « tutoriel » demarrent d'elle. */
+    /** Anciennes versions : une Mascotte unique etait posee au spawn ; elle est maintenant personnelle (MascotGuide). Retire l'ancienne. */
     private static void installMascot(ServerLevel l,BlockPos origin){
-        if(l.getEntity(com.mmorpg.entity.MascotEntity.ID)!=null||com.mmorpg.world.NpcDirectory.get(l.getServer()).entry(com.mmorpg.entity.MascotEntity.ID.toString())!=null)return;
-        var at=ground(l,origin.offset(MASCOT_DX,0,MASCOT_DZ),origin.getY(),4);if(at==null)return;
-        var n=com.mmorpg.registry.ModEntities.MASCOT.get().create(l,net.minecraft.world.entity.EntitySpawnReason.COMMAND);n.init();
-        n.snapTo(at.getX()+.5,at.getY()+.4,at.getZ()+.5,90,0);n.setYHeadRot(90);n.setYBodyRot(90);l.addFreshEntity(n);
+        var old=l.getEntity(com.mmorpg.entity.MascotEntity.ID);if(old!=null)old.discard();
+        com.mmorpg.world.NpcDirectory.get(l.getServer()).remove(com.mmorpg.entity.MascotEntity.ID.toString());
     }
     public static void refreshNavigation(net.minecraft.server.MinecraftServer server){
         var directory=com.mmorpg.world.NpcDirectory.get(server);

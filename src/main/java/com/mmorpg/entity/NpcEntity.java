@@ -116,7 +116,7 @@ public class NpcEntity extends PathfinderMob {
             switch (role()) {
                 case PVP -> com.mmorpg.competition.PvpProgression.open(sp,"");
                 case BOUTIQUE -> com.mmorpg.store.PremiumStore.open(sp,"");
-                case QUETES -> QuestManager.openGiver(sp, this);
+                case QUETES -> QuestManager.talk(sp, this);
                 case MARCHAND -> ShopManager.open(sp,this);
                 case DONJON -> com.mmorpg.dungeon.DungeonMaster.open(sp, this);
                 case MINES -> com.mmorpg.mine.MineManager.open(sp, this);
