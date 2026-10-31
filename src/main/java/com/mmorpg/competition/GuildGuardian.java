@@ -12,6 +12,8 @@ public final class GuildGuardian extends com.mmorpg.entity.boss.RpgBoss {
     private boolean attackQueued;private int casts;
     public GuildGuardian(EntityType<? extends Monster> type,Level level,int tier){super(type,level,"yggdrasil_"+Yggdrasil.ALL[tier].id());this.tier=tier;setCustomName(net.minecraft.network.chat.Component.literal(Yggdrasil.ALL[tier].name()));}
     @Override protected void registerGoals(){super.registerGoals();}
+    @Override protected double baseDamage(){return 1.15;}
+    @Override protected double baseToughness(){return 1.25;}
     public void initialize(){setHomeTo(blockPosition(),34);var md=new com.mmorpg.rpg.MobData();md.key=mobKey();md.level=Math.min(100,(tier+1)*10);md.boss=true;md.maxHp=14000*(tier+1)*(tier+1);md.hp=md.maxHp;md.atk=(float)(65*Math.pow(tier+1,1.55));md.def=10*(tier+1);md.xpMultiplier=0;setData(com.mmorpg.registry.ModAttachments.MOB,md);setHealth(getMaxHealth());}
     @Override public boolean hurtServer(ServerLevel level,net.minecraft.world.damagesource.DamageSource source,float amount){if(!(source.getEntity() instanceof ServerPlayer p)||!GuildRaids.allowed(this,p.getUUID()))return false;return super.hurtServer(level,source,amount);}
     @Override public void die(net.minecraft.world.damagesource.DamageSource source){if(source.getEntity() instanceof ServerPlayer p)GuildRaids.killed(this,p);super.die(source);}
@@ -25,6 +27,6 @@ public final class GuildGuardian extends com.mmorpg.entity.boss.RpgBoss {
         if(windup>0){getNavigation().stop();windup--;if(windup%4==0){for(int x=-15;x<=15;x+=3)for(int z=-15;z<=15;z+=3){var point=new net.minecraft.world.phys.Vec3(aim.x+x,aim.y+.15,aim.z+z);if(danger(point))level.sendParticles(net.minecraft.core.particles.ParticleTypes.END_ROD,point.x,point.y,point.z,1,0,0,0,0);}}
             if(windup==0){for(var p:level.players())if(GuildRaids.allowed(this,p.getUUID())&&danger(p.position()))com.mmorpg.combat.RpgCombat.mobHit(this,p,1.4+phase*.25+tier*.04);
                 level.sendParticles(net.minecraft.core.particles.ParticleTypes.EXPLOSION,aim.x,aim.y+1,aim.z,20,5,1,5,.03);}return;}
-        if(ready("yggdrasil_special",145-tier*5)){casts++;aim=(casts%2==0?getTarget().position():position());windup=phase==3?32:phase==2?42:52;level.addFreshEntity(com.mmorpg.entity.SkillFxEntity.create(level,com.mmorpg.entity.FxKind.CIRCLE,aim,7,Yggdrasil.ALL[tier].color(),windup));level.broadcastEntityEvent(this,(byte)74);for(var p:level.players())if(GuildRaids.allowed(this,p.getUUID()))p.sendSystemMessage(net.minecraft.network.chat.Component.literal("⚠ "+Yggdrasil.ALL[tier].attack()+" — quittez les marques lumineuses !").withColor(Yggdrasil.ALL[tier].color()));}
+        if(ready("yggdrasil_special",145-tier*5)){casts++;aim=(casts%2==0?getTarget().position():position());windup=phase>=3?30:phase==2?40:50;level.addFreshEntity(com.mmorpg.entity.SkillFxEntity.create(level,com.mmorpg.entity.FxKind.CIRCLE,aim,7,Yggdrasil.ALL[tier].color(),windup));level.broadcastEntityEvent(this,(byte)74);for(var p:level.players())if(GuildRaids.allowed(this,p.getUUID()))p.sendSystemMessage(net.minecraft.network.chat.Component.literal("⚠ "+Yggdrasil.ALL[tier].attack()+" — quittez les marques lumineuses !").withColor(Yggdrasil.ALL[tier].color()));}
     }
 }

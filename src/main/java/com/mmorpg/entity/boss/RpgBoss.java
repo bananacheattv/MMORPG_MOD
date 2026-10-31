@@ -57,6 +57,14 @@ public abstract class RpgBoss extends RpgMonster {
     protected int phase = 1;
     public int attackStarted=-100,castStarted=-100;
     private final BossPressure.State pressure=new BossPressure.State();
+    private final BossFury.State fury=new BossFury.State();
+    /** Base de la puissance offensive du boss (surchargee par les gardiens de guilde, deja tres puissants). */
+    protected double baseDamage(){return 1.5;}
+    /** Base de la robustesse du boss : les degats recus sont divises par ce facteur. */
+    protected double baseToughness(){return 1.8;}
+    public double damageMultiplier(){return BossFury.damageMultiplier(this,fury,phase,baseDamage());}
+    public double toughness(){return BossFury.toughness(fury,baseToughness());}
+    @Override public void die(DamageSource source){if(level() instanceof ServerLevel sl)BossFury.discardAdds(sl,fury);super.die(source);}
     public int combatPhase(){return phase;}
     void pressureAnimation(){level().broadcastEntityEvent(this,(byte)74);AnimSet a=animSet();if(a!=null)for(int i=0;i<a.lengths().length;i++)if(i!=a.death()&&i!=a.spawn()&&!a.looping()[i]&&!a.hold()[i]){playAnim(i);break;}}
     /** Etats des animations ponctuelles (client), lus par le rendu. */
@@ -113,13 +121,13 @@ public abstract class RpgBoss extends RpgMonster {
 
     /** Vrai si la capacite est prete ; la remet alors en recharge. */
     protected boolean ready(String ability, double defaultTicks) {
-        int left = cooldowns.getOrDefault(ability, (int) (defaultTicks * 0.5));
+        int left = cooldowns.getOrDefault(ability, (int) (defaultTicks * 0.35));
         if (left > 0) {
             cooldowns.put(ability, left - 1);
             return false;
         }
         double base = ability(ability, defaultTicks);
-        double mult = phase >= 3 ? 0.6 : phase == 2 ? 0.8 : 1.0;
+        double mult = phase >= 4 ? 0.42 : phase == 3 ? 0.55 : phase == 2 ? 0.7 : 0.85;
         cooldowns.put(ability, (int) Math.max(10, base * mult));
         return true;
     }
@@ -307,7 +315,7 @@ public abstract class RpgBoss extends RpgMonster {
         }
         // cible persistante : on garde la cible tant qu'elle est valide, sinon le joueur le plus proche (sans ligne de vue exigee)
         LivingEntity cur = getTarget();
-        if (tickCount % 10 == 0 && (cur == null || !cur.isAlive() || !com.mmorpg.combat.RpgCombat.isEnemy(this, cur) || distanceToSqr(cur) > 64 * 64
+        if (tickCount % 5 == 0 && (cur == null || !cur.isAlive() || !com.mmorpg.combat.RpgCombat.isEnemy(this, cur) || distanceToSqr(cur) > 64 * 64
                 || (cur instanceof ServerPlayer sp && (sp.isCreative() || sp.isSpectator())))) {
             var nearest = level.players().stream().filter(p -> p.isAlive() && !p.isCreative() && !p.isSpectator()
                     && com.mmorpg.combat.RpgCombat.isEnemy(this, p) && distanceToSqr(p) < 56 * 56)
@@ -317,9 +325,9 @@ public abstract class RpgBoss extends RpgMonster {
         keepInBase(level);
         LivingEntity target = this.getTarget();
         // poursuite active : si la cible s'eloigne et que le boss est libre, il la rejoint
-        if (target != null && target.isAlive() && !busy() && this.tickCount >= immobileEnd && this.tickCount % 10 == 0
-                && distanceToSqr(target) > 4.5 * 4.5 && (this.getNavigation().isDone() || this.getNavigation().getTargetPos() == null)) {
-            this.getNavigation().moveTo(target, 1.2);
+        if (target != null && target.isAlive() && !busy() && this.tickCount >= immobileEnd && this.tickCount % 5 == 0
+                && distanceToSqr(target) > 2.5 * 2.5) {
+            this.getNavigation().moveTo(target, 1.3 + 0.1 * Math.min(4, phase));      // poursuite constante, de plus en plus rapide
         }
         if (target != null && target.isAlive() && busy()) faceTarget(target, 15.0F);
         if (this.tickCount < immobileEnd) {
@@ -328,7 +336,7 @@ public abstract class RpgBoss extends RpgMonster {
             return;
         }
         float frac = hpFraction();
-        int newPhase = frac > 0.66f ? 1 : frac > 0.33f ? 2 : 3;
+        int newPhase = frac > 0.75f ? 1 : frac > 0.5f ? 2 : frac > 0.25f ? 3 : 4;
         if (newPhase != phase) {
             phase = newPhase;
             MobData d = this.getExistingDataOrNull(ModAttachments.MOB);
@@ -339,7 +347,7 @@ public abstract class RpgBoss extends RpgMonster {
             onPhaseChange(level, phase);
         }
         if (this.getTarget() != null && this.getTarget().isAlive()) {
-            if(!BossPressure.tick(this,level,phase,pressure))bossTick(level);
+            if(!BossFury.tick(this,level,phase,fury)&&!BossPressure.tick(this,level,phase,pressure))bossTick(level);
         }
     }
 
@@ -350,6 +358,7 @@ public abstract class RpgBoss extends RpgMonster {
         for (var p : level.players()) {
             if (p.distanceToSqr(this) < 64 * 64) p.sendOverlayMessage(msg);
         }
+        BossFury.onPhase(this, level, phase, fury);
         com.mmorpg.dungeon.BossTerrain.phase(level,this,phase);
         com.mmorpg.dungeon.ArenaEvents.phase(level, this, phase);          // renforts et annonce quand le boss est dans l'antre d'un donjon
     }
