@@ -44,7 +44,7 @@ public final class SchemPaste {
     private static final class Job {
         final ServerLevel level; final Path file; final String name;
         final int w, h, l; final int ox, oy, oz; final BlockState[] palette; final java.io.InputStream in; final long total; final byte[] buf = new byte[1 << 16]; int bufLen, bufPos; long remaining;
-        final boolean skipAir; long index; long placed; final CommandSourceStack source;
+        final boolean skipAir; long index; long placed; BlockPos origin; long consumed; long dataLen; final CommandSourceStack source;
         Job(CommandSourceStack s, ServerLevel level, Path file, int w, int h, int l, int ox, int oy, int oz, BlockState[] palette, java.io.InputStream in, long total, boolean skipAir) {
             this.source = s; this.level = level; this.file = file; this.name = file.getFileName().toString();
             this.w = w; this.h = h; this.l = l; this.ox = ox; this.oy = oy; this.oz = oz; this.palette = palette; this.in = in; this.total = total; this.remaining = total; this.skipAir = skipAir;
@@ -57,6 +57,53 @@ public final class SchemPaste {
     }
 
     private static void close(Job j) { try { j.in.close(); } catch (Exception ignored) { } }
+
+    private static Path stateFile(net.minecraft.server.MinecraftServer server) {
+        return server.getServerDirectory().resolve("config").resolve("mmorpg").resolve("schem_job.properties");
+    }
+
+    private static void save(net.minecraft.server.MinecraftServer server, Job j) {
+        try {
+            var p = new java.util.Properties();
+            p.setProperty("file", j.file.getFileName().toString());
+            p.setProperty("x", "" + j.origin.getX()); p.setProperty("y", "" + j.origin.getY()); p.setProperty("z", "" + j.origin.getZ());
+            p.setProperty("skipAir", "" + j.skipAir);
+            p.setProperty("consumed", "" + (j.dataLen - j.remaining));
+            p.setProperty("index", "" + j.index); p.setProperty("placed", "" + j.placed);
+            Files.createDirectories(stateFile(server).getParent());
+            Path tmp = stateFile(server).resolveSibling("schem_job.tmp");
+            try (var out = Files.newOutputStream(tmp)) { p.store(out, null); }
+            Files.move(tmp, stateFile(server), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception ignored) { }
+    }
+
+    private static void clearState(net.minecraft.server.MinecraftServer server) {
+        try { Files.deleteIfExists(stateFile(server)); } catch (Exception ignored) { }
+    }
+
+    /** Reprise automatique au demarrage apres un arret ou un crash (monde principal). */
+    @SubscribeEvent public static void started(net.neoforged.neoforge.event.server.ServerStartedEvent e) {
+        var server = e.getServer();
+        if (!Files.isRegularFile(stateFile(server))) return;
+        var src = server.createCommandSourceStack();
+        CompletableFuture.runAsync(() -> {
+            try {
+                var p = new java.util.Properties();
+                try (var in = Files.newInputStream(stateFile(server))) { p.load(in); }
+                Path file = dir(src).resolve(p.getProperty("file"));
+                var origin = new BlockPos(Integer.parseInt(p.getProperty("x")), Integer.parseInt(p.getProperty("y")), Integer.parseInt(p.getProperty("z")));
+                MMORPG.LOGGER.info("[schem] reprise de {} a {} %", file.getFileName(), p.getProperty("index"));
+                READY.add(load(src, server.overworld(), file, origin, Boolean.parseBoolean(p.getProperty("skipAir")),
+                    Long.parseLong(p.getProperty("consumed")), Long.parseLong(p.getProperty("index")), Long.parseLong(p.getProperty("placed"))));
+            } catch (Exception ex) { MMORPG.LOGGER.warn("[schem] reprise impossible : {}", ex.toString()); }
+        });
+    }
+
+    @SubscribeEvent public static void stopping(net.neoforged.neoforge.event.server.ServerStoppingEvent e) {
+        var j = JOBS.peek();
+        if (j != null && j.remaining > 0) save(e.getServer(), j);
+        JOBS.forEach(SchemPaste::close);
+    }
 
     private static final ArrayDeque<Job> JOBS = new ArrayDeque<>();
     private static final ConcurrentLinkedQueue<Job> READY = new ConcurrentLinkedQueue<>();
@@ -84,7 +131,7 @@ public final class SchemPaste {
         BlockPos origin = at != null ? at : BlockPos.containing(src.getPosition());
         src.sendSuccess(() -> Component.literal("Lecture de " + file.getFileName() + "..."), true);
         CompletableFuture.runAsync(() -> {
-            try { READY.add(load(src, level, file, origin, skipAir)); }
+            try { READY.add(load(src, level, file, origin, skipAir, 0, 0, 0)); }
             catch (Exception e) { src.getServer().execute(() -> src.sendFailure(Component.literal("Echec : " + e))); }
         });
         return 1;
@@ -93,7 +140,7 @@ public final class SchemPaste {
     private static final class Hdr { int w, h, l; int[] off = {0, 0, 0}; java.util.Map<String, Integer> pal = new java.util.LinkedHashMap<>(); long dataLen = -1; }
 
     /** Lit l'en-tete NBT en flux et s'arrete au debut du tableau BlockData : les ~400 Mo ne sont jamais charges en memoire. */
-    private static Job load(CommandSourceStack src, ServerLevel level, Path file, BlockPos origin, boolean skipAir) throws Exception {
+    private static Job load(CommandSourceStack src, ServerLevel level, Path file, BlockPos origin, boolean skipAir, long consumed, long index, long placed) throws Exception {
         var in = new java.io.DataInputStream(new java.io.BufferedInputStream(new java.util.zip.GZIPInputStream(Files.newInputStream(file), 1 << 16), 1 << 16));
         try {
             in.readByte(); in.readUTF();
@@ -110,7 +157,8 @@ public final class SchemPaste {
                 catch (Exception ex) { palette[en.getValue()] = Blocks.AIR.defaultBlockState(); }
             }
             var j = new Job(src, level, file, h.w, h.h, h.l, origin.getX() + h.off[0], origin.getY() + h.off[1], origin.getZ() + h.off[2], palette, in, total, skipAir);
-            j.remaining = h.dataLen;
+            j.remaining = h.dataLen; j.dataLen = h.dataLen; j.origin = origin;
+            if (consumed > 0 && consumed < h.dataLen) { in.skipNBytes(consumed); j.remaining = h.dataLen - consumed; j.index = index; j.placed = placed; }
             return j;
         } catch (Exception ex) { in.close(); throw ex; }
     }
@@ -173,8 +221,9 @@ public final class SchemPaste {
             }
         } catch (java.io.IOException ex) { j.remaining = 0; }
         if (j.remaining <= 0) j.index = j.total;
+        else if (e.getServer().getTickCount() % 100 == 0) save(e.getServer(), j);
         if (j.index >= j.total) {
-            JOBS.poll(); close(j);
+            JOBS.poll(); close(j); clearState(e.getServer());
             final Job fj = j;
             fj.source.sendSuccess(() -> Component.literal(fj.name + " : termine, " + fj.placed + " blocs poses."), true);
             MMORPG.LOGGER.info("[schem] {} termine : {} blocs", fj.name, fj.placed);
@@ -189,7 +238,7 @@ public final class SchemPaste {
         var nom = Commands.argument("nom", StringArgumentType.string()).suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(files(c.getSource()), b));
         var root = Commands.literal("schem").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
             .then(Commands.literal("list").executes(c -> { c.getSource().sendSuccess(() -> Component.literal("Schematics : " + String.join(", ", files(c.getSource()))), false); return 1; }))
-            .then(Commands.literal("stop").executes(c -> { int k = JOBS.size(); JOBS.forEach(SchemPaste::close); JOBS.clear(); c.getSource().sendSuccess(() -> Component.literal(k + " collage(s) arrete(s)."), true); return 1; }))
+            .then(Commands.literal("stop").executes(c -> { int k = JOBS.size(); JOBS.forEach(SchemPaste::close); JOBS.clear(); clearState(c.getSource().getServer()); c.getSource().sendSuccess(() -> Component.literal(k + " collage(s) arrete(s)."), true); return 1; }))
             .then(Commands.literal("paste").then(nom
                 .executes(c -> paste(c, null, true))
                 .then(Commands.argument("pos", BlockPosArgument.blockPos())
