@@ -11,5 +11,3 @@ Deux emplacements de sacs à dos ajoutent des cases. Les tailles sont **6, 12, 1
 Un sac ne peut pas être retiré si cela ferait disparaître des cases occupées. Les sacs ne s’imbriquent pas. Les objets ramassés peuvent rejoindre les sacs équipés lorsque l’inventaire normal est plein ; leur contenu suit le profil du joueur entre les serveurs.
 
 **Maj + clic** transfère une pile. En maintenant Maj et le bouton gauche, glisser sur d’autres piles les transfère successivement. Le curseur ne doit pas déjà porter un objet.
-
-Le catalogue Créatif est réservé aux véritables opérateurs du serveur. Le grade affiché, même Fondateur, ne suffit pas à donner cette autorisation.

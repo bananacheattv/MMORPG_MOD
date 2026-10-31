@@ -8,6 +8,6 @@ Le butin d’un coffre est déterminé et versé par le serveur au début de l�
 
 Les cinq Lucky Blocks sont **Céleste, Sylvestre, Infernal, Givre et Néant**. Chacun possède son aspect et ses couleurs. Le menu affiche d’abord trois cubes 3D « ? », puis les objets défilent. Utilise **Ouvrir le Lucky Block** pour lancer le tirage. Les probabilités ne sont pas affichées dans l’interface ; le calcul reste côté serveur.
 
-La boutique premium utilise des crédits. Elle peut proposer des clés, charmes, une rune de changement de classe, des potions, Lucky Blocks et grades. Les noms, prix et avantages sont configurables. Les achats en argent réel restent désactivés tant que le site et son intégration ne sont pas prêts.
+La boutique premium utilise des crédits. Elle peut proposer des clés, charmes, une rune de changement de classe, des potions, Lucky Blocks et grades. Les achats en argent réel restent désactivés pour le moment.
 
-Le grade de base est **Aelorien**. Les grades du staff, comme Fondateur ou Modérateur, ne donnent pas automatiquement OP : les permissions du serveur sont gérées séparément.
+Le grade de base est **Aelorien**.
