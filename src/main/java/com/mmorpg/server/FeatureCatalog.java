@@ -58,6 +58,7 @@ public final class FeatureCatalog {
                 new Entry("mines", "Mines", "Étages miniers."),
                 new Entry("plaines", "Plaines", "Zone des plaines."),
                 new Entry("cinematique", "Cinématique", "Intro du hub."),
-                new Entry("anticheat", "Anticheat", "Limites de débit et détections.")));
+                new Entry("anticheat", "Anticheat", "Limites de débit et détections."),
+                new Entry("drop_objets", "Interdire le drop", "Empêche de jeter des objets (admins exemptés).")));
     }
 }
