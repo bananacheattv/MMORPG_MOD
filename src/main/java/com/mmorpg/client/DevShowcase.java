@@ -252,6 +252,12 @@ public final class DevShowcase {
             if(tick==320)shot(mc,"shaders_cinema");
             if(tick==330){ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.OFF);stop(mc);}return;
         }
+        if(MODE.equals("deconnexion")){
+            if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
+            if(tick==80){mc.getWindow().setWindowed(1280,720);mc.resizeGui();mc.gui.setScreen(new net.minecraft.client.gui.screens.DisconnectedScreen(null,net.minecraft.network.chat.Component.translatable("disconnect.lost"),net.minecraft.network.chat.Component.literal("Vous avez été expulsé du serveur : Server closed")));}
+            if(tick==110){shot(mc,"deconnexion_kick");mc.gui.setScreen(new net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen(null));}
+            if(tick==140){shot(mc,"deconnexion_liste_serveurs");stop(mc);}return;
+        }
         if(MODE.equals("graphics")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
             if(tick==80){mc.options.guiScale().set(2);mc.getWindow().setWindowed(1280,720);mc.resizeGui();mc.gui.setScreen(new com.mmorpg.client.screen.AeloriaTitleScreen());}

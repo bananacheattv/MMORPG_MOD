@@ -18,8 +18,16 @@ import net.minecraft.util.Mth;
 public class AeloriaTitleScreen extends Screen {
     private long openedAt;
 
+    private final Component reason;
+
     public AeloriaTitleScreen() {
+        this(null);
+    }
+
+    /** Menu affiche apres une deconnexion : la raison s'affiche au-dessus des boutons. */
+    public AeloriaTitleScreen(Component reason) {
         super(Component.translatable("narrator.screen.title"));
+        this.reason = reason;
         if (this.minecraft != null) this.minecraft.gameRenderer.panorama().startSpin();
     }
 
@@ -70,6 +78,13 @@ public class AeloriaTitleScreen extends Screen {
         int lw=Math.min(260,(int)((y-40)*com.mmorpg.client.ui.Logo.FULL_RATIO));
         com.mmorpg.client.ui.Logo.full(g,x+bw/2,y-35-(int)(lw/com.mmorpg.client.ui.Logo.FULL_RATIO),lw);
         g.text(font,AeloriaFont.of("ÉCRIVEZ VOTRE LÉGENDE"),x+4,y-21,0xFFEED59E,true);
+        if(reason!=null){
+            var lines=font.split(reason,Math.max(80,Math.min(width-48,320)));
+            int n=Math.min(lines.size(),5),bx=Math.max(24,width-Math.max(80,Math.min(width-48,320))-24),by=height-40-n*10;
+            com.mmorpg.client.ui.Ui.rounded(g,bx-6,by-6,Math.max(80,Math.min(width-48,320))+12,16+n*10+6,6,0xB0180F2B);
+            g.text(font,"DÉCONNECTÉ",bx,by,0xFFE2B85A,false);
+            for(int i=0;i<n;i++)g.text(font,lines.get(i),bx,by+12+i*10,0xFFF1E6FF,false);
+        }
         embers(g,t,fade);
         com.mmorpg.client.ui.Ui.rounded(g,12,height-24,145,16,6,0x90180F2B);
         g.text(font,"AELORIA  ·  MMORPG",20,height-19,0xFFD9C9EE,false);
