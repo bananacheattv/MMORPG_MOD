@@ -79,6 +79,7 @@ neoForge {
             programArgument '--nogui'
             if (project.hasProperty('sharedChecks')) systemProperty 'mmorpg.checkShared', 'true'
             if (project.hasProperty('networkChecks')) systemProperty 'mmorpg.checkNetwork', 'true'
+            if (project.hasProperty('tutorialChecks')) systemProperty 'mmorpg.checkTutorial', 'true'
             if (project.hasProperty('fishingChecks')) systemProperty 'mmorpg.checkFishing', 'true'
             if (project.hasProperty('weeklyVisual')) systemProperty 'mmorpg.weeklyVisual', 'true'
             if (project.hasProperty('weeklyChecks')) systemProperty 'mmorpg.checkWeekly', 'true'

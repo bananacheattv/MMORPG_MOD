@@ -63,6 +63,10 @@ public final class ForgeRecipes {
         ItemDefs.WeaponDef def = ItemDefs.WEAPONS.stream().filter(w -> w.id().equals(id)).findFirst().orElseThrow();
         // metallurgie des mines : comme un outil, une arme demande du minerai compresse et des lingots du rang de son niveau
         int lvl = def.level();
+        if (NOVICE.contains(id)) {                      // premiere arme du tutoriel : sans minerai compresse, faconnable avec les materiaux de depart
+            add(Category.ARMES, id, 1, gold, lvl, def.cls(), ingredients);
+            return;
+        }
         double m = lvl <= 5 ? 0.25 : lvl <= 40 ? 1.0 : lvl <= 65 ? 1.5 : lvl <= 85 ? 2.0 : 3.0;
         String ore = MINE_ORES[oreTier(lvl)];
         List<Object> ing = new ArrayList<>(List.of(ingredients));
@@ -77,6 +81,10 @@ public final class ForgeRecipes {
         }
         add(Category.ARMES, id, 1, gold, lvl, def.cls(), ing.toArray());
     }
+
+    /** Premiere arme et premiere armure de chaque classe : recettes de debut de partie, fabriquees pendant le tutoriel. */
+    public static final java.util.Set<String> NOVICE = java.util.Set.of("epee_recrue", "baton_apprenti", "arc_chasseur", "masse_garde",
+            "acier_soldat", "apprenti", "chasseur", "garde");
 
     /** Minerais des mines par rang (voir MineBlocks) et niveau a partir duquel ils sont extraits. */
     private static final String[] MINE_ORES = {"verdite", "argentite", "ambrasite", "glacium", "neantite"};
@@ -141,6 +149,10 @@ public final class ForgeRecipes {
                 ing.add(special);
                 ing.add(1);
             }
+            if (NOVICE.contains(setId)) {
+                add(Category.ARMURES, setId + "_" + ItemDefs.PIECES[i], 1, goldPerPiece * weight[i] / 5, set.level(), set.cls(), ing.toArray());
+                continue;
+            }
             // metallurgie des mines : minerai compresse du rang de la panoplie, et lingot rare des panoplies de niveau 25+
             ing.add("compresse_" + MINE_ORES[oreTier(set.level())]);
             ing.add(COMPRESSED_PER_SET_PIECE[i] * (set.level() >= 90 ? 16 : 10) / 10);
@@ -163,6 +175,8 @@ public final class ForgeRecipes {
 
     static {
         PlayerClass N = PlayerClass.NONE;
+        add(Category.OUTILS, "pioche_debutant", 1, 0, 1, N, "ecorce_ancienne", 2, "ferraille_gobeline", 3);          // outils du tutoriel
+        add(Category.OUTILS, "houe_debutant", 1, 0, 1, N, "ecorce_ancienne", 2, "ferraille_gobeline", 2);
         for(int i=0;i<com.mmorpg.mine.ToolRunes.IDS.length;i++)add(Category.MATERIAUX,com.mmorpg.mine.ToolRunes.IDS[i],1,100,10+i*10,N,"cristal_arcanique",2,"poussiere_ame",8,"lingot_argentite",2);
         add(Category.MATERIAUX, "fiole_runique", 4, 1, 1, N, "lingot_verdite", 1, "poussiere_ame", 1);
         for(int i=0;i<4;i++)add(Category.CONSOMMABLES,"sac_a_dos_"+i,1,150*(i+1),1+i*15,N,"cuir_renforce",4+i*4,"soie_araignee",2+i*2,"poussiere_ame",2+i*3);

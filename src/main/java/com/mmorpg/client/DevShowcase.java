@@ -1270,6 +1270,10 @@ public final class DevShowcase {
             dummyPhase(mc, me);
             return;
         }
+        if (MODE.equals("mascotte")) {        // la Mascotte du tutoriel et sa bulle de dialogue
+            mascotPhase(mc, me);
+            return;
+        }
         if (MODE.equals("familiers")) {
             petsPhase(mc, me);
             return;
@@ -3938,6 +3942,34 @@ public final class DevShowcase {
             MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (cinematique) : la cinematique ne s'est pas terminee");
             stop(mc);
         }
+    }
+
+    private static boolean mascotLoadingSeen;
+    private static int mascotTick, mascotWait;
+
+    private static void mascotPhase(Minecraft mc, String me) {
+        // le spawn se construit apres la connexion : on attend l'ecran de chargement puis sa fin (ou 90 s s'il ne vient pas)
+        if (com.mmorpg.client.LoadingClient.active()) {
+            mascotLoadingSeen = true;
+            mascotWait = 0;
+            return;
+        }
+        if (!mascotLoadingSeen && ++mascotWait < 1800) return;
+        int t = ++mascotTick;
+        if (t == 5) mc.getWindow().setWindowed(1280, 720);
+        if (t == 60) {
+            var e = new com.mmorpg.entity.MascotEntity(com.mmorpg.registry.ModEntities.MASCOT.get(), mc.level);
+            e.init();
+            e.setId(-6000);                                     // entite purement cliente
+            var look = mc.player.getLookAngle();                // devant le joueur, sans commande (le joueur de test n'est pas operateur)
+            e.setPos(mc.player.getX() + look.x * 4.5, mc.player.getY() + 0.2, mc.player.getZ() + look.z * 4.5);
+            e.setYBodyRot(mc.player.getYRot() + 180);
+            e.yBodyRotO = e.yBodyRot;
+            mc.level.addEntity(e);
+            com.mmorpg.client.model.pet.MascotRenderer.say("Salut, voyageur ! Je suis la Mascotte, ton guide. Ici, tout se fabrique : suis mes missions !");
+        }
+        if (t == 140) shot(mc, "mascotte");
+        if (t == 150) stop(mc);
     }
 
     private static void petsPhase(Minecraft mc, String me) {

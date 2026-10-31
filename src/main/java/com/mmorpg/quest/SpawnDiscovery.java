@@ -69,8 +69,18 @@ public final class SpawnDiscovery {
         if(!missing.isEmpty()&&!quiet&&player.permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_GAMEMASTER))player.sendSystemMessage(Component.literal("Donneurs de quêtes sans sol à leur emplacement prévu : "+String.join(" ; ",missing)+". Construisez à cet endroit ou placez-les avec l’outil PNJ (distance minimale "+QuestNpcPlan.MIN_DISTANCE+" blocs).").withColor(0xFFB060));
         UUID merchantId=UUID.nameUUIDFromBytes("aeloria:spawn-premium-store".getBytes(java.nio.charset.StandardCharsets.UTF_8));
         if(l.getEntity(merchantId)==null&&com.mmorpg.world.NpcDirectory.get(l.getServer()).entry(merchantId.toString())==null){var at=safe(l,player.blockPosition(),5);if(at!=null){var n=com.mmorpg.registry.ModEntities.NPC.get().create(l,net.minecraft.world.entity.EntitySpawnReason.COMMAND);n.setUUID(merchantId);n.setup(NpcEntity.Role.BOUTIQUE,"Céliane · Boutique d’Aeloria",8,"");n.snapTo(at.getX()+.5,at.getY(),at.getZ()+.5,180,0);n.setPersistenceRequired();l.addFreshEntity(n);}}
+        installMascot(l,origin);
         bindDefaults(l.getServer());refreshNavigation(l.getServer());
         if(actors[0]!=null&&!RpgPlayers.get(player).completedQuests.contains(IDS[0]))player.sendSystemMessage(Component.literal("Découvrez la cité avec Maëlys, l’accueil du spawn. Ses quêtes vous présentent Aeloria.").withColor(0xD5B0FF));
+    }
+    /** Decalage de la Mascotte (est, sud) depuis le point d'arrivee du spawn : a cote de la sortie, en x +5 / z -2. */
+    public static final int MASCOT_DX=5,MASCOT_DZ=-2;
+    /** Pose la Mascotte du tutoriel a cote de la sortie du spawn ; les quetes du groupe « tutoriel » demarrent d'elle. */
+    private static void installMascot(ServerLevel l,BlockPos origin){
+        if(l.getEntity(com.mmorpg.entity.MascotEntity.ID)!=null||com.mmorpg.world.NpcDirectory.get(l.getServer()).entry(com.mmorpg.entity.MascotEntity.ID.toString())!=null)return;
+        var at=ground(l,origin.offset(MASCOT_DX,0,MASCOT_DZ),origin.getY(),4);if(at==null)return;
+        var n=com.mmorpg.registry.ModEntities.MASCOT.get().create(l,net.minecraft.world.entity.EntitySpawnReason.COMMAND);n.init();
+        n.snapTo(at.getX()+.5,at.getY()+.4,at.getZ()+.5,90,0);n.setYHeadRot(90);n.setYBodyRot(90);l.addFreshEntity(n);
     }
     public static void refreshNavigation(net.minecraft.server.MinecraftServer server){
         var directory=com.mmorpg.world.NpcDirectory.get(server);
@@ -90,7 +100,7 @@ public final class SpawnDiscovery {
     }
     private static void bindDefaults(net.minecraft.server.MinecraftServer server){
         var candidates=new ArrayList<net.minecraft.nbt.CompoundTag>();
-        for(var t:com.mmorpg.world.NpcDirectory.get(server).snapshot())if(t instanceof net.minecraft.nbt.CompoundTag n&&n.getIntOr("role",-1)==0&&!n.getBooleanOr("tutorialGuide",false)&&n.getStringOr("dimension","").equals(com.mmorpg.hub.SpawnBuilder.DIM.identifier().toString())&&!n.getStringOr("group","").startsWith("spawn_decouverte_"))candidates.add(n);
+        for(var t:com.mmorpg.world.NpcDirectory.get(server).snapshot())if(t instanceof net.minecraft.nbt.CompoundTag n&&n.getIntOr("role",-1)==0&&!n.getBooleanOr("tutorialGuide",false)&&!n.getStringOr("group","").equals(com.mmorpg.server.MascotGuide.GROUP)&&n.getStringOr("dimension","").equals(com.mmorpg.hub.SpawnBuilder.DIM.identifier().toString())&&!n.getStringOr("group","").startsWith("spawn_decouverte_"))candidates.add(n);
         candidates.sort(java.util.Comparator.comparing(n->n.getStringOr("id","")));if(candidates.isEmpty())return;
         int index=0;for(String key:DefaultQuests.create().keySet()){
             var q=ConfigManager.quests().get(key);if(q==null||q.npc!=null&&!q.npc.isEmpty())continue;

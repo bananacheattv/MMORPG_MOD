@@ -20,6 +20,10 @@ public final class QuestNpcPlan {
     public static final String GROUP_PLAINES = "quetes_plaines", GROUP_MORTS = "quetes_morts_vivants", GROUP_ELEMENTS = "quetes_elements",
             GROUP_NEANT = "quetes_neant", GROUP_FORGE = "quetes_forge";
 
+    /** Groupe de la Mascotte (guide du tutoriel) et identifiant fixe de son entite. */
+    public static final String GROUP_TUTORIAL = "tutoriel";
+    public static final UUID MASCOT_ID = UUID.nameUUIDFromBytes("aeloria:tutorial-mascot".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+
     public record Giver(int index, String name, int skin, String group, int dx, int dz) {
         public UUID uuid() {
             return QuestNpcPlan.uuid(index);
@@ -74,6 +78,7 @@ public final class QuestNpcPlan {
             q.minLevel = 1;
             q.revision = DefaultQuests.REVISION;
             if (i > 0) q.requires.add(DISCOVERY_IDS[i - 1]);
+            else q.requires.add("tuto_fin");                  // la chaîne de découverte suit le tutoriel de la Mascotte
             q.objectives.add(new QuestDef.Objective(i == 4 ? "kill" : "visit", i == 4 ? "gobelin" : GIVERS.get(i + 1).name(), i == 4 ? 3 : 1));
             q.rewards.xp = 80 + i * 40;
             q.rewards.gold = 10 + i * 5;

@@ -100,6 +100,9 @@ public final class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.hub.ClassMasterEntity>> CLASS_MASTER =
             ENTITIES.registerEntityType("maitre_classe", com.mmorpg.entity.hub.ClassMasterEntity::new, MobCategory.MISC,
                     b -> b.sized(0.7F, 2.1F).fireImmune().clientTrackingRange(12).noSummon());
+    public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.MascotEntity>> MASCOT =
+            ENTITIES.registerEntityType("mascotte", com.mmorpg.entity.MascotEntity::new, MobCategory.MISC,
+                    b -> b.sized(1.1F, 1.5F).fireImmune().clientTrackingRange(12).noSummon());
     public static final DeferredHolder<EntityType<?>, EntityType<PetEntity>> PET =
             ENTITIES.registerEntityType("familier", PetEntity::new, MobCategory.MISC,
                     b -> b.sized(0.5F, 0.5F).clientTrackingRange(8).updateInterval(1));
@@ -152,6 +155,7 @@ public final class ModEntities {
                 .add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH, 20).build());
         event.put(HUB_GUIDE.get(), com.mmorpg.entity.NpcEntity.createAttributes().build());
         event.put(NPC.get(), com.mmorpg.entity.NpcEntity.createAttributes().build());
+        event.put(MASCOT.get(), com.mmorpg.entity.NpcEntity.createAttributes().build());
         event.put(CLASS_MASTER.get(), com.mmorpg.entity.hub.ClassMasterEntity.createAttributes().build());
         event.put(TRAINING_DUMMY.get(), com.mmorpg.entity.dummy.TrainingDummyEntity.createAttributes().build());
     }

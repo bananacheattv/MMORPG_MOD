@@ -8,7 +8,7 @@ import java.util.function.IntFunction;
 /** Quetes par defaut : une campagne qui suit la progression des niveaux 1 a 100, plus des quetes journalieres. */
 public final class DefaultQuests {
     /** Incremente quand les quetes par defaut changent : les quetes d'un quests.json plus ancien sont alors remplacees une fois. */
-    public static final int REVISION = 2;
+    public static final int REVISION = 3;
 
     private DefaultQuests() {
     }
@@ -46,13 +46,167 @@ public final class DefaultQuests {
         return d;
     }
 
+    // ------------------------------------------------ tutoriel de la Mascotte (groupe « tutoriel »)
+    private static final String M = "tuto_";
+
+    /** Quete du tutoriel : proposee par la Mascotte, chainee a la precedente, avec ses repliques. */
+    private static QuestDef tq(Map<String, QuestDef> m, String prev, String id, String name, String desc, String speech, String done, long xp, long gold,
+                               Object... items) {
+        QuestDef d = q(name, 1, desc);
+        d.giver = QuestNpcPlan.GROUP_TUTORIAL;
+        d.npc = QuestNpcPlan.MASCOT_ID.toString();
+        d.speech = speech;
+        d.speechDone = done;
+        if (prev != null) d.requires.add(M + prev);
+        reward(d, xp, gold, items);
+        m.put(M + id, d);
+        return d;
+    }
+
+    /** Objectif de decouverte : {@code key} = cle d'action (voir QuestManager#onAction), {@code label} = texte affiche. */
+    private static QuestDef act(QuestDef d, String key, String label, int count) {
+        d.objectives.add(new QuestDef.Objective("action", key + "|" + label, count));
+        return d;
+    }
+
+    private static QuestDef open(QuestDef d, String screen, String label) {
+        return act(d, "screen:" + screen, label, 1);
+    }
+
+    /** Le tutoriel complet : equipement fabrique a la forge, puis une quete par fonctionnalite du mod. */
+    public static Map<String, QuestDef> tutorial() {
+        Map<String, QuestDef> m = new LinkedHashMap<>();
+        // --- partie 1 : tout se fabrique, rien n'est offert au depart
+        tq(m, null, "bienvenue", "Bienvenue, voyageur", "La Mascotte, votre guide, vous accueille. Vous n'avez rien sur vous : tout se fabrique.",
+                "Salut, voyageur ! Je suis la Mascotte, ton guide. Tu n'as rien sur toi : ici, tout se fabrique. Suis mes missions et tu deviendras un héros !",
+                "Voici de quoi forger ta première pioche et ta houe. Direction la Forge Arcanique !", 40, 20, "ecorce_ancienne", 4, "ferraille_gobeline", 5);
+        obj(m.get(M + "bienvenue"), "level", "niveau", 1);
+        open(tq(m, "bienvenue", "forge", "La Forge Arcanique", "La forge transforme les matériaux en outils, armes et armures.",
+                "Cherche la Forge Arcanique du spawn (bloc de forge) et ouvre-la en faisant un clic droit dessus.",
+                "Voilà la forge ! Chaque recette montre les matériaux, l'or et le niveau requis.", 40, 5), "ForgeScreen", "Ouvrir la Forge Arcanique");
+        act(tq(m, "forge", "pioche", "Votre première pioche", "Fabriquez une pioche du débutant à la forge.",
+                "Dans la forge, onglet Outils : fabrique ta Pioche du débutant avec les matériaux que je t'ai donnés.",
+                "Belle pioche ! Elle servira à extraire la Verdite dans les mines.", 60, 0), "craft:pioche_debutant", "Fabriquer la pioche du débutant", 1);
+        act(tq(m, "pioche", "houe", "Votre première houe", "Fabriquez une houe du débutant à la forge.",
+                "Maintenant la houe du débutant, pour labourer la terre et cultiver tes premières graines.",
+                "Parfait ! Tu pourras bientôt cultiver. Voici quelques graines de Lueur.", 60, 0, "graine_lueur", 4), "craft:houe_debutant", "Fabriquer la houe du débutant", 1);
+        open(tq(m, "houe", "mines", "Le Maître des mines", "Le Maître des mines vous mène aux galeries, riches en minerais.",
+                "Les mines d'Aeloria regorgent de minerais ! Parle au Maître des mines : il t'y emmènera.",
+                "Les mines sont dangereuses mais précieuses. Prends garde aux monstres !", 60, 0), "MineMasterScreen", "Parler au Maître des mines");
+        act(tq(m, "mines", "minage", "Premiers coups de pioche", "Minez dix blocs de minerai avec votre pioche.",
+                "À la pioche, mine 10 minerais de Verdite. Chaque minerai fait aussi progresser ton métier de Mineur !",
+                "Bravo, mineur ! Voici de quoi forger ta première arme.", 150, 20, "@mat_arme", 1), "job:mineur", "Miner des minerais", 10);
+        open(tq(m, "minage", "presse", "La presse de compression", "La presse transforme seize lingots en minerai compressé, utile aux grandes armures.",
+                "Pour les équipements avancés, il faut compresser les lingots. Va voir la Presse de compression du spawn !",
+                "Retiens-le : seize lingots donnent un minerai compressé.", 60, 0), "CompressorScreen", "Ouvrir la presse de compression");
+        act(tq(m, "presse", "arme", "Votre première arme", "Fabriquez l'arme de votre classe à la forge.",
+                "À la forge, fabrique l'arme de ta classe avec les matériaux reçus. Un héros sans arme, ça ne va pas loin !",
+                "Voici ton arme ! Prends-la en main et prépare ton armure.", 200, 30, "@mat_armure", 1), "craft:@arme", "Fabriquer l'arme de votre classe", 1);
+        QuestDef armor = tq(m, "arme", "armure", "Votre première armure", "Fabriquez les quatre pièces de l'armure de votre classe.",
+                "Il te faut maintenant une armure complète : casque, plastron, jambières et bottes. Équipe-les ensuite !",
+                "Te voilà équipé ! Voici des potions, du mana et des parchemins de téléportation pour la route.", 300, 50,
+                "potion_soin_mineure", 5, "potion_mana_mineure", 3, "parchemin_teleportation", 2);
+        act(armor, "craft:@casque", "Fabriquer le casque", 1);
+        act(armor, "craft:@plastron", "Fabriquer le plastron", 1);
+        act(armor, "craft:@jambieres", "Fabriquer les jambières", 1);
+        act(armor, "craft:@bottes", "Fabriquer les bottes", 1);
+        // --- partie 2 : une fonctionnalite par quete
+        open(tq(m, "armure", "personnage", "Votre personnage", "Le menu personnage regroupe équipement, attributs et inventaire.",
+                "Appuie sur [M] pour ouvrir le menu du personnage. Équipe ton armure et regarde tes attributs !",
+                "Chaque niveau te donne des points d'attributs à répartir : force, esprit, vitalité...", 100, 10), "CharacterScreen", "Ouvrir le menu du personnage");
+        open(tq(m, "personnage", "competences", "Les compétences", "Chaque classe possède des compétences à débloquer et à améliorer.",
+                "Ouvre l'onglet Compétences. Place-les dans ta barre pour les lancer en combat !",
+                "Les compétences montent de rang avec tes points. Choisis bien !", 100, 10), "SkillsScreen", "Ouvrir l'onglet Compétences");
+        obj(tq(m, "competences", "combat", "Baptême du feu", "Éliminez trois gobelins dans les plaines.",
+                "Va dans les plaines et élimine 3 gobelins avec ton arme. Garde des potions sous la main !",
+                "Bien joué ! Le butin des monstres sert à forger de meilleurs équipements.", 200, 20, "potion_soin_mineure", 2), "kill", "gobelin", 3);
+        open(tq(m, "combat", "bestiaire", "Le bestiaire", "Le bestiaire recense les monstres rencontrés et leur butin.",
+                "Chaque monstre vaincu s'ajoute au Bestiaire, avec son butin. Ouvre-le pour voir ce que tu as déjà croisé !",
+                "Compléter le bestiaire apporte des récompenses et des succès.", 100, 10), "BestiaryScreen", "Ouvrir le bestiaire");
+        open(tq(m, "bestiaire", "journal", "Le journal de quêtes", "Le journal garde vos quêtes, leurs objectifs et leurs récompenses.",
+                "Ouvre l'onglet Quêtes : tu y suis tes missions et peux choisir celle à afficher à l'écran.",
+                "Tu peux aussi abandonner une quête que tu ne veux plus faire.", 100, 10), "QuestLogScreen", "Ouvrir le journal de quêtes");
+        open(tq(m, "journal", "metiers", "Les métiers", "Pêcheur, fermier et mineur : trois métiers qui montent jusqu'au niveau 50.",
+                "Il y a trois métiers : Pêcheur, Fermier et Mineur. Ouvre l'onglet Métiers pour voir leurs bonus tous les 5 niveaux !",
+                "Chaque palier de métier offre des récompenses : titres, plats, cosmétiques...", 150, 20), "JobsScreen", "Ouvrir l'onglet Métiers");
+        act(tq(m, "metiers", "peche", "Une journée de pêche", "Pêchez un poisson dans un lac ou une rivière.",
+                "Voici une canne ! Équipe-la, lance-la dans l'eau et, quand ça mord, clique dans la zone de la jauge pour ramener la prise.",
+                "Quelle prise ! Les poissons rares, les coffres et les trésors t'attendent dans les eaux profondes.", 200, 20, "canne_apprenti", 1),
+                "stat:fish_caught", "Pêcher un poisson", 1);
+        act(tq(m, "peche", "ferme", "Les premières récoltes", "Labourez avec votre houe, plantez des graines et récoltez.",
+                "Laboure la terre avec ta houe, plante des graines de Lueur et récolte-les quand elles sont mûres !",
+                "Un vrai fermier ! Les plats de métier renforcent ton personnage.", 200, 20), "job:fermier", "Récolter des plantes", 3);
+        open(tq(m, "ferme", "marchand", "Les marchands", "Les marchands achètent le butin et vendent des fournitures.",
+                "Parle à un marchand : tu peux y vendre ton butin et acheter des potions, des graines et des outils.",
+                "Garde ton or : la banque et l'hôtel des ventes en ont aussi besoin.", 100, 30), "ShopScreen", "Parler à un marchand");
+        open(tq(m, "marchand", "banque", "La banque", "La banque garde votre or et vos objets en sécurité.",
+                "Passe à la banque d'Aeloria : tu y déposes ton or et tes objets, à l'abri des pertes en expédition.",
+                "Ta banque est partagée entre tous les serveurs du royaume.", 100, 10), "BankScreen", "Ouvrir la banque");
+        open(tq(m, "banque", "hdv", "L'hôtel des ventes", "L'hôtel des ventes permet d'acheter et de vendre aux autres joueurs.",
+                "À l'hôtel des ventes, tu mets tes objets en vente aux autres joueurs et tu achètes les leurs. Va le visiter !",
+                "Pense à comparer les prix avant de vendre.", 100, 10), "AuctionScreen", "Ouvrir l'hôtel des ventes");
+        open(tq(m, "hdv", "teleporteur", "Les téléporteurs", "Les téléporteurs relient les villes et les zones débloquées.",
+                "Les téléporteurs te mènent d'une zone à l'autre. Ouvre-en un pour voir les destinations !",
+                "Les nouvelles destinations se débloquent avec ton niveau.", 100, 10), "TeleporterScreen", "Utiliser un téléporteur");
+        open(tq(m, "teleporteur", "groupe", "Les groupes", "Jusqu'à quatre joueurs peuvent former un groupe pour les donjons.",
+                "L'union fait la force ! Ouvre l'onglet Groupe pour inviter des amis : les donjons se font à plusieurs.",
+                "Le chef du groupe décide quand lancer l'expédition.", 100, 10), "PartyScreen", "Ouvrir l'onglet Groupe");
+        open(tq(m, "groupe", "donjon", "Les donjons", "Les donjons sont privés pour votre groupe et annoncent leurs dangers.",
+                "Parle au Maître des donjons : choisis un donjon et sa difficulté. Attention, le butin de session peut être perdu à la mort !",
+                "Chaque donjon cache un boss et un butin rare.", 150, 20), "DungeonMasterScreen", "Parler au Maître des donjons");
+        open(tq(m, "donjon", "guilde", "Les guildes", "Une guilde réunit des joueurs : chat, coffre, raids et arènes.",
+                "Rejoins ou fonde une guilde dans l'onglet Guilde. Tu auras un chat privé, des raids et des arènes de guilde !",
+                "Une guilde, c'est une famille. Le chat de guilde est un canal à part.", 150, 20), "GuildScreen", "Ouvrir l'onglet Guilde");
+        open(tq(m, "guilde", "arene", "L'arène", "L'arène oppose les joueurs dans des duels et des matchs classés.",
+                "Dans l'arène, tu affrontes d'autres joueurs et gagnes des points de rang. Ouvre l'onglet Arène !",
+                "Les récompenses d'arène s'échangent chez l'Intendant.", 150, 20), "ArenaScreen", "Ouvrir l'onglet Arène");
+        open(tq(m, "arene", "echange", "Les échanges", "La commande /trade permet d'échanger des objets en toute sécurité.",
+                "Pour échanger avec un autre joueur, tape /trade suivi de son pseudo. Un double accord est demandé : aucune arnaque possible !",
+                "Les deux joueurs doivent confirmer l'échange.", 100, 10), "TradeScreen", "Ouvrir une fenêtre d'échange (/trade)");
+        open(tq(m, "echange", "succes", "Les succès", "Les succès récompensent vos exploits avec des titres et des médailles.",
+                "Chaque exploit débloque un succès et parfois un titre. Ouvre l'onglet Succès pour voir lesquels t'attendent !",
+                "Tu peux afficher ton titre favori au-dessus de ta tête.", 100, 10), "AchievementsScreen", "Ouvrir l'onglet Succès");
+        open(tq(m, "succes", "hebdo", "Les quêtes hebdomadaires", "Chaque semaine, la pancarte propose de nouveaux défis.",
+                "Une pancarte du spawn propose des défis chaque semaine, avec de belles récompenses. Va la lire !",
+                "Les quêtes hebdomadaires se renouvellent chaque semaine.", 150, 20), "WeeklyQuestScreen", "Lire la pancarte hebdomadaire");
+        open(tq(m, "hebdo", "familiers", "Les familiers", "Les familiers suivent le joueur et donnent des bonus.",
+                "Les familiers sont de fidèles compagnons qui donnent des bonus ! Ouvre l'onglet Familiers pour voir lesquels tu possèdes.",
+                "On obtient les familiers dans les caisses et les Lucky Blocks.", 100, 10), "PetsScreen", "Ouvrir l'onglet Familiers");
+        open(tq(m, "familiers", "montures", "Les montures", "Les montures vous permettent de voyager plus vite.",
+                "Pour aller plus vite, rien de tel qu'une monture. Ouvre l'onglet Montures !",
+                "Chaque monture a sa vitesse et son allure.", 100, 10), "MountsScreen", "Ouvrir l'onglet Montures");
+        open(tq(m, "montures", "cosmetiques", "Les cosmétiques", "Auras, ailes, couronnes : personnalisez votre apparence.",
+                "Un héros doit avoir de la prestance ! Ouvre l'onglet Cosmétiques pour personnaliser ton apparence.",
+                "Les cosmétiques n'ont aucun effet sur le combat.", 100, 10), "CosmeticsScreen", "Ouvrir l'onglet Cosmétiques");
+        open(tq(m, "cosmetiques", "sac", "Le sac à dos", "Le sac à dos étend votre capacité de rangement.",
+                "Ton sac à dos te donne de la place en plus. Ouvre-le avec la touche prévue !",
+                "Des sacs plus grands se fabriquent à la forge.", 100, 10), "BackpackScreen", "Ouvrir le sac à dos");
+        open(tq(m, "sac", "boutique", "La boutique", "La boutique d'Aeloria propose des cosmétiques et des avantages.",
+                "La boutique d'Aeloria a des cosmétiques et des extras. Jette-y un œil, rien ne t'oblige à acheter !",
+                "Les crédits de boutique sont une monnaie distincte de l'or.", 100, 10), "PremiumStoreScreen", "Ouvrir la boutique");
+        open(tq(m, "boutique", "wiki", "Le wiki", "Le wiki intégré explique chaque système du mod.",
+                "Si tu as un doute, le Wiki intégré explique tout. Ouvre l'onglet Wiki !",
+                "Tu peux le consulter à tout moment.", 100, 10), "WikiScreen", "Ouvrir le wiki");
+        obj(tq(m, "wiki", "fin", "Héros d'Aeloria", "Le tutoriel est terminé : l'aventure commence vraiment.",
+                "Tu connais maintenant tout ce qu'il faut ! Reviens me voir pour ta récompense finale, puis parle à Maëlys : l'aventure t'attend.",
+                "Tu es prêt, héros ! Maëlys t'attend pour les vraies missions. Bonne chance, je veille sur toi !", 800, 200,
+                "elixir_experience", 1, "pierre_amelioration", 2, "cle_quete", 1), "level", "niveau", 1);
+        m.values().forEach(d -> d.revision = REVISION);
+        return m;
+    }
+
+    /** Identifiants des quetes du tutoriel, dans l'ordre. */
+    public static java.util.List<String> tutorialIds() {
+        return java.util.List.copyOf(tutorial().keySet());
+    }
+
     public static Map<String, QuestDef> create() {
         return create(com.mmorpg.crafting.ForgeProgression::scroll);
     }
 
     /** {@code scroll} donne l'objet parchemin de forge d'un palier (injecte pour pouvoir valider les quetes sans le registre du jeu). */
     public static Map<String, QuestDef> create(IntFunction<String> scroll) {
-        Map<String, QuestDef> m = new LinkedHashMap<>();
+        Map<String, QuestDef> m = new LinkedHashMap<>(tutorial());
         // Les quetes sont rangees par niveau croissant ; chaque quete exige la precedente de sa chaine (introduction du spawn -> campagne).
         // ------------------------------------------------ chapitre 1 : les plaines (Brenn)
         m.put("premiers_pas", req(by(reward(obj(q("Premiers pas", 1,

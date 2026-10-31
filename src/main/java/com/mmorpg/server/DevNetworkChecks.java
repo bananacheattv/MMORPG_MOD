@@ -74,7 +74,7 @@ public final class DevNetworkChecks {
                 RpgPlayers.selectClass(p, cls);
                 check(RpgPlayers.get(p).classChosenOnce, "starter only once " + cls);
                 for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
-                    check(p.getItemBySlot(slot).getItem() instanceof com.mmorpg.item.RpgEquipment eq && eq.rpgDef().level() == 1, "level 1 armor " + cls + ":" + slot);
+                    check(p.getItemBySlot(slot).isEmpty(), "no starter armor offered (tutorial quests craft it) " + cls + ":" + slot);
                 }
                 long count = 0;
                 for (ItemStack item : p.getInventory()) if (!item.isEmpty()) count += item.getCount();

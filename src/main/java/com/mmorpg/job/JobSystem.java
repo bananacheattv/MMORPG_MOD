@@ -37,6 +37,7 @@ public final class JobSystem {
 
     /** Ajoute de l'experience de metier, gere les niveaux et octroie les recompenses des paliers franchis. */
     public static void addXp(ServerPlayer p, PlayerData d, Job job, long amount) {
+        if (p != null && amount > 0) com.mmorpg.server.QuestManager.onAction(p, "job:" + job.id, 1);      // objectifs de decouverte du tutoriel
         if (amount <= 0 || (p != null && !com.mmorpg.server.FeatureFlags.enabled(p.level().getServer(), "metiers"))) return;
         long max = Job.totalFor(Job.MAX_LEVEL);
         long before = d.jobXp.getOrDefault(job.id, 0L);

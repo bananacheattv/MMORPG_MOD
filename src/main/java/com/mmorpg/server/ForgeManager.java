@@ -79,6 +79,7 @@ public final class ForgeManager {
         }
         ServerLevel level = player.level();
         if (crafted > 0) {
+            QuestManager.onAction(player, "craft:" + r.result(), crafted);
             level.playSound(null, pos, SoundEvents.SMITHING_TABLE_USE, SoundSource.BLOCKS, 1f, 1f);
             level.sendParticles(ParticleTypes.ENCHANT, pos.getX() + 0.5, pos.getY() + 1.2, pos.getZ() + 0.5, 25, 0.4, 0.4, 0.4, 0.6);
             Net.toPlayer(player, new Payloads.Notify(Payloads.Notify.LOOT, "FABRICATION RÉUSSIE",
