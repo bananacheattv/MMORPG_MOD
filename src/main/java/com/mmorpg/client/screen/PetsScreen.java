@@ -62,11 +62,12 @@ public class PetsScreen extends MenuScreen {
             boolean has = d.petXp.containsKey(p.id);
             boolean active = p.id.equals(d.activePet);
             Ui.frame(g, cx, cy, cell, cell + 14, p.rarity.color, p == selected || hovered(cx, cy, cell, cell + 14));
+            g.fill(cx + 2, cy + 2, cx + cell - 2, cy + cell + 12, rarityBg(p));
             if (active) Ui.border(g, cx + 1, cy + 1, cell - 2, cell + 12, 0xFF60FF60);
             preview(g, p, cx + 3, cy + 2, cell - 6);
             if (hovered(cx, cy, cell, cell + 14)) tooltip(g, List.of(Component.literal(p.label).withColor(p.rarity.color)));
             if (!has) {
-                g.fill(cx + 1, cy + 1, cx + cell - 1, cy + cell + 13, 0xC0000000);
+                g.fill(cx + 1, cy + 1, cx + cell - 1, cy + cell + 13, 0x70000000);
                 g.centeredText(font, Component.literal("?"), cx + cell / 2, cy + 16, Ui.MUTED);
             } else {
                 String lv = "Niv. " + d.petLevel(p.id);
@@ -86,6 +87,7 @@ public class PetsScreen extends MenuScreen {
         PetType p = selected;
         boolean has = d.petXp.containsKey(p.id);
         float[] spin = spinZone("pet:" + p, dx + 6, y0 + 4, 64, 64);
+        g.fill(dx + 6, y0 + 4, dx + 70, y0 + 68, rarityBg(p));
         preview(g, p, dx + 6, y0 + 4, 64, spin);
         g.text(font, p.label, dx + 76, y0 + 10, p.rarity.color, true);
         g.text(font, p.rarity.label, dx + 76, y0 + 21, Ui.MUTED, false);
@@ -127,4 +129,8 @@ public class PetsScreen extends MenuScreen {
             g.centeredText(font, Component.literal("Familier non obtenu"), dx + dw / 2, by + 4, Ui.RED);
         }
     }
+    private static int rarityBg(PetType p) {
+        return 0xFF000000 | ((p.rarity.color & 0xFEFEFE) >> 1) & 0xFF7F7F7F;
+    }
+
 }
