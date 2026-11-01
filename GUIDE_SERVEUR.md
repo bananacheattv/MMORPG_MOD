@@ -30,7 +30,7 @@ enable-rcon=false           # (ou un mot de passe fort et le port jamais ouvert 
 enforce-whitelist=true      # seulement si l'accès est limité ; sinon false
 max-players=40              # à ajuster après mesure (non mesuré)
 motd=Aeloria                # le nom affiché dans la liste des serveurs
-view-distance=10
+view-distance=32   # maximum vanilla (64 impossible : plafonné à 32 par Minecraft)
 simulation-distance=8
 ```
 

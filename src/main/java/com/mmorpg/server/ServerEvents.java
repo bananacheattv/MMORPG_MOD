@@ -34,6 +34,8 @@ public final class ServerEvents {
         event.getServer().getGameRules().set(net.minecraft.world.level.gamerules.GameRules.KEEP_INVENTORY, true, event.getServer());
         event.getServer().getGameRules().set(net.minecraft.world.level.gamerules.GameRules.NATURAL_HEALTH_REGENERATION, false, event.getServer());
         // monde neuf : le hub est construit tout seul (un peu apres le demarrage), la premiere connexion s'y fait toujours
+        // distance de rendu : 64 demandee, mais Minecraft plafonne a 32 (ChunkMap) -> on met le maximum possible
+        event.getServer().getPlayerList().setViewDistance(32);
         var server = event.getServer();
         Scheduler.later(server.overworld(), 60, () -> com.mmorpg.hub.HubManager.ensureHub(server));
     }
