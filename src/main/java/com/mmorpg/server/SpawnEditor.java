@@ -198,6 +198,9 @@ public final class SpawnEditor {
     @SubscribeEvent public static void commands(RegisterCommandsEvent event) {
         var root=Commands.literal("amenagement").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .executes(c->{open(c.getSource().getPlayerOrException(),null);return 1;});
+        root.then(Commands.literal("purgepnj").executes(c->{c.getSource().sendFailure(Component.literal("Supprime TOUS les PNJ. Confirmez avec /amenagement purgepnj confirm (ou /amenagement purgepnj recreer pour les recréer)."));return 0;})
+                .then(Commands.literal("confirm").executes(c->{int n=NpcPurge.purge(c.getSource().getServer());c.getSource().sendSuccess(()->Component.literal(n+" PNJ supprimés. Ils ne reviendront pas ; /amenagement purgepnj recreer pour les recréer."),true);return 1;}))
+                .then(Commands.literal("recreer").executes(c->{NpcPurge.allow(c.getSource().getServer());for(var p:c.getSource().getServer().getPlayerList().getPlayers())com.mmorpg.quest.SpawnDiscovery.install(p);c.getSource().sendSuccess(()->Component.literal("PNJ du spawn recréés."),true);return 1;})));
         root.then(Commands.literal("outil").executes(c->{var p=c.getSource().getPlayerOrException();if(!p.getInventory().add(new ItemStack(ModItems.SPAWN_EDITOR.get())))return 0;return 1;}));
         root.then(Commands.literal("outilarmure").executes(c->{RpgPlayers.give(c.getSource().getPlayerOrException(),com.mmorpg.registry.ModItems.ARMOR_STAND_EDITOR.get(),1);return 1;}));
         root.then(Commands.literal("outilpnj").executes(c->{var p=c.getSource().getPlayerOrException();return p.getInventory().add(new ItemStack(ModItems.NPC_EDITOR.get()))?1:0;}));

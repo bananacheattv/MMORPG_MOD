@@ -48,6 +48,7 @@ public final class SpawnDiscovery {
     }
     private static boolean quiet;
     public static void install(ServerPlayer player){
+        if(com.mmorpg.server.NpcPurge.active(player.level().getServer()))return;
         if(!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.MAIN)||!player.level().dimension().equals(com.mmorpg.hub.SpawnBuilder.DIM))return;
         var l=player.level();var plan=QuestNpcPlan.GIVERS;NpcEntity[] actors=new NpcEntity[plan.size()];var origin=base(player);var missing=new ArrayList<String>();
         for(var g:plan){
