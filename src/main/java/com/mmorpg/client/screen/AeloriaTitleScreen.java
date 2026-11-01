@@ -48,7 +48,8 @@ public class AeloriaTitleScreen extends Screen {
         Button online=addRenderableWidget(new com.mmorpg.client.ui.GlassButton(x,y,bw,28,"ENTRER DANS AELORIA",0xFFE2B85A,b->join(serverAddress())));
         online.active=minecraft.allowsMultiplayer();
         if(!online.active)online.setTooltip(Tooltip.create(Component.translatable("title.multiplayer.disabled")));
-        addRenderableWidget(new com.mmorpg.client.ui.GlassButton(x,y+35,bw,24,"OPTIONS",0xFFB191ED,b->minecraft.gui.setScreen(new OptionsScreen(this,minecraft.options))));
+        addRenderableWidget(new com.mmorpg.client.ui.GlassButton(x,y+35,bw,24,"MODE SOLO",0xFF8FD694,b->minecraft.gui.setScreen(new net.minecraft.client.gui.screens.worldselection.SelectWorldScreen(this))));
+        addRenderableWidget(new com.mmorpg.client.ui.GlassButton(x,y+64,bw,24,"OPTIONS",0xFFB191ED,b->minecraft.gui.setScreen(new OptionsScreen(this,minecraft.options))));
         addRenderableWidget(new com.mmorpg.client.ui.GlassButton(width-79,12,67,20,"QUITTER",0xFFB191ED,b->minecraft.stop()));
     }
 
