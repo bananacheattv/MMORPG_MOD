@@ -43,7 +43,8 @@ public final class SchemPaste {
 
     private static final class Job {
         final ServerLevel level; final Path file; final String name;
-        final int w, h, l; final int ox, oy, oz; final BlockState[] palette; final java.io.InputStream in; final long total; final byte[] buf = new byte[1 << 16]; int bufLen, bufPos; long remaining;
+        final int w, h, l; final int ox, oy, oz; final BlockState[] palette; final java.io.InputStream in; final long total; long remaining;
+        final java.util.concurrent.ArrayBlockingQueue<Batch> queue = new java.util.concurrent.ArrayBlockingQueue<>(16); volatile boolean stop; Batch cur; int cp; boolean done; Thread producer;
         final boolean skipAir; long index; long placed; BlockPos origin; long consumed; long dataLen; final CommandSourceStack source;
         Job(CommandSourceStack s, ServerLevel level, Path file, int w, int h, int l, int ox, int oy, int oz, BlockState[] palette, java.io.InputStream in, long total, boolean skipAir) {
             this.source = s; this.level = level; this.file = file; this.name = file.getFileName().toString();
@@ -51,12 +52,44 @@ public final class SchemPaste {
         }
     }
 
-    private static int nextByte(Job j) throws java.io.IOException {
-        if (j.bufPos >= j.bufLen) { j.bufLen = j.in.read(j.buf); j.bufPos = 0; if (j.bufLen <= 0) return -1; }
-        return j.buf[j.bufPos++] & 0xFF;
+    /** Lot de blocs non-air decode hors du thread serveur ; bytesAfter/indexAfter = position de reprise une fois le lot pose. */
+    private record Batch(int n, int[] idx, int[] st, long bytesAfter, long indexAfter, boolean last) { }
+
+    /** Thread lecteur : decode le flux et saute l'air a pleine vitesse, le thread serveur ne fait que poser. */
+    private static void startProducer(Job j) {
+        boolean[] air = new boolean[j.palette.length];
+        for (int i = 0; i < air.length; i++) air[i] = j.skipAir && j.palette[i].isAir();
+        j.producer = Thread.ofPlatform().daemon().name("schem-reader").start(() -> {
+            byte[] buf = new byte[1 << 16]; int len = 0, bp = 0;
+            long bytes = j.dataLen - j.remaining, index = j.index, lastSent = index;
+            int[] idx = new int[2048], st = new int[2048]; int n = 0;
+            try {
+                while (!j.stop) {
+                    boolean end = false; int v = 0, shift = 0;
+                    while (true) {
+                        if (bp >= len) { len = j.in.read(buf); bp = 0; if (len <= 0) { end = true; break; } }
+                        int b = buf[bp++]; bytes++; v |= (b & 0x7F) << shift; shift += 7;
+                        if (b >= 0) break;
+                    }
+                    if (end || bytes > j.dataLen || index >= j.total) { offer(j, new Batch(n, idx, st, bytes, index, true)); return; }
+                    long i = index++;
+                    if (!air[Math.min(v, air.length - 1)]) { idx[n] = (int) i; st[n++] = v; }
+                    if (bytes >= j.dataLen || index >= j.total) { offer(j, new Batch(n, idx, st, bytes, index, true)); return; }
+                    if (n == idx.length || index - lastSent >= 4_000_000) {
+                        if (!offer(j, new Batch(n, idx, st, bytes, index, false))) return;
+                        idx = new int[2048]; st = new int[2048]; n = 0; lastSent = index;
+                    }
+                }
+            } catch (Exception ex) { offer(j, new Batch(n, idx, st, j.dataLen, j.total, true)); }
+        });
     }
 
-    private static void close(Job j) { try { j.in.close(); } catch (Exception ignored) { } }
+    private static boolean offer(Job j, Batch b) {
+        try { while (!j.stop) { if (j.queue.offer(b, 200, java.util.concurrent.TimeUnit.MILLISECONDS)) return true; } } catch (InterruptedException ignored) { }
+        return false;
+    }
+
+    private static void close(Job j) { j.stop = true; try { j.in.close(); } catch (Exception ignored) { } }
 
     private static Path stateFile(net.minecraft.server.MinecraftServer server) {
         return server.getServerDirectory().resolve("config").resolve("mmorpg").resolve("schem_job.properties");
@@ -218,7 +251,7 @@ public final class SchemPaste {
 
     @SubscribeEvent public static void tick(ServerTickEvent.Post e) {
         for (Job j; (j = READY.poll()) != null; ) {
-            JOBS.add(j); save(e.getServer(), j);
+            JOBS.add(j); startProducer(j); save(e.getServer(), j);
             MMORPG.LOGGER.info("[schem] {} {}x{}x{} depuis {},{},{}", j.name, j.w, j.h, j.l, j.ox, j.oy, j.oz);
             final Job fj = j;
             fj.source.sendSuccess(() -> Component.literal(fj.name + " : " + fj.w + "x" + fj.h + "x" + fj.l + ", collage progressif lance."), true);
@@ -226,21 +259,20 @@ public final class SchemPaste {
         Job j = JOBS.peek();
         if (j == null) return;
         long end = System.nanoTime() + BUDGET_NANOS; int n = 0; var pos = new BlockPos.MutableBlockPos();
-        int loops = 0;
-        try {
-            while (j.index < j.total && j.remaining > 0 && n < perTick && ((++loops & 8191) != 0 || System.nanoTime() < end)) {
-                int v = 0, shift = 0, b;
-                do { b = nextByte(j); if (b < 0) { j.remaining = 0; break; } j.remaining--; v |= (b & 0x7F) << shift; shift += 7; } while ((b & 0x80) != 0 && j.remaining > 0);
-                if (b < 0) break;
-                long i = j.index++;
-                int x = (int) (i % j.w), z = (int) ((i / j.w) % j.l), y = (int) (i / ((long) j.w * j.l));
-                var st = j.palette[Math.min(v, j.palette.length - 1)];
-                if (j.skipAir && st.isAir()) continue;
-                j.level.setBlock(pos.set(j.ox + x, j.oy + y, j.oz + z), st, FLAGS);
+        while (n < perTick && System.nanoTime() < end && !j.done) {
+            if (j.cur == null) { j.cur = j.queue.poll(); j.cp = 0; if (j.cur == null) break; }
+            var bt = j.cur;
+            while (j.cp < bt.n() && n < perTick) {
+                int k = j.cp++; int i = bt.idx()[k];
+                int x = i % j.w, z = (i / j.w) % j.l, y = i / (j.w * j.l);
+                j.level.setBlock(pos.set(j.ox + x, j.oy + y, j.oz + z), j.palette[Math.min(bt.st()[k], j.palette.length - 1)], FLAGS);
                 n++; j.placed++;
             }
-        } catch (java.io.IOException ex) { j.remaining = 0; }
-        if (j.remaining <= 0) j.index = j.total;
+            if (j.cp < bt.n()) break;
+            j.index = bt.indexAfter(); j.remaining = j.dataLen - bt.bytesAfter(); j.cur = null;
+            if (bt.last()) j.done = true;
+        }
+        if (j.done) j.index = j.total;
         else if (e.getServer().getTickCount() % 20 == 0) save(e.getServer(), j);
         if (j.index >= j.total) {
             JOBS.poll(); close(j); clearState(e.getServer());
