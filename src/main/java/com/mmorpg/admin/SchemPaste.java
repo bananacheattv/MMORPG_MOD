@@ -45,7 +45,7 @@ public final class SchemPaste {
         final ServerLevel level; final Path file; final String name;
         final int w, h, l; final int ox, oy, oz; final BlockState[] palette; final java.io.InputStream in; final long total; long remaining;
         final java.util.concurrent.ArrayBlockingQueue<Batch> queue = new java.util.concurrent.ArrayBlockingQueue<>(16); volatile boolean stop; Batch cur; int cp; boolean done; Thread producer;
-        final boolean skipAir; long index; long placed; BlockPos origin; long consumed; long dataLen; final CommandSourceStack source;
+        final boolean skipAir; boolean verify; long[] bad; long index; long placed; BlockPos origin; long consumed; long dataLen; final CommandSourceStack source;
         Job(CommandSourceStack s, ServerLevel level, Path file, int w, int h, int l, int ox, int oy, int oz, BlockState[] palette, java.io.InputStream in, long total, boolean skipAir) {
             this.source = s; this.level = level; this.file = file; this.name = file.getFileName().toString();
             this.w = w; this.h = h; this.l = l; this.ox = ox; this.oy = oy; this.oz = oz; this.palette = palette; this.in = in; this.total = total; this.remaining = total; this.skipAir = skipAir;
@@ -98,6 +98,7 @@ public final class SchemPaste {
     }
 
     private static void save(net.minecraft.server.MinecraftServer server, Job j) {
+        if (j.verify) return;
         try {
             var p = new java.util.Properties();
             p.setProperty("file", j.file.getFileName().toString());
@@ -150,6 +151,12 @@ public final class SchemPaste {
         return true;
     }
 
+    private static String verifyReport(Job fj) {
+        long tot = 0; var sb = new StringBuilder();
+        if (fj.bad != null) for (int i = 0; i < fj.bad.length; i++) if (fj.bad[i] > 0) { tot += fj.bad[i]; sb.append(' ').append(fj.palette[i].getBlock().builtInRegistryHolder().key().identifier().getPath()).append('=').append(fj.bad[i]); }
+        return "Verification : " + tot + " blocs differents sur " + fj.placed + (tot > 0 ? " :" + sb : "");
+    }
+
     private static int status(CommandSourceStack src) {
         var j = JOBS.peek();
         String msg;
@@ -172,7 +179,23 @@ public final class SchemPaste {
     @SubscribeEvent public static void stopping(net.neoforged.neoforge.event.server.ServerStoppingEvent e) {
         var j = JOBS.peek();
         if (j != null && j.remaining > 0) save(e.getServer(), j);
-        JOBS.forEach(SchemPaste::close);
+        JOBS.forEach(SchemPaste::close); JOBS.clear(); release(e.getServer());
+    }
+
+    private static int savedPause = -1;
+
+    /** Le serveur dedie se met en pause quand il est vide (pause-when-empty-seconds) : on le desactive pendant un collage. */
+    private static void keepAwake(net.minecraft.server.MinecraftServer server) {
+        if (savedPause < 0 && server instanceof net.minecraft.server.dedicated.DedicatedServer ds && ds.pauseWhenEmptySeconds() > 0) {
+            savedPause = ds.pauseWhenEmptySeconds(); ds.setPauseWhenEmptySeconds(0);
+            MMORPG.LOGGER.info("[schem] pause serveur vide desactivee pendant le collage (etait {} s)", savedPause);
+        }
+    }
+
+    private static void release(net.minecraft.server.MinecraftServer server) {
+        if (savedPause >= 0 && JOBS.isEmpty() && server instanceof net.minecraft.server.dedicated.DedicatedServer ds) {
+            ds.setPauseWhenEmptySeconds(savedPause); MMORPG.LOGGER.info("[schem] pause serveur vide retablie ({} s)", savedPause); savedPause = -1;
+        }
     }
 
     private static final ArrayDeque<Job> JOBS = new ArrayDeque<>();
@@ -190,18 +213,21 @@ public final class SchemPaste {
         return out;
     }
 
-    private static int paste(CommandContext<CommandSourceStack> c, BlockPos at, boolean skipAir) {
+    private static int paste(CommandContext<CommandSourceStack> c, BlockPos at, boolean skipAir) { return paste(c, at, skipAir, false); }
+
+    private static int paste(CommandContext<CommandSourceStack> c, BlockPos at, boolean skipAir, boolean verify) {
         var src = c.getSource();
         String name = StringArgumentType.getString(c, "nom");
         if (name.contains("/") || name.contains("\\") || name.contains("..")) { src.sendFailure(Component.literal("Nom invalide.")); return 0; }
         if (!name.endsWith(".schem")) name += ".schem";
         Path file = dir(src).resolve(name);
         if (!Files.isRegularFile(file)) { src.sendFailure(Component.literal("Introuvable : " + file + " (/schem list)")); return 0; }
+        keepAwake(src.getServer());
         var level = src.getLevel();
         BlockPos origin = at != null ? at : BlockPos.containing(src.getPosition());
         src.sendSuccess(() -> Component.literal("Lecture de " + file.getFileName() + "..."), true);
         CompletableFuture.runAsync(() -> {
-            try { READY.add(load(src, level, file, origin, skipAir, 0, 0, 0)); }
+            try { var jb = load(src, level, file, origin, skipAir, 0, 0, 0); jb.verify = verify; READY.add(jb); }
             catch (Exception e) { src.getServer().execute(() -> src.sendFailure(Component.literal("Echec : " + e))); }
         });
         return 1;
@@ -224,7 +250,7 @@ public final class SchemPaste {
             java.util.Arrays.fill(palette, Blocks.AIR.defaultBlockState());
             for (var en : h.pal.entrySet()) {
                 try { palette[en.getValue()] = BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK, en.getKey(), false).blockState(); }
-                catch (Exception ex) { palette[en.getValue()] = Blocks.AIR.defaultBlockState(); }
+                catch (Exception ex) { palette[en.getValue()] = Blocks.AIR.defaultBlockState(); MMORPG.LOGGER.warn("[schem] bloc inconnu remplace par de l'air : {} ({})", en.getKey(), ex.getMessage()); }
             }
             var j = new Job(src, level, file, h.w, h.h, h.l, origin.getX() + h.off[0], origin.getY() + h.off[1], origin.getZ() + h.off[2], palette, in, total, skipAir);
             j.remaining = h.dataLen; j.dataLen = h.dataLen; j.origin = origin;
@@ -268,7 +294,7 @@ public final class SchemPaste {
 
     /** Arret sur erreur : jamais silencieux, la sauvegarde est gardee pour /schem resume. */
     private static void fail(net.minecraft.server.MinecraftServer server, Job j, String why) {
-        JOBS.remove(j); close(j); save(server, j);
+        JOBS.remove(j); close(j); save(server, j); release(server);
         MMORPG.LOGGER.error("[schem] {} arrete a {} blocs : {}", j.name, j.placed, why);
         j.source.sendFailure(Component.literal(j.name + " arrete (" + j.placed + " blocs poses) : " + why + ". /schem resume pour reprendre."));
     }
@@ -280,7 +306,7 @@ public final class SchemPaste {
 
     private static void tick0(ServerTickEvent.Post e) {
         for (Job j; (j = READY.poll()) != null; ) {
-            JOBS.add(j); startProducer(j); save(e.getServer(), j);
+            JOBS.add(j); keepAwake(e.getServer()); startProducer(j); save(e.getServer(), j);
             MMORPG.LOGGER.info("[schem] {} {}x{}x{} depuis {},{},{}", j.name, j.w, j.h, j.l, j.ox, j.oy, j.oz);
             final Job fj = j;
             fj.source.sendSuccess(() -> Component.literal(fj.name + " : " + fj.w + "x" + fj.h + "x" + fj.l + ", collage progressif lance."), true);
@@ -295,7 +321,9 @@ public final class SchemPaste {
             while (j.cp < bt.n() && n < perTick) {
                 int k = j.cp++; int i = bt.idx()[k];
                 int x = i % j.w, z = (i / j.w) % j.l, y = i / (j.w * j.l);
-                j.level.setBlock(pos.set(j.ox + x, j.oy + y, j.oz + z), j.palette[Math.min(bt.st()[k], j.palette.length - 1)], FLAGS);
+                int pid = Math.min(bt.st()[k], j.palette.length - 1);
+                if (j.verify) { if (j.level.getBlockState(pos.set(j.ox + x, j.oy + y, j.oz + z)) != j.palette[pid]) { if (j.bad == null) j.bad = new long[j.palette.length]; j.bad[pid]++; } }
+                else j.level.setBlock(pos.set(j.ox + x, j.oy + y, j.oz + z), j.palette[pid], FLAGS);
                 n++; j.placed++;
             }
             if (j.cp < bt.n()) break;
@@ -305,10 +333,11 @@ public final class SchemPaste {
         if (j.done) j.index = j.total;
         else if (e.getServer().getTickCount() % 20 == 0) save(e.getServer(), j);
         if (j.index >= j.total) {
-            JOBS.poll(); close(j); clearState(e.getServer());
+            JOBS.poll(); close(j); clearState(e.getServer()); release(e.getServer());
             final Job fj = j;
             fj.source.sendSuccess(() -> Component.literal(fj.name + " : termine, " + fj.placed + " blocs poses."), true);
             MMORPG.LOGGER.info("[schem] {} termine : {} blocs", fj.name, fj.placed);
+            if (fj.verify) { String r = verifyReport(fj); MMORPG.LOGGER.info("[schem] {}", r); fj.source.sendSuccess(() -> Component.literal(r), true); }
         } else if (e.getServer().getTickCount() % 200 == 0) {
             MMORPG.LOGGER.info("[schem] {} : {} % ({} blocs)", j.name, 100L * j.index / j.total, j.placed);
             final Job fj = j;
@@ -334,7 +363,9 @@ public final class SchemPaste {
             .then(Commands.literal("resume").executes(c -> {
                 if (resume(c.getSource())) { c.getSource().sendSuccess(() -> Component.literal("Reprise lancée."), true); return 1; }
                 c.getSource().sendFailure(Component.literal("Rien à reprendre (ou un collage est déjà en cours).")); return 0; }))
-            .then(Commands.literal("stop").executes(c -> { int k = JOBS.size(); JOBS.forEach(SchemPaste::close); JOBS.clear(); clearState(c.getSource().getServer()); c.getSource().sendSuccess(() -> Component.literal(k + " collage(s) arrete(s)."), true); return 1; }))
+            .then(Commands.literal("stop").executes(c -> { int k = JOBS.size(); JOBS.forEach(jj -> { if (jj.verify) { String r = verifyReport(jj); MMORPG.LOGGER.info("[schem] {}", r); c.getSource().sendSuccess(() -> Component.literal(r), false); } });  JOBS.forEach(SchemPaste::close); JOBS.clear(); clearState(c.getSource().getServer()); release(c.getSource().getServer()); c.getSource().sendSuccess(() -> Component.literal(k + " collage(s) arrete(s)."), true); return 1; }))
+            .then(Commands.literal("verify").then(Commands.argument("nom", StringArgumentType.string()).then(Commands.argument("pos", BlockPosArgument.blockPos())
+                .executes(c -> paste(c, BlockPosArgument.getBlockPos(c, "pos"), true, true)))))
             .then(Commands.literal("paste").then(nom
                 .executes(c -> paste(c, null, true))
                 .then(Commands.argument("pos", BlockPosArgument.blockPos())
