@@ -100,7 +100,7 @@ public final class SchemPaste {
             var p = new java.util.Properties();
             p.setProperty("file", j.file.getFileName().toString());
             p.setProperty("x", "" + j.origin.getX()); p.setProperty("y", "" + j.origin.getY()); p.setProperty("z", "" + j.origin.getZ());
-            p.setProperty("skipAir", "" + j.skipAir); p.setProperty("rate", "" + perTick);
+            p.setProperty("skipAir", "" + j.skipAir); p.setProperty("dim", j.level.dimension().identifier().toString()); p.setProperty("rate", "" + perTick);
             p.setProperty("consumed", "" + (j.dataLen - j.remaining));
             p.setProperty("index", "" + j.index); p.setProperty("placed", "" + j.placed);
             Files.createDirectories(stateFile(server).getParent());
@@ -119,6 +119,14 @@ public final class SchemPaste {
         resume(e.getServer().createCommandSourceStack());
     }
 
+    private static ServerLevel dimLevel(net.minecraft.server.MinecraftServer server, String dim) {
+        if (dim != null) {
+            var id = net.minecraft.resources.Identifier.tryParse(dim);
+            if (id != null) { var l = server.getLevel(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION, id)); if (l != null) return l; }
+        }
+        return server.overworld();
+    }
+
     static boolean resume(CommandSourceStack src) {
         var server = src.getServer();
         if (!Files.isRegularFile(stateFile(server)) || !JOBS.isEmpty()) return false;
@@ -130,7 +138,7 @@ public final class SchemPaste {
                 Path file = dir(src).resolve(p.getProperty("file"));
                 var origin = new BlockPos(Integer.parseInt(p.getProperty("x")), Integer.parseInt(p.getProperty("y")), Integer.parseInt(p.getProperty("z")));
                 MMORPG.LOGGER.info("[schem] reprise de {} a {} %", file.getFileName(), p.getProperty("index"));
-                READY.add(load(src, server.overworld(), file, origin, Boolean.parseBoolean(p.getProperty("skipAir")),
+                READY.add(load(src, dimLevel(server, p.getProperty("dim")), file, origin, Boolean.parseBoolean(p.getProperty("skipAir")),
                     Long.parseLong(p.getProperty("consumed")), Long.parseLong(p.getProperty("index")), Long.parseLong(p.getProperty("placed"))));
             } catch (Exception ex) {
                 MMORPG.LOGGER.warn("[schem] reprise impossible : {}", ex.toString());
@@ -143,7 +151,14 @@ public final class SchemPaste {
     private static int status(CommandSourceStack src) {
         var j = JOBS.peek();
         String msg;
-        if (j != null) msg = j.name + " : " + (100L * j.index / j.total) + " % (" + j.placed + " blocs posés), en cours. Vitesse max " + perTick + " blocs/tick.";
+        if (j != null) {
+            int x2 = j.ox + j.w - 1, y2 = j.oy + j.h - 1, z2 = j.oz + j.l - 1;
+            msg = j.name + " : " + (100L * j.index / j.total) + " % (" + j.placed + " blocs posés), en cours. Vitesse max " + perTick + " blocs/tick.\n"
+                + "Dimension " + j.level.dimension().identifier() + ", coin min " + j.ox + " " + j.oy + " " + j.oz + ", coin max " + x2 + " " + y2 + " " + z2
+                + (j.oy < j.level.getMinY() ? "\nATTENTION : les couches sous y=" + j.level.getMinY() + " (limite de la dimension) sont perdues." : "")
+                + (y2 >= j.level.getMaxY() ? "\nATTENTION : les couches au-dessus de y=" + (j.level.getMaxY() - 1) + " sont perdues." : "")
+                + "\n/schem tp pour s'y rendre.";
+        }
         else if (!READY.isEmpty()) msg = "Chargement du schematic en cours...";
         else if (Files.isRegularFile(stateFile(src.getServer()))) msg = "Collage interrompu sauvegardé : /schem resume pour le reprendre.";
         else msg = "Aucun collage en cours ni sauvegardé.";
@@ -293,6 +308,13 @@ public final class SchemPaste {
             .then(Commands.literal("rate").then(Commands.argument("blocs", com.mojang.brigadier.arguments.IntegerArgumentType.integer(10, 20000)).executes(c -> {
                 perTick = com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(c, "blocs");
                 c.getSource().sendSuccess(() -> Component.literal("Vitesse : " + perTick + " blocs par tick maximum."), true); return 1; })))
+            .then(Commands.literal("tp").executes(c -> {
+                var j = JOBS.peek(); var pl = c.getSource().getPlayerOrException();
+                if (j == null) { c.getSource().sendFailure(Component.literal("Aucun collage en cours.")); return 0; }
+                double cx = j.ox + j.w / 2.0, cz = j.oz + j.l / 2.0; int top = Math.min(j.oy + j.h - 1, j.level.getMaxY() - 2);
+                pl.teleportTo(j.level, cx, Math.max(top, j.level.getMinY() + 2), cz, java.util.Set.of(), pl.getYRot(), 0, true);
+                pl.resetFallDistance(); pl.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOW_FALLING, 600, 0));
+                c.getSource().sendSuccess(() -> Component.literal("Téléporté au centre, tout en haut du schematic (chute lente 30 s)."), false); return 1; }))
             .then(Commands.literal("status").executes(c -> status(c.getSource())))
             .then(Commands.literal("resume").executes(c -> {
                 if (resume(c.getSource())) { c.getSource().sendSuccess(() -> Component.literal("Reprise lancée."), true); return 1; }
