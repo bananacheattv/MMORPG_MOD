@@ -125,6 +125,7 @@ public final class QuestEditor {
         require(Double.isFinite(r.xpPercentOfLevel)&&r.xpPercentOfLevel>=0&&r.xpPercentOfLevel<=100,"Pourcentage XP invalide.");
         for(var item:r.items) require(item!=null&&validItem(item.item)&&item.count>=1&&item.count<=4096,"Objet de récompense invalide (1 à 4 096).");
         require(r.pet!=null&&(r.pet.isEmpty()||Arrays.stream(PetType.values()).anyMatch(p->p.id.equals(r.pet))),"Familier inconnu.");
+        require(r.mount!=null&&(r.mount.isEmpty()||com.mmorpg.mount.MountType.byId(r.mount)!=null),"Monture inconnue.");
         require(r.cosmetic!=null&&(r.cosmetic.isEmpty()||Cosmetic.byId(r.cosmetic)!=null),"Cosmétique inconnu.");
     }
     private static boolean validEntity(String value) {var id=Identifier.tryParse(value);return id!=null&&BuiltInRegistries.ENTITY_TYPE.containsKey(id);}

@@ -148,6 +148,8 @@ public final class QuestManager {
         }
         rw.put("items", items);
         rw.putString("pet", q.rewards.pet == null ? "" : q.rewards.pet);
+        rw.putString("cosmetic", q.rewards.cosmetic == null ? "" : q.rewards.cosmetic);
+        rw.putString("mount", q.rewards.mount == null ? "" : q.rewards.mount);
         rw.putInt("evolution", q.rewards.evolution);
         t.put("rewards", rw);
         return t;
@@ -368,7 +370,12 @@ public final class QuestManager {
             Item item = ForgeRecipes.resolveItem(ir.item);
             if (item != null && item != Items.AIR && !CrateOnly.is(item)) RpgPlayers.give(p, item, ir.count);
         }
-        // familiers et cosmetiques : uniquement dans les caisses et les Lucky Blocks (q.rewards.pet / cosmetic ignores)
+        if (q.rewards.pet != null && !q.rewards.pet.isEmpty()) for (var t : com.mmorpg.pet.PetType.values()) if (t.id.equals(q.rewards.pet) && !d.petXp.containsKey(t.id)) RpgPlayers.unlockPet(p, t);
+        if (q.rewards.mount != null && !q.rewards.mount.isEmpty()) { var mt = com.mmorpg.mount.MountType.byId(q.rewards.mount); if (mt != null) MountManager.grant(p, mt); }
+        if (q.rewards.cosmetic != null && !q.rewards.cosmetic.isEmpty()) {
+            Cosmetic co = Cosmetic.byId(q.rewards.cosmetic);
+            if (co != null && d.cosmetics.add(co.id)) { Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.DISCOVERY, "COSMÉTIQUE OBTENU", co.label, co.color)); RpgPlayers.sync(p); }
+        }
         if (q.rewards.evolution > 0) RpgPlayers.unlockEvolution(p, q.rewards.evolution);
         Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "QUÊTE TERMINÉE", q.name, 0x60FF80));
         p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.SUCCESS.get(), SoundSource.PLAYERS, 1f, 1f);

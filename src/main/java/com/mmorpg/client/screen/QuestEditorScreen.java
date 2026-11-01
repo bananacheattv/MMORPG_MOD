@@ -235,7 +235,7 @@ public final class QuestEditorScreen extends MmoScreen {
         button(g,rx+rw/2+3,fy+objectiveOffset(106),rw/2-3,18,"Retirer",!draft.objectives.isEmpty(),Ui.RED,()->{draft.objectives.remove(objective);objective=Math.max(0,objective-1);rebuild();});
     }
     private void renderRewards(GuiGraphicsExtractor g) {
-        String[] tabs={"Or / XP","Objets","Évolution de classe"};int tw=rw/3;
+        String[] tabs={"Or / XP","Objets","Spécial"};int tw=rw/3;
         for(int i=0;i<3;i++) {int p=i;button(g,rx+i*tw,fy-8,tw-2,17,tabs[i],true,rewardPage==i?Ui.GOLD:Ui.MUTED,()->{rewardPage=p;rebuild();});}
         if(rewardPage==1) {
             if(!draft.rewards.items.isEmpty()) {var r=draft.rewards.items.get(item);
@@ -247,11 +247,18 @@ public final class QuestEditorScreen extends MmoScreen {
             button(g,rx,fy+112,rw/2-3,18,"+ Objet",draft.rewards.items.size()<16,Ui.GREEN,()->{draft.rewards.items.add(new QuestDef.ItemReward("minecraft:diamond",1));item=draft.rewards.items.size()-1;rebuild();});
             button(g,rx+rw/2+3,fy+112,rw/2-3,18,"Retirer",!draft.rewards.items.isEmpty(),Ui.RED,()->{draft.rewards.items.remove(item);item=Math.max(0,item-1);rebuild();});
         } else if(rewardPage==2) {
-            // familiers et cosmetiques ne s'obtiennent que dans les caisses : seule l'evolution de classe est proposee ici
             String[] evo={"Aucune","1re évolution (niv. 25)","2e évolution (niv. 50)","3e évolution (niv. 75)","4e évolution (niv. 100)"};
             int cur=Math.max(0,Math.min(4,draft.rewards.evolution));
             button(g,rx,fy+35,rw,25,evo[cur]+" ▾",true,Ui.GOLD,()->{var choices=new ArrayList<Choice>();for(int i=0;i<evo.length;i++) choices.add(new Choice(Integer.toString(i),evo[i]));choose("Récompense : évolution de classe",choices,v->draft.rewards.evolution=Integer.parseInt(v));});
-            g.text(font,"Quêtes du Maître des classes : débloque le palier.",rx,fy+68,Ui.MUTED,false);
+            var pets=new ArrayList<Choice>();pets.add(new Choice("","Aucun"));for(var t:com.mmorpg.pet.PetType.values()) pets.add(new Choice(t.id,t.label));
+            var mounts=new ArrayList<Choice>();mounts.add(new Choice("","Aucune"));for(var t:com.mmorpg.mount.MountType.values()) mounts.add(new Choice(t.id,t.label));
+            var cosm=new ArrayList<Choice>();cosm.add(new Choice("","Aucun"));for(var t:com.mmorpg.cosmetic.Cosmetic.values()) cosm.add(new Choice(t.id,t.label));
+            var pn=pets.stream().filter(c->c.id().equals(draft.rewards.pet)).findFirst().map(Choice::label).orElse("Aucun");
+            var mn=mounts.stream().filter(c->c.id().equals(draft.rewards.mount)).findFirst().map(Choice::label).orElse("Aucune");
+            var cn=cosm.stream().filter(c->c.id().equals(draft.rewards.cosmetic)).findFirst().map(Choice::label).orElse("Aucun");
+            button(g,rx,fy+66,rw,20,font.plainSubstrByWidth("Familier : "+pn+" ▾",rw-8),true,Ui.GOLD,()->choose("Récompense : familier",pets,v->draft.rewards.pet=v));
+            button(g,rx,fy+90,rw,20,font.plainSubstrByWidth("Monture : "+mn+" ▾",rw-8),true,Ui.GOLD,()->choose("Récompense : monture",mounts,v->draft.rewards.mount=v));
+            button(g,rx,fy+114,rw,20,font.plainSubstrByWidth("Cosmétique : "+cn+" ▾",rw-8),true,Ui.GOLD,()->choose("Récompense : cosmétique",cosm,v->draft.rewards.cosmetic=v));
         }
     }
     private void renderConditions(GuiGraphicsExtractor g) {

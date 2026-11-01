@@ -73,6 +73,12 @@ public final class DevQuestEditorChecks {
                 QuestManager.accept(p,questId,wrong.getId());check(!player.activeQuests.containsKey(questId),"exact NPC acceptance");
                 QuestManager.accept(p,questId,npc.getId());check(player.activeQuests.containsKey(questId),"assigned NPC acceptance");
                 long gold=player.gold;QuestManager.complete(p,questId,wrong.getId());check(player.gold==gold,"wrong NPC completion denied");
+                var pm=new QuestDef();pm.name="Test collection";pm.npc=npcId;pm.objectives.add(new QuestDef.Objective("level","*",1));
+                pm.rewards.pet="slime";pm.rewards.mount=com.mmorpg.mount.MountType.values()[0].id;pm.rewards.cosmetic="ailes_celestes";
+                ConfigManager.quests().put("codex_collection",pm);player.completedQuests.remove("codex_collection");
+                player.petXp.remove(pm.rewards.pet);player.mounts.remove(pm.rewards.mount);player.cosmetics.remove(pm.rewards.cosmetic);
+                QuestManager.accept(p,"codex_collection",npc.getId());QuestManager.complete(p,"codex_collection",npc.getId());
+                check(player.petXp.containsKey(pm.rewards.pet)&&player.mounts.contains(pm.rewards.mount)&&player.cosmetics.contains(pm.rewards.cosmetic),"pet/mount/cosmetic rewards granted");
                 // Avoid giving inventory rewards during this check; normal reward semantics have their own integration test.
             } finally {wrong.discard();}
             var a=new QuestDef();a.requires.add(questId);ConfigManager.quests().put("codex_dep_check",a);
