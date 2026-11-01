@@ -19,6 +19,11 @@ public final class ClientConfig {
             .translation("mmorpg.configuration.showOwnCosmetics")
             .define("showOwnCosmetics", false);
 
+    public static final ModConfigSpec.BooleanValue SHOW_QUEST_ARROW = BUILDER
+            .comment("Affiche la flèche de quête qui guide vers l'objectif")
+            .translation("mmorpg.configuration.showQuestArrow")
+            .define("showQuestArrow", true);
+
     public static final ModConfigSpec.IntValue AMBIENT_MUSIC_VOLUME = BUILDER
             .comment("Volume de la musique d'ambiance du hub et des donjons, en pourcentage (0 = coupée)")
             .translation("mmorpg.configuration.ambientMusicVolume")

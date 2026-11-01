@@ -112,12 +112,33 @@ public abstract class MenuScreen extends MmoScreen {
                 net.minecraft.network.chat.Component.literal("Déplacer, redimensionner ou masquer les éléments affichés").withColor(0x9C9282)), mx, my);
         click.accept(new int[]{ex, top + 6, 18, 18}, () -> Minecraft.getInstance().gui.setScreen(new HudEditorScreen(Minecraft.getInstance().gui.screen())));
         drawMusicButton(g, font, ex - 20, top + 6, mx, my, click);
+        drawArrowButton(g, font, ex - 40, top + 6, mx, my, click);
         for(int i=0;i<tabs.length;i++){
             Tab t=tabs[i];int tx=left+8+(i%count)*tw,ty=top+5+(i/count)*22;
             boolean on=t==active,hover=Ui.in(mx,my,tx,ty,tw-3,19);
             Ui.button(g,tx,ty,tw-3,19,t.label,true,mx,my,on?Ui.GOLD:Ui.LINE);
             if(!on)click.accept(new int[]{tx,ty,tw-3,19},()->open(t));
         }
+    }
+
+    /** Bouton flèche : active ou désactive la flèche de quête. */
+    private static void drawArrowButton(GuiGraphicsExtractor g, net.minecraft.client.gui.Font font, int x, int y, int mx, int my,
+                                        java.util.function.BiConsumer<int[], Runnable> click) {
+        boolean on = com.mmorpg.client.ClientConfig.SHOW_QUEST_ARROW.get();
+        boolean hover = Ui.in(mx, my, x, y, 18, 18);
+        int col = hover ? Ui.GOLD_LIGHT : Ui.MUTED;
+        g.fill(x, y, x + 18, y + 18, hover ? Ui.CARD_HOVER : Ui.CARD);
+        Ui.border(g, x, y, 18, 18, hover ? Ui.GOLD : Ui.LINE);
+        g.fill(x + 8, y + 9, x + 10, y + 15, col);                                       // pictogramme : flèche vers le haut
+        for (int i = 0; i < 4; i++) g.fill(x + 8 - i, y + 9 - i, x + 10 + i, y + 10 - i, col);
+        if (!on) for (int i = 0; i < 14; i++) g.fill(x + 2 + i, y + 15 - i, x + 4 + i, y + 16 - i, Ui.RED);
+        if (hover) g.setComponentTooltipForNextFrame(font, java.util.List.of(
+                net.minecraft.network.chat.Component.literal("Flèche de quête : " + (on ? "activée" : "désactivée")),
+                net.minecraft.network.chat.Component.literal("Cliquer pour " + (on ? "la masquer" : "l'afficher")).withColor(0x9C9282)), mx, my);
+        click.accept(new int[]{x, y, 18, 18}, () -> {
+            com.mmorpg.client.ClientConfig.SHOW_QUEST_ARROW.set(!on);
+            com.mmorpg.client.ClientConfig.SHOW_QUEST_ARROW.save();
+        });
     }
 
     private static final int[] MUSIC_STEPS = {100, 70, 40, 15, 0};

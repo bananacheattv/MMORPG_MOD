@@ -418,6 +418,7 @@
   "mmorpg.configuration.shaderMode": "Shaders intégrés (OFF, SOFT léger, AMBIANCE, CINEMA)",
   "mmorpg.configuration.ambientMusicVolume": "Volume de la musique d'ambiance (hub et donjons)",
   "mmorpg.configuration.showNameplates": "Afficher les barres de vie des monstres",
+  "mmorpg.configuration.showQuestArrow": "Afficher la flèche de quête",
   "mmorpg.configuration.showOwnCosmetics": "Afficher ses propres cosmétiques",
   "mmorpg.configuration.title": "Configuration MMORPG",
   "item.mmorpg.valkyrie_casque": "Casque de la Valkyrie Céleste",
