@@ -53,7 +53,9 @@ public final class SchemPaste {
     }
 
     /** Lot de blocs non-air decode hors du thread serveur ; bytesAfter/indexAfter = position de reprise une fois le lot pose. */
-    private record Batch(int n, int[] idx, int[] st, long bytesAfter, long indexAfter, boolean last) { }
+    private record Batch(int n, int[] idx, int[] st, long bytesAfter, long indexAfter, boolean last, String error) {
+        Batch(int n, int[] idx, int[] st, long bytesAfter, long indexAfter, boolean last) { this(n, idx, st, bytesAfter, indexAfter, last, null); }
+    }
 
     /** Thread lecteur : decode le flux et saute l'air a pleine vitesse, le thread serveur ne fait que poser. */
     private static void startProducer(Job j) {
@@ -71,7 +73,7 @@ public final class SchemPaste {
                         int b = buf[bp++]; bytes++; v |= (b & 0x7F) << shift; shift += 7;
                         if (b >= 0) break;
                     }
-                    if (end || bytes > j.dataLen || index >= j.total) { offer(j, new Batch(n, idx, st, bytes, index, true)); return; }
+                    if (end || bytes > j.dataLen) { offer(j, new Batch(0, idx, st, 0, 0, true, "fichier tronque a " + index + " / " + j.total + " blocs")); return; }
                     long i = index++;
                     if (!air[Math.min(v, air.length - 1)]) { idx[n] = (int) i; st[n++] = v; }
                     if (bytes >= j.dataLen || index >= j.total) { offer(j, new Batch(n, idx, st, bytes, index, true)); return; }
@@ -80,7 +82,7 @@ public final class SchemPaste {
                         idx = new int[2048]; st = new int[2048]; n = 0; lastSent = index;
                     }
                 }
-            } catch (Exception ex) { offer(j, new Batch(n, idx, st, j.dataLen, j.total, true)); }
+            } catch (Throwable ex) { MMORPG.LOGGER.error("[schem] erreur de lecture", ex); offer(j, new Batch(0, idx, st, 0, 0, true, ex.toString())); }
         });
     }
 
@@ -264,7 +266,19 @@ public final class SchemPaste {
         }
     }
 
+    /** Arret sur erreur : jamais silencieux, la sauvegarde est gardee pour /schem resume. */
+    private static void fail(net.minecraft.server.MinecraftServer server, Job j, String why) {
+        JOBS.remove(j); close(j); save(server, j);
+        MMORPG.LOGGER.error("[schem] {} arrete a {} blocs : {}", j.name, j.placed, why);
+        j.source.sendFailure(Component.literal(j.name + " arrete (" + j.placed + " blocs poses) : " + why + ". /schem resume pour reprendre."));
+    }
+
     @SubscribeEvent public static void tick(ServerTickEvent.Post e) {
+        try { tick0(e); }
+        catch (Throwable t) { var j = JOBS.peek(); MMORPG.LOGGER.error("[schem] erreur de collage", t); if (j != null) fail(e.getServer(), j, t.toString()); }
+    }
+
+    private static void tick0(ServerTickEvent.Post e) {
         for (Job j; (j = READY.poll()) != null; ) {
             JOBS.add(j); startProducer(j); save(e.getServer(), j);
             MMORPG.LOGGER.info("[schem] {} {}x{}x{} depuis {},{},{}", j.name, j.w, j.h, j.l, j.ox, j.oy, j.oz);
@@ -277,6 +291,7 @@ public final class SchemPaste {
         while (n < perTick && System.nanoTime() < end && !j.done) {
             if (j.cur == null) { j.cur = j.queue.poll(); j.cp = 0; if (j.cur == null) break; }
             var bt = j.cur;
+            if (bt.error() != null) { fail(e.getServer(), j, bt.error()); return; }
             while (j.cp < bt.n() && n < perTick) {
                 int k = j.cp++; int i = bt.idx()[k];
                 int x = i % j.w, z = (i / j.w) % j.l, y = i / (j.w * j.l);
