@@ -123,6 +123,20 @@ public final class DevShowcase {
         if(MODE.equals("pvp_polish")){DevPvpVisual.tick(mc);return;}
         if(MODE.equals("trade")){DevTradeVisual.tick(mc);return;}
         if(MODE.equals("chat_canaux")){DevChatVisual.tick(mc);return;}
+        if(MODE.equals("lumiere")){
+            if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
+            if(tick==60){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();cmd(mc,"gamemode creative");cmd(mc,"time set midnight");cmd(mc,"tp @s 0 200 0 0 10");}
+            if(tick==70||tick==110)com.mmorpg.client.cinematic.CinematicClient.skip();
+            if(tick==90){cmd(mc,"fill -9 199 -2 9 199 12 minecraft:stone");cmd(mc,"fill -9 200 -2 9 205 12 minecraft:air");cmd(mc,"setblock 0 201 4 mmorpg:bloc_lumiere[level=15]");cmd(mc,"setblock 4 201 4 mmorpg:bloc_lumiere[level=4]");cmd(mc,"item replace entity @s weapon.mainhand with mmorpg:bloc_lumiere");}
+            if(tick==140){mc.gui.setScreen(null);cmd(mc,"tp @s 0 200 0 0 10");}
+            if(tick==170)shot(mc,"lumiere_monde");
+            if(tick==175){var t=new CompoundTag();t.putLong("pos",new net.minecraft.core.BlockPos(0,201,4).asLong());t.putInt("level",15);mc.gui.setScreen(new com.mmorpg.client.screen.LightBlockScreen(t));}
+            if(tick==200)shot(mc,"lumiere_ecran");
+            if(tick==210)mc.gui.setScreen(null);
+            if(tick==215)cmd(mc,"item replace entity @s weapon.mainhand with minecraft:air");
+            if(tick==240)shot(mc,"lumiere_invisible");
+            return;
+        }
         if(MODE.equals("derniers_ajouts")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
             if(tick==60){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();cmd(mc,"gamemode creative");cmd(mc,"time set day");cmd(mc,"tp @s 0 200 0 0 0");}

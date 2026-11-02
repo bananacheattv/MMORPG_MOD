@@ -84,6 +84,7 @@ neoForge {
             if (project.hasProperty('fishingChecks')) systemProperty 'mmorpg.checkFishing', 'true'
             if (project.hasProperty('weeklyVisual')) systemProperty 'mmorpg.weeklyVisual', 'true'
             if (project.hasProperty('weeklyChecks')) systemProperty 'mmorpg.checkWeekly', 'true'
+            if (project.hasProperty('lightChecks')) systemProperty 'mmorpg.checkLight', 'true'
             if (project.hasProperty('visualChecks')) systemProperty 'mmorpg.visualChecks', 'true'
             if (project.hasProperty('guidanceVisual')) systemProperty 'mmorpg.guidanceVisual', 'true'
             if (project.hasProperty('guideVisual')) systemProperty 'mmorpg.guideVisual', 'true'

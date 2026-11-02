@@ -31,6 +31,9 @@ public final class ModBlocks {
     public static final DeferredBlock<TeleporterBlock> TELEPORTEUR = BLOCKS.registerBlock("teleporteur", TeleporterBlock::new,
             p -> p.mapColor(MapColor.QUARTZ).strength(3f, 1200f).sound(SoundType.AMETHYST).lightLevel(s -> 12).noOcclusion()
                     .pushReaction(PushReaction.IMMOVEABLE));
+    public static final DeferredBlock<com.mmorpg.block.LightEmitterBlock> BLOC_LUMIERE = BLOCKS.registerBlock("bloc_lumiere", com.mmorpg.block.LightEmitterBlock::new,
+            p -> p.strength(-1.0f, 3600000f).noLootTable().noOcclusion().noCollision().replaceable().air().lightLevel(s -> s.getValue(com.mmorpg.block.LightEmitterBlock.LEVEL))
+                    .pushReaction(PushReaction.IMMOVEABLE).isSuffocating(ModBlocks::never));
     public static final DeferredBlock<AltarBlock> AUTEL_INVOCATION = BLOCKS.registerBlock("autel_invocation", AltarBlock::new,
             p -> p.mapColor(MapColor.COLOR_PURPLE).strength(3f, 1200f).sound(SoundType.STONE).lightLevel(s -> s.getValue(AltarBlock.ACTIVE) ? 13 : 8).noOcclusion()
                     .pushReaction(PushReaction.IMMOVEABLE));
