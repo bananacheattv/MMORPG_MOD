@@ -54,7 +54,10 @@ public class LightEmitterBlock extends Block {
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext ctx) {
-        return ctx.isHoldingItem(ModItems.BLOC_LUMIERE.get()) ? Block.box(5, 5, 5, 11, 11, 11) : Shapes.empty();
+        boolean visible = ctx.isHoldingItem(ModItems.BLOC_LUMIERE.get())
+                || (!ctx.isPlacement() && ctx instanceof net.minecraft.world.phys.shapes.EntityCollisionContext e
+                && e.getEntity() instanceof Player pl && pl.isCreative());
+        return visible ? Block.box(5, 5, 5, 11, 11, 11) : Shapes.empty();
     }
 
     @Override
@@ -94,7 +97,7 @@ public class LightEmitterBlock extends Block {
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         for (Player p : level.players()) {
-            if (p.isLocalPlayer() && (p.getMainHandItem().is(ModItems.BLOC_LUMIERE.get()) || p.getOffhandItem().is(ModItems.BLOC_LUMIERE.get()))) {
+            if (p.isLocalPlayer() && (p.isCreative() || p.getMainHandItem().is(ModItems.BLOC_LUMIERE.get()) || p.getOffhandItem().is(ModItems.BLOC_LUMIERE.get()))) {
                 level.addParticle(ParticleTypes.END_ROD, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, 0, 0, 0);
                 return;
             }
