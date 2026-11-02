@@ -1320,6 +1320,23 @@ public final class DevShowcase {
             pnjPosePhase(mc);
             return;
         }
+        if (MODE.equals("pnj_editeur")) {      // fiche d'un PNJ dans l'atelier (taille / pose)
+            if (com.mmorpg.client.LoadingClient.active()) { mascotLoadingSeen = true; mascotWait = 0; return; }
+            if (!mascotLoadingSeen && ++mascotWait < 1800) return;
+            int t = ++mascotTick;
+            if (t == 5) mc.getWindow().setWindowed(1280, 720);
+            if (t == 60) {
+                var d = new CompoundTag(); var list = new net.minecraft.nbt.ListTag(); var n = new CompoundTag();
+                n.putString("id", "00000000-0000-0000-0000-000000000001"); n.putString("name", "Maître test"); n.putString("zone", "Spawn");
+                n.putInt("role", 0); n.putInt("skin", 4); n.putLong("pos", 0L); n.putFloat("scale", 2f); n.putInt("pose", 1); list.add(n);
+                d.put("npcs", list); d.put("quests", new CompoundTag()); d.put("templates", new CompoundTag()); d.putString("openNpc", "00000000-0000-0000-0000-000000000001");
+                mc.gui.setScreen(new com.mmorpg.client.screen.QuestEditorScreen(d));
+            }
+            if (t == 90 && mc.gui.screen() instanceof com.mmorpg.client.screen.QuestEditorScreen q) q.showLook();
+            if (t == 100) shot(mc, "pnj_editeur");
+            if (t == 110) stop(mc);
+            return;
+        }
         if (MODE.equals("mascotte")) {        // la Mascotte du tutoriel et sa bulle de dialogue
             mascotPhase(mc, me);
             return;

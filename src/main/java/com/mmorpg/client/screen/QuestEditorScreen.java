@@ -29,7 +29,7 @@ public final class QuestEditorScreen extends MmoScreen {
     private float npcScale=1f;
     private boolean editingNpc,success=true,saving;
     private String expected="",npcDialogue="";
-    private boolean editingDialogue;
+    private boolean editingDialogue,editingLook;
     private final List<Label> fieldLabels=new ArrayList<>();
     private record Label(String text,int x,int y) {}
     public QuestEditorScreen(CompoundTag data) {super("Atelier de quêtes");draft.name="Nouvelle quête";draft.objectives.add(new QuestDef.Objective());receive(data);}
@@ -52,6 +52,7 @@ public final class QuestEditorScreen extends MmoScreen {
         if(success&&data.getStringOr("saved","").equals(questId)) expected=catalogue.getStringOr(questId,"");
     }
     private void rebuild() {clearWidgets();fieldLabels.clear();init();}
+    public void showLook() {editingLook=true;editingDialogue=false;rebuild();}
     public void showPage(int p) {editingNpc=false;page=p;rebuild();}
     @Override protected void init() {
         super.init();fieldLabels.clear();
@@ -59,6 +60,8 @@ public final class QuestEditorScreen extends MmoScreen {
         field(left+9,top+50,listW-2,"Recherche",query,v->{query=v;scroll=0;},100,false);
         if(editingNpc&&editingDialogue){
             var text=MultiLineEditBox.builder().setX(rx).setY(fy).setShowDecorations(false).setPlaceholder(Component.literal("Dialogue propre à ce PNJ…")).build(font,rw,Math.max(40,top+ph-fy-40),Component.literal("Dialogue du PNJ"));text.setCharacterLimit(4000);text.setValue(npcDialogue);text.setValueListener(v->npcDialogue=v);addRenderableWidget(text);
+        } else if(editingNpc&&editingLook) {
+            // page « Aspect » : uniquement des boutons (dessinés dans renderNpc)
         } else if(editingNpc) {
             field(rx,fy,rw,"Nom du PNJ",npcName,v->npcName=v,80,false);
             field(rx,fy+npcOffset(35),rw,"Zone",npcZone,v->npcZone=v,80,false);
@@ -182,7 +185,7 @@ public final class QuestEditorScreen extends MmoScreen {
         }
         g.text(font,filtered.size()+" entrée(s) • molette",left+8,top+ph-50,Ui.MUTED,false);
         button(g,left+8,top+ph-35,listW,17,mode==0?"+ Créer un PNJ ici":"+ Nouvelle quête",true,Ui.GREEN,()->{
-            if(mode==0) {npcId="";npcName="Nouveau PNJ";npcZone=zone.equals("Toutes")?"":zone;npcGroup="";npcDialogue="";editingDialogue=false;npcSkin=0;npcRole=0;npcScale=1f;npcPose=0;editingNpc=true;}
+            if(mode==0) {npcId="";npcName="Nouveau PNJ";npcZone=zone.equals("Toutes")?"":zone;npcGroup="";npcDialogue="";editingDialogue=false;npcSkin=0;npcRole=0;npcScale=1f;npcPose=0;editingLook=false;editingNpc=true;}
             else {draft=new QuestDef();draft.name="Nouvelle quête";draft.objectives.add(new QuestDef.Objective());questId=newId();expected="";editingNpc=false;page=0;}rebuild();
         });
         g.fill(rx-6,top+25,rx-5,top+ph-12,Ui.GOLD);
@@ -202,18 +205,23 @@ public final class QuestEditorScreen extends MmoScreen {
     private int npcOffset(int n){return ph<270?Math.round(n*.76f):n;}
     private void npcAction(String action){var data=new CompoundTag();data.putString("action",action);data.putString("id",npcId);ClientNet.send(new Payloads.QuestEdit(data));}
     private void renderNpc(GuiGraphicsExtractor g) {
-        Ui.header(g,rx,top+27,rw-100,npcId.isEmpty()?"CRÉER UN PNJ":"MODIFIER LE PNJ");button(g,rx+rw-96,top+25,96,19,editingDialogue?"Fiche / position":"Dialogue",true,Ui.GOLD,()->{editingDialogue=!editingDialogue;rebuild();});if(editingDialogue)return;
-        button(g,rx,fy+npcOffset(97),rw/2-3,18,"Apparence : "+com.mmorpg.entity.NpcEntity.APPEARANCES[npcSkin],true,Ui.GOLD,()->npcSkin=(npcSkin+1)%com.mmorpg.entity.NpcEntity.SKINS);
-        button(g,rx+rw/2+3,fy+npcOffset(97),rw/2-3,18,com.mmorpg.entity.NpcEntity.Role.byId(npcRole).label,true,Ui.GOLD,()->npcRole=(npcRole+1)%com.mmorpg.entity.NpcEntity.Role.values().length);
-        button(g,rx,fy+npcOffset(162),rw/2-3,17,"Taille : x"+npcScale,true,Ui.GOLD,()->{float[] s=com.mmorpg.entity.NpcEntity.SCALES;int i=0;for(int k=0;k<s.length;k++)if(Math.abs(s[k]-npcScale)<.01f)i=k;npcScale=s[(i+1)%s.length];});
-        button(g,rx+rw/2+3,fy+npcOffset(162),rw/2-3,17,"Pose : "+com.mmorpg.entity.NpcEntity.POSES[Math.floorMod(npcPose,com.mmorpg.entity.NpcEntity.POSES.length)],true,Ui.GOLD,()->npcPose=(npcPose+1)%com.mmorpg.entity.NpcEntity.POSES.length);
-        if(!npcId.isEmpty()) npcs.stream().filter(n->npcId.equals(n.getStringOr("id",""))).findFirst().ifPresent(n->{
-            var pos=net.minecraft.core.BlockPos.of(n.getLongOr("pos",0));
-            g.text(font,pos.getX()+", "+pos.getY()+", "+pos.getZ(),rx,fy+npcOffset(123),Ui.MUTED,false);
-        });
+        Ui.header(g,rx,top+27,rw-180,npcId.isEmpty()?"NOUVEAU PNJ":"PNJ");
+        button(g,rx+rw-172,top+25,70,19,"Fiche",true,!editingDialogue&&!editingLook?Ui.GOLD:Ui.MUTED,()->{editingDialogue=false;editingLook=false;rebuild();});
+        button(g,rx+rw-100,top+25,49,19,"Dialogue",true,editingDialogue?Ui.GOLD:Ui.MUTED,()->{editingDialogue=true;editingLook=false;rebuild();});
+        button(g,rx+rw-49,top+25,49,19,"Aspect",true,editingLook?Ui.GOLD:Ui.MUTED,()->{editingLook=true;editingDialogue=false;rebuild();});
+        if(editingDialogue||!editingLook)return;
+        int h=ph<270?20:24;
+        button(g,rx,fy,rw/2-3,18,"Apparence : "+com.mmorpg.entity.NpcEntity.APPEARANCES[npcSkin],true,Ui.GOLD,()->npcSkin=(npcSkin+1)%com.mmorpg.entity.NpcEntity.SKINS);
+        button(g,rx+rw/2+3,fy,rw/2-3,18,com.mmorpg.entity.NpcEntity.Role.byId(npcRole).label,true,Ui.GOLD,()->npcRole=(npcRole+1)%com.mmorpg.entity.NpcEntity.Role.values().length);
+        button(g,rx,fy+h,rw/2-3,18,"Taille : x"+npcScale,true,Ui.GOLD,()->{float[] s=com.mmorpg.entity.NpcEntity.SCALES;int i=0;for(int k=0;k<s.length;k++)if(Math.abs(s[k]-npcScale)<.01f)i=k;npcScale=s[(i+1)%s.length];});
+        button(g,rx+rw/2+3,fy+h,rw/2-3,18,"Pose : "+com.mmorpg.entity.NpcEntity.POSES[Math.floorMod(npcPose,com.mmorpg.entity.NpcEntity.POSES.length)],true,Ui.GOLD,()->npcPose=(npcPose+1)%com.mmorpg.entity.NpcEntity.POSES.length);
         if(!npcId.isEmpty()){
-            button(g,rx,fy+npcOffset(141),rw/2-3,17,"Placer ici",true,Ui.GOLD,()->npcAction("move_npc"));
-            button(g,rx+rw/2+3,fy+npcOffset(141),rw/2-3,17,"Tourner de 90°",true,Ui.GOLD,()->npcAction("rotate_npc"));
+            button(g,rx,fy+2*h,rw/2-3,18,"Placer ici",true,Ui.GOLD,()->npcAction("move_npc"));
+            button(g,rx+rw/2+3,fy+2*h,rw/2-3,18,"Tourner de 90°",true,Ui.GOLD,()->npcAction("rotate_npc"));
+            npcs.stream().filter(n->npcId.equals(n.getStringOr("id",""))).findFirst().ifPresent(n->{
+                var pos=net.minecraft.core.BlockPos.of(n.getLongOr("pos",0));
+                g.text(font,"Position : "+pos.getX()+", "+pos.getY()+", "+pos.getZ(),rx,fy+2*h+22,Ui.MUTED,false);
+            });
         }
     }
     private int objectiveOffset(int offset){return ph<270?Math.round(offset*.78f):offset;}
