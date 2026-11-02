@@ -125,16 +125,22 @@ public final class DevShowcase {
         if(MODE.equals("chat_canaux")){DevChatVisual.tick(mc);return;}
         if(MODE.equals("lumiere")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
-            if(tick==60){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();cmd(mc,"gamemode creative");cmd(mc,"time set midnight");cmd(mc,"tp @s 0 200 0 0 10");}
-            if(tick==70||tick==110)com.mmorpg.client.cinematic.CinematicClient.skip();
-            if(tick==90){cmd(mc,"fill -9 199 -2 9 199 12 minecraft:stone");cmd(mc,"fill -9 200 -2 9 205 12 minecraft:air");cmd(mc,"setblock 0 201 4 mmorpg:bloc_lumiere[level=15]");cmd(mc,"setblock 4 201 4 mmorpg:bloc_lumiere[level=4]");cmd(mc,"item replace entity @s weapon.mainhand with mmorpg:bloc_lumiere");}
-            if(tick==140){mc.gui.setScreen(null);cmd(mc,"tp @s 0 200 0 0 10");}
-            if(tick==170)shot(mc,"lumiere_monde");
-            if(tick==175){var t=new CompoundTag();t.putLong("pos",new net.minecraft.core.BlockPos(0,201,4).asLong());t.putInt("level",15);mc.gui.setScreen(new com.mmorpg.client.screen.LightBlockScreen(t));}
-            if(tick==200)shot(mc,"lumiere_ecran");
-            if(tick==210)mc.gui.setScreen(null);
-            if(tick==215)cmd(mc,"item replace entity @s weapon.mainhand with minecraft:air");
-            if(tick==240)shot(mc,"lumiere_invisible");
+            if(tick==1560){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();scmd(mc,"gamemode creative @a");scmd(mc,"time set midnight");}
+            if(tick>=1570&&tick<=1700&&tick%10==0)com.mmorpg.client.cinematic.CinematicClient.skip();
+            if(tick==1610){mc.gui.setScreen(null);var b0=mc.player.blockPosition();LIGHT_BASE=b0;
+                scmd(mc,"fill "+(b0.getX()-4)+" "+(b0.getY()-1)+" "+b0.getZ()+" "+(b0.getX()+4)+" "+(b0.getY()-1)+" "+(b0.getZ()+6)+" minecraft:stone");
+                scmd(mc,"setblock "+b0.getX()+" "+(b0.getY()+1)+" "+(b0.getZ()+3)+" mmorpg:bloc_lumiere[level=15]");
+                scmd(mc,"setblock "+(b0.getX()+2)+" "+(b0.getY()+1)+" "+(b0.getZ()+3)+" mmorpg:bloc_lumiere[level=4]");
+                scmd(mc,"tp @a "+(b0.getX()+.5)+" "+b0.getY()+" "+(b0.getZ()+.5)+" 0 0");}
+            if(tick==1630){scmd(mc,"op @a");scmd(mc,"item replace entity @a weapon.mainhand with mmorpg:bloc_lumiere");}
+            if(tick==1650&&LIGHT_BASE!=null){var hr=mc.hitResult;MMORPG.LOGGER.info("[LIGHTTEST] creatif={} pos={} hit(objet en main)={} block={}",mc.player.isCreative(),mc.player.blockPosition(),hr==null?null:hr.getType(),LIGHT_BASE.offset(0,1,3));
+                if(hr instanceof net.minecraft.world.phys.BlockHitResult bh&&hr.getType()==net.minecraft.world.phys.HitResult.Type.BLOCK){var r=mc.gameMode.useItemOn(mc.player,net.minecraft.world.InteractionHand.MAIN_HAND,bh);MMORPG.LOGGER.info("[LIGHTTEST] useItemOn={} pos={}",r,bh.getBlockPos());}}
+            if(tick==1700){MMORPG.LOGGER.info("[LIGHTTEST] ecran={}",mc.gui.screen()==null?null:mc.gui.screen().getClass().getSimpleName());
+                if(mc.gui.screen() instanceof com.mmorpg.client.screen.LightBlockScreen sc){int pw=Math.min(sc.width-12,260),ph=Math.min(sc.height-12,120),l=(sc.width-pw)/2,t=(sc.height-ph)/2,bw=(pw-32)/8;
+                    double x=l+16+4*bw+bw/2,y=t+44+9;sc.mouseClicked(new net.minecraft.client.input.MouseButtonEvent(x,y,new net.minecraft.client.input.MouseButtonInfo(com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT,0)),false);}}
+            if(tick==1710)shot(mc,"lumiere_ecran");
+            if(tick==1760&&LIGHT_BASE!=null){var st=mc.level.getBlockState(LIGHT_BASE.offset(0,1,3));MMORPG.LOGGER.info("[LIGHTTEST] etat apres clic={} emission={}",st,st.getLightEmission());mc.gui.setScreen(null);}
+            if(tick==1780)shot(mc,"lumiere_monde");
             return;
         }
         if(MODE.equals("derniers_ajouts")){
@@ -5532,6 +5538,7 @@ public final class DevShowcase {
         mc.stop();
     }
 
+    private static net.minecraft.core.BlockPos LIGHT_BASE;
     private static void cmd(Minecraft mc, String command) {
         mc.player.connection.sendCommand(command);
     }
