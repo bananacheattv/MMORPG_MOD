@@ -1316,6 +1316,10 @@ public final class DevShowcase {
             dummyPhase(mc, me);
             return;
         }
+        if (MODE.equals("pnj_pose")) {        // PNJ de quetes : taille et pose assise (entites purement clientes)
+            pnjPosePhase(mc);
+            return;
+        }
         if (MODE.equals("mascotte")) {        // la Mascotte du tutoriel et sa bulle de dialogue
             mascotPhase(mc, me);
             return;
@@ -3992,6 +3996,30 @@ public final class DevShowcase {
 
     private static boolean mascotLoadingSeen;
     private static int mascotTick, mascotWait;
+
+    private static void pnjPosePhase(Minecraft mc) {
+        if (com.mmorpg.client.LoadingClient.active()) { mascotLoadingSeen = true; mascotWait = 0; return; }
+        if (!mascotLoadingSeen && ++mascotWait < 1800) return;
+        int t = ++mascotTick;
+        if (t == 5) mc.getWindow().setWindowed(1280, 720);
+        if (t == 60) {
+            var look = mc.player.getLookAngle();
+            double[][] cfg = {{-2.5, 0, 1, 0}, {0, 1, 1, 0}, {2.5, 0, 1.5f, 1}, {5, 1, 1.5f, 1}};
+            for (int i = 0; i < cfg.length; i++) {
+                var n = new com.mmorpg.entity.NpcEntity(com.mmorpg.registry.ModEntities.NPC.get(), mc.level);
+                n.setId(-6100 - i);
+                n.setup(com.mmorpg.entity.NpcEntity.Role.QUETES, "PNJ", (int) cfg[i][3] == 1 ? 5 : 0, "");
+                n.setNpcScale((float) cfg[i][2]);
+                n.setPoseStyle((int) cfg[i][1]);
+                n.setPos(mc.player.getX() + look.x * 6 - look.z * cfg[i][0], mc.player.getY(), mc.player.getZ() + look.z * 6 + look.x * cfg[i][0]);
+                n.setYBodyRot(mc.player.getYRot() + 180);
+                n.yBodyRotO = n.yBodyRot;
+                mc.level.addEntity(n);
+            }
+        }
+        if (t == 140) shot(mc, "pnj_pose");
+        if (t == 150) stop(mc);
+    }
 
     private static void mascotPhase(Minecraft mc, String me) {
         // le spawn se construit apres la connexion : on attend l'ecran de chargement puis sa fin (ou 90 s s'il ne vient pas)

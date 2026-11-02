@@ -30,7 +30,7 @@ public final class NpcDirectory extends SavedData {
         if(npc.role()==NpcEntity.Role.SORTIE||npc instanceof com.mmorpg.entity.MascotEntity) return;                        // le Passeur d'un donjon est ephemere
         var tag=new CompoundTag();String id=npc.getUUID().toString();
         tag.putString("backend",com.mmorpg.network.NetworkConfig.current.role.name());tag.putBoolean("tutorialGuide",npc instanceof com.mmorpg.entity.hub.HubGuideEntity);tag.putString("id",id);tag.putString("name",npc.displayName());tag.putString("zone",npc.zone());
-        tag.putString("group",npc.group());tag.putString("dialogue",npc.dialogue());tag.putInt("skin",npc.skin());tag.putInt("role",npc.role().ordinal());
+        tag.putString("group",npc.group());tag.putString("dialogue",npc.dialogue());tag.putInt("skin",npc.skin());tag.putInt("role",npc.role().ordinal());tag.putFloat("scale",npc.getScale());tag.putInt("pose",npc.poseStyle());
         tag.putString("dimension",npc.level().dimension().identifier().toString());tag.putLong("pos",npc.blockPosition().asLong());
         if(!tag.equals(entries.put(id,tag))) setDirty();
     }

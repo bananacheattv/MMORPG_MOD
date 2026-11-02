@@ -24,8 +24,9 @@ public final class QuestEditorScreen extends MmoScreen {
     private List<CompoundTag> npcs=new ArrayList<>();
     private QuestDef draft=new QuestDef();
     private String questId=newId(),query="",zone="Toutes",status="",npcId="",npcName="Nouveau PNJ",npcZone="",npcGroup="";
-    private int mode=1,page,rewardPage,scroll,objective,item,npcSkin,npcRole;
+    private int mode=1,page,rewardPage,scroll,objective,item,npcSkin,npcRole,npcPose;
     private int listW,rx,rw,fy;
+    private float npcScale=1f;
     private boolean editingNpc,success=true,saving;
     private String expected="",npcDialogue="";
     private boolean editingDialogue;
@@ -44,7 +45,7 @@ public final class QuestEditorScreen extends MmoScreen {
         if(!open.isEmpty()) {
             npcs.stream().filter(n->open.equals(n.getStringOr("id",""))).findFirst().ifPresent(n->{
                 mode=0;editingNpc=true;npcId=open;npcName=n.getStringOr("name","");npcZone=n.getStringOr("zone","");
-                npcDialogue=n.getStringOr("dialogue","");npcGroup=n.getStringOr("group","");npcSkin=n.getIntOr("skin",0);npcRole=n.getIntOr("role",0);
+                npcDialogue=n.getStringOr("dialogue","");npcGroup=n.getStringOr("group","");npcSkin=n.getIntOr("skin",0);npcRole=n.getIntOr("role",0);npcScale=n.getFloatOr("scale",1f);npcPose=n.getIntOr("pose",0);
                 if(width>0) rebuild();
             });
         }
@@ -114,7 +115,7 @@ public final class QuestEditorScreen extends MmoScreen {
     }
     private void selectNpc(CompoundTag n) {
         editingNpc=true;npcId=n.getStringOr("id","");npcName=n.getStringOr("name","");npcZone=n.getStringOr("zone","");
-        npcDialogue=n.getStringOr("dialogue","");npcGroup=n.getStringOr("group","");npcSkin=n.getIntOr("skin",0);npcRole=n.getIntOr("role",0);rebuild();
+        npcDialogue=n.getStringOr("dialogue","");npcGroup=n.getStringOr("group","");npcSkin=n.getIntOr("skin",0);npcRole=n.getIntOr("role",0);npcScale=n.getFloatOr("scale",1f);npcPose=n.getIntOr("pose",0);rebuild();
     }
     private void selectQuest(String id,boolean template) {
         draft=JSON.fromJson((template?templates:catalogue).getStringOr(id,"{}"),QuestDef.class);
@@ -144,7 +145,7 @@ public final class QuestEditorScreen extends MmoScreen {
         if(saving) return;var data=new CompoundTag();
         if(editingNpc) {
             data.putString("action","save_npc");data.putString("id",npcId);data.putString("name",npcName);data.putString("zone",npcZone);
-            data.putString("dialogue",npcDialogue);data.putString("group",npcGroup);data.putInt("skin",npcSkin);data.putInt("role",npcRole);
+            data.putString("dialogue",npcDialogue);data.putString("group",npcGroup);data.putInt("skin",npcSkin);data.putInt("role",npcRole);data.putFloat("scale",npcScale);data.putInt("pose",npcPose);
         } else {
             data.putString("action","save_quest");data.putString("id",questId);data.putString("json",JSON.toJson(draft));
             data.putString("expected",expected);
@@ -181,7 +182,7 @@ public final class QuestEditorScreen extends MmoScreen {
         }
         g.text(font,filtered.size()+" entrée(s) • molette",left+8,top+ph-50,Ui.MUTED,false);
         button(g,left+8,top+ph-35,listW,17,mode==0?"+ Créer un PNJ ici":"+ Nouvelle quête",true,Ui.GREEN,()->{
-            if(mode==0) {npcId="";npcName="Nouveau PNJ";npcZone=zone.equals("Toutes")?"":zone;npcGroup="";npcDialogue="";editingDialogue=false;npcSkin=0;npcRole=0;editingNpc=true;}
+            if(mode==0) {npcId="";npcName="Nouveau PNJ";npcZone=zone.equals("Toutes")?"":zone;npcGroup="";npcDialogue="";editingDialogue=false;npcSkin=0;npcRole=0;npcScale=1f;npcPose=0;editingNpc=true;}
             else {draft=new QuestDef();draft.name="Nouvelle quête";draft.objectives.add(new QuestDef.Objective());questId=newId();expected="";editingNpc=false;page=0;}rebuild();
         });
         g.fill(rx-6,top+25,rx-5,top+ph-12,Ui.GOLD);
@@ -204,6 +205,8 @@ public final class QuestEditorScreen extends MmoScreen {
         Ui.header(g,rx,top+27,rw-100,npcId.isEmpty()?"CRÉER UN PNJ":"MODIFIER LE PNJ");button(g,rx+rw-96,top+25,96,19,editingDialogue?"Fiche / position":"Dialogue",true,Ui.GOLD,()->{editingDialogue=!editingDialogue;rebuild();});if(editingDialogue)return;
         button(g,rx,fy+npcOffset(97),rw/2-3,18,"Apparence : "+com.mmorpg.entity.NpcEntity.APPEARANCES[npcSkin],true,Ui.GOLD,()->npcSkin=(npcSkin+1)%com.mmorpg.entity.NpcEntity.SKINS);
         button(g,rx+rw/2+3,fy+npcOffset(97),rw/2-3,18,com.mmorpg.entity.NpcEntity.Role.byId(npcRole).label,true,Ui.GOLD,()->npcRole=(npcRole+1)%com.mmorpg.entity.NpcEntity.Role.values().length);
+        button(g,rx,fy+npcOffset(162),rw/2-3,17,"Taille : x"+npcScale,true,Ui.GOLD,()->{float[] s=com.mmorpg.entity.NpcEntity.SCALES;int i=0;for(int k=0;k<s.length;k++)if(Math.abs(s[k]-npcScale)<.01f)i=k;npcScale=s[(i+1)%s.length];});
+        button(g,rx+rw/2+3,fy+npcOffset(162),rw/2-3,17,"Pose : "+com.mmorpg.entity.NpcEntity.POSES[Math.floorMod(npcPose,com.mmorpg.entity.NpcEntity.POSES.length)],true,Ui.GOLD,()->npcPose=(npcPose+1)%com.mmorpg.entity.NpcEntity.POSES.length);
         if(!npcId.isEmpty()) npcs.stream().filter(n->npcId.equals(n.getStringOr("id",""))).findFirst().ifPresent(n->{
             var pos=net.minecraft.core.BlockPos.of(n.getLongOr("pos",0));
             g.text(font,pos.getX()+", "+pos.getY()+", "+pos.getZ(),rx,fy+npcOffset(123),Ui.MUTED,false);

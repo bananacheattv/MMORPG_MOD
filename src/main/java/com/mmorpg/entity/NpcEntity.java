@@ -44,6 +44,12 @@ public class NpcEntity extends PathfinderMob {
     public static final int SKINS = APPEARANCES.length;
     private static final EntityDataAccessor<Integer> ROLE = SynchedEntityData.defineId(NpcEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> SKIN = SynchedEntityData.defineId(NpcEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> POSE = SynchedEntityData.defineId(NpcEntity.class, EntityDataSerializers.INT);
+    public static final float[] SCALES={.5f,.75f,1f,1.25f,1.5f,2f,2.5f,3f};
+    public static final String[] POSES={"Debout","Assis"};
+    public int poseStyle(){return this.entityData.get(POSE);}
+    public void setPoseStyle(int v){this.entityData.set(POSE,Math.floorMod(v,POSES.length));}
+    public void setNpcScale(float v){var a=getAttribute(Attributes.SCALE);if(a!=null)a.setBaseValue(Math.clamp(v,.25f,4f));}
     private String group = "";
     private String dialogue="";
     public String dialogue(){return dialogue;}
@@ -68,7 +74,7 @@ public class NpcEntity extends PathfinderMob {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return PathfinderMob.createMobAttributes().add(Attributes.MAX_HEALTH, 20).add(Attributes.MOVEMENT_SPEED, 0.0);
+        return PathfinderMob.createMobAttributes().add(Attributes.SCALE, 1.0).add(Attributes.MAX_HEALTH, 20).add(Attributes.MOVEMENT_SPEED, 0.0);
     }
 
     @Override
@@ -76,6 +82,7 @@ public class NpcEntity extends PathfinderMob {
         super.defineSynchedData(builder);
         builder.define(ROLE, 0);
         builder.define(SKIN, 0);
+        builder.define(POSE, 0);
     }
 
     @Override
@@ -151,7 +158,7 @@ public class NpcEntity extends PathfinderMob {
         output.putInt("NpcSkin", this.entityData.get(SKIN));
         output.putString("NpcGroup", group);output.putString("NpcDialogue",dialogue);
         output.putString("MerchantShop",merchantShop);
-        output.putString("NpcZone", zone);
+        output.putString("NpcZone", zone);output.putInt("NpcPose", this.entityData.get(POSE));
     }
 
     @Override
@@ -161,6 +168,6 @@ public class NpcEntity extends PathfinderMob {
         this.entityData.set(SKIN, input.getIntOr("NpcSkin", 0));
         this.group = input.getStringOr("NpcGroup", "");this.dialogue=input.getStringOr("NpcDialogue","");
         this.merchantShop = input.getStringOr("MerchantShop", "");
-        this.zone = input.getStringOr("NpcZone", "Sans zone");
+        this.zone = input.getStringOr("NpcZone", "Sans zone");this.entityData.set(POSE, input.getIntOr("NpcPose", 0));
     }
 }

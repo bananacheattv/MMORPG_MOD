@@ -69,6 +69,8 @@ public final class QuestEditor {
                         npc.snapTo(p.getX(),p.getY(),p.getZ(),p.getYRot()+180,0);
                     }
                     String dialogue=data.getStringOr("dialogue","");require(dialogue.length()<=4000,"Dialogue trop long (4000 caractères maximum).");npc.setDialogue(dialogue);
+                    float scale=data.getFloatOr("scale",1f);require(scale>=.25f&&scale<=4f,"Taille : 0,25 à 4.");npc.setNpcScale(scale);
+                    int pose=data.getIntOr("pose",0);require(pose>=0&&pose<NpcEntity.POSES.length,"Pose invalide.");npc.setPoseStyle(pose);
                     npc.setup(NpcEntity.Role.byId(role),name,skin,group);npc.setZone(zone.isEmpty()?"Sans zone":zone);
                     if(id.isEmpty()) require(p.level().addFreshEntity(npc),"Ajout du PNJ impossible.");
                     NpcDirectory.get(p.level().getServer()).record(npc);selectedNpc=npc.getUUID().toString();
