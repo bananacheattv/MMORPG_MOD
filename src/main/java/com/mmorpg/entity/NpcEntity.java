@@ -45,11 +45,11 @@ public class NpcEntity extends PathfinderMob {
     private static final EntityDataAccessor<Integer> ROLE = SynchedEntityData.defineId(NpcEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> SKIN = SynchedEntityData.defineId(NpcEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> POSE = SynchedEntityData.defineId(NpcEntity.class, EntityDataSerializers.INT);
-    public static final float[] SCALES={.5f,.75f,1f,1.25f,1.5f,2f,2.5f,3f};
+    public static final float[] SCALES={.5f,.75f,1f,1.25f,1.5f,2f,2.5f,3f,4f,5f,6f,8f,10f};
     public static final String[] POSES={"Debout","Assis"};
     public int poseStyle(){return this.entityData.get(POSE);}
     public void setPoseStyle(int v){this.entityData.set(POSE,Math.floorMod(v,POSES.length));}
-    public void setNpcScale(float v){var a=getAttribute(Attributes.SCALE);if(a!=null)a.setBaseValue(Math.clamp(v,.25f,4f));}
+    public void setNpcScale(float v){var a=getAttribute(Attributes.SCALE);if(a!=null)a.setBaseValue(Math.clamp(v,.25f,10f));}
     private String group = "";
     private String dialogue="";
     public String dialogue(){return dialogue;}
