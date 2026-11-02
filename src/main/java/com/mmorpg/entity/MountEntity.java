@@ -43,13 +43,31 @@ public class MountEntity extends Horse {
     public boolean isFlying() { return mountType.flies && !onGround() && isVehicle(); }
 
     // The type must be serializable for Minecraft to allow riding. Suppress instance saves instead.
-    @Override public boolean shouldBeSaved() { return false; }
+    @Override public boolean shouldBeSaved() { return display; }
+    /** Monture posee en decor par un operateur (/monture poser) : immobile, invulnerable, non montable, sauvegardee. */
+    private boolean display;
+    public boolean isDisplay() { return display; }
+    public void setDisplay() {
+        display = true; setNoAi(true); setPersistenceRequired(); setSilent(true); setNoGravity(false);
+        setCustomName(Component.literal(mountType.label)); setCustomNameVisible(false);
+    }
+    @Override protected void addAdditionalSaveData(net.minecraft.world.level.storage.ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        if (display) output.putBoolean("mm_display", true);
+    }
+    @Override protected void readAdditionalSaveData(net.minecraft.world.level.storage.ValueInput input) {
+        super.readAdditionalSaveData(input);
+        if (input.getBooleanOr("mm_display", false)) setDisplay();
+    }
+    @Override public boolean isPushable() { return !display && super.isPushable(); }
+    @Override public void push(double x, double y, double z) { if (!display) super.push(x, y, z); }
     @Override public boolean saveAsPassenger(net.minecraft.world.level.storage.ValueOutput output) { return false; }
     /**
      * La monture est invulnerable : les coups (fleches, monstres) touchent le cavalier a sa place. Les chutes, explosions et degats du
      * decor ne sont pas renvoyes : le cavalier les subit deja lui-meme.
      */
     @Override public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        if (display) return false;
         if (getFirstPassenger() instanceof net.minecraft.world.entity.LivingEntity rider && source.getEntity() != null && source.getEntity() != rider
                 && !source.is(net.minecraft.tags.DamageTypeTags.IS_EXPLOSION)) rider.hurtServer(level, source, amount);
         return false;
@@ -91,6 +109,7 @@ public class MountEntity extends Horse {
 
     @Override public InteractionResult mobInteract(Player player, InteractionHand hand) {
         if (level().isClientSide()) return InteractionResult.SUCCESS;
+        if (display) return InteractionResult.SUCCESS;
         if (!player.getUUID().equals(rider) || player.isSpectator()) return InteractionResult.FAIL;
         doPlayerRide(player);
         return InteractionResult.SUCCESS;
@@ -180,6 +199,7 @@ public class MountEntity extends Horse {
 
     @Override public void tick() {
         super.tick();
+        if (display) return;
         if (mountType.flies && !isVehicle() && isNoGravity()) setNoGravity(false);
         if (level() instanceof net.minecraft.server.level.ServerLevel sl && tickCount % 20 == 0) {
             var owner = rider == null ? null : sl.getServer().getPlayerList().getPlayer(rider);

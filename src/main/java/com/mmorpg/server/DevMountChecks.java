@@ -22,6 +22,15 @@ public final class DevMountChecks {
         for (int i = 0; i < items.length; i++) items[i] = inventory.getItem(i).copy();
         long cooldown = d.nextMountTick;
         try {
+            var shown = new MountEntity(com.mmorpg.registry.ModEntities.MOUNTS.get(MountType.SANGLIER).get(), p.level());
+            shown.setDisplay(); shown.snapTo(p.getX() + 3, p.getY(), p.getZ(), 0, 0); p.level().addFreshEntity(shown);
+            check(shown.shouldBeSaved() && shown.isNoAi() && shown.isDisplay(), "display flags");
+            for (int i = 0; i < 60; i++) shown.tick();
+            check(!shown.isRemoved(), "display survives without owner");
+            check(!shown.hurtServer((net.minecraft.server.level.ServerLevel) p.level(), p.level().damageSources().generic(), 10) && shown.getHealth() == shown.getMaxHealth(), "display invulnerable");
+            check(!p.startRiding(shown), "display not rideable");
+            shown.discard();
+            MMORPG.LOGGER.info("[CODEX CHECKS] MOUNT DISPLAY PASS");
             MountManager.despawn(p); d.mounts.clear(); d.nextMountTick = 0;
             for (int i = 0; i < items.length; i++) inventory.setItem(i, net.minecraft.world.item.ItemStack.EMPTY);
             d.playerClass = PlayerClass.GUERRIER; d.level = 1; d.gold = 10000;
@@ -42,7 +51,7 @@ public final class DevMountChecks {
             check(!MountManager.summon(p, "sanglier"), "summon cooldown");
             MountManager.despawn(p);
             check(entity.isRemoved() && d.mountEntity == null && d.activeMount.isEmpty(), "dismissal cleanup");
-            MMORPG.LOGGER.info("[CODEX CHECKS] MOUNTS PASS: level, gold, purchase, persistence, ownership, riding, cooldown, cleanup");
+            MMORPG.LOGGER.info("[CODEX CHECKS] MOUNTS PASS: level, gold, purchase, persistence, ownership, riding, cooldown, cleanup, display");
         } finally {
             for (int i = 0; i < items.length; i++) inventory.setItem(i, items[i]);
             MountManager.despawn(p); d.load(snapshot); d.nextMountTick = cooldown; RpgPlayers.recomputeAndSync(p);

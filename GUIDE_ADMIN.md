@@ -229,3 +229,4 @@ La roulette des coffres flotte à 3,3 blocs, son titre et son gain sont remonté
 Les buffs et débuffs affichent un texte de trois mots maximum et le temps restant sous le cadre de mana. Les armes possèdent des atlas individuels et des silhouettes franchement distinctes entre familles et paliers.
 
 Les cadres et porte-armures du spawn refusent les interactions et dégâts des non-OP, ainsi que les dégâts environnementaux. Les OP conservent l’édition. [Wiki complet](docs/wiki/README.md) : 17 pages et catalogues générés depuis les 44 compétences et 44 armes PvE.
+- **Montures en décor** : `/monture poser <type>` (opérateurs) pose une monture immobile, invulnérable, non montable et persistante à ta position ; `/monture retirer` enlève celles dans un rayon de 6 blocs.

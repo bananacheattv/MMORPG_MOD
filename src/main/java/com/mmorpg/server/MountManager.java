@@ -6,7 +6,37 @@ import com.mmorpg.registry.ModEntities;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.chat.Component;
 
+@net.neoforged.fml.common.EventBusSubscriber(modid = com.mmorpg.MMORPG.MODID)
 public final class MountManager {
+    /** /monture poser <type> | retirer (operateurs) : expose une monture immobile et persistante a ta position. */
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void commands(net.neoforged.neoforge.event.RegisterCommandsEvent e) {
+        e.getDispatcher().register(net.minecraft.commands.Commands.literal("monture")
+            .requires(net.minecraft.commands.Commands.hasPermission(net.minecraft.commands.Commands.LEVEL_GAMEMASTERS))
+            .then(net.minecraft.commands.Commands.literal("poser")
+                .then(net.minecraft.commands.Commands.argument("type", com.mojang.brigadier.arguments.StringArgumentType.word())
+                    .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(java.util.Arrays.stream(MountType.values()).map(t -> t.id), b))
+                    .executes(c -> {
+                        var src = c.getSource(); var p = src.getPlayerOrException();
+                        var type = MountType.byId(com.mojang.brigadier.arguments.StringArgumentType.getString(c, "type"));
+                        if (type == null) { src.sendFailure(Component.literal("Monture inconnue.")); return 0; }
+                        var m = new MountEntity(ModEntities.MOUNTS.get(type).get(), p.level());
+                        m.setDisplay();
+                        m.snapTo(p.getX(), p.getY(), p.getZ(), p.getYRot(), 0);
+                        m.yBodyRot = p.getYRot(); m.yHeadRot = p.getYRot();
+                        p.level().addFreshEntity(m);
+                        src.sendSuccess(() -> Component.literal(type.label + " posée ici."), true);
+                        return 1;
+                    })))
+            .then(net.minecraft.commands.Commands.literal("retirer").executes(c -> {
+                var src = c.getSource(); var p = src.getPlayerOrException();
+                var near = p.level().getEntitiesOfClass(MountEntity.class, p.getBoundingBox().inflate(6), MountEntity::isDisplay);
+                near.forEach(MountEntity::discard);
+                src.sendSuccess(() -> Component.literal(near.size() + " monture(s) retirée(s)."), true);
+                return near.size();
+            })));
+    }
+
     private static boolean playable(ServerPlayer p) { return p.isAlive() && !p.isSpectator() && RpgPlayers.get(p).playerClass.isPlayable(); }
     /** Les donjons (et leurs antres de boss) partagent leur dimension avec les mines et les plaines, ou les montures restent permises. */
     public static boolean inDungeon(ServerPlayer p) {
