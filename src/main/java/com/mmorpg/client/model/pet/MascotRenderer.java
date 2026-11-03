@@ -23,7 +23,7 @@ import java.util.List;
 /** La Mascotte du tutoriel : le Dragonnet du Neant, un peu plus grand qu'en familier, avec une bulle de dialogue au-dessus de la tete. */
 public class MascotRenderer extends EntityRenderer<MascotEntity, MascotRenderer.State> {
     private static final int FULL_BRIGHT = 0xF000F0;
-    private static final float SCALE = 1.1F;
+    private static final float SCALE = 3.3F;
     private static final long SPEECH_MS = 11_000;
     private static final int WRAP = 30;
     private static String speech = "";
@@ -77,9 +77,9 @@ public class MascotRenderer extends EntityRenderer<MascotEntity, MascotRenderer.
     public void extractRenderState(MascotEntity entity, State state, float partialTicks) {
         super.extractRenderState(entity, state, partialTicks);
         state.type = com.mmorpg.pet.PetType.DRAGONNET;
-        state.speed = 0.0F;
-        state.still = 0.0F;
-        state.fly = 1.0F;
+        state.speed = (float) Math.min(1, entity.getDeltaMovement().horizontalDistance() * 6);
+        state.still = state.speed < .02F ? 1F : 0F;
+        state.fly = 0.0F;
         state.yRot = Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
         var me = Minecraft.getInstance().player;
         state.mine = me != null && me.getId() == entity.ownerId();
@@ -89,7 +89,6 @@ public class MascotRenderer extends EntityRenderer<MascotEntity, MascotRenderer.
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         if (!state.mine) return;
         poseStack.pushPose();
-        poseStack.translate(0.0F, 0.25F * Mth.sin(state.ageInTicks * 0.1F) + 0.25F, 0.0F);
         poseStack.pushPose();
         poseStack.rotateDegrees(Axis.YP, -state.yRot);
         poseStack.scale(SCALE, SCALE, SCALE);

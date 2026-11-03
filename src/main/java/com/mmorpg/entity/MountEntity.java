@@ -61,7 +61,9 @@ public class MountEntity extends Horse {
     }
     @Override public boolean isPushable() { return !display && super.isPushable(); }
     @Override public void push(double x, double y, double z) { if (!display) super.push(x, y, z); }
-    @Override public boolean saveAsPassenger(net.minecraft.world.level.storage.ValueOutput output) { return false; }
+    @Override public boolean saveAsPassenger(net.minecraft.world.level.storage.ValueOutput output) {
+        return display && super.saveAsPassenger(output);
+    }
     /**
      * La monture est invulnerable : les coups (fleches, monstres) touchent le cavalier a sa place. Les chutes, explosions et degats du
      * decor ne sont pas renvoyes : le cavalier les subit deja lui-meme.
@@ -104,7 +106,7 @@ public class MountEntity extends Horse {
     }
 
     @Override protected boolean canAddPassenger(Entity passenger) {
-        return (level().isClientSide() || passenger.getUUID().equals(rider)) && super.canAddPassenger(passenger);
+        return !display && (level().isClientSide() || passenger.getUUID().equals(rider)) && super.canAddPassenger(passenger);
     }
 
     @Override public InteractionResult mobInteract(Player player, InteractionHand hand) {

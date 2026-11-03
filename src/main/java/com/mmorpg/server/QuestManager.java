@@ -129,7 +129,7 @@ public final class QuestManager {
             CompoundTag ot = new CompoundTag();
             ot.putString("type", o.type);
             ot.putString("target", o.target);
-            ot.putString("label", actionLabel(o, d));
+            ot.putString("label", o.type.equals("talk") ? talkLabel(p,o) : actionLabel(o, d));
             ot.putInt("count", o.count);
             ot.putInt("progress", active ? progress(p, d, id, i) : 0);
             objs.add(ot);
@@ -331,7 +331,11 @@ public final class QuestManager {
         } else if (available != null) {
             if (doAccept(p, available, npc.getId(), false)) GuidanceManager.refresh(p);
         } else {
-            MascotGuide.say(p, name, npc.dialogue().isEmpty() ? "Je n'ai rien de plus à te confier pour l'instant. Reviens me voir plus tard !" : npc.dialogue());
+            MascotGuide.say(p, name, npc.dialogue().isEmpty()
+                    ? npc instanceof com.mmorpg.entity.MascotEntity
+                        ? "Tu connais déjà les premières étapes ! Consulte le Wiki pour découvrir les activités, puis suis tes quêtes. Donjons, guildes et arènes t'attendent sur le chemin du niveau 100."
+                        : "Je n'ai rien de plus à te confier pour l'instant. Reviens me voir plus tard !"
+                    : npc.dialogue());
         }
     }
 
@@ -397,7 +401,19 @@ public final class QuestManager {
      * {@code craft:<objet>} (fabrication a la forge), {@code stat:<compteur>} (compteur de succes : kills, fish_caught...), {@code job:<metier>}
      * (experience de metier). Les jetons @arme / @casque... designent la piece de la classe du joueur.
      */
-    public static void onAction(ServerPlayer p, String key, int amount) {
+    public static void onAction(ServerPlayer p, String key, int amount) { advanceObjective(p,key,amount,"action"); }
+
+    private static String talkLabel(ServerPlayer p, QuestDef.Objective o) {
+        var entry=com.mmorpg.world.NpcDirectory.get(p.level().getServer()).entry(o.target);
+        return "Parler à " + (entry==null?"un PNJ indisponible":entry.getStringOr("name","ce PNJ"));
+    }
+    /** Uniquement appelé depuis l'interaction réelle avec un PNJ ; aucun paquet client ne valide un dialogue. */
+    public static void onNpcTalk(ServerPlayer p, NpcEntity npc) {
+        if(!p.isAlive() || p.isSpectator() || !npc.isAlive() || p.level()!=npc.level() || p.distanceToSqr(npc)>49
+                || !FeatureFlags.enabled(p.level().getServer(),"quetes")) return;
+        advanceObjective(p,npc.getUUID().toString(),1,"talk");
+    }
+    private static void advanceObjective(ServerPlayer p, String key, int amount, String kind) {
         PlayerData d = RpgPlayers.get(p);
         if (d.activeQuests.isEmpty() || amount <= 0) return;
         for (Map.Entry<String, int[]> e : d.activeQuests.entrySet()) {
@@ -411,12 +427,12 @@ public final class QuestManager {
             boolean wasComplete = completable(p, d, e.getKey());
             for (int i = 0; i < q.objectives.size(); i++) {
                 QuestDef.Objective o = q.objectives.get(i);
-                if (!"action".equals(o.type) || prog[i] >= o.count) continue;
+                if (!kind.equals(o.type) || prog[i] >= o.count) continue;
                 String target = o.target.contains("|") ? o.target.substring(0, o.target.indexOf('|')) : o.target;
                 if (!TutorialKit.resolve(target, d.playerClass).equalsIgnoreCase(key)) continue;
                 prog[i] = Math.min(o.count, prog[i] + amount);
                 p.sendOverlayMessage(Component.literal("✦ " + q.name + " — ").withColor(0xFFD040)
-                        .append(Component.literal(actionLabel(o, d)).withColor(0xFFFFFF))
+                        .append(Component.literal(kind.equals("talk") ? talkLabel(p,o) : actionLabel(o, d)).withColor(0xFFFFFF))
                         .append(Component.literal(" : " + prog[i] + "/" + o.count).withColor(0xFFFFFF)));
                 d.dirty = true;
             }

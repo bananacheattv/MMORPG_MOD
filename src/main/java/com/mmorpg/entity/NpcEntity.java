@@ -120,6 +120,7 @@ public class NpcEntity extends PathfinderMob {
             if(player.getItemInHand(hand).is(com.mmorpg.registry.ModItems.NPC_EDITOR.get())){
                 com.mmorpg.item.NpcEditorItem.edit(sp,this);return InteractionResult.SUCCESS;
             }
+            QuestManager.onNpcTalk(sp, this);
             switch (role()) {
                 case PVP -> com.mmorpg.competition.PvpProgression.open(sp,"");
                 case BOUTIQUE -> com.mmorpg.store.PremiumStore.open(sp,"");

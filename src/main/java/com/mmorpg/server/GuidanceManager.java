@@ -62,6 +62,11 @@ public final class GuidanceManager {
         var back=returnPortal(p,q.name);return back!=null?back:new Target("quest",q.name,"Rendre la quête à son donneur",dim(p),null);
     }
     private static Target objective(ServerPlayer p,QuestDef q,QuestDef.Objective o){
+        if(o.type.equals("talk")) {
+            var n=com.mmorpg.world.NpcDirectory.get(p.level().getServer()).entry(o.target);
+            if(n==null)return new Target("quest",q.name,"PNJ à rencontrer indisponible",dim(p),null);
+            return route(p,new Target("quest",q.name,"Parler à "+n.getStringOr("name","ce PNJ"),n.getStringOr("dimension",""),Vec3.atCenterOf(BlockPos.of(n.getLongOr("pos",0))),n.getStringOr("backend",NetworkConfig.current.role.name())));
+        }
         if(o.navigation!=null){var n=o.navigation;return route(p,new Target("quest",q.name,"Rejoindre l’objectif",n.dimension,new Vec3(n.x,n.y,n.z),n.backend.isEmpty()?NetworkConfig.current.role.name():n.backend));}
         if(o.type.equals("collect")){
             var item=com.mmorpg.crafting.ForgeRecipes.resolveItem(o.target);

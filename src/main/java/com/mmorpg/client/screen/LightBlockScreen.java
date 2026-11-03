@@ -23,10 +23,10 @@ public class LightBlockScreen extends MmoScreen {
     protected boolean compact() { return true; }
 
     @Override
-    protected int panelWidth() { return Math.min(this.width - 12, 260); }
+    protected int panelWidth() { return Math.min(this.width - 12, 320); }
 
     @Override
-    protected int panelHeight() { return Math.min(this.height - 12, 120); }
+    protected int panelHeight() { return Math.min(this.height - 12, 142); }
 
     private void set(int v) {
         level = Math.max(0, Math.min(15, v));
@@ -47,6 +47,7 @@ public class LightBlockScreen extends MmoScreen {
             button(g, left + 16 + (i % 8) * bw, top + 44 + (i / 8) * 22, bw - 3, 18, String.valueOf(i), true,
                     level == i ? 0xFFE2B85A : 0xFF3B3350, () -> set(v));
         }
+        g.text(font, "Éclairage étendu · 27 sources invisibles", left + 16, top + 94, Ui.MUTED, false);
         button(g, left + pw / 2 - 40, top + ph - 24, 80, 16, "Fermer", true, 0xFF2A6A3A, this::onClose);
     }
 }
