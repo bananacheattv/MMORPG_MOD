@@ -50,6 +50,7 @@ neoForge {
     runs {
         client {
             client()
+            if (project.hasProperty('qaDir')) gameDirectory = file(project.property('qaDir'))
             // Option de test : ./gradlew runClient -PquickWorld=<monde> ouvre directement une sauvegarde
             if (project.hasProperty('quickWorld')) {
                 programArguments.addAll '--quickPlaySingleplayer', project.property('quickWorld').toString()
@@ -84,6 +85,8 @@ neoForge {
             if (project.hasProperty('fishingChecks')) systemProperty 'mmorpg.checkFishing', 'true'
             if (project.hasProperty('weeklyVisual')) systemProperty 'mmorpg.weeklyVisual', 'true'
             if (project.hasProperty('weeklyChecks')) systemProperty 'mmorpg.checkWeekly', 'true'
+            if (project.hasProperty('mascotChecks')) systemProperty 'mmorpg.mascotChecks', 'true'
+            if (project.hasProperty('qaDir')) gameDirectory = file(project.property('qaDir'))
             if (project.hasProperty('lightChecks')) systemProperty 'mmorpg.checkLight', 'true'
             if (project.hasProperty('visualChecks')) systemProperty 'mmorpg.visualChecks', 'true'
             if (project.hasProperty('guidanceVisual')) systemProperty 'mmorpg.guidanceVisual', 'true'

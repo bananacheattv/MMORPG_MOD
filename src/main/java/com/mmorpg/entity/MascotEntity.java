@@ -26,6 +26,7 @@ public final class MascotEntity extends NpcEntity {
     public MascotEntity(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
         setNoGravity(false);
+        getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.FOLLOW_RANGE).setBaseValue(64);
         getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).setBaseValue(.28);
     }
 

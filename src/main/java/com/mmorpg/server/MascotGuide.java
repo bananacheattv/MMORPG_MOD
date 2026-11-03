@@ -233,7 +233,7 @@ public final class MascotGuide {
         }
         return null;
     }
-    private static void follow(ServerPlayer p, MascotEntity m) {
+    static void follow(ServerPlayer p, MascotEntity m) {
         if (m.level() != p.level()) { drop(p); return; }
         double distance = m.position().subtract(p.position()).horizontalDistanceSqr();
         if (m.tickCount % 10 != 0) return;
@@ -243,8 +243,7 @@ public final class MascotGuide {
                 : radial.normalize().scale(4).add(p.position());
         var goal = safeGround(p, m, wanted);
         if (goal == null) { m.getNavigation().stop(); return; }
-        if (distance > 32 * 32) { m.snapTo(goal, p.getYRot(), 0); m.getNavigation().stop(); }
-        else m.getNavigation().moveTo(goal.x, goal.y, goal.z, 1.1);
+        m.getNavigation().moveTo(goal.x, goal.y, goal.z, 1.1);
     }
 
     /**
