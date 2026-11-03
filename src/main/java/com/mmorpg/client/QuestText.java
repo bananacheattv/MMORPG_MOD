@@ -30,6 +30,7 @@ public final class QuestText {
         return switch (type) {
             case "collect" -> "Rapporter " + count + " × " + targetName(type, target);
             case "level" -> "Atteindre le niveau " + count;
+            case "talk" -> o.getStringOr("label", "Parler au PNJ indiqué");
             case "visit" -> "Rencontrer / découvrir : "+target;
             case "action" -> {
                 String label = o.getStringOr("label", "");

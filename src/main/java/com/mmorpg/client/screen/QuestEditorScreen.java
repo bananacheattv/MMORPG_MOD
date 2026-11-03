@@ -80,7 +80,7 @@ public final class QuestEditorScreen extends MmoScreen {
             case 1 -> {
                 if(!draft.objectives.isEmpty()) {
                     objective=Math.min(objective,draft.objectives.size()-1);var o=draft.objectives.get(objective);
-                    field(rx,fy+objectiveOffset(70),85,"Quantité / niveau",Integer.toString(o.count),v->o.count=number(v),6,true);
+                    if (!o.type.equals("talk")) field(rx,fy+objectiveOffset(70),85,"Quantité / niveau",Integer.toString(o.count),v->o.count=number(v),6,true);
                 }
             }
             case 2 -> {
@@ -137,7 +137,13 @@ public final class QuestEditorScreen extends MmoScreen {
     }
     private String itemName(String id) {var item=com.mmorpg.crafting.ForgeRecipes.resolveItem(id);return item==null?id:new net.minecraft.world.item.ItemStack(item).getHoverName().getString();}
     private void target(QuestDef.Objective o) {
-        if(o.type.equals("collect")) pickItem("Objet à rapporter",id->o.target=id);
+        if(o.type.equals("talk")) {
+            var list=npcs.stream().filter(n->!n.getStringOr("id", "").equals(draft.npc))
+                .sorted(Comparator.comparing(n->n.getStringOr("name", "")))
+                .map(n->new Choice(n.getStringOr("id", ""), n.getStringOr("name", "PNJ")+" — "+n.getStringOr("zone", "Sans zone")+" · "+n.getStringOr("backend", ""))).toList();
+            choose("PNJ à rencontrer",list,id->{o.target=id;o.count=1;o.navigation=null;});
+        }
+        else if(o.type.equals("collect")) pickItem("Objet à rapporter",id->o.target=id);
         else {
             var list=new ArrayList<Choice>();list.add(new Choice("*","Tous les monstres"));list.add(new Choice("boss","Tous les boss"));
             BuiltInRegistries.ENTITY_TYPE.forEach(t->{var id=BuiltInRegistries.ENTITY_TYPE.getKey(t);list.add(new Choice(id.getNamespace().equals("mmorpg")?id.getPath():id.toString(),t.getDescription().getString()));});
@@ -228,9 +234,10 @@ public final class QuestEditorScreen extends MmoScreen {
     private void renderObjectives(GuiGraphicsExtractor g) {
         if(!draft.objectives.isEmpty()) {
             var o=draft.objectives.get(objective);
-            button(g,rx,fy,rw,19,switch(o.type){case "collect"->"Rapporter des objets ▾";case "level"->"Atteindre un niveau ▾";case "visit"->"Découvrir un lieu ▾";case "action"->"Découvrir une fonctionnalité ▾";default->"Vaincre des monstres ▾";},true,Ui.GOLD,
-                    ()->choose("Type d’objectif",List.of(new Choice("kill","Vaincre des monstres"),new Choice("collect","Rapporter des objets"),new Choice("level","Atteindre un niveau"),new Choice("visit","Découvrir un lieu (repère requis)")),v->{o.type=v;o.target=v.equals("collect")?"minecraft:iron_ingot":"*";}));
-            if(!o.type.equals("level")) button(g,rx,fy+objectiveOffset(31),rw,ph<270?18:21,font.plainSubstrByWidth(o.type.equals("collect")?itemName(o.target):o.target.equals("*")?"Tous les monstres":o.target.equals("boss")?"Tous les boss":Component.translatable("entity."+o.target.replace(':','.').replaceFirst("^(?!.*\\.).*", "mmorpg."+o.target)).getString(),rw-10),true,Ui.GOLD,()->target(o));
+            button(g,rx,fy,rw,19,switch(o.type){case "talk"->"Parler à un autre PNJ ▾";case "collect"->"Rapporter des objets ▾";case "level"->"Atteindre un niveau ▾";case "visit"->"Découvrir un lieu ▾";case "action"->"Découvrir une fonctionnalité ▾";default->"Vaincre des monstres ▾";},true,Ui.GOLD,
+                    ()->choose("Type d’objectif",List.of(new Choice("talk","Parler à un autre PNJ"),new Choice("kill","Vaincre des monstres"),new Choice("collect","Rapporter des objets"),new Choice("level","Atteindre un niveau"),new Choice("visit","Découvrir un lieu (repère requis)")),v->{o.type=v;o.target=v.equals("talk")?"":v.equals("collect")?"minecraft:iron_ingot":"*";if(v.equals("talk")){o.count=1;o.navigation=null;}rebuild();}));
+            if(!o.type.equals("level")) button(g,rx,fy+objectiveOffset(31),rw,ph<270?18:21,font.plainSubstrByWidth(o.type.equals("talk")?(o.target.isEmpty()?"Choisir le PNJ à rencontrer":npcLabel(o.target)):o.type.equals("collect")?itemName(o.target):o.target.equals("*")?"Tous les monstres":o.target.equals("boss")?"Tous les boss":Component.translatable("entity."+o.target.replace(':','.').replaceFirst("^(?!.*\\.).*", "mmorpg."+o.target)).getString(),rw-10),true,Ui.GOLD,()->target(o));
+            if(o.type.equals("talk")) g.text(font,"1 conversation",rx,fy+objectiveOffset(75),Ui.MUTED,false);
             button(g,rx+94,fy+objectiveOffset(70),25,18,"◀",objective>0,Ui.GOLD,()->{objective--;rebuild();});
             button(g,rx+122,fy+objectiveOffset(70),25,18,"▶",objective+1<draft.objectives.size(),Ui.GOLD,()->{objective++;rebuild();});
             g.text(font,(objective+1)+" / "+draft.objectives.size(),rx+155,fy+objectiveOffset(75),Ui.TEXT,false);

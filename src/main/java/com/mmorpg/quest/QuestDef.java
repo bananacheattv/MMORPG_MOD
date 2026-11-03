@@ -10,6 +10,7 @@ import java.util.List;
  * <ul>
  *     <li>{@code kill} : vaincre des monstres. Cible : cle de monstre du mod ("gobelin"), identifiant vanilla
  *     ("minecraft:zombie"), "*" pour n'importe quel monstre, ou "boss" pour n'importe quel boss.</li>
+ *     <li>{@code talk} : parler à un autre PNJ. Cible : UUID persistant du PNJ ; quantité : 1.</li>
  *     <li>{@code collect} : rapporter des objets (retires de l'inventaire a la remise). Cible : identifiant d'objet.</li>
  *     <li>{@code level} : atteindre un niveau (la quantite est le niveau).</li>
  *     <li>{@code action} : faire decouvrir une fonctionnalite. Cible : {@code cle|libelle} (cle d'action, voir QuestManager#onAction).</li>

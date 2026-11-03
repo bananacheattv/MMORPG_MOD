@@ -25,7 +25,8 @@ public final class MascotEntity extends NpcEntity {
 
     public MascotEntity(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
-        setNoGravity(true);
+        setNoGravity(false);
+        getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).setBaseValue(.28);
     }
 
     @Override
@@ -53,7 +54,7 @@ public final class MascotEntity extends NpcEntity {
     public void tick() {
         super.tick();
         // ancienne Mascotte unique d'un monde existant (sans proprietaire) : retiree
-        if (!level().isClientSide() && ownerId() == -1) discard();
+        if (!level().isClientSide() && (ownerId() == -1 || !(level().getEntity(ownerId()) instanceof ServerPlayer))) discard();
     }
 
     @Override

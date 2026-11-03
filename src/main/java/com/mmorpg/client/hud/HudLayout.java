@@ -88,6 +88,7 @@ public final class HudLayout {
         /** Rectangle a l'ecran {x, y, largeur, hauteur} une fois deplace et mis a l'echelle (borne a l'ecran). */
         public int[] rect(int sw, int sh) {
             int[] s = size.get(sw, sh);
+            if (id.equals("dialogue_pnj")) scale = Math.max(MIN_SCALE, Math.min(scale, Math.min((sw - 8f) / s[0], (sh - 8f) / s[1])));
             float w = s[0] * scale;
             float h = s[1] * scale;
             float x;
@@ -187,6 +188,10 @@ public final class HudLayout {
             sw / 2 + 96 + w <= sw - 2 ? new int[]{sw / 2 + 96, sh - 25} : new int[]{sw / 2 - w / 2, sh - 73});
     public static final Element ESSAI = mod("essai", "Indicateur d'essai de classe", (sw, sh) -> new int[]{210, 30}, (sw, sh, w, h) -> new int[]{(sw - w) / 2, 6});
     public static final Element BANNIERE = mod("banniere", "Annonces", (sw, sh) -> MmoHud.bannerSize(), (sw, sh, w, h) -> new int[]{(sw - w) / 2, sh / 4 - 7});
+
+    public static final Element DIALOGUE = mod("dialogue_pnj", "Dialogue et portrait du PNJ",
+            (sw, sh) -> new int[]{Math.min(380, sw - 12), 100},
+            (sw, sh, w, h) -> new int[]{(sw - w) / 2, Math.max(8, sh - h - 80)});
 
     // ---------------------------------------------------------------- elements vanilla (deplaces par transformation)
     public static final Element HOTBAR = vanilla("hotbar", "Barre d'objets", (sw, sh) -> new int[]{182, 22}, (sw, sh, w, h) -> new int[]{sw / 2 - 91, sh - 22},

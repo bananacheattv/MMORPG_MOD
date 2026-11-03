@@ -107,7 +107,11 @@ public final class MascotGuide {
                     m = ModEntities.MASCOT.get().create(p.level(), EntitySpawnReason.COMMAND);
                     m.initFor(p);
                     if (atPost) m.snapTo(postX, postY, postZ, postYaw, 0);
-                    else m.snapTo(target(p, 0), 0, 0);
+                    else {
+                        var ground = safeGround(p, m, target(p, 0));
+                        if (ground == null) { m.discard(); continue; }
+                        m.snapTo(ground, p.getYRot(), 0);
+                    }
                     if (p.level().addFreshEntity(m)) MASCOTS.put(p.getUUID(), m.getUUID());
                 }
                 if (atPost) look(p, m);
@@ -117,15 +121,24 @@ public final class MascotGuide {
         if (server.getTickCount() % 40 != 0) return;
         for (ServerPlayer p : server.getPlayerList().getPlayers()) {
             PlayerData d = RpgPlayers.get(p);
-            if (mine(p) == null || !p.isAlive() || FORCED.contains(p.getUUID())) continue;
+            if (mine(p) == null || !p.isAlive()) continue;
             long now = server.getTickCount();
             if (now - LAST_REMINDER.getOrDefault(p.getUUID(), -10_000L) < 20 * 40) continue;
             String id = pending(d);
-            if (id == null) continue;
+            if (id == null) {
+                if (FORCED.contains(p.getUUID()) && !LAST_REMINDER.containsKey(p.getUUID())) {
+                    say(p, "Bienvenue sur Aeloria ! Deviens un héros de niveau 100 : quêtes, donjons, guildes et arènes t'attendent. Ouvre le Wiki pour découvrir chaque activité.");
+                    LAST_REMINDER.put(p.getUUID(), now);
+                }
+                continue;
+            }
             QuestDef q = ConfigManager.quests().get(id);
             LAST_REMINDER.put(p.getUUID(), now);
             if (d.activeQuests.containsKey(id)) say(p, QuestManager.completable(p, d, id) ? "Tu as réussi « " + q.name + " » ! Clique sur moi pour ta récompense." : q.speech.isEmpty() ? q.description : q.speech);
-            else say(p, "J'ai une mission pour toi : « " + q.name + " ». Clique sur moi !");
+            else say(p, q.speech.isEmpty() ? "J'ai une mission pour toi : « " + q.name + " ». Clique sur moi !" : q.speech + " Clique sur moi pour commencer.");
+            if (d.activeQuests.containsKey(id) && !d.questGuidanceMuted) {
+                d.trackedQuest = id; d.dirty = true; GuidanceManager.refresh(p);
+            }
         }
     }
 
@@ -198,29 +211,40 @@ public final class MascotGuide {
         }
     }
 
-    /** Position voulue : devant le joueur, un peu a sa droite, en vol. */
-    private static net.minecraft.world.phys.Vec3 target(ServerPlayer p, int ignored) {
+    /** Le guide marche à distance, avec les collisions et les chemins du jeu. */
+    static net.minecraft.world.phys.Vec3 target(ServerPlayer p, int ignored) {
         double yaw = Math.toRadians(p.getYRot());
-        double fx = -Math.sin(yaw), fz = Math.cos(yaw), rx = -Math.cos(yaw), rz = -Math.sin(yaw);
-        return p.position().add(fx * 1.9 + rx * 1.3, 0.55, fz * 1.9 + rz * 1.3);
+        return p.position().add(Math.sin(yaw) * 3.8 - Math.cos(yaw) * 2, 0,
+                -Math.cos(yaw) * 3.8 - Math.sin(yaw) * 2);
     }
-
-    /** Suit le joueur en douceur et le regarde en permanence. */
-    private static void follow(ServerPlayer p, MascotEntity m) {
-        if (m.level() != p.level()) {
-            drop(p);
-            return;
+    static net.minecraft.world.phys.Vec3 safeGround(ServerPlayer p, MascotEntity m, net.minecraft.world.phys.Vec3 wanted) {
+        var level = p.level();
+        for (int radius = 0; radius <= 3; radius++) for (int dx = -radius; dx <= radius; dx++) for (int dz = -radius; dz <= radius; dz++) {
+            if (Math.max(Math.abs(dx), Math.abs(dz)) != radius) continue;
+            for (int dy = 3; dy >= -4; dy--) {
+                var at = net.minecraft.core.BlockPos.containing(wanted).offset(dx, dy, dz);
+                if (!level.hasChunkAt(at) || !level.getWorldBorder().isWithinBounds(at)) continue;
+                var point = net.minecraft.world.phys.Vec3.atBottomCenterOf(at);
+                if (point.subtract(p.position()).horizontalDistanceSqr() < 9) continue;
+                if (!level.getBlockState(at.below()).isFaceSturdy(level, at.below(), net.minecraft.core.Direction.UP)) continue;
+                var box = m.getBoundingBox().move(point.subtract(m.position()));
+                if (level.noCollision(m, box) && !level.containsAnyLiquid(box)) return point;
+            }
         }
-        var goal = target(p, m.getId());
-        var at = m.position();
-        double dist = at.distanceTo(goal);
-        var next = dist > 14 ? goal : at.add(goal.subtract(at).scale(Math.min(1.0, 0.2 + dist * 0.02)));
-        double dx = p.getX() - next.x, dz = p.getZ() - next.z, dy = p.getEyeY() - (next.y + 0.8);
-        float yaw = (float) (Math.toDegrees(Math.atan2(-dx, dz)));
-        float pitch = (float) (-Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz))));
-        m.snapTo(next, yaw, pitch);
-        m.setYHeadRot(yaw);
-        m.setYBodyRot(yaw);
+        return null;
+    }
+    private static void follow(ServerPlayer p, MascotEntity m) {
+        if (m.level() != p.level()) { drop(p); return; }
+        double distance = m.position().subtract(p.position()).horizontalDistanceSqr();
+        if (m.tickCount % 10 != 0) return;
+        if (distance >= 9 && distance <= 25) { m.getNavigation().stop(); look(p, m); return; }
+        var radial = m.position().subtract(p.position()).multiply(1, 0, 1);
+        var wanted = distance < .01 || distance > 32 * 32 ? target(p, 0)
+                : radial.normalize().scale(4).add(p.position());
+        var goal = safeGround(p, m, wanted);
+        if (goal == null) { m.getNavigation().stop(); return; }
+        if (distance > 32 * 32) { m.snapTo(goal, p.getYRot(), 0); m.getNavigation().stop(); }
+        else m.getNavigation().moveTo(goal.x, goal.y, goal.z, 1.1);
     }
 
     /**
@@ -237,7 +261,7 @@ public final class MascotGuide {
                     ServerPlayer p = c.getSource().getPlayerOrException();
                     postDim = p.level().dimension().identifier().toString();
                     postX = p.getX();
-                    postY = p.getY() + 0.55;
+                    postY = p.getY();
                     postZ = p.getZ();
                     postYaw = p.getYRot();
                     save(c.getSource().getServer());
@@ -271,6 +295,11 @@ public final class MascotGuide {
         String msg = on ? "Mascotte invoquée pour " + p.getGameProfile().name() + "." : "Mascotte renvoyée pour " + p.getGameProfile().name() + ".";
         src.sendSuccess(() -> Component.literal(msg), true);
         return 1;
+    }
+
+    @SubscribeEvent
+    public static void stopped(net.neoforged.neoforge.event.server.ServerStoppedEvent e) {
+        LAST_REMINDER.clear(); MASCOTS.clear(); FORCED.clear();
     }
 
     @SubscribeEvent
