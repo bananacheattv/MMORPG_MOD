@@ -70,12 +70,13 @@ public final class MascotDialogClient {
             actor = fallback;
         }
         var state = mc.getEntityRenderDispatcher().getRenderer(actor).createRenderState(actor, 1f);
+        if (state instanceof net.minecraft.client.renderer.entity.state.LivingEntityRenderState living) { living.scale=1; living.bodyRot=180; living.yRot=0; living.xRot=0; }
         state.shadowPieces.clear(); state.outlineColor = 0; state.lightCoords = 0xF000F0;
         int[] r = element.rect(g.guiWidth(), g.guiHeight());
         float scale = element.scale(); boolean mascot = actor instanceof MascotEntity;
         // Les portraits natifs ne suivent pas la matrice du GUI : appliquer le rectangle de U explicitement.
-        g.entity(state, (mascot ? 14 : 32) * scale, new org.joml.Vector3f(0, mascot ? 1.7f : actor.getBbHeight() / 2, 0),
-                new org.joml.Quaternionf().rotateZ((float)Math.PI).rotateY((float)Math.toRadians(actor.getYRot() + 15)), null,
+        g.entity(state, (mascot ? 14 : 32) * scale, new org.joml.Vector3f(0, mascot ? 1.7f : 1.05f, 0),
+                new org.joml.Quaternionf().rotateZ((float)Math.PI).rotateY((float)Math.toRadians(15)), null,
                 r[0] + Math.round(7 * scale), r[1] + Math.round(8 * scale),
                 r[0] + Math.round(73 * scale), r[1] + Math.round((h - 8) * scale));
     }

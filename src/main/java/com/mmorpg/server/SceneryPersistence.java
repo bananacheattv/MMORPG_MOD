@@ -11,7 +11,7 @@ public final class SceneryPersistence {
     @SubscribeEvent public static void joined(net.neoforged.neoforge.event.entity.EntityJoinLevelEvent event){
         if(!(event.getLevel() instanceof ServerLevel level))return;
         var entity=event.getEntity();
-        if(entity instanceof com.mmorpg.entity.NpcEntity||entity instanceof com.mmorpg.entity.dummy.TrainingDummyEntity||entity instanceof com.mmorpg.entity.hub.ClassMasterEntity){
+        if((entity instanceof com.mmorpg.entity.NpcEntity && !(entity instanceof com.mmorpg.entity.MascotEntity))||entity instanceof com.mmorpg.entity.dummy.TrainingDummyEntity||entity instanceof com.mmorpg.entity.hub.ClassMasterEntity){
             var mob=(Mob)entity;mob.setPersistenceRequired();mob.setNoGravity(true);mob.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
         }
         if(entity instanceof Display.TextDisplay&&!entity.entityTags().contains("aeloria_visibility_v1"))Scheduler.later(level,2,()->{
