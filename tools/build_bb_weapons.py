@@ -116,7 +116,7 @@ METAL = ('mt', 'md', 'hl', 'go', 'gd', 'st', 'bk', 'bn')
 GEM = ('g1', 'g2', 'g3')
 
 
-def shade_rect(slot, col, w, h, rnd, force_x=False):
+def shade_rect(slot, col, w, h, rnd, force_x=False, rar=0.0):
     """Peint un rectangle local (w x h px) : degrade de section (rond), reflet, veinage, lueur des gemmes."""
     yy, xx = np.mgrid[0:h, 0:w].astype(float)
     a = (xx + .5) / w          # 0..1 en largeur
@@ -138,8 +138,17 @@ def shade_rect(slot, col, w, h, rnd, force_x=False):
     if slot in GEM:
         r = np.hypot((a - .5) * 2, (b - .5) * 2)
         k = 1.35 - .75 * r + .12 * np.sin((a + b) * 7)
+    if slot in ('mt', 'md', 'hl', 'go', 'gd', 'bk') and rar > .15:
+        # gravures : fines stries diagonales + micro-rayures, plus riches avec la rarete
+        k -= (.05 + .07 * rar) * (np.sin((xx + yy) * (1.1 + rar)) > .92) * (1 + 0 * k)
+        k += .03 * rar * np.sin(xx * 2.3 - yy * .7)
+    if rar > .55 and slot in ('mt', 'md', 'hl', 'go', 'gd', 'ac', 'ad'):
+        k = k * (1 + .08 * rar * (a - .5))   # reflet chromatique le long de la piece
     k = k + rnd.normal(0, .02, k.shape)
     px = np.clip(np.array(col, float)[None, None, :] * k[..., None], 0, 255)
+    if slot in ('mt', 'hl', 'go', 'st') and rar > 0:
+        sp = rnd.random(px.shape[:2]) < (.006 + .03 * rar)
+        px[sp] = np.clip(px[sp] + 70 + 60 * rar, 0, 255)
     if slot in GEM:
         px = np.clip(px + (np.maximum(0, 1.0 - np.hypot((a - .5) * 2, (b - .5) * 2))[..., None] ** 2) * 70, 0, 255)
     if slot not in ('mt', 'md', 'hl'):
@@ -148,13 +157,20 @@ def shade_rect(slot, col, w, h, rnd, force_x=False):
     return px.astype(np.uint8)
 
 
+def rarity(wid):
+    if wid.startswith('pvp_'):
+        return .15 + .17 * int(wid.split('_')[2])
+    ks = list(T)
+    return (ks.index(wid) % 11) / 10 if wid in ks else .5
+
+
 def build_atlas(elements, th, wid, bow):
     """Texture peinte : projection plane (continue) pour les pieces droites, tuiles pour les pieces inclinees."""
     ppu = 16 if bow else 8
     cw = 16 * ppu
     ch = (16 if bow else 32) * ppu
     rnd = np.random.RandomState(zlib.crc32(wid.encode()) & 0xffffffff)
-    pr = random.Random(zlib.crc32(wid.encode()))
+    r = rarity(wid)
     order = sorted(range(len(elements)), key=lambda i: (elements[i]['to'][2], i))
     tiles, place, x, y, rowh = [], {}, 0, 0, 0
     canvas = np.zeros((ch, cw, 4), np.uint8)
@@ -169,7 +185,7 @@ def build_atlas(elements, th, wid, bow):
         if 'rotation' not in e:
             x0 = round(f[0] * ppu)
             y0 = round((16 - t[1]) * ppu) if bow else round((32 - t[1]) * ppu)
-            blk = shade_rect(slot, col, wpx, hpx, rnd, fx)
+            blk = shade_rect(slot, col, wpx, hpx, rnd, fx, r)
             ys, xs = max(0, y0), max(0, x0)
             ye, xe = min(ch, y0 + hpx), min(cw, x0 + wpx)
             if ye > ys and xe > xs:
@@ -179,7 +195,7 @@ def build_atlas(elements, th, wid, bow):
         else:
             if x + wpx + 1 > cw:
                 x, y, rowh = 0, y + rowh + 1, 0
-            tiles.append((x, y, shade_rect(slot, col, wpx, hpx, rnd, fx)))
+            tiles.append((x, y, shade_rect(slot, col, wpx, hpx, rnd, fx, r)))
             place[i] = ('tile', x, y, wpx, hpx)
             x += wpx + 1
             rowh = max(rowh, hpx)
