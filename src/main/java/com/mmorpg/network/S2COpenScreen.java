@@ -43,6 +43,8 @@ public record S2COpenScreen(int screen, CompoundTag extra) implements CustomPack
     public static final int ADMIN_FEATURES = 35;
     /** Proposition automatique de quete (fenetre « Accepter la quete »). */
     public static final int QUEST_OFFER = 36;
+    /** Scene cinematique de l'histoire principale (StoryBook). */
+    public static final int STORY_SCENE = 61;
     /** Invitation à rejoindre le boss de guilde lancé (Accepter / Refuser). */
     public static final int GUILD_RAID_INVITE = 37;
     /** Reglage du niveau d'un bloc de lumiere invisible. */

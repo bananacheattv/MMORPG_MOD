@@ -127,6 +127,7 @@ public final class RpgPlayers {
         t.putString("activeMount", d.activeMount);
         t.put("quests", QuestManager.activeTag(player, d));
         t.put("declined", QuestManager.declinedTag(player, d));
+        t.put("questExtra", QuestManager.extraTag(player, d));
         Net.toPlayer(player, new Payloads.SyncPlayer(t));
         d.dirty = false;
         sendVitals(player, true);

@@ -516,6 +516,13 @@ public final class DevShowcase {
             if (tick == 35) stop(mc);
             return;
         }
+        if (MODE.equals("histoire")) {       // cinematique d'histoire principale
+            if (tick == 5) mc.gui.setScreen(new com.mmorpg.client.screen.StorySceneScreen("hist_3"));
+            if (tick == 45) shot(mc, "histoire_titre");
+            if (tick == 150) shot(mc, "histoire_repliques");
+            if (tick == 160) stop(mc);
+            return;
+        }
         if (MODE.equals("offre_quete")) {    // fenetre de proposition automatique de quete
             if (tick == 5) {
                 var q = new net.minecraft.nbt.CompoundTag();

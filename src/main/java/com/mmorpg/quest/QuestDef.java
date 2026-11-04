@@ -24,6 +24,10 @@ public class QuestDef {
     public int minLevel = 1;
     /** Quetes a terminer avant de pouvoir accepter celle-ci. */
     public List<String> requires = new ArrayList<>();
+    /** Classes concernees (identifiants : guerrier, mage, archer, tank) ; vide = toutes. Quetes de classe, remises au Maitre des classes. */
+    public List<String> classes = new ArrayList<>();
+    /** Identifiant de la scene cinematique de l'histoire principale (StoryBook) ; vide = pas une quete d'histoire. Rendue automatiquement. */
+    public String story = "";
     /** Quete journaliere (recommencable chaque jour civil du serveur). */
     public boolean daily = false;
     /** Quete hebdomadaire personnelle generee par WeeklyQuests (jamais ecrite dans quests.json). */

@@ -13,7 +13,7 @@ public class QuestLogScreen extends MenuScreen {
     private static String selected;
     private boolean confirmAbandon;
     private int page, filter;
-    private static final String[] FILTERS = {"Toutes", "Campagne", "Journalières", "À rendre", "Important"};
+    private static final String[] FILTERS = {"Toutes", "Campagne", "Journalières", "À rendre", "Important", "Histoire", "Découvertes"};
 
     public QuestLogScreen() {
         super(Tab.QUETES);
@@ -22,19 +22,29 @@ public class QuestLogScreen extends MenuScreen {
     @Override
     protected void renderTab(GuiGraphicsExtractor g, int mx, int my, float a) {
         ListTag quests = new ListTag();
-        ListTag source = filter == 4 ? ClientData.declined : ClientData.quests;
+        ListTag source = filter == 4 ? ClientData.declined : filter == 5 ? ClientData.questExtra.getListOrEmpty("story")
+                : filter == 6 ? ClientData.questExtra.getListOrEmpty("explore") : ClientData.quests;
+        if (filter == 2) {
+            source = new ListTag();
+            source.addAll(ClientData.quests);
+            source.addAll(ClientData.questExtra.getListOrEmpty("offers"));
+        }
         for (int i = 0; i < source.size(); i++) {
             CompoundTag entry = source.getCompoundOrEmpty(i);
             boolean daily = entry.getBooleanOr("daily", false);
-            if (filter == 4 || filter == 0 || filter == 1 && !daily || filter == 2 && daily || filter == 3 && entry.getBooleanOr("completable", false)) quests.add(entry);
+            if (filter >= 4 || filter == 0 || filter == 1 && !daily || filter == 2 && daily || filter == 3 && entry.getBooleanOr("completable", false)) quests.add(entry);
         }
         int x0 = left + 8;
         int y0 = contentTop;
         button(g, x0, y0 + 14, 160, 16, FILTERS[filter] + "  >", true, 0xFF2A2420, () -> { filter = (filter + 1) % FILTERS.length; page = 0; });
         int lw = 160;
-        Ui.header(g, x0, y0, lw, "JOURNAL (" + ClientData.quests.size() + "/10)");
+        Ui.header(g, x0, y0, lw, filter == 6 ? "DÉCOUVERTES (" + quests.size() + "/" + ClientData.questExtra.getIntOr("exploreTotal", 0) + ")" : "JOURNAL (" + ClientData.quests.size() + "/10)");
         if (quests.isEmpty()) {
-            Ui.wrap(g, (filter == 4 ? "Aucune quête refusée. Celles que vous repoussez avec « Plus tard » arrivent ici." : "Aucune quête dans cette catégorie. Parlez à un Maître des Quêtes pour en obtenir."), x0, y0 + 36, lw, Ui.MUTED);
+            Ui.wrap(g, (filter == 4 ? "Aucune quête refusée. Celles que vous repoussez avec « Plus tard » arrivent ici."
+                    : filter == 5 ? "L'histoire d'Aeloria commence après le tutoriel. Chaque chapitre se débloque en jouant."
+                    : filter == 6 ? "Des lieux secrets se cachent dans le monde : explorez, sans aucune indication."
+                    : filter == 2 ? "Plus de quête du jour : revenez demain pour de nouveaux contrats."
+                    : "Aucune quête dans cette catégorie. Parlez à un Maître des Quêtes pour en obtenir."), x0, y0 + 36, lw, Ui.MUTED);
         }
         boolean found = false;
         for (int i = 0; i < quests.size(); i++) {
@@ -83,6 +93,19 @@ public class QuestLogScreen extends MenuScreen {
         int by = y0 + dh - 22;
         QuestPanel.render(g, q, dx, y0, dw, by - 23, mx, my);
         String id = q.getStringOr("id", "");
+        if (filter == 6) return;
+        if (filter == 5) {
+            button(g, dx + 6, by, dw - 12, 16, "▶ Rejouer la cinématique", true, 0xFF3A2A6A, () -> ClientNet.send(new Payloads.QuestAction(Payloads.QuestAction.STORY_REPLAY, id, -1)));
+            return;
+        }
+        if (q.getBooleanOr("offer", false)) {
+            button(g, dx + 6, by, dw - 12, 16, "Accepter la quête du jour", ClientData.quests.size() < 10, 0xFF1A5A7A, () -> ClientNet.send(new Payloads.QuestAction(Payloads.QuestAction.ACCEPT, id, -1)));
+            return;
+        }
+        if (q.getBooleanOr("completable", false) && id.startsWith("rdaily:")) {
+            button(g, dx + 6, by, dw - 12, 16, "Rendre la quête", true, 0xFF2A7A3A, () -> ClientNet.send(new Payloads.QuestAction(Payloads.QuestAction.COMPLETE, id, -1)));
+            return;
+        }
         if (filter == 4) {
             button(g, dx + 6, by, dw - 12, 16, "Accepter la quête", ClientData.quests.size() < 10, 0xFF7A5A1A, () -> ClientNet.send(new Payloads.QuestAction(Payloads.QuestAction.ACCEPT, id, -1)));
             return;
