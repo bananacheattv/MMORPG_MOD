@@ -223,7 +223,8 @@ def finish(elements, wid, display, gui_light, bow):
         kind, px, py, wp, hp = place[i]
         base = 0
         def uv(x0, y0, x1, y1):
-            return [round(x0 / W * 16, 4), round((base + y0) / H * 16, 4), round(x1 / W * 16, 4), round((base + y1) / H * 16, 4)]
+            c = lambda v: round(min(16.0, max(0.0, v)), 4)
+            return [c(x0 / W * 16), c((base + y0) / H * 16), c(x1 / W * 16), c((base + y1) / H * 16)]
         ne = {'name': e['name'], 'from': e['from'], 'to': e['to']}
         if 'rotation' in e:
             ne['rotation'] = e['rotation']
