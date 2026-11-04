@@ -68,7 +68,7 @@ public class CrateBlock extends Block implements net.minecraft.world.level.block
     }
 
     @Override protected net.minecraft.world.level.block.RenderShape getRenderShape(BlockState state) {
-        return state.getValue(com.mmorpg.block.structure.FreeOrientation.FREE)?net.minecraft.world.level.block.RenderShape.INVISIBLE:net.minecraft.world.level.block.RenderShape.MODEL;
+        return net.minecraft.world.level.block.RenderShape.INVISIBLE;      // dessinee par CrateRenderer (coffre anime)
     }
 
     @Override

@@ -76,6 +76,7 @@ public final class AnimatedModels {
     public static void registerBlockEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlocks.STRUCTURE.get(), StructureRenderer::new);
         event.registerBlockEntityRenderer(ModBlocks.CRATE.get(), com.mmorpg.client.model.crate.CrateRenderer::new);
+        event.registerBlockEntityRenderer(ModBlocks.DUNGEON_CHEST_ENTITY.get(), com.mmorpg.client.model.chest.DungeonChestRenderer::new);
         event.registerBlockEntityRenderer(ModBlocks.RANKING_BOARD.get(), com.mmorpg.client.model.ranking.RankingBoardRenderer::new);
     }
 

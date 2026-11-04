@@ -87,6 +87,13 @@ public final class ModBlocks {
             () -> new BlockEntityType<>(com.mmorpg.block.crate.CrateBlockEntity::new,
                     CRATES.values().stream().map(DeferredBlock::get).toArray(net.minecraft.world.level.block.Block[]::new)));
 
+    /** Coffre de donjon (remplace le coffre vanilla) : rendu 3D anime, inventaire vanilla. */
+    public static final DeferredBlock<com.mmorpg.block.chest.DungeonChestBlock> DUNGEON_CHEST = BLOCKS.registerBlock("coffre_donjon",
+            com.mmorpg.block.chest.DungeonChestBlock::new,
+            p -> p.mapColor(MapColor.COLOR_BLACK).strength(2.5f).sound(SoundType.WOOD).noOcclusion().noLootTable());
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.mmorpg.block.chest.DungeonChestBlockEntity>> DUNGEON_CHEST_ENTITY = BLOCK_ENTITIES.register("coffre_donjon",
+            () -> new BlockEntityType<>(com.mmorpg.block.chest.DungeonChestBlockEntity::new, DUNGEON_CHEST.get()));
+
     /** Panneaux de classement : lignes du top affichées sur le panneau (état synchronisé). */
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.mmorpg.block.ranking.RankingBoardBlockEntity>> RANKING_BOARD = BLOCK_ENTITIES.register("classement",
             () -> new BlockEntityType<>(com.mmorpg.block.ranking.RankingBoardBlockEntity::new,

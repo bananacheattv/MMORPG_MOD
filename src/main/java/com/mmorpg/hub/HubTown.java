@@ -333,7 +333,7 @@ final class HubTown {
             if (stairHole(u, -hd + 1, hw, hd, f + 1) && f < floors - 1) continue;
             if (bedroom) {
                 bed(c, cx, cz, fx, fz, u, base, hd - 2, toBack);
-                put(c, cx, cz, fx, fz, u + 1, base, hd - 1, Blocks.CHEST.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, toBack));
+                put(c, cx, cz, fx, fz, u + 1, base, hd - 1, com.mmorpg.registry.ModBlocks.DUNGEON_CHEST.get().defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, toBack));
             } else {
                 put(c, cx, cz, fx, fz, u, base, hd - 1, Blocks.BARREL.defaultBlockState());
                 put(c, cx, cz, fx, fz, u + 1, base, hd - 1, Blocks.BARREL.defaultBlockState());

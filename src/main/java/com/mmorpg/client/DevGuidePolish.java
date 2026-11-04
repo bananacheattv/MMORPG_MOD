@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import com.mmorpg.client.screen.*;
 
-/** Captures privées opt-in, aucune activation dans le launcher. */
+/** Captures privÃ©es opt-in, aucune activation dans le launcher. */
 public final class DevGuidePolish {
     private static int tick;
     private static void shot(Minecraft mc,String name) {
@@ -20,11 +20,11 @@ public final class DevGuidePolish {
         if(t==260)shot(mc,"wiki_etape2");
         if(t==270)mc.gui.setScreen(new WikiScreen("forge"));
         if(t==278)shot(mc,"wiki_forge");
-        if(t==280){mc.gui.setScreen(null);MascotDialogClient.say("Mascotte","Bienvenue sur Aeloria ! Deviens un héros de niveau 100. Je vais t'accompagner vers tes premières quêtes et t'apprendre à fabriquer ton équipement.");}
+        if(t==280){mc.gui.setScreen(null);MascotDialogClient.say("Mascotte","Bienvenue sur Aeloria ! Deviens un hÃ©ros de niveau 100. Je vais t'accompagner vers tes premiÃ¨res quÃªtes et t'apprendre Ã  fabriquer ton Ã©quipement.");}
         if(t==300)shot(mc,"dialogue");
         if(t==305){
-            MascotDialogClient.say("PNJ qu�tes", "Portrait du PNJ agrandi : la t�te doit rester dans le cadre.");
-            try { var npc=new com.mmorpg.entity.NpcEntity(com.mmorpg.registry.ModEntities.NPC.get(),mc.level);npc.setId(-160010);npc.setup(com.mmorpg.entity.NpcEntity.Role.QUETES,"PNJ qu�tes",4,"");npc.setNpcScale(3);var f=MascotDialogClient.class.getDeclaredField("portrait");f.setAccessible(true);f.set(null,npc); }catch(Exception ex){throw new IllegalStateException(ex);}
+            MascotDialogClient.say("PNJ quêtes", "Portrait du PNJ agrandi : la tête doit rester dans le cadre.");
+            try { var npc=new com.mmorpg.entity.NpcEntity(com.mmorpg.registry.ModEntities.NPC.get(),mc.level);npc.setId(-160010);npc.setup(com.mmorpg.entity.NpcEntity.Role.QUETES,"PNJ quêtes",4,"");npc.setNpcScale(3);var f=MascotDialogClient.class.getDeclaredField("portrait");f.setAccessible(true);f.set(null,npc); }catch(Exception ex){throw new IllegalStateException(ex);}
         }
         if(t==315)shot(mc,"portrait_pnj_x3");
         if(t==320)mc.gui.setScreen(new HudEditorScreen(null));

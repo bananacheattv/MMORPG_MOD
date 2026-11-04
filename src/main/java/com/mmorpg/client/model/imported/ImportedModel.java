@@ -137,6 +137,7 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
     }
     @Override public void setupAnim(LivingEntityRenderState state) {
         super.setupAnim(state);
+        if(state instanceof ChestAnimState chest){if(chest.ticks>=0)animate("chest",chest.ticks,1);else animate("idle",0,1);return;}
         if(state instanceof net.minecraft.client.renderer.entity.state.ArmorStandRenderState stand){poseBone("head",stand.headPose);poseBone("body",stand.bodyPose);poseBone("arm_1",stand.leftArmPose);poseBone("arm_-1",stand.rightArmPose);poseBone("leg_1",stand.leftLegPose);poseBone("leg_-1",stand.rightLegPose);return;}
 
         if(state instanceof com.mmorpg.client.model.mount.MountRenderer.State m && m.flying && animations.containsKey("fly")) {

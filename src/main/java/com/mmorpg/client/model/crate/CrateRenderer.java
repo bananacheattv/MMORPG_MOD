@@ -39,7 +39,9 @@ public class CrateRenderer implements BlockEntityRenderer<CrateBlockEntity, Crat
     public static class State extends BlockEntityRenderState {
         public String label = "";
         public float yaw=Float.NaN;
-        public final net.minecraft.client.renderer.block.BlockModelRenderState model = new net.minecraft.client.renderer.block.BlockModelRenderState();
+        public final com.mmorpg.client.model.imported.ChestAnimState anim = new com.mmorpg.client.model.imported.ChestAnimState();
+        public net.minecraft.resources.Identifier texture;
+        public net.minecraft.core.Direction facing = net.minecraft.core.Direction.NORTH;
         public int color = 0xFFFFFF;
         public boolean spinning, showing;
         public float position, showTime, time;
@@ -48,6 +50,8 @@ public class CrateRenderer implements BlockEntityRenderer<CrateBlockEntity, Crat
         public String winner = "";
     }
 
+    private static final float CHEST_SCALE = 0.6f;
+    private final com.mmorpg.client.model.chest.ChestModels chest = new com.mmorpg.client.model.chest.ChestModels("coffre_bois");
     private final ItemModelResolver items;
     private final Font font;
 
@@ -71,13 +75,15 @@ public class CrateRenderer implements BlockEntityRenderer<CrateBlockEntity, Crat
         if (be.getBlockState().getBlock() instanceof CrateBlock block) {
             state.label = block.tier.label;
             state.color = block.tier.color;
+            state.texture = com.mmorpg.MMORPG.id("textures/imported/chests/caisse_" + block.tier.id + ".png");
+            state.facing = be.getBlockState().getValue(CrateBlock.FACING);
         }
         state.yaw=be.yaw;
-        if(Float.isFinite(state.yaw))net.minecraft.client.Minecraft.getInstance().getBlockModelResolver().update(state.model,
-                be.getBlockState().setValue(com.mmorpg.block.structure.FreeOrientation.FREE,false).setValue(CrateBlock.FACING,net.minecraft.core.Direction.NORTH),
-                net.minecraft.client.renderer.block.model.BlockDisplayContext.create());
         long now = be.getLevel() == null ? 0 : be.getLevel().getGameTime();
         float elapsed = now - be.startTick + partial;
+        float total = CrateBlockEntity.SPIN_TICKS + CrateBlockEntity.SHOW_TICKS;
+        state.anim.ticks = com.mmorpg.client.model.chest.ChestModels.ticks(!be.reel.isEmpty() && elapsed >= 0 && elapsed < total,
+                elapsed, elapsed - total);
         state.time = (now + partial) / 20f;
         state.items.clear();
         state.offsets.clear();
@@ -110,10 +116,9 @@ public class CrateRenderer implements BlockEntityRenderer<CrateBlockEntity, Crat
 
     @Override
     public void submit(State state, PoseStack pose, SubmitNodeCollector collector, CameraRenderState camera) {
-        if(Float.isFinite(state.yaw)) {
-            pose.pushPose();pose.translate(.5,0,.5);pose.rotateDegrees(Axis.YP,180-state.yaw);pose.translate(-.5,0,-.5);
-            state.model.submitMultiLayer(pose,collector,state.lightCoords,OverlayTexture.NO_OVERLAY,0);pose.popPose();
-        }
+        if (state.texture != null)
+            chest.submit(state.anim, pose, collector, state.texture, state.lightCoords,
+                    Float.isFinite(state.yaw) ? 180 - state.yaw : com.mmorpg.client.model.chest.ChestModels.yaw(state.facing), CHEST_SCALE);
         // ---- nom de la caisse
         if (net.minecraft.client.Minecraft.getInstance().gui.hud.isHidden()) return;
         float labelY = state.spinning || state.showing ? 4.6f : 2.65f;

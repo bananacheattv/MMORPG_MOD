@@ -89,7 +89,7 @@ public final class DungeonBuilder {
     }
 
     public static void chest(ServerLevel level, BlockPos p, List<ItemStack> items, RandomSource r) {
-        set(level, p, Blocks.CHEST.defaultBlockState());
+        set(level, p, com.mmorpg.registry.ModBlocks.DUNGEON_CHEST.get().defaultBlockState());
         if (level.getBlockEntity(p) instanceof ChestBlockEntity chest) {
             for (ItemStack s : items) {
                 int slot = r.nextInt(27);
