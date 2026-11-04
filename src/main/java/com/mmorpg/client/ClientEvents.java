@@ -71,7 +71,6 @@ public final class ClientEvents {
         ArenaResultDelivery.tick(mc);
         com.mmorpg.client.hud.GuidanceArrow.update(mc);
         CosmeticFx.tick(mc);
-        com.mmorpg.client.fx.WeaponGlowFx.tick(mc);
         DiscordPresence.tick(mc);
     }
 
