@@ -265,7 +265,7 @@ public final class DefaultMobs {
         String[][] zoneLoot = {{"ecorce_ancienne", "seve_lumineuse", "coeur_racine"}, {"mucus_acide", "venin_marais", "ecaille_hydre"},
                 {"fragment_ossuaire", "relique_funeraire", "couronne_cryptes"}, {"fourrure_polaire", "carapace_givree", "croc_wyrm"},
                 {"carapace_cuivre", "bandelette_ancienne", "braise_djinn"}, {"eclat_astral", "poussiere_etoile", "eclat_fracture"}};
-        List<String> elites = List.of("colosse_racine", "hydre_marais", "roi_cryptes", "wyrm_boreal", "djinn_braises", "devoreur_etoiles", "chevalier_fracture");
+        List<String> elites = List.of("colosse_racine", "hydre_marais", "roi_cryptes", "wyrm_boreal", "djinn_braises", "devoreur_etoiles", "chevalier_fracture", "champion_gobelin", "seigneur_squelette", "minotaure", "sentinelle_hibou");
         for (var entry : com.mmorpg.entity.mob.ImportedMobs.ALL) {
             int z = entry.zone();
             MobConfig c = mob(1 + z * 16, Math.min(100, 18 + z * 16), 70 + z * 70, 22 + z * 8, 8 + z * 5, 2.4 + z * .6, 1 + z * .4, .27, 1);

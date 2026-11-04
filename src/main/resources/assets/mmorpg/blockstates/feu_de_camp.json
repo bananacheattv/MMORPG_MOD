@@ -1,0 +1,1 @@
+{"variants":{"facing=north":{"model":"mmorpg:block/feu_de_camp"},"facing=east":{"model":"mmorpg:block/feu_de_camp","y":90},"facing=south":{"model":"mmorpg:block/feu_de_camp","y":180},"facing=west":{"model":"mmorpg:block/feu_de_camp","y":270}}}

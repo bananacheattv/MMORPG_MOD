@@ -62,6 +62,8 @@ public abstract class RpgMonster extends Monster implements RpgMob {
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason, @Nullable SpawnGroupData groupData) {
         SpawnGroupData data = super.finalizeSpawn(level, difficulty, reason, groupData);
+        // monstre pose a la main (oeuf, commande, spawner) : il reste en place apres un redemarrage
+        if (reason == EntitySpawnReason.SPAWN_ITEM_USE || reason == EntitySpawnReason.COMMAND) this.setPersistenceRequired();
         if (level.getLevel() instanceof ServerLevel sl) {
             MobLevels.initialize(this, sl);
         }

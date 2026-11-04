@@ -1,0 +1,1 @@
+{"variants":{"facing=north":{"model":"mmorpg:block/pot_decore"},"facing=east":{"model":"mmorpg:block/pot_decore","y":90},"facing=south":{"model":"mmorpg:block/pot_decore","y":180},"facing=west":{"model":"mmorpg:block/pot_decore","y":270}}}

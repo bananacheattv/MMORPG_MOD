@@ -1,0 +1,1 @@
+{"type":"minecraft:block","pools":[{"rolls":1,"entries":[{"type":"minecraft:item","name":"mmorpg:jarre_ancienne"}],"conditions":[{"condition":"minecraft:survives_explosion"}]}],"random_sequence":"mmorpg:blocks/jarre_ancienne"}

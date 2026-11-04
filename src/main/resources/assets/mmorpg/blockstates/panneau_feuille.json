@@ -1,0 +1,1 @@
+{"variants":{"facing=north":{"model":"mmorpg:block/panneau_feuille"},"facing=east":{"model":"mmorpg:block/panneau_feuille","y":90},"facing=south":{"model":"mmorpg:block/panneau_feuille","y":180},"facing=west":{"model":"mmorpg:block/panneau_feuille","y":270}}}

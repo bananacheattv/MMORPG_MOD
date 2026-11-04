@@ -1,0 +1,1 @@
+{"variants":{"facing=north":{"model":"mmorpg:block/potion_etoilee"},"facing=east":{"model":"mmorpg:block/potion_etoilee","y":90},"facing=south":{"model":"mmorpg:block/potion_etoilee","y":180},"facing=west":{"model":"mmorpg:block/potion_etoilee","y":270}}}
