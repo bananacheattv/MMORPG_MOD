@@ -41,10 +41,23 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
             if(value.has("children")){String nested=findHead(value.getAsJsonArray("children"));if(nested!=null)return nested;}}
         return null;
     }
-    private static JsonObject read(String kind, String key) {
+    /** Cache des geometries lues : un meme modele (ex. rendu + lueur, ou plusieurs rendus d'un meme PNJ) n'est lu et analyse qu'une fois. Vide apres un rechargement des ressources. */
+    private static final Map<String, JsonObject> GEOMETRY = new HashMap<>();
+    private static Object cacheOwner;
+    public static int geometryHits, geometryMisses;
+
+    private static synchronized JsonObject read(String kind, String key) {
+        var manager = Minecraft.getInstance().getResourceManager();
+        if (cacheOwner != manager) { GEOMETRY.clear(); cacheOwner = manager; }          // rechargement des ressources : nouveau gestionnaire
         var id = MMORPG.id("bbmodels/" + kind + "/" + key + ".json");
-        try (var reader = Minecraft.getInstance().getResourceManager().openAsReader(id)) {
-            return JsonParser.parseReader(reader).getAsJsonObject();
+        String k = id.toString();
+        JsonObject cached = GEOMETRY.get(k);
+        if (cached != null) { geometryHits++; return cached; }
+        try (var reader = manager.openAsReader(id)) {
+            JsonObject data = JsonParser.parseReader(reader).getAsJsonObject();
+            geometryMisses++;
+            GEOMETRY.put(k, data);
+            return data;
         } catch (Exception e) { throw new IllegalStateException("Invalid imported model: " + id, e); }
     }
     private static float[] vec(JsonObject j, String key) {

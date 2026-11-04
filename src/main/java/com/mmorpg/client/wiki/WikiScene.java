@@ -45,6 +45,8 @@ public final class WikiScene {
             return state;
         });
     }
+    /** Libere les modeles et l'acteur du diorama : tout est reconstruit a la demande a la prochaine page illustree. */
+    public void release() { models.clear(); actor = null; world = null; }
     public void draw(GuiGraphicsExtractor g, WikiStories.Story story, int step, float progress, float yaw, float pitch, float zoom, int x, int y, int w, int h) {
         var mc = Minecraft.getInstance(); if (mc.level == null || mc.player == null) return;
         boolean mascot = story.theme().equals("mascot");

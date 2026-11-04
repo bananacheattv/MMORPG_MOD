@@ -28,7 +28,11 @@ public final class ProfileStore implements AutoCloseable {
     public byte[] read() throws IOException {
         return Files.exists(profile) ? Files.readAllBytes(profile) : null;
     }
-    public void write(byte[] data) throws IOException {
+    public void write(byte[] data) throws IOException { write(data, Long.MAX_VALUE); }
+    private long lastSeq = Long.MIN_VALUE;
+    /** Ecrit si aucune sauvegarde plus recente (numero de sequence plus grand) n'est deja passee : garde l'ordre entre ecritures asynchrones et synchrones. */
+    public synchronized boolean write(byte[] data, long seq) throws IOException {
+        if (seq < lastSeq) return false;
         if (!lock.isValid()) throw new IOException("Player session lock lost");
         Path tmp = Files.createTempFile(profile.getParent(), "profile-", ".tmp");
         try {
@@ -39,6 +43,8 @@ public final class ProfileStore implements AutoCloseable {
             }
             if (Files.exists(profile)) Files.copy(profile, profile.resolveSibling(profile.getFileName() + ".bak"), StandardCopyOption.REPLACE_EXISTING);
             Files.move(tmp, profile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            lastSeq = seq;
+            return true;
         } finally { Files.deleteIfExists(tmp); }
     }
     @Override public void close() throws IOException { try { lock.release(); } finally { channel.close(); } }

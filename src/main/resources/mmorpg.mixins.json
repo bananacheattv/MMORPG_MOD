@@ -27,6 +27,7 @@
     "CharacterSlotHighlightMixin",
     "AeloriaShaderMixin",
     "MmoScreenMouseMixin",
-    "DevNoBlurMixin"
+    "DevNoBlurMixin",
+    "ParticleLimiterMixin"
   ]
 }

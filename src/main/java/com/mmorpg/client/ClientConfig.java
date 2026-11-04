@@ -68,6 +68,19 @@ public final class ClientConfig {
             .translation("mmorpg.configuration.discordAppId")
             .define("discordAppId", "1565874848167755776");
 
+    public static final ModConfigSpec.IntValue NPC_RENDER_DISTANCE = BUILDER
+            .comment("Distance d'affichage des PNJ, guides et maitres de classe, en blocs (plus bas = plus de FPS dans le hub)")
+            .translation("mmorpg.configuration.npcRenderDistance")
+            .defineInRange("npcRenderDistance", 64, 16, 128);
+    public static final ModConfigSpec.BooleanValue ADAPTIVE_PARTICLES = BUILDER
+            .comment("Reduit automatiquement le nombre de particules quand les FPS passent sous la cible, puis les restaure")
+            .translation("mmorpg.configuration.adaptiveParticles")
+            .define("adaptiveParticles", true);
+    public static final ModConfigSpec.IntValue PARTICLE_TARGET_FPS = BUILDER
+            .comment("FPS minimum visé par le limiteur de particules adaptatif")
+            .translation("mmorpg.configuration.particleTargetFps")
+            .defineInRange("particleTargetFps", 45, 20, 144);
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 
     /** Volume de la musique d'ambiance entre 0 et 1. */

@@ -91,6 +91,7 @@ public final class Net {
 
     public static void toPlayer(ServerPlayer player, CustomPacketPayload payload) {
         if (payload instanceof S2COpenScreen s) com.mmorpg.security.ScreenGuard.opened(player, s.screen());
+        if (PacketBatcher.offer(player, payload)) return;
         PacketDistributor.sendToPlayer(player, payload);
     }
 

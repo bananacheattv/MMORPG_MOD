@@ -19,6 +19,7 @@ public final class AuthoredNpcRenderer extends MobRenderer<NpcEntity,AuthoredNpc
         legacy=(HumanoidModel<State>)model;
         for(int i=0;i<authored.length;i++)authored[i]=new ImportedModel("guides",NpcEntity.AUTHORED_MODELS[i]);
     }
+    @Override public boolean shouldRender(NpcEntity e,net.minecraft.client.renderer.culling.Frustum frustum,double camX,double camY,double camZ,float partial){return com.mmorpg.client.PerfClient.withinNpcDistance(e,camX,camY,camZ)&&super.shouldRender(e,frustum,camX,camY,camZ,partial);}
     @Override public State createRenderState(){return new State();}
     @Override public void extractRenderState(NpcEntity entity,State state,float partial){super.extractRenderState(entity,state,partial);state.skin=Math.clamp(entity.skin(),0,NpcEntity.SKINS-1);state.sitting=entity.poseStyle()==1;state.isPassenger=state.sitting;faceViewer(entity,state);}
     private static final java.util.Map<Integer,float[]> FACING=new java.util.HashMap<>();

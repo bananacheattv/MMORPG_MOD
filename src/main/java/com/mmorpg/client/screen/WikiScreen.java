@@ -72,6 +72,8 @@ public class WikiScreen extends MenuScreen {
         return s.replaceAll("\\[([^\\]]*)\\]\\([^)]*\\)", "$1").replace("`", "").replace("**", "").trim();
     }
 
+    @Override public void removed() { scene.release(); super.removed(); }
+
     private void load(Page p) {
         loaded = p;
         textScroll = 0; sceneTick = 0; playing = true;

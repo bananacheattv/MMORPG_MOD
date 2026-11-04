@@ -198,6 +198,71 @@ public final class NetworkPlayers {
         p.inventoryMenu.broadcastChanges();
     }
 
+    // ---- sauvegarde asynchrone : l'instantane est pris sur le thread du serveur, la compression et l'ecriture disque (fsync) se font ailleurs
+    private static final java.util.concurrent.atomic.AtomicLong SEQ = new java.util.concurrent.atomic.AtomicLong();
+    private static final Map<UUID, Object[]> PENDING_SAVES = new java.util.concurrent.ConcurrentHashMap<>();   // uuid -> {store, snapshot, seq}
+    private static java.util.concurrent.ThreadPoolExecutor writer;
+
+    private static synchronized java.util.concurrent.ThreadPoolExecutor writer() {
+        if (writer == null) {
+            writer = new java.util.concurrent.ThreadPoolExecutor(1, 1, 30, java.util.concurrent.TimeUnit.SECONDS, new java.util.concurrent.LinkedBlockingQueue<>(), r -> {
+                Thread t = new Thread(r, "aeloria-profile-writer");
+                t.setDaemon(true);
+                return t;
+            });
+            writer.allowCoreThreadTimeOut(true);
+        }
+        return writer;
+    }
+
+    public static int pendingSaves() {
+        return PENDING_SAVES.size();
+    }
+
+    /** Sauvegarde sans bloquer le tick (sauvegarde automatique). Une ecriture en attente pour le meme joueur est remplacee par la plus recente. */
+    public static void saveAsync(ServerPlayer p) {
+        ProfileStore store = SESSIONS.get(p.getUUID());
+        if (store == null || ClassTrial.active(p)) return;
+        CompoundTag snap = snapshot(p);
+        long seq = SEQ.incrementAndGet();
+        UUID id = p.getUUID();
+        if (PENDING_SAVES.put(id, new Object[]{store, snap, seq}) != null) com.mmorpg.perf.Perf.ASYNC_SAVES_SKIPPED.incrementAndGet();
+        writer().execute(() -> {
+            Object[] job = PENDING_SAVES.get(id);
+            if (job == null || (long) job[2] != seq) return;           // remplace par une sauvegarde plus recente, ou deja ecrit par une sauvegarde synchrone
+            PENDING_SAVES.remove(id, job);
+            long t = System.nanoTime();
+            try {
+                var bytes = new ByteArrayOutputStream();
+                NbtIo.writeCompressed((CompoundTag) job[1], bytes);
+                ((ProfileStore) job[0]).write(bytes.toByteArray(), seq);
+                com.mmorpg.perf.Perf.ASYNC_SAVES.incrementAndGet();
+                com.mmorpg.perf.Perf.record("sauvegarde_disque", System.nanoTime() - t);
+            } catch (Exception e) {
+                MMORPG.LOGGER.warn("[Aeloria] Sauvegarde automatique impossible pour {} : {}", id, e.toString());
+            }
+        });
+    }
+
+    /** Appelee chaque seconde : une sauvegarde automatique par joueur toutes les 5 minutes, etalees dans le temps. */
+    public static void autosaveTick(net.minecraft.server.MinecraftServer server) {
+        if (!NetworkConfig.current.enabled) return;
+        long sec = server.getTickCount() / 20;
+        for (ServerPlayer p : server.getPlayerList().getPlayers()) {
+            if ((sec + Math.floorMod(p.getUUID().hashCode(), 300)) % 300 == 0) saveAsync(p);
+        }
+    }
+
+    /** A l'arret : laisse finir les ecritures deja demandees. */
+    public static void drainSaves() {
+        java.util.concurrent.ThreadPoolExecutor w;
+        synchronized (NetworkPlayers.class) { w = writer; }
+        if (w == null) return;
+        w.shutdown();
+        try { w.awaitTermination(15, java.util.concurrent.TimeUnit.SECONDS); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+        synchronized (NetworkPlayers.class) { writer = null; }
+    }
+
     public static boolean save(ServerPlayer p) {
         ProfileStore store = SESSIONS.get(p.getUUID());
         if (store == null) return !NetworkConfig.current.enabled;
@@ -205,8 +270,10 @@ public final class NetworkPlayers {
         if (ClassTrial.active(p)) return true;
         try {
             var bytes = new ByteArrayOutputStream();
+            long seq = SEQ.incrementAndGet();
             NbtIo.writeCompressed(snapshot(p), bytes);
-            store.write(bytes.toByteArray());
+            PENDING_SAVES.remove(p.getUUID());                          // la version synchrone, plus recente, remplace toute ecriture en attente
+            store.write(bytes.toByteArray(), seq);
             return true;
         } catch (Exception e) {
             MMORPG.LOGGER.error("[Aeloria] Failed to save shared character {}", p.getUUID(), e);

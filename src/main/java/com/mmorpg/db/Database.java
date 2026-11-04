@@ -34,7 +34,7 @@ public final class Database {
     }
 
     private static final int QUEUE_LIMIT = 20_000;
-    private static final long SCHEMA_VERSION = 3;
+    private static final long SCHEMA_VERSION = 4;
 
     private static volatile DbConfig config = new DbConfig();
     private static volatile boolean ready;
@@ -146,7 +146,15 @@ public final class Database {
                         + "value BIGINT NOT NULL DEFAULT 0, extra BIGINT NOT NULL DEFAULT 0, updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, "
                         + "PRIMARY KEY (board, uuid), KEY idx_lb_rank (board, value, extra)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
             }
-            // les prochaines evolutions du schema s'ajoutent ici : if (have < 4) { ... }
+            if (have < 4) {                                           // v4 : index pour les recherches du journal (par date, par joueur nomme) et des profils (inactifs, connectes)
+                s.execute("ALTER TABLE events ADD INDEX IF NOT EXISTS idx_events_ts (ts)");
+                s.execute("ALTER TABLE events ADD INDEX IF NOT EXISTS idx_events_name (name, ts)");
+                s.execute("ALTER TABLE events ADD INDEX IF NOT EXISTS idx_events_server (server_id, ts)");
+                s.execute("ALTER TABLE players ADD INDEX IF NOT EXISTS idx_players_seen (last_seen)");
+                s.execute("ALTER TABLE players ADD INDEX IF NOT EXISTS idx_players_online (online, last_seen)");
+                s.execute("ALTER TABLE transfers ADD INDEX IF NOT EXISTS idx_transfers_created (created)");
+            }
+            // les prochaines evolutions du schema s'ajoutent ici : if (have < 5) { ... }
             s.execute("REPLACE INTO aeloria_meta (k, v) VALUES ('schema_version', '" + SCHEMA_VERSION + "')");
             // reprise apres plantage : les joueurs que CE serveur avait en ligne ne le sont plus
             s.executeUpdate("UPDATE players SET online = 0 WHERE server_id = '" + config.serverId.replace("'", "''") + "' AND online = 1");
