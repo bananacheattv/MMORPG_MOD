@@ -19,6 +19,13 @@ public final class ModDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> TOOL_RUNES =
             COMPONENTS.registerComponentType("tool_runes",b->b.persistent(Codec.intRange(0,4095)).networkSynchronized(ByteBufCodecs.VAR_INT));
 
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> AFFIXES =
+            COMPONENTS.registerComponentType("affixes", b -> b.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.STRING_UTF8));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> REFORGE =
+            COMPONENTS.registerComponentType("reforge", b -> b.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.STRING_UTF8));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> CREATOR =
+            COMPONENTS.registerComponentType("creator", b -> b.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.STRING_UTF8));
+
     private ModDataComponents() {
     }
 }

@@ -51,6 +51,20 @@ public final class ItemTooltips {
         out.accept(Component.literal(" "));
         double mult = RpgEquipment.upgradeMult(stack);
         statLines(def.stats(), mult, out);
+        for (var e : Affixes.affixes(stack).entrySet()) {
+            out.accept(Component.literal("  ✦ " + e.getKey().format(e.getValue(), true) + " ").withColor(0x7FE0FF)
+                    .append(Component.literal(e.getKey().label).withColor(0xD8D0C0)));
+        }
+        Stat[] rf = Affixes.reforge(stack);
+        if (rf != null) {
+            out.accept(Component.literal("  ⟳ Reforgé : " + rf[0].label + " → " + rf[1].label + " (" + Math.round(Affixes.REFORGE_SHARE * 100) + " %)").withColor(0xC7A6FF));
+        }
+        if (def.slot() == RpgItemDef.Slot.WEAPON && def.rarity().ordinal() >= Rarity.LEGENDAIRE.ordinal()) {
+            out.accept(Component.literal("  ☠ Lié à un boss : trophée requis à la Forge").withColor(0xFF9C2A));
+        }
+        if (Affixes.creator(stack) != null) {
+            out.accept(Component.literal("  Forgé par " + Affixes.creator(stack)).withColor(0x9A9488).withStyle(s -> s.withItalic(true)));
+        }
         if (def.setId() != null) {
             ItemDefs.ArmorSet set = ItemDefs.SETS.get(def.setId());
             if (set != null) {
