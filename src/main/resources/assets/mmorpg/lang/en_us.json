@@ -633,6 +633,7 @@
   "item.mmorpg.outil_spawn": "Spawn editor",
   "item.mmorpg.outil_pnj": "NPC editor tool",
   "key.mmorpg.camera_near": "Move camera closer",
+  "key.mmorpg.zoom": "Zoom x4 (hold)",
   "key.mmorpg.camera_far": "Move camera farther",
   "item.mmorpg.bouclier_paladin_0": "Écu du novice",
   "item.mmorpg.bouclier_paladin_1": "Rempart du gardien",

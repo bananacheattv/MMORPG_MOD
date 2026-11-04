@@ -255,6 +255,14 @@ public final class DevShowcase {
             if(tick==710)shot(mc,"progression_archer_paladin");
             if(tick==730)stop(mc);return;
         }
+        if(MODE.equals("zoom")){
+            if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
+            if(tick==50)mc.gui.setScreen(null);if(tick==60){mc.getWindow().setWindowed(1280,720);MMORPG.LOGGER.info("[ZOOM] sens={}",mc.options.sensitivity().get());shot(mc,"zoom_off");}
+            if(tick==70)com.mmorpg.client.ZoomClient.forced=true;
+            if(tick==100){MMORPG.LOGGER.info("[ZOOM] zooming={} sens={}",com.mmorpg.client.ZoomClient.isZooming(),mc.options.sensitivity().get());shot(mc,"zoom_on");}
+            if(tick==110)com.mmorpg.client.ZoomClient.forced=false;
+            if(tick==130){MMORPG.LOGGER.info("[ZOOM] zooming={} sens={}",com.mmorpg.client.ZoomClient.isZooming(),mc.options.sensitivity().get());stop(mc);}return;
+        }
         if(MODE.equals("quick_fixes")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
             if(tick==80){mc.options.guiScale().set(2);mc.getWindow().setWindowed(1280,720);mc.resizeGui();mc.gui.setScreen(new net.minecraft.client.gui.screens.Screen(net.minecraft.network.chat.Component.literal("Portail")){@Override public void extractRenderState(net.minecraft.client.gui.GuiGraphicsExtractor g,int x,int y,float a){com.mmorpg.client.ui.PortalLoadingView.draw(g,width,height);}});}

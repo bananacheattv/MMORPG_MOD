@@ -24,6 +24,7 @@ public final class Keys {
     public static final KeyMapping HUD_EDIT = new KeyMapping("key.mmorpg.hud_edit", InputConstants.KEY_U, CATEGORY);
     public static final KeyMapping CAMERA_NEAR = new KeyMapping("key.mmorpg.camera_near", InputConstants.KEY_PAGEUP, CATEGORY);
     public static final KeyMapping CAMERA_FAR = new KeyMapping("key.mmorpg.camera_far", InputConstants.KEY_PAGEDOWN, CATEGORY);
+    public static final KeyMapping ZOOM = new KeyMapping("key.mmorpg.zoom", InputConstants.KEY_C, CATEGORY);
     public static final KeyMapping[] SKILLS = createSkills();
 
     private Keys() {
@@ -49,6 +50,7 @@ public final class Keys {
         event.register(MOUNT);
         event.register(CAMERA_NEAR);
         event.register(CAMERA_FAR);
+        event.register(ZOOM);
         for (KeyMapping skill : SKILLS) event.register(skill);
     }
 

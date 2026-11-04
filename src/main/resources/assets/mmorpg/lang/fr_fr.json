@@ -633,6 +633,7 @@
   "item.mmorpg.outil_spawn": "Outil d’aménagement du spawn",
   "item.mmorpg.outil_pnj": "Outil d'édition des PNJ",
   "key.mmorpg.camera_near": "Rapprocher la caméra",
+  "key.mmorpg.zoom": "Zoom x4 (maintenir)",
   "key.mmorpg.camera_far": "Éloigner la caméra",
   "item.mmorpg.bouclier_paladin_0": "Écu du novice",
   "item.mmorpg.bouclier_paladin_1": "Rempart du gardien",
