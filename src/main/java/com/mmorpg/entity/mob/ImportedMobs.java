@@ -47,8 +47,10 @@ public final class ImportedMobs {
         new Entry("champion_gobelin", "Champion gobelin", 0, 0.925f, 2.125f, 1.318f, false),
         new Entry("voyageur_squelette", "Voyageur squelette", 2, 0.950f, 2.000f, 1.050f, false),
         new Entry("sentinelle_hibou", "Sentinelle hibou du givre", 3, 1.080f, 3.438f, 1.047f, false),
-        new Entry("minotaure", "Minotaure", 4, 2.000f, 3.875f, 1.084f, false),
-        new Entry("seigneur_squelette", "Seigneur squelette", 2, 2.000f, 6.500f, 0.846f, false),
+        new Entry("minotaure", "Minotaure", 4, 3.820f, 3.875f, 1.084f, false),
+        new Entry("morghul", "Morghul, bête des abysses", 5, 8.000f, 13.475f, 0.445f, false),
+        new Entry("gardien_citadelle", "Gardien de glace de la citadelle", 3, 3.035f, 7.366f, 0.815f, false),
+        new Entry("seigneur_squelette", "Seigneur squelette", 2, 2.200f, 6.500f, 0.846f, false),
         // EXTRA-END
     };
 }

@@ -44,7 +44,8 @@ public enum Cosmetic {
     CORNES_INFERNALES("cornes_infernales", "Cornes Infernales", Category.COIFFE, -1, 0xFFFF7050, "Cornes 3D aux braises animées."),
     CAPE_ROYALE("cape_royale", "Cape Royale", Category.DOS, -1, 0xFFFFC050, "Une cape royale animée."),
     CARQUOIS_SYLVESTRE("carquois_sylvestre", "Carquois Sylvestre", Category.DOS, -1, 0xFF90C060, "Un carquois sylvestre en trois dimensions."),
-    EPAULIERES_GIVRE("epaulieres_givre", "Épaulières de Givre", Category.EPAULES, -1, 0xFF90D8FF, "Deux épaulières aux cristaux animés.");
+    EPAULIERES_GIVRE("epaulieres_givre", "Épaulières de Givre", Category.EPAULES, -1, 0xFF90D8FF, "Deux épaulières aux cristaux animés."),
+    MANTEAU_CELESTE("manteau_celeste", "Manteau Céleste", Category.DOS, -1, 0xFFE8D8FF, "Un manteau céleste en trois dimensions.");
 
     public enum Category {
         AURA("Auras"), AILES("Ailes"), HALO("Halos"), TRAINEE("Traînées"),

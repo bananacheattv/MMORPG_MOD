@@ -86,6 +86,26 @@ public final class DecorBlocks {
         }
     }
 
+    /** Decor dessine par un modele anime (bloc-entite) : cle du modele -> boite de collision. */
+    public static final Map<String, DeferredBlock<com.mmorpg.block.DecorModelBlock>> MODEL_BLOCKS = new LinkedHashMap<>();
+    public static final net.neoforged.neoforge.registries.DeferredHolder<net.minecraft.world.level.block.entity.BlockEntityType<?>, net.minecraft.world.level.block.entity.BlockEntityType<com.mmorpg.block.DecorModelBlock.Entity>> MODEL_ENTITY =
+            ModBlocks.BLOCK_ENTITIES.register("decor_modele", () -> new net.minecraft.world.level.block.entity.BlockEntityType<>(com.mmorpg.block.DecorModelBlock.Entity::new,
+                    MODEL_BLOCKS.values().stream().map(DeferredBlock::get).toArray(Block[]::new)));
+
+    static {
+        Object[][] models = {{"drapeau_aeloria", Block.box(6, 0, 6, 10, 16, 10)}, {"camp_aeloria", Block.box(0, 0, 0, 16, 6, 16)}};
+        for (Object[] m : models) {
+            String id = (String) m[0];
+            net.minecraft.world.phys.shapes.VoxelShape shape = (net.minecraft.world.phys.shapes.VoxelShape) m[1];
+            DeferredBlock<com.mmorpg.block.DecorModelBlock> block = ModBlocks.BLOCKS.registerBlock(id,
+                    props -> new com.mmorpg.block.DecorModelBlock(props, shape),
+                    props -> props.mapColor(MapColor.WOOD).strength(1.2F, 4F).sound(SoundType.WOOD).noOcclusion());
+            MODEL_BLOCKS.put(id, block);
+            BY_ID.put(id, block);
+            ITEMS.add(ModItems.ITEMS.registerSimpleBlockItem(id, block));
+        }
+    }
+
     private static Block.Properties props(Block.Properties p, Mat m) {
         Block.Properties q = p.mapColor(m.color()).strength(m.hardness(), 6F).sound(m.sound());
         if (m.light() > 0) q = q.lightLevel(s -> m.light());

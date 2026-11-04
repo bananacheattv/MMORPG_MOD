@@ -21,7 +21,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 @EventBusSubscriber(modid = MMORPG.MODID)
 public final class DevModelPersistChecks {
     private static final String MODE = System.getProperty("mmorpg.modelChecks", "");
-    private static final String[] MOBS = {"fernling", "champion_gobelin", "voyageur_squelette", "sentinelle_hibou", "minotaure", "seigneur_squelette"};
+    private static final String[] MOBS = {"fernling", "champion_gobelin", "voyageur_squelette", "sentinelle_hibou", "minotaure", "seigneur_squelette", "morghul", "gardien_citadelle"};
     private static final int SX = 40, SZ = 40;
     private static int ticks;
     private static boolean done;
@@ -60,7 +60,7 @@ public final class DevModelPersistChecks {
                 n.setPos(SX + i * 2 + .5, y, SZ + 3);
                 level.addFreshEntity(n);
             }
-            String[] decor = {"chaise_aeloria", "table_aeloria", "armoire_aeloria", "feu_de_camp", "buche_camp", "jarre_ancienne", "pot_decore", "panneau_feuille", "viande_deco", "potion_etoilee", "panneau_quetes"};
+            String[] decor = {"chaise_aeloria", "table_aeloria", "armoire_aeloria", "feu_de_camp", "buche_camp", "jarre_ancienne", "pot_decore", "panneau_feuille", "viande_deco", "potion_etoilee", "panneau_quetes", "drapeau_aeloria", "camp_aeloria"};
             for (int i = 0; i < decor.length; i++) level.setBlock(new BlockPos(SX + i * 2, y, SZ + 6), DecorBlocks.state(decor[i]), 3);
             server.saveEverything(false, true, true);
             MMORPG.LOGGER.info("[CODEX CHECKS] MODELES {} : lot pose et sauvegarde", ok ? "PASS" : "ECHEC");
@@ -75,11 +75,11 @@ public final class DevModelPersistChecks {
                 check(mobs.stream().anyMatch(m -> m instanceof NpcEntity n && n.skin() == skin), "PNJ apparence " + skin + " toujours present");
             }
             int blocks = 0;
-            for (int i = 0; i < 11; i++) {
+            for (int i = 0; i < 13; i++) {
                 var s = level.getBlockState(new BlockPos(SX + i * 2, y, SZ + 6));
-                if (s.getBlock() instanceof com.mmorpg.block.DecorPropBlock) blocks++;
+                if (s.getBlock() instanceof com.mmorpg.block.DecorPropBlock || s.getBlock() instanceof com.mmorpg.block.DecorModelBlock) blocks++;
             }
-            check(blocks == 11, "blocs de decor toujours poses (" + blocks + "/11)");
+            check(blocks == 13, "blocs de decor toujours poses (" + blocks + "/13)");
             MMORPG.LOGGER.info("[CODEX CHECKS] MODELES {} : persistance apres redemarrage", ok ? "PASS" : "ECHEC");
         }
         server.halt(false);

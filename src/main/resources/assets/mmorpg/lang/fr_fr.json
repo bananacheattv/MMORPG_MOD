@@ -851,5 +851,11 @@
   "block.mmorpg.panneau_feuille": "Panneau feuille féerique",
   "block.mmorpg.viande_deco": "Viande (décor)",
   "block.mmorpg.potion_etoilee": "Potion étoilée",
-  "block.mmorpg.panneau_quetes": "Panneau de quêtes"
+  "block.mmorpg.panneau_quetes": "Panneau de quêtes",
+  "entity.mmorpg.morghul": "Morghul, bête des abysses",
+  "item.mmorpg.morghul_spawn_egg": "Œuf d’apparition : Morghul, bête des abysses",
+  "entity.mmorpg.gardien_citadelle": "Gardien de glace de la citadelle",
+  "item.mmorpg.gardien_citadelle_spawn_egg": "Œuf d’apparition : Gardien de glace de la citadelle",
+  "block.mmorpg.drapeau_aeloria": "Drapeau",
+  "block.mmorpg.camp_aeloria": "Campement"
 }

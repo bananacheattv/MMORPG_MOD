@@ -52,7 +52,7 @@ final class DevPackShowcase {
                 place(mc, n, np.getX() + .5, base.getY(), np.getZ() + .5, look);
             }
             int i = 0;
-            for (var key : new String[]{"fernling", "champion_gobelin", "voyageur_squelette", "sentinelle_hibou", "minotaure", "seigneur_squelette"}) {
+            for (var key : new String[]{"fernling", "champion_gobelin", "voyageur_squelette", "sentinelle_hibou", "minotaure", "seigneur_squelette", "morghul", "gardien_citadelle"}) {
                 var e = ModEntities.IMPORTED.get(key).get().create(level, EntitySpawnReason.COMMAND);
                 if (e == null) continue;
                 e.setId(-6300 - i);

@@ -71,7 +71,7 @@ public final class ImportedCosmetics extends RenderLayer<AvatarRenderState,Playe
                 switch(c) {
                     case DRAGON_EPAULE -> {pose.translate(.53,-.1,-.08);pose.scale(.72f,.72f,.72f);}
                     case EPAULIERES_GIVRE -> {pose.translate(0,-.12,0);pose.scale(1.2f,1.2f,1.2f);}
-                    case CAPE_ROYALE -> pose.translate(0,.02,.22);
+                    case CAPE_ROYALE, MANTEAU_CELESTE -> pose.translate(0,.02,.22);
                     case AILES_CELESTES -> pose.translate(0,.27,.2);
                     default -> pose.translate(0,.38,.33);
                 }

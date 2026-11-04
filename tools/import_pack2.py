@@ -23,15 +23,18 @@ MOBS = {
     'dead-traveler-skeleton': ('voyageur_squelette', {'idle': 'animation.traveler_skeleton.idle', 'walk': 'animation.traveler_skeleton.walk', 'attack': 'animation.traveler_skeleton.slash'}),
     'frostveil-owl-sentinel': ('sentinelle_hibou', {'idle': 'idle', 'walk': 'walk', 'attack': 'attack_1', 'death': 'death'}),
     'minotaur': ('minotaure', {'idle': 'minotaur.idle', 'walk': 'minotaur.walking.hostile', 'attack': 'minotaur.swing_1'}),
+    'morghul-bestia-otchlani': ('morghul', {'idle': 'idle', 'walk': 'walk', 'attack': 'claw_grab', 'death': 'death'}),
+    'lodowy-straznik-cytadeli': ('gardien_citadelle', {'idle': 'idle', 'walk': 'walk', 'attack': 'attack', 'death': 'spawn'}),
     'skeleton-lord': ('seigneur_squelette', {'idle': 'idle', 'walk': 'walk', 'attack': 'spell_knockback'}),
 }
 # cle -> (nom, zone, hauteur cible en blocs)
 MOB_INFO = {
     'fernling': ('Fougerin', 0, 1.1), 'champion_gobelin': ('Champion gobelin', 0, 2.8),
     'voyageur_squelette': ('Voyageur squelette', 2, 2.1), 'seigneur_squelette': ('Seigneur squelette', 2, 5.5),
+    'morghul': ('Morghul, bête des abysses', 5, 6.0), 'gardien_citadelle': ('Gardien de glace de la citadelle', 3, 6.0),
     'sentinelle_hibou': ('Sentinelle hibou du givre', 3, 3.6), 'minotaure': ('Minotaure', 4, 4.2),
 }
-NPCS = {'npc-oldman': 'vieux_sage', 'knight': 'chevalier', 'templar': 'templier', 'legacy-templar': 'templier_ancien'}
+NPCS = {'npc-oldman': 'vieux_sage', 'knight': 'chevalier', 'templar': 'templier', 'legacy-templar': 'templier_ancien', 'valheim-padded-armor': 'armure_valheim'}
 NPC_NAMES = {'vieux_sage': 'Vieux sage', 'chevalier': 'Chevalier', 'templier': 'Templier', 'templier_ancien': 'Templier ancien'}
 
 
@@ -56,8 +59,8 @@ def load(name):
 
 
 def visible_cubes(data):
-    """uuid -> element pour les cubes visibles ; ignore maillages, locators et elements masques."""
-    return {e['uuid']: e for e in data['elements'] if e.get('type', 'cube') == 'cube' and e.get('visibility', True) is not False}
+    """uuid -> element pour les cubes et maillages visibles ; ignore locators et elements masques."""
+    return {e['uuid']: e for e in data['elements'] if e.get('type', 'cube') in ('cube', 'mesh') and e.get('visibility', True) is not False}
 
 
 def build_atlas(data, cubes):
@@ -76,7 +79,15 @@ def build_atlas(data, cubes):
     return atlas, offsets
 
 
-def convert(name, kind, key, anims):
+def shift_y(nodes, dy):
+    for n in nodes:
+        for k in ('from', 'to', 'origin'):
+            if k in n:
+                n[k] = [n[k][0], n[k][1] + dy, n[k][2]]
+        shift_y(n.get('children', []), dy)
+
+
+def convert(name, kind, key, anims, dy=0):
     data = load(name)
     cubes = visible_cubes(data)
     atlas, offsets = build_atlas(data, cubes)
@@ -90,6 +101,9 @@ def convert(name, kind, key, anims):
                 out[fname] = dict(texture=None)
                 continue
             y, sx, sy = offsets[f['texture']]
+            if 'vertices' in f:        # face de maillage : un UV par sommet
+                out[fname] = dict(vertices=f['vertices'], texture=0, uv={k: [v[0] * sx, v[1] * sy + y] for k, v in f['uv'].items()})
+                continue
             uv = f['uv']
             g = dict(uv=[uv[0] * sx, uv[1] * sy + y, uv[2] * sx, uv[3] * sy + y], texture=0)
             if f.get('rotation'):
@@ -103,7 +117,7 @@ def convert(name, kind, key, anims):
                 return None
             e = cubes[entry]
             seen.add(entry)
-            n = {k: e[k] for k in ('uuid', 'from', 'to', 'origin', 'rotation', 'inflate') if k in e}
+            n = {k: e[k] for k in ('uuid', 'from', 'to', 'origin', 'rotation', 'inflate', 'vertices') if k in e}
             n['faces'] = faces(e)
             return n
         g = groups.get(entry['uuid'], entry)
@@ -112,6 +126,8 @@ def convert(name, kind, key, anims):
                     rotation=g.get('rotation', [0, 0, 0]), children=children)
 
     tree = [n for n in (node(e) for e in data['outliner']) if n]
+    if dy:
+        shift_y(tree, dy)
     animations = []
     for rt_name, bb_name in anims.items():
         a = next((x for x in data['animations'] if x['name'] == bb_name), None)
@@ -287,7 +303,10 @@ final class DecorPropList {
     return names
 
 
-def write_state(key):
+def write_state(key, model=None):
+    if model:
+        write(RES / f'blockstates/{key}.json', {'variants': {f'facing={d}': {'model': model} for d in ('north', 'east', 'south', 'west')}})
+        return
     write(RES / f'blockstates/{key}.json', {'variants': {
         'facing=north': {'model': f'mmorpg:block/{key}'},
         'facing=east': {'model': f'mmorpg:block/{key}', 'y': 90},
@@ -307,8 +326,15 @@ def main():
     for name, (key, anims) in MOBS.items():
         cubes = convert(name, 'mobs', key, anims)
         title, zone, target = MOB_INFO[key]
-        height = max(e['to'][1] for e in cubes.values()) / 16
-        width = min(2.0, max(.45, (max(e['to'][0] for e in cubes.values()) - min(e['from'][0] for e in cubes.values())) / 20))
+        ys, xs = [], []
+        for e in cubes.values():
+            if e.get('type') == 'mesh':
+                ys += [e['origin'][1] + v[1] for v in e['vertices'].values()]
+                xs += [e['origin'][0] + v[0] for v in e['vertices'].values()]
+            else:
+                ys.append(e['to'][1]); xs += [e['from'][0], e['to'][0]]
+        height = max(ys) / 16
+        width = min(8.0, max(.45, (max(xs) - min(xs)) / 20))
         rows.append('        new Entry(%s, %s, %d, %.3ff, %.3ff, %.3ff, false),\n' % (json.dumps(key), json.dumps(title, ensure_ascii=False), zone, width, height, target / height))
         spawn_egg(key)
         names['entity.mmorpg.' + key] = title
@@ -316,6 +342,15 @@ def main():
     patch_mobs(rows)
     for name, key in NPCS.items():
         convert(name, 'guides', key, {})
+    convert('caller-flag-polyjo', 'props', 'drapeau', {'chest': 'animation.flag.wave'})   # animation continue (cf. DecorModelRenderer)
+    convert('camping-staging', 'props', 'camp', {})
+    names['block.mmorpg.drapeau_aeloria'] = 'Drapeau'
+    names['block.mmorpg.camp_aeloria'] = 'Campement'
+    for key, icon in (('drapeau_aeloria', 'minecraft:item/stick'), ('camp_aeloria', 'minecraft:item/campfire')):
+        write(RES / f'items/{key}.json', {'model': {'type': 'minecraft:model', 'model': icon}})
+        write_state(key, 'mmorpg:block/coffre_donjon')
+        write_loot(key)
+    convert('heavenly-mantle', 'cosmetics', 'manteau_celeste', {}, -24)   # origine au niveau des epaules
     names.update(decor())
     lang(names)
     print('decor', len(DECOR) + 1, 'mobs', len(MOBS), 'pnj', len(NPCS))
