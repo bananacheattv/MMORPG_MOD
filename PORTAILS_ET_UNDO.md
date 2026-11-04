@@ -33,3 +33,7 @@ L'historique est propre à chaque administrateur et reste en mémoire jusqu'à l
 ## Tests
 
 La suite `gradlew.bat runServer -PnetworkChecks build` comprend désormais les vérifications `[CODEX CHECKS] PORTALS PASS` : deux orientations, commandes et alias, destinations persistantes, refus des chevauchements/coffres, annulation de pose et de suppression, retour exact du terrain, protection des modifications ultérieures, contrôle des accès et prévention du rebond au retour d'un donjon. Utiliser exclusivement le monde de développement pour cette suite, comme expliqué dans `RESEAU_AELORIA.md`.
+
+## Bloc portail (sans arche)
+Viser un bloc existant (6 blocs max), puis : `/portail bloc <hub|spawn|mine [n]|plaines [n]|donjon [type [normal|heroique|mythique]]>`.
+Le bloc devient le portail : marcher dessus ou contre lui téléporte. Le bloc n'est jamais modifié. Retirer : `/portail supprimer` (à moins de 8 blocs) ; annuler : `/undoportail`. Sauvegarde persistante comme les arches (`/portail liste`).

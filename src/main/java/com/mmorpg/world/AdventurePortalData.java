@@ -21,7 +21,8 @@ import java.util.UUID;
 /** Placed adventure arches, independent of procedural generation and personal waypoints. */
 public final class AdventurePortalData extends SavedData {
     public record Portal(UUID id, ResourceKey<Level> dimension, BlockPos pos, boolean widthX,
-                         String kind, int region, String dungeon, int difficulty) {
+                         String kind, int region, String dungeon, int difficulty, boolean block) {
+        public Portal(UUID id, ResourceKey<Level> dimension, BlockPos pos, boolean widthX, String kind, int region, String dungeon, int difficulty) { this(id, dimension, pos, widthX, kind, region, dungeon, difficulty, false); }
         public static final Codec<Portal> CODEC = RecordCodecBuilder.create(i -> i.group(
                 UUIDUtil.CODEC.fieldOf("id").forGetter(Portal::id),
                 ResourceKey.codec(Registries.DIMENSION).fieldOf("dimension").forGetter(Portal::dimension),
@@ -30,7 +31,8 @@ public final class AdventurePortalData extends SavedData {
                 Codec.STRING.fieldOf("kind").forGetter(Portal::kind),
                 Codec.INT.fieldOf("region").forGetter(Portal::region),
                 Codec.STRING.fieldOf("dungeon").forGetter(Portal::dungeon),
-                Codec.INT.fieldOf("difficulty").forGetter(Portal::difficulty)
+                Codec.INT.fieldOf("difficulty").forGetter(Portal::difficulty),
+                Codec.BOOL.optionalFieldOf("block", false).forGetter(Portal::block)
         ).apply(i, Portal::new));
         public BlockPos at(int width, int height) { return pos.offset(widthX ? width : 0, height, widthX ? 0 : width); }
     }

@@ -107,6 +107,13 @@ public final class DevPortalChecks {
         check(data.all().stream().anyMatch(g -> g.kind().equals("donjon") && g.difficulty() == 1), "selected dungeon difficulty saved");
         check(commands.execute("undoportail", source) == 1, "dedicated undo command");
         original.forEach((at, state) -> check(level.getBlockState(at).equals(state), "exact terrain after command undo"));
+        BlockPos stone = new BlockPos(44, 99, 44);
+        Portal blockPortal = new Portal(UUID.randomUUID(), level.dimension(), stone, true, "hub", -1, "", 0, true);
+        check(AdventurePortals.place(p, blockPortal), "block portal placed on existing block");
+        check(data.find(blockPortal.id()).block() && AdventurePortals.passage(blockPortal).contains(44.5, 100, 44.5), "block portal passage on top of block");
+        check(!AdventurePortals.place(p, blockPortal), "duplicate block portal refused");
+        check(Portal.CODEC.encodeStart(NbtOps.INSTANCE, blockPortal).result().flatMap(t -> Portal.CODEC.parse(NbtOps.INSTANCE, t).result()).orElseThrow().block(), "block flag persisted");
+        check(AdventurePortals.undo(p) && data.find(blockPortal.id()) == null && !level.getBlockState(stone).isAir(), "undo removes block portal, keeps block");
         com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] PORTALS PASS: placement, both orientations, persistence, overlap, undo/undo deletion, exact terrain restoration, containers, conflicts, access gates");
     }
 }

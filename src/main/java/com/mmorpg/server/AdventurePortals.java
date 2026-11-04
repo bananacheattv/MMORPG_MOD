@@ -42,6 +42,7 @@ public final class AdventurePortals {
 
     public static AABB passage(Portal portal) {
         BlockPos p = portal.pos();
+        if (portal.block()) return new AABB(p.getX() - .3, p.getY() - .1, p.getZ() - .3, p.getX() + 1.3, p.getY() + 2, p.getZ() + 1.3);
         return portal.widthX() ? new AABB(p.getX() - 1, p.getY(), p.getZ() + .15, p.getX() + 2, p.getY() + 4, p.getZ() + .85)
                 : new AABB(p.getX() + .15, p.getY(), p.getZ() - 1, p.getX() + .85, p.getY() + 4, p.getZ() + 2);
     }
@@ -73,6 +74,7 @@ public final class AdventurePortals {
     }
     private static Map<BlockPos, BlockState> frame(Portal p) {
         Map<BlockPos, BlockState> blocks = new LinkedHashMap<>();
+        if (p.block()) return blocks;
         for (int x = -2; x <= 2; x++) for (int y = 0; y <= 4; y++) {
             if (Math.abs(x) == 2 || y == 4) blocks.put(p.at(x, y), frame(p, x, y));
         }
@@ -103,7 +105,14 @@ public final class AdventurePortals {
         if (!portal.dimension().equals(level.dimension())) return false;
         var data = AdventurePortalData.get(level.getServer());
         if (data.all().size() >= 256 || data.find(portal.id()) != null) return fail(player, "Limite de portails atteinte ou identifiant déjà utilisé.");
-        for (Portal other : data.all()) if (other.dimension().equals(portal.dimension()) && passage(other).inflate(2).intersects(passage(portal))) return fail(player, "Un portail est déjà trop proche.");
+        for (Portal other : data.all()) if (!portal.block() && !other.block() && other.dimension().equals(portal.dimension()) && passage(other).inflate(2).intersects(passage(portal))) return fail(player, "Un portail est déjà trop proche.");
+        if (portal.block()) {
+            if (data.all().stream().anyMatch(o -> o.block() && o.dimension().equals(portal.dimension()) && o.pos().equals(portal.pos()))) return fail(player, "Ce bloc est déjà un portail.");
+            if (level.getBlockState(portal.pos()).isAir()) return fail(player, "Visez un bloc.");
+            data.put(portal);
+            remember(player, new Change(portal, true, new LinkedHashMap<>(), new LinkedHashMap<>()));
+            return true;
+        }
         for (int x = -2; x <= 2; x++) for (int y = 0; y <= 4; y++) {
             BlockPos at = portal.at(x, y);
             if (level.isOutsideBuildHeight(at) || !level.getWorldBorder().isWithinBounds(at) || !level.hasChunkAt(at) || !level.getBlockState(at).isAir()) return fail(player, "Il faut un espace vide de 5 blocs de large et 5 de haut, dans la bordure du monde. Aucun terrain n'a été remplacé.");
@@ -211,8 +220,9 @@ public final class AdventurePortals {
                 if (!valid(portal) || !p.level().dimension().equals(portal.dimension()) || p.distanceToSqr(portal.pos().getX() + .5, portal.pos().getY() + 2, portal.pos().getZ() + .5) > 32 * 32) continue;
                 if (HEALED.add(portal.id())) heal(p.level(), portal);
                 if (!frame(portal).entrySet().stream().allMatch(e -> p.level().getBlockState(e.getKey()).equals(e.getValue()))) continue;
+                if (portal.block() && p.level().getBlockState(portal.pos()).isAir()) continue;
                 int color = portal.kind().equals("mine") ? 0xFFB040 : portal.kind().equals("plaines") ? 0x50E0A0 : 0xB070FF;
-                p.level().sendParticles(p, new DustParticleOptions(color, 1.3f), false, false, portal.pos().getX() + .5, portal.pos().getY() + 2, portal.pos().getZ() + .5, 12, portal.widthX() ? 1.2 : .1, 1.5, portal.widthX() ? .1 : 1.2, 0);
+                p.level().sendParticles(p, new DustParticleOptions(color, 1.3f), false, false, portal.pos().getX() + .5, portal.pos().getY() + (portal.block() ? 1.2 : 2), portal.pos().getZ() + .5, 12, portal.block() ? .5 : portal.widthX() ? 1.2 : .1, portal.block() ? .5 : 1.5, portal.block() ? .5 : portal.widthX() ? .1 : 1.2, 0);
                 if (p.distanceToSqr(portal.pos().getX() + .5, portal.pos().getY(), portal.pos().getZ() + .5) < 36 && server.getTickCount() % 40 == 0) p.sendOverlayMessage(Component.literal(label(portal)).withColor(color));
                 if (passage(portal).contains(p.position())) inside = portal;
             }
@@ -224,31 +234,49 @@ public final class AdventurePortals {
     @SubscribeEvent public static void stopped(ServerStoppedEvent event) { INSIDE.clear(); HISTORY.clear(); HEALED.clear(); }
 
     private static int create(net.minecraft.commands.CommandSourceStack source, String kind, int region, String dungeon, int difficulty) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        return create(source, kind, region, dungeon, difficulty, false);
+    }
+    /** block=true : le bloc visé (6 blocs max) devient lui-même le portail, sans arche. */
+    private static int create(net.minecraft.commands.CommandSourceStack source, String kind, int region, String dungeon, int difficulty, boolean block) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
         ServerPlayer p = source.getPlayerOrException();
+        if (block) {
+            var hit = p.pick(6, 0, false);
+            if (!(hit instanceof net.minecraft.world.phys.BlockHitResult bh) || hit.getType() != net.minecraft.world.phys.HitResult.Type.BLOCK) { fail(p, "Visez un bloc (6 blocs max)."); return 0; }
+            Portal bp = new Portal(UUID.randomUUID(), p.level().dimension(), bh.getBlockPos(), true, kind, region, dungeon, difficulty, true);
+            if (!place(p, bp)) return 0;
+            source.sendSuccess(() -> Component.literal("Bloc portail : " + label(bp) + ". Marchez dessus pour entrer. /portail supprimer : retirer, /undoportail : annuler."), true);
+            return 1;
+        }
         Direction facing = p.getDirection();
         Portal portal = new Portal(UUID.randomUUID(), p.level().dimension(), p.blockPosition().relative(facing, 4), facing.getAxis() == Direction.Axis.Z, kind, region, dungeon, difficulty);
         if (!place(p, portal)) return 0;
         source.sendSuccess(() -> Component.literal("Portail posé : " + label(portal) + ". Traversez l'arche pour entrer. Annuler : /undoportail."), true);
         return 1;
     }
+    private static void kinds(com.mojang.brigadier.builder.ArgumentBuilder<net.minecraft.commands.CommandSourceStack, ?> parent, boolean block) {
+        parent.then(Commands.literal("hub").executes(c -> create(c.getSource(), "hub", -1, "", 0, block)));
+        parent.then(Commands.literal("spawn").executes(c -> create(c.getSource(), "spawn", -1, "", 0, block)));
+        parent.then(Commands.literal("mine").executes(c -> create(c.getSource(), "mine", -1, "", 0, block))
+                .then(Commands.argument("region", IntegerArgumentType.integer(1, com.mmorpg.mine.MineLayout.SECTORS)).executes(c -> create(c.getSource(), "mine", IntegerArgumentType.getInteger(c, "region") - 1, "", 0, block))));
+        parent.then(Commands.literal("plaines").executes(c -> create(c.getSource(), "plaines", -1, "", 0, block))
+                .then(Commands.argument("region", IntegerArgumentType.integer(1, com.mmorpg.plains.PlainsLayout.REGIONS)).executes(c -> create(c.getSource(), "plaines", IntegerArgumentType.getInteger(c, "region") - 1, "", 0, block))));
+        var dungeon = Commands.argument("type", StringArgumentType.word())
+                .suggests((c, b) -> SharedSuggestionProvider.suggest(Arrays.stream(DungeonType.values()).map(t -> t.id), b))
+                .executes(c -> create(c.getSource(), "donjon", -1, StringArgumentType.getString(c, "type"), 0, block));
+        for (int i = 0; i < 3; i++) {
+            final int difficulty = i;
+            dungeon.then(Commands.literal(new String[]{"normal", "heroique", "mythique"}[i]).executes(c -> create(c.getSource(), "donjon", -1, StringArgumentType.getString(c, "type"), difficulty, block)));
+        }
+        parent.then(Commands.literal("donjon").executes(c -> create(c.getSource(), "donjons", -1, "", 0, block)).then(dungeon));
+    }
     @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.LOWEST)
     public static void commands(RegisterCommandsEvent event) {
         var dispatcher = event.getDispatcher();
         var root = Commands.literal("portail").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS));
-        root.then(Commands.literal("hub").executes(c -> create(c.getSource(), "hub", -1, "", 0)));
-        root.then(Commands.literal("spawn").executes(c -> create(c.getSource(), "spawn", -1, "", 0)));
-        root.then(Commands.literal("mine").executes(c -> create(c.getSource(), "mine", -1, "", 0))
-                .then(Commands.argument("region", IntegerArgumentType.integer(1, com.mmorpg.mine.MineLayout.SECTORS)).executes(c -> create(c.getSource(), "mine", IntegerArgumentType.getInteger(c, "region") - 1, "", 0))));
-        root.then(Commands.literal("plaines").executes(c -> create(c.getSource(), "plaines", -1, "", 0))
-                .then(Commands.argument("region", IntegerArgumentType.integer(1, com.mmorpg.plains.PlainsLayout.REGIONS)).executes(c -> create(c.getSource(), "plaines", IntegerArgumentType.getInteger(c, "region") - 1, "", 0))));
-        var dungeon = Commands.argument("type", StringArgumentType.word())
-                .suggests((c, b) -> SharedSuggestionProvider.suggest(Arrays.stream(DungeonType.values()).map(t -> t.id), b))
-                .executes(c -> create(c.getSource(), "donjon", -1, StringArgumentType.getString(c, "type"), 0));
-        for (int i = 0; i < 3; i++) {
-            final int difficulty = i;
-            dungeon.then(Commands.literal(new String[]{"normal", "heroique", "mythique"}[i]).executes(c -> create(c.getSource(), "donjon", -1, StringArgumentType.getString(c, "type"), difficulty)));
-        }
-        root.then(Commands.literal("donjon").executes(c -> create(c.getSource(), "donjons", -1, "", 0)).then(dungeon));
+        kinds(root, false);
+        var blocRoot = Commands.literal("bloc");
+        kinds(blocRoot, true);
+        root.then(blocRoot);
         root.then(Commands.literal("liste").executes(c -> {
             var portals = AdventurePortalData.get(c.getSource().getServer()).all();
             c.getSource().sendSuccess(() -> Component.literal(portals.size() + " portail(s) enregistré(s)."), false);
