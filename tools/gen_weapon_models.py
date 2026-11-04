@@ -1,3 +1,4 @@
+# OBSOLETE : les armes sont désormais modélisées dans Blockbench (voir tools/build_bb_weapons.py). Ne plus lancer ce script, il écraserait les modèles.
 """Genere les 64 armes d'Aeloria : sprite peint haute definition (textures/item/weapons/<id>.png) et modele 3D extrude
 (models/item/sculpted_<id>.json). Remplace l'ancienne generation « cubes empiles » de sculpt-rpg-assets.py.
 Usage : python3 tools/gen_weapon_models.py [id ...]"""
