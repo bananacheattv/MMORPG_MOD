@@ -128,6 +128,17 @@ def convert(name, kind, key, anims, dy=0):
     tree = [n for n in (node(e) for e in data['outliner']) if n]
     if dy:
         shift_y(tree, dy)
+    # Imported animation files can retain UUIDs from deleted template bones.
+    # Preserve tracks by unique bone name when possible, omit only absent bones.
+    exported = set()
+    by_name = {}
+    def index_bones(nodes):
+        for n in nodes:
+            exported.add(n['uuid'])
+            if n.get('name'):
+                by_name.setdefault(n['name'], []).append(n['uuid'])
+            index_bones(n.get('children', []))
+    index_bones(tree)
     animations = []
     for rt_name, bb_name in anims.items():
         a = next((x for x in data['animations'] if x['name'] == bb_name), None)
@@ -135,6 +146,14 @@ def convert(name, kind, key, anims, dy=0):
             continue
         lines = []
         for bone, animator in a['animators'].items():
+            if bone not in exported:
+                matches = by_name.get(animator.get('name'), [])
+                if len(matches) == 1:
+                    bone = matches[0]
+                else:
+                    if animator.get('keyframes'):
+                        print(f"{name}/{bb_name}: omitted absent bone {animator.get('name')} ({bone})")
+                    continue
             for channel, code in [('rotation', 'r'), ('position', 'p'), ('scale', 's')]:
                 frames = []
                 for frame in sorted(animator.get('keyframes', []), key=lambda k: k['time']):

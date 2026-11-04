@@ -38,6 +38,12 @@ public final class DevShowcase {
     public static void onTick(ClientTickEvent.Post event) {
         if (!ENABLED) return;
         Minecraft mc = Minecraft.getInstance();
+        if (MODE.equals("startup_check")) {
+            if (!(mc.gui.screen() instanceof net.minecraft.client.gui.screens.TitleScreen || mc.gui.screen() instanceof com.mmorpg.client.screen.AeloriaTitleScreen) || mc.gui.overlay()!=null) return;
+            if (++tick==80) {shot(mc,"startup_models_loaded");MMORPG.LOGGER.info("[CODEX CHECKS] CLIENT STARTUP PASS: resource reload completed and title screen visible");}
+            if(tick==100)mc.stop();
+            return;
+        }
         DevFreshWorld.tick(mc);
         if (MODE.equals("guide_polish")) { DevGuidePolish.tick(mc); return; }
         if (MODE.equals("metiers")) {          // menu Metiers (sans monde) : verifications puis captures de chaque onglet
