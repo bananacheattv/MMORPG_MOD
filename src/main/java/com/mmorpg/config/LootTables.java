@@ -19,6 +19,15 @@ public class LootTables {
     /** Toutes les tables modifiables en jeu (ordre des onglets de l'editeur). */
     public static final List<String> ALL = List.of(VOTE, QUETE, CRATE, RARE, EPIQUE, LEGENDAIRE, MYTHIQUE, "lucky_celeste","lucky_sylvestre","lucky_infernal","lucky_givre","lucky_neant", OEUF, SCEAU);
     public static final int MAX_ENTRIES = 48;
+    /** Coffres des donjons : deux tables par donjon (salles, tresor du boss), editees depuis le donjon de setup. */
+    public static String dungeonRooms(String dungeon) { return "donjon_" + dungeon; }
+    public static String dungeonTreasure(String dungeon) { return "donjon_" + dungeon + "_tresor"; }
+    public static List<String> dungeonTables() {
+        List<String> out = new ArrayList<>();
+        for (var t : com.mmorpg.world.DungeonBuilder.DungeonType.values()) { out.add(dungeonRooms(t.id)); out.add(dungeonTreasure(t.id)); }
+        return out;
+    }
+    public static boolean isDungeonTable(String id) { return id != null && id.startsWith("donjon_") && dungeonTables().contains(id); }
 
     public Map<String, List<Entry>> tables = new LinkedHashMap<>();
 
@@ -49,6 +58,7 @@ public class LootTables {
     }
 
     public static String label(String id) {
+        if (id.startsWith("donjon_")) return id.endsWith("_tresor") ? "Trésor du boss" : "Coffres des salles";
         return switch (id) {
             case LUCKY -> "Lucky Block";
             case VOTE -> "Vote";
@@ -108,6 +118,19 @@ public class LootTables {
                 e("sceau_sanglier", 1, 1, 40), e("sceau_loup_givre", 1, 1, 22), e("sceau_cerf_sylvestre", 1, 1, 22), e("sceau_tortue_cristal", 1, 1, 22),
                 e("sceau_chevre_celeste", 1, 1, 22), e("sceau_lezard_lave", 1, 1, 12), e("sceau_raptor_sables", 1, 1, 12), e("sceau_ours_runique", 1, 1, 12),
                 e("sceau_scorpion_dunes", 1, 1, 12), e("sceau_felin_vide", 1, 1, 5), e("sceau_araignee_cavernes", 1, 1, 5), e("sceau_hippogriffe", 1, 1, 2))));
+        for (var dt : com.mmorpg.world.DungeonBuilder.DungeonType.values()) {
+            int lv = dt.level;
+            String heal = lv >= 50 ? "potion_soin_majeure" : lv >= 20 ? "potion_soin" : "potion_soin_mineure";
+            String mana = lv >= 50 ? "potion_mana_majeure" : lv >= 20 ? "potion_mana" : "potion_mana_mineure";
+            List<Entry> rooms = new ArrayList<>(List.of(e("or", 5 + lv / 3, 14 + lv / 3, 30), e(heal, 1, 3, 25), e(mana, 1, 2, 20), e("pierre_amelioration", 1, 1, 12)));
+            for (String m : dt.loot) rooms.add(e(m, 1, 3, 22));
+            t.tables.put(LootTables.dungeonRooms(dt.id), rooms);
+            List<Entry> boss = new ArrayList<>(List.of(e("or", 40 + lv, 120 + lv * 2, 30), e(heal, 2, 4, 15), e(mana, 2, 3, 12), e("pierre_amelioration", 1, 2, 14),
+                    e("pierre_amelioration_sup", 1, 1, 8), e("parchemin_teleportation", 1, 2, 8), e("oeuf_mystere", 1, 1, 4)));
+            if (lv >= 50) boss.add(e("fragment_divin", 1, 1, 6));
+            for (String m : dt.loot) boss.add(e(m, 2, 5, 16));
+            t.tables.put(LootTables.dungeonTreasure(dt.id), boss);
+        }
         for(var tier:com.mmorpg.block.LuckyTier.values()){
             int rank=tier.ordinal()+1;
             t.tables.put(tier.id,new ArrayList<>(List.of(e("or",80*rank,250*rank,24),e("potion_soin_majeure",rank,rank+2,15),e("potion_mana_majeure",rank,rank+2,12),e("pierre_amelioration_sup",1,rank,12),e("charme_chance",1,1,8),e("charme_experience",1,1,8),e("coffre_cosmetique",1,rank,8+rank),e("oeuf_mystere",1,1,6+rank),e("sceau_mystere",1,1,3+rank),e("cle_"+new String[]{"rare","epique","legendaire","mythique","mythique"}[tier.ordinal()],1,1,5))));
@@ -134,7 +157,9 @@ public class LootTables {
     public LootTables sanitize() {
         if (tables == null) tables = new LinkedHashMap<>();
         LootTables d = defaults();
-        for (String id : ALL) {
+        List<String> every = new ArrayList<>(ALL);
+        every.addAll(dungeonTables());
+        for (String id : every) {
             List<Entry> list = tables.get(id);
             if (list == null) tables.put(id, d.tables.get(id));
         }

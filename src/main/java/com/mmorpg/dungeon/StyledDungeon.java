@@ -48,11 +48,14 @@ public final class StyledDungeon {
         final Theme th;
         final DungeonType t;
         final int bonus;
+        /** Donjon de setup (admin) : ni modele copie, ni variantes d'expedition. */
+        final boolean setup;
         Carve v;
         public BlockPos tp;
         final java.util.List<Runnable> steps = new java.util.ArrayList<>();
 
-        Job(ServerLevel level, BlockPos origin, DungeonType t, int bonus) {
+        Job(ServerLevel level, BlockPos origin, DungeonType t, int bonus, boolean setup) {
+            this.setup = setup;
             this.level = level;
             this.o = origin.below();
             this.c = new HubCtx(level, o);
@@ -113,7 +116,7 @@ public final class StyledDungeon {
             steps.add(th::treasure);
             // epreuves : une par salle ou couloir a fosse, puis les embuscades
             TrialData trials = TrialData.get(level.getServer());
-            long seed = o.asLong() * 31 + t.level;
+            long seed = t.level * 7919L + t.id.hashCode();      // meme plan pour tous les exemplaires : le modele du donjon reste coherent
             int lvl = t.level + 4 * bonus;
             for (int i = 0; i < Layout.ROOMS.length; i++) {
                 int idx = i;
@@ -130,8 +133,17 @@ public final class StyledDungeon {
                 steps.add(() -> Trials.ambush(c, level, trials, pal, id, cr, diff, lvl));
             }
             steps.add(() -> gameElements(plan));
+            // modele enregistre depuis le donjon de setup : copie par-dessus la generation de base
+            var template = setup ? null : DungeonTemplate.get(t);
+            if (template != null) {
+                for (int k = 0; k < DungeonTemplate.slices(); k++) {
+                    int slice = k;
+                    steps.add(() -> DungeonTemplate.paste(level, o, template, slice));
+                }
+                steps.add(() -> DungeonTemplate.finish(level, o, template, t, bonus));
+            }
             steps.add(this::registerZones);
-            steps.add(()->{var slot=InstanceManager.slotAt(level.getServer(),level,o.getX(),o.getZ()+12);if(slot!=null)DungeonVariants.decorate(level,o.above(),slot.variantSeed);});
+            if (!setup) steps.add(()->{var slot=InstanceManager.slotAt(level.getServer(),level,o.getX(),o.getZ()+12);if(slot!=null)DungeonVariants.decorate(level,o.above(),slot.variantSeed);});
         }
 
         private void decorRoom(int i, Layout.Room rm) {
@@ -254,14 +266,10 @@ public final class StyledDungeon {
                 }
                 // un coffre par salle : dans la salle, ou derriere le lac de plateformes
                 BlockPos at = th.jumpRoom(i) ? o.offset(3, 1, rm.z1() + 6) : o.offset(rm.r() - 3, 1, rm.z() + (i % 2 == 0 ? 7 : -7));
-                DungeonBuilder.chest(level, at, DungeonBuilder.roomLoot(t, r, false), r);
+                DungeonBuilder.chest(level, at, DungeonLoot.room(t, r), r);
             }
             c.set(0, 1, Theme.ARENA_Z, ModBlocks.AUTEL_INVOCATION.get());
-            var bossLoot = DungeonBuilder.roomLoot(t, r, true);
-            var summonKey = com.mmorpg.registry.ModItems.get(t.bossKey);
-            bossLoot.removeIf(s -> s.is(summonKey));
-            for (int i = 0; i < bonus; i++) bossLoot.addAll(DungeonBuilder.roomLoot(t, r, false));
-            DungeonBuilder.chest(level, o.offset(0, 1, Theme.TREASURE_Z + 3), bossLoot.subList(0, Math.min(27, bossLoot.size())), r);
+            DungeonBuilder.chest(level, o.offset(0, 1, Theme.TREASURE_Z + 3), DungeonLoot.treasure(t, r, bonus), r);
         }
 
         private void registerZones() {
@@ -284,26 +292,32 @@ public final class StyledDungeon {
         /** Remplit de nouveau les coffres (remise a zero d'un exemplaire reutilise). */
         void refillChests() {
             RandomSource r = level.getRandom();
+            var template = setup ? null : DungeonTemplate.get(t);
+            if (template != null) {
+                DungeonTemplate.fillChests(level, o, template, t, bonus);
+                return;
+            }
             for (int i = 0; i < Layout.ROOMS.length; i++) {
                 Layout.Room rm = Layout.ROOMS[i];
                 BlockPos at = th.jumpRoom(i) ? o.offset(3, 1, rm.z1() + 6) : o.offset(rm.r() - 3, 1, rm.z() + (i % 2 == 0 ? 7 : -7));
-                DungeonBuilder.chest(level, at, DungeonBuilder.roomLoot(t, r, false), r);
+                DungeonBuilder.chest(level, at, DungeonLoot.room(t, r), r);
             }
-            var bossLoot = DungeonBuilder.roomLoot(t, r, true);
-            var summonKey = com.mmorpg.registry.ModItems.get(t.bossKey);
-            bossLoot.removeIf(s -> s.is(summonKey));
-            for (int i = 0; i < bonus; i++) bossLoot.addAll(DungeonBuilder.roomLoot(t, r, false));
-            DungeonBuilder.chest(level, o.offset(0, 1, Theme.TREASURE_Z + 3), bossLoot.subList(0, Math.min(27, bossLoot.size())), r);
+            DungeonBuilder.chest(level, o.offset(0, 1, Theme.TREASURE_Z + 3), DungeonLoot.treasure(t, r, bonus), r);
         }
     }
 
     public static Job prepare(ServerLevel level, BlockPos origin, DungeonType t, int bonus) {
-        return new Job(level, origin, t, bonus);
+        return new Job(level, origin, t, bonus, false);
+    }
+
+    /** Donjon de setup : generation d'origine (difficulte normale), sans modele ; l'administrateur le modifie puis l'enregistre. */
+    public static Job prepareSetup(ServerLevel level, BlockPos origin, DungeonType t) {
+        return new Job(level, origin, t, 0, true);
     }
 
     /** Remet des objets neufs dans les coffres d'un exemplaire (appele par la remise a zero). */
     public static void refill(ServerLevel level, BlockPos origin, DungeonType t, int bonus) {
-        new Job(level, origin, t, bonus).refillChests();
+        new Job(level, origin, t, bonus, false).refillChests();
     }
 
     /** Phrase d'ambiance d'un donjon (ecran de chargement, entree). */
