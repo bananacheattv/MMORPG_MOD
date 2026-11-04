@@ -15,3 +15,8 @@ L’or ramassé rejoint directement le portefeuille même si l’inventaire est 
 Les éditeurs de PNJ proposent les dix apparences des guides et maîtres de classe en plus des quatre apparences historiques. Les armures personnalisées sur les porte-armures suivent les six poses du mannequin.
 
 Validation locale : `./gradlew runServer -PnetworkChecks`, puis contrôler `build/reports/network-checks.txt`. Test manuel administrateur : `/aeloriatest arene feu`, `/aeloriatest equipe rouge|bleu`, `/aeloriatest stop`. Le mode créatif est ignoré par les drones ; passer en survie pour leur test.
+
+## Saisons classées, duels, signalements
+- `/saison` : cote Elo (départ 1000, paliers Bronze→Diamant), top 10 ; saison de 28 jours, fin automatique : récompenses (or, points PvP, titres Champion/Élite), cotes ramenées à moitié. Admin : `/saison terminer`. Minimum 5 matchs pour être classé.
+- `/duel <joueur> [mise]`, `/duel accepter|refuser|abandon` : mise en séquestre, gagnant prend tout ; déconnexion = défaite, 10 min max = nul. Exige le PvP actif sur le serveur.
+- `/report <joueur> <raison>` (1/min) ; modérateurs : `/signalements [tous|joueur <nom>|traiter <id>|rejeter <id>]`.

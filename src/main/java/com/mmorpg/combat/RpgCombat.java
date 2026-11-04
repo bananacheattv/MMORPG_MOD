@@ -121,6 +121,7 @@ public final class RpgCombat {
             if (p.isCreative() || p.isSpectator()) return false;
             if (attacker instanceof Player ap) {
                 if(com.mmorpg.competition.ArenaManager.session(ap.getUUID())!=null||com.mmorpg.competition.ArenaManager.session(p.getUUID())!=null)return com.mmorpg.competition.ArenaManager.enemies(ap,p);
+                if (com.mmorpg.competition.Duels.fighting(ap, p)) return true;
                 if (com.mmorpg.server.PartyManager.sameParty(ap, p)) return false;
                 return ConfigManager.general().skillsHitPlayers && p.level() instanceof net.minecraft.server.level.ServerLevel psl && psl.isPvpAllowed();
             }
@@ -349,7 +350,7 @@ public final class RpgCombat {
         }
         double newHp = h.hp() - damage;
         if(damage>0&&target instanceof ServerPlayer player&&attacker instanceof LivingEntity mob)MobDebuffs.onHit(mob,player);
-        if(newHp<=.01&&target instanceof ServerPlayer arenaPlayer&&(com.mmorpg.competition.ArenaManager.lethal(arenaPlayer,attacker)||com.mmorpg.competition.GuildRaids.testDeath(arenaPlayer))){event.setNewDamage(0F);return;}
+        if(newHp<=.01&&target instanceof ServerPlayer arenaPlayer&&(com.mmorpg.competition.Duels.lethal(arenaPlayer,attacker)||com.mmorpg.competition.ArenaManager.lethal(arenaPlayer,attacker)||com.mmorpg.competition.GuildRaids.testDeath(arenaPlayer))){event.setNewDamage(0F);return;}
         if (newHp <= 0.01) {
             h.setHp(0);
             event.setNewDamage(target.getHealth() + 1000F);
