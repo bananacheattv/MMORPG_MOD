@@ -294,7 +294,7 @@ Cadre commun (`MmoScreen`), onglets du menu **M** (activables par interrupteur) 
 - 9 plats exclusifs.
 
 ### Montures, familiers, cosmétiques
-- **Montures** : 23 types (Sanglier … Hippogriffe, Drake ascendant en vol ; montures partagées à plusieurs sièges ; Chimère d'arène), sceaux, vitesse selon rareté, caméra adaptative.
+- **Montures** : 22 types (Sanglier … Hippogriffe, Drake ascendant en vol ; montures partagées à plusieurs sièges ; Chimère d'arène), sceaux, vitesse selon rareté, caméra adaptative.
 - **Familiers** : 8 (Feu Follet, Bébé Slime, Chouette Sage, Loup Spectral, Golem de Poche, Fée Lumineuse, Phénix Doré, Dragonnet du Néant), niveau 10 max, bonus de stats, modèles 3D animés ; œufs.
 - **Cosmétiques** : auras, ailes, halos, traînées, coiffes/dos/visage/épaules 3D (26), visibles par tous.
 
