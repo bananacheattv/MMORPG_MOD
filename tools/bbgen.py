@@ -19,3 +19,7 @@ def blade(y0, y1, hw, tip, zh=.25, n=10, cx=8, pre=''):
 if __name__ == '__main__':
     a = sys.argv[2:]
     print(json.dumps(blade(*[float(x) if '.' in x else int(x) for x in a[:5]], *[(float(x) if '.' in x else int(x)) for x in a[5:8]]), separators=(',', ':')))
+
+def compact(*a):
+    import json
+    return json.dumps([{**e, 'from': [round(x, 3) for x in e['from']], 'to': [round(x, 3) for x in e['to']]} for e in blade(*a)], separators=(',', ':'))
