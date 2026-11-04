@@ -166,9 +166,10 @@ def rarity(wid):
 
 def build_atlas(elements, th, wid, bow):
     """Texture peinte : projection plane (continue) pour les pieces droites, tuiles pour les pieces inclinees."""
-    ppu = 16 if bow else 8
+    ppu = 12 if bow else 8
     cw = 16 * ppu
     ch = (16 if bow else 32) * ppu
+    S = 256
     rnd = np.random.RandomState(zlib.crc32(wid.encode()) & 0xffffffff)
     r = rarity(wid)
     order = sorted(range(len(elements)), key=lambda i: (elements[i]['to'][2], i))
@@ -193,32 +194,34 @@ def build_atlas(elements, th, wid, bow):
                 canvas[ys:ye, xs:xe, 3] = 255
             place[i] = ('plane', x0, y0, wpx, hpx)
         else:
-            if x + wpx + 1 > cw:
+            if x + wpx + 1 > S - cw:
                 x, y, rowh = 0, y + rowh + 1, 0
             tiles.append((x, y, shade_rect(slot, col, wpx, hpx, rnd, fx, r)))
             place[i] = ('tile', x, y, wpx, hpx)
             x += wpx + 1
             rowh = max(rowh, hpx)
-    th_h = y + rowh
-    H = ch + th_h
-    tex = np.zeros((H, cw, 4), np.uint8)
-    tex[:ch] = canvas
+    while y + rowh > S or max(ch, 1) > S:
+        S *= 2
+    tex = np.zeros((S, S, 4), np.uint8)
+    tex[:ch, :cw] = canvas
     for (tx, ty, blk) in tiles:
-        tex[ch + ty:ch + ty + blk.shape[0], tx:tx + blk.shape[1], :3] = blk
-        tex[ch + ty:ch + ty + blk.shape[0], tx:tx + blk.shape[1], 3] = 255
+        tex[ty:ty + blk.shape[0], cw + tx:cw + tx + blk.shape[1], :3] = blk
+        tex[ty:ty + blk.shape[0], cw + tx:cw + tx + blk.shape[1], 3] = 255
+    for k, v in list(place.items()):
+        if v[0] == 'tile':
+            place[k] = ('tile', cw + v[1], v[2], v[3], v[4])
     # fond opaque sombre pour eviter les halos aux bords (les pixels non peints ne sont jamais echantillonnes)
     tex[tex[..., 3] == 0] = (0, 0, 0, 255)
-    return Image.fromarray(tex, 'RGBA'), place, cw, H, ch
+    return Image.fromarray(tex, 'RGBA'), place, S, S, ch
 
 
 def finish(elements, wid, display, gui_light, bow):
     th = theme_for(wid)
     img, place, W, H, ch = build_atlas(elements, th, wid, bow)
-    ppu = 16 if bow else 8
     out = []
     for i, e in enumerate(elements):
         kind, px, py, wp, hp = place[i]
-        base = 0 if kind == 'plane' else ch
+        base = 0
         def uv(x0, y0, x1, y1):
             return [round(x0 / W * 16, 4), round((base + y0) / H * 16, 4), round(x1 / W * 16, 4), round((base + y1) / H * 16, 4)]
         ne = {'name': e['name'], 'from': e['from'], 'to': e['to']}

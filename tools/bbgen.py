@@ -68,3 +68,39 @@ def bowc(*a, **k):
     c, tips = bow(*a, **k)
     print(json.dumps(c, separators=(',', ':')))
     print('tips', [(round(x, 2), round(y, 2)) for x, y in tips])
+
+
+def chain(start, angles, s=1.6, w0=1.2, w1=.6, zh=.45, pre='mt:a', z=8, mirror=False):
+    """Chaine de segments contigus (aile, corne, queue) : angles = directions de marche en degres (multiples de 22.5).
+    mirror=True : symetrique par rapport a x=8."""
+    import math
+    out = []
+    x, y = start
+    n = len(angles)
+    for i, a in enumerate(angles):
+        if mirror:
+            a = 180 - a
+        r = math.radians(a)
+        nx, ny = x + s * math.cos(r), y + s * math.sin(r)
+        cx, cy = (x + nx) / 2, (y + ny) / 2
+        w = w0 + (w1 - w0) * i / max(1, n - 1)
+        ang = ((a + 90) % 180) - 90
+        ln = s + .3
+        if abs(ang) <= 45:
+            f, t, rot = [cx - ln / 2, cy - w / 2], [cx + ln / 2, cy + w / 2], ang
+        else:
+            rot = ang - 90 if ang > 0 else ang + 90
+            f, t, rot = [cx - w / 2, cy - ln / 2], [cx + w / 2, cy + ln / 2], rot
+        e = {'name': f'{pre}{i}', 'from': [round(f[0], 3), round(f[1], 3), z - zh], 'to': [round(t[0], 3), round(t[1], 3), z + zh]}
+        if rot:
+            e['rotation'] = {'axis': 'z', 'angle': rot, 'origin': [round(cx, 3), round(cy, 3), z]}
+        out.append(e)
+        x, y = nx, ny
+    return out, (x, y)
+
+
+def chainc(*a, **k):
+    import json
+    c, end = chain(*a, **k)
+    print(json.dumps(c, separators=(',', ':')))
+    print('end', end)
