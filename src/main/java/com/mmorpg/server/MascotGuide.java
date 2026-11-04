@@ -235,14 +235,16 @@ public final class MascotGuide {
     static void follow(ServerPlayer p, MascotEntity m) {
         if (m.level() != p.level()) { drop(p); return; }
         double distance = m.position().subtract(p.position()).horizontalDistanceSqr();
-        if (m.tickCount % 10 != 0) return;
+        if (m.tickCount % 4 != 0) return;
         if (distance >= 9 && distance <= 25) { m.getNavigation().stop(); look(p, m); return; }
         var radial = m.position().subtract(p.position()).multiply(1, 0, 1);
-        var wanted = distance < .01 || distance > 32 * 32 ? target(p, 0)
+        boolean far = distance > 14 * 14;
+        var wanted = distance < .01 || far ? target(p, 0)
                 : radial.normalize().scale(4).add(p.position());
         var goal = safeGround(p, m, wanted);
         if (goal == null) { m.getNavigation().stop(); return; }
-        m.getNavigation().moveTo(goal.x, goal.y, goal.z, 1.1);
+        if (far) { m.getNavigation().stop(); m.snapTo(goal, p.getYRot(), 0); return; }
+        m.getNavigation().moveTo(goal.x, goal.y, goal.z, distance > 8 * 8 ? 1.4 : 1.2);
     }
 
     /**

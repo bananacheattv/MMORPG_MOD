@@ -90,7 +90,7 @@ public class MascotRenderer extends EntityRenderer<MascotEntity, MascotRenderer.
         if (!state.mine) return;
         poseStack.pushPose();
         poseStack.pushPose();
-        poseStack.rotateDegrees(Axis.YP, -state.yRot);
+        poseStack.rotateDegrees(Axis.YP, 180.0F - state.yRot);
         poseStack.scale(SCALE, SCALE, SCALE);
         poseStack.scale(-1.0F, -1.0F, 1.0F);
         poseStack.translate(0.0F, -1.501F, 0.0F);
