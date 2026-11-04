@@ -139,6 +139,7 @@ public final class DevNetworkChecks {
             check(countPlans(p) == scrolls + 1, "boss grants a personal crafting scroll");
             DevPortalChecks.run(p);
             com.mmorpg.dungeon.DevDedicatedDungeonChecks.run(p);
+            com.mmorpg.dungeon.DevDungeonSetupChecks.run(p);
             DevSpawnEditorChecks.run(p);
             DevMerchantChecks.run(p);
             DevSocialChecks.run(p);

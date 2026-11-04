@@ -47,6 +47,8 @@ public record S2COpenScreen(int screen, CompoundTag extra) implements CustomPack
     public static final int GUILD_RAID_INVITE = 37;
     /** Reglage du niveau d'un bloc de lumiere invisible. */
     public static final int LIGHT_BLOCK = 38;
+    /** Menu du donjon de setup (enregistrer le modele, butins des coffres). */
+    public static final int DUNGEON_SETUP = 39;
     public static final int SPAWN_EDITOR = 19;
     public static final int ADVENTURE_SUMMARY = 20;
     public static final int MERCHANT_EDITOR = 21;

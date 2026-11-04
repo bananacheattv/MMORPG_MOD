@@ -29,7 +29,7 @@ public final class LootEditorScreen extends MmoScreen {
     private static final Gson JSON = new Gson();
     private static final java.lang.reflect.Type LIST = new TypeToken<List<LootTables.Entry>>() {
     }.getType();
-    private static final String[] TABLES = LootTables.ALL.toArray(new String[0]);
+    private final String[] TABLES;
 
     private final Map<String, List<LootTables.Entry>> tables = new LinkedHashMap<>();
     private final Map<String, Boolean> modified = new LinkedHashMap<>();
@@ -41,6 +41,9 @@ public final class LootEditorScreen extends MmoScreen {
 
     public LootEditorScreen(CompoundTag data) {
         super("Éditeur de butins");
+        String tabs = data.getStringOr("tabs", "");
+        TABLES = tabs.isEmpty() ? LootTables.ALL.toArray(new String[0]) : tabs.split(",");
+        current = TABLES[0];
         load(data, null);
     }
 
@@ -125,7 +128,7 @@ public final class LootEditorScreen extends MmoScreen {
     @Override
     protected void renderContent(GuiGraphicsExtractor g, int mx, int my, float a) {
         Ui.panel(g, left, top, pw, ph);
-        Ui.title(g, left + pw / 2, top + 9, "ÉDITEUR DE BUTINS", Ui.GOLD);
+        Ui.title(g, left + pw / 2, top + 9, TABLES.length < 6 ? "BUTINS DES COFFRES DU DONJON" : "ÉDITEUR DE BUTINS", Ui.GOLD);
         // onglets des tables
         int tw = (pw - 20) / TABLES.length;
         for (int i = 0; i < TABLES.length; i++) {

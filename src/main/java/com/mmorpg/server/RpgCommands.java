@@ -58,6 +58,15 @@ public final class RpgCommands {
         d.register(Commands.literal("mmorpg")
                 .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("editeurquetes").executes(c -> {QuestEditor.open(c.getSource().getPlayerOrException());return 1;}))
+                .then(Commands.literal("donjonsetup")
+                        .then(Commands.literal("menu").executes(c -> {com.mmorpg.dungeon.DungeonSetup.openMenu(c.getSource().getPlayerOrException());return 1;}))
+                        .then(Commands.argument("donjon", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((c, b) -> net.minecraft.commands.SharedSuggestionProvider.suggest(dungeons, b))
+                                .executes(c -> {
+                                    var t = DungeonBuilder.DungeonType.byId(com.mojang.brigadier.arguments.StringArgumentType.getString(c, "donjon"));
+                                    if (t == null) {c.getSource().sendFailure(Component.literal("Donjon inconnu."));return 0;}
+                                    return com.mmorpg.dungeon.DungeonSetup.enter(c.getSource().getPlayerOrException(), t) ? 1 : 0;
+                                })))
                 .then(Commands.literal("butins").executes(c -> {com.mmorpg.server.LootEditor.open(c.getSource().getPlayerOrException());return 1;}))
                 .then(Commands.literal("niveau").then(Commands.argument("joueur", EntityArgument.player())
                         .then(Commands.argument("niveau", IntegerArgumentType.integer(1, LevelSystem.MAX_LEVEL)).executes(c -> {
