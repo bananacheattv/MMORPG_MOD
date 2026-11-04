@@ -57,6 +57,10 @@ public record S2COpenScreen(int screen, CompoundTag extra) implements CustomPack
     public static final int DUNGEON_MAP = 70;
     /** Panneau de moderation complet (/moderation). */
     public static final int MODERATION = 80;
+    /** Liste d'amis avec statuts (/amis). */
+    public static final int FRIENDS = 41;
+    /** Compte à rebours de photo de groupe (pas d'écran). */
+    public static final int PHOTO = 42;
     public static final int SPAWN_EDITOR = 19;
     public static final int ADVENTURE_SUMMARY = 20;
     public static final int MERCHANT_EDITOR = 21;

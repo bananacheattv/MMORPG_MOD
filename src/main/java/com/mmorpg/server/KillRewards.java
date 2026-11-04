@@ -96,6 +96,8 @@ public final class KillRewards {
             if (xp > 0) RpgPlayers.giveXp(p, xp, true);
             if (xp > 0 && !d.activePet.isEmpty()) PetManager.addPetXp(p, d.activePet, (int) Math.max(1, xp * 0.05));
             AdventureSummary.count(p,"kills",1);
+            com.mmorpg.guild.GuildService.progress(p,"KILLS",1);
+            if (md.boss) com.mmorpg.guild.GuildService.progress(p,"BOSS",1);
             d.kills.merge(md.key, 1, Integer::sum);
             com.mmorpg.achievement.Achievements.add(p, com.mmorpg.achievement.Achievement.KILLS, 1);
             if (md.boss) com.mmorpg.achievement.Achievements.add(p, com.mmorpg.achievement.Achievement.BOSS_KILLS, 1);

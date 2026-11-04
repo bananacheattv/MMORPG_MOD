@@ -15,10 +15,19 @@ public final class GuildStore {
         public UUID id=UUID.randomUUID();public String name,motto="";public int level=1;public long xp,gold;public int bosses;
         public String banner="VIOLET",bannerPattern="CRISTAL";public int hallLevel,hallIndex=-1;
         public LinkedHashMap<UUID,Member> members=new LinkedHashMap<>();public LinkedHashMap<UUID,Long> invites=new LinkedHashMap<>();public ArrayList<String> history=new ArrayList<>();
+        public String banner2="OR",motd="";public ArrayList<String> pins=new ArrayList<>();
+        public LinkedHashMap<UUID,Activity> activity=new LinkedHashMap<>();
+        public String questDay="",questWeek="";public ArrayList<Quest> quests=new ArrayList<>();public int questsDone;
+        public ArrayList<String> vault=new ArrayList<>();
+        public ArrayList<String> trophies=new ArrayList<>();
         public LinkedHashMap<Integer,Long> bossCooldowns=new LinkedHashMap<>();
         public LinkedHashMap<String,Long> buffs=new LinkedHashMap<>();
-        public void log(String message){history.add(0,java.time.Instant.now()+" · "+message);while(history.size()>60)history.removeLast();}
+        public void log(String message){history.add(0,java.time.Instant.now()+" · "+message);while(history.size()>200)history.removeLast();}
     }
+    /** Contribution d'un membre : dons, XP, monstres, dernière connexion. */
+    public static final class Activity {public long lastSeen,gold,xp;public int kills,quests;}
+    /** Quête de guilde (quotidienne ou hebdomadaire) : progression commune de tous les membres. */
+    public static final class Quest {public String type="KILLS";public boolean weekly,done;public long target,progress,rewardXp,rewardGold;}
     public static final class Transfer {public UUID id=UUID.randomUUID(),player,guild;public long delta;public String name;}
     public static final class State {public ArrayList<Guild> guilds=new ArrayList<>();public ArrayList<Transfer> pending=new ArrayList<>();public long revision;public int nextHall;}
     private static final com.google.gson.Gson JSON=new GsonBuilder().setPrettyPrinting().create();
@@ -30,8 +39,8 @@ public final class GuildStore {
         Set<UUID> ids=new HashSet<>(),players=new HashSet<>();Set<String> names=new HashSet<>();
         for(var g:s.guilds){if(g==null||g.id==null||!ids.add(g.id)||g.name==null||!names.add(g.name.toLowerCase(Locale.ROOT))||g.level<1||g.level>10||g.gold<0||g.xp<0||g.members==null||g.members.isEmpty()||g.members.size()>50||g.history==null||g.invites==null||g.members.entrySet().stream().anyMatch(e->e.getValue()==null||!e.getKey().equals(e.getValue().id)))throw new IllegalStateException("Guilde invalide");
             if(g.hallIndex< -1||g.hallIndex>100000||s.nextHall<0||s.nextHall>100001)throw new IllegalStateException("Adresse de hall invalide.");
-            if(g.bannerPattern==null)g.bannerPattern="CRISTAL";if(!List.of("CRISTAL","SOLEIL","LUNE","ARBRE","DRAGON").contains(g.bannerPattern))throw new IllegalStateException("Emblème invalide");
-            if(g.banner==null)g.banner="VIOLET";if(!List.of("VIOLET","AZUR","EMERAUDE","CARMIN","OR").contains(g.banner)||g.hallLevel<0||g.hallLevel>3)throw new IllegalStateException("Identité de guilde invalide");
+            if(g.bannerPattern==null)g.bannerPattern="CRISTAL";if(!GuildCrest.PATTERNS.contains(g.bannerPattern))throw new IllegalStateException("Emblème invalide");
+            if(g.banner==null)g.banner="VIOLET";if(g.banner2==null)g.banner2="OR";if(g.motd==null)g.motd="";if(g.pins==null)g.pins=new ArrayList<>();if(g.activity==null)g.activity=new LinkedHashMap<>();if(g.quests==null)g.quests=new ArrayList<>();if(g.vault==null)g.vault=new ArrayList<>();if(g.trophies==null)g.trophies=new ArrayList<>();if(g.questDay==null)g.questDay="";if(g.questWeek==null)g.questWeek="";if(!GuildCrest.COLORS.contains(g.banner)||!GuildCrest.COLORS.contains(g.banner2)||g.vault.size()>27||g.pins.size()>3||g.hallLevel<0||g.hallLevel>3)throw new IllegalStateException("Identité de guilde invalide");
             if(g.bossCooldowns==null)g.bossCooldowns=new LinkedHashMap<>();
             if(g.bossCooldowns.size()>10||g.bossCooldowns.entrySet().stream().anyMatch(e->e.getKey()<0||e.getKey()>9||e.getValue()==null||e.getValue()<0))throw new IllegalStateException("Cooldown de gardien invalide");
             if(g.buffs==null||g.buffs.size()>4)throw new IllegalStateException("Buffs invalides");for(var e:g.buffs.entrySet()){GuildBuffs.Kind.valueOf(e.getKey());if(e.getValue()==null||e.getValue()<0)throw new IllegalStateException("Durée de buff invalide");}

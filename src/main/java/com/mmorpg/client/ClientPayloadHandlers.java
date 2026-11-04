@@ -113,6 +113,8 @@ public final class ClientPayloadHandlers {
             case S2COpenScreen.MINE_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.MineMasterScreen(payload.extra()));
             case S2COpenScreen.SPAWN_EDITOR -> mc.gui.setScreen(new com.mmorpg.client.screen.SpawnEditorScreen(payload.extra()));
             case S2COpenScreen.PREMIUM_STORE -> mc.gui.setScreen(new com.mmorpg.client.screen.PremiumStoreScreen(payload.extra()));
+            case S2COpenScreen.FRIENDS -> mc.gui.setScreen(new com.mmorpg.client.screen.FriendsScreen(payload.extra()));
+            case S2COpenScreen.PHOTO -> com.mmorpg.client.PhotoMode.start(payload.extra().getIntOr("seconds", 5));
             case S2COpenScreen.GUILD -> mc.gui.setScreen(new com.mmorpg.client.screen.GuildScreen(payload.extra()));
             case S2COpenScreen.DUNGEON_MAP -> mc.gui.setScreen(new com.mmorpg.client.screen.DungeonMapScreen(payload.extra()));
             case S2COpenScreen.CHARACTERS -> mc.gui.setScreen(new com.mmorpg.client.screen.CharacterSelectScreen(payload.extra()));
