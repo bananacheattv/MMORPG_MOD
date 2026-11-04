@@ -49,6 +49,8 @@ public final class DevCharacterChecks {
         var n = RpgPlayers.get(p);
         check(n.charSlot == 1 && "Elara".equals(n.charName) && n.level == 1 && n.gold == 0 && !n.playerClass.isPlayable(), "nouveau personnage vierge");
         check(p.getInventory().isEmpty() && com.mmorpg.economy.BankData.get(server).account(account).gold == 0, "inventaire et banque vierges");
+        check(p.getDisplayName().getString().contains("Elara") && !p.getDisplayName().getString().contains(p.getGameProfile().name()), "chat : nom du personnage actif");
+        check(p.getTabListDisplayName() != null && p.getTabListDisplayName().getString().contains("Elara") && !p.getTabListDisplayName().getString().contains(p.getGameProfile().name()), "tab : nom du personnage actif");
         var store = CharacterStore.load(server, account);
         check(store.slots.get(0).snapshot != null && store.slots.get(0).level == 12 && store.slots.get(1).name.equals("Elara"), "fiche : personnage 0 range, personnage 1 resume");
         // guildes separees : le personnage 1 fonde sa guilde, le 0 n'en a pas
