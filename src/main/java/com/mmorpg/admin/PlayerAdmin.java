@@ -632,6 +632,16 @@ public final class PlayerAdmin {
                 command(server, admin, "tp " + safeName(t.name) + " " + safeName(admin.getGameProfile().name()));
                 result = "Joueur téléporté auprès de vous.";
             }
+            case "grade_aucun", "grade_fondateur", "grade_responsable", "grade_moderateur", "grade_builder" -> {
+                require(admin.permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_OWNER), "Gestion des grades réservée aux propriétaires (OP niveau 4).");
+                String staff = what.substring(6);
+                com.mmorpg.store.StoreLedger.access(server, s -> {
+                    com.mmorpg.store.StoreLedger.account(s, t.id).staff = staff.equals("aucun") ? "" : staff;
+                    return null;
+                });
+                if (t.online != null) com.mmorpg.store.PremiumStore.refresh(t.online);
+                result = "Grade : " + staff + (t.online == null ? " (appliqué à la prochaine connexion)." : ".");
+            }
             case "gamemode" -> {
                 t.live();
                 require(arg.matches("survival|creative|adventure|spectator"), "Mode invalide.");

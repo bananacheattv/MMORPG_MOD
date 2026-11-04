@@ -89,10 +89,10 @@ public final class Achievements {
     }
 
     public static boolean staff(String rankLabel) {
-        return "Fondateur".equals(rankLabel) || "Administrateur".equals(rankLabel);
+        return "Fondateur".equals(rankLabel) || "Responsable".equals(rankLabel);
     }
 
-    /** Texte d'un message de chat : rouge clair et gras pour les Fondateurs et Administrateurs. */
+    /** Texte d'un message de chat : rouge clair et gras pour les Fondateurs et Responsables. */
     public static Component body(String rankLabel, String text, int color) {
         var c = Component.literal(text);
         return staff(rankLabel) ? c.withColor(0xFF6B6B).withStyle(s -> s.withBold(true)) : c.withColor(color);

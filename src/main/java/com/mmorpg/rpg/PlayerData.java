@@ -268,7 +268,7 @@ public class PlayerData implements ValueIOSerializable {
     public void load(CompoundTag t) {
         adventureSummary = t.getCompoundOrEmpty("adventure_summary").copy();
         charSlot=Math.clamp(t.getIntOr("charSlot",0),-1,11);charName=t.getStringOr("charName","");
-        rankLabel=t.getStringOr("rankLabel","Aelorien");rankColor=t.getIntOr("rankColor",0xB9AFCC);rankTier=t.getIntOr("rankTier",0);auctionSlots=t.getIntOr("auctionSlots",12);
+        rankLabel=t.getStringOr("rankLabel","Aelorien");if(rankLabel.equals("Administrateur"))rankLabel="Responsable";rankColor=t.getIntOr("rankColor",0xB9AFCC);rankTier=t.getIntOr("rankTier",0);auctionSlots=t.getIntOr("auctionSlots",12);
         shieldGuard=Math.clamp(t.getFloatOr("shieldGuard",100),0,100);shieldGuardRecovering=t.getBooleanOr("shieldGuardRecovering",shieldGuard<=0);pvpTitle=t.getStringOr("pvpTitle","");backpacks=t.getCompoundOrEmpty("backpacks").copy();guildReceipts=t.getCompoundOrEmpty("guild_receipts").copy();guildLevel=Math.clamp(t.getIntOr("guild_level",0),0,10);
         guildBuffs=t.getLongArray("guild_buffs").orElse(new long[4]);if(guildBuffs.length!=4)guildBuffs=new long[4];
         forgeRecipes.clear();forgeRecipes.addAll(t.read("forgeRecipes",Codec.STRING.listOf()).orElse(List.of()));

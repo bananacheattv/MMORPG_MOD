@@ -20,7 +20,7 @@ public final class DevExpansionChecks {
   var p=net.neoforged.neoforge.common.util.FakePlayerFactory.get(source.level(),new com.mojang.authlib.GameProfile(UUID.randomUUID(),"ExpansionChecks"));var d=RpgPlayers.get(p);d.playerClass=com.mmorpg.rpg.PlayerClass.GUERRIER;RpgPlayers.recompute(p);
   try{
    var cfg=StoreConfig.load(server);StoreConfig.validate(cfg);check(cfg.ranks.size()==5&&cfg.ranks.getFirst().id.equals("aelorien"),"five public grades with free Aelorien");
-   check(cfg.products.stream().noneMatch(x->x.id.contains("fondateur")||x.id.contains("administrateur")||x.id.contains("moderateur")||x.id.contains("builder")),"staff cannot be purchased");
+   check(cfg.products.stream().noneMatch(x->x.id.contains("fondateur")||x.id.contains("responsable")||x.id.contains("administrateur")||x.id.contains("moderateur")||x.id.contains("builder")),"staff cannot be purchased");
    check(!cfg.paymentBridgeEnabled&&cfg.websiteUrl.isEmpty(),"money payments disabled before site launch");
    var id=p.getUUID();String external="test:"+UUID.randomUUID();StoreLedger.credit(server,id,10000,external);StoreLedger.credit(server,id,10000,external);
    check(StoreLedger.access(server,s->StoreLedger.account(s,id).credits)==10000,"external payment idempotent");rejects(()->StoreLedger.credit(server,id,10001,external),"conflicting payment must fail");
