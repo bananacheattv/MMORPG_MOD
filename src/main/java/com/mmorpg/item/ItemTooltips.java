@@ -52,8 +52,9 @@ public final class ItemTooltips {
         double mult = RpgEquipment.upgradeMult(stack);
         statLines(def.stats(), mult, out);
         for (var e : Affixes.affixes(stack).entrySet()) {
-            out.accept(Component.literal("  ✦ " + e.getKey().format(e.getValue(), true) + " ").withColor(0x7FE0FF)
-                    .append(Component.literal(e.getKey().label).withColor(0xD8D0C0)));
+            int ti = Affixes.tier(e.getKey(), e.getValue(), def.level());
+            out.accept(Component.literal("  ✦ " + e.getKey().format(e.getValue(), true) + " ").withColor(Affixes.TIER_COLORS[ti])
+                    .append(Component.literal(e.getKey().label).withColor(Affixes.TIER_COLORS[ti])));
         }
         Stat[] rf = Affixes.reforge(stack);
         if (rf != null) {

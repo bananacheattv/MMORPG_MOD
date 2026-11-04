@@ -357,7 +357,7 @@ public class ForgeScreen extends MmoScreen {
         g.text(font, "Affixes", dx + 6, ty, Ui.GOLD, false);
         ty += 11;
         if (aff.isEmpty()) {g.text(font, "Aucun", dx + 10, ty, Ui.MUTED, false);ty += 11;}
-        for (var e : aff.entrySet()) {g.text(font, "✦ " + e.getKey().format(e.getValue(), true) + " " + e.getKey().label, dx + 10, ty, 0xFF7FE0FF, false);ty += 11;}
+        for (var e : aff.entrySet()) {g.text(font, "✦ " + e.getKey().format(e.getValue(), true) + " " + e.getKey().label, dx + 10, ty, 0xFF000000 | com.mmorpg.item.Affixes.TIER_COLORS[com.mmorpg.item.Affixes.tier(e.getKey(), e.getValue(), def.level())], false);ty += 11;}
         Item stone = ModItems.PIERRE_AMELIORATION.get();
         int haveStone = count(inv, stone);
         long haveGold = ClientData.DATA.gold;

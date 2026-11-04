@@ -36,9 +36,23 @@ public final class Affixes {
         return true;
     }
 
+    /** Couleurs des paliers, du plus faible au plus fort : vert, bleu, violet, jaune, rose. */
+    public static final int[] TIER_COLORS = {0x55E055, 0x4FA3FF, 0xB66CFF, 0xFFD740, 0xFF6FB5};
+    public static final String[] TIER_NAMES = {"Vert", "Bleu", "Violet", "Jaune", "Rose"};
+
+    /** Palier 0..4 d'un affixe selon la qualite du tirage (0,7 a 1,3 de la valeur de base). */
+    public static int tier(Stat s, double value, int level) {
+        double ratio = value / base(s, level);
+        return Math.max(0, Math.min(4, (int) Math.floor((ratio - 0.7) / 0.6 * 5)));
+    }
+
     private static double value(Stat s, int level, Random r) {
         double roll = 0.7 + r.nextDouble() * 0.6;
-        double v = switch (s) {
+        return Math.round(base(s, level) * roll * 10) / 10.0;
+    }
+
+    private static double base(Stat s, int level) {
+        return switch (s) {
             case ATK, MAG -> 2 + level * 0.4;
             case MAX_HP -> 10 + level * 2;
             case CRIT -> 1 + level * 0.05;
@@ -48,7 +62,6 @@ public final class Affixes {
             case CDR -> 1 + level * 0.04;
             default -> 0.3 + level * 0.02;
         };
-        return Math.round(v * roll * 10) / 10.0;
     }
 
     /** Tire (ou retire) les affixes de l'arme. */
