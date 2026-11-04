@@ -479,6 +479,26 @@ public final class DevShowcase {
         mc.options.pauseOnLostFocus = false;
         if (mc.gui.screen() instanceof net.minecraft.client.gui.screens.PauseScreen && !MODE.equals("interface")) mc.gui.setScreen(null);
         String me = mc.player.getName().getString();
+        if (MODE.equals("personnages")) {    // ecran de choix de personnage (donnees d'exemple)
+            if (tick == 20) {
+                var t = new net.minecraft.nbt.CompoundTag();
+                t.putString("account", me); t.putInt("owned", 3); t.putInt("max", 12); t.putInt("live", 0);
+                t.putLong("price", 400); t.putLong("credits", 1000); t.putBoolean("selecting", true);
+                var list = new net.minecraft.nbt.ListTag();
+                String[][] rows = {{"Haldar", "3", "51", "Hautes Terres Perdues"}, {"Diendas", "1", "3", "Spawn d'Aeloria"}, {"", "", "", ""}};
+                for (int i = 0; i < 3; i++) {
+                    var e = new net.minecraft.nbt.CompoundTag();
+                    e.putInt("slot", i); e.putBoolean("empty", rows[i][0].isEmpty());
+                    if (!rows[i][0].isEmpty()) { e.putString("name", rows[i][0]); e.putInt("cls", Integer.parseInt(rows[i][1])); e.putInt("level", Integer.parseInt(rows[i][2])); e.putString("place", rows[i][3]); e.put("equip", new net.minecraft.nbt.CompoundTag()); }
+                    list.add(e);
+                }
+                t.put("slots", list);
+                mc.gui.setScreen(new com.mmorpg.client.screen.CharacterSelectScreen(t));
+            }
+            if (tick == 60) shot(mc, "personnages");
+            if (tick == 70) stop(mc);
+            return;
+        }
         if (MODE.equals("invitation_boss")) {    // invitation au boss de guilde
             if (tick == 5) {
                 var q = new net.minecraft.nbt.CompoundTag();

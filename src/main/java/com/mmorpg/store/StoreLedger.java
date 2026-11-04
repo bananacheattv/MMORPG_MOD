@@ -6,7 +6,7 @@ import java.util.*;
 /** Wallet debits and delivery intents commit together under the cross-backend ledger lock. */
 public final class StoreLedger {
     public static class Delivery {public String id=UUID.randomUUID().toString(),item;public int count;}
-    public static class Account {public long credits;public int rank;public String staff="";public List<Delivery> pending=new ArrayList<>();}
+    public static class Account {public long credits;public int charSlots;public int rank;public String staff="";public List<Delivery> pending=new ArrayList<>();}
     public static class CreditReceipt {public String player;public long amount;}
     public static class State {public Map<String,Account> accounts=new HashMap<>();public Map<String,CreditReceipt> credits=new HashMap<>();public Set<String> purchases=new HashSet<>();}
     public static Account account(State s,UUID player){return s.accounts.computeIfAbsent(player.toString(),k->new Account());}
@@ -24,6 +24,18 @@ public final class StoreLedger {
     public static long price(StoreConfig.Config cfg,StoreConfig.Product product,Account account){
         if(product.rank<0)return product.credits;if(product.rank<=account.rank)return 0;
         long paid=cfg.products.stream().filter(p->p.rank==account.rank).mapToLong(p->p.credits).findFirst().orElse(0);return Math.max(1,product.credits-paid);
+    }
+    /** Emplacements de personnage achetes avec des credits (en plus des {@code BASE_SLOTS} gratuits) ; achat idempotent par reference. */
+    public static final int BASE_SLOTS=3,MAX_SLOTS=12;
+    public static int extraSlots(MinecraftServer server,UUID player){return read(server,s->Math.clamp(account(s,player).charSlots,0,MAX_SLOTS-BASE_SLOTS));}
+    public static long slotPrice(MinecraftServer server){return StoreConfig.load(server).slotPrice;}
+    public static void buySlot(MinecraftServer server,UUID player,UUID request,long expectedPrice){
+        long price=slotPrice(server);
+        access(server,s->{String receipt=player+":slot:"+request;if(s.purchases.contains(receipt))return null;var a=account(s,player);
+            if(expectedPrice>=0&&price!=expectedPrice)throw new IllegalArgumentException("Le prix a changé. Confirme à nouveau.");
+            if(a.charSlots>=MAX_SLOTS-BASE_SLOTS)throw new IllegalArgumentException("Tu as déjà les "+MAX_SLOTS+" emplacements.");
+            if(a.credits<price)throw new IllegalArgumentException("Crédits insuffisants ("+price+" requis).");
+            a.credits-=price;a.charSlots++;s.purchases.add(receipt);return null;});
     }
     public static void buy(MinecraftServer server,UUID player,String productId,UUID request){buy(server,player,productId,request,-1);}
     public static void buy(MinecraftServer server,UUID player,String productId,UUID request,long expectedPrice){

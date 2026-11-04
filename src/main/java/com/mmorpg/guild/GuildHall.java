@@ -22,7 +22,7 @@ public final class GuildHall {
     public static void enter(ServerPlayer p){
         if(com.mmorpg.competition.ArenaManager.active(p)||com.mmorpg.competition.GuildRaids.of(p.getUUID())!=null||com.mmorpg.dungeon.InstanceManager.containsPlayer(p))throw new IllegalArgumentException("Termine ton activité avant de rejoindre le hall.");
         if(com.mmorpg.competition.CompetitionTravel.route(p,"guild-hall"))return;
-        var g=GuildStore.access(p.level().getServer(),true,s->{var found=GuildStore.of(s,p.getUUID());if(found==null)throw new IllegalArgumentException("Rejoins une guilde.");if(found.hallIndex<0)found.hallIndex=s.nextHall++;return found;});
+        var g=GuildStore.access(p.level().getServer(),true,s->{var found=GuildStore.of(s,com.mmorpg.character.CharKey.of(p));if(found==null)throw new IllegalArgumentException("Rejoins une guilde.");if(found.hallIndex<0)found.hallIndex=s.nextHall++;return found;});
         var level=p.level().getServer().getLevel(DIM);if(level==null)throw new IllegalArgumentException("Hall indisponible.");
         BUILDS.computeIfAbsent(g.id,id->build(g));VISITORS.put(p.getUUID(),g.id);p.sendSystemMessage(Component.literal("Préparation du hall de "+g.name+"…"));
     }
@@ -67,13 +67,13 @@ public final class GuildHall {
         for(var id:new ArrayList<>(BUILDS.keySet())){var job=BUILDS.get(id);job.tick(level);if(job.done()){
             BUILDS.remove(id);var finished=GuildStore.access(e.getServer(),false,state->GuildStore.byId(state,id));if(finished!=null)labels(level,finished);for(var visitor:new HashMap<>(VISITORS).entrySet())if(visitor.getValue().equals(id)){
                 var p=e.getServer().getPlayerList().getPlayer(visitor.getKey());VISITORS.remove(visitor.getKey());if(p==null)continue;
-                var g=GuildStore.access(e.getServer(),false,s->GuildStore.of(s,p.getUUID()));if(g==null||!g.id.equals(id))continue;var c=center(g);
+                var g=GuildStore.access(e.getServer(),false,s->GuildStore.of(s,com.mmorpg.character.CharKey.of(p)));if(g==null||!g.id.equals(id))continue;var c=center(g);
                 p.teleportTo(level,c.getX()+.5,100,c.getZ()+5.5,Set.of(),180,0,true);p.sendSystemMessage(Component.literal("Hall de "+g.name+" · /guilde pour les améliorations · /reseau spawn pour sortir"));
             }
         }}
         if(e.getServer().getTickCount()%40==0)for(var p:new ArrayList<>(level.players())){
             if(Boolean.getBoolean("mmorpg.expansionVisual"))continue;
-            var g=GuildStore.access(e.getServer(),false,s->GuildStore.of(s,p.getUUID()));if(g==null||g.hallIndex<0||Math.abs(p.getX()-center(g).getX())>34||Math.abs(p.getZ()-center(g).getZ())>34||p.getY()<95)com.mmorpg.competition.CompetitionTravel.home(p);
+            var g=GuildStore.access(e.getServer(),false,s->GuildStore.of(s,com.mmorpg.character.CharKey.of(p)));if(g==null||g.hallIndex<0||Math.abs(p.getX()-center(g).getX())>34||Math.abs(p.getZ()-center(g).getZ())>34||p.getY()<95)com.mmorpg.competition.CompetitionTravel.home(p);
         }
     }
     @SubscribeEvent public static void damage(net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent e){if(e.getEntity().level().dimension().equals(DIM))e.setCanceled(true);}

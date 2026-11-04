@@ -7,11 +7,11 @@ import java.nio.file.Path;
 
 /** Optional local multi-server network; disabled for existing single-player worlds. */
 public final class NetworkConfig {
-    public enum Role { STANDALONE, HUB, MAIN, MINES, PLAINS, DUNGEONS }
+    public enum Role { STANDALONE, HUB, MAIN, MINES, PLAINS, DUNGEONS, LOBBY }
     public boolean enabled = false;
     public Role role = Role.STANDALONE;
     public String sharedDirectory = "../../shared/players";
-    public String hub = "hub", main = "serveur", mines = "mines", plains = "plaines", dungeons = "donjons";
+    public String hub = "hub", main = "serveur", mines = "mines", plains = "plaines", dungeons = "donjons", lobby = "lobby";
     public int dungeonMaxInstancesPerPool = 8;
     public int dungeonBuildBudgetMs = 8;
     public static NetworkConfig current = new NetworkConfig();
@@ -23,7 +23,7 @@ public final class NetworkConfig {
         current = Files.exists(file) ? gson.fromJson(Files.readString(file), NetworkConfig.class) : new NetworkConfig();
         if (current == null || current.role == null) throw new java.io.IOException("Invalid network.json");
         if (current.enabled && current.role == Role.STANDALONE) throw new java.io.IOException("Network role must be explicit");
-        for (String name : new String[]{current.hub, current.main, current.mines, current.plains, current.dungeons}) {
+        for (String name : new String[]{current.hub, current.main, current.mines, current.plains, current.dungeons, current.lobby}) {
             if (name == null || !name.matches("[a-zA-Z0-9_-]{1,64}")) throw new java.io.IOException("Invalid proxy server name");
         }
         current.dungeonMaxInstancesPerPool = Math.clamp(current.dungeonMaxInstancesPerPool, 1, 40);
@@ -35,7 +35,7 @@ public final class NetworkConfig {
     public static String serverFor(Role role) {
         return switch (role) {
             case HUB -> current.hub; case MAIN -> current.main; case MINES -> current.mines;
-            case PLAINS -> current.plains; case DUNGEONS -> current.dungeons;
+            case PLAINS -> current.plains; case DUNGEONS -> current.dungeons; case LOBBY -> current.lobby;
             default -> throw new IllegalArgumentException("Standalone is not a proxy destination");
         };
     }

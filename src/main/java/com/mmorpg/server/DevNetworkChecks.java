@@ -152,6 +152,7 @@ public final class DevNetworkChecks {
             DevBossChecks.run(p);
             com.mmorpg.competition.DevPvpChecks.run(p);
             com.mmorpg.economy.DevTradeChecks.run(p);
+            DevCharacterChecks.run(p);      // en dernier : change de personnage, donc de lieu et d'inventaire
             java.nio.file.Files.writeString(java.nio.file.Path.of("../build/reports/blueprints.json"),new com.google.gson.Gson().toJson(ForgeRecipes.all().stream().filter(r->ForgeProgression.required(r)>0).map(ForgeProgression::blueprint).toList()));
             MMORPG.LOGGER.info("[CODEX CHECKS] NETWORK_FORGE PASS: session locks, backup, proxy format, recipes, starters, scrolls, crafting, quests, shared inventory/bank, corruption refusal, handoff");
             Files.createDirectories(Path.of("../build/reports"));

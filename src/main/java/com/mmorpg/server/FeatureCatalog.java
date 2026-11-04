@@ -47,7 +47,8 @@ public final class FeatureCatalog {
         CATEGORIES.put("Social", List.of(
                 new Entry("guildes", "Guildes", "Création et gestion de guilde."),
                 new Entry("chat_guilde", "Chat de guilde", "Canal de discussion."),
-                new Entry("groupes", "Groupes", "Groupes de joueurs.")));
+                new Entry("groupes", "Groupes", "Groupes de joueurs."),
+                new Entry("personnages", "Choix de personnage", "Écran de sélection à la connexion (3 emplacements, jusqu'à 12).")));
         CATEGORIES.put("Collection", List.of(
                 new Entry("familiers", "Familiers", "Compagnons de combat."),
                 new Entry("montures", "Montures", "Chevauchées."),
