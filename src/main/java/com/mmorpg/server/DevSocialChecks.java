@@ -34,7 +34,7 @@ public final class DevSocialChecks {
             long walletBefore=RpgPlayers.get(p).gold;GuildService.action(p,shopPacket(0));
             check(RpgPlayers.get(p).gold==walletBefore-GuildExtras.price(GuildExtras.SHOP.get(0),0),"shop purchase debits wallet into guild bank");
             long afterBuy=RpgPlayers.get(p).gold;GuildService.action(p,shopPacket(7));check(RpgPlayers.get(p).gold==afterBuy,"locked shop item refused");
-            GuildStore.access(server,true,s->{var g=GuildStore.byId(s,id);g.gold=saved[0];g.xp=saved[1];g.questsDone=0;g.trophies.clear();g.quests.clear();g.pins.clear();g.motd="";return null;});RpgPlayers.get(p).gold=saved[2];
+            GuildStore.access(server,true,s->{var g=GuildStore.byId(s,id);g.gold=20000;g.xp=saved[1];g.questsDone=0;g.trophies.clear();g.quests.clear();g.pins.clear();g.motd="";return null;});RpgPlayers.get(p).gold=saved[2];
             GuildService.action(p,packet("upgrade"));check(GuildStore.access(server,false,s->GuildStore.byId(s,id).level)==1,"unbeaten boss blocks level advance");
             GuildStore.access(server,true,s->{var g=GuildStore.byId(s,id);g.xp=1000;g.bosses=1;return null;});GuildService.action(p,packet("upgrade"));
             check(GuildStore.access(server,false,s->{var g=GuildStore.byId(s,id);return g.level==2&&g.gold==10000&&g.xp==0;}),"upgrade atomically spends 10000 gold and required XP after boss");GuildService.action(p,packet("upgrade"));check(GuildStore.access(server,false,s->GuildStore.byId(s,id).gold)==10000,"repeated upgrade never spends again");
