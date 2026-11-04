@@ -4172,6 +4172,7 @@ public final class DevShowcase {
                 mc.level.addEntity(n);
             }
         }
+        if (t >= 62 && t < 140 && mc.gui.screen() instanceof com.mmorpg.client.screen.CharacterSelectScreen) mc.gui.setScreen(null);
         if (t == 140) shot(mc, "pnj_pose");
         if (t == 150) stop(mc);
     }
