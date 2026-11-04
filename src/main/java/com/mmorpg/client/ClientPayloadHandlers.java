@@ -24,6 +24,7 @@ public final class ClientPayloadHandlers {
     @SubscribeEvent
     public static void register(RegisterClientPayloadHandlersEvent event) {
         event.register(com.mmorpg.network.ProxyConnect.TYPE, (payload, context) -> { });
+        event.register(com.mmorpg.security.PacketSigner.SessionKey.TYPE, (payload, context) -> com.mmorpg.security.PacketSigner.clientKey(payload.key()));
         event.register(S2COpenScreen.TYPE, (payload, context) -> openScreen(payload));
         event.register(Payloads.AdminReply.TYPE, (payload, context) -> com.mmorpg.client.screen.AdminScreen.handle(payload));
         event.register(Payloads.Guidance.TYPE,(payload,context)->com.mmorpg.client.hud.GuidanceArrow.receive(payload.data()));

@@ -23,6 +23,7 @@ public final class Audit {
     }
 
     public static void log(UUID uuid, String name, String kind, long amount, String detail) {
+        if (ADMIN.equals(kind)) com.mmorpg.security.AdminJournal.write((name == null ? "?" : name), kind, amount, detail);
         if (!Database.enabled() || !Database.config().audit) return;
         final String id = uuid == null ? null : uuid.toString();
         final String who = name == null ? null : (name.length() > 32 ? name.substring(0, 32) : name);

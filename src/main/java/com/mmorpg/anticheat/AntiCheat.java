@@ -74,7 +74,9 @@ public final class AntiCheat {
 
     public enum Check {
         PACKET_RATE("débit de paquets", 1), PACKET_PERM("paquet interdit", 15), SPEED("vitesse", 6), FLY("vol", 8), REACH("portée", 6),
-        CLICK_RATE("cadence de frappe", 4), BREAK_RATE("cadence de casse", 4), BREAK_REACH("portée de casse", 6);
+        CLICK_RATE("cadence de frappe", 4), BREAK_RATE("cadence de casse", 4), BREAK_REACH("portée de casse", 6),
+        COMMAND_RATE("débit de commandes", 1), SCREEN("interface non ouverte", 5), SIGNATURE("signature de paquet invalide", 15),
+        DUPLICATE("objet dupliqué", 20);
         final String label;
         final int weight;
 
@@ -84,7 +86,7 @@ public final class AntiCheat {
         }
     }
 
-    private static boolean on(ServerPlayer p) {
+    public static boolean on(ServerPlayer p) {
         return FeatureFlags.enabled(p.level().getServer(), "anticheat");
     }
 
@@ -110,6 +112,19 @@ public final class AntiCheat {
                 if (!take(p, name)) return;
             }
             handler.handle(packet, ctx);
+        };
+    }
+
+    /** Comme {@link #gate(CustomPacketPayload.Type, IPayloadHandler)}, avec controle de la signature et de l'interface ouverte. */
+    public static <T extends CustomPacketPayload> IPayloadHandler<T> gate(CustomPacketPayload.Type<T> type,
+            net.minecraft.network.codec.StreamCodec<? super net.minecraft.network.RegistryFriendlyByteBuf, T> codec, IPayloadHandler<T> handler) {
+        final String name = type.id().getPath();
+        com.mmorpg.security.PacketSigner.register(name, codec);
+        final IPayloadHandler<T> inner = gate(type, handler);
+        return (packet, ctx) -> {
+            if (ctx.player() instanceof ServerPlayer p && on(p) && !com.mmorpg.security.PacketSigner.verify(p, name, packet)) return;
+            if (ctx.player() instanceof ServerPlayer p && on(p) && !com.mmorpg.security.ScreenGuard.allowed(p, name)) return;
+            inner.handle(packet, ctx);
         };
     }
 
@@ -169,7 +184,7 @@ public final class AntiCheat {
         if (pr.score < WARN) pr.warned = 0;
     }
 
-    private static void alert(String message) {
+    public static void alert(String message) {
         var server = net.neoforged.neoforge.server.ServerLifecycleHooks.getCurrentServer();
         if (server == null) return;
         for (ServerPlayer op : server.getPlayerList().getPlayers()) if (PlayerAdmin.allowed(op)) op.sendSystemMessage(Component.literal(message));

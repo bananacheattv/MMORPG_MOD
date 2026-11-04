@@ -9,6 +9,8 @@ public final class ClientNet {
     }
 
     public static void send(CustomPacketPayload payload) {
+        var conn = net.minecraft.client.Minecraft.getInstance().getConnection();
+        com.mmorpg.security.PacketSigner.signBeforeSend(payload, conn == null ? null : conn.registryAccess(), ClientPacketDistributor::sendToServer);
         ClientPacketDistributor.sendToServer(payload);
     }
 }

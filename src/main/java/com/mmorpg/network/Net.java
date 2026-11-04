@@ -17,6 +17,10 @@ public final class Net {
         event.registrar("1").optional().playToClient(ProxyConnect.TYPE, ProxyConnect.CODEC);
         PayloadRegistrar r = event.registrar("1");
         r.playToClient(S2COpenScreen.TYPE, S2COpenScreen.CODEC);
+        r.playToClient(com.mmorpg.security.PacketSigner.SessionKey.TYPE, com.mmorpg.security.PacketSigner.SessionKey.CODEC);
+        r.playToServer(com.mmorpg.security.PacketSigner.Sign.TYPE, com.mmorpg.security.PacketSigner.Sign.CODEC, (packet, ctx) -> {
+            if (ctx.player() instanceof ServerPlayer p) com.mmorpg.security.PacketSigner.received(p, packet);
+        });
         r.playToClient(Payloads.Guidance.TYPE,Payloads.Guidance.CODEC);
         r.playToClient(Payloads.SyncPlayer.TYPE, Payloads.SyncPlayer.CODEC);
         r.playToClient(Payloads.Vitals.TYPE, Payloads.Vitals.CODEC);
@@ -80,10 +84,11 @@ public final class Net {
     private static <T extends CustomPacketPayload> void srv(PayloadRegistrar r, CustomPacketPayload.Type<T> type,
             net.minecraft.network.codec.StreamCodec<? super net.minecraft.network.RegistryFriendlyByteBuf, T> codec,
             net.neoforged.neoforge.network.handling.IPayloadHandler<T> handler) {
-        r.playToServer(type, codec, com.mmorpg.anticheat.AntiCheat.gate(type, handler));
+        r.playToServer(type, codec, com.mmorpg.anticheat.AntiCheat.gate(type, codec, handler));
     }
 
     public static void toPlayer(ServerPlayer player, CustomPacketPayload payload) {
+        if (payload instanceof S2COpenScreen s) com.mmorpg.security.ScreenGuard.opened(player, s.screen());
         PacketDistributor.sendToPlayer(player, payload);
     }
 
