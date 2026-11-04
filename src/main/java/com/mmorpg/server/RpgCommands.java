@@ -102,6 +102,22 @@ public final class RpgCommands {
                                     c.getSource().sendSuccess(() -> ok("Classe de " + p.getName().getString() + " : " + cls.label), true);
                                     return 1;
                                 }))))
+                .then(Commands.literal("renommer").then(Commands.argument("joueur", EntityArgument.player())
+                        .then(Commands.argument("emplacement", com.mojang.brigadier.arguments.IntegerArgumentType.integer(1, 12))
+                                .then(Commands.argument("nom", StringArgumentType.greedyString()).executes(c -> {
+                                    ServerPlayer p = EntityArgument.getPlayer(c, "joueur");
+                                    try {
+                                        com.mmorpg.character.Characters.rename(p, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(c, "emplacement") - 1, StringArgumentType.getString(c, "nom").trim());
+                                    } catch (IllegalArgumentException e) {
+                                        c.getSource().sendFailure(Component.literal(e.getMessage()));
+                                        return 0;
+                                    } catch (Exception e) {
+                                        c.getSource().sendFailure(Component.literal("Renommage impossible : " + e.getMessage()));
+                                        return 0;
+                                    }
+                                    c.getSource().sendSuccess(() -> ok("Personnage renommé."), true);
+                                    return 1;
+                                })))))
                 .then(Commands.literal("reset").then(Commands.argument("joueur", EntityArgument.player()).executes(c -> {
                     ServerPlayer p = EntityArgument.getPlayer(c, "joueur");
                     PlayerData data = RpgPlayers.get(p);

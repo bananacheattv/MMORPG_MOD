@@ -17,7 +17,7 @@ public final class PlayerListDisplay {
         var d = RpgPlayers.get(p);
         e.setDisplayName(Component.literal("[" + d.level + "] ").withColor(0xFFD040)
             .append(Component.literal(d.playerClass.label + " ").withColor(d.playerClass.color))
-            .append(p.getName().copy().withColor(0xFFFFFF)));
+            .append(Component.literal(com.mmorpg.character.CharKey.name(p)).withColor(0xFFFFFF)));
     }
     @SubscribeEvent public static void tick(PlayerTickEvent.Post e) {
         if (e.getEntity() instanceof ServerPlayer p && p.tickCount % 100 == 0) refresh(p);

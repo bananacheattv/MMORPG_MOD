@@ -488,7 +488,7 @@ public final class DevShowcase {
         if (MODE.equals("personnages")) {    // ecran de choix de personnage (donnees d'exemple)
             if (tick == 20) {
                 var t = new net.minecraft.nbt.CompoundTag();
-                t.putString("account", me); t.putInt("owned", 3); t.putInt("max", 12); t.putInt("live", 0);
+                t.putString("account", me); t.putInt("owned", 3); t.putInt("max", 12); t.putInt("live", 1);
                 t.putLong("price", 400); t.putLong("credits", 1000); t.putBoolean("selecting", true);
                 var list = new net.minecraft.nbt.ListTag();
                 String[][] rows = {{"Haldar", "3", "51", "Hautes Terres Perdues"}, {"Diendas", "1", "3", "Spawn d'Aeloria"}, {"", "", "", ""}};
@@ -501,6 +501,7 @@ public final class DevShowcase {
                 t.put("slots", list);
                 mc.gui.setScreen(new com.mmorpg.client.screen.CharacterSelectScreen(t));
             }
+            if (tick == 30) try { var f = com.mmorpg.client.screen.CharacterSelectScreen.class.getDeclaredField("sel"); f.setAccessible(true); f.setInt(mc.gui.screen(), 0); } catch (Exception ex) { throw new RuntimeException(ex); }
             if (tick == 60) shot(mc, "personnages");
             if (tick == 70) stop(mc);
             return;

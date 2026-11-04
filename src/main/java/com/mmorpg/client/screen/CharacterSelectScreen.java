@@ -93,6 +93,7 @@ public final class CharacterSelectScreen extends MmoScreen {
                 var s = slot(k);
                 if (s == null || s.getBooleanOr("empty", true) || minecraft.level == null || minecraft.player == null) return null;
                 var p = new RemotePlayer(minecraft.level, minecraft.player.getGameProfile());
+                p.setId(-2000 - k);                              // sans id, le rendu leve « entity ID before ID assignment » (crash au clic)
                 var ops = RegistryOps.create(NbtOps.INSTANCE, minecraft.level.registryAccess());
                 var equip = s.getCompoundOrEmpty("equip");
                 for (String key : equip.keySet()) {

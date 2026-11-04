@@ -65,8 +65,33 @@ public final class Characters {
         }
     }
 
+    /** Le chat et le tab affichent le nom du personnage actif, pas le pseudo du compte. */
+    public static void refreshNames(ServerPlayer p) {
+        p.refreshDisplayName();
+        p.refreshTabListName();
+    }
+
+    /** Renomme le personnage d'un compte (emplacement 0-11). Commande admin. */
+    public static void rename(ServerPlayer target, int slot, String name) throws Exception {
+        require(name.matches("[\\p{L}0-9 '_-]{3,16}"), "Nom : 3 à 16 lettres, chiffres ou espaces.");
+        var server = target.level().getServer();
+        var store = CharacterStore.load(server, target.getUUID());
+        PlayerData d = RpgPlayers.get(target);
+        for (var other : store.slots.values()) require(other.slot == slot || !other.name.equalsIgnoreCase(name), "Ce compte a déjà un personnage de ce nom.");
+        var s = store.slots.get(slot);
+        require(s != null || slot == d.charSlot, "Aucun personnage à cet emplacement.");
+        if (s != null) { s.name = name; store.write(); }
+        if (slot == d.charSlot) {
+            d.charName = name;
+            d.dirty = true;
+            refreshNames(target);
+            savedNow(target);
+        }
+    }
+
     private static void finish(ServerPlayer p) {
         SELECTING.remove(p.getUUID());
+        refreshNames(p);
         if (NetworkConfig.current.enabled && NetworkConfig.current.role == NetworkConfig.Role.LOBBY) {
             // serveur de connexion : le personnage est choisi, on l'envoie sur le serveur de jeu (Spawn s'il a une classe, sinon hub)
             boolean playable = RpgPlayers.get(p).playerClass.isPlayable();
@@ -75,6 +100,7 @@ public final class Characters {
         }
         com.mmorpg.dungeon.DungeonLobby.arriveIfNeeded(p);
         RpgPlayers.onLogin(p);
+        refreshNames(p);
     }
 
     @SubscribeEvent
