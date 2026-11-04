@@ -10,7 +10,7 @@ import net.minecraft.client.input.KeyEvent;
 /** Menu principal a onglets du mod. */
 public abstract class MenuScreen extends MmoScreen {
     public enum Tab {
-        PERSONNAGE("Personnage"), COMPETENCES("Compétences"), QUETES("Quêtes"), GROUPE("Groupe"), GUILDE("Guilde"), ARENE("Arène"), FAMILIERS("Familiers"), MONTURES("Montures"), COSMETIQUES("Cosmétiques"), BESTIAIRE("Bestiaire"), TALENTS("Talents"), METIERS("Métiers"), SUCCES("Succès"), JOURNAL("Journal"), BOUTIQUE("Boutique"), WIKI("Wiki"), CREATIF("Créatif");
+        PERSONNAGE("Personnage"), COMPETENCES("Compétences"), QUETES("Quêtes"), GROUPE("Groupe"), GUILDE("Guilde"), ARENE("Arène"), FAMILIERS("Familiers"), MONTURES("Montures"), COSMETIQUES("Cosmétiques"), BESTIAIRE("Bestiaire"), TALENTS("Talents"), METIERS("Métiers"), SUCCES("Succès"), JOURNAL("Journal"), BOUTIQUE("Boutique"), WIKI("Wiki"), AMIS("Amis"), CREATIF("Créatif");
 
         public final String label;
 
@@ -30,6 +30,7 @@ public abstract class MenuScreen extends MmoScreen {
 
     public static void open(Tab tab) {
         if(tab==Tab.CREATIF){var mc=Minecraft.getInstance();if(mc.player!=null&&ClientData.creativeAllowed&&mc.player.hasInfiniteMaterials())mc.gui.setScreen(new AeloriaCreativeScreen());return;}
+        if(tab==Tab.AMIS){var t=new net.minecraft.nbt.CompoundTag();t.putString("action","open");com.mmorpg.client.ClientNet.send(new com.mmorpg.network.Payloads.SocialAction("friends",t));return;}
         if(tab==Tab.GUILDE||tab==Tab.ARENE||tab==Tab.BOUTIQUE){var t=new net.minecraft.nbt.CompoundTag();t.putString("action","open");com.mmorpg.client.ClientNet.send(new com.mmorpg.network.Payloads.SocialAction(tab==Tab.GUILDE?"guild":tab==Tab.BOUTIQUE?"store":"arena",t));return;}
         if (tab == Tab.PERSONNAGE) {             // personnage + inventaire + equipement (aussi sans classe)
             lastTab = tab;
@@ -60,7 +61,7 @@ public abstract class MenuScreen extends MmoScreen {
             case SUCCES -> new AchievementsScreen();
             case WIKI -> new WikiScreen();
             case JOURNAL -> new JournalScreen();
-            case GUILDE,ARENE,BOUTIQUE,CREATIF -> throw new IllegalStateException("Server-backed screen");
+            case GUILDE,ARENE,BOUTIQUE,AMIS,CREATIF -> throw new IllegalStateException("Server-backed screen");
         });
     }
 

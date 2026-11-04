@@ -77,6 +77,7 @@ public final class FriendService {
             if (!idText.isEmpty()) target = UUID.fromString(idText);
             final UUID other = target;
             switch (action) {
+                case "open" -> { open(p); return; }
                 case "add" -> {
                     String wanted = data.getStringOr("name", "").trim();
                     var found = GuildService.online(server).stream().filter(m -> m.name.equalsIgnoreCase(wanted)).findFirst().orElse(null);

@@ -17,6 +17,8 @@ public final class FriendsScreen extends MmoScreen {
 
     public FriendsScreen(CompoundTag data) { super("Amis"); this.data = data; }
 
+    @Override protected MenuScreen.Tab navActive() { return MenuScreen.Tab.AMIS; }
+
     @Override protected int designHeight() { return 340; }
 
     @Override protected void init() {
