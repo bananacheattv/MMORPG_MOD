@@ -28,6 +28,7 @@ public final class DevCharacterChecks {
 
     public static void run(ServerPlayer p) throws Exception {
         var server = p.level().getServer();
+        check("lobby".equals(com.mmorpg.network.NetworkConfig.serverFor(com.mmorpg.network.NetworkConfig.Role.LOBBY)), "role LOBBY et nom de serveur du proxy");
         var d = RpgPlayers.get(p);
         UUID account = p.getUUID();
         check(d.charSlot == 0 && CharKey.of(p).equals(account), "personnage 0 = cle du compte (migration sans perte)");

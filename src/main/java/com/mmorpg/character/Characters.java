@@ -67,6 +67,12 @@ public final class Characters {
 
     private static void finish(ServerPlayer p) {
         SELECTING.remove(p.getUUID());
+        if (NetworkConfig.current.enabled && NetworkConfig.current.role == NetworkConfig.Role.LOBBY) {
+            // serveur de connexion : le personnage est choisi, on l'envoie sur le serveur de jeu (Spawn s'il a une classe, sinon hub)
+            boolean playable = RpgPlayers.get(p).playerClass.isPlayable();
+            NetworkPlayers.route(p, playable ? NetworkConfig.Role.MAIN : NetworkConfig.Role.HUB, playable ? "spawn" : "hub");
+            return;
+        }
         com.mmorpg.dungeon.DungeonLobby.arriveIfNeeded(p);
         RpgPlayers.onLogin(p);
     }
@@ -271,7 +277,7 @@ public final class Characters {
         store.write();
         savedNow(p);
         PlayerData now = RpgPlayers.get(p);
-        if (!NetworkConfig.town()) sendToHome(p, now);
+        if (!NetworkConfig.town() && NetworkConfig.current.role != NetworkConfig.Role.LOBBY) sendToHome(p, now);
     }
 
     /** Remet le joueur a l'etat d'un tout nouveau personnage (comme une premiere connexion). */
@@ -324,6 +330,7 @@ public final class Characters {
 
     /** Un personnage change n'est pas la ou il etait : retour au Spawn (ou au hub s'il n'a pas de classe). */
     private static void sendToHome(ServerPlayer p, PlayerData d) {
+        if (NetworkConfig.current.enabled && NetworkConfig.current.role == NetworkConfig.Role.LOBBY) return;   // le lobby envoie ensuite vers le serveur de jeu
         if (d.playerClass.isPlayable()) com.mmorpg.hub.HubManager.goToSpawn(p);
         else com.mmorpg.hub.HubManager.goToHub(p);
     }
