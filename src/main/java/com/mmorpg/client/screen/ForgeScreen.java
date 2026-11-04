@@ -277,6 +277,8 @@ public class ForgeScreen extends MmoScreen {
         ItemStack s = inv.getItem(upgradeSlot);
         if (com.mmorpg.mine.ToolRunes.tool(s)) {renderRunes(g,inv,s,dx,dy,dw,dh);return;}
         if (!(s.getItem() instanceof RpgEquipment eq)) return;
+        button(g, dx + dw - 70, dy + 4, 66, 14, affixMode ? "◂ Amélior." : "Affixes ▸", true, 0xFF3A3A6A, () -> affixMode = !affixMode);
+        if (affixMode) {renderAffixes(g, inv, s, eq, dx, dy, dw, dh);return;}
         int cur = RpgEquipment.upgrade(s);
         g.pose().pushMatrix();
         g.pose().translate(dx + 6, dy + 6);
@@ -343,6 +345,51 @@ public class ForgeScreen extends MmoScreen {
         button(g, dx + 6, dy + dh - 22, dw - 12, 16, "Améliorer", ok, 0xFF7A5A1A,
                 () -> ClientNet.send(new Payloads.ForgeAction(Payloads.ForgeAction.UPGRADE, cloverId, slot, pos)));
     }
+    private boolean affixMode;
+    private int rfFrom, rfTo = 1;
+
+    private void renderAffixes(GuiGraphicsExtractor g, Inventory inv, ItemStack s, RpgEquipment eq, int dx, int dy, int dw, int dh) {
+        var def = eq.rpgDef();
+        g.item(s, dx + 6, dy + 6);
+        g.text(font, font.plainSubstrByWidth(s.getHoverName().getString(), dw - 100), dx + 27, dy + 9, def.rarity().color, false);
+        int ty = dy + 26;
+        var aff = com.mmorpg.item.Affixes.affixes(s);
+        g.text(font, "Affixes", dx + 6, ty, Ui.GOLD, false);
+        ty += 11;
+        if (aff.isEmpty()) {g.text(font, "Aucun", dx + 10, ty, Ui.MUTED, false);ty += 11;}
+        for (var e : aff.entrySet()) {g.text(font, "✦ " + e.getKey().format(e.getValue(), true) + " " + e.getKey().label, dx + 10, ty, 0xFF7FE0FF, false);ty += 11;}
+        Item stone = ModItems.PIERRE_AMELIORATION.get();
+        int haveStone = count(inv, stone);
+        long haveGold = ClientData.DATA.gold;
+        final int slot = upgradeSlot;
+        int by = dy + dh - 22;
+        // reforge : choix des statistiques
+        java.util.List<com.mmorpg.rpg.Stat> from = new java.util.ArrayList<>();
+        for (var st : com.mmorpg.rpg.Stat.values()) if (def.stats().get(st) > 0) from.add(st);
+        com.mmorpg.rpg.Stat[] all = com.mmorpg.rpg.Stat.values();
+        if (!from.isEmpty()) {
+            rfFrom = Math.floorMod(rfFrom, from.size());
+            var f = from.get(rfFrom);
+            rfTo = Math.floorMod(rfTo, all.length);
+            if (all[rfTo] == f) rfTo = Math.floorMod(rfTo + 1, all.length);
+            var t = all[rfTo];
+            int rcost = 80 + def.level() * 15;
+            int half = (dw - 18) / 2;
+            button(g, dx + 6, by - 36, half, 14, "De : " + f.label, true, 0xFF4A3A2A, () -> rfFrom++);
+            button(g, dx + 12 + half, by - 36, half, 14, "Vers : " + t.label, true, 0xFF4A3A2A, () -> rfTo++);
+            var cur = com.mmorpg.item.Affixes.reforge(s);
+            if (cur != null) g.text(font, "Reforgé : " + cur[0].label + " → " + cur[1].label, dx + 6, by - 52, 0xFFC7A6FF, false);
+            final String spec = f.name() + ">" + t.name();
+            button(g, dx + 6, by - 18, dw - 12, 16, "Reforger 40 % · 1 pierre + " + rcost + " or", haveStone >= 1 && haveGold >= rcost, 0xFF5A3A7A,
+                    () -> ClientNet.send(new Payloads.ForgeAction(Payloads.ForgeAction.REFORGE, spec, slot, pos)));
+        }
+        if (def.slot() == com.mmorpg.item.RpgItemDef.Slot.WEAPON && com.mmorpg.item.Affixes.count(def) > 0) {
+            int cost = 50 + def.level() * 10;
+            button(g, dx + 6, by, dw - 12, 16, "Relancer affixes · 1 pierre + " + cost + " or", haveStone >= 1 && haveGold >= cost, 0xFF1A5A7A,
+                    () -> ClientNet.send(new Payloads.ForgeAction(Payloads.ForgeAction.REROLL, "", slot, pos)));
+        }
+    }
+
     private void renderRunes(GuiGraphicsExtractor g,Inventory inv,ItemStack tool,int x,int y,int w,int h){
         g.item(tool,x+6,y+6);g.text(font,font.plainSubstrByWidth(tool.getHoverName().getString(),w-32),x+27,y+9,Ui.GOLD,false);
         g.text(font,"Runes d’outil · 5 rangs par rune",x+6,y+28,Ui.TEXT,false);
