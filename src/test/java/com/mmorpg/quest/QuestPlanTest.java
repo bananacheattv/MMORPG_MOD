@@ -135,6 +135,7 @@ class QuestPlanTest {
         for (var g : QuestNpcPlan.GIVERS) assertTrue(groups.add(g.group()), "groupe de PNJ en double : " + g.group());
         groups.add("maitre_classes"); // PNJ du hub (HubBuilder)
         groups.add(QuestNpcPlan.GROUP_TUTORIAL); // la Mascotte du tutoriel
+        groups.add("histoire"); // histoire principale : rendue automatiquement, sans PNJ
         for (var e : QUESTS.entrySet()) {
             assertFalse(e.getValue().giver.isEmpty(), e.getKey() + " sans donneur");
             assertTrue(groups.contains(e.getValue().giver), e.getKey() + " : donneur inconnu " + e.getValue().giver);

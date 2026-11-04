@@ -32,6 +32,7 @@ public final class FeatureCatalog {
                 new Entry("boutique_pvp", "Boutique PvP", "Récompenses de l'arène."),
                 new Entry("hdv", "Hôtel des ventes", "Ventes entre joueurs."),
                 new Entry("banque", "Banque", "Coffre et or en banque."),
+                new Entry("courrier", "Courrier", "Boîtes aux lettres : lettres, or et objets."),
                 new Entry("marchands", "Marchands", "PNJ marchands."),
                 new Entry("echange", "Échanges", "Commande /trade."),
                 new Entry("sacs", "Sacs à dos", "Sacs et stockage portable.")));

@@ -171,11 +171,12 @@ public final class Characters {
     }
 
     /** Envoie (ou renvoie) l'ecran avec l'etat a jour. */
-    public static void open(ServerPlayer p, String status) throws java.io.IOException {
+    public static void open(ServerPlayer p, String status) throws Exception {
         var server = p.level().getServer();
         PlayerData d = RpgPlayers.get(p);
         var store = CharacterStore.load(server, p.getUUID());
-        boolean changed = false;
+        boolean changed = purgeExpired(p, store);
+        d = RpgPlayers.get(p);
         if (d.charSlot >= 0) {
             var live = store.slots.computeIfAbsent(d.charSlot, k -> { var s = new CharacterStore.Slot(); s.slot = k; return s; });
             refresh(p, live);
@@ -201,6 +202,7 @@ public final class Characters {
             if (s != null) {
                 e.putString("name", s.name); e.putInt("cls", s.cls); e.putInt("level", s.level);
                 e.putString("place", s.place); e.put("equip", s.equip.copy());
+                e.putLong("deleteIn", s.deleteAt > 0 ? Math.max(1, s.deleteAt - System.currentTimeMillis()) : 0);
             }
             list.add(e);
         }
@@ -228,7 +230,11 @@ public final class Characters {
                 }
                 case "delete" -> {
                     delete(p, slot, data.getStringOr("confirm", "").trim());
-                    open(p, "Personnage supprimé.");
+                    open(p, "Suppression dans 24 h : tu peux l'annuler d'ici là.");
+                }
+                case "undelete" -> {
+                    undelete(p, slot);
+                    open(p, "Suppression annulée.");
                 }
                 case "buy" -> {
                     UUID req = BUY_REQUEST.computeIfAbsent(p.getUUID(), k -> UUID.randomUUID());
@@ -268,9 +274,10 @@ public final class Characters {
         var server = p.level().getServer();
         require(slot >= 0 && slot < ownedSlots(server, p.getUUID()), "Emplacement indisponible.");
         PlayerData d = RpgPlayers.get(p);
-        if (slot == d.charSlot) return;                      // le personnage deja charge : on joue tel quel
         var store = CharacterStore.load(server, p.getUUID());
         var target = store.slots.get(slot);
+        require(target == null || target.deleteAt == 0, "Ce personnage est en cours de suppression : annule-la d'abord.");
+        if (slot == d.charSlot) return;                      // le personnage deja charge : on joue tel quel
         require(target != null && target.snapshot != null, "Ce personnage est vide.");
         stash(p, store);
         com.mmorpg.server.MountManager.despawn(p);
@@ -330,23 +337,47 @@ public final class Characters {
         p.inventoryMenu.broadcastChanges();
     }
 
+    /** Delai d'annulation avant la suppression definitive d'un personnage. */
+    public static final long DELETE_DELAY_MS = 24L * 60 * 60 * 1000;
+
+    /** Demande la suppression : le personnage est marque, puis efface pour de bon apres 24 h (annulable). */
     private static void delete(ServerPlayer p, int slot, String confirm) throws Exception {
         var server = p.level().getServer();
         var store = CharacterStore.load(server, p.getUUID());
         var s = store.slots.get(slot);
         require(s != null, "Emplacement vide.");
+        require(s.deleteAt == 0, "Suppression déjà demandée.");
         require(confirm.equalsIgnoreCase(s.name), "Écris le nom exact du personnage pour confirmer.");
-        PlayerData d = RpgPlayers.get(p);
-        UUID key = CharKey.key(p.getUUID(), slot);
-        com.mmorpg.guild.GuildService.leaveForDelete(server, key);   // refuse si chef d'une guilde qui a d'autres membres
-        store.slots.remove(slot);
+        com.mmorpg.guild.GuildService.leaveForDelete(server, CharKey.key(p.getUUID(), slot));   // refuse si chef d'une guilde qui a d'autres membres
+        s.deleteAt = System.currentTimeMillis() + DELETE_DELAY_MS;
         store.write();
-        if (slot == d.charSlot) {                                   // personnage joue : on repart d'un etat vide, sans personnage actif
-            com.mmorpg.server.MountManager.despawn(p);
-            com.mmorpg.server.PetManager.despawn(p);
-            blank(p, -1, "");
-            savedNow(p);
+    }
+
+    private static void undelete(ServerPlayer p, int slot) throws Exception {
+        var store = CharacterStore.load(p.level().getServer(), p.getUUID());
+        var s = store.slots.get(slot);
+        require(s != null && s.deleteAt > 0, "Aucune suppression en attente.");
+        s.deleteAt = 0;
+        store.write();
+    }
+
+    /** Efface pour de bon les personnages dont le delai de 24 h est ecoule. Renvoie vrai si la fiche a change. */
+    private static boolean purgeExpired(ServerPlayer p, CharacterStore store) throws Exception {
+        long now = System.currentTimeMillis();
+        boolean changed = false;
+        for (var s : new java.util.ArrayList<>(store.slots.values())) {
+            if (s.deleteAt <= 0 || s.deleteAt > now) continue;
+            store.slots.remove(s.slot);
+            changed = true;
+            if (s.slot == RpgPlayers.get(p).charSlot) {            // personnage joue : on repart d'un etat vide, sans personnage actif
+                com.mmorpg.server.MountManager.despawn(p);
+                com.mmorpg.server.PetManager.despawn(p);
+                blank(p, -1, "");
+                savedNow(p);
+            }
         }
+        if (changed) store.write();
+        return false;
     }
 
     private static void savedNow(ServerPlayer p) {

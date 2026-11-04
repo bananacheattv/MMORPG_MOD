@@ -28,6 +28,8 @@ public final class ModBlocks {
             p -> p.mapColor(MapColor.WOOD).strength(3f, 1200f).sound(SoundType.WOOD).lightLevel(s -> 8).noOcclusion().pushReaction(PushReaction.IMMOVEABLE));
     public static final DeferredBlock<com.mmorpg.block.QuetesHebdoBlock> QUETES_HEBDO = BLOCKS.registerBlock("quetes_hebdo", com.mmorpg.block.QuetesHebdoBlock::new,
             p -> p.mapColor(MapColor.WOOD).strength(3f, 1200f).sound(SoundType.WOOD).lightLevel(s -> 8).noOcclusion().pushReaction(PushReaction.IMMOVEABLE));
+    public static final DeferredBlock<com.mmorpg.block.BoiteAuxLettresBlock> BOITE_AUX_LETTRES = BLOCKS.registerBlock("boite_aux_lettres", com.mmorpg.block.BoiteAuxLettresBlock::new,
+            p -> p.mapColor(MapColor.COLOR_BLUE).strength(3f, 1200f).sound(SoundType.METAL).lightLevel(s -> 6).noOcclusion().pushReaction(PushReaction.IMMOVEABLE));
     public static final DeferredBlock<TeleporterBlock> TELEPORTEUR = BLOCKS.registerBlock("teleporteur", TeleporterBlock::new,
             p -> p.mapColor(MapColor.QUARTZ).strength(3f, 1200f).sound(SoundType.AMETHYST).lightLevel(s -> 12).noOcclusion()
                     .pushReaction(PushReaction.IMMOVEABLE));
@@ -80,7 +82,7 @@ public final class ModBlocks {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, MMORPG.MODID);
     /** Entite des blocs fonctionnels de structure (rendu des modeles 3D). */
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<StructureBlockEntity>> STRUCTURE = BLOCK_ENTITIES.register("structure",
-            () -> new BlockEntityType<>(StructureBlockEntity::new, FORGE_ARCANIQUE.get(), TELEPORTEUR.get(), AUTEL_INVOCATION.get(), PRESSE_COMPRESSION.get(), BANQUE.get(), HDV.get(), QUETES_HEBDO.get()));
+            () -> new BlockEntityType<>(StructureBlockEntity::new, FORGE_ARCANIQUE.get(), TELEPORTEUR.get(), AUTEL_INVOCATION.get(), PRESSE_COMPRESSION.get(), BANQUE.get(), HDV.get(), QUETES_HEBDO.get(), BOITE_AUX_LETTRES.get()));
 
     /** Caisses : roue d'ouverture animee (etat synchronise). */
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<com.mmorpg.block.crate.CrateBlockEntity>> CRATE = BLOCK_ENTITIES.register("caisse",

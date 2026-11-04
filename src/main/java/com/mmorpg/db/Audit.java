@@ -16,13 +16,16 @@ public final class Audit {
     public static final String LOGIN = "login", LOGOUT = "logout", LEVEL_UP = "level_up", DEATH = "death", BOSS_KILL = "boss_kill",
             DUNGEON_WIN = "dungeon_win", BANK_DEPOSIT = "bank_deposit", BANK_WITHDRAW = "bank_withdraw", AUCTION_LIST = "auction_list",
             AUCTION_BUY = "auction_buy", AUCTION_SALE = "auction_sale", SHOP_BUY = "shop_buy", SHOP_SELL = "shop_sell", QUEST_DONE = "quest_done",
-            UNLOCK = "unlock", MOUNT = "mount", TRANSFER = "transfer", GOLD_SPENT = "gold_spent", ADMIN = "admin", ANTICHEAT = "anticheat";
+            UNLOCK = "unlock", MOUNT = "mount", TRANSFER = "transfer", GOLD_SPENT = "gold_spent", ADMIN = "admin", ANTICHEAT = "anticheat",
+            MAIL_SEND = "mail_send", MAIL_CLAIM = "mail_claim";
 
     public static void log(ServerPlayer p, String kind, long amount, String detail) {
         log(p == null ? null : p.getUUID(), p == null ? null : p.getGameProfile().name(), kind, amount, detail);
     }
 
     public static void log(UUID uuid, String name, String kind, long amount, String detail) {
+        if (ADMIN.equals(kind)) com.mmorpg.security.AdminJournal.write((name == null ? "?" : name), kind, amount, detail);
+        com.mmorpg.moderation.Journal.add(uuid, name, kind, amount, detail);
         if (!Database.enabled() || !Database.config().audit) return;
         final String id = uuid == null ? null : uuid.toString();
         final String who = name == null ? null : (name.length() > 32 ? name.substring(0, 32) : name);

@@ -524,6 +524,13 @@ public final class DevShowcase {
             if (tick == 35) stop(mc);
             return;
         }
+        if (MODE.equals("histoire")) {       // cinematique d'histoire principale
+            if (tick == 5) mc.gui.setScreen(new com.mmorpg.client.screen.StorySceneScreen("hist_3"));
+            if (tick == 45) shot(mc, "histoire_titre");
+            if (tick == 150) shot(mc, "histoire_repliques");
+            if (tick == 160) stop(mc);
+            return;
+        }
         if (MODE.equals("offre_quete")) {    // fenetre de proposition automatique de quete
             if (tick == 5) {
                 var q = new net.minecraft.nbt.CompoundTag();
@@ -726,6 +733,10 @@ public final class DevShowcase {
         }
         if (MODE.equals("marche")) {          // Marche d'Aeloria : reconstruction du hub puis visite du quartier
             marchePhase(mc, me);
+            return;
+        }
+        if (MODE.equals("courrier")) {          // boite aux lettres : modele 3D (drapeau baisse puis leve), interface courrier et ecriture
+            courrierPhase(mc, me);
             return;
         }
         if (MODE.equals("services")) {          // banque et hotel des ventes : modeles 3D, interfaces, depot, vente, achat, comptoir
@@ -1391,6 +1402,10 @@ public final class DevShowcase {
             mascotPhase(mc, me);
             return;
         }
+        if (MODE.equals("qol")) {             // minimap, carte, journal, recherche et tri d'inventaire
+            qolPhase(mc);
+            return;
+        }
         if (MODE.equals("familiers")) {
             petsPhase(mc, me);
             return;
@@ -2032,6 +2047,7 @@ public final class DevShowcase {
             pl.onUpdateAbilities();
             pl.teleportTo(lv, lay.x0() + com.mmorpg.plains.PlainsLayout.PLAZA_X + 0.5, com.mmorpg.plains.PlainsLayout.BASE + 1, com.mmorpg.plains.PlainsLayout.Z0 + com.mmorpg.plains.PlainsLayout.PLAZA_Z + 4.5, java.util.Set.of(), 0F, 0F, true);
             var d = com.mmorpg.server.RpgPlayers.get(pl);
+            d.playerClass = com.mmorpg.rpg.PlayerClass.GUERRIER;
             d.mounts.add(type.id);
             d.nextMountTick = 0;
             d.pvpUntilTick = 0;
@@ -2048,6 +2064,16 @@ public final class DevShowcase {
             boolean ok = com.mmorpg.server.MountManager.summon(pl, type.id);
             MMORPG.LOGGER.info("[MMORPG] MONTURES {} : invoquee = {}, en selle = {}", type.id, ok, pl.isPassenger());
         });
+        if (rel == 23 && type.seats.length > 1) srv.execute(() -> {          // montures partagees : passagers factices pour voir tous les sieges
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            if (pl.getVehicle() instanceof com.mmorpg.entity.MountEntity me2)
+                for (int i = 1; i < type.seats.length; i++) {
+                    var v = com.mmorpg.registry.ModEntities.TRAINING_DUMMY.get().create(pl.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                    com.mmorpg.entity.MountEntity.TEST_PASSENGERS.add(v.getUUID()); v.setPos(me2.getX(), me2.getY(), me2.getZ()); v.setNoAi(true);
+                    pl.level().addFreshEntity(v); v.startRiding(me2, true, true);
+                }
+        });
+        if (rel == 80) srv.execute(() -> { var pl = srv.getPlayerList().getPlayerByName(me); if (pl.getVehicle() != null) pl.getVehicle().getPassengers().stream().filter(e -> com.mmorpg.entity.MountEntity.TEST_PASSENGERS.contains(e.getUUID())).toList().forEach(net.minecraft.world.entity.Entity::discard); });
         if (rel == 26) mc.execute(() -> mc.options.setCameraType(CameraType.THIRD_PERSON_BACK));
         if (rel == 44) shot(mc, "mont_selle_dos_" + type.id);
         if (rel == 48) mc.execute(() -> mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT));
@@ -2546,6 +2572,68 @@ public final class DevShowcase {
             stop(mc);
         }
         if (t > end + 6000) stop(mc);
+    }
+
+    /** Boite aux lettres : 3D (sans puis avec courrier), liste des lettres, onglet d'ecriture. Tout est pose cote serveur (pas de commandes). */
+    private static void courrierPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) { mc.getWindow().setWindowed(1280, 720); mc.options.guiScale().set(2); mc.resizeGui(); }
+        if (tick == 8 || tick == 300) srv.execute(() -> {          // quitte l'ecran de choix de personnage et la cinematique de connexion
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            if (pl == null) return;
+            if (com.mmorpg.character.Characters.selecting(pl)) {
+                var t = new net.minecraft.nbt.CompoundTag();
+                t.putString("action", "play");
+                t.putInt("slot", 0);
+                com.mmorpg.character.Characters.action(pl, t);
+            }
+            com.mmorpg.hub.CinematicManager.finish(pl);
+        });
+        if (tick == 12 && mc.gui.screen() instanceof com.mmorpg.client.screen.CharacterSelectScreen) mc.gui.setScreen(null);
+        int k = tick - 700;      // le serveur logiciel est tres en retard au demarrage : on attend
+        structOrigin = new net.minecraft.core.BlockPos(0, 181, 0);
+        net.minecraft.core.BlockPos box = structOrigin.offset(0, 0, -6);
+        if (k == 20) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            if (pl == null) return;
+            var lv = srv.overworld();
+            for (int x = -12; x <= 12; x++) for (int z = -12; z <= 12; z++) {
+                lv.setBlock(new net.minecraft.core.BlockPos(x, 180, z), net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState(), 3);
+                for (int y = 181; y <= 190; y++) lv.setBlock(new net.minecraft.core.BlockPos(x, y, z), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+            }
+            lv.setBlock(box, com.mmorpg.registry.ModBlocks.BOITE_AUX_LETTRES.get().defaultBlockState().setValue(com.mmorpg.block.structure.MultiblockMasterBlock.FACING, net.minecraft.core.Direction.SOUTH), 3);
+            com.mmorpg.block.structure.Multiblocks.placeParts(lv, box, com.mmorpg.block.structure.MultiblockKind.BOITE_AUX_LETTRES, net.minecraft.core.Direction.SOUTH);
+            pl.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+            pl.teleportTo(lv, 0.5, 182.0, 0.5, java.util.Set.of(), 180f, 8f, true);
+        });
+        if (k == 45) {
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+            if (!mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        }
+        if (k == 80) shot(mc, "200_boite_vide");
+        if (k == 90) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            if (pl == null) return;
+            com.mmorpg.economy.Mail.deliver(srv, pl.getUUID(), null, "Hôtel des ventes", "Achat : Épée de fer x1 (vendeur Marchand)", 0,
+                    java.util.List.of(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD)), true);
+            com.mmorpg.economy.Mail.deliver(srv, pl.getUUID(), pl.getUUID(), "Aldric", "Merci pour l'aide, voici ta part !", 250,
+                    java.util.List.of(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND, 3)), false);
+        });
+        if (k == 190) shot(mc, "201_boite_courrier");
+        if (k == 200) {
+            if (mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                if (pl != null) com.mmorpg.economy.Mail.open(pl, box);
+            });
+        }
+        if (k == 280) shot(mc, "202_courrier_recu");
+        if (k == 285 && mc.gui.screen() instanceof com.mmorpg.client.screen.MailScreen s) s.previewTab(1);
+        if (k == 340) shot(mc, "203_courrier_ecrire");
+        if (k == 350) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (courrier)");
+            stop(mc);
+        }
     }
 
     /** Banque et hotel des ventes : vue des modeles 3D puis actions reelles (messages serveur). */
@@ -4112,6 +4200,38 @@ public final class DevShowcase {
         if (t == 140) shot(mc, "mascotte");
         if (t == 150) stop(mc);
     }
+
+    private static int qolTick, qolWait;
+    private static void qolPhase(Minecraft mc) {
+        if (com.mmorpg.client.LoadingClient.active()) { qolWait = 0; return; }
+        if (mc.gui.screen() instanceof com.mmorpg.client.screen.CharacterSelectScreen cs && qolTick == 0) {
+            if (++qolWait == 40) try { var m = cs.getClass().getDeclaredMethod("play"); m.setAccessible(true); m.invoke(cs); } catch (Exception ex) { throw new RuntimeException(ex); }
+            return;
+        }
+        if (qolTick == 0 && mc.gui.screen() == null && mc.level != null) { if (com.mmorpg.client.cinematic.CinematicClient.active()) { qolWait = 0; return; } if (++qolWait < 700) return; } else if (qolTick == 0) return;
+        int t = ++qolTick;
+        if (t == 5) mc.getWindow().setWindowed(1280, 720);
+        if (t == 100) { mc.player.setYRot(45f); shot(mc, "qol_minimap"); }
+        if (t == 110) { com.mmorpg.client.QolClient.receive(pingTag(mc)); com.mmorpg.client.QolClient.receive(dpsTag("VisualChecks", 412, 9000)); com.mmorpg.client.QolClient.receive(dpsTag("Kael", 238, 5200)); }
+        if (t == 130) shot(mc, "qol_hud_ping_dps");
+        if (t == 140) mc.gui.setScreen(new com.mmorpg.client.screen.WorldMapScreen());
+        if (t == 200) shot(mc, "qol_carte");
+        if (t == 210) mc.gui.setScreen(new com.mmorpg.client.screen.JournalScreen());
+        if (t == 235) { ClientData.DATA.counters.put("kills", 1432L); ClientData.DATA.counters.put("j_dmg_dealt", 2845000L); ClientData.DATA.counters.put("j_minutes", 725L); ClientData.DATA.kills.put("loup", 310); ClientData.DATA.kills.put("gobelin", 120); }
+        if (t == 260) shot(mc, "qol_journal");
+        if (t == 265) { var srv = mc.getSingleplayerServer(); srv.execute(() -> { var sp = srv.getPlayerList().getPlayers().get(0); var inv = sp.getInventory();
+            inv.setItem(10, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.STICK, 5)); inv.setItem(14, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.APPLE, 3));
+            inv.setItem(20, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.STICK, 7)); inv.setItem(25, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.BREAD, 2)); inv.setItem(30, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.APPLE, 9)); }); }
+        if (t == 270) { mc.gui.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player)); }
+        if (t == 300) shot(mc, "qol_inventaire");
+        if (t == 305) com.mmorpg.client.InventoryTools.testQuery("e");
+        if (t == 330) shot(mc, "qol_recherche");
+        if (t == 335) com.mmorpg.client.QolClient.action("sort_inv");
+        if (t == 380) shot(mc, "qol_tri");
+        if (t == 390) stop(mc);
+    }
+    private static net.minecraft.nbt.CompoundTag pingTag(Minecraft mc) { var c=new net.minecraft.nbt.CompoundTag(); c.putString("kind","ping"); c.putString("name","Kael"); c.putInt("x",mc.player.getBlockX()+12); c.putInt("y",mc.player.getBlockY()); c.putInt("z",mc.player.getBlockZ()+10); return c; }
+    private static net.minecraft.nbt.CompoundTag dpsTag(String n, float dps, long total) { var c=new net.minecraft.nbt.CompoundTag(); c.putString("kind","dps"); c.putString("name",n); c.putFloat("dps",dps); c.putLong("total",total); return c; }
 
     private static void petsPhase(Minecraft mc, String me) {
         if (tick == 5) mc.getWindow().setWindowed(1280, 720);

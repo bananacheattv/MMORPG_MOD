@@ -43,6 +43,8 @@ public record S2COpenScreen(int screen, CompoundTag extra) implements CustomPack
     public static final int ADMIN_FEATURES = 35;
     /** Proposition automatique de quete (fenetre « Accepter la quete »). */
     public static final int QUEST_OFFER = 36;
+    /** Scene cinematique de l'histoire principale (StoryBook). */
+    public static final int STORY_SCENE = 61;
     /** Invitation à rejoindre le boss de guilde lancé (Accepter / Refuser). */
     public static final int GUILD_RAID_INVITE = 37;
     /** Reglage du niveau d'un bloc de lumiere invisible. */
@@ -51,6 +53,16 @@ public record S2COpenScreen(int screen, CompoundTag extra) implements CustomPack
     public static final int DUNGEON_SETUP = 39;
     /** Selection de personnage a la connexion. */
     public static final int CHARACTERS = 40;
+    /** Carte du donjon (salles découvertes, clés, chrono). */
+    public static final int DUNGEON_MAP = 70;
+    /** Panneau de moderation complet (/moderation). */
+    public static final int MODERATION = 80;
+    /** Liste d'amis avec statuts (/amis). */
+    public static final int FRIENDS = 41;
+    /** Compte à rebours de photo de groupe (pas d'écran). */
+    public static final int PHOTO = 42;
+    /** Boite aux lettres (courrier) et nombre de lettres en attente (drapeau des boites, pas d'ecran). */
+    public static final int MAIL = 90, MAIL_STATE = 91;
     public static final int SPAWN_EDITOR = 19;
     public static final int ADVENTURE_SUMMARY = 20;
     public static final int MERCHANT_EDITOR = 21;

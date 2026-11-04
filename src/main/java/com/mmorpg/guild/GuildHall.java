@@ -18,7 +18,9 @@ public final class GuildHall {
     private static final Map<UUID,UUID> VISITORS=new HashMap<>();
     private static final Map<UUID,com.mmorpg.competition.CompetitionWorld.Job> BUILDS=new HashMap<>();
     public static BlockPos center(GuildStore.Guild g){return new BlockPos(500+g.hallIndex*128,100,500);}
-    public static DyeColor color(String key){return switch(key){case "AZUR"->DyeColor.LIGHT_BLUE;case "EMERAUDE"->DyeColor.GREEN;case "CARMIN"->DyeColor.RED;case "OR"->DyeColor.YELLOW;default->DyeColor.PURPLE;};}
+    public static DyeColor color(String key){return GuildCrest.dye(key);}
+    /** Stations du hall (décalage par rapport au centre, y = 0) : banque, coffre, quêtes, boutique. */
+    private static final int[][] STATIONS={{-10,-3},{-10,3},{10,-3},{10,3}};
     public static void enter(ServerPlayer p){
         if(com.mmorpg.competition.ArenaManager.active(p)||com.mmorpg.competition.GuildRaids.of(p.getUUID())!=null||com.mmorpg.dungeon.InstanceManager.containsPlayer(p))throw new IllegalArgumentException("Termine ton activité avant de rejoindre le hall.");
         if(com.mmorpg.competition.CompetitionTravel.route(p,"guild-hall"))return;
@@ -40,9 +42,9 @@ public final class GuildHall {
         for(int z=-4;z<=4;z++)for(int x=-1;x<=1;x++)j.add(c.getX()+x,99,c.getZ()+z,Blocks.CONCRETE.pick(color(g.banner)));
         // A pair of raised, coloured banners forms the guild crest above its council table.
         for(int x:new int[]{-3,3}){for(int y=0;y<7;y++)j.add(c.getX()+x,100+y,c.getZ()-10,Blocks.DARK_OAK_FENCE);for(int z=-10;z<=-8;z++)for(int y=104;y<=106;y++)j.add(c.getX()+x,y,c.getZ()+z,Blocks.CONCRETE.pick(color(g.banner)));}
+        for(int x=-4;x<=4;x++)for(int y=-1;y<=5;y++)j.add(c.getX()+x,103+y,c.getZ()-17,Blocks.CONCRETE.pick(color(g.banner)));
         for(int x=-3;x<=3;x++)for(int y=0;y<=4;y++){
-            boolean crest=switch(g.bannerPattern){case "SOLEIL"->x*x+(y-2)*(y-2)<=5;case "LUNE"->x*x+(y-2)*(y-2)<=6&&x<=0;case "ARBRE"->y<2?x==0:Math.abs(x)<=4-y;case "DRAGON"->Math.abs(x)==y/2||y==1;default->Math.abs(x)+Math.abs(y-2)<=2;};
-            if(crest)j.add(c.getX()+x,103+y,c.getZ()-17,Blocks.CONCRETE.pick(color(g.banner)));
+            if(GuildCrest.shape(g.bannerPattern,x,y))j.add(c.getX()+x,103+y,c.getZ()-17,Blocks.CONCRETE.pick(color(g.banner2)));
         }
         for(int x=-4;x<=4;x++)for(int z=-2;z<=2;z++)j.add(c.getX()+x,100,c.getZ()-8+z,Blocks.DARK_OAK_PLANKS);
         for(int i=0;i<10;i++){int x=-14+(i%5)*7,z=i<5?12:-14;for(int y=0;y<2;y++)j.add(c.getX()+x,100+y,c.getZ()+z,Blocks.CHISELED_DEEPSLATE);
@@ -50,12 +52,38 @@ public final class GuildHall {
         if(g.hallLevel>=1)for(int x=-4;x<=4;x++)j.add(c.getX()+x,100,c.getZ()+r-4,Blocks.BOOKSHELF);
         if(g.hallLevel>=2)for(int x:new int[]{-r+5,r-5})j.add(c.getX()+x,100,c.getZ(),Blocks.ENCHANTING_TABLE);
         if(g.hallLevel>=3)for(int z=-4;z<=4;z++)j.add(c.getX()+r-5,100,c.getZ()+z,Blocks.CHISELED_QUARTZ_BLOCK);
+        stations(j,c);annex(j,g,c,r);
         return j;
+    }
+    private static void stations(com.mmorpg.competition.CompetitionWorld.Job j,BlockPos c){
+        Block[] blocks={Blocks.GOLD_BLOCK,Blocks.BARREL,Blocks.LECTERN,Blocks.EMERALD_BLOCK};
+        for(int i=0;i<4;i++){int x=STATIONS[i][0],z=STATIONS[i][1];j.add(c.getX()+x,99,c.getZ()+z,Blocks.SEA_LANTERN);j.add(c.getX()+x,100,c.getZ()+z,blocks[i]);}
+    }
+    /** Salle des trophées : un piédestal par trophée du catalogue, doré une fois débloqué. */
+    private static void annex(com.mmorpg.competition.CompetitionWorld.Job j,GuildStore.Guild g,BlockPos c,int r){
+        for(int x=-14;x<=14;x++)for(int z=r+1;z<=r+14;z++)for(int y=-2;y<=10;y++){
+            Block block=y<0?Blocks.POLISHED_DEEPSLATE:y==10?Blocks.DARK_OAK_PLANKS:Math.abs(x)==14||z==r+14?Blocks.DEEPSLATE_BRICKS:Blocks.AIR;
+            j.add(c.getX()+x,c.getY()+y,c.getZ()+z,block);
+        }
+        for(int x=-1;x<=1;x++)for(int y=0;y<=3;y++)j.add(c.getX()+x,c.getY()+y,c.getZ()+r,Blocks.AIR);
+        for(int x=-1;x<=1;x++)j.add(c.getX()+x,c.getY()+4,c.getZ()+r,Blocks.GILDED_BLACKSTONE);
+        for(int x=-12;x<=12;x+=6)for(int z:new int[]{r+3,r+7,r+11}){j.add(c.getX()+x,99,c.getZ()+z,Blocks.SEA_LANTERN);j.add(c.getX()+x,109,c.getZ()+z,Blocks.SHROOMLIGHT);}
+        var all=GuildExtras.catalog();
+        for(int i=0;i<all.size();i++){var t=all.get(i);int x=-9+2*(i%10),z=r+(i<10?4:10);boolean earned=g.trophies.contains(t.id());
+            j.add(c.getX()+x,100,c.getZ()+z,Blocks.CHISELED_DEEPSLATE);
+            if(earned){j.add(c.getX()+x,99,c.getZ()+z,Blocks.SEA_LANTERN);j.add(c.getX()+x,101,c.getZ()+z,t.boss()?(t.id().equals("BOSS9")?Blocks.DRAGON_HEAD:Blocks.SKELETON_SKULL):Blocks.GOLD_BLOCK);}}
     }
     public static void labels(ServerLevel level,GuildStore.Guild guild){
         var c=center(guild);String tag="aeloria_guild_"+guild.id;
-        for(var entity:level.getEntitiesOfClass(net.minecraft.world.entity.Display.TextDisplay.class,new net.minecraft.world.phys.AABB(c).inflate(40),e->e.entityTags().contains(tag)))entity.discard();
+        for(var entity:level.getEntitiesOfClass(net.minecraft.world.entity.Display.TextDisplay.class,new net.minecraft.world.phys.AABB(c).inflate(70),e->e.entityTags().contains(tag)))entity.discard();
         text(level,c.offset(0,7,-16),guild.name+" · "+guild.bannerPattern,tag,.8f);
+        String board=(guild.motd.isEmpty()?"Aucun message du jour":guild.motd);for(var pin:guild.pins)board+="\n— "+pin;
+        text(level,c.offset(0,5,-9),"Message du jour\n"+board,tag,.3f);
+        String[] names={"Banque de guilde","Coffre de guilde","Quêtes de guilde","Boutique de guilde"};
+        for(int i=0;i<4;i++)text(level,c.offset(STATIONS[i][0],2,STATIONS[i][1]),names[i]+"\n(clic droit)",tag,.35f);
+        int hr=18+guild.hallLevel*3;text(level,c.offset(0,5,hr-1),"Salle des trophées",tag,.45f);
+        var all=GuildExtras.catalog();for(int i=0;i<all.size();i++){var t=all.get(i);boolean earned=guild.trophies.contains(t.id());
+            text(level,c.offset(-9+2*(i%10),3,hr+(i<10?4:10)),earned?t.label():"???\n"+t.hint(),tag,.2f);}
         for(int i=0;i<10;i++)text(level,c.offset(-14+(i%5)*7,4,i<5?12:-14),Yggdrasil.cleared(guild,i)?Yggdrasil.ALL[i].name():"Gardien "+(i+1)+" · À conquérir",tag,.35f);
     }
     private static void text(ServerLevel level,BlockPos pos,String label,String tag,float scale){
@@ -73,9 +101,18 @@ public final class GuildHall {
         }}
         if(e.getServer().getTickCount()%40==0)for(var p:new ArrayList<>(level.players())){
             if(Boolean.getBoolean("mmorpg.expansionVisual"))continue;
-            var g=GuildStore.access(e.getServer(),false,s->GuildStore.of(s,com.mmorpg.character.CharKey.of(p)));if(g==null||g.hallIndex<0||Math.abs(p.getX()-center(g).getX())>34||Math.abs(p.getZ()-center(g).getZ())>34||p.getY()<95)com.mmorpg.competition.CompetitionTravel.home(p);
+            var g=GuildStore.access(e.getServer(),false,s->GuildStore.of(s,com.mmorpg.character.CharKey.of(p)));if(g==null||g.hallIndex<0||Math.abs(p.getX()-center(g).getX())>34||Math.abs(p.getZ()-center(g).getZ())>56||p.getY()<95)com.mmorpg.competition.CompetitionTravel.home(p);
         }
     }
+    @SubscribeEvent public static void use(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock e){
+        if(!(e.getEntity() instanceof ServerPlayer p)||!p.level().dimension().equals(DIM)||e.getHand()!=net.minecraft.world.InteractionHand.MAIN_HAND)return;
+        try{var g=GuildStore.access(p.level().getServer(),false,s->GuildStore.of(s,com.mmorpg.character.CharKey.of(p)));if(g==null||g.hallIndex<0)return;var c=center(g);
+            if(e.getPos().getY()!=c.getY())return;int dx=e.getPos().getX()-c.getX(),dz=e.getPos().getZ()-c.getZ();
+            for(int i=0;i<4;i++)if(dx==STATIONS[i][0]&&dz==STATIONS[i][1]){e.setCanceled(true);
+                if(i==1){var t=new net.minecraft.nbt.CompoundTag();t.putString("action","vault");GuildService.action(p,t);}else GuildService.open(p,"",new int[]{2,0,4,3}[i]);return;}
+        }catch(Exception ex){p.sendSystemMessage(Component.literal("Hall indisponible : "+ex.getMessage()));}
+    }
+    @SubscribeEvent public static void logout(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent e){if(e.getEntity() instanceof ServerPlayer p)GuildService.left(p);}
     @SubscribeEvent public static void damage(net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent e){if(e.getEntity().level().dimension().equals(DIM))e.setCanceled(true);}
     @SubscribeEvent public static void breaking(net.neoforged.neoforge.event.level.block.BreakBlockEvent e){if(e.getPlayer().level().dimension().equals(DIM)&&!e.getPlayer().isCreative())e.setCanceled(true);}
     @SubscribeEvent public static void placing(net.neoforged.neoforge.event.level.BlockEvent.EntityPlaceEvent e){if(e.getLevel() instanceof ServerLevel l&&l.dimension().equals(DIM))e.setCanceled(true);}

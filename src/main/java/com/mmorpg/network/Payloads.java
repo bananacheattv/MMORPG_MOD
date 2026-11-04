@@ -27,6 +27,18 @@ public final class Payloads {
         public static final StreamCodec<ByteBuf,DungeonSetupAction> CODEC=StreamCodec.composite(ByteBufCodecs.COMPOUND_TAG,DungeonSetupAction::data,DungeonSetupAction::new);
         @Override public Type<? extends CustomPacketPayload> type() {return TYPE;}
     }
+    /** Actions client -> serveur du confort de jeu : tri, ping de groupe, journal (voir Qol). */
+    public record QolAction(CompoundTag data) implements CustomPacketPayload {
+        public static final Type<QolAction> TYPE=new Type<>(MMORPG.id("qol_action"));
+        public static final StreamCodec<ByteBuf,QolAction> CODEC=StreamCodec.composite(ByteBufCodecs.COMPOUND_TAG,QolAction::data,QolAction::new);
+        @Override public Type<? extends CustomPacketPayload> type() {return TYPE;}
+    }
+    /** Donnees serveur -> client du confort de jeu : compteur de degats, pings de groupe. */
+    public record QolSync(CompoundTag data) implements CustomPacketPayload {
+        public static final Type<QolSync> TYPE=new Type<>(MMORPG.id("qol_sync"));
+        public static final StreamCodec<ByteBuf,QolSync> CODEC=StreamCodec.composite(ByteBufCodecs.COMPOUND_TAG,QolSync::data,QolSync::new);
+        @Override public Type<? extends CustomPacketPayload> type() {return TYPE;}
+    }
     private Payloads() {
     }
 
@@ -359,7 +371,7 @@ public final class Payloads {
 
     /** Action d'un service de la ville : banque (service 0) ou hotel des ventes (service 1). */
     public record ServiceAction(int service, int action, long amount, String text, int page, BlockPos pos) implements CustomPacketPayload {
-        public static final int BANK = 0, AUCTION = 1, WEEKLY = 2;
+        public static final int BANK = 0, AUCTION = 1, WEEKLY = 2, MAIL = 3;
         public static final Type<ServiceAction> TYPE = new Type<>(MMORPG.id("service_action"));
         public static final StreamCodec<ByteBuf, ServiceAction> CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, ServiceAction::service, ByteBufCodecs.VAR_INT, ServiceAction::action,
@@ -373,7 +385,7 @@ public final class Payloads {
     }
 
     public record ForgeAction(int action, String recipe, int value, BlockPos pos) implements CustomPacketPayload {
-        public static final int CRAFT = 0, UPGRADE = 1, COMPRESS = 2;
+        public static final int CRAFT = 0, UPGRADE = 1, COMPRESS = 2, REROLL = 3, REFORGE = 4;
         public static final Type<ForgeAction> TYPE = new Type<>(MMORPG.id("forge_action"));
         public static final StreamCodec<ByteBuf, ForgeAction> CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, ForgeAction::action, ByteBufCodecs.STRING_UTF8, ForgeAction::recipe,
@@ -400,7 +412,7 @@ public final class Payloads {
 
     /** Action de quete : 0 = accepter, 1 = rendre, 2 = abandonner. */
     public record QuestAction(int action, String quest, int npc) implements CustomPacketPayload {
-        public static final int ACCEPT = 0, COMPLETE = 1, ABANDON = 2, TRACK = 3, DECLINE = 4, RAID_JOIN = 5, RAID_REFUSE = 6;
+        public static final int ACCEPT = 0, COMPLETE = 1, ABANDON = 2, TRACK = 3, DECLINE = 4, RAID_JOIN = 5, RAID_REFUSE = 6, STORY_REPLAY = 7;
         public static final Type<QuestAction> TYPE = new Type<>(MMORPG.id("quest_action"));
         public static final StreamCodec<ByteBuf, QuestAction> CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, QuestAction::action, ByteBufCodecs.STRING_UTF8, QuestAction::quest,

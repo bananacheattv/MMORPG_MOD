@@ -121,6 +121,7 @@ public final class RpgCombat {
             if (p.isCreative() || p.isSpectator()) return false;
             if (attacker instanceof Player ap) {
                 if(com.mmorpg.competition.ArenaManager.session(ap.getUUID())!=null||com.mmorpg.competition.ArenaManager.session(p.getUUID())!=null)return com.mmorpg.competition.ArenaManager.enemies(ap,p);
+                if (com.mmorpg.competition.Duels.fighting(ap, p)) return true;
                 if (com.mmorpg.server.PartyManager.sameParty(ap, p)) return false;
                 return ConfigManager.general().skillsHitPlayers && p.level() instanceof net.minecraft.server.level.ServerLevel psl && psl.isPvpAllowed();
             }
@@ -335,6 +336,7 @@ public final class RpgCombat {
             if (ls > 0) RpgPlayers.heal(playerAttacker, damage * ls / 100.0, false);
         }
 
+        if (playerAttacker != null && !environmental && damage > 0) com.mmorpg.server.Qol.dealt(playerAttacker, Math.min(damage, h.hp()));
         // mannequin d'entrainement : jamais de perte de vie, le coup alimente ses statistiques
         if (target instanceof com.mmorpg.entity.dummy.TrainingDummyEntity dummy) {
             if (!environmental) dummy.recordHit(damage, crit, attacker);       // chute, feu, vide... ne comptent pas
@@ -349,7 +351,7 @@ public final class RpgCombat {
         }
         double newHp = h.hp() - damage;
         if(damage>0&&target instanceof ServerPlayer player&&attacker instanceof LivingEntity mob)MobDebuffs.onHit(mob,player);
-        if(newHp<=.01&&target instanceof ServerPlayer arenaPlayer&&(com.mmorpg.competition.ArenaManager.lethal(arenaPlayer,attacker)||com.mmorpg.competition.GuildRaids.testDeath(arenaPlayer))){event.setNewDamage(0F);return;}
+        if(newHp<=.01&&target instanceof ServerPlayer arenaPlayer&&(com.mmorpg.competition.Duels.lethal(arenaPlayer,attacker)||com.mmorpg.competition.ArenaManager.lethal(arenaPlayer,attacker)||com.mmorpg.competition.GuildRaids.testDeath(arenaPlayer))){event.setNewDamage(0F);return;}
         if (newHp <= 0.01) {
             h.setHp(0);
             event.setNewDamage(target.getHealth() + 1000F);
@@ -363,6 +365,7 @@ public final class RpgCombat {
         if (damage > 0) {
             if (target instanceof ServerPlayer tp) {
                 CombatTexts.above(tp, (float) damage, Payloads.CombatText.TAKEN);
+                com.mmorpg.server.Qol.taken(tp, damage);
                 RpgPlayers.sendVitals(tp, true);
             } else if (playerAttacker != null || attacker instanceof Player) {
                 CombatTexts.above(target, (float) damage, crit ? Payloads.CombatText.CRIT : Payloads.CombatText.DAMAGE);

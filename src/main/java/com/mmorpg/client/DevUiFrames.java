@@ -71,6 +71,26 @@ final class DevUiFrames {
         add("admin_players_data", () -> adminPlayers(1, "skills"));
         add("admin_players_items", () -> adminPlayers(2));
         add("admin_players_actions", () -> adminPlayers(3));
+        add("moderation", () -> {
+            var t = new CompoundTag();
+            t.putString("kind", "state");
+            t.putInt("online", 3);
+            t.putInt("openReports", 2);
+            var rows = new net.minecraft.nbt.ListTag();
+            String[][] ps = {{"Aelwyn", "Mage niv. 42", ""}, {"Borin", "Guerrier niv. 17", "silence"}, {"Cyra", "Archer niv. 63", "prison"}};
+            for (var p : ps) {
+                var r = new CompoundTag();
+                r.putString("a", p[0]);
+                r.putString("b", p[1]);
+                r.putString("c", p[2]);
+                r.putString("id", "00000000-0000-0000-0000-000000000001");
+                r.putString("name", p[0]);
+                rows.add(r);
+            }
+            t.put("rows", rows);
+            t.putString("tab", "players");
+            return new ModerationScreen(t);
+        });
         add("admin_features", () -> {
             var flags = new CompoundTag();
             for (String k : com.mmorpg.server.FeatureFlags.KEYS) flags.putBoolean(k, !k.equals("drones") && !k.equals("luckyblocks") && !k.equals("cinematique"));
@@ -191,6 +211,34 @@ final class DevUiFrames {
             data.putString("self", self.toString());
             data.putString("guild", new com.google.gson.Gson().toJson(guild));
             return new GuildScreen(data);
+        });
+        for (int tab : new int[]{0, 2, 3, 4, 6, 8, 9}) add("guild_tab" + tab, () -> {
+            var guild = new com.mmorpg.guild.GuildStore.Guild();
+            guild.name = "Les Veilleurs d’Aeloria"; guild.level = 4; guild.gold = 25000; guild.hallLevel = 2; guild.bosses = 7;
+            guild.motd = "Raid Yggdrasil samedi 20h"; guild.pins.add("Aeloria : Pas de PvP en hall"); guild.pins.add("Aeloria : Dons de matériaux ouverts");
+            guild.banner = "AZUR"; guild.banner2 = "OR"; guild.bannerPattern = "COURONNE"; guild.questsDone = 12;
+            guild.trophies.addAll(java.util.List.of("BOSS0", "BOSS1", "BOSS2", "QUESTS_10", "MEMBERS_10"));
+            var self = new java.util.UUID(0, 1);
+            guild.members.put(self, new com.mmorpg.guild.GuildStore.Member(self, "Aeloria", "CHEF"));
+            guild.activity.put(self, new com.mmorpg.guild.GuildStore.Activity());
+            guild.activity.get(self).lastSeen = System.currentTimeMillis(); guild.activity.get(self).gold = 15000; guild.activity.get(self).kills = 340; guild.activity.get(self).quests = 5;
+            com.mmorpg.guild.GuildExtras.roll(guild);
+            guild.quests.get(0).progress = guild.quests.get(0).target / 2; guild.quests.get(1).done = true; guild.quests.get(1).progress = guild.quests.get(1).target;
+            guild.history.add(0, "2026-11-04T10:00:00Z · Aeloria dépose 5000 or");
+            var data = new CompoundTag();
+            data.putString("self", self.toString()); data.putLong("wallet", 12000); data.putInt("vaultCount", 9); data.putInt("tab", tab);
+            data.putString("guild", new com.google.gson.Gson().toJson(guild));
+            return new GuildScreen(data);
+        });
+        add("friends", () -> {
+            var data = new CompoundTag();
+            data.putString("mine", "OCCUPE"); data.putString("status", "Demande envoyée à Lyra.");
+            var list = new net.minecraft.nbt.ListTag();
+            String[][] f = {{"Lyra", "EN_LIGNE"}, {"Borin", "ABSENT"}, {"Kael", "OCCUPE"}, {"Mira", "HORS_LIGNE"}};
+            for (var e : f) { var t = new CompoundTag(); t.putString("id", java.util.UUID.randomUUID().toString()); t.putString("name", e[0]); t.putString("state", e[1]); t.putLong("seen", System.currentTimeMillis() - 86400000L); list.add(t); }
+            data.put("friends", list);
+            var reqs = new net.minecraft.nbt.ListTag(); var r = new CompoundTag(); r.putString("id", java.util.UUID.randomUUID().toString()); r.putString("name", "Thorn"); reqs.add(r); data.put("requests", reqs);
+            return new FriendsScreen(data);
         });
     }
 

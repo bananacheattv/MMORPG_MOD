@@ -24,6 +24,7 @@ public final class ClientPayloadHandlers {
     @SubscribeEvent
     public static void register(RegisterClientPayloadHandlersEvent event) {
         event.register(com.mmorpg.network.ProxyConnect.TYPE, (payload, context) -> { });
+        event.register(com.mmorpg.security.PacketSigner.SessionKey.TYPE, (payload, context) -> com.mmorpg.security.PacketSigner.clientKey(payload.key()));
         event.register(S2COpenScreen.TYPE, (payload, context) -> openScreen(payload));
         event.register(Payloads.AdminReply.TYPE, (payload, context) -> com.mmorpg.client.screen.AdminScreen.handle(payload));
         event.register(Payloads.Guidance.TYPE,(payload,context)->com.mmorpg.client.hud.GuidanceArrow.receive(payload.data()));
@@ -34,6 +35,7 @@ public final class ClientPayloadHandlers {
             ClientData.mana = payload.mana();
             ClientData.maxMana = payload.maxMana();
         });
+        event.register(Payloads.QolSync.TYPE, (payload, context) -> com.mmorpg.client.QolClient.receive(payload.data()));
         event.register(Payloads.FishFightState.TYPE, (payload, context) -> FishFightClient.receive(payload.data()));
         event.register(Payloads.MobInfo.TYPE, (payload, context) -> ClientData.mobInfo = payload.data().copy());
         event.register(Payloads.Notify.TYPE, (payload, context) -> {
@@ -93,11 +95,16 @@ public final class ClientPayloadHandlers {
                 if (mc.gui.screen() instanceof com.mmorpg.client.screen.AdminPlayersScreen screen) screen.receive(payload.extra());
                 else mc.gui.setScreen(new com.mmorpg.client.screen.AdminPlayersScreen(payload.extra()));
             }
+            case S2COpenScreen.MODERATION -> {
+                if (mc.gui.screen() instanceof com.mmorpg.client.screen.ModerationScreen screen) screen.receive(payload.extra());
+                else mc.gui.setScreen(new com.mmorpg.client.screen.ModerationScreen(payload.extra()));
+            }
             case S2COpenScreen.ADMIN_FEATURES -> {
                 if (mc.gui.screen() instanceof com.mmorpg.client.screen.AdminFeaturesScreen screen) screen.receive(payload.extra());
                 else mc.gui.setScreen(new com.mmorpg.client.screen.AdminFeaturesScreen(payload.extra()));
             }
             case S2COpenScreen.COMPRESSOR -> mc.gui.setScreen(new com.mmorpg.client.screen.CompressorScreen(BlockPos.of(payload.extra().getLongOr("pos", 0))));
+            case S2COpenScreen.STORY_SCENE -> { if (mc.player != null && !(mc.gui.screen() instanceof com.mmorpg.client.screen.StorySceneScreen)) mc.gui.setScreen(new com.mmorpg.client.screen.StorySceneScreen(payload.extra().getStringOr("scene", ""))); }
             case S2COpenScreen.QUEST_OFFER -> { if (mc.gui.screen() == null) mc.gui.setScreen(new com.mmorpg.client.screen.QuestOfferScreen(payload.extra())); }
             case S2COpenScreen.GUILD_RAID_INVITE -> { if (mc.gui.screen() == null) mc.gui.setScreen(new com.mmorpg.client.screen.GuildRaidInviteScreen(payload.extra())); }
             case S2COpenScreen.QUEST_GIVER -> mc.gui.setScreen(new com.mmorpg.client.screen.QuestGiverScreen(payload.extra()));
@@ -106,7 +113,10 @@ public final class ClientPayloadHandlers {
             case S2COpenScreen.MINE_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.MineMasterScreen(payload.extra()));
             case S2COpenScreen.SPAWN_EDITOR -> mc.gui.setScreen(new com.mmorpg.client.screen.SpawnEditorScreen(payload.extra()));
             case S2COpenScreen.PREMIUM_STORE -> mc.gui.setScreen(new com.mmorpg.client.screen.PremiumStoreScreen(payload.extra()));
+            case S2COpenScreen.FRIENDS -> mc.gui.setScreen(new com.mmorpg.client.screen.FriendsScreen(payload.extra()));
+            case S2COpenScreen.PHOTO -> com.mmorpg.client.PhotoMode.start(payload.extra().getIntOr("seconds", 5));
             case S2COpenScreen.GUILD -> mc.gui.setScreen(new com.mmorpg.client.screen.GuildScreen(payload.extra()));
+            case S2COpenScreen.DUNGEON_MAP -> mc.gui.setScreen(new com.mmorpg.client.screen.DungeonMapScreen(payload.extra()));
             case S2COpenScreen.CHARACTERS -> mc.gui.setScreen(new com.mmorpg.client.screen.CharacterSelectScreen(payload.extra()));
             case S2COpenScreen.PVP_STORE -> mc.gui.setScreen(new com.mmorpg.client.screen.PvpStoreScreen(payload.extra()));
             case S2COpenScreen.ARENA_RESULTS -> com.mmorpg.client.ArenaResultDelivery.receive(payload.extra());
@@ -120,6 +130,11 @@ public final class ClientPayloadHandlers {
             case S2COpenScreen.LIGHT_BLOCK -> mc.gui.setScreen(new com.mmorpg.client.screen.LightBlockScreen(payload.extra()));
             case S2COpenScreen.ARMOR_STAND_EDITOR -> mc.gui.setScreen(new com.mmorpg.client.screen.ArmorStandEditorScreen(payload.extra()));
             case S2COpenScreen.CLASS_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.ClassMasterScreen(payload.extra()));
+            case S2COpenScreen.MAIL -> {
+                if (mc.gui.screen() instanceof com.mmorpg.client.screen.MailScreen screen) screen.receive(payload.extra());
+                else mc.gui.setScreen(new com.mmorpg.client.screen.MailScreen(payload.extra()));
+            }
+            case S2COpenScreen.MAIL_STATE -> ClientData.mailCount = payload.extra().getIntOr("count", 0);
             case S2COpenScreen.TRIAL_STATE -> {
                 ClientData.trialActive = payload.extra().getBooleanOr("active", false);
                 ClientData.trialClass = payload.extra().getIntOr("class", 0);

@@ -73,8 +73,16 @@ public final class ServerHandlers {
     public static void questAction(Payloads.QuestAction p, IPayloadContext ctx) {
         if (!(ctx.player() instanceof ServerPlayer sp)) return;
         switch (p.action()) {
-            case Payloads.QuestAction.ACCEPT -> { if (p.npc() < 0) QuestOffers.accept(sp, p.quest()); else QuestManager.accept(sp, p.quest(), p.npc()); }
-            case Payloads.QuestAction.COMPLETE -> QuestManager.complete(sp, p.quest(), p.npc());
+            case Payloads.QuestAction.ACCEPT -> {
+                if (p.npc() < 0 && p.quest().startsWith(DailyQuests.PREFIX)) DailyQuests.accept(sp, p.quest());
+                else if (p.npc() < 0) QuestOffers.accept(sp, p.quest());
+                else QuestManager.accept(sp, p.quest(), p.npc());
+            }
+            case Payloads.QuestAction.COMPLETE -> {
+                if (p.npc() < 0) DailyQuests.claim(sp, p.quest());
+                else QuestManager.complete(sp, p.quest(), p.npc());
+            }
+            case Payloads.QuestAction.STORY_REPLAY -> StoryQuests.replay(sp, p.quest());
             case Payloads.QuestAction.ABANDON -> QuestManager.abandon(sp, p.quest());
             case Payloads.QuestAction.TRACK -> QuestManager.track(sp, p.quest());
             case Payloads.QuestAction.DECLINE -> QuestOffers.decline(sp, p.quest());
@@ -116,6 +124,8 @@ public final class ServerHandlers {
             com.mmorpg.economy.Bank.action(sp, p.pos(), p.action(), p.amount(), p.page());
         } else if (p.service() == Payloads.ServiceAction.AUCTION) {
             com.mmorpg.economy.Auction.action(sp, p.pos(), p.action(), p.amount(), p.text(), p.page());
+        } else if (p.service() == Payloads.ServiceAction.MAIL) {
+            com.mmorpg.economy.Mail.action(sp, p.pos(), p.action(), p.amount(), p.text());
         } else if (p.service() == Payloads.ServiceAction.WEEKLY) {
             com.mmorpg.server.WeeklyQuests.action(sp, p.pos(), p.action(), (int) p.amount());
         }
@@ -128,6 +138,10 @@ public final class ServerHandlers {
             ForgeManager.craft(sp, p.pos(), p.recipe(), p.value());
         } else if (p.action() == Payloads.ForgeAction.UPGRADE) {
             ForgeManager.upgrade(sp, p.pos(), p.value(), p.recipe());
+        } else if (p.action() == Payloads.ForgeAction.REROLL) {
+            ForgeManager.reroll(sp, p.pos(), p.value());
+        } else if (p.action() == Payloads.ForgeAction.REFORGE) {
+            ForgeManager.reforge(sp, p.pos(), p.value(), p.recipe());
         } else if (p.action() == Payloads.ForgeAction.COMPRESS) {
             com.mmorpg.mine.Compression.compress(sp, p.pos(), p.value(), p.recipe());
         }

@@ -39,12 +39,14 @@ public final class QuestManager {
 
     public static QuestDef def(String id) {
         if (id.startsWith(WeeklyQuests.PREFIX)) return WeeklyQuests.def(id);
+        if (id.startsWith(DailyQuests.PREFIX)) return DailyQuests.def(id);
         return ConfigManager.quests().get(id);
     }
 
     public static boolean isAvailable(PlayerData d, String id, QuestDef q, String group) {
         if (q == null || d.activeQuests.containsKey(id) || d.level < q.minLevel) return false;
         if (!q.giver.isEmpty() && !q.giver.equalsIgnoreCase(group)) return false;
+        if (!q.classes.isEmpty() && !q.classes.contains(d.playerClass.id())) return false;
         for (String r : q.requires) {
             if (!d.completedQuests.contains(r)) return false;
         }
@@ -121,6 +123,8 @@ public final class QuestManager {
         t.putInt("minLevel", q.minLevel);
         t.putBoolean("daily", q.daily);
         t.putBoolean("weekly", q.weekly);
+        t.putBoolean("story", !q.story.isEmpty());
+        t.putBoolean("classQuest", !q.classes.isEmpty());
         boolean active = d.activeQuests.containsKey(id);
         t.putBoolean("active", active);
         ListTag objs = new ListTag();
@@ -165,6 +169,16 @@ public final class QuestManager {
             if (q != null) list.add(questTag(p, d, id, q));
         }
         return list;
+    }
+
+    /** Onglets supplementaires du journal : quotidiennes du jour, histoire principale (rejouable), lieux secrets decouverts. */
+    public static CompoundTag extraTag(ServerPlayer p, PlayerData d) {
+        CompoundTag t = new CompoundTag();
+        t.put("offers", DailyQuests.offersTag(p, d));
+        t.put("story", StoryQuests.tag(p, d));
+        t.put("explore", ExplorationQuests.tag(p, d));
+        t.putInt("exploreTotal", ExplorationQuests.total());
+        return t;
     }
 
     /** Quetes refusees encore disponibles (onglet Important du journal). */
@@ -364,6 +378,7 @@ public final class QuestManager {
         d.questGivers.remove(id);
         if (id.equals(d.trackedQuest)) d.trackedQuest = "";
         if (q.weekly) d.dailyQuests.put(WeeklyQuests.doneKey(id), WeeklyQuests.week());
+        else if (id.startsWith(DailyQuests.PREFIX)) d.dailyQuests.put(DailyQuests.doneKey(id), today());
         else if (q.daily) d.dailyQuests.put(id, today());
         else d.completedQuests.add(id);
         com.mmorpg.db.Audit.log(p, com.mmorpg.db.Audit.QUEST_DONE, 0, id);
@@ -385,6 +400,7 @@ public final class QuestManager {
         p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.SUCCESS.get(), SoundSource.PLAYERS, 1f, 1f);
         if (xp > 0) RpgPlayers.giveXp(p, xp, false);
         com.mmorpg.achievement.Achievements.add(p, com.mmorpg.achievement.Achievement.QUESTS, 1);
+        StoryQuests.onFinish(p, q);
         if (speaker != null) MascotGuide.say(p, speaker, q.speechDone.isEmpty() ? "Bien joué, voici ta récompense !" : q.speechDone);
         else if (!q.speechDone.isEmpty()) MascotGuide.say(p, q.speechDone);
         d.dirty = true;
@@ -449,6 +465,7 @@ public final class QuestManager {
     public static void onKill(ServerPlayer p, String mobKey, String typeId, boolean boss) {
         PlayerData d = RpgPlayers.get(p);
         WeeklyQuests.purge(d);
+        DailyQuests.purge(d);
         if (d.activeQuests.isEmpty()) return;
         for (Map.Entry<String, int[]> e : d.activeQuests.entrySet()) {
             QuestDef q = def(e.getKey());

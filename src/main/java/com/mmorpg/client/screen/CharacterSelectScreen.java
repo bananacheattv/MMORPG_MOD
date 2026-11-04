@@ -153,7 +153,9 @@ public final class CharacterSelectScreen extends MmoScreen {
                 int tx = px + pw2 + 6;
                 g.text(font, font.plainSubstrByWidth(s.getStringOr("name", "?"), cw - pw2 - 16), tx, cy + 10, Ui.GOLD_LIGHT, true);
                 g.text(font, (c.isPlayable() ? c.label : "Novice") + "  Niv. " + s.getIntOr("level", 1), tx, cy + 26, c.isPlayable() ? (c.color | 0xFF000000) : Ui.TEXT, false);
-                g.text(font, font.plainSubstrByWidth(s.getStringOr("place", ""), cw - pw2 - 16), tx, cy + 42, Ui.MUTED, false);
+                long din = s.getLongOr("deleteIn", 0);
+                if (din > 0) g.text(font, font.plainSubstrByWidth("Suppression dans " + left(din), cw - pw2 - 16), tx, cy + 42, 0xFFFF8888, false);
+                else g.text(font, font.plainSubstrByWidth(s.getStringOr("place", ""), cw - pw2 - 16), tx, cy + 42, Ui.MUTED, false);
             } else if (isOwned(i)) {
                 g.centeredText(font, Component.literal("+"), cx + cw / 2, cy + cardH / 2 - 12, Ui.GOLD);
                 g.centeredText(font, Component.literal("Emplacement libre"), cx + cw / 2, cy + cardH / 2 + 2, Ui.MUTED);
@@ -196,10 +198,12 @@ public final class CharacterSelectScreen extends MmoScreen {
         } else {
             button(g, bx0, by, bw, 22, bw >= 90 ? "Créer Personnage" : "Créer", empty, 0xFF2A6A2A, () -> startField(false));
         }
-        button(g, bx0 + bw + 4, by, bw, 22, "Effacer", owned1 && !empty, 0xFF7A2A2A, () -> startField(true));
+        boolean pending = owned1 && !empty && slot(sel).getLongOr("deleteIn", 0) > 0;
+        if (pending) button(g, bx0 + bw + 4, by, bw, 22, bw >= 90 ? "Annuler suppression" : "Annuler", true, 0xFF7A5A1A, () -> send("undelete", t -> t.putInt("slot", sel)));
+        else button(g, bx0 + bw + 4, by, bw, 22, "Effacer", owned1 && !empty, 0xFF7A2A2A, () -> startField(true));
         button(g, bx0 + 3 * bw + 12, by, bw, 22, "Retour", true, 0xFF3A3436, () ->
                 minecraft.getReportingContext().draftReportHandled(minecraft, this, () -> minecraft.disconnectFromWorld(net.minecraft.client.multiplayer.ClientLevel.DEFAULT_QUIT_MESSAGE), true));
-        button(g, bx0 + 2 * bw + 8, by, bw, 22, "C'est parti !", owned1 && !empty && !creating && !deleting, 0xFF2A6A2A, this::play);
+        button(g, bx0 + 2 * bw + 8, by, bw, 22, "C'est parti !", owned1 && !empty && !pending && !creating && !deleting, 0xFF2A6A2A, this::play);
 
         // ---- saisie (creation / suppression)
         boolean input = creating || deleting;
@@ -208,7 +212,7 @@ public final class CharacterSelectScreen extends MmoScreen {
         if (input) {
             int pxl = cxm - 130, pyl = height - 108;
             Ui.panel(g, pxl, pyl, 260, 100);
-            String title = creating ? "Nom du nouveau personnage (3 à 16 caractères)" : "Écris « " + (slot(sel) == null ? "" : slot(sel).getStringOr("name", "")) + " » pour effacer";
+            String title = creating ? "Nom du nouveau personnage (3 à 16 caractères)" : "Écris « " + (slot(sel) == null ? "" : slot(sel).getStringOr("name", "")) + " » (effacé après 24 h)";
             g.centeredText(font, Component.literal(title), cxm, pyl + 8, deleting ? 0xFFFF8888 : Ui.TEXT);
             field.setX(cxm - 80);
             field.setY(pyl + 26);
@@ -222,6 +226,11 @@ public final class CharacterSelectScreen extends MmoScreen {
         }
         String status = data.getStringOr("status", "");
         if (!status.isEmpty()) g.centeredText(font, Component.literal(status), cxm, height - 44, 0xFFFFD27A);
+    }
+
+    private static String left(long ms) {
+        long m = Math.max(1, ms / 60000);
+        return m >= 60 ? (m / 60) + " h " + (m % 60) + " min" : m + " min";
     }
 
     private void startField(boolean delete) {

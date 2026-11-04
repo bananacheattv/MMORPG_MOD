@@ -72,6 +72,17 @@ public final class DevCharacterChecks {
         Characters.action(p, packet("delete", 1, "confirm", "Mauvais"));
         check(CharacterStore.load(server, account).slots.containsKey(1), "suppression sans bon nom refusee");
         Characters.action(p, packet("delete", 1, "confirm", "elara"));
+        var pend = CharacterStore.load(server, account).slots.get(1);
+        check(pend != null && pend.deleteAt > System.currentTimeMillis() + 23L * 3600_000, "suppression differee de 24 h");
+        Characters.action(p, packet("play", 1));
+        check(Characters.selecting(p), "jeu refuse pendant la suppression");
+        Characters.action(p, packet("undelete", 1));
+        check(CharacterStore.load(server, account).slots.get(1).deleteAt == 0, "suppression annulee");
+        Characters.action(p, packet("delete", 1, "confirm", "elara"));
+        var exp = CharacterStore.load(server, account);
+        exp.slots.get(1).deleteAt = 1;                                  // delai ecoule
+        exp.write();
+        Characters.action(p, packet("open", 0));
         check(!CharacterStore.load(server, account).slots.containsKey(1) && GuildStore.access(server, false, s -> s.guilds.stream().noneMatch(x -> x.name.equals("Cendres de Test"))), "personnage 1 efface avec sa guilde vide");
         check(Characters.selecting(p) && RpgPlayers.get(p).charSlot == 0, "personnage actif intact apres suppression d'un autre");
         // achat d'emplacements avec credits

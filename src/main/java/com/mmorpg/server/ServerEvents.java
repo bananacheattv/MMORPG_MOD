@@ -82,6 +82,7 @@ public final class ServerEvents {
         if (event.getEntity() instanceof ServerPlayer sp) {
             RpgPlayers.tick(sp);
             AdventureSummary.tick(sp);
+            Qol.tick(sp);
             sp.getFoodData().setFoodLevel(20);
             sp.getFoodData().setSaturation(5);
             if (sp.tickCount % 20 == 0) MountManager.maintain(sp);
@@ -95,6 +96,7 @@ public final class ServerEvents {
             if (com.mmorpg.character.Characters.intercept(sp)) return;      // ecran de choix : l'initialisation reprend apres le choix
             com.mmorpg.dungeon.DungeonLobby.arriveIfNeeded(sp);
             RpgPlayers.onLogin(sp);
+            Scheduler.later(sp.level(), 60, () -> com.mmorpg.economy.Mail.onLogin(sp));
         }
     }
 
@@ -105,6 +107,7 @@ public final class ServerEvents {
             com.mmorpg.network.NetworkPlayers.logout(sp);
             MountManager.despawn(sp);
             RpgPlayers.onLogout(sp);
+            Qol.forget(sp.getUUID());
         }
     }
 

@@ -29,6 +29,8 @@ public final class ClientData {
     /** Quetes en cours (avec progression), recues a chaque synchronisation. */
     public static net.minecraft.nbt.ListTag quests = new net.minecraft.nbt.ListTag();
     public static net.minecraft.nbt.ListTag declined = new net.minecraft.nbt.ListTag();
+    /** Onglets supplementaires du journal : offers (quotidiennes), story, explore, exploreTotal. */
+    public static CompoundTag questExtra = new CompoundTag();
     /** Etat du groupe (membres, invitation en attente). */
     public static CompoundTag party = new CompoundTag();
     public static boolean received = false;
@@ -41,6 +43,8 @@ public final class ClientData {
     public static String backend="";
     /** Essai de classe en cours (indicateur du HUD). */
     public static boolean trialActive;
+    /** Lettres en attente dans le courrier (drapeau des boites aux lettres). */
+    public static int mailCount;
     public static int trialClass;
     public static int trialLevel;
     public static long trialSince;
@@ -82,6 +86,7 @@ public final class ClientData {
         }
         quests = t.getListOrEmpty("quests");
         declined = t.getListOrEmpty("declined");
+        questExtra = t.getCompoundOrEmpty("questExtra");
         maxHp = (float) stats.get(Stat.MAX_HP);
         maxMana = (float) stats.get(Stat.MAX_MANA);
         received = true;
@@ -117,6 +122,7 @@ public final class ClientData {
         BUFFS.clear();
         quests = new net.minecraft.nbt.ListTag();
         declined = new net.minecraft.nbt.ListTag();
+        questExtra = new CompoundTag();
         party = new CompoundTag();
         received = false;
         trialActive = false;

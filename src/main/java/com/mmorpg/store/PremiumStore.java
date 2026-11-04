@@ -12,11 +12,11 @@ import java.util.*;
 
 @EventBusSubscriber(modid=MMORPG.MODID)
 public final class PremiumStore {
-    public static final Set<String> STAFF=Set.of("aucun","fondateur","administrateur","moderateur","builder");
+    public static final Set<String> STAFF=Set.of("aucun","fondateur","responsable","moderateur","builder");
     public static void refresh(ServerPlayer p){var server=p.level().getServer();refresh(p,StoreConfig.load(server),StoreLedger.read(server,s->StoreLedger.account(s,p.getUUID())));}
     private static void refresh(ServerPlayer p,StoreConfig.Config cfg,StoreLedger.Account account){
         var rank=cfg.ranks.get(Math.clamp(account.rank,0,4));var d=RpgPlayers.get(p);
-        String label=account.staff.isEmpty()?rank.label:switch(account.staff){case "fondateur"->"Fondateur";case "administrateur"->"Administrateur";case "moderateur"->"Modérateur";case "builder"->"Builder";default->rank.label;};
+        String label=account.staff.isEmpty()?rank.label:switch(account.staff){case "fondateur"->"Fondateur";case "responsable","administrateur"->"Responsable";case "moderateur"->"Modérateur";case "builder"->"Builder";default->rank.label;};
         int color=account.staff.isEmpty()?rank.color:switch(account.staff){case "moderateur"->0x55AFFF;case "builder"->0x58DE87;default->0xFF5555;};boolean changed=!d.rankLabel.equals(label)||d.rankColor!=color||d.rankTier!=account.rank;
         d.rankLabel=label;d.rankColor=color;d.rankTier=account.rank;d.auctionSlots=rank.auctionSlots;
         for(int i=1;i<=account.rank;i++)if(!cfg.ranks.get(i).cosmetic.isEmpty())d.cosmetics.add(cfg.ranks.get(i).cosmetic);

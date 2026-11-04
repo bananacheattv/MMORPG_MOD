@@ -24,6 +24,16 @@ public final class ClientConfig {
             .translation("mmorpg.configuration.showQuestArrow")
             .define("showQuestArrow", true);
 
+    public static final ModConfigSpec.BooleanValue STREAMER_MODE = BUILDER
+            .comment("Mode streamer : masque coordonnees, messages prives, adresse du serveur et pseudos des autres joueurs")
+            .define("streamerMode", false);
+    public static final ModConfigSpec.BooleanValue SHOW_MINIMAP = BUILDER
+            .comment("Affiche la minimap")
+            .define("showMinimap", true);
+    public static final ModConfigSpec.BooleanValue SHOW_DPS = BUILDER
+            .comment("Affiche le compteur de degats par seconde du groupe")
+            .define("showDps", true);
+
     public static final ModConfigSpec.IntValue AMBIENT_MUSIC_VOLUME = BUILDER
             .comment("Volume de la musique d'ambiance du hub et des donjons, en pourcentage (0 = coupée)")
             .translation("mmorpg.configuration.ambientMusicVolume")

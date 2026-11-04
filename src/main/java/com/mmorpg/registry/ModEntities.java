@@ -87,11 +87,16 @@ public final class ModEntities {
     /** Une entite par monture 3D (taille et hauteur de selle propres). */
     public static final Map<com.mmorpg.mount.MountType, DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.MountEntity>>> MOUNTS =
             new java.util.EnumMap<>(com.mmorpg.mount.MountType.class);
+    private static net.minecraft.world.phys.Vec3[] attachments(com.mmorpg.mount.MountType m) {
+        var out = new net.minecraft.world.phys.Vec3[m.seats.length];
+        for (int i = 0; i < out.length; i++) out[i] = new net.minecraft.world.phys.Vec3(m.seats[i][0] * MOUNT_SCALE, m.seat * MOUNT_SCALE + .1f, m.seats[i][1] * MOUNT_SCALE);
+        return out;
+    }
     static {
         for (var m : com.mmorpg.mount.MountType.values()) {
             MOUNTS.put(m, ENTITIES.registerEntityType("monture_" + m.id, com.mmorpg.entity.MountEntity::new, MobCategory.CREATURE,
                     b -> b.sized(m.width * MOUNT_SCALE, m.height * MOUNT_SCALE).eyeHeight(m.height * MOUNT_SCALE * .9f)
-                            .passengerAttachments(m.seat * MOUNT_SCALE + .1f).clientTrackingRange(10)));
+                            .passengerAttachments(attachments(m)).clientTrackingRange(10)));
         }
     }
     public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.dummy.TrainingDummyEntity>> TRAINING_DUMMY =

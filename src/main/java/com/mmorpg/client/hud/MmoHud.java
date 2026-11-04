@@ -108,6 +108,15 @@ public final class MmoHud {
             playerFrame(g, mc);
             HudLayout.end(g);
         }
+        if (com.mmorpg.client.ClientConfig.SHOW_MINIMAP.get() && HudLayout.begin(g, HudLayout.MINIMAP)) {
+            MiniMapHud.minimap(g, mc);
+            HudLayout.end(g);
+        }
+        if (com.mmorpg.client.ClientConfig.SHOW_DPS.get() && (!com.mmorpg.client.QolClient.DPS.isEmpty() || HudLayout.editing) && HudLayout.begin(g, HudLayout.DPS)) {
+            MiniMapHud.dps(g, mc);
+            HudLayout.end(g);
+        }
+        if (!HudLayout.editing) MiniMapHud.pings(g, mc, w, h);
         if (HudLayout.begin(g, HudLayout.BUFFS)) {
             buffs(g);
             HudLayout.end(g);

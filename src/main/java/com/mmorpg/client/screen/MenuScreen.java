@@ -10,7 +10,7 @@ import net.minecraft.client.input.KeyEvent;
 /** Menu principal a onglets du mod. */
 public abstract class MenuScreen extends MmoScreen {
     public enum Tab {
-        PERSONNAGE("Personnage"), COMPETENCES("Compétences"), QUETES("Quêtes"), GROUPE("Groupe"), GUILDE("Guilde"), ARENE("Arène"), FAMILIERS("Familiers"), MONTURES("Montures"), COSMETIQUES("Cosmétiques"), BESTIAIRE("Bestiaire"), METIERS("Métiers"), SUCCES("Succès"), BOUTIQUE("Boutique"), WIKI("Wiki"), CREATIF("Créatif");
+        PERSONNAGE("Personnage"), COMPETENCES("Compétences"), QUETES("Quêtes"), GROUPE("Groupe"), GUILDE("Guilde"), ARENE("Arène"), FAMILIERS("Familiers"), MONTURES("Montures"), COSMETIQUES("Cosmétiques"), BESTIAIRE("Bestiaire"), METIERS("Métiers"), SUCCES("Succès"), JOURNAL("Journal"), BOUTIQUE("Boutique"), WIKI("Wiki"), CREATIF("Créatif");
 
         public final String label;
 
@@ -58,6 +58,7 @@ public abstract class MenuScreen extends MmoScreen {
             case METIERS -> new JobsScreen();
             case SUCCES -> new AchievementsScreen();
             case WIKI -> new WikiScreen();
+            case JOURNAL -> new JournalScreen();
             case GUILDE,ARENE,BOUTIQUE,CREATIF -> throw new IllegalStateException("Server-backed screen");
         });
     }

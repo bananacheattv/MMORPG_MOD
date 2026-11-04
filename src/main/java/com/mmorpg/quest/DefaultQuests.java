@@ -8,7 +8,7 @@ import java.util.function.IntFunction;
 /** Quetes par defaut : une campagne qui suit la progression des niveaux 1 a 100, plus des quetes journalieres. */
 public final class DefaultQuests {
     /** Incremente quand les quetes par defaut changent : les quetes d'un quests.json plus ancien sont alors remplacees une fois. */
-    public static final int REVISION = 3;
+    public static final int REVISION = 4;
 
     private DefaultQuests() {
     }
@@ -314,7 +314,97 @@ public final class DefaultQuests {
             m.put("parchemin_forge_" + tier, license);
         }
         m.putAll(QuestNpcPlan.discoveryDefinitions());
+        m.putAll(classQuests());
+        m.putAll(storyQuests());
         m.values().forEach(d -> d.revision = REVISION);
+        return m;
+    }
+
+    // ------------------------------------------------ quetes de classe (Maitre des classes), niveaux 5 a 100
+    public static final int[] CLASS_LEVELS = {5, 15, 25, 35, 45, 55, 65, 75, 85, 95, 100};
+    private static final String[] CLASS_IDS = {"guerrier", "mage", "archer", "tank"};
+    private static final String[][] CLASS_TITLES = {
+            {"Premier sang", "La discipline de l'acier", "Le poing de fer", "Gardien de la brèche", "Le cri de guerre", "Briseur de lignes",
+                    "Seigneur du champ de bataille", "Fléau des titans", "La lame sans pitié", "Champion des champions", "Légende de la guerre"},
+            {"L'étincelle", "Le grimoire d'écorce", "Souffle des éléments", "Tisseur de sorts", "L'œil de la tempête", "Maître des flux",
+                    "Archimage en devenir", "Brisure du voile", "L'arcane interdite", "Gardien du savoir", "Légende de la magie"},
+            {"Première flèche", "L'œil du faucon", "Pas de loup", "Tir à l'aveugle", "Chasseur de crépuscule", "Le trait fantôme",
+                    "Ombre des cimes", "Pluie de lames", "La corde tendue", "Tireur d'élite", "Légende de l'arc"},
+            {"Le premier rempart", "Serment de lumière", "Le bouclier d'aube", "Marteau de justice", "Mur vivant", "Lumière inflexible",
+                    "Sentinelle des cités", "Bastion des anges", "L'aube indomptée", "Garde du royaume", "Légende du paladin"}};
+    private static final String[] CLASS_VOICE = {
+            "Le Maître des classes juge votre bras : ", "Le Maître des classes teste votre savoir : ",
+            "Le Maître des classes éprouve votre précision : ", "Le Maître des classes met votre rempart à l'épreuve : "};
+
+    /** Une chaine de onze epreuves par classe, du niveau 5 au niveau 100 ; chaque epreuve exige la precedente et se rend au Maitre des classes. */
+    public static Map<String, QuestDef> classQuests() {
+        Map<String, QuestDef> m = new LinkedHashMap<>();
+        String[] mobs = {"gobelin", "loup_sombre", "squelette_maudit", "orc_guerrier", "elementaire_feu", "spectre_givre", "golem_cristal"};
+        int[] counts = {12, 15, 25, 25, 25, 30, 20};
+        for (int c = 0; c < CLASS_IDS.length; c++) {
+            for (int i = 0; i < CLASS_LEVELS.length; i++) {
+                int lv = CLASS_LEVELS[i];
+                QuestDef d = q(CLASS_TITLES[c][i], lv, CLASS_VOICE[c] + switch (i) {
+                    case 0, 1, 2, 3, 4, 5, 6 -> "prouvez votre valeur sur le terrain.";
+                    case 7 -> "affrontez les boss du royaume.";
+                    case 8 -> "une grande campagne vous attend.";
+                    case 9 -> "seuls les plus grands boss vous attendent.";
+                    default -> "atteignez le sommet de votre art et inscrivez votre nom dans la légende.";
+                });
+                if (i < mobs.length) obj(d, "kill", mobs[i], counts[i]);
+                else if (i == 7) { obj(d, "kill", "boss", 2); obj(d, "kill", "*", 100); }
+                else if (i == 8) { obj(d, "kill", "*", 200); obj(d, "kill", "boss", 3); }
+                else if (i == 9) obj(d, "kill", "boss", 5);
+                else { obj(d, "level", "niveau", 100); obj(d, "kill", "boss", 8); }
+                d.rewards.xpPercentOfLevel = Math.min(120, 40 + i * 8);
+                d.rewards.gold = lv * 40L;
+                d.rewards.items.add(new QuestDef.ItemReward("mmorpg:pierre_amelioration" + (i >= 6 ? "_sup" : ""), i / 3 + 1));
+                if (i == 3 || i == 7) d.rewards.items.add(new QuestDef.ItemReward("mmorpg:elixir_experience", 1));
+                if (i == CLASS_LEVELS.length - 1) {
+                    d.rewards.items.add(new QuestDef.ItemReward("mmorpg:fragment_divin", 1));
+                    d.rewards.items.add(new QuestDef.ItemReward("mmorpg:cle_quete", 2));
+                }
+                d.giver = "maitre_classes";
+                d.classes.add(CLASS_IDS[c]);
+                if (i > 0) d.requires.add("classe_" + CLASS_IDS[c] + "_" + (i - 1));
+                m.put("classe_" + CLASS_IDS[c] + "_" + i, d);
+            }
+        }
+        return m;
+    }
+
+    // ------------------------------------------------ histoire principale : douze chapitres, une cinematique par chapitre
+    public static final int[] STORY_LEVELS = {3, 10, 18, 28, 38, 45, 55, 65, 75, 85, 95, 100};
+
+    /** L'histoire principale : proposee automatiquement, rendue automatiquement, avec une scene cinematique par chapitre. */
+    public static Map<String, QuestDef> storyQuests() {
+        Map<String, QuestDef> m = new LinkedHashMap<>();
+        for (int i = 0; i < STORY_LEVELS.length; i++) {
+            var sc = StoryBook.get("hist_" + (i + 1));
+            QuestDef d = q(sc.chapter() + " — " + sc.title(), STORY_LEVELS[i], sc.lines().get(0) + " " + sc.lines().get(sc.lines().size() - 1));
+            switch (i) {
+                case 0 -> obj(d, "kill", "gobelin", 10);
+                case 1 -> obj(d, "kill", "loup_sombre", 10);
+                case 2 -> obj(d, "kill", "roi_gobelin", 1);
+                case 3 -> obj(d, "kill", "squelette_maudit", 15);
+                case 4 -> obj(d, "kill", "boss", 1);
+                case 5 -> obj(d, "kill", "orc_guerrier", 20);
+                case 6 -> obj(d, "kill", "spectre_givre", 15);
+                case 7 -> obj(d, "kill", "golem_cristal", 10);
+                case 8 -> obj(d, "kill", "boss", 2);
+                case 9 -> obj(d, "kill", "chevalier_neant", 15);
+                case 10 -> obj(d, "kill", "avatar_neant", 1);
+                default -> { obj(d, "level", "niveau", 100); obj(d, "kill", "boss", 3); }
+            }
+            d.story = "hist_" + (i + 1);
+            d.giver = "histoire";
+            d.requires.add(i == 0 ? "tuto_fin" : "histoire_" + i);
+            d.rewards.xpPercentOfLevel = 35;
+            d.rewards.gold = STORY_LEVELS[i] * 30L;
+            d.rewards.items.add(new QuestDef.ItemReward("mmorpg:cle_quete", 1));
+            if (i >= 4) d.rewards.items.add(new QuestDef.ItemReward("mmorpg:pierre_amelioration_sup", i / 4));
+            m.put("histoire_" + (i + 1), d);
+        }
         return m;
     }
 

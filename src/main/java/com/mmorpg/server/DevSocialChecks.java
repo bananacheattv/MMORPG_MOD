@@ -10,6 +10,7 @@ import java.nio.file.*;
 
 public final class DevSocialChecks {
     private static void check(boolean b,String text){if(!b)throw new AssertionError("social: "+text);}
+    private static CompoundTag shopPacket(int item){var t=packet("shop");t.putInt("item",item);return t;}
     private static CompoundTag packet(String action,String... values){var t=new CompoundTag();t.putString("action",action);for(int i=0;i<values.length;i+=2)t.putString(values[i],values[i+1]);return t;}
     public static void run(ServerPlayer p)throws Exception{
         var original=NetworkConfig.current;var dir=Files.createTempDirectory("aeloria-guild-checks-");var cfg=new NetworkConfig();cfg.enabled=true;cfg.role=NetworkConfig.Role.MAIN;cfg.sharedDirectory=dir.resolve("players").toString();NetworkConfig.current=cfg;
@@ -17,11 +18,23 @@ public final class DevSocialChecks {
         try{
             check(NetworkPlayers.login(p),"guild test profile acquired");check(NetworkPlayers.login(member),"member profile acquired");RpgPlayers.get(p).gold=25000;
             GuildService.action(p,packet("create","name","Racines du Test"));var guild=GuildStore.access(server,false,s->GuildStore.of(s,p.getUUID()));check(guild!=null&&guild.level==1,"new guild starts at one");UUID id=guild.id;
-            var deposit=packet("deposit");deposit.putLong("amount",20000);GuildService.action(p,deposit);check(RpgPlayers.get(p).gold==5000,"deposit debits personal wallet");check(GuildStore.access(server,false,s->GuildStore.byId(s,id).gold)==20000,"deposit credits shared bank once");GuildService.reconcile(p);check(GuildStore.access(server,false,s->GuildStore.byId(s,id).gold)==20000,"reconciliation never duplicates deposit");
+            var deposit=packet("deposit");deposit.putLong("amount",20000);GuildService.action(p,deposit);check(RpgPlayers.get(p).gold==5000,"deposit debits personal wallet");long banked=GuildStore.access(server,false,s->GuildStore.byId(s,id).gold);check(banked>=20000&&banked<=20000+GuildStore.access(server,false,s->GuildStore.byId(s,id).quests.stream().mapToLong(q->q.rewardGold).sum()),"deposit credits shared bank once (plus any guild quest reward)");GuildService.reconcile(p);check(GuildStore.access(server,false,s->GuildStore.byId(s,id).gold)==banked,"reconciliation never duplicates deposit");
             var negative=packet("deposit");negative.putLong("amount",-100);GuildService.action(p,negative);check(RpgPlayers.get(p).gold==5000,"negative deposits refused");
             GuildService.action(p,packet("invite","target",member.getUUID().toString()));GuildService.action(member,packet("accept","target",id.toString()));check(GuildStore.access(server,false,s->GuildStore.of(s,member.getUUID()).id).equals(id),"invite and accept authoritative membership");
             var withdraw=packet("withdraw");withdraw.putLong("amount",100);long before=RpgPlayers.get(member).gold;GuildService.action(member,withdraw);check(RpgPlayers.get(member).gold==before,"member cannot withdraw treasury");
             GuildService.action(p,packet("promote","target",member.getUUID().toString()));GuildService.action(member,withdraw);check(RpgPlayers.get(member).gold==before,"officer cannot withdraw treasury");
+            long[] saved={GuildStore.access(server,false,s->GuildStore.byId(s,id).gold),GuildStore.access(server,false,s->GuildStore.byId(s,id).xp),RpgPlayers.get(p).gold};
+            GuildService.action(p,packet("motd","text","Bienvenue !"));GuildService.action(p,packet("pin","text","Raid samedi"));
+            check(GuildStore.access(server,false,s->{var g=GuildStore.byId(s,id);return g.motd.equals("Bienvenue !")&&g.pins.size()==1&&g.pins.get(0).endsWith("Raid samedi");}),"guild motd and pinned announcement saved");
+            GuildService.action(p,packet("banner2","banner","ROSE"));GuildService.action(p,packet("bannerPattern","pattern","COURONNE"));GuildService.action(p,packet("banner","banner","FAUX"));
+            check(GuildStore.access(server,false,s->{var g=GuildStore.byId(s,id);return g.banner2.equals("ROSE")&&g.bannerPattern.equals("COURONNE")&&g.banner.equals("VIOLET");}),"crest customised, unknown colour refused");
+            GuildStore.access(server,true,s->{var g=GuildStore.byId(s,id);GuildExtras.roll(g);check(g.quests.size()==4&&g.quests.stream().filter(q->q.weekly).count()==1,"three daily quests and one weekly quest");
+                for(var q:new ArrayList<>(g.quests))GuildExtras.add(g,p.getUUID(),q.type,q.target);check(g.quests.stream().allMatch(q->q.done)&&g.questsDone==4,"guild quests complete from member contributions");
+                check(g.trophies.stream().noneMatch(t->t.startsWith("QUESTS_")),"no quest trophy before 10 quests");g.questsDone=10;GuildExtras.trophies(g);check(g.trophies.contains("QUESTS_10"),"quest trophy unlocked");return null;});
+            long walletBefore=RpgPlayers.get(p).gold;GuildService.action(p,shopPacket(0));
+            check(RpgPlayers.get(p).gold==walletBefore-GuildExtras.price(GuildExtras.SHOP.get(0),0),"shop purchase debits wallet into guild bank");
+            long afterBuy=RpgPlayers.get(p).gold;GuildService.action(p,shopPacket(7));check(RpgPlayers.get(p).gold==afterBuy,"locked shop item refused");
+            GuildStore.access(server,true,s->{var g=GuildStore.byId(s,id);g.gold=20000;g.xp=saved[1];g.questsDone=0;g.trophies.clear();g.quests.clear();g.pins.clear();g.motd="";return null;});RpgPlayers.get(p).gold=saved[2];
             GuildService.action(p,packet("upgrade"));check(GuildStore.access(server,false,s->GuildStore.byId(s,id).level)==1,"unbeaten boss blocks level advance");
             GuildStore.access(server,true,s->{var g=GuildStore.byId(s,id);g.xp=1000;g.bosses=1;return null;});GuildService.action(p,packet("upgrade"));
             check(GuildStore.access(server,false,s->{var g=GuildStore.byId(s,id);return g.level==2&&g.gold==10000&&g.xp==0;}),"upgrade atomically spends 10000 gold and required XP after boss");GuildService.action(p,packet("upgrade"));check(GuildStore.access(server,false,s->GuildStore.byId(s,id).gold)==10000,"repeated upgrade never spends again");

@@ -19,6 +19,27 @@ public class ClassSelectScreen extends MmoScreen {
     private static final PlayerClass[] CLASSES = {PlayerClass.GUERRIER, PlayerClass.MAGE, PlayerClass.ARCHER, PlayerClass.TANK};
     private static final String[] RATINGS = {"Attaque", "Défense", "Magie", "Mobilité", "Difficulté"};
     private PlayerClass chosen;
+    private final java.util.Map<PlayerClass, net.minecraft.client.player.RemotePlayer> previews = new java.util.EnumMap<>(PlayerClass.class);
+    private float dragYaw;
+
+    /** Joueur factice tenant l'arme typique de la classe, montre en rotation dans la carte choisie ou survolee. */
+    private net.minecraft.client.player.RemotePlayer preview(PlayerClass c) {
+        var mc = net.minecraft.client.Minecraft.getInstance();
+        if (mc.level == null || mc.player == null) return null;
+        return previews.computeIfAbsent(c, k -> {
+            var p = new net.minecraft.client.player.RemotePlayer(mc.level, mc.player.getGameProfile());
+            p.setId(-3000 - k.ordinal());                       // sans id, le rendu leve une erreur
+            net.minecraft.world.item.Item main = switch (k) {
+                case GUERRIER -> net.minecraft.world.item.Items.IRON_SWORD;
+                case MAGE -> net.minecraft.world.item.Items.BLAZE_ROD;
+                case ARCHER -> net.minecraft.world.item.Items.BOW;
+                default -> net.minecraft.world.item.Items.IRON_AXE;
+            };
+            p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, new net.minecraft.world.item.ItemStack(main));
+            if (k == PlayerClass.TANK) p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.OFFHAND, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.SHIELD));
+            return p;
+        });
+    }
 
     public ClassSelectScreen() {
         super("Choix de la classe");
@@ -47,6 +68,14 @@ public class ClassSelectScreen extends MmoScreen {
             int by0 = cy + ch - 24;
             int portraitH = Math.max(40, Math.min(84, ch / 4));
             Ui.classPortrait(g, i, cx + 2, cy + 2, cw - 4, portraitH);
+            if (sel || (hover && chosen == null)) {                // apercu 3D tournant (glisser pour tourner)
+                var pv = preview(c);
+                if (pv != null) {
+                    g.fill(cx + 2, cy + 2, cx + cw - 2, cy + 2 + portraitH, Ui.withAlpha(Ui.darker(c.color, 0.35f), 0xF0));
+                    float yaw = (float) Math.toRadians((System.currentTimeMillis() / 20) % 360) + dragYaw;
+                    Ui.entitySpin(g, cx + 2, cy + 2, cx + cw - 2, cy + 2 + portraitH, Math.max(16, portraitH / 2 - 4), .0625f, yaw, 0f, pv);
+                }
+            }
             g.fillGradient(cx + 2, cy + 2 + portraitH - 18, cx + cw - 2, cy + 2 + portraitH, 0x00000000, 0xB0080410);
             int ty = cy + 6 + portraitH;
             Ui.scaledText(g, c.label.toUpperCase(java.util.Locale.ROOT), cx + cw / 2f, ty, 1.3f, c.color, true);

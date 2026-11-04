@@ -103,6 +103,7 @@ public final class QuestOffers {
         GuidanceManager.refresh(p);
         d.dirty = true;
         if (!q.speech.isEmpty()) MascotGuide.say(p, q.speech);
+        StoryQuests.onAccept(p, q);
     }
 
     public static void decline(ServerPlayer p, String id) {

@@ -33,6 +33,7 @@ public final class PvpProgression {
  public static void finish(ArenaManager.Session session,MinecraftServer server){if(!session.match.ended)return;var report=snapshot(session,server,false);
   var counted=new ArrayList<Row>();
   access(server,s->{for(var row:report.rows){var a=account(s,UUID.fromString(row.id));if(a.awards.add(report.id)){a.points=Math.addExact(a.points,row.points);a.report=report;counted.add(row);}}return null;});
+  if(!report.training&&!counted.isEmpty())PvpSeasons.record(server,report);
   if(!report.training)for(var row:counted)com.mmorpg.ranking.Rankings.arena(server,UUID.fromString(row.id),row.name,row.kills,row.team==report.winner);
   if(!report.training)for(var row:counted){var winner=server.getPlayerList().getPlayer(UUID.fromString(row.id));if(winner!=null&&row.team==report.winner)com.mmorpg.achievement.Achievements.add(winner,com.mmorpg.achievement.Achievement.PVP_WINS,1);}
  }

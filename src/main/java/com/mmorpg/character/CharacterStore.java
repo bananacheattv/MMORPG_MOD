@@ -25,6 +25,8 @@ public final class CharacterStore {
         public String dim = "";
         public double x, y, z;
         public long saved;
+        /** Heure (ms) de suppression definitive ; 0 = aucune suppression en attente. */
+        public long deleteAt;
         public CompoundTag equip = new CompoundTag();
         public CompoundTag snapshot;
 
@@ -32,7 +34,7 @@ public final class CharacterStore {
             var t = new CompoundTag();
             t.putInt("slot", slot); t.putString("name", name); t.putInt("cls", cls); t.putInt("level", level);
             t.putString("place", place); t.putString("role", role); t.putString("dim", dim);
-            t.putDouble("x", x); t.putDouble("y", y); t.putDouble("z", z); t.putLong("saved", saved);
+            t.putDouble("x", x); t.putDouble("y", y); t.putDouble("z", z); t.putLong("saved", saved); t.putLong("deleteAt", deleteAt);
             t.put("equip", equip.copy());
             if (snapshot != null) t.put("snapshot", snapshot.copy());
             return t;
@@ -42,7 +44,7 @@ public final class CharacterStore {
             var s = new Slot();
             s.slot = t.getIntOr("slot", 0); s.name = t.getStringOr("name", ""); s.cls = t.getIntOr("cls", 0); s.level = t.getIntOr("level", 1);
             s.place = t.getStringOr("place", ""); s.role = t.getStringOr("role", ""); s.dim = t.getStringOr("dim", "");
-            s.x = t.getDoubleOr("x", 0); s.y = t.getDoubleOr("y", 0); s.z = t.getDoubleOr("z", 0); s.saved = t.getLongOr("saved", 0);
+            s.x = t.getDoubleOr("x", 0); s.y = t.getDoubleOr("y", 0); s.z = t.getDoubleOr("z", 0); s.saved = t.getLongOr("saved", 0); s.deleteAt = t.getLongOr("deleteAt", 0);
             s.equip = t.getCompoundOrEmpty("equip").copy();
             s.snapshot = t.getCompound("snapshot").map(CompoundTag::copy).orElse(null);
             return s;

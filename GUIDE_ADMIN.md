@@ -230,3 +230,18 @@ Les buffs et débuffs affichent un texte de trois mots maximum et le temps resta
 
 Les cadres et porte-armures du spawn refusent les interactions et dégâts des non-OP, ainsi que les dégâts environnementaux. Les OP conservent l’édition. [Wiki complet](docs/wiki/README.md) : 17 pages et catalogues générés depuis les 44 compétences et 44 armes PvE.
 - **Montures en décor** : `/monture poser <type>` (opérateurs) pose une monture immobile, invulnérable, non montable et persistante à ta position ; `/monture retirer` enlève celles dans un rayon de 6 blocs.
+
+## Modération et outils admin (opérateurs)
+
+Panneau complet : `/moderation` (ou `/mod`) — onglets Joueurs, Sanctions, Signalements, Historique, Journal/rejeu, Sauvegardes, Connectés (par serveur si la base est active), Outils, Donjons.
+
+| Commande | Effet |
+| --- | --- |
+| `/jail "pseudo" "temps" [raison]` / `/unjail "pseudo"` / `/jail liste` | Prison (30m, 2h, 1d). Plus aucune commande tant qu'on y est ; libération automatique et retour au point d'origine ; applicable hors ligne |
+| `/jailzone set` / `rayon <n>` / `info` | Définit la zone de la prison à votre position |
+| `/maintenance <temps> [raison]` / `off` / `statut` | Compte à rebours annoncé, puis expulsion des non-opérateurs et connexion refusée |
+| `/planifier annonce\|commande <délai> [repete <intervalle>] <texte>` / `liste` / `supprimer <n>` | Planificateur d'événements |
+| `/profil sauvegarder\|liste\|restaurer "pseudo" [fichier]` | Sauvegardes de profil (auto toutes les 5 min, connexion, déconnexion, avant modification admin) |
+| `/annuler "pseudo" <minutes>` | Annule les dernières minutes (restaure la sauvegarde antérieure) |
+
+Journal d'incident local : `config/mmorpg/moderation/journal/` (14 jours : événements, chat, commandes, positions, sanctions), visible dans l'onglet Journal / rejeu. Le `/report` alimente l'onglet Signalements via `Reports.add(...)`. L'éditeur de donjons du panneau ouvre le donjon de setup existant.

@@ -17,6 +17,10 @@ public final class Net {
         event.registrar("1").optional().playToClient(ProxyConnect.TYPE, ProxyConnect.CODEC);
         PayloadRegistrar r = event.registrar("1");
         r.playToClient(S2COpenScreen.TYPE, S2COpenScreen.CODEC);
+        r.playToClient(com.mmorpg.security.PacketSigner.SessionKey.TYPE, com.mmorpg.security.PacketSigner.SessionKey.CODEC);
+        r.playToServer(com.mmorpg.security.PacketSigner.Sign.TYPE, com.mmorpg.security.PacketSigner.Sign.CODEC, (packet, ctx) -> {
+            if (ctx.player() instanceof ServerPlayer p) com.mmorpg.security.PacketSigner.received(p, packet);
+        });
         r.playToClient(Payloads.Guidance.TYPE,Payloads.Guidance.CODEC);
         r.playToClient(Payloads.SyncPlayer.TYPE, Payloads.SyncPlayer.CODEC);
         r.playToClient(Payloads.Vitals.TYPE, Payloads.Vitals.CODEC);
@@ -73,17 +77,20 @@ public final class Net {
         srv(r, Payloads.QuestAction.TYPE, Payloads.QuestAction.CODEC, ServerHandlers::questAction);
         srv(r, Payloads.ShopAction.TYPE, Payloads.ShopAction.CODEC, ServerHandlers::shopAction);
         srv(r, Payloads.MerchantEdit.TYPE,Payloads.MerchantEdit.CODEC,(packet,ctx)->{if(ctx.player() instanceof ServerPlayer p)com.mmorpg.server.MerchantEditor.action(p,packet.data());});
-        srv(r, Payloads.SocialAction.TYPE,Payloads.SocialAction.CODEC,(packet,ctx)->{if(ctx.player() instanceof ServerPlayer p){if(packet.system().equals("tuto"))com.mmorpg.server.MascotGuide.screen(p,packet.data().getStringOr("screen",""));else if(packet.system().equals("pvp"))com.mmorpg.competition.PvpProgression.action(p,packet.data());else if(packet.system().equals("jobs"))com.mmorpg.job.JobSystem.action(p,packet.data());else if(packet.system().equals("backpack"))com.mmorpg.server.Backpacks.open(p);else if(packet.system().equals("store"))com.mmorpg.store.PremiumStore.action(p,packet.data());else if(packet.system().equals("achievements"))com.mmorpg.achievement.Achievements.action(p,packet.data());else if(packet.system().equals("guild"))com.mmorpg.guild.GuildService.action(p,packet.data());else if(packet.system().equals("armorstand"))com.mmorpg.server.ArmorStandEditor.action(p,packet.data());else if(packet.system().equals("arena"))com.mmorpg.competition.ArenaManager.action(p,packet.data());else if(packet.system().equals("trade"))com.mmorpg.economy.TradeManager.action(p,packet.data());else if(packet.system().equals("playeradmin"))com.mmorpg.admin.PlayerAdmin.action(p,packet.data());else if(packet.system().equals("lightblock"))com.mmorpg.block.LightEmitterBlock.apply(p,packet.data());else if(packet.system().equals("features"))com.mmorpg.admin.FeatureAdmin.action(p,packet.data());else if(packet.system().equals("characters"))com.mmorpg.character.Characters.action(p,packet.data());}});
+        srv(r, Payloads.SocialAction.TYPE,Payloads.SocialAction.CODEC,(packet,ctx)->{if(ctx.player() instanceof ServerPlayer p){if(packet.system().equals("tuto"))com.mmorpg.server.MascotGuide.screen(p,packet.data().getStringOr("screen",""));else if(packet.system().equals("pvp"))com.mmorpg.competition.PvpProgression.action(p,packet.data());else if(packet.system().equals("jobs"))com.mmorpg.job.JobSystem.action(p,packet.data());else if(packet.system().equals("backpack"))com.mmorpg.server.Backpacks.open(p);else if(packet.system().equals("store"))com.mmorpg.store.PremiumStore.action(p,packet.data());else if(packet.system().equals("achievements"))com.mmorpg.achievement.Achievements.action(p,packet.data());else if(packet.system().equals("friends"))com.mmorpg.social.FriendService.action(p,packet.data());else if(packet.system().equals("guild"))com.mmorpg.guild.GuildService.action(p,packet.data());else if(packet.system().equals("armorstand"))com.mmorpg.server.ArmorStandEditor.action(p,packet.data());else if(packet.system().equals("arena"))com.mmorpg.competition.ArenaManager.action(p,packet.data());else if(packet.system().equals("trade"))com.mmorpg.economy.TradeManager.action(p,packet.data());else if(packet.system().equals("playeradmin"))com.mmorpg.admin.PlayerAdmin.action(p,packet.data());else if(packet.system().equals("lightblock"))com.mmorpg.block.LightEmitterBlock.apply(p,packet.data());else if(packet.system().equals("features"))com.mmorpg.admin.FeatureAdmin.action(p,packet.data());else if(packet.system().equals("moderation"))com.mmorpg.moderation.ModerationPanel.action(p,packet.data());else if(packet.system().equals("characters"))com.mmorpg.character.Characters.action(p,packet.data());}});
+        srv(r, Payloads.QolAction.TYPE, Payloads.QolAction.CODEC, (packet, ctx) -> {if (ctx.player() instanceof ServerPlayer p) com.mmorpg.server.Qol.action(p, packet.data());});
+        r.playToClient(Payloads.QolSync.TYPE, Payloads.QolSync.CODEC);
         srv(r, Payloads.PartyAction.TYPE, Payloads.PartyAction.CODEC, ServerHandlers::partyAction);
     }
 
     private static <T extends CustomPacketPayload> void srv(PayloadRegistrar r, CustomPacketPayload.Type<T> type,
             net.minecraft.network.codec.StreamCodec<? super net.minecraft.network.RegistryFriendlyByteBuf, T> codec,
             net.neoforged.neoforge.network.handling.IPayloadHandler<T> handler) {
-        r.playToServer(type, codec, com.mmorpg.anticheat.AntiCheat.gate(type, handler));
+        r.playToServer(type, codec, com.mmorpg.anticheat.AntiCheat.gate(type, codec, handler));
     }
 
     public static void toPlayer(ServerPlayer player, CustomPacketPayload payload) {
+        if (payload instanceof S2COpenScreen s) com.mmorpg.security.ScreenGuard.opened(player, s.screen());
         PacketDistributor.sendToPlayer(player, payload);
     }
 

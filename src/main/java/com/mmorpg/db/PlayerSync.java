@@ -58,6 +58,7 @@ public final class PlayerSync {
         if (!active()) return;
         final UUID id = p.getUUID();
         final String me = Database.config().serverId;
+        final java.util.concurrent.atomic.AtomicReference<String> refusedBy = new java.util.concurrent.atomic.AtomicReference<>();
         Row row = Database.await("lecture du profil", PULL_WAIT_MS + 2000, c -> {
             long deadline = System.currentTimeMillis() + PULL_WAIT_MS;
             Row r;
@@ -75,7 +76,11 @@ public final class PlayerSync {
                     }
                 }
                 if (r == null || !busyElsewhere || System.currentTimeMillis() >= deadline) {
-                    if (busyElsewhere) MMORPG.LOGGER.warn("[MMORPG] Base de donnees : {} est encore en ligne sur un autre serveur, on reprend sans attendre", id);
+                    if (busyElsewhere) {                          // session unique par compte : on refuse la seconde connexion
+                        MMORPG.LOGGER.warn("[MMORPG] Base de donnees : {} est deja en ligne sur un autre serveur, connexion refusee", id);
+                        refusedBy.set("autre");
+                        r = null;
+                    }
                     break;
                 }
                 try {
@@ -112,6 +117,10 @@ public final class PlayerSync {
             if (kind != null) r = r == null ? new Row(null, 0, null, null, kind, arg) : new Row(r.data(), r.version(), r.bank(), r.inventory(), kind, arg);
             return r;
         });
+        if (refusedBy.get() != null) {
+            p.connection.disconnect(net.minecraft.network.chat.Component.literal("Ce compte est déjà connecté sur un autre serveur."));
+            return;
+        }
         PlayerData d = RpgPlayers.get(p);
         MinecraftServer server = p.level().getServer();
         if (row != null) {

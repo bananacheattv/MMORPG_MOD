@@ -352,6 +352,8 @@ public class CharacterScreen extends AbstractContainerScreen<InventoryMenu> {
         if(front)Ui.border(g,x,y,size,size,0xB0D4B2FF);else g.fill(x,y,x+size,y+size,0x303E2B55);
     }
 
+    /** Cadre absolu {x, y, taille} d'un emplacement (surbrillance de la recherche). */
+    public int[] slotBox(Slot slot){var r=layoutRects.get(slotModule(slot));if(r==null||!r.visible()||slot.x<-1000)return null;int size=Math.round((slot.index>=9&&slot.index<45?cell-2:20)*r.scale());return new int[]{leftPos+slot.x-Math.round(r.scale()),topPos+slot.y-Math.round(r.scale()),size};}
     private Module slotModule(Slot slot){return slot.index>=9&&slot.index<45?Module.INVENTORY:Module.EQUIPMENT;}
     private void defaults(Module module,float x,float y,float w,float h){layoutDefaults.put(module,new float[]{x,y,w,h});var r=CharacterLayout.resolve(module,x,y,w,h,width,height);if(module==Module.IDENTITY&&!CharacterLayout.box(module).custom&&y+h>py+ph-29)r=new CharacterLayout.Rect(r.x(),r.y(),r.w(),r.h(),r.scale(),false);if(module==Module.EVOLUTION&&ph<258&&!CharacterLayout.box(module).custom)r=new CharacterLayout.Rect(r.x(),r.y(),r.w(),r.h(),r.scale(),false);layoutRects.put(module,r);}
     private void prepareLayout(){

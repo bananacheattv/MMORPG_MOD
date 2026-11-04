@@ -138,6 +138,7 @@ public final class DevNetworkChecks {
             KillRewards.onDeath(new net.neoforged.neoforge.event.entity.living.LivingDeathEvent(boss, p.damageSources().playerAttack(p)));
             check(countPlans(p) == scrolls + 1, "boss grants a personal crafting scroll");
             DevPortalChecks.run(p);
+            com.mmorpg.moderation.DevModerationChecks.run(p);
             com.mmorpg.dungeon.DevDedicatedDungeonChecks.run(p);
             com.mmorpg.dungeon.DevDungeonSetupChecks.run(p);
             DevSpawnEditorChecks.run(p);
@@ -151,6 +152,7 @@ public final class DevNetworkChecks {
             DevPolishChecks.run(p);
             DevBossChecks.run(p);
             com.mmorpg.competition.DevPvpChecks.run(p);
+            com.mmorpg.competition.DevSeasonChecks.run(p);
             com.mmorpg.economy.DevTradeChecks.run(p);
             DevCharacterChecks.run(p);      // en dernier : change de personnage, donc de lieu et d'inventaire
             java.nio.file.Files.writeString(java.nio.file.Path.of("../build/reports/blueprints.json"),new com.google.gson.Gson().toJson(ForgeRecipes.all().stream().filter(r->ForgeProgression.required(r)>0).map(ForgeProgression::blueprint).toList()));

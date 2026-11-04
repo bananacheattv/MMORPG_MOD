@@ -47,6 +47,7 @@ public final class Multiblocks {
                         case PRESSE -> "6 × 6 blocs, 5 de haut";
                         case BANQUE, HDV -> "7 × 5 blocs, 4 de haut";
                         case QUETES_HEBDO -> "7 × 3 blocs, 6 de haut";
+                        case BOITE_AUX_LETTRES -> "1 × 1 bloc, 3 de haut";
                     } + ").").withColor(0xFF6060));
         }
     }

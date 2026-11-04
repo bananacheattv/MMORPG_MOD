@@ -127,6 +127,7 @@ public final class RpgPlayers {
         t.putString("activeMount", d.activeMount);
         t.put("quests", QuestManager.activeTag(player, d));
         t.put("declined", QuestManager.declinedTag(player, d));
+        t.put("questExtra", QuestManager.extraTag(player, d));
         Net.toPlayer(player, new Payloads.SyncPlayer(t));
         d.dirty = false;
         sendVitals(player, true);
@@ -637,6 +638,7 @@ public final class RpgPlayers {
         String lostLoot = SessionLoot.onDeath(player);          // mines et donjons : le butin de la session est perdu
         com.mmorpg.network.Net.toPlayer(player, new Payloads.DeathInfo(Math.max(0, lost), d.level, d.xp, LevelSystem.xpToNext(d.level), cause, lostLoot));
         PetManager.despawn(player);
+        Qol.died(player);
     }
 
     public static void onLogout(ServerPlayer player) {

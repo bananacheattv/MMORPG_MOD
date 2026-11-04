@@ -253,7 +253,8 @@ RUNE_SHAPES = [
 # ---------------------------------------------------------------- modele
 
 class Model:
-    def __init__(self, key, seed):
+    def __init__(self, key, seed, density=DENSITY):
+        self.density = density
         self.key = key
         self.groups = {}
         self.top = []
@@ -293,7 +294,7 @@ class Model:
             dx, dy, dz = (abs(b['to'][i] - b['from'][i]) for i in range(3))
             dims = {'north': (dx, dy), 'south': (dx, dy), 'east': (dz, dy), 'west': (dz, dy), 'up': (dx, dz), 'down': (dx, dz)}
             for face, (fw, fh) in dims.items():
-                rects.append((b, face, max(1, round(fw * DENSITY)), max(1, round(fh * DENSITY))))
+                rects.append((b, face, max(1, round(fw * self.density)), max(1, round(fh * self.density))))
         rects.sort(key=lambda r: -r[3])
         x = y = row = 0
         for b, face, w, h in rects:
