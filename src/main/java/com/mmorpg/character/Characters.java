@@ -73,7 +73,7 @@ public final class Characters {
 
     /** Renomme le personnage d'un compte (emplacement 0-11). Commande admin. */
     public static void rename(ServerPlayer target, int slot, String name) throws Exception {
-        require(name.matches("[\\p{L}0-9 '_-]{3,16}"), "Nom : 3 à 16 lettres, chiffres ou espaces.");
+        require(name.matches("[\\p{L}0-9 '_\\-\\[\\]().]{3,16}"), "Nom : 3 à 16 caractères (lettres, chiffres, espaces, [ ] ( ) . - _).");
         var server = target.level().getServer();
         var store = CharacterStore.load(server, target.getUUID());
         PlayerData d = RpgPlayers.get(target);
@@ -288,7 +288,7 @@ public final class Characters {
     private static void create(ServerPlayer p, int slot, String name) throws Exception {
         var server = p.level().getServer();
         require(slot >= 0 && slot < ownedSlots(server, p.getUUID()), "Emplacement indisponible.");
-        require(name.matches("[\\p{L}0-9 '_-]{3,16}"), "Nom : 3 à 16 lettres, chiffres ou espaces.");
+        require(name.matches("[\\p{L}0-9 '_\\-\\[\\]().]{3,16}"), "Nom : 3 à 16 caractères (lettres, chiffres, espaces, [ ] ( ) . - _).");
         var store = CharacterStore.load(server, p.getUUID());
         require(!store.slots.containsKey(slot), "Emplacement déjà utilisé.");
         for (var other : store.slots.values()) require(!other.name.equalsIgnoreCase(name), "Tu as déjà un personnage de ce nom.");
