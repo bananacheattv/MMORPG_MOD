@@ -42,6 +42,7 @@ public final class AdventurePortals {
 
     public static AABB passage(Portal portal) {
         BlockPos p = portal.pos();
+        if (portal.block() && portal.max().isPresent()) { BlockPos m = portal.max().get(); return new AABB(p.getX() - .3, p.getY() - .1, p.getZ() - .3, m.getX() + 1.3, m.getY() + 2, m.getZ() + 1.3); }
         if (portal.block()) return new AABB(p.getX() - .3, p.getY() - .1, p.getZ() - .3, p.getX() + 1.3, p.getY() + 2, p.getZ() + 1.3);
         return portal.widthX() ? new AABB(p.getX() - 1, p.getY(), p.getZ() + .15, p.getX() + 2, p.getY() + 4, p.getZ() + .85)
                 : new AABB(p.getX() + .15, p.getY(), p.getZ() - 1, p.getX() + .85, p.getY() + 4, p.getZ() + 2);
@@ -108,7 +109,8 @@ public final class AdventurePortals {
         for (Portal other : data.all()) if (!portal.block() && !other.block() && other.dimension().equals(portal.dimension()) && passage(other).inflate(2).intersects(passage(portal))) return fail(player, "Un portail est déjà trop proche.");
         if (portal.block()) {
             if (data.all().stream().anyMatch(o -> o.block() && o.dimension().equals(portal.dimension()) && o.pos().equals(portal.pos()))) return fail(player, "Ce bloc est déjà un portail.");
-            if (level.getBlockState(portal.pos()).isAir()) return fail(player, "Visez un bloc.");
+            if (portal.max().isEmpty() && level.getBlockState(portal.pos()).isAir()) return fail(player, "Visez un bloc.");
+            if (portal.max().isPresent()) { var box = passage(portal); if (box.getXsize() > 40 || box.getYsize() > 40 || box.getZsize() > 40) return fail(player, "Zone trop grande (40 blocs max par côté)."); }
             data.put(portal);
             remember(player, new Change(portal, true, new LinkedHashMap<>(), new LinkedHashMap<>()));
             return true;
@@ -220,9 +222,10 @@ public final class AdventurePortals {
                 if (!valid(portal) || !p.level().dimension().equals(portal.dimension()) || p.distanceToSqr(portal.pos().getX() + .5, portal.pos().getY() + 2, portal.pos().getZ() + .5) > 32 * 32) continue;
                 if (HEALED.add(portal.id())) heal(p.level(), portal);
                 if (!frame(portal).entrySet().stream().allMatch(e -> p.level().getBlockState(e.getKey()).equals(e.getValue()))) continue;
-                if (portal.block() && p.level().getBlockState(portal.pos()).isAir()) continue;
+                if (portal.block() && portal.max().isEmpty() && p.level().getBlockState(portal.pos()).isAir()) continue;
                 int color = portal.kind().equals("mine") ? 0xFFB040 : portal.kind().equals("plaines") ? 0x50E0A0 : 0xB070FF;
                 p.level().sendParticles(p, new DustParticleOptions(color, 1.3f), false, false, portal.pos().getX() + .5, portal.pos().getY() + (portal.block() ? 1.2 : 2), portal.pos().getZ() + .5, 12, portal.block() ? .5 : portal.widthX() ? 1.2 : .1, portal.block() ? .5 : 1.5, portal.block() ? .5 : portal.widthX() ? .1 : 1.2, 0);
+                if (portal.max().isPresent()) { var box = passage(portal); p.level().sendParticles(p, new DustParticleOptions(color, 1.3f), false, false, box.getCenter().x, box.getCenter().y, box.getCenter().z, 16, box.getXsize() / 2, box.getYsize() / 2, box.getZsize() / 2, 0); }
                 if (p.distanceToSqr(portal.pos().getX() + .5, portal.pos().getY(), portal.pos().getZ() + .5) < 36 && server.getTickCount() % 40 == 0) p.sendOverlayMessage(Component.literal(label(portal)).withColor(color));
                 if (passage(portal).contains(p.position())) inside = portal;
             }
@@ -239,6 +242,18 @@ public final class AdventurePortals {
     /** block=true : le bloc visé (6 blocs max) devient lui-même le portail, sans arche. */
     private static int create(net.minecraft.commands.CommandSourceStack source, String kind, int region, String dungeon, int difficulty, boolean block) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
         ServerPlayer p = source.getPlayerOrException();
+        if (block && kind.startsWith("zone:")) {
+            kind = kind.substring(5);
+            var sel = com.mmorpg.zone.ZoneManager.selection(p);
+            if (!sel.complete() || !p.level().dimension().equals(sel.dimension)) { fail(p, "Sélectionnez 2 coins avec la baguette de zone (clic droit sur chaque coin)."); return 0; }
+            BlockPos lo = new BlockPos(Math.min(sel.a.getX(), sel.b.getX()), Math.min(sel.a.getY(), sel.b.getY()), Math.min(sel.a.getZ(), sel.b.getZ()));
+            BlockPos hi = new BlockPos(Math.max(sel.a.getX(), sel.b.getX()), Math.max(sel.a.getY(), sel.b.getY()), Math.max(sel.a.getZ(), sel.b.getZ()));
+            Portal zp = new Portal(UUID.randomUUID(), p.level().dimension(), lo, true, kind, region, dungeon, difficulty, true, java.util.Optional.of(hi));
+            if (!place(p, zp)) return 0;
+            com.mmorpg.zone.ZoneManager.clearSelection(p);
+            source.sendSuccess(() -> Component.literal("Zone portail : " + label(zp) + ". Entrer dans la zone téléporte. /portail supprimer (près de son coin min), /undoportail."), true);
+            return 1;
+        }
         if (block) {
             var hit = p.pick(6, 0, false);
             if (!(hit instanceof net.minecraft.world.phys.BlockHitResult bh) || hit.getType() != net.minecraft.world.phys.HitResult.Type.BLOCK) { fail(p, "Visez un bloc (6 blocs max)."); return 0; }
@@ -253,21 +268,22 @@ public final class AdventurePortals {
         source.sendSuccess(() -> Component.literal("Portail posé : " + label(portal) + ". Traversez l'arche pour entrer. Annuler : /undoportail."), true);
         return 1;
     }
-    private static void kinds(com.mojang.brigadier.builder.ArgumentBuilder<net.minecraft.commands.CommandSourceStack, ?> parent, boolean block) {
-        parent.then(Commands.literal("hub").executes(c -> create(c.getSource(), "hub", -1, "", 0, block)));
-        parent.then(Commands.literal("spawn").executes(c -> create(c.getSource(), "spawn", -1, "", 0, block)));
-        parent.then(Commands.literal("mine").executes(c -> create(c.getSource(), "mine", -1, "", 0, block))
-                .then(Commands.argument("region", IntegerArgumentType.integer(1, com.mmorpg.mine.MineLayout.SECTORS)).executes(c -> create(c.getSource(), "mine", IntegerArgumentType.getInteger(c, "region") - 1, "", 0, block))));
-        parent.then(Commands.literal("plaines").executes(c -> create(c.getSource(), "plaines", -1, "", 0, block))
-                .then(Commands.argument("region", IntegerArgumentType.integer(1, com.mmorpg.plains.PlainsLayout.REGIONS)).executes(c -> create(c.getSource(), "plaines", IntegerArgumentType.getInteger(c, "region") - 1, "", 0, block))));
+    private static void kinds(com.mojang.brigadier.builder.ArgumentBuilder<net.minecraft.commands.CommandSourceStack, ?> parent, boolean block) { kinds(parent, block, ""); }
+    private static void kinds(com.mojang.brigadier.builder.ArgumentBuilder<net.minecraft.commands.CommandSourceStack, ?> parent, boolean block, String pre) {
+        parent.then(Commands.literal("hub").executes(c -> create(c.getSource(), pre + "hub", -1, "", 0, block)));
+        parent.then(Commands.literal("spawn").executes(c -> create(c.getSource(), pre + "spawn", -1, "", 0, block)));
+        parent.then(Commands.literal("mine").executes(c -> create(c.getSource(), pre + "mine", -1, "", 0, block))
+                .then(Commands.argument("region", IntegerArgumentType.integer(1, com.mmorpg.mine.MineLayout.SECTORS)).executes(c -> create(c.getSource(), pre + "mine", IntegerArgumentType.getInteger(c, "region") - 1, "", 0, block))));
+        parent.then(Commands.literal("plaines").executes(c -> create(c.getSource(), pre + "plaines", -1, "", 0, block))
+                .then(Commands.argument("region", IntegerArgumentType.integer(1, com.mmorpg.plains.PlainsLayout.REGIONS)).executes(c -> create(c.getSource(), pre + "plaines", IntegerArgumentType.getInteger(c, "region") - 1, "", 0, block))));
         var dungeon = Commands.argument("type", StringArgumentType.word())
                 .suggests((c, b) -> SharedSuggestionProvider.suggest(Arrays.stream(DungeonType.values()).map(t -> t.id), b))
-                .executes(c -> create(c.getSource(), "donjon", -1, StringArgumentType.getString(c, "type"), 0, block));
+                .executes(c -> create(c.getSource(), pre + "donjon", -1, StringArgumentType.getString(c, "type"), 0, block));
         for (int i = 0; i < 3; i++) {
             final int difficulty = i;
-            dungeon.then(Commands.literal(new String[]{"normal", "heroique", "mythique"}[i]).executes(c -> create(c.getSource(), "donjon", -1, StringArgumentType.getString(c, "type"), difficulty, block)));
+            dungeon.then(Commands.literal(new String[]{"normal", "heroique", "mythique"}[i]).executes(c -> create(c.getSource(), pre + "donjon", -1, StringArgumentType.getString(c, "type"), difficulty, block)));
         }
-        parent.then(Commands.literal("donjon").executes(c -> create(c.getSource(), "donjons", -1, "", 0, block)).then(dungeon));
+        parent.then(Commands.literal("donjon").executes(c -> create(c.getSource(), pre + "donjons", -1, "", 0, block)).then(dungeon));
     }
     @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.LOWEST)
     public static void commands(RegisterCommandsEvent event) {
@@ -277,6 +293,9 @@ public final class AdventurePortals {
         var blocRoot = Commands.literal("bloc");
         kinds(blocRoot, true);
         root.then(blocRoot);
+        var zoneRoot = Commands.literal("zone");
+        kinds(zoneRoot, true, "zone:");
+        root.then(zoneRoot);
         root.then(Commands.literal("liste").executes(c -> {
             var portals = AdventurePortalData.get(c.getSource().getServer()).all();
             c.getSource().sendSuccess(() -> Component.literal(portals.size() + " portail(s) enregistré(s)."), false);
@@ -285,7 +304,7 @@ public final class AdventurePortals {
         }));
         root.then(Commands.literal("supprimer").executes(c -> {
             ServerPlayer p = c.getSource().getPlayerOrException();
-            Portal nearest = AdventurePortalData.get(p.level().getServer()).all().stream().filter(g -> g.dimension().equals(p.level().dimension()) && p.distanceToSqr(g.pos().getX() + .5, g.pos().getY(), g.pos().getZ() + .5) < 64).min(Comparator.comparingDouble(g -> p.distanceToSqr(g.pos().getX() + .5, g.pos().getY(), g.pos().getZ() + .5))).orElse(null);
+            Portal nearest = AdventurePortalData.get(p.level().getServer()).all().stream().filter(g -> g.dimension().equals(p.level().dimension()) && passage(g).distanceToSqr(p.position()) < 64).min(Comparator.comparingDouble(g -> passage(g).distanceToSqr(p.position()))).orElse(null);
             if (nearest == null) { fail(p, "Aucun portail à moins de 8 blocs."); return 0; }
             if (!remove(p, nearest)) return 0;
             c.getSource().sendSuccess(() -> Component.literal("Portail supprimé. /undoportail permet de le rétablir."), true);

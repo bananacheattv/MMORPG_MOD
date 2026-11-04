@@ -37,3 +37,6 @@ La suite `gradlew.bat runServer -PnetworkChecks build` comprend désormais les v
 ## Bloc portail (sans arche)
 Viser un bloc existant (6 blocs max), puis : `/portail bloc <hub|spawn|mine [n]|plaines [n]|donjon [type [normal|heroique|mythique]]>`.
 Le bloc devient le portail : marcher dessus ou contre lui téléporte. Le bloc n'est jamais modifié. Retirer : `/portail supprimer` (à moins de 8 blocs) ; annuler : `/undoportail`. Sauvegarde persistante comme les arches (`/portail liste`).
+
+## Zone portail
+Baguette de zone (onglet créatif) : clic droit sur 2 coins, puis `/portail zone <hub|spawn|mine [n]|plaines [n]|donjon [type [difficulté]]>` (40 blocs max par côté). Entrer dans la zone téléporte. Retirer : `/portail supprimer` (à moins de 8 blocs de la zone), annuler : `/undoportail`.

@@ -56,6 +56,7 @@ public class ZoneWandItem extends RpgMaterialItem {
         out.accept(Component.literal("Outil d'administration (opérateurs)").withColor(0xFF8060));
         out.accept(Component.literal("Clic droit sur un bloc : coin A, puis coin B").withColor(0x80C0FF));
         out.accept(Component.literal("/zone creer <nom> : valide la zone").withColor(0xA0A0A0));
+        out.accept(Component.literal("/portail zone <destination> : la zone devient un portail").withColor(0xA0A0A0));
         out.accept(Component.literal("Accroupi + clic : efface la sélection").withColor(0xA0A0A0));
     }
 

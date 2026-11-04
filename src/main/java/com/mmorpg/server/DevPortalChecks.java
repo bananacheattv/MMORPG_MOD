@@ -114,6 +114,14 @@ public final class DevPortalChecks {
         check(!AdventurePortals.place(p, blockPortal), "duplicate block portal refused");
         check(Portal.CODEC.encodeStart(NbtOps.INSTANCE, blockPortal).result().flatMap(t -> Portal.CODEC.parse(NbtOps.INSTANCE, t).result()).orElseThrow().block(), "block flag persisted");
         check(AdventurePortals.undo(p) && data.find(blockPortal.id()) == null && !level.getBlockState(stone).isAir(), "undo removes block portal, keeps block");
+        check(commands.execute("portail zone hub", source) == 0, "zone portal needs a selection");
+        var sel = com.mmorpg.zone.ZoneManager.selection(p); sel.dimension = level.dimension();
+        com.mmorpg.zone.ZoneManager.pick(p, new BlockPos(50, 100, 46)); com.mmorpg.zone.ZoneManager.pick(p, new BlockPos(46, 101, 50));
+        check(commands.execute("portail zone mine 2", source) == 1, "zone portal command");
+        Portal zone = data.all().stream().filter(g -> g.max().isPresent()).findFirst().orElseThrow();
+        check(zone.pos().equals(new BlockPos(46, 100, 46)) && zone.max().get().equals(new BlockPos(50, 101, 50)) && AdventurePortals.passage(zone).contains(48.5, 100.5, 48.5), "zone corners normalised, inside passage");
+        check(Portal.CODEC.encodeStart(NbtOps.INSTANCE, zone).result().flatMap(t -> Portal.CODEC.parse(NbtOps.INSTANCE, t).result()).orElseThrow().equals(zone), "zone portal persisted");
+        check(AdventurePortals.undo(p) && data.find(zone.id()) == null, "undo removes zone portal");
         com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] PORTALS PASS: placement, both orientations, persistence, overlap, undo/undo deletion, exact terrain restoration, containers, conflicts, access gates");
     }
 }
