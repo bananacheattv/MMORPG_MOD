@@ -86,6 +86,9 @@ public final class StatCalculator {
             pct.add(Stat.DEF, Skills.PEAU_DE_FER.power2 * r);
         }
 
+        // --- talents secondaires et prestige
+        com.mmorpg.progress.Progress.applyStats(data, flat, pct);
+
         // --- effets temporaires
         for (Buff b : data.buffs.values()) {
             switch (b.type) {

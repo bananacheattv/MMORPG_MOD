@@ -28,7 +28,8 @@ public enum MountType {
     MAMMOUTH("mammouth", "Mammouth laineux", Rarity.EPIQUE, 1.6f, 2.66f, 2.44f, false, -.344f, .5f, .344f, .5f, -.344f, -.5f, .344f, -.5f),
     ELEPHANT_GUERRE("elephant_guerre", "Éléphant de guerre", Rarity.LEGENDAIRE, 1.6f, 3.4f, 2.57f, false, -.344f, .5f, .344f, .5f, -.344f, -.5f, .344f, -.5f),
     TORTUE_FORTERESSE("tortue_forteresse", "Tortue forteresse", Rarity.LEGENDAIRE, 1.9f, 2.75f, 1.69f, false, 0, .812f, -.375f, .188f, .375f, .188f, -.375f, -.5f, .375f, -.5f),
-    DRAKE_CARAVANE("drake_caravane", "Drake de caravane", Rarity.MYTHIQUE, 1.6f, 3.06f, 2.0f, false, 0, .812f, -.344f, .188f, .344f, .188f, -.344f, -.5f, .344f, -.5f);
+    DRAKE_CARAVANE("drake_caravane", "Drake de caravane", Rarity.MYTHIQUE, 1.6f, 3.06f, 2.0f, false, 0, .812f, -.344f, .188f, .344f, .188f, -.344f, -.5f, .344f, -.5f),
+    DRAKE_ASCENDANT("drake_ascendant","Drake ascendant",Rarity.MYTHIQUE,1.0f,1.6f,1.6f,true);
 
     public final String id, label;
     public final Rarity rarity;

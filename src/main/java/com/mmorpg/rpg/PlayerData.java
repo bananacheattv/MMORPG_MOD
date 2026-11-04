@@ -44,6 +44,11 @@ public class PlayerData implements ValueIOSerializable {
     public int guildLevel;
     public long[] guildBuffs=new long[4];
     public final Set<String> forgeRecipes = new HashSet<>();
+    /** Prestige (0 ou 1, une seule fois), talents secondaires (id -> rang), points de talent bonus et paliers de bestiaire reclames (« mob:palier »). */
+    public int prestige;
+    public int bonusTalentPoints;
+    public final Map<String, Integer> talents = new LinkedHashMap<>();
+    public final Set<String> bestiaryClaimed = new HashSet<>();
     public static final int SKILL_SLOTS = 6;
     private static final Codec<Map<String, Integer>> STR_INT_MAP = Codec.unboundedMap(Codec.STRING, Codec.INT);
     private static final Codec<Map<String, String>> STR_STR_MAP = Codec.unboundedMap(Codec.STRING, Codec.STRING);
@@ -212,6 +217,8 @@ public class PlayerData implements ValueIOSerializable {
         t.putFloat("shieldGuard",shieldGuard);t.putBoolean("shieldGuardRecovering",shieldGuardRecovering);t.putString("pvpTitle",pvpTitle);t.put("backpacks",backpacks.copy());t.put("guild_receipts",guildReceipts.copy());t.putInt("guild_level",guildLevel);
         t.putLongArray("guild_buffs",guildBuffs);
         t.store("forgeRecipes",Codec.STRING.listOf(),new ArrayList<>(forgeRecipes));
+        t.putInt("prestige",prestige);t.putInt("bonusTalentPoints",bonusTalentPoints);
+        t.store("talents",STR_INT_MAP,talents);t.store("bestiaryClaimed",Codec.STRING.listOf(),new ArrayList<>(bestiaryClaimed));
         t.putString("class", playerClass.name());
         t.putInt("level", level);
         t.putLong("xp", xp);
@@ -272,6 +279,9 @@ public class PlayerData implements ValueIOSerializable {
         shieldGuard=Math.clamp(t.getFloatOr("shieldGuard",100),0,100);shieldGuardRecovering=t.getBooleanOr("shieldGuardRecovering",shieldGuard<=0);pvpTitle=t.getStringOr("pvpTitle","");backpacks=t.getCompoundOrEmpty("backpacks").copy();guildReceipts=t.getCompoundOrEmpty("guild_receipts").copy();guildLevel=Math.clamp(t.getIntOr("guild_level",0),0,10);
         guildBuffs=t.getLongArray("guild_buffs").orElse(new long[4]);if(guildBuffs.length!=4)guildBuffs=new long[4];
         forgeRecipes.clear();forgeRecipes.addAll(t.read("forgeRecipes",Codec.STRING.listOf()).orElse(List.of()));
+        prestige=Math.clamp(t.getIntOr("prestige",0),0,1);bonusTalentPoints=Math.max(0,t.getIntOr("bonusTalentPoints",0));
+        talents.clear();talents.putAll(t.read("talents",STR_INT_MAP).orElse(Map.of()));
+        bestiaryClaimed.clear();bestiaryClaimed.addAll(t.read("bestiaryClaimed",Codec.STRING.listOf()).orElse(List.of()));
         playerClass = PlayerClass.byName(t.getStringOr("class", "NONE"));
         level = Math.max(1, Math.min(LevelSystem.MAX_LEVEL, t.getIntOr("level", 1)));
         xp = t.getLongOr("xp", 0);

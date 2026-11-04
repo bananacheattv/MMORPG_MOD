@@ -166,7 +166,23 @@ public class BestiaryScreen extends MenuScreen {
         ty += Ui.wrap(g, origin, dx + 8, ty, textW, Ui.MUTED) + 1;
         int kills = ClientData.DATA.kills.getOrDefault(selected, 0);
         g.text(font, font.plainSubstrByWidth("Vaincus : " + kills, textW), dx + 8, ty, Ui.GREEN, false);
-        ty += 16;
+        ty += 12;
+        for (int tr = 0; tr < com.mmorpg.progress.Progress.BESTIARY_TIERS.length; tr++) {
+            final int tier = tr;
+            final String mob = selected;
+            boolean done = ClientData.DATA.bestiaryClaimed.contains(mob + ":" + tr);
+            boolean ready = com.mmorpg.progress.Progress.bestiaryReady(ClientData.DATA, mob, tr);
+            int bw = Math.max(30, (textW - 8) / 3);
+            String lbl = done ? "✓ " + com.mmorpg.progress.Progress.BESTIARY_TIERS[tr] : com.mmorpg.progress.Progress.BESTIARY_TIERS[tr] + " : " + com.mmorpg.progress.Progress.bestiaryGold(mob, tr) + "◎";
+            button(g, dx + 8 + tr * (bw + 4), ty, bw, 14, font.plainSubstrByWidth(lbl, bw - 4), ready, 0xFF7A5A10, () -> {
+                CompoundTag t2 = new CompoundTag();
+                t2.putString("action", "bestiary");
+                t2.putString("mob", mob);
+                t2.putInt("tier", tier);
+                com.mmorpg.client.ClientNet.send(new com.mmorpg.network.Payloads.SocialAction("progress", t2));
+            });
+        }
+        ty += 20;
         int lootW = dw - 16 - boxW - 8;
         Ui.header(g, dx + 8, ty, lootW, "BUTIN");
         ty += 14;
