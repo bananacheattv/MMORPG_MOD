@@ -22,7 +22,7 @@ Un serveur du mod en rôle `LOBBY`, toujours en ligne, où arrive toute nouvelle
 }
 ```
 
-- Velocity : ajouter `lobby = "127.0.0.1:25575"` dans `[servers]` et mettre `try = ["lobby"]` (nom identique à `network.json`).
+- Velocity : ajouter `lobby = "127.0.0.1:25575"` dans `[servers]` et mettre `try = ["lobby", "hub"]` (nom identique à `network.json`). **Toujours garder `hub` en repli** : avec `try = ["lobby"]` seul et un lobby arrêté ou absent, Velocity affiche « Unable to connect you to lobby. Please try again later. » et personne ne peut entrer. Si le lobby n'est pas installé, utiliser `try = ["hub"]`.
 
 ## Dossier partagé
 
