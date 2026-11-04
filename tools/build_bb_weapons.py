@@ -260,7 +260,8 @@ def line_cubes(name, p, q, th=.6, z=(7.75, 8.25)):
 
 
 def bow_pull(elements, pull):
-    """Remplace le cube « st:cord » (corde droite) par une corde tiree et ajoute la fleche."""
+    """Remplace le cube « st:cord » (corde droite) par une corde tiree et ajoute la fleche.
+    Geometrie des arcs : bouts en haut-droite et bas-gauche, ventre vers le haut-gauche (comme les anciens modeles)."""
     keep, cord = [], None
     for e in elements:
         if e['name'] == 'st:cord':
@@ -270,20 +271,22 @@ def bow_pull(elements, pull):
     assert cord, 'cube st:cord manquant'
     r = cord['rotation']['origin']
     h = (cord['to'][1] - cord['from'][1]) / 2
-    u = (math.sqrt(.5), -math.sqrt(.5))
+    k = 1 if cord['rotation']['angle'] > 0 else -1   # +45 : corde \ (ancienne geometrie) ; -45 : corde /
+    u = (math.sqrt(.5), -k * math.sqrt(.5))
     c = (r[0], r[1])
     e1 = (c[0] - h * u[0], c[1] - h * u[1])
     e2 = (c[0] + h * u[0], c[1] + h * u[1])
     d = (1.6, 3.2, 4.8)[pull - 1]
-    p = (c[0] - d * math.sqrt(.5), c[1] - d * math.sqrt(.5))
+    pd = (-k * math.sqrt(.5), -math.sqrt(.5))        # direction de traction (opposee au ventre)
+    p = (c[0] + d * pd[0], c[1] + d * pd[1])
     keep += line_cubes('st:cord', e1, p, .35, (7.9, 8.1)) + line_cubes('st:cord', p, e2, .35, (7.9, 8.1))
-    # fleche : de la corde tiree vers l'avant (haut-droite)
     L = 12.5
-    tip = (p[0] + L * math.sqrt(.5), p[1] + L * math.sqrt(.5))
+    ad = (-pd[0], -pd[1])                            # la fleche part vers le ventre
+    tip = (p[0] + L * ad[0], p[1] + L * ad[1])
     keep += line_cubes('bn:fleche', p, tip, .4, (7.85, 8.15))
-    keep.append(cube('hl:pointe_fleche', (tip[0] - .35, tip[1] - .35, 7.8), (tip[0] + .7, tip[1] + .7, 8.2)))
-    for k in range(3):
-        o = (p[0] + (1.2 + k * .9) * math.sqrt(.5), p[1] + (1.2 + k * .9) * math.sqrt(.5))
+    keep.append(cube('hl:pointe_fleche', (tip[0] - .55, tip[1] - .55, 7.8), (tip[0] + .55, tip[1] + .55, 8.2)))
+    for q in range(3):
+        o = (p[0] + (1.2 + q * .9) * ad[0], p[1] + (1.2 + q * .9) * ad[1])
         keep.append(cube('ac:penne', (o[0] - .7, o[1] - .2, 7.7), (o[0] + .7, o[1] + .2, 8.3)))
     return keep
 
