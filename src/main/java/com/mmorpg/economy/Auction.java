@@ -150,9 +150,10 @@ public final class Auction {
         ItemStack bought = l.stack().copy();
         com.mmorpg.db.Audit.log(p, com.mmorpg.db.Audit.AUCTION_BUY, l.price(), bought.getHoverName().getString() + " x" + bought.getCount() + " (vendeur " + l.seller() + ")");
         com.mmorpg.db.Audit.log(l.seller(), null, com.mmorpg.db.Audit.AUCTION_SALE, payout, bought.getHoverName().getString() + " x" + bought.getCount() + " (acheteur " + p.getGameProfile().name() + ", prix " + l.price() + ")");
-        if (!p.getInventory().add(bought)) p.drop(bought, false, net.minecraft.util.Prediction.SERVER_ONLY);
+        if (!Mail.deliver(p.level().getServer(), p.getUUID(), null, "Hôtel des ventes", "Achat : " + bought.getHoverName().getString() + " x" + bought.getCount()
+                + " (vendeur " + l.sellerName() + ")", 0, List.of(bought), true)) data.addReturn(p.getUUID(), bought);   // boite pleine : l'objet attend au comptoir
         p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.COINS.get(), SoundSource.NEUTRAL, 0.9f, 1f);
-        p.sendOverlayMessage(Component.literal("Achat : " + bought.getHoverName().getString() + " x" + bought.getCount() + " (-" + l.price() + " or)").withColor(0xFFD040));
+        p.sendOverlayMessage(Component.literal("Achat : " + bought.getHoverName().getString() + " x" + bought.getCount() + " (-" + l.price() + " or). Retrait à une boîte aux lettres.").withColor(0xFFD040));
         ServerPlayer seller = p.level().getServer().getPlayerList().getPlayer(l.seller());
         if (seller != null) {
             seller.sendSystemMessage(Component.literal("✦ Hôtel des ventes : votre « " + bought.getHoverName().getString() + " » a été vendu pour " + l.price()

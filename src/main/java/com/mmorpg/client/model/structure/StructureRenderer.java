@@ -69,6 +69,8 @@ public class StructureRenderer implements BlockEntityRenderer<StructureBlockEnti
                 new int[]{HdvAeloriaAnims.REPOS, HdvAeloriaAnims.OUVERTURE, HdvAeloriaAnims.ACTIVE}, "hdv_aeloria", null));
         models.put(MultiblockKind.QUETES_HEBDO, models(c, QuetesHebdoModel.LAYER, QuetesHebdoModel.animations(),
                 new int[]{QuetesHebdoAnims.REPOS, QuetesHebdoAnims.OUVERTURE, QuetesHebdoAnims.ACTIVE}, "quetes_hebdo", null));
+        models.put(MultiblockKind.BOITE_AUX_LETTRES, models(c, BoiteAuxLettresModel.LAYER, BoiteAuxLettresModel.animations(),
+                new int[]{BoiteAuxLettresAnims.REPOS, BoiteAuxLettresAnims.OUVERTURE, BoiteAuxLettresAnims.ACTIVE}, "boite_aux_lettres", null));
     }
 
     private static Models models(BlockEntityRendererProvider.Context c, ModelLayerLocation layer, AnimationDefinition[] defs, int[] anims,
@@ -99,6 +101,8 @@ public class StructureRenderer implements BlockEntityRenderer<StructureBlockEnti
         boolean active;
         if (kind == MultiblockKind.AUTEL) {
             active = bs.getValue(AltarBlock.ACTIVE);
+        } else if (kind == MultiblockKind.BOITE_AUX_LETTRES) {
+            active = com.mmorpg.client.ClientData.mailCount > 0;      // drapeau leve : du courrier attend
         } else {
             var player = Minecraft.getInstance().player;
             active = player != null && player.distanceToSqr(Vec3.atCenterOf(be.getBlockPos())) < 7 * 7;

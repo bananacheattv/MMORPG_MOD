@@ -130,6 +130,11 @@ public final class ClientPayloadHandlers {
             case S2COpenScreen.LIGHT_BLOCK -> mc.gui.setScreen(new com.mmorpg.client.screen.LightBlockScreen(payload.extra()));
             case S2COpenScreen.ARMOR_STAND_EDITOR -> mc.gui.setScreen(new com.mmorpg.client.screen.ArmorStandEditorScreen(payload.extra()));
             case S2COpenScreen.CLASS_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.ClassMasterScreen(payload.extra()));
+            case S2COpenScreen.MAIL -> {
+                if (mc.gui.screen() instanceof com.mmorpg.client.screen.MailScreen screen) screen.receive(payload.extra());
+                else mc.gui.setScreen(new com.mmorpg.client.screen.MailScreen(payload.extra()));
+            }
+            case S2COpenScreen.MAIL_STATE -> ClientData.mailCount = payload.extra().getIntOr("count", 0);
             case S2COpenScreen.TRIAL_STATE -> {
                 ClientData.trialActive = payload.extra().getBooleanOr("active", false);
                 ClientData.trialClass = payload.extra().getIntOr("class", 0);

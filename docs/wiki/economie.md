@@ -13,3 +13,7 @@ La Forge présente les recettes disponibles et leurs composants. Les sacs à dos
 Une apparence ou un grade ne remplace pas les conditions de classe et de niveau d’une arme. L’équipement PvP provient de son marchand dédié et possède un compromis différent du matériel PvE.
 
 Si une activité est temporairement indisponible, ses interactions sont refusées. Tes objets, soldes et livraisons déjà achetées restent conservés. Signale un problème avec la version du client, l’activité et l’heure approximative.
+
+## Boîte aux lettres
+
+La boîte aux lettres d'Aeloria (modèle 3D, bloc « Boîte aux lettres » ; le drapeau se lève quand du courrier attend) permet d'écrire à un joueur, connecté ou non : un message (140 caractères), de l'or et jusqu'à 4 objets. Le destinataire relève ses lettres à n'importe quelle boîte (« Récupérer » ou « Tout récupérer »). Les objets achetés à l'hôtel des ventes arrivent aussi dans la boîte aux lettres. Si l'inventaire est plein, les objets restent dans la lettre. 60 lettres maximum par boîte. Interrupteur : `courrier`.

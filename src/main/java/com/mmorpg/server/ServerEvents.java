@@ -96,6 +96,7 @@ public final class ServerEvents {
             if (com.mmorpg.character.Characters.intercept(sp)) return;      // ecran de choix : l'initialisation reprend apres le choix
             com.mmorpg.dungeon.DungeonLobby.arriveIfNeeded(sp);
             RpgPlayers.onLogin(sp);
+            Scheduler.later(sp.level(), 60, () -> com.mmorpg.economy.Mail.onLogin(sp));
         }
     }
 

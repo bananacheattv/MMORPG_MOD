@@ -727,6 +727,10 @@ public final class DevShowcase {
             marchePhase(mc, me);
             return;
         }
+        if (MODE.equals("courrier")) {          // boite aux lettres : modele 3D (drapeau baisse puis leve), interface courrier et ecriture
+            courrierPhase(mc, me);
+            return;
+        }
         if (MODE.equals("services")) {          // banque et hotel des ventes : modeles 3D, interfaces, depot, vente, achat, comptoir
             servicesPhase(mc, me);
             return;
@@ -2560,6 +2564,68 @@ public final class DevShowcase {
             stop(mc);
         }
         if (t > end + 6000) stop(mc);
+    }
+
+    /** Boite aux lettres : 3D (sans puis avec courrier), liste des lettres, onglet d'ecriture. Tout est pose cote serveur (pas de commandes). */
+    private static void courrierPhase(Minecraft mc, String me) {
+        var srv = mc.getSingleplayerServer();
+        if (tick == 5) { mc.getWindow().setWindowed(1280, 720); mc.options.guiScale().set(2); mc.resizeGui(); }
+        if (tick == 8 || tick == 300) srv.execute(() -> {          // quitte l'ecran de choix de personnage et la cinematique de connexion
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            if (pl == null) return;
+            if (com.mmorpg.character.Characters.selecting(pl)) {
+                var t = new net.minecraft.nbt.CompoundTag();
+                t.putString("action", "play");
+                t.putInt("slot", 0);
+                com.mmorpg.character.Characters.action(pl, t);
+            }
+            com.mmorpg.hub.CinematicManager.finish(pl);
+        });
+        if (tick == 12 && mc.gui.screen() instanceof com.mmorpg.client.screen.CharacterSelectScreen) mc.gui.setScreen(null);
+        int k = tick - 700;      // le serveur logiciel est tres en retard au demarrage : on attend
+        structOrigin = new net.minecraft.core.BlockPos(0, 181, 0);
+        net.minecraft.core.BlockPos box = structOrigin.offset(0, 0, -6);
+        if (k == 20) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            if (pl == null) return;
+            var lv = srv.overworld();
+            for (int x = -12; x <= 12; x++) for (int z = -12; z <= 12; z++) {
+                lv.setBlock(new net.minecraft.core.BlockPos(x, 180, z), net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState(), 3);
+                for (int y = 181; y <= 190; y++) lv.setBlock(new net.minecraft.core.BlockPos(x, y, z), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+            }
+            lv.setBlock(box, com.mmorpg.registry.ModBlocks.BOITE_AUX_LETTRES.get().defaultBlockState().setValue(com.mmorpg.block.structure.MultiblockMasterBlock.FACING, net.minecraft.core.Direction.SOUTH), 3);
+            com.mmorpg.block.structure.Multiblocks.placeParts(lv, box, com.mmorpg.block.structure.MultiblockKind.BOITE_AUX_LETTRES, net.minecraft.core.Direction.SOUTH);
+            pl.setGameMode(net.minecraft.world.level.GameType.CREATIVE);
+            pl.teleportTo(lv, 0.5, 182.0, 0.5, java.util.Set.of(), 180f, 8f, true);
+        });
+        if (k == 45) {
+            mc.options.setCameraType(CameraType.FIRST_PERSON);
+            if (!mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+        }
+        if (k == 80) shot(mc, "200_boite_vide");
+        if (k == 90) srv.execute(() -> {
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            if (pl == null) return;
+            com.mmorpg.economy.Mail.deliver(srv, pl.getUUID(), null, "Hôtel des ventes", "Achat : Épée de fer x1 (vendeur Marchand)", 0,
+                    java.util.List.of(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD)), true);
+            com.mmorpg.economy.Mail.deliver(srv, pl.getUUID(), pl.getUUID(), "Aldric", "Merci pour l'aide, voici ta part !", 250,
+                    java.util.List.of(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND, 3)), false);
+        });
+        if (k == 190) shot(mc, "201_boite_courrier");
+        if (k == 200) {
+            if (mc.gui.hud.isHidden()) mc.gui.hud.toggle();
+            srv.execute(() -> {
+                var pl = srv.getPlayerList().getPlayerByName(me);
+                if (pl != null) com.mmorpg.economy.Mail.open(pl, box);
+            });
+        }
+        if (k == 280) shot(mc, "202_courrier_recu");
+        if (k == 285 && mc.gui.screen() instanceof com.mmorpg.client.screen.MailScreen s) s.previewTab(1);
+        if (k == 340) shot(mc, "203_courrier_ecrire");
+        if (k == 350) {
+            MMORPG.LOGGER.info("[MMORPG] SHOWCASE TERMINE (courrier)");
+            stop(mc);
+        }
     }
 
     /** Banque et hotel des ventes : vue des modeles 3D puis actions reelles (messages serveur). */

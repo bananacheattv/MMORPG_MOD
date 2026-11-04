@@ -43,6 +43,8 @@ public final class ClientData {
     public static String backend="";
     /** Essai de classe en cours (indicateur du HUD). */
     public static boolean trialActive;
+    /** Lettres en attente dans le courrier (drapeau des boites aux lettres). */
+    public static int mailCount;
     public static int trialClass;
     public static int trialLevel;
     public static long trialSince;

@@ -61,6 +61,8 @@ public record S2COpenScreen(int screen, CompoundTag extra) implements CustomPack
     public static final int FRIENDS = 41;
     /** Compte à rebours de photo de groupe (pas d'écran). */
     public static final int PHOTO = 42;
+    /** Boite aux lettres (courrier) et nombre de lettres en attente (drapeau des boites, pas d'ecran). */
+    public static final int MAIL = 90, MAIL_STATE = 91;
     public static final int SPAWN_EDITOR = 19;
     public static final int ADVENTURE_SUMMARY = 20;
     public static final int MERCHANT_EDITOR = 21;
