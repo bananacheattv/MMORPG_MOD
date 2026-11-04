@@ -92,6 +92,7 @@ public final class ServerEvents {
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
             if (!com.mmorpg.network.NetworkPlayers.login(sp)) return;
+            if (com.mmorpg.character.Characters.intercept(sp)) return;      // ecran de choix : l'initialisation reprend apres le choix
             com.mmorpg.dungeon.DungeonLobby.arriveIfNeeded(sp);
             RpgPlayers.onLogin(sp);
         }
@@ -100,6 +101,7 @@ public final class ServerEvents {
     @SubscribeEvent
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
+            com.mmorpg.character.Characters.logout(sp);
             com.mmorpg.network.NetworkPlayers.logout(sp);
             MountManager.despawn(sp);
             RpgPlayers.onLogout(sp);

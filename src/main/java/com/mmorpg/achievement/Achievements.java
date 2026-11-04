@@ -65,7 +65,7 @@ public final class Achievements {
     }
 
     private static void store(ServerPlayer p, PlayerData d) {
-        if (AchievementStore.enabled()) AchievementStore.save(p.getUUID(), d.achievements, d.counters, d.pvpTitle);
+        if (AchievementStore.enabled()) AchievementStore.save(com.mmorpg.character.CharKey.of(p), d.achievements, d.counters, d.pvpTitle);
     }
 
     /** Reprend l'existant (niveau, metiers) pour les joueurs qui avaient deja progresse avant les succes. */
@@ -140,7 +140,7 @@ public final class Achievements {
             backfill(p, RpgPlayers.get(p));
             if (!AchievementStore.enabled()) return;
             var server = p.level().getServer();
-            AchievementStore.load(p.getUUID(), loaded -> server.execute(() -> {
+            AchievementStore.load(com.mmorpg.character.CharKey.of(p), loaded -> server.execute(() -> {
                 if (p.isRemoved()) return;
                 PlayerData d = RpgPlayers.get(p);
                 loaded.achievements().forEach((k, v) -> d.achievements.putIfAbsent(k, v));

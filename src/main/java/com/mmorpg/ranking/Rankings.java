@@ -133,7 +133,7 @@ public final class Rankings {
     private static String ownGuild(ServerPlayer p) {
         try {
             String id = GuildStore.access(p.level().getServer(), false, s -> {
-                var g = GuildStore.of(s, p.getUUID());
+                var g = GuildStore.of(s, com.mmorpg.character.CharKey.of(p));
                 return g == null ? "" : g.id.toString();
             });
             return id;

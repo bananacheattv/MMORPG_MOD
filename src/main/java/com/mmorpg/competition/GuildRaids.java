@@ -23,7 +23,7 @@ public final class GuildRaids {
     public static void enter(ServerPlayer p,int requestedTier){
         if(!com.mmorpg.server.FeatureFlags.allow(p,"boss_guilde"))return;
         if(ArenaManager.session(p.getUUID())!=null||ArenaManager.queued(p.getUUID())||of(p.getUUID())!=null||com.mmorpg.dungeon.InstanceManager.containsPlayer(p))throw new IllegalArgumentException("Tu participes déjà à un combat.");
-        var g=GuildStore.access(p.level().getServer(),false,s->GuildStore.of(s,p.getUUID()));GuildService.require(g!=null,"Rejoins d’abord une guilde.");
+        var g=GuildStore.access(p.level().getServer(),false,s->GuildStore.of(s,com.mmorpg.character.CharKey.of(p)));GuildService.require(g!=null,"Rejoins d’abord une guilde.");
         int tier=requestedTier<0?g.level-1:requestedTier;
         GuildService.require(tier>=0&&tier<g.level,"Ce gardien n’est pas encore débloqué.");
         long remaining=g.bossCooldowns.getOrDefault(tier,0L)-System.currentTimeMillis();
@@ -41,7 +41,7 @@ public final class GuildRaids {
     /** Propose aux membres en ligne de la guilde de rejoindre le combat (fenêtre Accepter / Refuser). */
     private static void invite(ServerPlayer leader,GuildStore.Guild g,int tier){
         var server=leader.level().getServer();long until=server.getTickCount()+20*120;
-        for(UUID id:g.members.keySet()){if(id.equals(leader.getUUID()))continue;var m=server.getPlayerList().getPlayer(id);if(m==null||!m.isAlive()||of(id)!=null||ArenaManager.session(id)!=null||com.mmorpg.dungeon.InstanceManager.containsPlayer(m))continue;
+        for(UUID id:g.members.keySet()){if(id.equals(com.mmorpg.character.CharKey.of(leader)))continue;var m=com.mmorpg.character.CharKey.online(server,id);if(m==null||!m.isAlive()||of(id)!=null||ArenaManager.session(id)!=null||com.mmorpg.dungeon.InstanceManager.containsPlayer(m))continue;
             INVITES.put(id,new Invite(g.id,tier,until));
             var tag=new net.minecraft.nbt.CompoundTag();tag.putString("boss",Yggdrasil.ALL[tier].name());tag.putString("from",leader.getGameProfile().name());tag.putString("guild",g.name);tag.putInt("tier",tier);tag.putInt("color",Yggdrasil.ALL[tier].color());
             Net.toPlayer(m,new S2COpenScreen(S2COpenScreen.GUILD_RAID_INVITE,tag));}

@@ -12,17 +12,21 @@ public final class GuildService {
     private static final Map<UUID,Long> XP=new HashMap<>();
     private static final Map<UUID,Set<String>> NOTIFIED_INVITES=new HashMap<>();
     private static final class Presence {long time;ArrayList<GuildStore.Member> players=new ArrayList<>();}
-    public static void presence(net.minecraft.server.MinecraftServer server){try{var snapshot=new Presence();snapshot.time=System.currentTimeMillis();for(var p:server.getPlayerList().getPlayers())snapshot.players.add(new GuildStore.Member(p.getUUID(),p.getName().getString(),"MEMBRE"));var dir=GuildStore.directory(server);java.nio.file.Files.createDirectories(dir);var file=dir.resolve("presence-"+NetworkConfig.current.role+".json");var tmp=java.nio.file.Files.createTempFile(dir,"presence-",".tmp");try{java.nio.file.Files.writeString(tmp,new com.google.gson.Gson().toJson(snapshot));java.nio.file.Files.move(tmp,file,java.nio.file.StandardCopyOption.ATOMIC_MOVE,java.nio.file.StandardCopyOption.REPLACE_EXISTING);}finally{java.nio.file.Files.deleteIfExists(tmp);}}catch(Exception e){MMORPG.LOGGER.warn("Guild presence unavailable: {}",e.getMessage());}}
-    public static List<GuildStore.Member> online(net.minecraft.server.MinecraftServer server){var all=new LinkedHashMap<UUID,GuildStore.Member>();try(var files=java.nio.file.Files.list(GuildStore.directory(server))){for(var file:files.filter(f->f.getFileName().toString().startsWith("presence-")&&f.toString().endsWith(".json")).toList()){try{var snapshot=new com.google.gson.Gson().fromJson(java.nio.file.Files.readString(file),Presence.class);if(snapshot!=null&&snapshot.time>System.currentTimeMillis()-15000)for(var m:snapshot.players)all.put(m.id,m);}catch(Exception ignored){}}}catch(Exception ignored){}for(var p:server.getPlayerList().getPlayers())all.put(p.getUUID(),new GuildStore.Member(p.getUUID(),p.getName().getString(),"MEMBRE"));return new ArrayList<>(all.values());}
+    public static void presence(net.minecraft.server.MinecraftServer server){try{var snapshot=new Presence();snapshot.time=System.currentTimeMillis();for(var p:server.getPlayerList().getPlayers())snapshot.players.add(new GuildStore.Member(com.mmorpg.character.CharKey.of(p),com.mmorpg.character.CharKey.name(p),"MEMBRE"));var dir=GuildStore.directory(server);java.nio.file.Files.createDirectories(dir);var file=dir.resolve("presence-"+NetworkConfig.current.role+".json");var tmp=java.nio.file.Files.createTempFile(dir,"presence-",".tmp");try{java.nio.file.Files.writeString(tmp,new com.google.gson.Gson().toJson(snapshot));java.nio.file.Files.move(tmp,file,java.nio.file.StandardCopyOption.ATOMIC_MOVE,java.nio.file.StandardCopyOption.REPLACE_EXISTING);}finally{java.nio.file.Files.deleteIfExists(tmp);}}catch(Exception e){MMORPG.LOGGER.warn("Guild presence unavailable: {}",e.getMessage());}}
+    public static List<GuildStore.Member> online(net.minecraft.server.MinecraftServer server){var all=new LinkedHashMap<UUID,GuildStore.Member>();try(var files=java.nio.file.Files.list(GuildStore.directory(server))){for(var file:files.filter(f->f.getFileName().toString().startsWith("presence-")&&f.toString().endsWith(".json")).toList()){try{var snapshot=new com.google.gson.Gson().fromJson(java.nio.file.Files.readString(file),Presence.class);if(snapshot!=null&&snapshot.time>System.currentTimeMillis()-15000)for(var m:snapshot.players)all.put(m.id,m);}catch(Exception ignored){}}}catch(Exception ignored){}for(var p:server.getPlayerList().getPlayers())all.put(com.mmorpg.character.CharKey.of(p),new GuildStore.Member(com.mmorpg.character.CharKey.of(p),com.mmorpg.character.CharKey.name(p),"MEMBRE"));return new ArrayList<>(all.values());}
+    /** Suppression d'un personnage : il quitte sa guilde (refus s'il en est le chef et qu'il reste d'autres membres ou de l'or en banque). */
+    public static void leaveForDelete(net.minecraft.server.MinecraftServer server,UUID key){GuildStore.access(server,true,s->{var g=GuildStore.of(s,key);if(g==null)return null;var m=g.members.get(key);
+        if(m.rank.equals("CHEF")){require(g.members.size()==1,"Ce personnage est chef de guilde : transfère la direction avant de le supprimer.");require(g.gold==0&&s.pending.stream().noneMatch(t->t.guild.equals(g.id)),"Vide la banque de la guilde avant de supprimer ce personnage.");s.guilds.remove(g);}
+        else{g.members.remove(key);g.log(m.name+" quitte la guilde.");}return null;});}
     public static void require(boolean test,String message){if(!test)throw new IllegalArgumentException(message);}
-    private static GuildStore.Guild member(GuildStore.State s,ServerPlayer p){var g=GuildStore.of(s,p.getUUID());require(g!=null,"Tu n’as pas de guilde.");return g;}
+    private static GuildStore.Guild member(GuildStore.State s,ServerPlayer p){var g=GuildStore.of(s,com.mmorpg.character.CharKey.of(p));require(g!=null,"Tu n’as pas de guilde.");return g;}
     private static void officer(GuildStore.Guild g,UUID id){require(!g.members.get(id).rank.equals("MEMBRE"),"Réservé au chef et aux officiers.");}
     private static void chief(GuildStore.Guild g,UUID id){require(g.members.get(id).rank.equals("CHEF"),"Réservé au chef de guilde.");}
     public static void open(ServerPlayer p){open(p,"");}
     public static void open(ServerPlayer p,String status){
-        try{var t=GuildStore.access(p.level().getServer(),false,s->{var data=new CompoundTag();data.putString("status",status);var g=GuildStore.of(s,p.getUUID());
-            data.putString("self",p.getUUID().toString());data.putLong("wallet",RpgPlayers.get(p).gold);data.putString("guild",g==null?"":new com.google.gson.Gson().toJson(g));
-            var invites=new ListTag();for(var x:s.guilds)if(x.invites.getOrDefault(p.getUUID(),0L)>System.currentTimeMillis()){var v=new CompoundTag();v.putString("id",x.id.toString());v.putString("name",x.name);invites.add(v);}data.put("invites",invites);
+        try{var t=GuildStore.access(p.level().getServer(),false,s->{var data=new CompoundTag();data.putString("status",status);var g=GuildStore.of(s,com.mmorpg.character.CharKey.of(p));
+            data.putString("self",com.mmorpg.character.CharKey.of(p).toString());data.putLong("wallet",RpgPlayers.get(p).gold);data.putString("guild",g==null?"":new com.google.gson.Gson().toJson(g));
+            var invites=new ListTag();for(var x:s.guilds)if(x.invites.getOrDefault(com.mmorpg.character.CharKey.of(p),0L)>System.currentTimeMillis()){var v=new CompoundTag();v.putString("id",x.id.toString());v.putString("name",x.name);invites.add(v);}data.put("invites",invites);
             var players=new ListTag();for(var player:online(p.level().getServer())){var v=new CompoundTag();v.putString("id",player.id.toString());v.putString("name",player.name);players.add(v);}data.put("online",players);return data;});
             Net.toPlayer(p,new S2COpenScreen(S2COpenScreen.GUILD,t));
         }catch(Exception e){p.sendSystemMessage(Component.literal("Guildes indisponibles : "+e.getMessage()));}
@@ -38,14 +42,14 @@ public final class GuildService {
             if(action.equals("raidLeave")){com.mmorpg.competition.GuildRaids.leave(p);open(p);return;}
             reconcile(p);
             GuildStore.access(p.level().getServer(),true,s->{
-                var g=GuildStore.of(s,p.getUUID());UUID self=p.getUUID();
+                var g=GuildStore.of(s,com.mmorpg.character.CharKey.of(p));UUID self=com.mmorpg.character.CharKey.of(p);
                 if(action.equals("create")){
                     require(g==null,"Tu appartiens déjà à une guilde.");String name=data.getStringOr("name","").trim();require(name.matches("[\\p{L}0-9 _'-]{3,28}"),"Nom : 3 à 28 lettres, chiffres ou espaces.");require(s.guilds.stream().noneMatch(x->x.name.equalsIgnoreCase(name)),"Nom déjà utilisé.");
-                    g=new GuildStore.Guild();g.name=name;g.members.put(self,new GuildStore.Member(self,p.getName().getString(),"CHEF"));g.log("Guilde fondée par "+p.getName().getString());s.guilds.add(g);return null;
+                    g=new GuildStore.Guild();g.name=name;g.members.put(self,new GuildStore.Member(self,com.mmorpg.character.CharKey.name(p),"CHEF"));g.log("Guilde fondée par "+p.getName().getString());s.guilds.add(g);return null;
                 }
                 if(action.equals("accept")||action.equals("decline")){
                     var invited=GuildStore.byId(s,UUID.fromString(data.getStringOr("target","")));require(invited!=null&&invited.invites.getOrDefault(self,0L)>System.currentTimeMillis(),"Invitation expirée.");
-                    if(action.equals("accept")){require(g==null,"Quitte d’abord ta guilde.");require(invited.members.size()<50,"Guilde complète (50 membres).");invited.members.put(self,new GuildStore.Member(self,p.getName().getString(),"MEMBRE"));invited.log(p.getName().getString()+" rejoint la guilde.");}invited.invites.remove(self);return null;
+                    if(action.equals("accept")){require(g==null,"Quitte d’abord ta guilde.");require(invited.members.size()<50,"Guilde complète (50 membres).");invited.members.put(self,new GuildStore.Member(self,com.mmorpg.character.CharKey.name(p),"MEMBRE"));invited.log(com.mmorpg.character.CharKey.name(p)+" rejoint la guilde.");}invited.invites.remove(self);return null;
                 }
                 g=member(s,p);
                 switch(action){
@@ -70,11 +74,11 @@ public final class GuildService {
     /** Write intent, save an idempotent player receipt, then settle the bank. A reconnect completes interrupted transfers. */
     private static void transfer(ServerPlayer p,long amount,boolean withdraw){
         require(amount>0&&amount<=1_000_000_000L,"Montant entre 1 et 1 000 000 000 or.");reconcile(p);
-        GuildStore.access(p.level().getServer(),true,s->{var g=member(s,p);if(withdraw){chief(g,p.getUUID());require(g.gold>=amount,"Banque insuffisante.");g.gold-=amount;}else require(RpgPlayers.get(p).gold>=amount,"Or personnel insuffisant.");
-            var t=new GuildStore.Transfer();t.guild=g.id;t.player=p.getUUID();t.name=p.getName().getString();t.delta=withdraw?amount:-amount;s.pending.add(t);return null;});reconcile(p);
+        GuildStore.access(p.level().getServer(),true,s->{var g=member(s,p);if(withdraw){chief(g,com.mmorpg.character.CharKey.of(p));require(g.gold>=amount,"Banque insuffisante.");g.gold-=amount;}else require(RpgPlayers.get(p).gold>=amount,"Or personnel insuffisant.");
+            var t=new GuildStore.Transfer();t.guild=g.id;t.player=com.mmorpg.character.CharKey.of(p);t.name=com.mmorpg.character.CharKey.name(p);t.delta=withdraw?amount:-amount;s.pending.add(t);return null;});reconcile(p);
     }
     public static void reconcile(ServerPlayer p){
-        var pending=GuildStore.access(p.level().getServer(),false,s->s.pending.stream().filter(t->t.player.equals(p.getUUID())).toList());
+        var pending=GuildStore.access(p.level().getServer(),false,s->s.pending.stream().filter(t->t.player.equals(com.mmorpg.character.CharKey.of(p))).toList());
         for(var t:pending){var d=RpgPlayers.get(p);String key=t.id.toString();if(!d.guildReceipts.getBooleanOr(key,false)){
             if(t.delta<0&&d.gold<-t.delta)throw new IllegalStateException("Transaction en attente : conserve l’or du dépôt.");
             long old=d.gold;d.gold=Math.addExact(old,t.delta);d.guildReceipts.putBoolean(key,true);d.dirty=true;
@@ -82,12 +86,12 @@ public final class GuildService {
         }
         GuildStore.access(p.level().getServer(),true,s->{var present=s.pending.stream().filter(x->x.id.equals(t.id)).findFirst().orElse(null);if(present!=null){var g=GuildStore.byId(s,t.guild);require(g!=null,"Guilde indisponible.");if(t.delta<0)g.gold=Math.addExact(g.gold,-t.delta);g.log(t.name+(t.delta<0?" dépose ":" retire ")+Math.abs(t.delta)+" or");s.pending.remove(present);}return null;});}
     }
-    public static void earned(ServerPlayer p,long amount){if(amount>0)XP.merge(p.getUUID(),Math.max(1,amount/10),Long::sum);}
+    public static void earned(ServerPlayer p,long amount){if(amount>0)XP.merge(com.mmorpg.character.CharKey.of(p),Math.max(1,amount/10),Long::sum);}
     public static void flush(net.minecraft.server.MinecraftServer server){if(XP.isEmpty())return;var pending=new HashMap<>(XP);try{GuildStore.access(server,true,s->{pending.forEach((id,xp)->{var g=GuildStore.of(s,id);if(g!=null&&g.level<10)g.xp=Math.min(1_000_000_000L,g.xp+xp);});return null;});pending.forEach((id,n)->XP.computeIfPresent(id,(k,v)->v<=n?null:v-n));}catch(Exception e){MMORPG.LOGGER.error("Guild XP retained for retry",e);}}
     private record Membership(int level,long[] buffs){}
-    public static void refresh(ServerPlayer p){try{var membership=GuildStore.access(p.level().getServer(),false,s->{var g=GuildStore.of(s,p.getUUID());
-            var seen=NOTIFIED_INVITES.computeIfAbsent(p.getUUID(),id->new HashSet<>());var pending=new HashSet<String>();
-            for(var invitation:s.guilds){long expires=invitation.invites.getOrDefault(p.getUUID(),0L);if(expires>System.currentTimeMillis()){
+    public static void refresh(ServerPlayer p){try{var membership=GuildStore.access(p.level().getServer(),false,s->{var g=GuildStore.of(s,com.mmorpg.character.CharKey.of(p));
+            var seen=NOTIFIED_INVITES.computeIfAbsent(com.mmorpg.character.CharKey.of(p),id->new HashSet<>());var pending=new HashSet<String>();
+            for(var invitation:s.guilds){long expires=invitation.invites.getOrDefault(com.mmorpg.character.CharKey.of(p),0L);if(expires>System.currentTimeMillis()){
                 String key=invitation.id+":"+expires;pending.add(key);
                 if(seen.add(key))p.sendSystemMessage(Component.literal("Invitation de guilde : "+invitation.name+". Ouvre /guilde pour accepter ou refuser. Cette invitation est distincte de ton groupe.").withColor(0xD5B0FF));
             }}seen.retainAll(pending);

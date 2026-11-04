@@ -44,8 +44,8 @@ public final class GuildChat {
         MinecraftServer server = p.level().getServer();
         try {
             String[] info = GuildStore.access(server, false, s -> {
-                var g = GuildStore.of(s, p.getUUID());
-                return g == null ? null : new String[]{g.id.toString(), g.members.get(p.getUUID()).rank};
+                var g = GuildStore.of(s, com.mmorpg.character.CharKey.of(p));
+                return g == null ? null : new String[]{g.id.toString(), g.members.get(com.mmorpg.character.CharKey.of(p)).rank};
             });
             if (info == null) {
                 p.sendSystemMessage(Component.literal("Tu n’as pas de guilde.").withColor(0xFFAA77));
@@ -113,7 +113,7 @@ public final class GuildChat {
                     .append(Component.literal(" : ").withColor(0xFFFFFF))
                     .append(com.mmorpg.achievement.Achievements.body(m.rankLabel, m.text, 0xFFFFFF));
             for (ServerPlayer p : server.getPlayerList().getPlayers())
-                if (m.guild.equals(guildOf.get(p.getUUID()))) p.sendSystemMessage(line);
+                if (m.guild.equals(guildOf.get(com.mmorpg.character.CharKey.of(p)))) p.sendSystemMessage(line);
         }
         return fresh.size();
     }
