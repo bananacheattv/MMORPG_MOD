@@ -295,24 +295,30 @@ public final class RpgPlayers {
         if (xp > 0) giveXp(player, xp, false);
     }
 
+    /** Vrai si le joueur a atteint un palier (25/50/75/100) dont la quete d'evolution n'est pas terminee. */
+    public static boolean evolutionLocked(PlayerData d) {
+        return d.evolution < PlayerClass.tier(d.level);
+    }
+
     public static void giveXp(ServerPlayer player, long amount, boolean fromKill) {
         if (com.mmorpg.hub.ClassTrial.active(player)) return;          // essai de classe : aucune recompense
         if(amount>0&&get(player).playerClass.isPlayable())com.mmorpg.guild.GuildService.earned(player,amount);
         PlayerData d = get(player);
         if (!d.playerClass.isPlayable() || d.level >= LevelSystem.MAX_LEVEL || amount <= 0) return;
+        if (evolutionLocked(d)) return;                                 // palier 25/50/75 : XP gelee tant que la quete d'evolution n'est pas faite
         amount = Math.max(1, Math.round(amount * ConfigManager.general().xpMultiplier * (d.xpCharmSeconds > 0 ? 1.25 : 1.0)*(1+(com.mmorpg.guild.GuildBuffs.active(d,com.mmorpg.guild.GuildBuffs.Kind.SAVOIR)?d.guildLevel*.01:0))));
         AdventureSummary.count(player,"xp",amount);
         d.xp += amount;
         CombatTexts.send(player, player.getX(), player.getY() + player.getBbHeight() + 0.6, player.getZ(), amount, Payloads.CombatText.XP);
         boolean leveled = false;
         int oldLevel = d.level;
-        while (d.level < LevelSystem.MAX_LEVEL && d.xp >= LevelSystem.xpToNext(d.level)) {
+        while (d.level < LevelSystem.MAX_LEVEL && !evolutionLocked(d) && d.xp >= LevelSystem.xpToNext(d.level)) {
             d.xp -= LevelSystem.xpToNext(d.level);
             d.level++;
             d.attributePoints += LevelSystem.ATTRIBUTE_POINTS_PER_LEVEL;
             leveled = true;
         }
-        if (d.level >= LevelSystem.MAX_LEVEL) d.xp = 0;
+        if (d.level >= LevelSystem.MAX_LEVEL || evolutionLocked(d)) d.xp = 0;
         if (leveled) {
             onLevelUp(player, oldLevel, d.level);
             com.mmorpg.achievement.Achievements.max(player, com.mmorpg.achievement.Achievement.LEVEL, d.level);

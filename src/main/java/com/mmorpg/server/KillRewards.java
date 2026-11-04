@@ -91,9 +91,10 @@ public final class KillRewards {
             PlayerData d = RpgPlayers.get(p);
             boolean inGroup = p == killer || PartyManager.sameParty(killer, p);
             double share = inGroup ? groupFactor : 1.0;
-            long xp = Math.max(1, Math.round(LevelSystem.xpForKill(md.level, md.xpMultiplier, d.level) * share * 0.5 * (dungeonMob(dead) ? 0.2 : 1.0)));
-            RpgPlayers.giveXp(p, xp, true);
-            if (!d.activePet.isEmpty()) PetManager.addPetXp(p, d.activePet, (int) Math.max(1, xp * 0.05));
+            long base = LevelSystem.xpForKill(md.level, md.xpMultiplier, d.level);
+            long xp = base <= 0 ? 0 : Math.max(1, Math.round(base * share * 0.5 * (dungeonMob(dead) ? 0.2 : 1.0)));
+            if (xp > 0) RpgPlayers.giveXp(p, xp, true);
+            if (xp > 0 && !d.activePet.isEmpty()) PetManager.addPetXp(p, d.activePet, (int) Math.max(1, xp * 0.05));
             AdventureSummary.count(p,"kills",1);
             d.kills.merge(md.key, 1, Integer::sum);
             com.mmorpg.achievement.Achievements.add(p, com.mmorpg.achievement.Achievement.KILLS, 1);

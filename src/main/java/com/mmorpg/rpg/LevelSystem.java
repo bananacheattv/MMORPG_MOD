@@ -48,11 +48,10 @@ public final class LevelSystem {
         double base = 10 + 0.6 * mobLevel * mobLevel + 5 * mobLevel;
         int diff = playerLevel - mobLevel;
         double mod;
-        if (diff > 15) mod = 0.1;
-        else if (diff > 10) mod = 0.3;
+        if (diff > 10) return 0;   // monstre trop faible : aucune XP
         else if (diff > 5) mod = 0.7;
         else if (diff < -5) mod = 1.2;
         else mod = 1.0;
-        return Math.max(1, Math.round(base * multiplier * mod));
+        return Math.max(0, Math.round(base * multiplier * mod));
     }
 }
