@@ -27,6 +27,18 @@ public final class Payloads {
         public static final StreamCodec<ByteBuf,DungeonSetupAction> CODEC=StreamCodec.composite(ByteBufCodecs.COMPOUND_TAG,DungeonSetupAction::data,DungeonSetupAction::new);
         @Override public Type<? extends CustomPacketPayload> type() {return TYPE;}
     }
+    /** Actions client -> serveur du confort de jeu : tri, ping de groupe, journal (voir Qol). */
+    public record QolAction(CompoundTag data) implements CustomPacketPayload {
+        public static final Type<QolAction> TYPE=new Type<>(MMORPG.id("qol_action"));
+        public static final StreamCodec<ByteBuf,QolAction> CODEC=StreamCodec.composite(ByteBufCodecs.COMPOUND_TAG,QolAction::data,QolAction::new);
+        @Override public Type<? extends CustomPacketPayload> type() {return TYPE;}
+    }
+    /** Donnees serveur -> client du confort de jeu : compteur de degats, pings de groupe. */
+    public record QolSync(CompoundTag data) implements CustomPacketPayload {
+        public static final Type<QolSync> TYPE=new Type<>(MMORPG.id("qol_sync"));
+        public static final StreamCodec<ByteBuf,QolSync> CODEC=StreamCodec.composite(ByteBufCodecs.COMPOUND_TAG,QolSync::data,QolSync::new);
+        @Override public Type<? extends CustomPacketPayload> type() {return TYPE;}
+    }
     private Payloads() {
     }
 

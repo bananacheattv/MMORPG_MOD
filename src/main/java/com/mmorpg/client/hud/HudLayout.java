@@ -194,6 +194,8 @@ public final class HudLayout {
             (sw, sh, w, h) -> new int[]{(sw - w) / 2, Math.max(8, sh - h - 80)});
 
     // ---------------------------------------------------------------- elements vanilla (deplaces par transformation)
+    public static final Element MINIMAP = mod("minimap", "Minimap", (sw, sh) -> MiniMapHud.mapSize(), (sw, sh, w, h) -> new int[]{sw - w - 4, sh - h - 4});
+    public static final Element DPS = mod("dps", "Compteur de dégâts", (sw, sh) -> MiniMapHud.dpsSize(), (sw, sh, w, h) -> new int[]{4, sh / 2 - 20});
     public static final Element HOTBAR = vanilla("hotbar", "Barre d'objets", (sw, sh) -> new int[]{182, 22}, (sw, sh, w, h) -> new int[]{sw / 2 - 91, sh - 22},
             VanillaGuiLayers.HOTBAR, VanillaGuiLayers.SELECTED_ITEM_NAME, VanillaGuiLayers.SPECTATOR_TOOLTIP);
     public static final Element XP = vanilla("experience", "Barre d'expérience", (sw, sh) -> new int[]{182, 12}, (sw, sh, w, h) -> new int[]{sw / 2 - 91, sh - 36},

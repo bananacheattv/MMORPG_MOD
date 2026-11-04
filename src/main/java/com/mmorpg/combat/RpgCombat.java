@@ -336,6 +336,7 @@ public final class RpgCombat {
             if (ls > 0) RpgPlayers.heal(playerAttacker, damage * ls / 100.0, false);
         }
 
+        if (playerAttacker != null && !environmental && damage > 0) com.mmorpg.server.Qol.dealt(playerAttacker, Math.min(damage, h.hp()));
         // mannequin d'entrainement : jamais de perte de vie, le coup alimente ses statistiques
         if (target instanceof com.mmorpg.entity.dummy.TrainingDummyEntity dummy) {
             if (!environmental) dummy.recordHit(damage, crit, attacker);       // chute, feu, vide... ne comptent pas
@@ -364,6 +365,7 @@ public final class RpgCombat {
         if (damage > 0) {
             if (target instanceof ServerPlayer tp) {
                 CombatTexts.above(tp, (float) damage, Payloads.CombatText.TAKEN);
+                com.mmorpg.server.Qol.taken(tp, damage);
                 RpgPlayers.sendVitals(tp, true);
             } else if (playerAttacker != null || attacker instanceof Player) {
                 CombatTexts.above(target, (float) damage, crit ? Payloads.CombatText.CRIT : Payloads.CombatText.DAMAGE);

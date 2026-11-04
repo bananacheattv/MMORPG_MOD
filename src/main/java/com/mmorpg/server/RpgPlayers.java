@@ -638,6 +638,7 @@ public final class RpgPlayers {
         String lostLoot = SessionLoot.onDeath(player);          // mines et donjons : le butin de la session est perdu
         com.mmorpg.network.Net.toPlayer(player, new Payloads.DeathInfo(Math.max(0, lost), d.level, d.xp, LevelSystem.xpToNext(d.level), cause, lostLoot));
         PetManager.despawn(player);
+        Qol.died(player);
     }
 
     public static void onLogout(ServerPlayer player) {

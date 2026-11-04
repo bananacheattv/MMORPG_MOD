@@ -21,6 +21,7 @@
     "AeloriaLoadingOverlayMixin",
     "AeloriaWindowIconMixin",
     "SlotPositionAccessor",
+    "ContainerScreenAccessor",
     "HideFireOverlayMixin",
     "ShiftDragTransferMixin",
     "CharacterSlotHighlightMixin",

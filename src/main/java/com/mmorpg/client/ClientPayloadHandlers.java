@@ -35,6 +35,7 @@ public final class ClientPayloadHandlers {
             ClientData.mana = payload.mana();
             ClientData.maxMana = payload.maxMana();
         });
+        event.register(Payloads.QolSync.TYPE, (payload, context) -> com.mmorpg.client.QolClient.receive(payload.data()));
         event.register(Payloads.FishFightState.TYPE, (payload, context) -> FishFightClient.receive(payload.data()));
         event.register(Payloads.MobInfo.TYPE, (payload, context) -> ClientData.mobInfo = payload.data().copy());
         event.register(Payloads.Notify.TYPE, (payload, context) -> {

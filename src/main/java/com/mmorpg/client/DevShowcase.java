@@ -1390,6 +1390,10 @@ public final class DevShowcase {
             mascotPhase(mc, me);
             return;
         }
+        if (MODE.equals("qol")) {             // minimap, carte, journal, recherche et tri d'inventaire
+            qolPhase(mc);
+            return;
+        }
         if (MODE.equals("familiers")) {
             petsPhase(mc, me);
             return;
@@ -4122,6 +4126,38 @@ public final class DevShowcase {
         if (t == 140) shot(mc, "mascotte");
         if (t == 150) stop(mc);
     }
+
+    private static int qolTick, qolWait;
+    private static void qolPhase(Minecraft mc) {
+        if (com.mmorpg.client.LoadingClient.active()) { qolWait = 0; return; }
+        if (mc.gui.screen() instanceof com.mmorpg.client.screen.CharacterSelectScreen cs && qolTick == 0) {
+            if (++qolWait == 40) try { var m = cs.getClass().getDeclaredMethod("play"); m.setAccessible(true); m.invoke(cs); } catch (Exception ex) { throw new RuntimeException(ex); }
+            return;
+        }
+        if (qolTick == 0 && mc.gui.screen() == null && mc.level != null) { if (com.mmorpg.client.cinematic.CinematicClient.active()) { qolWait = 0; return; } if (++qolWait < 700) return; } else if (qolTick == 0) return;
+        int t = ++qolTick;
+        if (t == 5) mc.getWindow().setWindowed(1280, 720);
+        if (t == 100) { mc.player.setYRot(45f); shot(mc, "qol_minimap"); }
+        if (t == 110) { com.mmorpg.client.QolClient.receive(pingTag(mc)); com.mmorpg.client.QolClient.receive(dpsTag("VisualChecks", 412, 9000)); com.mmorpg.client.QolClient.receive(dpsTag("Kael", 238, 5200)); }
+        if (t == 130) shot(mc, "qol_hud_ping_dps");
+        if (t == 140) mc.gui.setScreen(new com.mmorpg.client.screen.WorldMapScreen());
+        if (t == 200) shot(mc, "qol_carte");
+        if (t == 210) mc.gui.setScreen(new com.mmorpg.client.screen.JournalScreen());
+        if (t == 235) { ClientData.DATA.counters.put("kills", 1432L); ClientData.DATA.counters.put("j_dmg_dealt", 2845000L); ClientData.DATA.counters.put("j_minutes", 725L); ClientData.DATA.kills.put("loup", 310); ClientData.DATA.kills.put("gobelin", 120); }
+        if (t == 260) shot(mc, "qol_journal");
+        if (t == 265) { var srv = mc.getSingleplayerServer(); srv.execute(() -> { var sp = srv.getPlayerList().getPlayers().get(0); var inv = sp.getInventory();
+            inv.setItem(10, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.STICK, 5)); inv.setItem(14, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.APPLE, 3));
+            inv.setItem(20, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.STICK, 7)); inv.setItem(25, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.BREAD, 2)); inv.setItem(30, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.APPLE, 9)); }); }
+        if (t == 270) { mc.gui.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(mc.player)); }
+        if (t == 300) shot(mc, "qol_inventaire");
+        if (t == 305) com.mmorpg.client.InventoryTools.testQuery("e");
+        if (t == 330) shot(mc, "qol_recherche");
+        if (t == 335) com.mmorpg.client.QolClient.action("sort_inv");
+        if (t == 380) shot(mc, "qol_tri");
+        if (t == 390) stop(mc);
+    }
+    private static net.minecraft.nbt.CompoundTag pingTag(Minecraft mc) { var c=new net.minecraft.nbt.CompoundTag(); c.putString("kind","ping"); c.putString("name","Kael"); c.putInt("x",mc.player.getBlockX()+12); c.putInt("y",mc.player.getBlockY()); c.putInt("z",mc.player.getBlockZ()+10); return c; }
+    private static net.minecraft.nbt.CompoundTag dpsTag(String n, float dps, long total) { var c=new net.minecraft.nbt.CompoundTag(); c.putString("kind","dps"); c.putString("name",n); c.putFloat("dps",dps); c.putLong("total",total); return c; }
 
     private static void petsPhase(Minecraft mc, String me) {
         if (tick == 5) mc.getWindow().setWindowed(1280, 720);

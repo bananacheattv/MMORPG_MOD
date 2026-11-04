@@ -18,6 +18,9 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 public final class Keys {
     public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(MMORPG.id("mmorpg"));
     public static final KeyMapping MENU = new KeyMapping("key.mmorpg.menu", InputConstants.KEY_M, CATEGORY);
+    public static final KeyMapping MAP = new KeyMapping("key.mmorpg.map", InputConstants.KEY_K, CATEGORY);
+    public static final KeyMapping PING = new KeyMapping("key.mmorpg.ping", InputConstants.KEY_X, CATEGORY);
+    public static final KeyMapping STREAMER = new KeyMapping("key.mmorpg.streamer", InputConstants.UNKNOWN.getValue(), CATEGORY);
     public static final KeyMapping MOUNT = new KeyMapping("key.mmorpg.mount", InputConstants.KEY_N, CATEGORY);
     /** Saute la cinematique d'arrivee. */
     public static final KeyMapping SKIP = new KeyMapping("key.mmorpg.skip", InputConstants.KEY_SPACE, CATEGORY);
@@ -47,6 +50,9 @@ public final class Keys {
         event.register(HUD_EDIT);
         event.register(SKIP);
         event.register(MOUNT);
+        event.register(MAP);
+        event.register(PING);
+        event.register(STREAMER);
         event.register(CAMERA_NEAR);
         event.register(CAMERA_FAR);
         for (KeyMapping skill : SKILLS) event.register(skill);
@@ -55,6 +61,14 @@ public final class Keys {
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
+        QolClient.tick();
+        boolean free = mc.player != null && mc.level != null && mc.gui.screen() == null;
+        while (MAP.consumeClick()) if (free) mc.gui.setScreen(new com.mmorpg.client.screen.WorldMapScreen());
+        while (PING.consumeClick()) if (free) QolClient.sendPing();
+        while (STREAMER.consumeClick()) {
+            ClientConfig.STREAMER_MODE.set(!ClientConfig.STREAMER_MODE.get());
+            if (mc.player != null) mc.player.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Mode streamer : " + (ClientConfig.STREAMER_MODE.get() ? "activé" : "désactivé")));
+        }
         while (CAMERA_NEAR.consumeClick()) if (mc.player != null && mc.gui.screen() == null) MountCameraClient.zoom(-1);
         while (CAMERA_FAR.consumeClick()) if (mc.player != null && mc.gui.screen() == null) MountCameraClient.zoom(1);
         while (MENU.consumeClick()) {
