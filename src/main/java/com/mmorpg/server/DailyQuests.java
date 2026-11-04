@@ -155,6 +155,48 @@ public final class DailyQuests {
         return list;
     }
 
+    private static String activeIdOfSlot(PlayerData d, long day, int slot) {
+        for (String id : d.activeQuests.keySet()) {
+            int[] k = parse(id);
+            if (k != null && k[0] == day && k[1] == slot) return id;
+        }
+        return null;
+    }
+
+    /** Les trois quotidiennes pour la pancarte : etat 0 a prendre, 1 en cours, 2 terminee. */
+    public static ListTag boardTag(ServerPlayer p, PlayerData d) {
+        purge(d);
+        ListTag list = new ListTag();
+        long day = QuestManager.today();
+        for (int slot = 0; slot < SLOTS; slot++) {
+            boolean finished = done(d, day, slot);
+            String active = activeIdOfSlot(d, day, slot);
+            String id = active != null ? active : offeredId(p, d, slot);
+            CompoundTag t = QuestManager.questTag(p, d, id, def(id));
+            t.putInt("tier", slot);
+            t.putString("tierName", "Quotidienne " + (slot + 1));
+            t.putInt("state", finished ? 2 : active != null ? 1 : 0);
+            list.add(t);
+        }
+        return list;
+    }
+
+    /** Action de la pancarte sur la quotidienne d'un emplacement. */
+    public static void boardAction(ServerPlayer p, int action, int slot) {
+        PlayerData d = RpgPlayers.get(p);
+        if (slot < 0 || slot >= SLOTS) return;
+        purge(d);
+        long day = QuestManager.today();
+        String active = activeIdOfSlot(d, day, slot);
+        switch (action) {
+            case WeeklyQuests.ACT_ACCEPT -> accept(p, offeredId(p, d, slot));
+            case WeeklyQuests.ACT_CLAIM -> { if (active != null) claim(p, active); }
+            case WeeklyQuests.ACT_ABANDON -> { if (active != null) QuestManager.abandon(p, active); }
+            default -> {
+            }
+        }
+    }
+
     public static void accept(ServerPlayer p, String id) {
         PlayerData d = RpgPlayers.get(p);
         if (!FeatureFlags.allow(p, "quetes") || !p.isAlive() || !d.playerClass.isPlayable()) return;

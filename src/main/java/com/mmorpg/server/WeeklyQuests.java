@@ -195,12 +195,18 @@ public final class WeeklyQuests {
             tiers.add(e);
         }
         t.put("tiers", tiers);
+        t.put("daily", DailyQuests.boardTag(p, d));
         t.putInt("doneCount", (int) java.util.stream.IntStream.range(0, TEMPLATES.length).filter(i -> done(d, w, i)).count());
         Net.toPlayer(p, new S2COpenScreen(S2COpenScreen.WEEKLY, t));
     }
 
     public static void action(ServerPlayer p, BlockPos pos, int action, int tier) {
         if (!FeatureFlags.allow(p, "quetes") || !FeatureFlags.allow(p, "quetes_hebdo") || !near(p, pos)) return;
+        if (tier >= 10 && tier < 10 + DailyQuests.SLOTS) {
+            DailyQuests.boardAction(p, action, tier - 10);
+            open(p, pos);
+            return;
+        }
         if (tier < 0 || tier >= TEMPLATES.length) {
             if (action == ACT_BROWSE) open(p, pos);
             return;

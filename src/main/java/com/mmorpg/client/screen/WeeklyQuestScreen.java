@@ -19,6 +19,8 @@ public class WeeklyQuestScreen extends MmoScreen {
     private final List<CompoundTag> tiers = new ArrayList<>();
     private long resetSeconds;
     private int doneCount;
+    private final List<CompoundTag> dailies = new ArrayList<>();
+    private boolean dailyMode;
 
     public WeeklyQuestScreen(CompoundTag data) {
         super("Quêtes hebdomadaires");
@@ -32,6 +34,9 @@ public class WeeklyQuestScreen extends MmoScreen {
         tiers.clear();
         ListTag list = data.getListOrEmpty("tiers");
         for (int i = 0; i < list.size(); i++) tiers.add(list.getCompoundOrEmpty(i));
+        dailies.clear();
+        ListTag dl = data.getListOrEmpty("daily");
+        for (int i = 0; i < dl.size(); i++) dailies.add(dl.getCompoundOrEmpty(i));
     }
 
 
@@ -39,7 +44,7 @@ public class WeeklyQuestScreen extends MmoScreen {
     protected int designHeight(){return 252;}
 
     public void send(int action, int tier) {
-        ClientNet.send(new Payloads.ServiceAction(Payloads.ServiceAction.WEEKLY, action, tier, "", 0, pos));
+        ClientNet.send(new Payloads.ServiceAction(Payloads.ServiceAction.WEEKLY, action, dailyMode ? tier + 10 : tier, "", 0, pos));
     }
 
     private static String reset(long s) {
@@ -61,11 +66,14 @@ public class WeeklyQuestScreen extends MmoScreen {
     @Override
     protected void renderContent(GuiGraphicsExtractor g, int mx, int my, float a) {
         Ui.panel(g, left, top, pw, ph);
-        Ui.title(g, left + pw / 2, top + 8, "QUÊTES HEBDOMADAIRES", Ui.GOLD_LIGHT);
-        String sub = doneCount + " / 3 terminées · remise à zéro dans " + reset(resetSeconds);
+        Ui.title(g, left + pw / 2, top + 8, dailyMode ? "QUÊTES QUOTIDIENNES" : "QUÊTES HEBDOMADAIRES", Ui.GOLD_LIGHT);
+        int doneDaily = (int) dailies.stream().filter(q -> q.getIntOr("state", 0) == 2).count();
+        String sub = dailyMode ? doneDaily + " / 3 terminées · nouvelles quêtes demain" : doneCount + " / 3 terminées · remise à zéro dans " + reset(resetSeconds);
         g.centeredText(font, net.minecraft.network.chat.Component.literal(sub), left + pw / 2, top + 22, Ui.MUTED);
+        button(g, left + 8, top + 6, 96, 14, dailyMode ? "Hebdomadaires >" : "Quotidiennes >", true, 0xFF1A5A7A, () -> dailyMode = !dailyMode);
         int gap = 6, cw = (pw - 16 - gap * 2) / 3, cy = top + 38, ch = ph - 38 - 34;
-        for (int i = 0; i < tiers.size(); i++) card(g, tiers.get(i), left + 8 + i * (cw + gap), cy, cw, ch);
+        List<CompoundTag> shown = dailyMode ? dailies : tiers;
+        for (int i = 0; i < shown.size(); i++) card(g, shown.get(i), left + 8 + i * (cw + gap), cy, cw, ch);
         int by = top + ph - 26;
         button(g, left + pw / 2 - 60, by, 120, 18, "Revenir au jeu", true, Ui.GOLD, this::onClose);
     }

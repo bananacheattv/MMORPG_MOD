@@ -77,6 +77,11 @@ public final class DevContentQuestChecks {
             reload.load(d.save());
             check(DailyQuests.offersTag(p, reload).size() == 2 || reload.dailyQuests.keySet().stream().anyMatch(k -> k.startsWith(DailyQuests.DONE_PREFIX)), "persistance etat du jour");
 
+            var board = DailyQuests.boardTag(p, d);
+            check(board.size() == 3 && board.stream().anyMatch(t -> t instanceof net.minecraft.nbt.CompoundTag c && c.getIntOr("state", 0) == 2), "pancarte : 3 quotidiennes dont une terminee");
+            DailyQuests.boardAction(p, WeeklyQuests.ACT_ACCEPT, 1);
+            check(DailyQuests.boardTag(p, d).stream().anyMatch(t -> t instanceof net.minecraft.nbt.CompoundTag c && c.getIntOr("state", 0) == 1), "pancarte : acceptation");
+            DailyQuests.boardAction(p, WeeklyQuests.ACT_ABANDON, 1);
             // histoire : proposee dans l'ordre, rendue automatiquement
             var h1 = quests.get("histoire_1");
             check(h1 != null && h1.story.equals("hist_1"), "chapitre 1");
