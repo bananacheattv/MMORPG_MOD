@@ -56,8 +56,19 @@ public final class InstanceManager {
     public static int difficultyOf(String pool) {
         return Integer.parseInt(pool.substring(pool.indexOf(':') + 1));
     }
+    /** Difficulte 3 = donjon de setup (reserve aux administrateurs, voir {@link DungeonSetup}). */
+    public static final int SETUP = 3;
+    static final String SETUP_OWNER = "setup";
+    public static boolean isSetup(String pool) { return validPool(pool) && difficultyOf(pool) == SETUP; }
+    static boolean isSetupSlot(Slot s) { return isSetup(s.pool); }
+    /** Exemplaires dont le modele a change alors qu'ils etaient occupes : reconstruits a leur prochaine reservation. */
+    static final java.util.Set<String> STALE = new java.util.HashSet<>();
+    private static StyledDungeon.Job job(ServerLevel level, Slot s) {
+        BlockPos at = new BlockPos(s.x, s.y, s.z);
+        return isSetupSlot(s) ? StyledDungeon.prepareSetup(level, at, typeOf(s.pool)) : StyledDungeon.prepare(level, at, typeOf(s.pool), difficultyOf(s.pool));
+    }
     public static boolean validPool(String pool) {
-        try { return pool != null && typeOf(pool) != null && difficultyOf(pool) >= 0 && difficultyOf(pool) <= 2; }
+        try { return pool != null && typeOf(pool) != null && difficultyOf(pool) >= 0 && difficultyOf(pool) <= SETUP; }
         catch (RuntimeException e) { return false; }
     }
     public static boolean containsPlayer(ServerPlayer player) {
@@ -139,7 +150,7 @@ public final class InstanceManager {
      */
     public static boolean enterPool(ServerPlayer player, String pool) {
         if(!com.mmorpg.server.FeatureFlags.allow(player,"donjons"))return false;
-        if (!validPool(pool)) return false;
+        if (!validPool(pool) || isSetup(pool)) return false;
         if (!com.mmorpg.server.PortalAccess.consume(player,"donjon")) return false;
         if (com.mmorpg.network.GroupTravel.begin(player,"donjon",pool)) return true;
         if (com.mmorpg.network.DungeonTravel.enterRemote(player, pool)) return true;
@@ -150,23 +161,25 @@ public final class InstanceManager {
         if (!com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.DUNGEONS) || !validPool(pool)) return false;
         return enterLocal(player, pool, false);
     }
-    private static boolean enterLocal(ServerPlayer player, String pool, boolean groupEntry) {
-        if (RpgPlayers.get(player).level < com.mmorpg.dungeon.DungeonMaster.requiredLevel(typeOf(pool), difficultyOf(pool))) return false;
+    static boolean enterLocal(ServerPlayer player, String pool, boolean groupEntry) {
+        boolean setup = isSetup(pool);
+        if (setup && !com.mmorpg.server.QuestEditor.allowed(player)) return false;
+        if (!setup && RpgPlayers.get(player).level < com.mmorpg.dungeon.DungeonMaster.requiredLevel(typeOf(pool), difficultyOf(pool))) return false;
         MinecraftServer server = player.level().getServer();
         ServerLevel dim = server.getLevel(DIM);
         if (dim == null) return false;
-        Slot slot = reserve(server, pool, ownerKey(player));
+        Slot slot = reserve(server, pool, setup ? SETUP_OWNER : ownerKey(player));
         if (slot == null) {
             player.sendOverlayMessage(Component.literal("Tous les exemplaires de ce donjon sont occupés : réessayez dans un instant.").withColor(0xFF6050));
             return false;
         }
         DungeonType t = typeOf(pool);
-        String title = t.label + (difficultyOf(pool) == 1 ? " (héroïque)" : difficultyOf(pool) >= 2 ? " (mythique)" : "");
+        String title = t.label + (setup ? " (setup admin)" : difficultyOf(pool) == 1 ? " (héroïque)" : difficultyOf(pool) >= 2 ? " (mythique)" : "");
         String lore = StyledDungeon.loreOf(t)+" · "+DungeonVariants.description(slot.variantSeed);
         int color = StyledDungeon.colorOf(t);
         long at = server.overworld().getGameTime() + MIN_LOADING_TICKS;
-        for (ServerPlayer m : groupEntry ? PartyManager.onlineMembers(player) : java.util.List.of(player)) {
-            if (RpgPlayers.get(m).level < com.mmorpg.dungeon.DungeonMaster.requiredLevel(typeOf(pool), difficultyOf(pool))) continue;
+        for (ServerPlayer m : groupEntry && !setup ? PartyManager.onlineMembers(player) : java.util.List.of(player)) {
+            if (!setup && RpgPlayers.get(m).level < com.mmorpg.dungeon.DungeonMaster.requiredLevel(typeOf(pool), difficultyOf(pool))) continue;
             if (!m.level().dimension().equals(DIM)) RETURNS.put(m.getUUID(), new Return(m.level().dimension(), m.getX(), m.getY(), m.getZ(), m.getYRot()));
             com.mmorpg.server.AdventureSummary.begin(m,"donjon");
             BossReveal.hold(m, MIN_LOADING_TICKS + 400);
@@ -176,7 +189,7 @@ public final class InstanceManager {
         }
         if (!slot.ready && !BUILDS.containsKey(slotKey(slot))) {
             ServerLevel level = server.getLevel(DIM);
-            BUILDS.put(slotKey(slot), new Build(slot, StyledDungeon.prepare(level, new BlockPos(slot.x, slot.y, slot.z), t, difficultyOf(pool))));
+            BUILDS.put(slotKey(slot), new Build(slot, job(level, slot)));
         }
         return true;
     }
@@ -267,6 +280,7 @@ public final class InstanceManager {
                 s.variantSeed= DungeonVariants.preview(server,pool,owner);
                 s.lastBusy = server.getTickCount();
                 data.dirty();
+                if (s.ready && STALE.remove(slotKey(s))) s.ready = false;      // le modele a change : on reconstruit
                 if (s.ready) resetSlot(server, s);
                 return s;
             }
@@ -275,7 +289,7 @@ public final class InstanceManager {
         DungeonType t = typeOf(pool);
         int poolIndex = 0;
         for (int i = 0; i < TYPES.length; i++) {
-            if (TYPES[i] == t) poolIndex = i * 3 + difficultyOf(pool);
+            if (TYPES[i] == t) poolIndex = difficultyOf(pool) == SETUP ? TYPES.length * 3 + i : i * 3 + difficultyOf(pool);
         }
         Slot s = new Slot(pool, slots.size(), 200 + slots.size() * 120, 101, Z_BASE + poolIndex * Z_STEP, owner, server.getTickCount(), false);
         s.variantSeed= DungeonVariants.preview(server,pool,owner);
@@ -312,7 +326,7 @@ public final class InstanceManager {
         if (com.mmorpg.network.NetworkConfig.current.enabled) {
             Slot slot = reserve(server, pool, owner);
             if (slot != null && !slot.ready && !BUILDS.containsKey(slotKey(slot))) {
-                BUILDS.put(slotKey(slot), new Build(slot, StyledDungeon.prepare(server.getLevel(DIM), new BlockPos(slot.x, slot.y, slot.z), typeOf(pool), difficultyOf(pool))));
+                BUILDS.put(slotKey(slot), new Build(slot, job(server.getLevel(DIM), slot)));
             }
             return slot;
         }
@@ -371,7 +385,7 @@ public final class InstanceManager {
         InstanceData data = InstanceData.get(server);
         long now = server.getTickCount();
         for (Slot s : data.slots) {
-            if (s.owner.isEmpty()) continue;
+            if (s.owner.isEmpty() || isSetupSlot(s)) continue;
             boolean occupied = false;
             for (ServerPlayer p : level.players()) {
                 if (!p.isSpectator() && Math.abs(p.getX() - s.x) < 40 && p.getZ() > s.z - 6 && p.getZ() < s.z + Layout.LENGTH + 6) {
@@ -509,11 +523,17 @@ public final class InstanceManager {
     static void resetSlot(MinecraftServer server, Slot s) {
         ServerLevel level = server.getLevel(DIM);
         if (level == null || !s.ready) return;
+        if (STALE.remove(slotKey(s))) {                       // modele modifie pendant l'occupation : reconstruction a la prochaine reservation
+            clearEntities(level, s);
+            s.ready = false;
+            InstanceData.get(server).dirty();
+            return;
+        }
         DungeonManager.reset(server, group(s.pool, s));
         clearEntities(level, s);
         DungeonType t = typeOf(s.pool);
         StyledDungeon.refill(level, new BlockPos(s.x, s.y, s.z), t, difficultyOf(s.pool));
-        DungeonVariants.decorate(level,new BlockPos(s.x,s.y,s.z),s.variantSeed);
+        if (!isSetupSlot(s)) DungeonVariants.decorate(level,new BlockPos(s.x,s.y,s.z),s.variantSeed);
     }
 
     private static void clearEntities(ServerLevel level, Slot s) {

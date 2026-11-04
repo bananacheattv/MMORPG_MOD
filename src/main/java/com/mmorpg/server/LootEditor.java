@@ -24,7 +24,9 @@ public final class LootEditor {
     public static CompoundTag snapshot() {
         CompoundTag t = new CompoundTag();
         CompoundTag tables = new CompoundTag();
-        for (String id : LootTables.ALL) {
+        java.util.List<String> every = new java.util.ArrayList<>(LootTables.ALL);
+        every.addAll(LootTables.dungeonTables());
+        for (String id : every) {
             tables.putString(id, QuestEditor.JSON.toJson(ConfigManager.loot().table(id)));
         }
         t.put("tables", tables);
@@ -35,13 +37,21 @@ public final class LootEditor {
         if (QuestEditor.allowed(p)) Net.toPlayer(p, new S2COpenScreen(S2COpenScreen.LOOT_EDITOR, snapshot()));
     }
 
+    /** Ouvre l'editeur limite a quelques tables (ex. les coffres d'un donjon depuis son setup). */
+    public static void open(ServerPlayer p, java.util.List<String> tabs) {
+        if (!QuestEditor.allowed(p)) return;
+        CompoundTag t = snapshot();
+        t.putString("tabs", String.join(",", tabs));
+        Net.toPlayer(p, new S2COpenScreen(S2COpenScreen.LOOT_EDITOR, t));
+    }
+
     public static void action(ServerPlayer p, CompoundTag data) {
         if (!QuestEditor.allowed(p)) return;
         String status;
         boolean ok = false;
         String table = data.getStringOr("table", "");
         try {
-            if (!LootTables.ALL.contains(table)) throw new IllegalArgumentException("Table inconnue.");
+            if (!LootTables.ALL.contains(table) && !LootTables.isDungeonTable(table)) throw new IllegalArgumentException("Table inconnue.");
             String json = data.getStringOr("json", "");
             if (json.length() > 20000) throw new IllegalArgumentException("Table trop grande.");
             List<LootTables.Entry> entries = QuestEditor.JSON.fromJson(json, LIST);

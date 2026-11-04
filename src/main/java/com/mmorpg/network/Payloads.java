@@ -21,6 +21,12 @@ public final class Payloads {
         public static final StreamCodec<ByteBuf,LootEdit> CODEC=StreamCodec.composite(ByteBufCodecs.COMPOUND_TAG,LootEdit::data,LootEdit::new);
         @Override public Type<? extends CustomPacketPayload> type() {return TYPE;}
     }
+    /** Action du menu du donjon de setup (administrateur). */
+    public record DungeonSetupAction(CompoundTag data) implements CustomPacketPayload {
+        public static final Type<DungeonSetupAction> TYPE=new Type<>(MMORPG.id("dungeon_setup"));
+        public static final StreamCodec<ByteBuf,DungeonSetupAction> CODEC=StreamCodec.composite(ByteBufCodecs.COMPOUND_TAG,DungeonSetupAction::data,DungeonSetupAction::new);
+        @Override public Type<? extends CustomPacketPayload> type() {return TYPE;}
+    }
     private Payloads() {
     }
 

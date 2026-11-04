@@ -31,7 +31,7 @@ public final class DevDedicatedDungeonChecks {
                     && com.mmorpg.zone.ZoneData.get(server).byId("dungeon_lobby") != null, "safe protected waiting room");
             String pool = "crypte_gobeline:0";
             InstanceData.get(server).slots.removeIf(slot->slot.pool.equals(pool));InstanceData.get(server).dirty();
-            check(InstanceManager.validPool(pool) && !InstanceManager.validPool("invalid") && !InstanceManager.validPool("crypte_gobeline:3"), "pool validation");
+            check(InstanceManager.validPool(pool) && !InstanceManager.validPool("invalid") && !InstanceManager.validPool("crypte_gobeline:4"), "pool validation");
             PartyManager.Party group = new PartyManager.Party(); group.leader = p.getUUID(); group.members.add(p.getUUID()); group.members.add(mate.getUUID());
             SharedParties.mutate(p, () -> PartyManager.installShared(List.of(group)));
             PartyManager.clear(); SharedParties.refresh();

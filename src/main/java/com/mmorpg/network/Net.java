@@ -45,6 +45,9 @@ public final class Net {
         srv(r, Payloads.LootEdit.TYPE, Payloads.LootEdit.CODEC, (packet, ctx) -> {
             if (ctx.player() instanceof ServerPlayer p) com.mmorpg.server.LootEditor.action(p, packet.data());
         });
+        srv(r, Payloads.DungeonSetupAction.TYPE, Payloads.DungeonSetupAction.CODEC, (packet, ctx) -> {
+            if (ctx.player() instanceof ServerPlayer p) com.mmorpg.dungeon.DungeonSetup.action(p, packet.data());
+        });
         srv(r, Payloads.HubAction.TYPE, Payloads.HubAction.CODEC, (packet, ctx) -> {
             if (ctx.player() instanceof ServerPlayer p) com.mmorpg.hub.HubManager.action(p, packet.action(), packet.a(), packet.b());
         });
