@@ -1,0 +1,1 @@
+{"variants":{"facing=north":{"model":"mmorpg:block/chaise_aeloria"},"facing=east":{"model":"mmorpg:block/chaise_aeloria","y":90},"facing=south":{"model":"mmorpg:block/chaise_aeloria","y":180},"facing=west":{"model":"mmorpg:block/chaise_aeloria","y":270}}}

@@ -1364,6 +1364,10 @@ public final class DevShowcase {
             if (t == 110) stop(mc);
             return;
         }
+        if (MODE.equals("modeles2")) {
+            DevPackShowcase.phase(mc, me);
+            return;
+        }
         if (MODE.equals("coffres")) {
             DevChestShowcase.phase(mc, me);
             return;

@@ -1,0 +1,1 @@
+{"variants":{"facing=north":{"model":"mmorpg:block/jarre_ancienne"},"facing=east":{"model":"mmorpg:block/jarre_ancienne","y":90},"facing=south":{"model":"mmorpg:block/jarre_ancienne","y":180},"facing=west":{"model":"mmorpg:block/jarre_ancienne","y":270}}}

@@ -1,0 +1,1 @@
+{"variants":{"facing=north":{"model":"mmorpg:block/armoire_aeloria"},"facing=east":{"model":"mmorpg:block/armoire_aeloria","y":90},"facing=south":{"model":"mmorpg:block/armoire_aeloria","y":180},"facing=west":{"model":"mmorpg:block/armoire_aeloria","y":270}}}

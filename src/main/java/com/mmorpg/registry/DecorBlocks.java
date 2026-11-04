@@ -73,6 +73,19 @@ public final class DecorBlocks {
         }
     }
 
+    static {
+        for (DecorPropList.Prop p : DecorPropList.ALL) {
+            DeferredBlock<? extends Block> block = ModBlocks.BLOCKS.registerBlock(p.id(),
+                    props -> new com.mmorpg.block.DecorPropBlock(props, p.x0(), p.y0(), p.z0(), p.x1(), p.y1(), p.z1()),
+                    props -> {
+                        Block.Properties q = props.mapColor(MapColor.WOOD).strength(1.2F, 4F).sound(p.sound()).noOcclusion();
+                        return p.light() > 0 ? q.lightLevel(st -> p.light()) : q;
+                    });
+            BY_ID.put(p.id(), block);
+            ITEMS.add(ModItems.ITEMS.registerSimpleBlockItem(p.id(), block));
+        }
+    }
+
     private static Block.Properties props(Block.Properties p, Mat m) {
         Block.Properties q = p.mapColor(m.color()).strength(m.hardness(), 6F).sound(m.sound());
         if (m.light() > 0) q = q.lightLevel(s -> m.light());

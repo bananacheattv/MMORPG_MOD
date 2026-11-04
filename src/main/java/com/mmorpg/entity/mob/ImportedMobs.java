@@ -41,6 +41,14 @@ public final class ImportedMobs {
         new Entry("rodeur_vide", "Rôdeur du vide", 5, 0.450f, 0.975f, 3.077f, false),
         new Entry("oeil_chaos", "Œil du chaos", 5, 0.919f, 1.400f, 2.714f, true),
         new Entry("chevalier_fracture", "Chevalier fracturé", 5, 0.790f, 1.830f, 2.404f, false),
-        new Entry("devoreur_etoiles", "Dévoreur d’étoiles", 5, 1.928f, 2.466f, 6.163f, false)
+        new Entry("devoreur_etoiles", "Dévoreur d’étoiles", 5, 1.928f, 2.466f, 6.163f, false),
+        // EXTRA-BEGIN (genere par tools/import_pack2.py)
+        new Entry("fernling", "Fougerin", 0, 0.621f, 0.849f, 1.295f, false),
+        new Entry("champion_gobelin", "Champion gobelin", 0, 0.925f, 2.125f, 1.318f, false),
+        new Entry("voyageur_squelette", "Voyageur squelette", 2, 0.950f, 2.000f, 1.050f, false),
+        new Entry("sentinelle_hibou", "Sentinelle hibou du givre", 3, 1.080f, 3.438f, 1.047f, false),
+        new Entry("minotaure", "Minotaure", 4, 2.000f, 3.875f, 1.084f, false),
+        new Entry("seigneur_squelette", "Seigneur squelette", 2, 2.000f, 6.500f, 0.846f, false),
+        // EXTRA-END
     };
 }

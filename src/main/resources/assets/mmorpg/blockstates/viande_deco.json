@@ -1,0 +1,1 @@
+{"variants":{"facing=north":{"model":"mmorpg:block/viande_deco"},"facing=east":{"model":"mmorpg:block/viande_deco","y":90},"facing=south":{"model":"mmorpg:block/viande_deco","y":180},"facing=west":{"model":"mmorpg:block/viande_deco","y":270}}}
