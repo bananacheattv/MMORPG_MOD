@@ -45,10 +45,9 @@ public final class MascotGuide {
         say(p, NAME, text);
     }
 
-    /** Bulle de dialogue d'un PNJ de quetes (titre = nom du PNJ) affichee a l'ecran du joueur, et copie dans le chat. */
+    /** Bulle de dialogue d'un PNJ de quetes (titre = nom du PNJ) affichee a l'ecran du joueur. */
     public static void say(ServerPlayer p, String speaker, String text) {
         Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.MASCOT, text, speaker, 0xFFE0302A));
-        p.sendSystemMessage(Component.literal("<" + speaker + "> ").withColor(0xC890FF).append(Component.literal(text).withColor(0xFFFFFF)));
     }
 
     /** Anciens joueurs : tutoriel considere comme termine (aucune quete de depart ni equipement redonnes). */
