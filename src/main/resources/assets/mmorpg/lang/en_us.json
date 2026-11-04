@@ -857,5 +857,21 @@
   "entity.mmorpg.gardien_citadelle": "Gardien de glace de la citadelle",
   "item.mmorpg.gardien_citadelle_spawn_egg": "Œuf d’apparition : Gardien de glace de la citadelle",
   "block.mmorpg.drapeau_aeloria": "Drapeau",
-  "block.mmorpg.camp_aeloria": "Campement"
+  "block.mmorpg.camp_aeloria": "Campement",
+  "entity.mmorpg.monture_taureau_guerre": "War Bull",
+  "item.mmorpg.sceau_taureau_guerre": "Mount seal: War Bull",
+  "entity.mmorpg.monture_lion_dore": "Golden Lion",
+  "item.mmorpg.sceau_lion_dore": "Mount seal: Golden Lion",
+  "entity.mmorpg.monture_rhinoceros_cuirasse": "Armored Rhino",
+  "item.mmorpg.sceau_rhinoceros_cuirasse": "Mount seal: Armored Rhino",
+  "entity.mmorpg.monture_bison_geant": "Giant Bison",
+  "item.mmorpg.sceau_bison_geant": "Mount seal: Giant Bison",
+  "entity.mmorpg.monture_mammouth": "Woolly Mammoth",
+  "item.mmorpg.sceau_mammouth": "Mount seal: Woolly Mammoth",
+  "entity.mmorpg.monture_elephant_guerre": "War Elephant",
+  "item.mmorpg.sceau_elephant_guerre": "Mount seal: War Elephant",
+  "entity.mmorpg.monture_tortue_forteresse": "Fortress Tortoise",
+  "item.mmorpg.sceau_tortue_forteresse": "Mount seal: Fortress Tortoise",
+  "entity.mmorpg.monture_drake_caravane": "Caravan Drake",
+  "item.mmorpg.sceau_drake_caravane": "Mount seal: Caravan Drake"
 }

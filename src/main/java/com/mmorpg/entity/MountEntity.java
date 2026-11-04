@@ -38,7 +38,15 @@ public class MountEntity extends Horse {
         this.mountType = t == null ? MountType.SANGLIER : t;
     }
 
+    /** Passagers factices (vitrine de test uniquement). */
+    public static final java.util.Set<UUID> TEST_PASSENGERS = java.util.concurrent.ConcurrentHashMap.newKeySet();
     public MountType mountType() { return mountType; }
+
+    /** Un coequipier du groupe du proprietaire peut monter en passager tant que le proprietaire est en selle et qu'il reste un siege. */
+    private boolean isShared(Player other) {
+        if (mountType.seats.length < 2 || rider == null || !(getFirstPassenger() instanceof ServerPlayer owner) || !owner.getUUID().equals(rider)) return false;
+        return com.mmorpg.server.PartyManager.sameParty(owner, other);
+    }
 
     public boolean isFlying() { return mountType.flies && !onGround() && isVehicle(); }
 
@@ -106,14 +114,17 @@ public class MountEntity extends Horse {
     }
 
     @Override protected boolean canAddPassenger(Entity passenger) {
-        return !display && (level().isClientSide() || passenger.getUUID().equals(rider)) && super.canAddPassenger(passenger);
+        if (display || getPassengers().size() >= mountType.seats.length) return false;
+        return level().isClientSide() || passenger.getUUID().equals(rider) || TEST_PASSENGERS.contains(passenger.getUUID()) || (passenger instanceof Player && isShared((Player) passenger));
     }
 
     @Override public InteractionResult mobInteract(Player player, InteractionHand hand) {
         if (level().isClientSide()) return InteractionResult.SUCCESS;
         if (display) return InteractionResult.SUCCESS;
-        if (!player.getUUID().equals(rider) || player.isSpectator()) return InteractionResult.FAIL;
-        doPlayerRide(player);
+        if (player.isSpectator()) return InteractionResult.FAIL;
+        if (player.getUUID().equals(rider)) { doPlayerRide(player); return InteractionResult.SUCCESS; }
+        if (!isShared(player)) return InteractionResult.FAIL;
+        player.startRiding(this);
         return InteractionResult.SUCCESS;
     }
 

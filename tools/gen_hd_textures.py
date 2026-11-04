@@ -195,6 +195,14 @@ MOUNT_SEALS = {
     'sceau_hippogriffe': ('seal', '#f0ece4', '#e8b830', '#fff0a0', '#ffd040'),
     'oeuf_mystere': ('egg', '#7a4ad8', '#ffd040', '#ffffff', '#c080ff'),
     'sceau_mystere': ('seal', '#2a2040', '#ffd040', '#ffffff', '#ffb040'),
+    'sceau_taureau_guerre': ('seal', '#4a2e22', '#c03020', '#e0b040', None),
+    'sceau_lion_dore': ('seal', '#d9a64a', '#fff0b0', '#e8c040', None),
+    'sceau_rhinoceros_cuirasse': ('seal', '#7a7a80', '#2a3a6a', '#d9b040', None),
+    'sceau_bison_geant': ('seal', '#5a3a24', '#e8c060', '#a06030', None),
+    'sceau_mammouth': ('seal', '#6a4a30', '#3a5a8a', '#e0e8f0', '#80c0ff'),
+    'sceau_elephant_guerre': ('seal', '#8a8478', '#7a1a1a', '#e0b040', '#ffd040'),
+    'sceau_tortue_forteresse': ('seal', '#4a7a52', '#1a6a6a', '#e8d070', '#40f0d0'),
+    'sceau_drake_caravane': ('seal', '#5a2a6a', '#ffd040', '#ff9a30', '#c060ff'),
 }
 
 

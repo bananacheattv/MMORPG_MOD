@@ -2031,6 +2031,7 @@ public final class DevShowcase {
             pl.onUpdateAbilities();
             pl.teleportTo(lv, lay.x0() + com.mmorpg.plains.PlainsLayout.PLAZA_X + 0.5, com.mmorpg.plains.PlainsLayout.BASE + 1, com.mmorpg.plains.PlainsLayout.Z0 + com.mmorpg.plains.PlainsLayout.PLAZA_Z + 4.5, java.util.Set.of(), 0F, 0F, true);
             var d = com.mmorpg.server.RpgPlayers.get(pl);
+            d.playerClass = com.mmorpg.rpg.PlayerClass.GUERRIER;
             d.mounts.add(type.id);
             d.nextMountTick = 0;
             d.pvpUntilTick = 0;
@@ -2047,6 +2048,16 @@ public final class DevShowcase {
             boolean ok = com.mmorpg.server.MountManager.summon(pl, type.id);
             MMORPG.LOGGER.info("[MMORPG] MONTURES {} : invoquee = {}, en selle = {}", type.id, ok, pl.isPassenger());
         });
+        if (rel == 23 && type.seats.length > 1) srv.execute(() -> {          // montures partagees : passagers factices pour voir tous les sieges
+            var pl = srv.getPlayerList().getPlayerByName(me);
+            if (pl.getVehicle() instanceof com.mmorpg.entity.MountEntity me2)
+                for (int i = 1; i < type.seats.length; i++) {
+                    var v = com.mmorpg.registry.ModEntities.TRAINING_DUMMY.get().create(pl.level(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                    com.mmorpg.entity.MountEntity.TEST_PASSENGERS.add(v.getUUID()); v.setPos(me2.getX(), me2.getY(), me2.getZ()); v.setNoAi(true);
+                    pl.level().addFreshEntity(v); v.startRiding(me2, true, true);
+                }
+        });
+        if (rel == 80) srv.execute(() -> { var pl = srv.getPlayerList().getPlayerByName(me); if (pl.getVehicle() != null) pl.getVehicle().getPassengers().stream().filter(e -> com.mmorpg.entity.MountEntity.TEST_PASSENGERS.contains(e.getUUID())).toList().forEach(net.minecraft.world.entity.Entity::discard); });
         if (rel == 26) mc.execute(() -> mc.options.setCameraType(CameraType.THIRD_PERSON_BACK));
         if (rel == 44) shot(mc, "mont_selle_dos_" + type.id);
         if (rel == 48) mc.execute(() -> mc.options.setCameraType(CameraType.THIRD_PERSON_FRONT));

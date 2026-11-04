@@ -117,7 +117,7 @@ public class LootTables {
         t.tables.put(SCEAU, new ArrayList<>(List.of(
                 e("sceau_sanglier", 1, 1, 40), e("sceau_loup_givre", 1, 1, 22), e("sceau_cerf_sylvestre", 1, 1, 22), e("sceau_tortue_cristal", 1, 1, 22),
                 e("sceau_chevre_celeste", 1, 1, 22), e("sceau_lezard_lave", 1, 1, 12), e("sceau_raptor_sables", 1, 1, 12), e("sceau_ours_runique", 1, 1, 12),
-                e("sceau_scorpion_dunes", 1, 1, 12), e("sceau_felin_vide", 1, 1, 5), e("sceau_araignee_cavernes", 1, 1, 5), e("sceau_hippogriffe", 1, 1, 2))));
+                e("sceau_scorpion_dunes", 1, 1, 12), e("sceau_felin_vide", 1, 1, 5), e("sceau_araignee_cavernes", 1, 1, 5), e("sceau_hippogriffe", 1, 1, 2), e("sceau_taureau_guerre", 1, 1, 14), e("sceau_lion_dore", 1, 1, 10), e("sceau_rhinoceros_cuirasse", 1, 1, 9), e("sceau_bison_geant", 1, 1, 7), e("sceau_mammouth", 1, 1, 5), e("sceau_elephant_guerre", 1, 1, 3), e("sceau_tortue_forteresse", 1, 1, 2), e("sceau_drake_caravane", 1, 1, 1))));
         for (var dt : com.mmorpg.world.DungeonBuilder.DungeonType.values()) {
             int lv = dt.level;
             String heal = lv >= 50 ? "potion_soin_majeure" : lv >= 20 ? "potion_soin" : "potion_soin_mineure";
