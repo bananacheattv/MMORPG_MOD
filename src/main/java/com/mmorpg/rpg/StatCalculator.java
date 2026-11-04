@@ -41,7 +41,7 @@ public final class StatCalculator {
         if (main.getItem() instanceof RpgEquipment eq) {
             RpgItemDef def = eq.rpgDef();
             if (def.slot() == RpgItemDef.Slot.WEAPON && def.usableBy(cls, level)) {
-                flat.addScaled(def.stats(), RpgEquipment.upgradeMult(main));
+                flat.addScaled(def.stats(), RpgEquipment.upgradeMult(main)); com.mmorpg.item.Affixes.apply(flat, main, def);
             }
         }
         for (EquipmentSlot slot : ARMOR_SLOTS) {
@@ -49,7 +49,7 @@ public final class StatCalculator {
             if (stack.getItem() instanceof RpgEquipment eq) {
                 RpgItemDef def = eq.rpgDef();
                 if (def.slot() != RpgItemDef.Slot.WEAPON && def.usableBy(cls, level)) {
-                    flat.addScaled(def.stats(), RpgEquipment.upgradeMult(stack));
+                    flat.addScaled(def.stats(), RpgEquipment.upgradeMult(stack)); com.mmorpg.item.Affixes.apply(flat, stack, def);
                     if (def.setId() != null) setCounts.merge(def.setId(), 1, Integer::sum);
                 }
             }

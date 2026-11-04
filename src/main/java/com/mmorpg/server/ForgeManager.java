@@ -21,6 +21,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
 /** Artisanat et amelioration a la Forge Arcanique (toujours verifies cote serveur). */
+@net.neoforged.fml.common.EventBusSubscriber(modid = com.mmorpg.MMORPG.MODID)
 public final class ForgeManager {
     private ForgeManager() {
     }
@@ -74,6 +75,10 @@ public final class ForgeManager {
             for (ForgeRecipes.Ingredient ing : r.ingredients()) remove(inv, ing.resolve(), ing.count());
             RpgPlayers.takeGold(player, r.gold());
             ItemStack result = new ItemStack(r.resultItem(), r.count());
+            if (result.getItem() instanceof RpgEquipment re) {
+                result.set(ModDataComponents.CREATOR.get(), player.getGameProfile().name());
+                com.mmorpg.item.Affixes.roll(result, re.rpgDef(), new java.util.Random());
+            }
             if (!inv.add(result)) player.drop(result, false, net.minecraft.util.Prediction.SERVER_ONLY);
             crafted++;
         }
@@ -145,5 +150,111 @@ public final class ForgeManager {
             Net.toPlayer(player, new Payloads.Notify(Payloads.Notify.INFO, "ÉCHEC DE L'AMÉLIORATION", "La pierre s'est brisée" + extra, 0xFF5050));
         }
         RpgPlayers.recomputeAndSync(player);
+    }
+
+    private static final double EPS = 1e-9;
+
+    /** Coute une pierre d'amelioration et de l'or ; false (avec message) sinon. */
+    private static boolean payStone(ServerPlayer player, int gold) {
+        Inventory inv = player.getInventory();
+        RpgPlayers.depositCoins(player);
+        Item stone = ModItems.PIERRE_AMELIORATION.get();
+        if (count(inv, stone) < 1 || RpgPlayers.get(player).gold < gold) {
+            player.sendOverlayMessage(Component.literal("Il vous faut une pierre d'amélioration et " + gold + " or.").withColor(0xFF5050));
+            return false;
+        }
+        remove(inv, stone, 1);
+        RpgPlayers.takeGold(player, gold);
+        return true;
+    }
+
+    /** Relance les affixes de l'arme en main. */
+    public static void reroll(ServerPlayer player, BlockPos pos, int slot) {
+        if (!nearForge(player, pos)) return;
+        Inventory inv = player.getInventory();
+        if (slot < 0 || slot >= inv.getContainerSize()) return;
+        ItemStack stack = inv.getItem(slot);
+        if (!(stack.getItem() instanceof RpgEquipment re) || re.rpgDef().slot() != com.mmorpg.item.RpgItemDef.Slot.WEAPON) {
+            player.sendOverlayMessage(Component.literal("Seules les armes ont des affixes.").withColor(0xFF5050));
+            return;
+        }
+        if (com.mmorpg.item.Affixes.count(re.rpgDef()) == 0) {
+            player.sendOverlayMessage(Component.literal("Cette arme commune n'a pas d'affixe.").withColor(0xFF5050));
+            return;
+        }
+        if (!payStone(player, 50 + re.rpgDef().level() * 10)) return;
+        com.mmorpg.item.Affixes.roll(stack, re.rpgDef(), new java.util.Random());
+        player.level().playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 1f, 1.1f);
+        Net.toPlayer(player, new Payloads.Notify(Payloads.Notify.LOOT, "AFFIXES RELANCÉS", stack.getHoverName().getString(), 0x7FE0FF));
+        RpgPlayers.recomputeAndSync(player);
+    }
+
+    /** Reforge : deplace 40 % d'une statistique de base de l'equipement vers une autre (spec "DE>VERS", vide = annuler). */
+    public static void reforge(ServerPlayer player, BlockPos pos, int slot, String spec) {
+        if (!nearForge(player, pos)) return;
+        Inventory inv = player.getInventory();
+        if (slot < 0 || slot >= inv.getContainerSize()) return;
+        ItemStack stack = inv.getItem(slot);
+        if (!(stack.getItem() instanceof RpgEquipment re)) return;
+        if (spec.isEmpty()) {
+            if (stack.remove(ModDataComponents.REFORGE.get()) != null) RpgPlayers.recomputeAndSync(player);
+            return;
+        }
+        String[] p = spec.split(">");
+        com.mmorpg.rpg.Stat from, to;
+        try {
+            from = com.mmorpg.rpg.Stat.valueOf(p[0]);
+            to = com.mmorpg.rpg.Stat.valueOf(p[1]);
+        } catch (RuntimeException e) {
+            return;
+        }
+        if (from == to || re.rpgDef().stats().get(from) <= EPS) {
+            player.sendOverlayMessage(Component.literal("Cet équipement n'a pas cette statistique.").withColor(0xFF5050));
+            return;
+        }
+        if (!payStone(player, 80 + re.rpgDef().level() * 15)) return;
+        stack.set(ModDataComponents.REFORGE.get(), from.name() + ">" + to.name());
+        player.level().playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 1f, 0.8f);
+        Net.toPlayer(player, new Payloads.Notify(Payloads.Notify.LOOT, "REFORGE", from.label + " → " + to.label, 0xC7A6FF));
+        RpgPlayers.recomputeAndSync(player);
+    }
+
+    /** Forge arcanique la plus proche (6 blocs) ou null. */
+    public static BlockPos nearestForge(ServerPlayer player) {
+        BlockPos o = player.blockPosition();
+        for (BlockPos b : BlockPos.betweenClosed(o.offset(-6, -3, -6), o.offset(6, 3, 6))) {
+            if (nearForge(player, b)) return b.immutable();
+        }
+        return null;
+    }
+
+    /** /forge relancer | /forge reforger DE VERS | /forge reforger annuler (objet en main, forge a proximite). */
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void commands(net.neoforged.neoforge.event.RegisterCommandsEvent e) {
+        var str = com.mojang.brigadier.arguments.StringArgumentType.word();
+        e.getDispatcher().register(net.minecraft.commands.Commands.literal("forge")
+                .then(net.minecraft.commands.Commands.literal("relancer").executes(c -> {
+                    var p = c.getSource().getPlayerOrException();
+                    BlockPos b = nearestForge(p);
+                    if (b == null) p.sendSystemMessage(Component.literal("Approchez-vous d'une Forge Arcanique."));
+                    else reroll(p, b, p.getInventory().getSelectedSlot());
+                    return 1;
+                }))
+                .then(net.minecraft.commands.Commands.literal("reforger")
+                        .then(net.minecraft.commands.Commands.literal("annuler").executes(c -> {
+                            var p = c.getSource().getPlayerOrException();
+                            BlockPos b = nearestForge(p);
+                            if (b != null) reforge(p, b, p.getInventory().getSelectedSlot(), "");
+                            return 1;
+                        }))
+                        .then(net.minecraft.commands.Commands.argument("de", str).then(net.minecraft.commands.Commands.argument("vers", str).executes(c -> {
+                            var p = c.getSource().getPlayerOrException();
+                            BlockPos b = nearestForge(p);
+                            if (b == null) p.sendSystemMessage(Component.literal("Approchez-vous d'une Forge Arcanique."));
+                            else reforge(p, b, p.getInventory().getSelectedSlot(),
+                                    com.mojang.brigadier.arguments.StringArgumentType.getString(c, "de").toUpperCase() + ">"
+                                            + com.mojang.brigadier.arguments.StringArgumentType.getString(c, "vers").toUpperCase());
+                            return 1;
+                        })))));
     }
 }

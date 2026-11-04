@@ -373,7 +373,7 @@ public final class Payloads {
     }
 
     public record ForgeAction(int action, String recipe, int value, BlockPos pos) implements CustomPacketPayload {
-        public static final int CRAFT = 0, UPGRADE = 1, COMPRESS = 2;
+        public static final int CRAFT = 0, UPGRADE = 1, COMPRESS = 2, REROLL = 3, REFORGE = 4;
         public static final Type<ForgeAction> TYPE = new Type<>(MMORPG.id("forge_action"));
         public static final StreamCodec<ByteBuf, ForgeAction> CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, ForgeAction::action, ByteBufCodecs.STRING_UTF8, ForgeAction::recipe,

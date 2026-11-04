@@ -60,7 +60,9 @@ public class AdminPlayersScreen extends MmoScreen {
             {"Mode de jeu (valeur)", "gamemode", "", "1"}, {"Quitter son groupe", "partyleave", "1", "1"}, {"Quitter sa guilde", "guildleave", "1", "0"},
             {"Réinit. attributs", "resetattr", "1", "0"}, {"Réinit. classe", "resetclass", "1", "0"}, {"Réinit. quêtes", "resetquests", "1", "0"},
             {"Réinit. métiers", "resetjobs", "1", "0"}, {"Vider inventaire", "clearinv", "1", "1"}, {"Vider Ender", "clearender", "1", "1"},
-            {"Vider la banque", "clearbank", "1", "0"}, {"TOUT réinitialiser", "resetall", "1", "0"}};
+            {"Vider la banque", "clearbank", "1", "0"}, {"TOUT réinitialiser", "resetall", "1", "0"},
+            {"Grade : GM Fondateur", "grade_fondateur", "1", "0"}, {"Grade : GR Responsable", "grade_responsable", "1", "0"}, {"Grade : GS Modérateur", "grade_moderateur", "1", "0"},
+            {"Grade : GB Builder", "grade_builder", "1", "0"}, {"Retirer le grade", "grade_aucun", "1", "0"}};
 
     private Page page = Page.RESUME;
     private final List<CompoundTag> players = new ArrayList<>();
