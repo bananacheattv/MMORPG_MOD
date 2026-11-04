@@ -26,7 +26,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 /** PNJ des villes : Maitre des Quetes ou Marchand. Immobile, invulnerable et persistant. */
 public class NpcEntity extends PathfinderMob {
     public enum Role {
-        QUETES("Maître des Quêtes"), MARCHAND("Marchand"), DONJON("Maître des donjons"), MINES("Maître des mines"), SORTIE("Passeur"), BOUTIQUE("Boutique d’Aeloria"), PVP("Intendant des arènes");
+        QUETES("Maître des Quêtes"), MARCHAND("Marchand"), DONJON("Maître des donjons"), MINES("Maître des mines"), SORTIE("Passeur"), BOUTIQUE("Boutique d’Aeloria"), PVP("Intendant des arènes"), PAROLE("Parle seulement"), MUET("Silencieux");
 
         public final String label;
 
@@ -87,7 +87,7 @@ public class NpcEntity extends PathfinderMob {
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(1, new LookAtPlayerGoal(this, Player.class, 8.0F));
+        this.goalSelector.addGoal(1, new LookAtPlayerGoal(this, Player.class, 80.0F));
         this.goalSelector.addGoal(2, new RandomLookAroundGoal(this));
     }
 
@@ -129,6 +129,8 @@ public class NpcEntity extends PathfinderMob {
                 case DONJON -> com.mmorpg.dungeon.DungeonMaster.open(sp, this);
                 case MINES -> com.mmorpg.mine.MineManager.open(sp, this);
                 case SORTIE -> com.mmorpg.dungeon.InstanceManager.leaveNow(sp, this.group());
+                case PAROLE -> { if (!dialogue.isEmpty()) com.mmorpg.server.MascotGuide.say(sp, displayName(), dialogue); }
+                default -> {}
             }
         }
         return InteractionResult.SUCCESS;

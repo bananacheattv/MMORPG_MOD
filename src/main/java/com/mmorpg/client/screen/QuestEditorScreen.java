@@ -217,10 +217,10 @@ public final class QuestEditorScreen extends MmoScreen {
         button(g,rx+rw-49,top+25,49,19,"Aspect",true,editingLook?Ui.GOLD:Ui.MUTED,()->{editingLook=true;editingDialogue=false;rebuild();});
         if(editingDialogue||!editingLook)return;
         int h=ph<270?20:24;
-        button(g,rx,fy,rw/2-3,18,"Apparence : "+com.mmorpg.entity.NpcEntity.APPEARANCES[npcSkin],true,Ui.GOLD,()->npcSkin=(npcSkin+1)%com.mmorpg.entity.NpcEntity.SKINS);
-        button(g,rx+rw/2+3,fy,rw/2-3,18,com.mmorpg.entity.NpcEntity.Role.byId(npcRole).label,true,Ui.GOLD,()->npcRole=(npcRole+1)%com.mmorpg.entity.NpcEntity.Role.values().length);
-        button(g,rx,fy+h,rw/2-3,18,"Taille : x"+npcScale,true,Ui.GOLD,()->{float[] s=com.mmorpg.entity.NpcEntity.SCALES;int i=0;for(int k=0;k<s.length;k++)if(Math.abs(s[k]-npcScale)<.01f)i=k;npcScale=s[(i+1)%s.length];});
-        button(g,rx+rw/2+3,fy+h,rw/2-3,18,"Pose : "+com.mmorpg.entity.NpcEntity.POSES[Math.floorMod(npcPose,com.mmorpg.entity.NpcEntity.POSES.length)],true,Ui.GOLD,()->npcPose=(npcPose+1)%com.mmorpg.entity.NpcEntity.POSES.length);
+        button(g,rx,fy,rw/2-3,18,"Apparence : "+com.mmorpg.entity.NpcEntity.APPEARANCES[npcSkin]+" ▾",true,Ui.GOLD,()->{var c=new ArrayList<Choice>();for(int i=0;i<com.mmorpg.entity.NpcEntity.SKINS;i++)c.add(new Choice(Integer.toString(i),com.mmorpg.entity.NpcEntity.APPEARANCES[i]));choose("Apparence",c,v->npcSkin=Integer.parseInt(v));});
+        button(g,rx+rw/2+3,fy,rw/2-3,18,com.mmorpg.entity.NpcEntity.Role.byId(npcRole).label+" ▾",true,Ui.GOLD,()->{var c=new ArrayList<Choice>();for(var r:com.mmorpg.entity.NpcEntity.Role.values())c.add(new Choice(Integer.toString(r.ordinal()),r.label));choose("Rôle",c,v->npcRole=Integer.parseInt(v));});
+        button(g,rx,fy+h,rw/2-3,18,"Taille : x"+npcScale+" ▾",true,Ui.GOLD,()->{var c=new ArrayList<Choice>();for(float f:com.mmorpg.entity.NpcEntity.SCALES)c.add(new Choice(Float.toString(f),"x"+f));choose("Taille",c,v->npcScale=Float.parseFloat(v));});
+        button(g,rx+rw/2+3,fy+h,rw/2-3,18,"Pose : "+com.mmorpg.entity.NpcEntity.POSES[Math.floorMod(npcPose,com.mmorpg.entity.NpcEntity.POSES.length)]+" ▾",true,Ui.GOLD,()->{var c=new ArrayList<Choice>();for(int i=0;i<com.mmorpg.entity.NpcEntity.POSES.length;i++)c.add(new Choice(Integer.toString(i),com.mmorpg.entity.NpcEntity.POSES[i]));choose("Pose",c,v->npcPose=Integer.parseInt(v));});
         if(!npcId.isEmpty()){
             button(g,rx,fy+2*h,rw/2-3,18,"Placer ici",true,Ui.GOLD,()->npcAction("move_npc"));
             button(g,rx+rw/2+3,fy+2*h,rw/2-3,18,"Tourner de 90°",true,Ui.GOLD,()->npcAction("rotate_npc"));
