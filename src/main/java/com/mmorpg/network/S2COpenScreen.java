@@ -55,6 +55,8 @@ public record S2COpenScreen(int screen, CompoundTag extra) implements CustomPack
     public static final int CHARACTERS = 40;
     /** Carte du donjon (salles découvertes, clés, chrono). */
     public static final int DUNGEON_MAP = 70;
+    /** Panneau de moderation complet (/moderation). */
+    public static final int MODERATION = 80;
     public static final int SPAWN_EDITOR = 19;
     public static final int ADVENTURE_SUMMARY = 20;
     public static final int MERCHANT_EDITOR = 21;

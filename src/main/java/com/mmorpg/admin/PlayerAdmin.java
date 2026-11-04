@@ -114,6 +114,10 @@ public final class PlayerAdmin {
         }
         String act = d.getStringOr("action", "");
         try {
+            if (act.equals("set") || act.equals("del") || act.equals("add") || act.equals("clear") || act.equals("act")) {
+                ServerPlayer live = admin.level().getServer().getPlayerList().getPlayer(com.mmorpg.moderation.ModUtil.uuid(d.getStringOr("id", "")));
+                if (live != null) com.mmorpg.moderation.Backups.snapshot(live, "avant-admin");
+            }
             switch (act) {
                 case "list" -> reply(admin, list(admin, text(d, "q", 32)));
                 case "get" -> reply(admin, profile(admin, target(admin, d), ""));
@@ -787,6 +791,7 @@ public final class PlayerAdmin {
             default -> throw new IllegalArgumentException("Action inconnue.");
         }
         log(admin, t, what + (arg.isEmpty() ? "" : " " + clip(arg)));
+        if (what.matches("kick|ban|pardon|mute|unmute")) com.mmorpg.moderation.ModHistory.record(admin.getGameProfile().name(), t.id, t.name, what, arg);
         return result;
     }
 
@@ -861,6 +866,20 @@ public final class PlayerAdmin {
     private static boolean isMuted(UUID id) {
         loadMutes();
         return MUTED.containsKey(id);
+    }
+
+    /** Acces du panneau de moderation a la liste des joueurs reduits au silence. */
+    public static boolean muted(UUID id) {
+        return isMuted(id);
+    }
+
+    public static Map<UUID, String> mutedAll() {
+        loadMutes();
+        return new LinkedHashMap<>(MUTED);
+    }
+
+    public static void mute(UUID id, String name, boolean on) {
+        setMuted(id, name, on);
     }
 
     private static synchronized void setMuted(UUID id, String name, boolean on) {

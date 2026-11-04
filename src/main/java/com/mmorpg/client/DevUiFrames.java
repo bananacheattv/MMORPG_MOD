@@ -71,6 +71,26 @@ final class DevUiFrames {
         add("admin_players_data", () -> adminPlayers(1, "skills"));
         add("admin_players_items", () -> adminPlayers(2));
         add("admin_players_actions", () -> adminPlayers(3));
+        add("moderation", () -> {
+            var t = new CompoundTag();
+            t.putString("kind", "state");
+            t.putInt("online", 3);
+            t.putInt("openReports", 2);
+            var rows = new net.minecraft.nbt.ListTag();
+            String[][] ps = {{"Aelwyn", "Mage niv. 42", ""}, {"Borin", "Guerrier niv. 17", "silence"}, {"Cyra", "Archer niv. 63", "prison"}};
+            for (var p : ps) {
+                var r = new CompoundTag();
+                r.putString("a", p[0]);
+                r.putString("b", p[1]);
+                r.putString("c", p[2]);
+                r.putString("id", "00000000-0000-0000-0000-000000000001");
+                r.putString("name", p[0]);
+                rows.add(r);
+            }
+            t.put("rows", rows);
+            t.putString("tab", "players");
+            return new ModerationScreen(t);
+        });
         add("admin_features", () -> {
             var flags = new CompoundTag();
             for (String k : com.mmorpg.server.FeatureFlags.KEYS) flags.putBoolean(k, !k.equals("drones") && !k.equals("luckyblocks") && !k.equals("cinematique"));

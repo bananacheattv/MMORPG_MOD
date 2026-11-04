@@ -138,6 +138,7 @@ public final class DevNetworkChecks {
             KillRewards.onDeath(new net.neoforged.neoforge.event.entity.living.LivingDeathEvent(boss, p.damageSources().playerAttack(p)));
             check(countPlans(p) == scrolls + 1, "boss grants a personal crafting scroll");
             DevPortalChecks.run(p);
+            com.mmorpg.moderation.DevModerationChecks.run(p);
             com.mmorpg.dungeon.DevDedicatedDungeonChecks.run(p);
             com.mmorpg.dungeon.DevDungeonSetupChecks.run(p);
             DevSpawnEditorChecks.run(p);

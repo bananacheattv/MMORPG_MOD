@@ -95,6 +95,10 @@ public final class ClientPayloadHandlers {
                 if (mc.gui.screen() instanceof com.mmorpg.client.screen.AdminPlayersScreen screen) screen.receive(payload.extra());
                 else mc.gui.setScreen(new com.mmorpg.client.screen.AdminPlayersScreen(payload.extra()));
             }
+            case S2COpenScreen.MODERATION -> {
+                if (mc.gui.screen() instanceof com.mmorpg.client.screen.ModerationScreen screen) screen.receive(payload.extra());
+                else mc.gui.setScreen(new com.mmorpg.client.screen.ModerationScreen(payload.extra()));
+            }
             case S2COpenScreen.ADMIN_FEATURES -> {
                 if (mc.gui.screen() instanceof com.mmorpg.client.screen.AdminFeaturesScreen screen) screen.receive(payload.extra());
                 else mc.gui.setScreen(new com.mmorpg.client.screen.AdminFeaturesScreen(payload.extra()));
