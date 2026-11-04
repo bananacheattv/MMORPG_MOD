@@ -54,6 +54,23 @@ public final class DevExpansionChecks {
     for(int i=0;i<3;i++)for(int turn=0;turn<3;turn++){var at=DungeonSecrets.rune(o,i);player.setPos(at.getX()+.5,at.getY(),at.getZ()+.5);var hit=new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(at),Direction.UP,at,false);DungeonSecrets.interact(new net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock(player,net.minecraft.world.InteractionHand.MAIN_HAND,at,hit));}
     check(level.isEmptyBlock(o.offset(17,0,Layout.R2.z()))&&RpgPlayers.get(player).cosmetics.contains("aura_arcane"),"real rune clicks open secret and unlock cosmetic");
     check(!level.isEmptyBlock(o.offset(27,0,Layout.R2.z())),"multi-class seal remains locked for solo player");
+    {java.util.function.BiConsumer<Integer,Integer> click=(rx,rz)->{var at=o.offset(rx,0,rz);player.setPos(at.getX()+.5,at.getY(),at.getZ()+.5);var hit=new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(at),Direction.UP,at,false);var ev=new net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock(player,net.minecraft.world.InteractionHand.MAIN_HAND,at,hit);DungeonPuzzles.interact(ev);DungeonRun.onClick(ev);};
+     check(!level.isEmptyBlock(o.offset(0,1,DungeonRun.DOOR_Z[0]))&&!level.isEmptyBlock(o.offset(0,1,DungeonRun.DOOR_Z[2])),"floor doors placed");
+     int[] seq=DungeonPuzzles.sequence(first);int mz=DungeonPuzzles.MEM_Z;
+     check(!level.isEmptyBlock(o.offset(5,1,mz)),"memory room sealed");
+     click.accept(2,mz-3);int wrong=(seq[0]+1)%4;click.accept(2,mz-1+wrong);for(int i=0;i<4;i++)click.accept(2,mz-1+seq[i]);
+     check(level.isEmptyBlock(o.offset(5,1,mz)),"memory sequence opens secret room");
+     int sz=DungeonPuzzles.SPH_Z;check(!level.isEmptyBlock(o.offset(5,1,sz)),"sphinx room sealed");
+     int rid=DungeonPuzzles.riddle(first);int shift=(int)Math.floorMod(first/11,4L);int goodSlot=Math.floorMod(rid-shift,4);int badSlot=(goodSlot+1)%4;
+     click.accept(2,sz-1+badSlot);check(!level.isEmptyBlock(o.offset(5,1,sz)),"wrong riddle answer refused");
+     DungeonPuzzles.debugClearCooldown();click.accept(2,sz-1+goodSlot);check(level.isEmptyBlock(o.offset(5,1,sz)),"riddle answer opens secret room");
+     player.setPos(o.getX(),o.getY(),o.getZ()+20);DungeonRun.enter(player,slot);var run=DungeonRun.find(server,slot);check(run!=null&&!run.done,"run starts on entry");
+     int dz=DungeonRun.DOOR_Z[0];click.accept(0,dz);check(!level.isEmptyBlock(o.offset(0,1,dz)),"sealed door stays shut without key");
+     run.keys|=1;click.accept(0,dz);click.accept(0,dz);check(level.isEmptyBlock(o.offset(0,1,dz))&&(run.opened&1)==1,"key opens floor door");
+     check(DungeonRun.nodeAt(Layout.R3.z())==6,"map node lookup");
+     DungeonRun.victory(level,o.offset(0,1,Layout.ARENA.z()));var board=DungeonRun.ranking(server,slot.pool);check(!board.isEmpty()&&run.done&&run.hasBonus&&level.getBlockState(BlockPos.of(run.bonusPos)).is(ModBlocks.DUNGEON_CHEST.get()),"victory records speed time and spawns no-death bonus chest");
+     DungeonRun.cleanup(server,slot);check(DungeonRun.find(server,slot)==null,"run cleared on reset");
+    }
     var healer=ModEntities.IMPORTED.get("veilleur_champignon").get().create(level,EntitySpawnReason.COMMAND);var colossus=ModEntities.IMPORTED.get("colosse_racine").get().create(level,EntitySpawnReason.COMMAND);var scout=ModEntities.IMPORTED.get("archer_sylvestre").get().create(level,EntitySpawnReason.COMMAND);
     try{
         healer.snapTo(o.getX(),o.getY(),o.getZ()+122,0,0);colossus.snapTo(o.getX()+3,o.getY(),o.getZ()+122,0,0);scout.snapTo(o.getX(),o.getY(),o.getZ()+120,0,0);healer.setNoAi(true);colossus.setNoAi(true);scout.setNoAi(true);level.addFreshEntity(healer);level.addFreshEntity(colossus);level.addFreshEntity(scout);

@@ -316,6 +316,7 @@ public final class InstanceManager {
         level.sendParticles(ParticleTypes.REVERSE_PORTAL, p.getX(), p.getY() + 1, p.getZ(), 50, 0.4, 0.9, 0.4, 0.1);
         slot.lastBusy = level.getServer().getTickCount();
         InstanceData.get(level.getServer()).dirty();
+        DungeonRun.enter(p, slot);
     }
 
     // ================================================================== reservation
@@ -523,6 +524,7 @@ public final class InstanceManager {
     static void resetSlot(MinecraftServer server, Slot s) {
         ServerLevel level = server.getLevel(DIM);
         if (level == null || !s.ready) return;
+        DungeonRun.cleanup(server, s);
         if (STALE.remove(slotKey(s))) {                       // modele modifie pendant l'occupation : reconstruction a la prochaine reservation
             clearEntities(level, s);
             s.ready = false;
@@ -575,7 +577,7 @@ public final class InstanceManager {
         String mine = ownerKey(p);
         for (Slot s : InstanceData.get(server).slots) {
             if (Math.abs(p.getX() - s.x) < 40 && p.getZ() > s.z - 6 && p.getZ() < s.z + Layout.LENGTH + 6) {
-                if (s.owner.equals(mine)) return;
+                if (s.owner.equals(mine) && s.ready) { DungeonRun.rejoin(p, s); return; }
                 break;
             }
         }

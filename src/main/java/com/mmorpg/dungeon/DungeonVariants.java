@@ -35,6 +35,8 @@ public final class DungeonVariants {
             data.replaceVariant(trial,enabled,(int)Math.floorMod(seed+index,3));
         }
         DungeonSecrets.build(level,origin,seed);
+        DungeonRun.buildDoors(level,origin);
+        DungeonPuzzles.build(level,origin,seed);
     }
     public static void scaleMob(net.minecraft.world.entity.Mob mob,ServerLevel level){
         var slot=InstanceManager.slotAt(level.getServer(),level,mob.getX(),mob.getZ());if(slot==null||modifier(slot.variantSeed)!=0)return;
