@@ -104,3 +104,31 @@ def chainc(*a, **k):
     c, end = chain(*a, **k)
     print(json.dumps(c, separators=(',', ':')))
     print('end', end)
+
+
+def tip(y0, yt, hw, zh=.25, cx=8, n=6):
+    """Lame lisse : corps (lame + arete) jusqu'a yt, pointe = 2 lames inclinees a 22.5 deg (bords) + tranches interieures + arete."""
+    import math
+    L = hw * 2.414
+    sl = min(hw * 2.613, 31.98 - yt)
+    c = [{'name': 'mt:lame', 'from': [cx - hw, y0, 8 - zh], 'to': [cx + hw, yt, 8 + zh]},
+         {'name': 'hl:arete', 'from': [cx - hw * .16, y0, 8 - zh - .15], 'to': [cx + hw * .16, yt, 8 + zh + .15]},
+         {'name': 'mt:pointe_g', 'from': [cx - hw, yt, 8 - zh - .03], 'to': [cx - hw + .55, yt + sl, 8 + zh + .03], 'rotation': {'axis': 'z', 'angle': -22.5, 'origin': [cx - hw, yt, 8]}},
+         {'name': 'md:pointe_d', 'from': [cx + hw - .55, yt, 8 - zh - .03], 'to': [cx + hw, yt + sl, 8 + zh + .03], 'rotation': {'axis': 'z', 'angle': 22.5, 'origin': [cx + hw, yt, 8]}}]
+    dy = L / n
+    for i in range(n):
+        w = hw * (1 - (i + 1) / n) + .1 * (i == n - 1)
+        z = zh * (1 - .4 * (i + 1) / n)
+        c.append({'name': f'{"hl" if i == n - 1 else "mt"}:t{i}', 'from': [round(cx - w, 3), round(yt + i * dy, 3), round(8 - z, 3)], 'to': [round(cx + w, 3), round(yt + (i + 1) * dy, 3), round(8 + z, 3)]})
+    for i in range(3):
+        r = hw * .16 * (1 - i * .35)
+        c.append({'name': f'hl:r{i}', 'from': [round(cx - r, 3), round(yt + i * .9, 3), round(8 - zh - .12 + i * .04, 3)], 'to': [round(cx + r, 3), round(yt + i * .9 + .9, 3), round(8 + zh + .12 - i * .04, 3)]})
+    for e in c:
+        e['from'] = [round(v, 3) for v in e['from']]
+        e['to'] = [round(v, 3) for v in e['to']]
+    return c
+
+
+def tipc(*a, **k):
+    import json
+    print(json.dumps(tip(*a, **k), separators=(',', ':')))
