@@ -31,15 +31,21 @@ import org.jspecify.annotations.Nullable;
  */
 public class LightEmitterBlock extends Block {
     public static final IntegerProperty LEVEL = BlockStateProperties.LEVEL;
+    /** Index de portee (15, 25, 40, 60, 80, 100 blocs) : voir LightNetwork.RANGES. */
+    public static final IntegerProperty RANGE = IntegerProperty.create("range", 0, 5);
 
     public LightEmitterBlock(Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(LEVEL, 15));
+        registerDefaultState(stateDefinition.any().setValue(LEVEL, 15).setValue(RANGE, 0));
+    }
+
+    @Override protected void onPlace(BlockState s, Level l, BlockPos p, BlockState old, boolean moved) {
+        if (l instanceof net.minecraft.server.level.ServerLevel sl) com.mmorpg.server.LightNetwork.changed(sl, p);
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> b) {
-        b.add(LEVEL);
+        b.add(LEVEL, RANGE);
     }
 
     @Override
@@ -88,6 +94,7 @@ public class LightEmitterBlock extends Block {
             CompoundTag t = new CompoundTag();
             t.putLong("pos", pos.asLong());
             t.putInt("level", state.getValue(LEVEL));
+            t.putInt("range", state.getValue(RANGE));
             Net.toPlayer(sp, new S2COpenScreen(S2COpenScreen.LIGHT_BLOCK, t));
         }
         return InteractionResult.SUCCESS;
@@ -111,7 +118,9 @@ public class LightEmitterBlock extends Block {
         if (p.distanceToSqr(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5) > 64 * 64 || !p.level().isLoaded(pos)) return;
         BlockState s = p.level().getBlockState(pos);
         if (!(s.getBlock() instanceof LightEmitterBlock)) return;
-        int lvl = Math.max(0, Math.min(15, data.getIntOr("level", 15)));
-        p.level().setBlock(pos, s.setValue(LEVEL, lvl), Block.UPDATE_ALL);
+        int lvl = Math.max(0, Math.min(15, data.getIntOr("level", s.getValue(LEVEL))));
+        int rng = Math.max(0, Math.min(5, data.getIntOr("range", s.getValue(RANGE))));
+        p.level().setBlock(pos, s.setValue(LEVEL, lvl).setValue(RANGE, rng), Block.UPDATE_ALL);
+        if (p.level() instanceof net.minecraft.server.level.ServerLevel sl) com.mmorpg.server.LightNetwork.changed(sl, pos);
     }
 }

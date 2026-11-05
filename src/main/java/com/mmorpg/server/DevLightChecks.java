@@ -68,14 +68,21 @@ public final class DevLightChecks {
             check(!restored.isRemoved(), "restored display survives missing rider");
             var temporary = new com.mmorpg.entity.MountEntity(com.mmorpg.registry.ModEntities.MOUNTS.get(com.mmorpg.mount.MountType.SANGLIER).get(),level);
             check(!temporary.save(net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING,level.registryAccess())), "summoned mounts remain temporary");
-            // Une seule source : aucune copie de lumiere ailleurs, et les anciens relais disparaissent.
-            for(int x=-3;x<=3;x++)for(int z=-3;z<=3;z++)level.getChunk(x,z);
-            level.setBlock(pos, ModBlocks.BLOC_LUMIERE.get().defaultBlockState(), 3);
-            var east=pos.offset(16,0,0);
-            level.setBlock(east,ModBlocks.LIGHT_FIELD.get().defaultBlockState(),3);
-            com.mmorpg.block.LightFieldBlock.reconcile(level,east);
-            check(!level.getBlockState(east).is(ModBlocks.LIGHT_FIELD.get()),"old relay removed");
-            check(level.getBlockState(pos.offset(-16,0,0)).isAir() && level.getBlockState(pos.offset(0,16,0)).isAir(),"no repeated light");
+            // Portee etendue : degrade depuis un point, pas de motif repete, murs respectes, nettoyage.
+            for(int x=-4;x<=4;x++)for(int z=-4;z<=4;z++)level.getChunk(x,z);
+            level.setBlock(pos, ModBlocks.BLOC_LUMIERE.get().defaultBlockState().setValue(LightEmitterBlock.RANGE, 2), 3);
+            LightNetwork.runNow(level,pos,40,15,true);
+            var near=pos.offset(8,0,0); var far=pos.offset(36,0,0);
+            check(level.getBlockState(near).is(ModBlocks.LIGHT_FIELD.get()) && level.getBlockState(far).is(ModBlocks.LIGHT_FIELD.get()),"relays up to range");
+            check(level.getBlockState(near).getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LEVEL)
+                    > level.getBlockState(far).getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LEVEL),"light decreases with distance");
+            check(!level.getBlockState(pos.offset(44,0,0)).is(ModBlocks.LIGHT_FIELD.get()),"nothing beyond range");
+            level.setBlock(pos.offset(20,0,0),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),3);
+            LightNetwork.runNow(level,pos,40,15,true);
+            check(!level.getBlockState(pos.offset(24,0,0)).is(ModBlocks.LIGHT_FIELD.get()),"relay does not cross wall");
+            level.removeBlock(pos.offset(20,0,0),false);
+            LightNetwork.runNow(level,pos,0,0,false);
+            check(!level.getBlockState(near).is(ModBlocks.LIGHT_FIELD.get()) && !level.getBlockState(far).is(ModBlocks.LIGHT_FIELD.get()),"relays cleaned");
             level.removeBlock(pos,false);
             // Sol sûr et distance de suivi minimale de la mascotte.
             p.snapTo(0,150,0,0,0);
@@ -85,7 +92,7 @@ public final class DevLightChecks {
             check(ground!=null && ground.y==150 && ground.subtract(p.position()).horizontalDistanceSqr()>=9,"mascot grounded and at least three blocks away");
             check(!guide.isNoGravity() && guide.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED)>0,"mascot walks with gravity");
             DevQuestTalkChecks.run(p);
-            MMORPG.LOGGER.info("[CODEX CHECKS] LIGHT PASS: niveaux 0-15, emission, clamp, refus non-op, sans collision, source unique, persistence montures, mascotte au sol");
+            MMORPG.LOGGER.info("[CODEX CHECKS] LIGHT PASS: niveaux 0-15, emission, clamp, refus non-op, sans collision, portee etendue, persistence montures, mascotte au sol");
         } catch (Throwable t) {
             MMORPG.LOGGER.error("[CODEX CHECKS] LIGHT FAIL", t);
         } finally {

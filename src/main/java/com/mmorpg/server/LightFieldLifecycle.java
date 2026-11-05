@@ -11,7 +11,7 @@ import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 
-/** Réactive également les sources déjà posées, sans reconstruction du spawn. */
+/** Retrouve les sources déjà posées au chargement des chunks et reconstruit leurs relais. */
 @EventBusSubscriber(modid = MMORPG.MODID)
 public final class LightFieldLifecycle {
     private static final java.util.Queue<LevelChunk> QUEUE = new java.util.concurrent.ConcurrentLinkedQueue<>();
@@ -25,12 +25,12 @@ public final class LightFieldLifecycle {
         if (!l.hasChunk(c.getPos().x(), c.getPos().z())) return;
         for (int i = 0; i < c.getSections().length; i++) {
             var section = c.getSections()[i];
-            if (!section.maybeHas(s -> s.is(ModBlocks.BLOC_LUMIERE.get()) || s.is(ModBlocks.LIGHT_FIELD.get()))) continue;
+            if (!section.maybeHas(s -> s.is(ModBlocks.BLOC_LUMIERE.get()))) continue;
             int y0 = c.getMinY() + i * 16;
             for (int x = 0; x < 16; x++) for (int y = 0; y < 16; y++) for (int z = 0; z < 16; z++) {
                 var s = section.getBlockState(x, y, z);
-                if (s.is(ModBlocks.BLOC_LUMIERE.get()) || s.is(ModBlocks.LIGHT_FIELD.get()))
-                    l.scheduleTick(new BlockPos(c.getPos().getMinBlockX() + x, y0 + y, c.getPos().getMinBlockZ() + z), s.getBlock(), 10 + (x * 16 + z) % 40);
+                if (s.is(ModBlocks.BLOC_LUMIERE.get()))
+                    LightNetwork.changed(l, new BlockPos(c.getPos().getMinBlockX() + x, y0 + y, c.getPos().getMinBlockZ() + z));
             }
         }
     }
