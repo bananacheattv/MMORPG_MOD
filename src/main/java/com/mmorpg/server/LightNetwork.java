@@ -78,19 +78,15 @@ public final class LightNetwork {
         var field = ModBlocks.LIGHT_FIELD.get();
         int total = N * N * N, h = N / 2;
         while (iters-- > 0) {
-            if (j.idx >= total) {
-                if (!j.cleared && j.fill) { j.cleared = true; j.idx = 0; continue; }
-                return true;
-            }
+            if (j.idx >= total) return true;
             int i = j.idx++;
             int dx = (i / (N * N) - h) * STEP, dy = (i / N % N - h) * STEP, dz = (i % N - h) * STEP;
             if (dx == 0 && dy == 0 && dz == 0) continue;
             var p = j.src.offset(dx, dy, dz);
             if (p.getY() < l.getMinY() || p.getY() >= l.getMaxY() || !l.hasChunkAt(p)) continue;
             var old = l.getBlockState(p);
-            if (!j.cleared) { if (old.is(field)) l.removeBlock(p, false); continue; }
             double d = Math.sqrt((double) dx * dx + dy * dy + dz * dz);
-            if (d > j.range || !l.getWorldBorder().isWithinBounds(p)) continue;
+            if (!j.fill || d > j.range || !l.getWorldBorder().isWithinBounds(p)) { if (old.is(field)) l.removeBlock(p, false); continue; }
             if (!old.is(field) && !old.isAir()) continue;
             if (--air < 0) { j.idx--; return false; }
             if (!clear(l, j.src, p)) { if (old.is(field)) l.removeBlock(p, false); continue; }
@@ -106,6 +102,17 @@ public final class LightNetwork {
         while (!step(l, j, Integer.MAX_VALUE / 2, Integer.MAX_VALUE / 2)) { }
     }
 
+    /** Pour les tests : vide la file de travaux comme le ferait le serveur au fil des ticks. */
+    public static int pump(ServerLevel l) {
+        var q = JOBS.get(l); int n = 0;
+        while (q != null && !q.isEmpty()) {
+            var it = q.entrySet().iterator(); var job = it.next().getValue();
+            if (step(l, job, 40000, 800)) it.remove();
+            n++;
+        }
+        return n;
+    }
+
     @SubscribeEvent public static void tick(ServerTickEvent.Post e) {
         var server = e.getServer();
         long t = server.getTickCount();
@@ -114,7 +121,7 @@ public final class LightNetwork {
             if (q != null && !q.isEmpty()) {
                 var it = q.entrySet().iterator();
                 var job = it.next().getValue();
-                if (step(l, job, 6000, 120)) it.remove();
+                if (step(l, job, 40000, 800)) it.remove();
             }
             if (t % 100 == 7) validate(l, t % 2400 == 7);
         }

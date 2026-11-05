@@ -84,6 +84,21 @@ public final class DevLightChecks {
             LightNetwork.runNow(level,pos,0,0,false);
             check(!level.getBlockState(near).is(ModBlocks.LIGHT_FIELD.get()) && !level.getBlockState(far).is(ModBlocks.LIGHT_FIELD.get()),"relays cleaned");
             level.removeBlock(pos,false);
+            // Chemin reel : le joueur choisit 100 blocs dans le menu (paquet), la file de travaux construit les relais.
+            server.getPlayerList().op(new net.minecraft.server.players.NameAndId(id));
+            level.setBlock(pos, ModBlocks.BLOC_LUMIERE.get().defaultBlockState(), 3);
+            var rt = new CompoundTag(); rt.putLong("pos", pos.asLong()); rt.putInt("level", 15); rt.putInt("range", 5);
+            p.snapTo(pos.getX() + .5, pos.getY(), pos.getZ() + 2.5, 0, 0);
+            LightEmitterBlock.apply(p, rt);
+            check(level.getBlockState(pos).getValue(LightEmitterBlock.RANGE) == 5, "range stored");
+            int ticks = LightNetwork.pump(level);
+            int relays = 0;
+            for (int x = -40; x <= 40; x += 4) for (int z = -40; z <= 40; z += 4)
+                if (level.getBlockState(pos.offset(x, 0, z)).is(ModBlocks.LIGHT_FIELD.get())) relays++;
+            MMORPG.LOGGER.info("[LIGHTTEST] portee 100 : {} relais dans le plan, {} ticks", relays, ticks);
+            check(relays > 100, "range 100 builds relays through the real path: " + relays);
+            level.removeBlock(pos, false);
+            LightNetwork.runNow(level, pos, 0, 0, false);
             // Sol sûr et distance de suivi minimale de la mascotte.
             p.snapTo(0,150,0,0,0);
             for(int x=-10;x<=10;x++)for(int z=-10;z<=10;z++)level.setBlock(new BlockPos(x,149,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),3);
