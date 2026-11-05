@@ -5,6 +5,27 @@ Donne du relief aux volumes simples : chaque grande face recoit un panneau encad
 DARK = {'stone': ('stone', '#6f737b'), 'marble': ('marble', '#c9c2b4'), 'wood': ('wood', '#4a2e1a'), 'metal': ('metal', '#2e3037')}
 
 
+# Elements d'architecture agrandis (arches, portails, barrieres, murs) : la citadelle est a l'echelle x3.
+SIZES = {
+    'deco_arche': 1.7, 'deco_grille_forgee': 1.9, 'deco_cat_arc_brise': 1.6, 'deco_cat_portail': 1.45, 'deco_cat_porche': 1.3,
+    'deco_cat_arcade_cloitre': 1.8, 'deco_cat_balustrade_choeur': 1.35, 'deco_cat_contrefort': 1.5,
+    'decob_portail_monumental': 1.7, 'decob_portail_runique': 1.7, 'decob_balustrade': 1.8, 'decob_creneau': 1.8, 'decob_mur_orne': 1.8,
+    'decob_herse': 1.7, 'decob_passerelle': 1.7, 'decob_haie_taillee': 1.8, 'decob_fenetre_gothique': 1.7, 'decob_escalier_monumental': 1.7,
+}
+MAX_XZ, MAX_Y = 85.0, 205.0             # limites de l'emprise a collision (5 blocs de chaque cote, 13 de haut)
+
+
+def enlarge(m, key):
+    k = SIZES.get(key)
+    if not k:
+        return
+    ext = max(max(abs(b['from'][0]), abs(b['to'][0]), abs(b['from'][2]), abs(b['to'][2])) for b in m.boxes)
+    k = min(k, MAX_XZ / ext, MAX_Y / max(b['to'][1] for b in m.boxes))
+    for b in m.boxes:
+        for f in ('from', 'to', 'origin'):
+            b[f] = [v * k for v in b[f]]
+
+
 def mouldings(m):
     """Plinthe et corniche sur les grands volumes : le meme vocabulaire d'architecture sur tous les decors."""
     for b in list(m.boxes):

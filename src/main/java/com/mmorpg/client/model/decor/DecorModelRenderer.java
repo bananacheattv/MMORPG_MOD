@@ -73,6 +73,6 @@ public class DecorModelRenderer implements BlockEntityRenderer<DecorModelBlock.E
 
     @Override
     public AABB getRenderBoundingBox(DecorModelBlock.Entity be) {
-        return new AABB(be.getBlockPos()).inflate(8, 1, 8).expandTowards(0, 12, 0);
+        return new AABB(be.getBlockPos()).inflate(8, 1, 8).expandTowards(0, 14, 0);
     }
 }

@@ -314,7 +314,6 @@ def arche():
         m.box(G, (x - 3.2, y - 3.2, -5.5), (x + 3.2, y + 3.2, 5.5), MARB if i % 2 else MARB2, (0, 0, math.degrees(a) - 90), (x, y, 0))
     Bc(m, 0, 0, 114, 120, 5, 7, GOLD)                     # clef de voute
     Bc(m, 0, 0, 120, 126, 3, 5, CRYS)
-    Bc(m, 0, 0, 120, 128, 40, 6.6, ('stone', '#b8b2a4'), hide=())
     return m
 
 
@@ -775,6 +774,8 @@ def main():
             import decor_detail
             decor_detail.mouldings(m)
             decor_detail.frames(m)
+        import decor_detail
+        decor_detail.enlarge(m, key)
         data, model_json, tex = decor_atlas.finish(m)
         (ROOT / 'bbmodels' / f'{key}.bbmodel').write_text(json.dumps(data, separators=(',', ':')), encoding='utf-8')
         (RES / f'bbmodels/props/{key}.json').write_text(json.dumps(model_json, separators=(',', ':')), encoding='utf-8')

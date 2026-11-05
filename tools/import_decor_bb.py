@@ -151,6 +151,7 @@ def main():
         import decor_detail
         decor_detail.mouldings(m)
         decor_detail.frames(m)
+        decor_detail.enlarge(m, bid)
         bbdata, model, tex = decor_atlas.finish(m)
         (ROOT / 'bbmodels' / f'{bid}.bbmodel').write_text(json.dumps(bbdata, separators=(',', ':')), encoding='utf-8', newline='\n')
         fake = m.boxes
