@@ -1390,6 +1390,10 @@ public final class DevShowcase {
             if (t == 110) stop(mc);
             return;
         }
+        if (MODE.equals("decor_citadelle")) {
+            DevDecorShowcase.phase(mc);
+            return;
+        }
         if (MODE.equals("modeles2")) {
             DevPackShowcase.phase(mc, me);
             return;

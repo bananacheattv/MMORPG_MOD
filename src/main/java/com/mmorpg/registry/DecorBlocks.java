@@ -106,6 +106,22 @@ public final class DecorBlocks {
         }
     }
 
+    /** Decors 3D de la citadelle (modeles Blockbench a l'echelle x3, tools/gen_decor_bb.py) : meme moteur de rendu que ci-dessus. */
+    static {
+        for (DecorCitadelList.Entry e : DecorCitadelList.ALL) {
+            net.minecraft.world.phys.shapes.VoxelShape shape = Block.box(e.x0(), e.y0(), e.z0(), e.x1(), e.y1(), e.z1());
+            DeferredBlock<com.mmorpg.block.DecorModelBlock> block = ModBlocks.BLOCKS.registerBlock(e.id(),
+                    props -> new com.mmorpg.block.DecorModelBlock(props, shape),
+                    props -> {
+                        Block.Properties q = props.mapColor(MapColor.STONE).strength(1.5F, 6F).sound(SoundType.STONE).noOcclusion();
+                        return e.light() > 0 ? q.lightLevel(st -> e.light()) : q;
+                    });
+            MODEL_BLOCKS.put(e.id(), block);
+            BY_ID.put(e.id(), block);
+            ITEMS.add(ModItems.ITEMS.registerSimpleBlockItem(e.id(), block));
+        }
+    }
+
     private static Block.Properties props(Block.Properties p, Mat m) {
         Block.Properties q = p.mapColor(m.color()).strength(m.hardness(), 6F).sound(m.sound());
         if (m.light() > 0) q = q.lightLevel(s -> m.light());
