@@ -28,6 +28,7 @@
     "AeloriaShaderMixin",
     "MmoScreenMouseMixin",
     "DevNoBlurMixin",
-    "ParticleLimiterMixin"
+    "ParticleLimiterMixin",
+    "NoTutorialToastMixin"
   ]
 }
