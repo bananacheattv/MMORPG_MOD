@@ -39,6 +39,13 @@ public final class RpgCommands {
     private RpgCommands() {
     }
 
+    private static int setSkin(ServerPlayer p, String v) {
+        RpgPlayers.get(p).skin = v;
+        RpgPlayers.updatePublic(p);
+        p.sendSystemMessage(ok(v.isEmpty() ? "Skin d'origine rétabli." : "Skin changé : " + v));
+        return 1;
+    }
+
     private static Component ok(String msg) {
         return Component.literal("[MMORPG] ").withColor(0xE8C060).append(Component.literal(msg).withColor(0xE0D8C0));
     }
@@ -371,6 +378,17 @@ public final class RpgCommands {
     /** /hub (tous les joueurs), /hub set, /hub reset <joueur> et /class set <joueur> <classe> (operateurs). */
     public static void registerHub(CommandDispatcher<CommandSourceStack> d) {
         List<String> classes = Arrays.stream(PlayerClass.values()).map(c -> c == PlayerClass.TANK ? "paladin" : c.id()).toList();
+        d.register(Commands.literal("skin")
+                .then(Commands.literal("reset").executes(c -> setSkin(c.getSource().getPlayerOrException(), "")))
+                .then(Commands.argument("cible", StringArgumentType.greedyString()).executes(c -> {
+                    String v = StringArgumentType.getString(c, "cible").trim();
+                    boolean url = v.startsWith("https://") || v.startsWith("http://");
+                    if (!(url && v.length() <= 256) && !v.matches("[A-Za-z0-9_]{1,16}")) {
+                        c.getSource().sendFailure(Component.literal("Indiquez un pseudo Minecraft ou une URL http(s) d'image PNG."));
+                        return 0;
+                    }
+                    return setSkin(c.getSource().getPlayerOrException(), v);
+                })));
         d.register(Commands.literal("hub")
                 .executes(c -> {
                     ServerPlayer p = c.getSource().getPlayerOrException();

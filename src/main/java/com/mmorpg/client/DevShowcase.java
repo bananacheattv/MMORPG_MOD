@@ -1403,6 +1403,10 @@ public final class DevShowcase {
             DevChestShowcase.phase(mc, me);
             return;
         }
+        if (MODE.equals("skin")) {            // /skin : skin par URL (serveur HTTP local) puis par pseudo
+            skinPhase(mc);
+            return;
+        }
         if (MODE.equals("mascotte")) {        // la Mascotte du tutoriel et sa bulle de dialogue
             mascotPhase(mc, me);
             return;
@@ -4205,6 +4209,23 @@ public final class DevShowcase {
         }
         if (t == 140) shot(mc, "mascotte");
         if (t == 150) stop(mc);
+    }
+
+    private static int skinTick, skinWait;
+    private static void skinPhase(Minecraft mc) {
+        if (com.mmorpg.client.LoadingClient.active()) { skinWait = 0; return; }
+        if (mc.gui.screen() instanceof com.mmorpg.client.screen.CharacterSelectScreen cs && skinTick == 0) {
+            if (++skinWait == 40) try { var m = cs.getClass().getDeclaredMethod("play"); m.setAccessible(true); m.invoke(cs); } catch (Exception ex) { throw new RuntimeException(ex); }
+            return;
+        }
+        if (mc.level == null || mc.player == null || mc.gui.screen() != null) return;
+        if (skinTick == 0 && (com.mmorpg.client.cinematic.CinematicClient.active() || ++skinWait < 700)) return;
+        int t = ++skinTick;
+        if (t == 5) { mc.getWindow().setWindowed(1280, 720); mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT); }
+        if (t == 60) shot(mc, "skin_avant");
+        if (t == 70) { var pub = new com.mmorpg.rpg.PublicPlayerData(); pub.skin = System.getProperty("mmorpg.skinurl", "http://127.0.0.1:8765/skin.png"); mc.player.setData(com.mmorpg.registry.ModAttachments.PUBLIC, pub); }
+        if (t == 200) shot(mc, "skin_url");
+        if (t == 210) stop(mc);
     }
 
     private static int qolTick, qolWait;

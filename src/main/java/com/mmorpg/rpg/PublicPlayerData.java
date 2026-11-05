@@ -10,6 +10,7 @@ import java.util.List;
 /** Informations publiques d'un joueur, visibles des joueurs proches (classe, niveau, cosmetiques equipes). */
 public class PublicPlayerData {
     public String pvpTitle="";
+    public String skin="";
     public int playerClass = 0;
     public int level = 1;
     public int evolution = 0;
@@ -22,7 +23,7 @@ public class PublicPlayerData {
         ByteBufCodecs.VAR_INT.encode(buf, d.evolution);
         ByteBufCodecs.VAR_INT.encode(buf, d.cosmetics.size());
         for (String c : d.cosmetics) ByteBufCodecs.STRING_UTF8.encode(buf, c);
-        buf.writeFloat(d.hpFraction);ByteBufCodecs.STRING_UTF8.encode(buf,d.rankLabel);buf.writeInt(d.rankColor);ByteBufCodecs.STRING_UTF8.encode(buf,d.pvpTitle);
+        buf.writeFloat(d.hpFraction);ByteBufCodecs.STRING_UTF8.encode(buf,d.rankLabel);buf.writeInt(d.rankColor);ByteBufCodecs.STRING_UTF8.encode(buf,d.pvpTitle);ByteBufCodecs.STRING_UTF8.encode(buf,d.skin);
     }, buf -> {
         PublicPlayerData d = new PublicPlayerData();
         d.playerClass = ByteBufCodecs.VAR_INT.decode(buf);
@@ -30,12 +31,12 @@ public class PublicPlayerData {
         d.evolution = ByteBufCodecs.VAR_INT.decode(buf);
         int n = ByteBufCodecs.VAR_INT.decode(buf);
         for (int i = 0; i < n; i++) d.cosmetics.add(ByteBufCodecs.STRING_UTF8.decode(buf));
-        d.hpFraction = buf.readFloat();d.rankLabel=ByteBufCodecs.STRING_UTF8.decode(buf);d.rankColor=buf.readInt();d.pvpTitle=ByteBufCodecs.STRING_UTF8.decode(buf);
+        d.hpFraction = buf.readFloat();d.rankLabel=ByteBufCodecs.STRING_UTF8.decode(buf);d.rankColor=buf.readInt();d.pvpTitle=ByteBufCodecs.STRING_UTF8.decode(buf);d.skin=ByteBufCodecs.STRING_UTF8.decode(buf);
         return d;
     });
 
     public boolean sameAs(PublicPlayerData o) {
-        return o != null && o.pvpTitle.equals(pvpTitle)&&o.rankLabel.equals(rankLabel)&&o.rankColor==rankColor&& o.playerClass == playerClass && o.level == level && o.evolution == evolution && o.cosmetics.equals(cosmetics)
+        return o != null && o.pvpTitle.equals(pvpTitle)&&o.skin.equals(skin)&&o.rankLabel.equals(rankLabel)&&o.rankColor==rankColor&& o.playerClass == playerClass && o.level == level && o.evolution == evolution && o.cosmetics.equals(cosmetics)
                 && Math.abs(o.hpFraction - hpFraction) < 0.02f;
     }
 }

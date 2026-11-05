@@ -154,7 +154,7 @@ public final class RpgPlayers {
 
     public static void updatePublic(ServerPlayer player) {
         PlayerData d = get(player);
-        PublicPlayerData pub = new PublicPlayerData();pub.pvpTitle=d.pvpTitle;pub.rankLabel=d.rankLabel;pub.rankColor=d.rankColor;
+        PublicPlayerData pub = new PublicPlayerData();pub.pvpTitle=d.pvpTitle;pub.skin=d.skin;pub.rankLabel=d.rankLabel;pub.rankColor=d.rankColor;
         pub.playerClass = d.playerClass.ordinal();
         pub.level = d.level;
         pub.evolution = d.evolutionTier();
