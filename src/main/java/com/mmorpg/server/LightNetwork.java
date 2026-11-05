@@ -29,11 +29,11 @@ public final class LightNetwork {
 
     /** Sources connues par dimension : permet de nettoyer les relais d'un bloc supprime. */
     public static final class Sources extends SavedData {
-        public static final Codec<Sources> CODEC = Codec.LONG.listOf().xmap(Sources::new, s -> new ArrayList<>(s.set));
+        public static final Codec<Sources> CODEC = Codec.STRING.listOf().xmap(Sources::new, s -> new ArrayList<>(s.set));
         public static final SavedDataType<Sources> TYPE = new SavedDataType<>(MMORPG.id("light_sources"), Sources::new, CODEC);
-        final Set<Long> set = new LinkedHashSet<>();
+        final Set<String> set = new LinkedHashSet<>();
         public Sources() { }
-        private Sources(List<Long> l) { set.addAll(l); }
+        private Sources(List<String> l) { set.addAll(l); }
         static Sources get(ServerLevel l) { return l.getDataStorage().computeIfAbsent(TYPE); }
     }
 
@@ -41,6 +41,9 @@ public final class LightNetwork {
         final BlockPos src; final int range, lvl; final boolean fill; int idx; boolean cleared;
         Job(BlockPos src, int range, int lvl, boolean fill, boolean cleared) { this.src = src; this.range = range; this.lvl = lvl; this.fill = fill; this.cleared = cleared; }
     }
+
+    private static String key(ServerLevel l, BlockPos p) { return l.dimension() + ";" + p.asLong(); }
+    private static String mine(ServerLevel l) { return l.dimension() + ";"; }
 
     private static final Map<ServerLevel, LinkedHashMap<Long, Job>> JOBS = new HashMap<>();
 
@@ -51,13 +54,14 @@ public final class LightNetwork {
         var s = l.getBlockState(pos);
         if (!(s.getBlock() instanceof LightEmitterBlock)) return;
         var data = Sources.get(l);
-        if (data.set.add(pos.asLong())) data.setDirty();
+        if (data.set.add(key(l, pos))) data.setDirty();
         int range = rangeOf(s.getValue(LightEmitterBlock.RANGE)), lvl = s.getValue(LightEmitterBlock.LEVEL);
         JOBS.computeIfAbsent(l, k -> new LinkedHashMap<>()).put(pos.asLong(), new Job(pos.immutable(), range, lvl, range > 15 && lvl > 0, false));
     }
 
     static int relayLevel(int lvl, int range, double d) {
-        return Math.max(1, (int) Math.round(lvl - (lvl - 1) * Math.min(1.0, d / range)));
+        // Le niveau ne tombe qu'a ~la moitie : entre deux relais la lumiere perd jusqu'a 6 niveaux, il faut de la marge.
+        return Math.max(1, (int) Math.round(lvl - (lvl - 1) * 0.5 * Math.min(1.0, d / range)));
     }
 
     /** Aucun chargement de chunk, aucune traversee de mur. */
@@ -134,12 +138,14 @@ public final class LightNetwork {
         var data = Sources.get(l);
         if (data.set.isEmpty()) return;
         var q = JOBS.computeIfAbsent(l, k -> new LinkedHashMap<>());
-        for (long k : new ArrayList<>(data.set)) {
+        for (String ks : new ArrayList<>(data.set)) {
+            if (!ks.startsWith(mine(l))) continue;
+            long k = Long.parseLong(ks.substring(mine(l).length()));
             var pos = BlockPos.of(k);
             if (!l.hasChunkAt(pos)) continue;
             var s = l.getBlockState(pos);
             if (!(s.getBlock() instanceof LightEmitterBlock)) {
-                data.set.remove(k); data.setDirty();
+                data.set.remove(ks); data.setDirty();
                 q.put(k, new Job(pos, 0, 0, false, false));
             } else if (refresh && !q.containsKey(k) && rangeOf(s.getValue(LightEmitterBlock.RANGE)) > 15 && s.getValue(LightEmitterBlock.LEVEL) > 0) {
                 q.put(k, new Job(pos, rangeOf(s.getValue(LightEmitterBlock.RANGE)), s.getValue(LightEmitterBlock.LEVEL), true, true));
