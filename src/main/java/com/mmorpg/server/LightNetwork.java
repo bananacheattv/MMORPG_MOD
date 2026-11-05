@@ -45,6 +45,7 @@ public final class LightNetwork {
     private static String key(ServerLevel l, BlockPos p) { return l.dimension() + ";" + p.asLong(); }
     private static String mine(ServerLevel l) { return l.dimension() + ";"; }
 
+    private static final Set<String> DIRTY = new HashSet<>();
     private static final Map<ServerLevel, LinkedHashMap<Long, Job>> JOBS = new HashMap<>();
 
     public static int rangeOf(int index) { return RANGES[Math.max(0, Math.min(RANGES.length - 1, index))]; }
@@ -147,11 +148,24 @@ public final class LightNetwork {
             if (!(s.getBlock() instanceof LightEmitterBlock)) {
                 data.set.remove(ks); data.setDirty();
                 q.put(k, new Job(pos, 0, 0, false, false));
-            } else if (refresh && !q.containsKey(k) && rangeOf(s.getValue(LightEmitterBlock.RANGE)) > 15 && s.getValue(LightEmitterBlock.LEVEL) > 0) {
+            } else if ((DIRTY.remove(ks) || refresh) && !q.containsKey(k) && rangeOf(s.getValue(LightEmitterBlock.RANGE)) > 15 && s.getValue(LightEmitterBlock.LEVEL) > 0) {
                 q.put(k, new Job(pos, rangeOf(s.getValue(LightEmitterBlock.RANGE)), s.getValue(LightEmitterBlock.LEVEL), true, true));
             }
         }
     }
 
-    @SubscribeEvent public static void stopped(ServerStoppedEvent e) { JOBS.clear(); }
+    /** Un chunk se charge pres d'une source : ses relais manquants seront reconstruits au prochain controle (10 s max). */
+    @SubscribeEvent public static void chunkLoaded(net.neoforged.neoforge.event.level.ChunkEvent.Load e) {
+        if (!(e.getLevel() instanceof ServerLevel l) || !(e.getChunk() instanceof net.minecraft.world.level.chunk.LevelChunk c)) return;
+        var data = Sources.get(l);
+        if (data.set.isEmpty()) return;
+        int cx = c.getPos().getMiddleBlockX(), cz = c.getPos().getMiddleBlockZ();
+        for (String ks : data.set) {
+            if (!ks.startsWith(mine(l))) continue;
+            var pos = BlockPos.of(Long.parseLong(ks.substring(mine(l).length())));
+            if (Math.abs(pos.getX() - cx) <= MAX_RANGE + 16 && Math.abs(pos.getZ() - cz) <= MAX_RANGE + 16) DIRTY.add(ks);
+        }
+    }
+
+    @SubscribeEvent public static void stopped(ServerStoppedEvent e) { JOBS.clear(); DIRTY.clear(); }
 }

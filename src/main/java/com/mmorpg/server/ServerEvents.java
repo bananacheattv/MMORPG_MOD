@@ -36,6 +36,8 @@ public final class ServerEvents {
         // monde neuf : le hub est construit tout seul (un peu apres le demarrage), la premiere connexion s'y fait toujours
         // distance de rendu : 64 demandee, mais Minecraft plafonne a 32 (ChunkMap) -> on met le maximum possible
         event.getServer().getPlayerList().setViewDistance(32);
+        // simulation : 12 chunks (192 blocs) pour que PNJ, decors et lumieres lointains restent actifs (defaut serveur souvent 5-10)
+        event.getServer().getPlayerList().setSimulationDistance(12);
         var server = event.getServer();
         Scheduler.later(server.overworld(), 60, () -> com.mmorpg.hub.HubManager.ensureHub(server));
     }

@@ -78,10 +78,10 @@ public final class ModEntities {
                     b -> b.sized(0.2F, 0.2F).clientTrackingRange(10).updateInterval(1).noSave().fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.NpcEntity>> NPC =
             ENTITIES.registerEntityType("pnj", com.mmorpg.entity.NpcEntity::new, MobCategory.MISC,
-                    b -> b.sized(0.6F, 1.95F).clientTrackingRange(10));
+                    b -> b.sized(0.6F, 1.95F).clientTrackingRange(16));
     public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.hub.HubGuideEntity>> HUB_GUIDE =
             ENTITIES.registerEntityType("guide_hub", com.mmorpg.entity.hub.HubGuideEntity::new, MobCategory.MISC,
-                    b -> b.sized(.7F,2.15F).clientTrackingRange(10));
+                    b -> b.sized(.7F,2.15F).clientTrackingRange(16));
     /** Les montures sont affichees 2x plus grandes que leur modele. */
     public static final float MOUNT_SCALE = 2f;
     /** Une entite par monture 3D (taille et hauteur de selle propres). */
