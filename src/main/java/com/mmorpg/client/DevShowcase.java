@@ -4163,11 +4163,11 @@ public final class DevShowcase {
         if (t == 5) mc.getWindow().setWindowed(1280, 720);
         if (t == 60) {
             var look = mc.player.getLookAngle();
-            double[][] cfg = {{-2.5, 0, 1, 0}, {0, 1, 1, 0}, {2.5, 0, 1.5f, 1}, {5, 1, 1.5f, 1}};
+            double[][] cfg = {{-3.75, 1, 1, 14}, {-1.25, 1, 1, 15}, {1.25, 1, 1, 16}, {3.75, 1, 1, 18}, {6.25, 1, 1, 5}};
             for (int i = 0; i < cfg.length; i++) {
                 var n = new com.mmorpg.entity.NpcEntity(com.mmorpg.registry.ModEntities.NPC.get(), mc.level);
                 n.setId(-6100 - i);
-                n.setup(com.mmorpg.entity.NpcEntity.Role.QUETES, "PNJ", (int) cfg[i][3] == 1 ? 5 : 0, "");
+                n.setup(com.mmorpg.entity.NpcEntity.Role.QUETES, "PNJ", (int) cfg[i][3], "");
                 n.setNpcScale((float) cfg[i][2]);
                 n.setPoseStyle((int) cfg[i][1]);
                 n.setPos(mc.player.getX() + look.x * 6 - look.z * cfg[i][0], mc.player.getY(), mc.player.getZ() + look.z * 6 + look.x * cfg[i][0]);
@@ -4176,6 +4176,7 @@ public final class DevShowcase {
                 mc.level.addEntity(n);
             }
         }
+        if (t >= 62 && t < 140 && mc.gui.screen() instanceof com.mmorpg.client.screen.CharacterSelectScreen) mc.gui.setScreen(null);
         if (t == 140) shot(mc, "pnj_pose");
         if (t == 150) stop(mc);
     }

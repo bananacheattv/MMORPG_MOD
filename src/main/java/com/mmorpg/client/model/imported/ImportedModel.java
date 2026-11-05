@@ -24,7 +24,7 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
     public ImportedModel(String kind,String key,boolean emissiveOnly){this(kind,key,read(kind,key),emissiveOnly);}
     private ImportedModel(String kind, String key, JsonObject data,boolean emissiveOnly) {
         super(root(data, kind.equals("cosmetics") ? 0 : 24,emissiveOnly), RenderTypes::entityTranslucent);
-        for(String name:new String[]{"head","body","arm_-1","arm_1","leg_-1","leg_1"}){String id=findNamed(data.getAsJsonArray("parts"),name);if(id!=null)standBones.put(name,root().createPartLookup().apply(id));}
+        for(String name:new String[]{"head","body","arm_-1","arm_1","leg_-1","leg_1"}){String id=null;for(String alias:boneAliases(name)){id=findNamed(data.getAsJsonArray("parts"),alias);if(id!=null)break;}if(id!=null)standBones.put(name,root().createPartLookup().apply(id));}
         String headId=findHead(data.getAsJsonArray("parts"));head=headId==null?null:root().createPartLookup().apply(headId);
         texture = data.has("texture")?Identifier.parse(data.get("texture").getAsString()):MMORPG.id("textures/imported/" + kind + "/" + key + ".png");
         for (var value : data.getAsJsonArray("animations")) {
@@ -35,6 +35,17 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
         }
     }
     private static String findNamed(JsonArray nodes,String name){for(var node:nodes){var n=node.getAsJsonObject();if(n.has("name")&&n.get("name").getAsString().equals(name))return n.get("uuid").getAsString();if(n.has("children")){String id=findNamed(n.getAsJsonArray("children"),name);if(id!=null)return id;}}return null;}
+    /** Noms alternatifs des os (modeles importes Blockbench varies) pour la pose assise/armor stand. */
+    private static String[] boneAliases(String name){
+        return switch(name){
+            case "arm_-1"->new String[]{"arm_-1","rightArm","RightArm","r_arm","bipedRightArm"};
+            case "arm_1"->new String[]{"arm_1","leftArm","LeftArm","l_arm","bipedLeftArm"};
+            case "leg_-1"->new String[]{"leg_-1","rightLeg","RightLeg","r_leg","bipedRightLeg"};
+            case "leg_1"->new String[]{"leg_1","leftLeg","LeftLeg","l_leg","bipedLeftLeg"};
+            case "body"->new String[]{"body","Body","bipedBody"};
+            default->new String[]{name};
+        };
+    }
     private void poseBone(String name,net.minecraft.core.Rotations rotation){var p=standBones.get(name);if(p!=null){p.xRot+=(float)Math.toRadians(rotation.x());p.yRot+=(float)Math.toRadians(rotation.y());p.zRot+=(float)Math.toRadians(rotation.z());}}
     private static String findHead(JsonArray nodes){
         for(var node:nodes){var value=node.getAsJsonObject();if(value.has("name")&&value.get("name").getAsString().equals("head"))return value.get("uuid").getAsString();
