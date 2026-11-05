@@ -61,16 +61,17 @@ public final class LightNetwork {
     }
 
     /** Aucun chargement de chunk, aucune traversee de mur. */
-    static boolean clear(ServerLevel l, BlockPos a, BlockPos b) {
+    /** 1 = degage, 0 = mur, -1 = chunk non charge en chemin (on ne touche a rien). */
+    static int clear(ServerLevel l, BlockPos a, BlockPos b) {
         var from = net.minecraft.world.phys.Vec3.atCenterOf(a);
         var delta = net.minecraft.world.phys.Vec3.atCenterOf(b).subtract(from);
         int samples = (int) Math.ceil(delta.length() * 2);
         for (int i = 1; i < samples; i++) {
             var p = BlockPos.containing(from.add(delta.scale((double) i / samples)));
-            if (!l.hasChunkAt(p)) return false;
-            if (!l.getBlockState(p).getCollisionShape(l, p).isEmpty()) return false;
+            if (!l.hasChunkAt(p)) return -1;
+            if (!l.getBlockState(p).getCollisionShape(l, p).isEmpty()) return 0;
         }
-        return true;
+        return 1;
     }
 
     /** Avance un travail ; renvoie vrai quand il est termine. */
@@ -89,7 +90,9 @@ public final class LightNetwork {
             if (!j.fill || d > j.range || !l.getWorldBorder().isWithinBounds(p)) { if (old.is(field)) l.removeBlock(p, false); continue; }
             if (!old.is(field) && !old.isAir()) continue;
             if (--air < 0) { j.idx--; return false; }
-            if (!clear(l, j.src, p)) { if (old.is(field)) l.removeBlock(p, false); continue; }
+            int los = clear(l, j.src, p);
+            if (los < 0) continue;
+            if (los == 0) { if (old.is(field)) l.removeBlock(p, false); continue; }
             var next = field.defaultBlockState().setValue(BlockStateProperties.LEVEL, relayLevel(j.lvl, j.range, d));
             if (!old.equals(next)) l.setBlock(p, next, Block.UPDATE_ALL);
         }
