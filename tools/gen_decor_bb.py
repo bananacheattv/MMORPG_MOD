@@ -106,22 +106,22 @@ L.Shader = DShader
 MARB = ('marble', '#ece7dc')
 MARB2 = ('marble', '#c9c2b4')
 AZUR = ('marble', '#9a6fd0')
-STONE = ('stone', '#8a82a0')
-STONE2 = ('stone', '#5f5878')
+STONE = ('stone', '#92918c')
+STONE2 = ('stone', '#6f737b')
 GOLD = ('gold', '#d9a830')
-IRON = ('metal', '#3b3350')
-IRON2 = ('metal', '#262038')
-WOOD = ('wood', '#4b2f6b')
-WOOD2 = ('wood', '#2d1b45')
+IRON = ('metal', '#4b4e57')
+IRON2 = ('metal', '#2e3037')
+WOOD = ('wood', '#6b4528')
+WOOD2 = ('wood', '#4a2e1a')
 CRYS = ('crystal', '#b070f0')
 CRYS2 = ('crystal', '#e070d0')
 FLAME = ('flame', '#ff9a28')
-GLOW = ('glowc', '#e0b8ff')
+GLOW = ('glowc', '#f0ecff')
 WATER = ('water', '#3f8fe0')
-RED = ('banner', '#5a2a8a', '#e0b040')
-BLUE = ('banner', '#5a2a8a', '#e0e0f0')
-LEATH = ('leather', '#3a2358')
-CLOTH = ('cloth_plain', '#6a3fa8')
+RED = ('banner', '#8a1e1e', '#e0b040')
+BLUE = ('banner', '#1e3f8a', '#e0e0f0')
+LEATH = ('leather', '#6b4024')
+CLOTH = ('cloth_plain', '#a82a2a')
 BONE = ('bone', '#e8dfc4')
 
 
@@ -258,7 +258,7 @@ def statue_guerrier():
     m = statue('deco_statue_guerrier', 4, MARB, MARB2, None)
     Bc(m, 0, 0, 82, 86, 4.8, 4.8, IRON)                  # casque
     Bc(m, 0, 0, 86, 90, 1, 4.6, IRON)
-    Bc(m, 0, 0, 90, 94, .8, 1.5, ('banner', '#5a2a8a', '#e0b040'))
+    Bc(m, 0, 0, 90, 94, .8, 1.5, ('banner', '#8a1e1e', '#e0b040'))
     Bc(m, 10.4, -1, 38, 46, 2.4, 2.4, MARB)              # main sur l'epee
     cyl(m, 10.4, -1, 22, 38, 1.3, IRON)                  # lame plantee
     Bc(m, 10.4, -1, 38, 40, 5.6, 1.4, GOLD)
@@ -459,8 +459,8 @@ def table():
         for sz in (-1, 1):
             Bc(m, sx * 31, sz * 8, 0, 26, 2.6, 2.6, WOOD2)
     B(m, (-33, 14, -.8), (33, 17, .8), WOOD2)
-    B(m, (-20, 31, -4), (-6, 32, 8), ('cloth_plain', '#6a3fa8'))
-    B(m, (6, 31, -8), (22, 32, 4), ('cloth_plain', '#6a3fa8'))
+    B(m, (-20, 31, -4), (-6, 32, 8), ('cloth_plain', '#a82a2a'))
+    B(m, (6, 31, -8), (22, 32, 4), ('cloth_plain', '#a82a2a'))
     cyl(m, -24, -4, 31, 35, 2.4, GOLD)                    # gobelets / plats
     cyl(m, 14, 6, 31, 34, 5, ('metal', '#c0c4cc'))
     cyl(m, 0, 0, 31, 40, 1.6, GOLD)
@@ -617,7 +617,7 @@ def etal():
     B(m, (-34, 0, -16), (34, 26, -14), WOOD2)
     B(m, (-34, 0, 14), (34, 26, 16), WOOD2)
     for i in range(7):                                    # toit a rayures
-        c = ('cloth_plain', '#6a3fa8') if i % 2 == 0 else ('cloth_plain', '#f0e8d0')
+        c = ('cloth_plain', '#a82a2a') if i % 2 == 0 else ('cloth_plain', '#f0e8d0')
         x0 = -36 + i * 10.3
         B(m, (x0, 76, -20), (x0 + 10.3, 80, 20), c)
         B(m, (x0, 72, 19), (x0 + 10.3, 78, 21), c)
@@ -682,7 +682,7 @@ def bibliotheque():
     for y in (4, 34, 64, 94, 118):
         B(m, (-30, y, -9), (30, y + 3, 9), WOOD)
     B(m, (-33, 118, -11), (33, 124, 11), GOLD)
-    cols = ['#5a2a8a', '#5a2a8a', '#2e6a3a', '#c09030', '#5a2a7a', '#6b4024', '#2a6a8a']
+    cols = ['#8a1e1e', '#1e3f8a', '#2e6a3a', '#c09030', '#5a2a7a', '#6b4024', '#2a6a8a']
     for row, y in enumerate((7, 37, 67, 97)):
         x = -27.0
         i = row
@@ -738,17 +738,22 @@ def jstr(s):
 
 
 def lang_update(entries):
-    if all(f'"{k}"' in (RES / 'lang/fr_fr.json').read_text(encoding='utf-8') for k in entries):
-        return
+    """Ajoute les textes manquants en conservant le format du fichier (fins de ligne, ordre)."""
     for code, idx in (('fr_fr', 0), ('en_us', 1)):
         path = RES / f'lang/{code}.json'
-        data = json.loads(path.read_text(encoding='utf-8'))
-        for k, names in entries.items():
-            data[k] = names[idx]
-        path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+        b = path.read_bytes().decode('utf-8')
+        nl = '\r\n' if '\r\n' in b else '\n'
+        body = b[:b.rstrip().rfind('}')].rstrip()
+        add = ''.join(f',{nl}  {json.dumps(k)}: {json.dumps(v[idx], ensure_ascii=False)}' for k, v in entries.items() if f'"{k}"' not in b)
+        if add:
+            path.write_bytes((body + add + nl + '}' + nl).encode('utf-8'))
+            json.loads(path.read_text(encoding='utf-8'))
 
 
 def main():
+    sys.modules['gen_decor_bb'] = sys.modules[__name__]          # evite un second chargement du module lance en script
+    import decor_atlas
+    import decor_cathedral  # noqa: F401  (enregistre les decors cathedrale)
     args = sys.argv[1:]
     prev = None
     if '--preview' in args:
@@ -766,15 +771,16 @@ def main():
         if only and key not in only:
             continue
         m = f()
-        tex, _ = m.build([])
-        data = L.to_bbmodel(m, tex, [])
+        if not key.startswith('deco_cat_'):
+            import decor_detail
+            decor_detail.mouldings(m)
+            decor_detail.frames(m)
+        data, model_json, tex = decor_atlas.finish(m)
         (ROOT / 'bbmodels' / f'{key}.bbmodel').write_text(json.dumps(data, separators=(',', ':')), encoding='utf-8')
-        model_json, png = L.bbmodel_to_runtime(data)
         (RES / f'bbmodels/props/{key}.json').write_text(json.dumps(model_json, separators=(',', ':')), encoding='utf-8')
-        (RES / f'textures/imported/props/{key}.png').write_bytes(png)
         hts = max(b['to'][1] for b in m.boxes)
         wid = max(max(abs(b['from'][0]), abs(b['to'][0]), abs(b['from'][2]), abs(b['to'][2])) for b in m.boxes) * 2
-        print(f'{key}: {len(m.boxes)} cubes, {wid:.0f} x {hts:.0f} u ({wid / CITADEL_BLOCK:.1f} x {hts / CITADEL_BLOCK:.1f} blocs citadelle), densite {m.density:.2f}')
+        print(f'{key}: {len(m.boxes)} cubes, {wid:.0f} x {hts:.0f} u ({wid / CITADEL_BLOCK:.1f} x {hts / CITADEL_BLOCK:.1f} blocs citadelle)')
         icon = L.render(m, tex, -35, 18, 64)
         icon.save(RES / f'textures/item/{key}.png')
         (RES / f'models/item/{key}.json').write_text(json.dumps({'parent': 'minecraft:item/generated', 'textures': {'layer0': f'mmorpg:item/{key}'}}, indent=2), encoding='utf-8')
@@ -797,7 +803,7 @@ def main():
     for i, (key, s, light) in enumerate(rows):
         out.append(f'            new Entry("{key}", {s[0]}, {s[1]}, {s[2]}, {s[3]}, {s[4]}, {s[5]}, {light})' + (',' if i < len(rows) - 1 else ');'))
     out.append('}')
-    (ROOT / 'src/main/java/com/mmorpg/registry/DecorCitadelList.java').write_text('\n'.join(out) + '\n', encoding='utf-8')
+    (ROOT / 'src/main/java/com/mmorpg/registry/DecorCitadelList.java').write_text('\n'.join(out) + '\n', encoding='utf-8', newline='\n')
     print(len(rows), 'decors')
 
 

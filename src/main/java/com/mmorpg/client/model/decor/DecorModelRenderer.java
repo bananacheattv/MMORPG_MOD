@@ -26,7 +26,6 @@ import java.util.Map;
 
 /** Rendu des decors animes (drapeau, camp) : l'animation « chest » du modele sert de boucle continue. */
 public class DecorModelRenderer implements BlockEntityRenderer<DecorModelBlock.Entity, DecorModelRenderer.State> {
-    private static final float BLOCKBENCH_SCALE = 1.6f;
     private final Map<String, ImportedModel> models = new HashMap<>();
 
     public static class State extends BlockEntityRenderState {
@@ -65,9 +64,8 @@ public class DecorModelRenderer implements BlockEntityRenderer<DecorModelBlock.E
         pose.pushPose();
         pose.translate(0.5f, 0f, 0.5f);
         pose.rotateDegrees(Axis.YP, yaw);
-        float k = state.key.startsWith("decob_") ? BLOCKBENCH_SCALE : 1f;   // decors Blockbench : agrandis (echelle citadelle)
-        pose.translate(0f, 1.5f * k, 0f);
-        pose.scale(-k, -k, k);
+        pose.translate(0f, 1.5f, 0f);
+        pose.scale(-1f, -1f, 1f);
         Identifier texture = model.texture;
         collector.submitModel(model, state.anim, pose, RenderTypes.entityTranslucent(texture), state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, 0);
         pose.popPose();

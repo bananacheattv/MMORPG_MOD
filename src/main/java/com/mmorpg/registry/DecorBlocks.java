@@ -106,12 +106,17 @@ public final class DecorBlocks {
         }
     }
 
+    /** Parties invisibles portant la collision des decors plus grands qu'un bloc. */
+    public static final DeferredBlock<com.mmorpg.block.DecorPartBlock> PART = ModBlocks.BLOCKS.registerBlock("decor_part", com.mmorpg.block.DecorPartBlock::new,
+            p -> p.mapColor(MapColor.STONE).strength(1.5F, 6F).sound(SoundType.STONE).noOcclusion().noLootTable()
+                    .pushReaction(net.minecraft.world.level.material.PushReaction.IMMOVEABLE).isSuffocating((st, l, pos) -> false));
+
     /** Decors 3D de la citadelle (modeles Blockbench a l'echelle x3, tools/gen_decor_bb.py) : meme moteur de rendu que ci-dessus. */
     static {
         for (DecorCitadelList.Entry e : java.util.stream.Stream.concat(DecorCitadelList.ALL.stream(), DecorBlockbenchList.ALL.stream()).toList()) {
             net.minecraft.world.phys.shapes.VoxelShape shape = Block.box(e.x0(), e.y0(), e.z0(), e.x1(), e.y1(), e.z1());
             DeferredBlock<com.mmorpg.block.DecorModelBlock> block = ModBlocks.BLOCKS.registerBlock(e.id(),
-                    props -> new com.mmorpg.block.DecorModelBlock(props, shape),
+                    props -> new com.mmorpg.block.DecorModelBlock(props, shape, e.id()),
                     props -> {
                         Block.Properties q = props.mapColor(MapColor.STONE).strength(1.5F, 6F).sound(SoundType.STONE).noOcclusion();
                         return e.light() > 0 ? q.lightLevel(st -> e.light()) : q;

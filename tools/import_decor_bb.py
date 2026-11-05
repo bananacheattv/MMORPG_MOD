@@ -17,11 +17,14 @@ from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import bbmount_lib as L
+import decor_atlas
 import gen_decor_bb as G
 from gen_decor_bb import GOLD
 
 ROOT = Path(__file__).resolve().parents[1]
 RES = ROOT / 'src/main/resources/assets/mmorpg'
+
+SCALE = 1.6                 # geometrie agrandie a l'echelle de la citadelle (meme densite de texture que les autres decors)
 
 # id : (nom fr, nom en, lumiere)
 NAMES = {
@@ -95,8 +98,8 @@ def material(theme, name):
         if n.startswith(('tronc', 'racine', 'branche')):
             return G.WOOD
         if n.startswith(('fleur', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'cris')):
-            return ('banner', '#a050d8', '#f0d060')
-        return ('leaf', '#6a3fa8')
+            return ('banner', '#c03a8a', '#f0d060')
+        return ('leaf', '#3f8a3a')
     if theme == 'pierre':
         return G.STONE2 if n.startswith(('base', 'socle', 'seuil', 'plinthe', 'sol')) else G.STONE
     if theme == 'marbre':
@@ -108,7 +111,7 @@ def material(theme, name):
     if theme == 'or':
         return G.GOLD
     if theme == 'rouge':
-        return G.WOOD2 if n.startswith(('pilier', 'pied', 'tete', 'dossier', 'sommier', 'ciel', 'accoud', 'mat', 'sol', 'timon')) else ('banner', '#5a2a8a', '#e0b040')
+        return G.WOOD2 if n.startswith(('pilier', 'pied', 'tete', 'dossier', 'sommier', 'ciel', 'accoud', 'mat', 'sol', 'timon')) else ('banner', '#8a1e1e', '#e0b040')
     if theme == 'cristal':
         return G.STONE2 if n.startswith(('base', 'socle', 'pied', 'disque', 'roche', 'mont', 'cadre', 'fut', 'bague', 'plateau', 'coupe')) else G.CRYS
     return G.STONE
@@ -132,9 +135,9 @@ def main():
         m.group('root', (0, 0, 0))
         for i, e in enumerate(cubes):
             rot = e.get('rotation') or [0, 0, 0]
-            frm = [e['from'][0] - 8, e['from'][1], e['from'][2] - 8]
-            to = [e['to'][0] - 8, e['to'][1], e['to'][2] - 8]
-            org = [e.get('origin', e['from'])[0] - 8, e.get('origin', e['from'])[1], e.get('origin', e['from'])[2] - 8]
+            frm = [(e['from'][0] - 8) * SCALE, e['from'][1] * SCALE, (e['from'][2] - 8) * SCALE]
+            to = [(e['to'][0] - 8) * SCALE, e['to'][1] * SCALE, (e['to'][2] - 8) * SCALE]
+            org = [(e.get('origin', e['from'])[0] - 8) * SCALE, e.get('origin', e['from'])[1] * SCALE, (e.get('origin', e['from'])[2] - 8) * SCALE]
             mat = material(theme, e['name'])
             m.box('root', frm, to, mat, rot if any(rot) else None, org if any(rot) else None)
             sx, sy, sz = (to[k] - frm[k] for k in range(3))
@@ -145,13 +148,13 @@ def main():
                     for t in (.18, .82):
                         y = frm[1] + sy * t
                         m.box('root', (frm[0] - .8, y, frm[2] - .8), (to[0] + .8, y + 1.6, to[2] + .8), GOLD)
-        tex, _ = m.build([])
-        bbdata = L.to_bbmodel(m, tex, [])
+        import decor_detail
+        decor_detail.mouldings(m)
+        decor_detail.frames(m)
+        bbdata, model, tex = decor_atlas.finish(m)
         (ROOT / 'bbmodels' / f'{bid}.bbmodel').write_text(json.dumps(bbdata, separators=(',', ':')), encoding='utf-8', newline='\n')
-        model, png = L.bbmodel_to_runtime(bbdata)
         fake = m.boxes
         (RES / f'bbmodels/props/{bid}.json').write_text(json.dumps(model, separators=(',', ':')), encoding='utf-8', newline='\n')
-        (RES / f'textures/imported/props/{bid}.png').write_bytes(png)
         L.render(m, tex, -35, 18, 64).save(RES / f'textures/item/{bid}.png')
         w = lambda p, t: p.write_text(t, encoding='utf-8', newline='\n')
         w(RES / f'models/item/{bid}.json', json.dumps({'parent': 'minecraft:item/generated', 'textures': {'layer0': f'mmorpg:item/{bid}'}}, indent=2))
