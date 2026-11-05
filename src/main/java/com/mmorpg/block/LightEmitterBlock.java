@@ -37,14 +37,6 @@ public class LightEmitterBlock extends Block {
         registerDefaultState(stateDefinition.any().setValue(LEVEL, 15));
     }
 
-    @Override protected void onPlace(BlockState s, Level l, BlockPos p, BlockState old, boolean moved) {
-        if (l instanceof net.minecraft.server.level.ServerLevel sl) sl.scheduleTick(p, this, 1);
-    }
-    @Override protected void tick(BlockState s, net.minecraft.server.level.ServerLevel l, BlockPos p, RandomSource r) {
-        LightFieldBlock.refresh(l, p);
-        l.scheduleTick(p, this, 100);
-    }
-
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> b) {
         b.add(LEVEL);
@@ -121,6 +113,5 @@ public class LightEmitterBlock extends Block {
         if (!(s.getBlock() instanceof LightEmitterBlock)) return;
         int lvl = Math.max(0, Math.min(15, data.getIntOr("level", 15)));
         p.level().setBlock(pos, s.setValue(LEVEL, lvl), Block.UPDATE_ALL);
-        LightFieldBlock.refresh(p.level(), pos);
     }
 }
