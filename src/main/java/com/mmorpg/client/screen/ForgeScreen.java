@@ -379,6 +379,8 @@ public class ForgeScreen extends MmoScreen {
             button(g, dx + 12 + half, by - 36, half, 14, "Vers : " + t.label, true, 0xFF4A3A2A, () -> rfTo++);
             var cur = com.mmorpg.item.Affixes.reforge(s);
             if (cur != null) g.text(font, "Reforgé : " + cur[0].label + " → " + cur[1].label, dx + 6, by - 52, 0xFFC7A6FF, false);
+            if (cur != null) button(g, dx + dw - 76, by - 52 - 3, 70, 12, "Annuler", true, 0xFF7A3A3A,
+                    () -> ClientNet.send(new Payloads.ForgeAction(Payloads.ForgeAction.REFORGE, "", slot, pos)));
             final String spec = f.name() + ">" + t.name();
             button(g, dx + 6, by - 18, dw - 12, 16, "Reforger 40 % · 1 pierre + " + rcost + " or", haveStone >= 1 && haveGold >= rcost, 0xFF5A3A7A,
                     () -> ClientNet.send(new Payloads.ForgeAction(Payloads.ForgeAction.REFORGE, spec, slot, pos)));

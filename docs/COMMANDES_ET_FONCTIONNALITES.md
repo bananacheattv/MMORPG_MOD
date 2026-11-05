@@ -73,9 +73,6 @@ Disponibles pour tous. Les commandes marquées *(OP)* sont détaillées en §3.
 | `/trade accepter` / `refuser` / `annuler` | Répondre / annuler |
 | `/boutique` | Boutique premium (crédits) |
 | `/credits` | Ouvre la boutique (solde de crédits) |
-| `/outils` | Outils du débutant (cooldown) |
-| `/forge relancer` | Relancer les affixes de l'objet tenu (près d'une Forge Arcanique) |
-| `/forge reforger <de> <vers>` / `annuler` | Reforger un affixe (près d'une Forge) |
 
 ### Combat, PvP, guilde
 | Commande | Effet |
@@ -85,7 +82,6 @@ Disponibles pour tous. Les commandes marquées *(OP)* sont détaillées en §3.
 | `/arene` | Menu des arènes |
 | `/arene quitter` | Quitter la file ou le match |
 | `/arene bilan` | Revoir le dernier bilan |
-| `/pvp` | Marchand de points d'arène |
 | `/saison` | Saison PvP : récompenses et classement |
 | `/guilde` | Menu de guilde |
 | `/guilde sortir` | Quitter une épreuve de guilde (Yggdrasil) |
@@ -289,7 +285,7 @@ Cadre commun (`MmoScreen`), onglets du menu **M** (activables par interrupteur) 
 - Caisses (vote, quête, commune, rare, épique, légendaire, mythique) et 5 Lucky Blocks (Céleste, Sylvestre, Infernal, Givre, Néant) avec tirage animé.
 
 ### Artisanat et métiers
-- **Forge Arcanique** : 6 catégories (Armes, Armures, Matériaux, Consommables, Invocations, Familiers), onglet Amélioration, parchemins de forge, runes d'outils (Abondance, Prospection, Célérité, Ténacité, rangs 1-5), sacs à dos (6/12/18/24 cases, 2 emplacements).
+- **Forge Arcanique** : (bouton Affixes : relancer, reforger, annuler) 6 catégories (Armes, Armures, Matériaux, Consommables, Invocations, Familiers), onglet Amélioration, parchemins de forge, runes d'outils (Abondance, Prospection, Célérité, Ténacité, rangs 1-5), sacs à dos (6/12/18/24 cases, 2 emplacements).
 - **Métiers** (niv. 1-50, paliers 10/20/30/40/50 : titre, plat, cosmétique) : **Mineur** (5 mines, minerais Verdite→Néantite, veines), **Fermier** (5 cultures, 6 plaines), **Pêcheur** (6 cannes, 27 poissons, mini-jeu de jauge, coffres, combat de poisson).
 - 9 plats exclusifs.
 
@@ -321,6 +317,7 @@ Cadre commun (`MmoScreen`), onglets du menu **M** (activables par interrupteur) 
 | Outil porte-armure (`outil_armure`) | Poses, position, skin/modèle 3D |
 | Sceptre des quêtes (`sceptre_quetes`) | Atelier de quêtes / fiche PNJ |
 | Baguette de zone (`baguette_zone`) | Coins A/B d'une zone |
+| Outil portail (`outil_portail`) | Clic droit dans le vide : choisir la destination (hub, spawn, mines, plaines, donjon + type/difficulté) ; clic droit sur un bloc : il devient un portail |
 | Téléporteur (`teleporteur`) | Arche de téléportation configurable |
 | Bloc de lumière / relais | Éclairage décoratif |
 | Blocs : Forge Arcanique, Autel d'invocation, Banque, HDV, Boîte aux lettres, Quêtes hebdo, Presse, Lucky Blocks, Caisses, Coffre de donjon, Classements, Structures | Interactifs |

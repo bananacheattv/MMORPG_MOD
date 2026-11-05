@@ -228,33 +228,4 @@ public final class ForgeManager {
         return null;
     }
 
-    /** /forge relancer | /forge reforger DE VERS | /forge reforger annuler (objet en main, forge a proximite). */
-    @net.neoforged.bus.api.SubscribeEvent
-    public static void commands(net.neoforged.neoforge.event.RegisterCommandsEvent e) {
-        var str = com.mojang.brigadier.arguments.StringArgumentType.word();
-        e.getDispatcher().register(net.minecraft.commands.Commands.literal("forge")
-                .then(net.minecraft.commands.Commands.literal("relancer").executes(c -> {
-                    var p = c.getSource().getPlayerOrException();
-                    BlockPos b = nearestForge(p);
-                    if (b == null) p.sendSystemMessage(Component.literal("Approchez-vous d'une Forge Arcanique."));
-                    else reroll(p, b, p.getInventory().getSelectedSlot());
-                    return 1;
-                }))
-                .then(net.minecraft.commands.Commands.literal("reforger")
-                        .then(net.minecraft.commands.Commands.literal("annuler").executes(c -> {
-                            var p = c.getSource().getPlayerOrException();
-                            BlockPos b = nearestForge(p);
-                            if (b != null) reforge(p, b, p.getInventory().getSelectedSlot(), "");
-                            return 1;
-                        }))
-                        .then(net.minecraft.commands.Commands.argument("de", str).then(net.minecraft.commands.Commands.argument("vers", str).executes(c -> {
-                            var p = c.getSource().getPlayerOrException();
-                            BlockPos b = nearestForge(p);
-                            if (b == null) p.sendSystemMessage(Component.literal("Approchez-vous d'une Forge Arcanique."));
-                            else reforge(p, b, p.getInventory().getSelectedSlot(),
-                                    com.mojang.brigadier.arguments.StringArgumentType.getString(c, "de").toUpperCase() + ">"
-                                            + com.mojang.brigadier.arguments.StringArgumentType.getString(c, "vers").toUpperCase());
-                            return 1;
-                        })))));
-    }
 }

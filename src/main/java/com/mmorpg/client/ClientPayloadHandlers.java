@@ -118,6 +118,7 @@ public final class ClientPayloadHandlers {
             case S2COpenScreen.GUILD -> mc.gui.setScreen(new com.mmorpg.client.screen.GuildScreen(payload.extra()));
             case S2COpenScreen.DUNGEON_MAP -> mc.gui.setScreen(new com.mmorpg.client.screen.DungeonMapScreen(payload.extra()));
             case S2COpenScreen.CHARACTERS -> mc.gui.setScreen(new com.mmorpg.client.screen.CharacterSelectScreen(payload.extra()));
+            case S2COpenScreen.PORTAL_TOOL -> mc.gui.setScreen(new com.mmorpg.client.screen.PortalToolScreen(payload.extra()));
             case S2COpenScreen.PVP_STORE -> mc.gui.setScreen(new com.mmorpg.client.screen.PvpStoreScreen(payload.extra()));
             case S2COpenScreen.ARENA_RESULTS -> com.mmorpg.client.ArenaResultDelivery.receive(payload.extra());
             case S2COpenScreen.ARENA_HUD -> {ClientData.arenaState=payload.extra();ClientData.arenaUpdated=ClientData.now();}
