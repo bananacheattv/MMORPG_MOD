@@ -91,6 +91,7 @@ Disponibles pour tous. Les commandes marquées *(OP)* sont détaillées en §3.
 | Commande | Effet |
 |---|---|
 | `/hub` | Retour au hub (met fin à un essai) ; `/hub <n>` : hub n°n |
+| `/skin <pseudo|url>` · `/skin reset` | Change ton skin (pseudo Minecraft ou URL d'une image PNG 64x64), visible par tous |
 | `/spawn` (alias `/marche`) | Aller au Spawn d'Aeloria |
 | `/reseau hub` / `spawn` / `mines` / `plaines` | Changer de serveur du réseau |
 | `/mine` | Menu du Maître des mines (5 étages) |

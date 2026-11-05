@@ -61,16 +61,17 @@ public final class LightNetwork {
     }
 
     /** Aucun chargement de chunk, aucune traversee de mur. */
-    static boolean clear(ServerLevel l, BlockPos a, BlockPos b) {
+    /** 1 = degage, 0 = mur, -1 = chunk non charge en chemin (on ne touche a rien). */
+    static int clear(ServerLevel l, BlockPos a, BlockPos b) {
         var from = net.minecraft.world.phys.Vec3.atCenterOf(a);
         var delta = net.minecraft.world.phys.Vec3.atCenterOf(b).subtract(from);
         int samples = (int) Math.ceil(delta.length() * 2);
         for (int i = 1; i < samples; i++) {
             var p = BlockPos.containing(from.add(delta.scale((double) i / samples)));
-            if (!l.hasChunkAt(p)) return false;
-            if (!l.getBlockState(p).getCollisionShape(l, p).isEmpty()) return false;
+            if (!l.hasChunkAt(p)) return -1;
+            if (!l.getBlockState(p).getCollisionShape(l, p).isEmpty()) return 0;
         }
-        return true;
+        return 1;
     }
 
     /** Avance un travail ; renvoie vrai quand il est termine. */
@@ -78,22 +79,20 @@ public final class LightNetwork {
         var field = ModBlocks.LIGHT_FIELD.get();
         int total = N * N * N, h = N / 2;
         while (iters-- > 0) {
-            if (j.idx >= total) {
-                if (!j.cleared && j.fill) { j.cleared = true; j.idx = 0; continue; }
-                return true;
-            }
+            if (j.idx >= total) return true;
             int i = j.idx++;
             int dx = (i / (N * N) - h) * STEP, dy = (i / N % N - h) * STEP, dz = (i % N - h) * STEP;
             if (dx == 0 && dy == 0 && dz == 0) continue;
             var p = j.src.offset(dx, dy, dz);
             if (p.getY() < l.getMinY() || p.getY() >= l.getMaxY() || !l.hasChunkAt(p)) continue;
             var old = l.getBlockState(p);
-            if (!j.cleared) { if (old.is(field)) l.removeBlock(p, false); continue; }
             double d = Math.sqrt((double) dx * dx + dy * dy + dz * dz);
-            if (d > j.range || !l.getWorldBorder().isWithinBounds(p)) continue;
+            if (!j.fill || d > j.range || !l.getWorldBorder().isWithinBounds(p)) { if (old.is(field)) l.removeBlock(p, false); continue; }
             if (!old.is(field) && !old.isAir()) continue;
             if (--air < 0) { j.idx--; return false; }
-            if (!clear(l, j.src, p)) { if (old.is(field)) l.removeBlock(p, false); continue; }
+            int los = clear(l, j.src, p);
+            if (los < 0) continue;
+            if (los == 0) { if (old.is(field)) l.removeBlock(p, false); continue; }
             var next = field.defaultBlockState().setValue(BlockStateProperties.LEVEL, relayLevel(j.lvl, j.range, d));
             if (!old.equals(next)) l.setBlock(p, next, Block.UPDATE_ALL);
         }
@@ -106,6 +105,17 @@ public final class LightNetwork {
         while (!step(l, j, Integer.MAX_VALUE / 2, Integer.MAX_VALUE / 2)) { }
     }
 
+    /** Pour les tests : vide la file de travaux comme le ferait le serveur au fil des ticks. */
+    public static int pump(ServerLevel l) {
+        var q = JOBS.get(l); int n = 0;
+        while (q != null && !q.isEmpty()) {
+            var it = q.entrySet().iterator(); var job = it.next().getValue();
+            if (step(l, job, 40000, 800)) it.remove();
+            n++;
+        }
+        return n;
+    }
+
     @SubscribeEvent public static void tick(ServerTickEvent.Post e) {
         var server = e.getServer();
         long t = server.getTickCount();
@@ -114,7 +124,7 @@ public final class LightNetwork {
             if (q != null && !q.isEmpty()) {
                 var it = q.entrySet().iterator();
                 var job = it.next().getValue();
-                if (step(l, job, 6000, 120)) it.remove();
+                if (step(l, job, 40000, 800)) it.remove();
             }
             if (t % 100 == 7) validate(l, t % 2400 == 7);
         }

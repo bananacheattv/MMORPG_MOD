@@ -34,6 +34,8 @@ public class PlayerData implements ValueIOSerializable {
     public boolean shieldGuardRecovering;
     /** Titre affiche apres le pseudo (succes ou PvP). */
     public String pvpTitle="";
+    /** Skin choisi (/skin) : pseudo Minecraft ou URL d'image ; vide = skin du compte. */
+    public String skin="";
     /** Compteurs des succes et succes debloques (id -> date de deblocage, en secondes). */
     public final Map<String, Long> counters = new LinkedHashMap<>();
     public final Map<String, Long> achievements = new LinkedHashMap<>();
@@ -214,7 +216,7 @@ public class PlayerData implements ValueIOSerializable {
         t.put("adventure_summary", adventureSummary.copy());
         t.putInt("charSlot",charSlot);t.putString("charName",charName);
         t.putString("rankLabel",rankLabel);t.putInt("rankColor",rankColor);t.putInt("rankTier",rankTier);t.putInt("auctionSlots",auctionSlots);
-        t.putFloat("shieldGuard",shieldGuard);t.putBoolean("shieldGuardRecovering",shieldGuardRecovering);t.putString("pvpTitle",pvpTitle);t.put("backpacks",backpacks.copy());t.put("guild_receipts",guildReceipts.copy());t.putInt("guild_level",guildLevel);
+        t.putFloat("shieldGuard",shieldGuard);t.putBoolean("shieldGuardRecovering",shieldGuardRecovering);t.putString("pvpTitle",pvpTitle);t.putString("skin",skin);t.put("backpacks",backpacks.copy());t.put("guild_receipts",guildReceipts.copy());t.putInt("guild_level",guildLevel);
         t.putLongArray("guild_buffs",guildBuffs);
         t.store("forgeRecipes",Codec.STRING.listOf(),new ArrayList<>(forgeRecipes));
         t.putInt("prestige",prestige);t.putInt("bonusTalentPoints",bonusTalentPoints);
@@ -276,7 +278,7 @@ public class PlayerData implements ValueIOSerializable {
         adventureSummary = t.getCompoundOrEmpty("adventure_summary").copy();
         charSlot=Math.clamp(t.getIntOr("charSlot",0),-1,11);charName=t.getStringOr("charName","");
         rankLabel=t.getStringOr("rankLabel","Aelorien");if(rankLabel.equals("Administrateur"))rankLabel="Responsable";rankColor=t.getIntOr("rankColor",0xB9AFCC);rankTier=t.getIntOr("rankTier",0);auctionSlots=t.getIntOr("auctionSlots",12);
-        shieldGuard=Math.clamp(t.getFloatOr("shieldGuard",100),0,100);shieldGuardRecovering=t.getBooleanOr("shieldGuardRecovering",shieldGuard<=0);pvpTitle=t.getStringOr("pvpTitle","");backpacks=t.getCompoundOrEmpty("backpacks").copy();guildReceipts=t.getCompoundOrEmpty("guild_receipts").copy();guildLevel=Math.clamp(t.getIntOr("guild_level",0),0,10);
+        shieldGuard=Math.clamp(t.getFloatOr("shieldGuard",100),0,100);shieldGuardRecovering=t.getBooleanOr("shieldGuardRecovering",shieldGuard<=0);pvpTitle=t.getStringOr("pvpTitle","");skin=t.getStringOr("skin","");backpacks=t.getCompoundOrEmpty("backpacks").copy();guildReceipts=t.getCompoundOrEmpty("guild_receipts").copy();guildLevel=Math.clamp(t.getIntOr("guild_level",0),0,10);
         guildBuffs=t.getLongArray("guild_buffs").orElse(new long[4]);if(guildBuffs.length!=4)guildBuffs=new long[4];
         forgeRecipes.clear();forgeRecipes.addAll(t.read("forgeRecipes",Codec.STRING.listOf()).orElse(List.of()));
         prestige=Math.clamp(t.getIntOr("prestige",0),0,1);bonusTalentPoints=Math.max(0,t.getIntOr("bonusTalentPoints",0));
