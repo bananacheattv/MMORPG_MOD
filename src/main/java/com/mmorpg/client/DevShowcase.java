@@ -127,6 +127,7 @@ public final class DevShowcase {
             return;
         }
         if(MODE.equals("ui_frames")){DevUiFrames.tick(mc);return;}
+        if(MODE.equals("outils_retires")){DevToolsRemoved.tick(mc);return;}
         if(MODE.equals("pvp_polish")){DevPvpVisual.tick(mc);return;}
         if(MODE.equals("trade")){DevTradeVisual.tick(mc);return;}
         if(MODE.equals("chat_canaux")){DevChatVisual.tick(mc);return;}

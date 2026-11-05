@@ -228,6 +228,10 @@ public final class ModItems {
     public static final DeferredItem<com.mmorpg.item.ZoneWandItem> BAGUETTE_ZONE = ITEMS.registerItem("baguette_zone",
             com.mmorpg.item.ZoneWandItem::new);
 
+    /** Outil d'administration : pose les portails d'aventure (operateurs). */
+    public static final DeferredItem<com.mmorpg.item.PortalToolItem> OUTIL_PORTAIL = ITEMS.registerItem("outil_portail",
+            com.mmorpg.item.PortalToolItem::new);
+
     // ------------------------------------------------------------------ invocations
     public static final DeferredItem<SummonKeyItem> SCEAU_ROI_GOBELIN = summon("sceau_roi_gobelin", Rarity.RARE, "roi_gobelin", "Roi Gobelin", 20);
     public static final DeferredItem<SummonKeyItem> GRIMOIRE_INTERDIT = summon("grimoire_interdit", Rarity.EPIQUE, "liche_ancienne", "Liche Ancienne", 45);

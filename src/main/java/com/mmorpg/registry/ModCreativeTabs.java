@@ -41,6 +41,7 @@ public final class ModCreativeTabs {
                 out.accept(ModItems.BLOC_LUMIERE.get());
                 out.accept(ModItems.SCEPTRE_QUETES.get());
                 out.accept(ModItems.BAGUETTE_ZONE.get());
+                out.accept(ModItems.OUTIL_PORTAIL.get());
                 out.accept(ModItems.AUTEL_INVOCATION.get());
                 ModItems.MATERIALS.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
                 com.mmorpg.mine.MineTools.ITEMS.forEach(i -> {if(!com.mmorpg.server.RetiredItems.item(i.get()))out.accept(i.get());});
