@@ -12,7 +12,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.entity.player.PlayerSkin;
-import net.minecraft.world.item.component.ResolvableProfile;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -48,22 +47,49 @@ public final class SkinOverride {
         });
     }
 
+    private static final String API = System.getProperty("mmorpg.mojangapi", "https://api.mojang.com");
+    private static final String SESSION = System.getProperty("mmorpg.mojangsession", "https://sessionserver.mojang.com");
+
     private static PlayerSkin resolve(String spec) {
-        if (spec.startsWith("http://") || spec.startsWith("https://")) {
-            var s = URL_SKINS.get(spec);
-            if (s == null && LOADING.putIfAbsent(spec, Boolean.TRUE) == null) download(spec);
-            return s;
+        var s = URL_SKINS.get(spec);
+        if (s == null && LOADING.putIfAbsent(spec, Boolean.TRUE) == null) {
+            if (spec.startsWith("http://") || spec.startsWith("https://")) loadPng(spec, spec, PlayerModelType.WIDE);
+            else lookupPseudo(spec);
         }
-        try {
-            return Minecraft.getInstance().playerSkinRenderCache().getOrDefault(ResolvableProfile.createUnresolved(spec)).playerSkin();
-        } catch (Exception e) {
-            return null;
-        }
+        return s;
     }
 
-    private static void download(String url) {
+    private static HttpClient http() {
         if (http == null) http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(8)).followRedirects(HttpClient.Redirect.NORMAL).build();
-        http.sendAsync(HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofSeconds(15)).GET().build(), HttpResponse.BodyHandlers.ofByteArray())
+        return http;
+    }
+
+    private static java.util.concurrent.CompletableFuture<String> getText(String url) {
+        return http().sendAsync(HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofSeconds(15)).GET().build(), HttpResponse.BodyHandlers.ofString())
+                .thenApply(r -> {if (r.statusCode() != 200) throw new IllegalStateException("HTTP " + r.statusCode() + " " + url);return r.body();});
+    }
+
+    /** pseudo -> UUID (api.mojang.com) -> profil (sessionserver) -> textures.SKIN.url -> PNG. */
+    private static void lookupPseudo(String name) {
+        getText(API + "/users/profiles/minecraft/" + name)
+                .thenCompose(b -> getText(SESSION + "/session/minecraft/profile/" + com.google.gson.JsonParser.parseString(b).getAsJsonObject().get("id").getAsString()))
+                .thenAccept(b -> {
+                    for (var e : com.google.gson.JsonParser.parseString(b).getAsJsonObject().getAsJsonArray("properties")) {
+                        var o = e.getAsJsonObject();
+                        if (!"textures".equals(o.get("name").getAsString())) continue;
+                        var tex = com.google.gson.JsonParser.parseString(new String(java.util.Base64.getDecoder().decode(o.get("value").getAsString()), java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("textures");
+                        if (tex == null || !tex.has("SKIN")) throw new IllegalStateException("pas de skin");
+                        var sk = tex.getAsJsonObject("SKIN");
+                        boolean slim = sk.has("metadata") && sk.getAsJsonObject("metadata").has("model") && "slim".equals(sk.getAsJsonObject("metadata").get("model").getAsString());
+                        loadPng(name, sk.get("url").getAsString(), slim ? PlayerModelType.SLIM : PlayerModelType.WIDE);
+                        return;
+                    }
+                    throw new IllegalStateException("pas de textures");
+                }).exceptionally(e -> {MMORPG.LOGGER.warn("Skin introuvable pour le pseudo {}: {}", name, e.toString());return null;});
+    }
+
+    private static void loadPng(String key, String url, PlayerModelType model) {
+        http().sendAsync(HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofSeconds(15)).GET().build(), HttpResponse.BodyHandlers.ofByteArray())
                 .thenAccept(r -> {
                     try {
                         byte[] b = r.body();
@@ -71,13 +97,13 @@ public final class SkinOverride {
                         NativeImage img = NativeImage.read(new ByteArrayInputStream(b));
                         if (img.getWidth() != 64 || img.getHeight() != 64) {img.close();throw new IllegalStateException("image 64x64 requise");}
                         Minecraft.getInstance().execute(() -> {
-                            var id = Identifier.fromNamespaceAndPath(MMORPG.MODID, "skin_url/" + Integer.toHexString(url.hashCode()) + Long.toHexString(System.nanoTime()));
+                            var id = Identifier.fromNamespaceAndPath(MMORPG.MODID, "skin_url/" + Integer.toHexString(key.hashCode()) + Long.toHexString(System.nanoTime()));
                             Minecraft.getInstance().getTextureManager().register(id, new DynamicTexture(() -> id.toString(), img));
-                            URL_SKINS.put(url, new PlayerSkin(new ClientAsset.ResourceTexture(id), null, null, PlayerModelType.WIDE, true));
+                            URL_SKINS.put(key, new PlayerSkin(new ClientAsset.ResourceTexture(id), null, null, model, true));
                         });
                     } catch (Exception e) {
-                        MMORPG.LOGGER.warn("Skin URL illisible ({}): {}", url, e.toString());
+                        MMORPG.LOGGER.warn("Skin illisible ({}): {}", url, e.toString());
                     }
-                }).exceptionally(e -> {MMORPG.LOGGER.warn("Skin URL inaccessible ({}): {}", url, e.toString());return null;});
+                }).exceptionally(e -> {MMORPG.LOGGER.warn("Skin inaccessible ({}): {}", url, e.toString());return null;});
     }
 }
