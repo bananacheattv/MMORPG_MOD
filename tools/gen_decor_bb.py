@@ -85,7 +85,15 @@ class DShader(L.Shader):
         w = np.sin(P[..., 0] * .8 + P[..., 2] * .6 + fbm(P, (.2, .2, .2), self.seed) * 5)
         return np.clip(c * (.9 + .18 * w[..., None]) + 14, 0, 255)
 
-    def s_banner(self, P, color='#8a1e1e', trim='#e0b040'):
+    def s_leaf(self, P, color='#3f8a3a'):
+        c = rgb(color)
+        n = fbm(P, (.35, .35, .35), self.seed)
+        v = vnoise(P, (1.6, 1.6, 1.6), self.seed + 3)
+        img = lerp(c * .55, c * 1.35, np.clip(n * 1.2 + (v - .5) * .5, 0, 1))
+        spot = (vnoise(P, (.9, .9, .9), self.seed + 8) > .86)[..., None]
+        return np.where(spot, rgb('#d8b8f0'), img)
+
+    def s_banner(self, P, color='#5a2a8a', trim='#e0b040'):
         c = rgb(color); t = rgb(trim)
         band = (np.abs(np.sin(P[..., 1] * .22)) > .93)[..., None]
         diam = (np.abs(P[..., 0]) + np.abs(((P[..., 1] % 24) - 12) * .6) < 3.4)[..., None]
@@ -98,22 +106,22 @@ L.Shader = DShader
 MARB = ('marble', '#ece7dc')
 MARB2 = ('marble', '#c9c2b4')
 AZUR = ('marble', '#9a6fd0')
-STONE = ('stone', '#8f9298')
-STONE2 = ('stone', '#6f737b')
+STONE = ('stone', '#8a82a0')
+STONE2 = ('stone', '#5f5878')
 GOLD = ('gold', '#d9a830')
-IRON = ('metal', '#4b4e57')
-IRON2 = ('metal', '#2e3037')
-WOOD = ('wood', '#6b4528')
-WOOD2 = ('wood', '#4a2e1a')
+IRON = ('metal', '#3b3350')
+IRON2 = ('metal', '#262038')
+WOOD = ('wood', '#4b2f6b')
+WOOD2 = ('wood', '#2d1b45')
 CRYS = ('crystal', '#b070f0')
 CRYS2 = ('crystal', '#e070d0')
 FLAME = ('flame', '#ff9a28')
 GLOW = ('glowc', '#e0b8ff')
 WATER = ('water', '#3f8fe0')
-RED = ('banner', '#8a1e1e', '#e0b040')
+RED = ('banner', '#5a2a8a', '#e0b040')
 BLUE = ('banner', '#5a2a8a', '#e0e0f0')
-LEATH = ('leather', '#6b4024')
-CLOTH = ('cloth_plain', '#a82a2a')
+LEATH = ('leather', '#3a2358')
+CLOTH = ('cloth_plain', '#6a3fa8')
 BONE = ('bone', '#e8dfc4')
 
 
@@ -250,7 +258,7 @@ def statue_guerrier():
     m = statue('deco_statue_guerrier', 4, MARB, MARB2, None)
     Bc(m, 0, 0, 82, 86, 4.8, 4.8, IRON)                  # casque
     Bc(m, 0, 0, 86, 90, 1, 4.6, IRON)
-    Bc(m, 0, 0, 90, 94, .8, 1.5, ('banner', '#8a1e1e', '#e0b040'))
+    Bc(m, 0, 0, 90, 94, .8, 1.5, ('banner', '#5a2a8a', '#e0b040'))
     Bc(m, 10.4, -1, 38, 46, 2.4, 2.4, MARB)              # main sur l'epee
     cyl(m, 10.4, -1, 22, 38, 1.3, IRON)                  # lame plantee
     Bc(m, 10.4, -1, 38, 40, 5.6, 1.4, GOLD)
@@ -451,8 +459,8 @@ def table():
         for sz in (-1, 1):
             Bc(m, sx * 31, sz * 8, 0, 26, 2.6, 2.6, WOOD2)
     B(m, (-33, 14, -.8), (33, 17, .8), WOOD2)
-    B(m, (-20, 31, -4), (-6, 32, 8), ('cloth_plain', '#a82a2a'))
-    B(m, (6, 31, -8), (22, 32, 4), ('cloth_plain', '#a82a2a'))
+    B(m, (-20, 31, -4), (-6, 32, 8), ('cloth_plain', '#6a3fa8'))
+    B(m, (6, 31, -8), (22, 32, 4), ('cloth_plain', '#6a3fa8'))
     cyl(m, -24, -4, 31, 35, 2.4, GOLD)                    # gobelets / plats
     cyl(m, 14, 6, 31, 34, 5, ('metal', '#c0c4cc'))
     cyl(m, 0, 0, 31, 40, 1.6, GOLD)
@@ -609,7 +617,7 @@ def etal():
     B(m, (-34, 0, -16), (34, 26, -14), WOOD2)
     B(m, (-34, 0, 14), (34, 26, 16), WOOD2)
     for i in range(7):                                    # toit a rayures
-        c = ('cloth_plain', '#a82a2a') if i % 2 == 0 else ('cloth_plain', '#f0e8d0')
+        c = ('cloth_plain', '#6a3fa8') if i % 2 == 0 else ('cloth_plain', '#f0e8d0')
         x0 = -36 + i * 10.3
         B(m, (x0, 76, -20), (x0 + 10.3, 80, 20), c)
         B(m, (x0, 72, 19), (x0 + 10.3, 78, 21), c)
@@ -674,7 +682,7 @@ def bibliotheque():
     for y in (4, 34, 64, 94, 118):
         B(m, (-30, y, -9), (30, y + 3, 9), WOOD)
     B(m, (-33, 118, -11), (33, 124, 11), GOLD)
-    cols = ['#8a1e1e', '#5a2a8a', '#2e6a3a', '#c09030', '#5a2a7a', '#6b4024', '#2a6a8a']
+    cols = ['#5a2a8a', '#5a2a8a', '#2e6a3a', '#c09030', '#5a2a7a', '#6b4024', '#2a6a8a']
     for row, y in enumerate((7, 37, 67, 97)):
         x = -27.0
         i = row
@@ -730,6 +738,8 @@ def jstr(s):
 
 
 def lang_update(entries):
+    if all(f'"{k}"' in (RES / 'lang/fr_fr.json').read_text(encoding='utf-8') for k in entries):
+        return
     for code, idx in (('fr_fr', 0), ('en_us', 1)):
         path = RES / f'lang/{code}.json'
         data = json.loads(path.read_text(encoding='utf-8'))

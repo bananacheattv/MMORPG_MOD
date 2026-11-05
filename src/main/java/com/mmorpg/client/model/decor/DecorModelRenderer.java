@@ -26,6 +26,7 @@ import java.util.Map;
 
 /** Rendu des decors animes (drapeau, camp) : l'animation « chest » du modele sert de boucle continue. */
 public class DecorModelRenderer implements BlockEntityRenderer<DecorModelBlock.Entity, DecorModelRenderer.State> {
+    private static final float BLOCKBENCH_SCALE = 1.6f;
     private final Map<String, ImportedModel> models = new HashMap<>();
 
     public static class State extends BlockEntityRenderState {
@@ -53,7 +54,7 @@ public class DecorModelRenderer implements BlockEntityRenderer<DecorModelBlock.E
 
     @Override
     public void submit(State state, PoseStack pose, SubmitNodeCollector collector, CameraRenderState camera) {
-        String modelKey = state.key.startsWith("deco_") ? state.key : state.key.equals("drapeau_aeloria") ? "drapeau" : "camp";
+        String modelKey = state.key.startsWith("deco") ? state.key : state.key.equals("drapeau_aeloria") ? "drapeau" : "camp";
         ImportedModel model = models.computeIfAbsent(modelKey, k -> new ImportedModel("props", k));
         float yaw = switch (state.facing) {
             case EAST -> -90f;
@@ -64,8 +65,9 @@ public class DecorModelRenderer implements BlockEntityRenderer<DecorModelBlock.E
         pose.pushPose();
         pose.translate(0.5f, 0f, 0.5f);
         pose.rotateDegrees(Axis.YP, yaw);
-        pose.translate(0f, 1.5f, 0f);
-        pose.scale(-1f, -1f, 1f);
+        float k = state.key.startsWith("decob_") ? BLOCKBENCH_SCALE : 1f;   // decors Blockbench : agrandis (echelle citadelle)
+        pose.translate(0f, 1.5f * k, 0f);
+        pose.scale(-k, -k, k);
         Identifier texture = model.texture;
         collector.submitModel(model, state.anim, pose, RenderTypes.entityTranslucent(texture), state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, 0);
         pose.popPose();
@@ -73,6 +75,6 @@ public class DecorModelRenderer implements BlockEntityRenderer<DecorModelBlock.E
 
     @Override
     public AABB getRenderBoundingBox(DecorModelBlock.Entity be) {
-        return new AABB(be.getBlockPos()).inflate(6, 1, 6).expandTowards(0, 9, 0);
+        return new AABB(be.getBlockPos()).inflate(8, 1, 8).expandTowards(0, 12, 0);
     }
 }

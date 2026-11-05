@@ -1,0 +1,1 @@
+{"type":"minecraft:block","pools":[{"rolls":1,"entries":[{"type":"minecraft:item","name":"mmorpg:decob_buisson_fleuri"}],"conditions":[{"condition":"minecraft:survives_explosion"}]}],"random_sequence":"mmorpg:blocks/decob_buisson_fleuri"}
