@@ -18,6 +18,7 @@ RAMPS = {
     # --- matieres communes (toute la collection)
     'cuir': ramp('#2a120b', '#4a1f10', '#6e3216', '#94491f', '#b8672d', '#d48c47'),
     'cuivre_vert': ramp('#0e1e20', '#16323a', '#214a50', '#2f6868', '#468a84', '#6eb0a0', '#a2d4bc'),
+    'cuivre': ramp('#3a1e10', '#6a3a1c', '#a05c2a', '#cf8a45', '#eab676', '#fbe0b4'),
     'marbre': ramp('#5f5c55', '#827f76', '#a3a097', '#c2c0b6', '#dbd9d0', '#efede6', '#fbfaf5'),
     'marbre_sombre': ramp('#16141a', '#25222a', '#37333d', '#4c4752', '#655f6b', '#837c88'),
     'flamme': ramp('#5c1206', '#a22408', '#e0490c', '#f97c14', '#fdb02b', '#fee56f', '#fff9d8'),
