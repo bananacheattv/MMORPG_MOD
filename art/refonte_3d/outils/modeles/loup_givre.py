@@ -62,9 +62,9 @@ def build():
 
     # queue touffue en deux os
     p.bone('tail', (0, 20, 14), 'body')
-    p.cube('tail', 'queue', (-1.5, 16, 14), (1.5, 21, 20), ('poils_longs', 'fourrure_givre'), rot=(-34, 0, 0), pivot=(0, 20, 14), y=(9, 30))
-    p.bone('tail_bout', (0, 15.5, 19), 'tail')
-    p.cube('tail_bout', 'queue_blanche', (-2, 11, 18), (2, 16.5, 22), ('poils_longs', 'fourrure_givre'), rot=(-58, 0, 0), pivot=(0, 15.5, 19), ton=1.4, y=(9, 30))
+    p.cube('tail', 'queue', (-2, 17.5, 13.5), (2, 22, 21), ('poils_longs', 'fourrure_givre'), rot=(35, 0, 0), pivot=(0, 20, 14), y=(9, 30))
+    p.bone('tail_bout', (0, 16, 19.5), 'tail')
+    p.cube('tail_bout', 'queue_blanche', (-1.5, 14, 19), (1.5, 18, 25.5), ('poils_longs', 'fourrure_givre'), rot=(55, 0, 0), pivot=(0, 16, 19.5), ton=1.4, y=(9, 30))
 
     # pattes hautes et fines
     p.bone('leg_fl', (3.5, 18, -8))
@@ -84,7 +84,7 @@ def build():
     p.sym('leg_bl_bas|leg_br_bas', 'patte_ar', (2, 0, 6.5), (5, 2, 11), ('uni', 'gris_peau'), base=2)
 
     # harnais
-    selle(p, SEAT, 21.5, 4, 15, 'rare', av=-5, ar=6, bas=14.5)
+    selle(p, SEAT, 21.5, 4, 15, 'rare', av=-5, ar=6, bas=15.5)
 
     rig = {'body': 'body', 'head': 'head', 'tail': 'tail', 'tail_tip': 'tail_bout', 'jaw': 'machoire', 'ears': ('ear_l', 'ear_r'), 'swing': ('etrier_g', 'etrier_d'),
            'legs': [('leg_fl', 'leg_fl_bas', 0.0), ('leg_fr', 'leg_fr_bas', .5), ('leg_bl', 'leg_bl_bas', .56), ('leg_br', 'leg_br_bas', .06)],

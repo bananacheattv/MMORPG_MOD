@@ -159,7 +159,7 @@ def decor_famille(k):
 def statut(key):
     for f in (LIV / 'bbmodels' / f'{key}.bbmodel',):
         if f.exists():
-            return 'PILOTE LIVRE'
+            return 'VALIDE' if key in ('sanglier', 'deco_puits') else 'REFAIT, a valider'
     return 'a refaire'
 
 

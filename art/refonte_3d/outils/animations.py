@@ -213,9 +213,28 @@ def ajoute_vol(clips, rig, T=.7):
         if low:
             tr[low] = {'rotation': rot(T, x=sin(3, 1, ph + .1, bias=-50))}
     clips['fly'] = (T, True, tr)
-    # les ailes restent repliees et respirent au repos et a la marche
-    for name in ('idle', 'walk'):
+    # les ailes restent repliees et respirent au repos et a la marche : le modele est construit ailes ouvertes, le repli est porte par les clips
+    fy, fz, fx = rig.get('wing_fold', (0, 0, 0))
+    tip_y, tip_z = rig.get('tip_fold', (0, 0))
+    for name in ('idle', 'walk', 'run', 'jump'):
+        if name not in clips:
+            continue
         L = clips[name][0]
-        clips[name][2][wl] = {'rotation': rot(L, z=sin(-2.5, 1, .2))}
-        clips[name][2][wr] = {'rotation': rot(L, z=sin(2.5, 1, .2))}
+        n = 12
+        clips[name][2][wl] = {'rotation': keys(L, lambda p: (fx, fy, fz + 2.5 * math.sin(TAU * p)), n)}
+        clips[name][2][wr] = {'rotation': keys(L, lambda p: (fx, -fy, -fz - 2.5 * math.sin(TAU * p)), n)}
+        if len(tips) == 2:
+            clips[name][2][tips[0]] = {'rotation': keys(L, lambda p: (0, tip_y, tip_z), 2)}
+            clips[name][2][tips[1]] = {'rotation': keys(L, lambda p: (0, -tip_y, -tip_z), 2)}
+    return clips
+
+
+def ajoute_chaine(clips, os_liste, ax=(1.2, 2.5, 4.0), az=(2.0, 3.5, 6.0), retard=.1):
+    """Cou, queue ou trompe articules : chaque os suit le precedent avec un leger retard. ax et az : amplitude (repos, marche, galop) de la bascule et du balancement."""
+    idx = {'idle': 0, 'walk': 1, 'run': 2, 'jump': 2, 'fly': 1}
+    for name, (T, loop, tr) in clips.items():
+        i = idx.get(name, 1)
+        for n, b in enumerate(os_liste):
+            if b not in tr:
+                tr[b] = {'rotation': rot(T, x=sin(ax[i], 1, retard * n), z=sin(az[i], 1, retard * n + .25))}
     return clips

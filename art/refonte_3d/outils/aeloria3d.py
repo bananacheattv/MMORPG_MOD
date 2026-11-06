@@ -328,24 +328,51 @@ class Project:
 
     @staticmethod
     def _shelf(clusters, size):
+        """Rangement en ligne d'horizon : chaque patron va au point le plus bas ou il tient (1 texel de marge)."""
+        sky = [(1, 1, size - 2)]                # segments (x, y, largeur)
         pos = []
-        x = y = row = 1
-        y = 1
-        row = 0
-        x = 1
         for t in clusters:
-            W, H = t[3], t[4]
-            if W + 2 > size:
+            W, H = t[3] + 1, t[4] + 1
+            best = None
+            for i in range(len(sky)):
+                x = sky[i][0]
+                if x + W > size - 1 + 1:
+                    continue
+                y = 0
+                rest = W
+                j = i
+                while rest > 0 and j < len(sky):
+                    y = max(y, sky[j][1])
+                    rest -= sky[j][2]
+                    j += 1
+                if rest > 0 or y + H > size:
+                    continue
+                if best is None or (y, x) < (best[0], best[1]):
+                    best = (y, x, i)
+            if best is None:
                 return None
-            if x + W + 1 > size:
-                x = 1
-                y += row + 1
-                row = 0
-            if y + H + 1 > size:
-                return None
+            y, x, i = best
             pos.append((x, y))
-            x += W + 1
-            row = max(row, H)
+            # met a jour l'horizon
+            new = []
+            for (sx, sy, sw) in sky:
+                ex = sx + sw
+                if ex <= x or sx >= x + W:
+                    new.append((sx, sy, sw))
+                else:
+                    if sx < x:
+                        new.append((sx, sy, x - sx))
+                    if ex > x + W:
+                        new.append((x + W, sy, ex - (x + W)))
+            new.append((x, y + H, W))
+            new.sort()
+            merged = []
+            for s in new:
+                if merged and merged[-1][1] == s[1] and merged[-1][0] + merged[-1][2] == s[0]:
+                    merged[-1] = (merged[-1][0], s[1], merged[-1][2] + s[2])
+                else:
+                    merged.append(s)
+            sky = merged
         return pos
 
     # ---------------------------------------------------------------- peinture

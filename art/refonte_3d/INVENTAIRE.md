@@ -8,28 +8,28 @@ Copie du depot : commit `892a216`. Mesures automatiques (`outils/inventaire.py`)
 
 | Monture | Id | Rarete | Sieges | Hauteur selle attendue | Cubes | Os | Texture | Densite | Scintille | Trous | Animations | Etat |
 |---|---|---|---|---|---:|---:|---|---|---:|---:|---|---|
-| Sanglier de guerre | `sanglier` | PEU_COMMUN | 1 | 21.16 u | 89 | 7 | 512x512 | 3.2 (1.8-84.0) | 5 | 0 | idle 3s, walk 0.9s | PILOTE LIVRE |
-| Loup de givre | `loup_givre` | RARE | 1 | 23.24 u | 92 | 7 | 512x512 | 3.1 (1.0-55.6) | 0 | 0 | idle 3s, walk 0.75s | PILOTE LIVRE |
-| Cerf sylvestre | `cerf_sylvestre` | RARE | 1 | 29.16 u | 97 | 7 | 512x512 | 3.1 (1.2-55.6) | 2 | 0 | idle 3s, walk 0.85s | a refaire |
-| Tortue de cristal | `tortue_cristal` | RARE | 1 | 20.20 u | 75 | 7 | 512x512 | 3.3 (1.5-94.4) | 6 | 0 | idle 4s, walk 1.4s | a refaire |
-| Chèvre céleste | `chevre_celeste` | RARE | 1 | 24.20 u | 83 | 7 | 512x512 | 3.3 (2.2-61.1) | 0 | 0 | idle 3s, walk 0.75s | a refaire |
-| Lézard de lave | `lezard_lave` | EPIQUE | 1 | 16.20 u | 94 | 7 | 512x512 | 3.1 (0.9-66.7) | 2 | 0 | idle 3s, walk 0.7s | a refaire |
-| Raptor des sables | `raptor_sables` | EPIQUE | 1 | 23.24 u | 88 | 7 | 512x512 | 3.1 (0.9-61.1) | 5 | 0 | idle 3s, walk 0.6s | a refaire |
-| Ours runique | `ours_runique` | EPIQUE | 1 | 24.20 u | 82 | 7 | 512x512 | 3.3 (2.2-94.4) | 0 | 0 | idle 3s, walk 1s | a refaire |
-| Scorpion des dunes | `scorpion_dunes` | EPIQUE | 1 | 15.40 u | 78 | 12 | 512x512 | 3.3 (2.5-168.0) | 0 | 0 | idle 3s, walk 0.6s | a refaire |
-| Félin du vide | `felin_vide` | LEGENDAIRE | 1 | 22.28 u | 86 | 7 | 512x512 | 3.2 (1.6-61.1) | 0 | 0 | idle 3s, walk 0.65s | a refaire |
-| Araignée des cavernes | `araignee_cavernes` | LEGENDAIRE | 1 | 20.20 u | 90 | 10 | 512x512 | 3.2 (2.5-166.7) | 68 | 0 | idle 3s, walk 0.5s | a refaire |
-| Hippogriffe | `hippogriffe` | MYTHIQUE | 1 | 26.60 u | 106 | 9 | 512x512 | 6.7 (2.2-61.1) | 16 | 0 | idle 3s, walk 0.8s, fly 0.7s | a refaire |
-| Chimère des arènes | `chimere_arene` | MYTHIQUE | 1 | 24.20 u | 72 | 7 | 512x512 | 3.0 (2.2-4.0) | 4 | 0 | idle 3s, walk 0.75s | a refaire |
-| Taureau de guerre | `taureau_guerre` | PEU_COMMUN | 2 | 28.04 u | 53 (local non pousse : 528 cubes, 1024 px) | 7 | 512x512 | 3.0 (2.5-3.3) | 10 | 0 | idle 3s, walk 0.8s | a refaire |
-| Lion doré | `lion_dore` | RARE | 2 | 27.08 u | 56 (local non pousse : 738 cubes, 1024 px) | 7 | 512x512 | 3.0 (2.5-3.3) | 12 | 0 | idle 3s, walk 0.7s | a refaire |
-| Rhinocéros cuirassé | `rhinoceros_cuirasse` | RARE | 3 | 27.08 u | 56 (local non pousse : 573 cubes, 1024 px) | 7 | 512x512 | 2.4 (1.7-3.3) | 11 | 0 | idle 3s, walk 0.95s | a refaire |
-| Bison géant | `bison_geant` | EPIQUE | 3 | 32.60 u | 52 (local non pousse : 726 cubes, 1024 px) | 7 | 512x512 | 2.4 (2.0-3.3) | 10 | 0 | idle 3s, walk 0.9s | a refaire |
-| Mammouth laineux | `mammouth` | EPIQUE | 4 | 40.04 u | 61 (local non pousse : 960 cubes, 1024 px) | 7 | 512x512 | 2.0 (1.7-3.3) | 10 | 0 | idle 3s, walk 1s | a refaire |
-| Éléphant de guerre | `elephant_guerre` | LEGENDAIRE | 4 | 42.12 u | 73 (local non pousse : 938 cubes, 1024 px) | 7 | 512x512 | 2.0 (1.7-3.3) | 11 | 0 | idle 3s, walk 1s | a refaire |
-| Tortue forteresse | `tortue_forteresse` | LEGENDAIRE | 5 | 28.04 u | 51 (local non pousse : 545 cubes, 1024 px) | 7 | 512x512 | 2.0 (1.7-3.3) | 12 | 0 | idle 3s, walk 1.1s | a refaire |
-| Drake de caravane | `drake_caravane` | MYTHIQUE | 5 | 33.00 u | 68 (local non pousse : 706 cubes, 1024 px) | 7 | 512x512 | 2.0 (1.7-3.3) | 10 | 0 | idle 3s, walk 0.85s | a refaire |
-| Drake ascendant | `drake_ascendant` | MYTHIQUE | 1 | 26.60 u | 106 | 9 | 512x512 **PNG ABSENT** | 6.7 (2.2-61.1) | 16 | 0 | idle 3s, walk 0.8s, fly 0.7s | a refaire |
+| Sanglier de guerre | `sanglier` | PEU_COMMUN | 1 | 21.16 u | 89 | 7 | 512x512 | 3.2 (1.8-84.0) | 5 | 0 | idle 3s, walk 0.9s | VALIDE |
+| Loup de givre | `loup_givre` | RARE | 1 | 23.24 u | 92 | 7 | 512x512 | 3.1 (1.0-55.6) | 0 | 0 | idle 3s, walk 0.75s | REFAIT, a valider |
+| Cerf sylvestre | `cerf_sylvestre` | RARE | 1 | 29.16 u | 97 | 7 | 512x512 | 3.1 (1.2-55.6) | 2 | 0 | idle 3s, walk 0.85s | REFAIT, a valider |
+| Tortue de cristal | `tortue_cristal` | RARE | 1 | 20.20 u | 75 | 7 | 512x512 | 3.3 (1.5-94.4) | 6 | 0 | idle 4s, walk 1.4s | REFAIT, a valider |
+| Chèvre céleste | `chevre_celeste` | RARE | 1 | 24.20 u | 83 | 7 | 512x512 | 3.3 (2.2-61.1) | 0 | 0 | idle 3s, walk 0.75s | REFAIT, a valider |
+| Lézard de lave | `lezard_lave` | EPIQUE | 1 | 16.20 u | 94 | 7 | 512x512 | 3.1 (0.9-66.7) | 2 | 0 | idle 3s, walk 0.7s | REFAIT, a valider |
+| Raptor des sables | `raptor_sables` | EPIQUE | 1 | 23.24 u | 88 | 7 | 512x512 | 3.1 (0.9-61.1) | 5 | 0 | idle 3s, walk 0.6s | REFAIT, a valider |
+| Ours runique | `ours_runique` | EPIQUE | 1 | 24.20 u | 82 | 7 | 512x512 | 3.3 (2.2-94.4) | 0 | 0 | idle 3s, walk 1s | REFAIT, a valider |
+| Scorpion des dunes | `scorpion_dunes` | EPIQUE | 1 | 15.40 u | 78 | 12 | 512x512 | 3.3 (2.5-168.0) | 0 | 0 | idle 3s, walk 0.6s | REFAIT, a valider |
+| Félin du vide | `felin_vide` | LEGENDAIRE | 1 | 22.28 u | 86 | 7 | 512x512 | 3.2 (1.6-61.1) | 0 | 0 | idle 3s, walk 0.65s | REFAIT, a valider |
+| Araignée des cavernes | `araignee_cavernes` | LEGENDAIRE | 1 | 20.20 u | 90 | 10 | 512x512 | 3.2 (2.5-166.7) | 68 | 0 | idle 3s, walk 0.5s | REFAIT, a valider |
+| Hippogriffe | `hippogriffe` | MYTHIQUE | 1 | 26.60 u | 106 | 9 | 512x512 | 6.7 (2.2-61.1) | 16 | 0 | idle 3s, walk 0.8s, fly 0.7s | REFAIT, a valider |
+| Chimère des arènes | `chimere_arene` | MYTHIQUE | 1 | 24.20 u | 72 | 7 | 512x512 | 3.0 (2.2-4.0) | 4 | 0 | idle 3s, walk 0.75s | REFAIT, a valider |
+| Taureau de guerre | `taureau_guerre` | PEU_COMMUN | 2 | 28.04 u | 53 (local non pousse : 528 cubes, 1024 px) | 7 | 512x512 | 3.0 (2.5-3.3) | 10 | 0 | idle 3s, walk 0.8s | REFAIT, a valider |
+| Lion doré | `lion_dore` | RARE | 2 | 27.08 u | 56 (local non pousse : 738 cubes, 1024 px) | 7 | 512x512 | 3.0 (2.5-3.3) | 12 | 0 | idle 3s, walk 0.7s | REFAIT, a valider |
+| Rhinocéros cuirassé | `rhinoceros_cuirasse` | RARE | 3 | 27.08 u | 56 (local non pousse : 573 cubes, 1024 px) | 7 | 512x512 | 2.4 (1.7-3.3) | 11 | 0 | idle 3s, walk 0.95s | REFAIT, a valider |
+| Bison géant | `bison_geant` | EPIQUE | 3 | 32.60 u | 52 (local non pousse : 726 cubes, 1024 px) | 7 | 512x512 | 2.4 (2.0-3.3) | 10 | 0 | idle 3s, walk 0.9s | REFAIT, a valider |
+| Mammouth laineux | `mammouth` | EPIQUE | 4 | 40.04 u | 61 (local non pousse : 960 cubes, 1024 px) | 7 | 512x512 | 2.0 (1.7-3.3) | 10 | 0 | idle 3s, walk 1s | REFAIT, a valider |
+| Éléphant de guerre | `elephant_guerre` | LEGENDAIRE | 4 | 42.12 u | 73 (local non pousse : 938 cubes, 1024 px) | 7 | 512x512 | 2.0 (1.7-3.3) | 11 | 0 | idle 3s, walk 1s | REFAIT, a valider |
+| Tortue forteresse | `tortue_forteresse` | LEGENDAIRE | 5 | 28.04 u | 51 (local non pousse : 545 cubes, 1024 px) | 7 | 512x512 | 2.0 (1.7-3.3) | 12 | 0 | idle 3s, walk 1.1s | REFAIT, a valider |
+| Drake de caravane | `drake_caravane` | MYTHIQUE | 5 | 33.00 u | 68 (local non pousse : 706 cubes, 1024 px) | 7 | 512x512 | 2.0 (1.7-3.3) | 10 | 0 | idle 3s, walk 0.85s | REFAIT, a valider |
+| Drake ascendant | `drake_ascendant` | MYTHIQUE | 1 | 26.60 u | 106 | 9 | 512x512 **PNG ABSENT** | 6.7 (2.2-61.1) | 16 | 0 | idle 3s, walk 0.8s, fly 0.7s | REFAIT, a valider |
 
 Geometries strictement identiques : [['hippogriffe', 'drake_ascendant']].
 
@@ -65,7 +65,7 @@ Geometries strictement identiques : [['hippogriffe', 'drake_ascendant']].
 | `deco_lampadaire` | 40 | 1.1 x 1.1 | 6.2 | 2048x1792 | 5.3 (5.0-5.7) | 65% | 0 | 0 | a refaire |
 | `deco_lanterne_potence` | 23 | 2.6 x 0.8 | 5.1 | 2048x1792 | 5.3 (5.0-5.6) | 46% | 3 | 0 | a refaire |
 | `deco_obelisque` | 24 | 2.2 x 2.2 | 8.4 | 2048x1792 | 5.3 (5.1-5.6) | 61% | 0 | 0 | a refaire |
-| `deco_puits` | 67 | 2.5 x 2.5 | 7.0 | 2048x1792 | 5.3 (5.0-5.5) | 67% | 68 | 0 | PILOTE LIVRE |
+| `deco_puits` | 67 | 2.5 x 2.5 | 7.0 | 2048x1792 | 5.3 (5.0-5.5) | 67% | 68 | 0 | VALIDE |
 | `deco_ratelier_armes` | 40 | 3.9 x 1.2 | 5.6 | 2048x1792 | 5.3 (4.6-5.8) | 43% | 2 | 0 | a refaire |
 | `deco_sablier_geant` | 80 | 2.0 x 2.0 | 6.0 | 2048x1792 | 5.3 (5.1-5.6) | 70% | 4 | 0 | a refaire |
 | `deco_statue_guerrier` | 32 | 2.1 x 1.7 | 5.9 | 2048x1792 | 5.3 (5.0-6.3) | 59% | 28 | 0 | a refaire |
