@@ -3,11 +3,15 @@
 Memes cubes, memes UV, memes PNG que les fichiers livres. Aucun modele ne cache son voisin.
     python planche_bb.py sortie.bbmodel echelle id1 id2 ...
 """
+import base64
+import io
 import json
 import math
 import sys
 import uuid
 from pathlib import Path
+
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 LIV = ROOT / 'livraison/bbmodels'
@@ -66,13 +70,24 @@ def main(out, s, ids, egal=False):
     base['resolution'] = {'width': res, 'height': res}
     base['animations'] = []
     base['elements'], base['textures'], base['groups'], base['outliner'] = [], [], [], []
+    base['meta'] = {'format_version': '5.0', 'model_format': 'free', 'box_uv': False}
     for i, (key, d, t) in enumerate(zip(ids, docs, infos)):
         xc, yc = places[i]
-        ku, kv = res / d['resolution']['width'], res / d['resolution']['height']
+        # une texture plus haute que large serait lue comme une animation par Blockbench : sur la planche seulement, on la complete en carre
+        S_ = max(d['resolution']['width'], d['resolution']['height'])
+        ku, kv = res / S_, res / S_
         ti = len(base['textures'])
         tex = {}
         for j, tx in enumerate(d['textures']):
             tx = dict(tx)
+            if d['resolution']['width'] != d['resolution']['height']:
+                im = Image.open(io.BytesIO(base64.b64decode(tx['source'].split(',', 1)[1]))).convert('RGBA')
+                ca = Image.new('RGBA', (S_, S_), (0, 0, 0, 0))
+                ca.paste(im, (0, 0))
+                buf = io.BytesIO()
+                ca.save(buf, 'PNG')
+                tx['source'] = 'data:image/png;base64,' + base64.b64encode(buf.getvalue()).decode()
+                tx['width'], tx['height'] = S_, S_
             tx['uuid'] = str(uuid.uuid4())
             tx['id'] = str(ti + j)
             tx['name'] = f'{key}_{j}.png'
@@ -96,6 +111,9 @@ def main(out, s, ids, egal=False):
             if isinstance(n, str):
                 e = dict(els[n])
                 e['uuid'] = str(uuid.uuid4())
+                e['box_uv'] = False
+                e.pop('uv_offset', None)
+                e.pop('mirror_uv', None)
                 e['from'], e['to'] = tr(e['from']), tr(e['to'])
                 if 'origin' in e:
                     e['origin'] = tr(e['origin'])

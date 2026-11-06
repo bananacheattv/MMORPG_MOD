@@ -117,6 +117,7 @@ RAMPS = {
     'tissu_brun': ramp('#1e140c', '#302115', '#463220', '#5f462d', '#7a5d3c'),
     'tissu_bleu': ramp('#0d1830', '#16264a', '#203a68', '#2e5288', '#436fa8', '#648fc4'),
     'nuit': ramp('#07060c', '#0f0d18', '#1a1726', '#272338', '#37324d', '#4b4566'),
+    'nuit_violet': ramp('#0d0b12', '#15121c', '#1e1a28', '#282334', '#6a2bc9', '#8f4cf0', '#e6d4ff'),
     'acier': ramp('#1c2028', '#30363f', '#4a525e', '#6c7683', '#98a2ae', '#cdd5dc', '#f2f6f8'),
     'pierre': ramp('#2b2c33', '#41434b', '#5b5e67', '#797c85', '#9a9da4', '#bcbec3'),
     'pierre_chaude': ramp('#2f2a2a', '#474040', '#625a57', '#817873', '#a2978f', '#c4b9ad'),
@@ -1014,7 +1015,15 @@ def flamme_pleine(ctx, nom='flamme', base=3.0, ton=0.0, **_):
     return nom, _face_light(ctx, v, up=.8, down=-.6)
 
 
-PEINTRES = {'lave': lave, 'flamme_pleine': flamme_pleine, 'aile_insecte': aile_insecte, 'coquille': coquille, 'ecorce': ecorce, 'chapeau': chapeau, 'verrues': verrues, 'gluant': gluant, 'bandelette': bandelette, 'mailles': mailles, 'os': os_, 'plaque': plaque, 'voile': voile, 'caisse': caisse, 'peau_tissu': peau_tissu, 'marbre': marbre, 'flamme': flamme, 'feuilles': feuilles, 'braises': braises, 'tuyaux': tuyaux, 'cordage': cordage, 'pics': pics, 'scutes': scutes, 'cuirasse': cuirasse, 'crete_arriere': crete_arriere, 'membrane_pliee': membrane_pliee, 'segments': segments, 'rayures': rayures, 'aile_plumes': aile_plumes, 'aile_membrane': aile_membrane, 'nacre': nacre, 'griffe': griffe, 'creneau_pierre': creneau_pierre, 'plumes': plumes, 'ecailles': ecailles, 'plaques': plaques, 'peau_plissee': peau_plissee, 'poils_longs': poils_longs, 'laine': laine, 'basalte': basalte, 'etoile': etoile, 'glace': glace, 'uni': uni, 'corne': corne, 'fourrure': fourrure, 'peau': peau, 'soies': soies, 'crete': crete, 'plan': plan_masque, 'coeur_puits': coeur_puits, 'toit': toit, 'seau_bois': seau_bois, 'tambour_corde': tambour_corde, 'pignon': pignon, 'cristal': cristal, 'cuir': cuir, 'metal': metal, 'ivoire': ivoire, 'sabot': sabot, 'tissu': tissu,
+def roche(ctx, nom='pierre_noire', base=3.0, ton=0.0, **_):
+    """Roche fendue : grandes plages de valeur, fissures sombres continues d'une face a l'autre, aucune assise."""
+    n1, n2 = ctx.noise((.08, .08, .08), 321), ctx.noise((.25, .25, .25), 323)
+    v = base + ton + np.round((n1 - .5) * 5) / 2.5 + (n2 - .5) * .7
+    v = np.where(np.abs(n1 - .5 + .2 * (n2 - .5)) < .012, base + ton - 1.9, v)
+    return nom, _face_light(ctx, v, up=.6, down=-1.0)
+
+
+PEINTRES = {'roche': roche, 'lave': lave, 'flamme_pleine': flamme_pleine, 'aile_insecte': aile_insecte, 'coquille': coquille, 'ecorce': ecorce, 'chapeau': chapeau, 'verrues': verrues, 'gluant': gluant, 'bandelette': bandelette, 'mailles': mailles, 'os': os_, 'plaque': plaque, 'voile': voile, 'caisse': caisse, 'peau_tissu': peau_tissu, 'marbre': marbre, 'flamme': flamme, 'feuilles': feuilles, 'braises': braises, 'tuyaux': tuyaux, 'cordage': cordage, 'pics': pics, 'scutes': scutes, 'cuirasse': cuirasse, 'crete_arriere': crete_arriere, 'membrane_pliee': membrane_pliee, 'segments': segments, 'rayures': rayures, 'aile_plumes': aile_plumes, 'aile_membrane': aile_membrane, 'nacre': nacre, 'griffe': griffe, 'creneau_pierre': creneau_pierre, 'plumes': plumes, 'ecailles': ecailles, 'plaques': plaques, 'peau_plissee': peau_plissee, 'poils_longs': poils_longs, 'laine': laine, 'basalte': basalte, 'etoile': etoile, 'glace': glace, 'uni': uni, 'corne': corne, 'fourrure': fourrure, 'peau': peau, 'soies': soies, 'crete': crete, 'plan': plan_masque, 'coeur_puits': coeur_puits, 'toit': toit, 'seau_bois': seau_bois, 'tambour_corde': tambour_corde, 'pignon': pignon, 'cristal': cristal, 'cuir': cuir, 'metal': metal, 'ivoire': ivoire, 'sabot': sabot, 'tissu': tissu,
             'maconnerie': maconnerie, 'dalle': dalle, 'bois': bois, 'tuiles': tuiles, 'corde': corde, 'eau': eau}
 
 

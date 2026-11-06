@@ -386,11 +386,11 @@ Format Modded Entity, box UV, classes Java `<Boss>Model` et `<Boss>Anims`.
 
 | Id | Etat |
 |---|---|
-| `roi_gobelin` | a refaire |
-| `liche_ancienne` | a refaire |
-| `ignis` | a refaire |
-| `titan_glace` | a refaire |
-| `avatar_neant` | a refaire |
+| `roi_gobelin` | REFAIT, a valider |
+| `liche_ancienne` | REFAIT, a valider |
+| `ignis` | REFAIT, a valider |
+| `titan_glace` | REFAIT, a valider |
+| `avatar_neant` | REFAIT, a valider |
 
 ## Dossiers non traites a ce jour
 

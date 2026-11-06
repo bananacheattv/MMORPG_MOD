@@ -298,8 +298,8 @@ mob;elementaire_feu;Bestiaire classique;ImportedModel;26;11;;128;;;;idle 3s, wal
 mob;golem_cristal;Bestiaire classique;ImportedModel;36;11;;256;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
 mob;loup_sombre;Bestiaire classique;ImportedModel;29;16;;128;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
 mob;araignee_venimeuse;Bestiaire classique;ImportedModel;27;21;;64;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
-boss;roi_gobelin;boss;Modded Entity;;;;;;;;;a refaire
-boss;liche_ancienne;boss;Modded Entity;;;;;;;;;a refaire
-boss;ignis;boss;Modded Entity;;;;;;;;;a refaire
-boss;titan_glace;boss;Modded Entity;;;;;;;;;a refaire
-boss;avatar_neant;boss;Modded Entity;;;;;;;;;a refaire
+boss;roi_gobelin;boss;Modded Entity;;;;;;;;;REFAIT, a valider
+boss;liche_ancienne;boss;Modded Entity;;;;;;;;;REFAIT, a valider
+boss;ignis;boss;Modded Entity;;;;;;;;;REFAIT, a valider
+boss;titan_glace;boss;Modded Entity;;;;;;;;;REFAIT, a valider
+boss;avatar_neant;boss;Modded Entity;;;;;;;;;REFAIT, a valider
