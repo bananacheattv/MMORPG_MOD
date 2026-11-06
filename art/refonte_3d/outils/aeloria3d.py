@@ -257,7 +257,7 @@ class Project:
         for c in self.cubes:
             if c.twin is not None:
                 continue
-            others = [o for o in groups[c.bone.name] if o is not c]
+            others = [o for o in groups[c.bone.name] if o is not c and not o.opts.get('ajoure')]
             for f in FACES:
                 if f in c.hide:
                     continue
@@ -488,6 +488,56 @@ class Project:
                 'resolution': {'width': S, 'height': S}, 'elements': elements, 'groups': groups, 'outliner': outliner, 'textures': [tex], 'animations': anims}
 
     # ---------------------------------------------------------------- controles
+    def resoudre_coplanaires(self, passes=10):
+        """Decors : deux faces de meme sens dans le meme plan scintillent. Au lieu de les laisser, la plus petite des deux avance d'une unite vers l'exterieur, comme une moulure en saillie. Les paires en miroir restent identiques."""
+        hide0 = {id(c): set(c.hide) for c in self.cubes}
+        pas = 1 / self.density
+        axis = {'north': (2, 'frm'), 'south': (2, 'to'), 'east': (0, 'to'), 'west': (0, 'frm'), 'up': (1, 'to'), 'down': (1, 'frm')}
+        jumeau = {id(c.twin): c for c in self.cubes if c.twin is not None}
+
+        def aire(c, ax):
+            s = c.to - c.frm
+            return float(np.prod([s[k] for k in (0, 1, 2) if k != ax]))
+        reste = []
+        for _ in range(passes):
+            for c in self.cubes:
+                c.hide = set(hide0[id(c)])
+            self.cull()
+            cs = [c for c in self.cubes if not c.rotated]
+            reste = []
+            for i, a in enumerate(cs):
+                for b in cs[i + 1:]:
+                    for f, (ax, side) in axis.items():
+                        if f in a.hide or f in b.hide:
+                            continue
+                        if abs(getattr(a, side)[ax] - getattr(b, side)[ax]) > 1e-6:
+                            continue
+                        o = [k for k in (0, 1, 2) if k != ax]
+                        if all(min(a.to[k], b.to[k]) - max(a.frm[k], b.frm[k]) > 1e-6 for k in o):
+                            reste.append((a, b, f, ax))
+            if not reste:
+                return []
+            bouge = set()
+            for a, b, f, ax in reste:
+                s = a if aire(a, ax) < aire(b, ax) else b
+                if f == 'down' and s.frm[1] <= 1e-6:
+                    hide0[id(a)].add('down')        # au sol : la face du dessous ne se voit jamais
+                    hide0[id(b)].add('down')
+                    continue
+                g = s.twin if s.twin is not None else s
+                fg = MIRROR_FACE.get(f, f) if s.twin is not None else f
+                if id(g) in bouge:
+                    continue
+                bouge.add(id(g))
+                axg, sideg = axis[fg]
+                v = getattr(g, sideg)
+                v[axg] += pas if sideg == 'to' else -pas
+                t = jumeau.get(id(g))
+                if t is not None:
+                    t.frm = np.array((-g.to[0], g.frm[1], g.frm[2]))
+                    t.to = np.array((-g.frm[0], g.to[1], g.to[2]))
+        return reste
+
     def coplanar_overlaps(self):
         """Paires de faces paralleles, de meme sens, dans le meme plan et qui se recouvrent : c'est ce qui scintille en jeu.
         Traite les cubes non tournes (les plus frequents)."""

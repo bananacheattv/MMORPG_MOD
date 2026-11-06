@@ -19,6 +19,8 @@ RES = LIV / 'src/main/resources/assets/mmorpg'
 
 def extras_bloc(p, model):
     """Bloc de decor : icone d'inventaire (fond transparent, l'ancienne a un fond bleu opaque) et collisions recalculees par la meme regle que tools/gen_decor_shapes.py."""
+    if not p.name.startswith('deco'):
+        return                                  # camp et drapeau : pas d'objet d'inventaire ni de collisions dans le jeu
     from render import Model, render
     m = Model(LIV / 'bbmodels' / f'{p.name}.bbmodel')
     (RES / 'textures/item').mkdir(parents=True, exist_ok=True)
@@ -34,7 +36,25 @@ def extras_bloc(p, model):
     old = json.loads((ROOT / 'originaux/git_main/decor_shapes.json').read_text(encoding='utf-8')).get(p.name, '')
     oc = {c.split(':')[0] for c in old.split(';') if c}
     nc = {c.split(':')[0] for c in txt.split(';') if c}
-    print(f'  collisions : {len(oc)} cellules avant, {len(nc)} apres ; retirees {sorted(oc - nc)[:12]} ; ajoutees {sorted(nc - oc)[:12]}')
+    print(f'  collisions : {len(oc)} cellules avant, {len(nc)} apres ; {len(oc - nc)} retirees, {len(nc - oc)} ajoutees')
+    old_m = ROOT / f'originaux/git_main/src/main/resources/assets/mmorpg/bbmodels/props/{p.name}.json'
+    if old_m.exists():
+        def bb(d):
+            out = []
+            def w(n):
+                for c in n:
+                    if 'children' in c:
+                        w(c['children'])
+                    else:
+                        out.append(c)
+            w(d['parts'])
+            return [min(e['from'][i] for e in out) for i in range(3)] + [max(e['to'][i] for e in out) for i in range(3)]
+        bo, bn = bb(json.loads(old_m.read_text(encoding='utf-8'))), bb(model)
+        print('  enveloppe avant', [round(v, 1) for v in bo], 'apres', [round(v, 1) for v in bn])
+        rapport = LIV / 'collisions_rapport.json'
+        cur2 = json.loads(rapport.read_text(encoding='utf-8')) if rapport.exists() else {}
+        cur2[p.name] = {'avant': len(oc), 'apres': len(nc), 'retirees': len(oc - nc), 'ajoutees': len(nc - oc)}
+        rapport.write_text(json.dumps(cur2, ensure_ascii=False, indent=0, sort_keys=True), encoding='utf-8')
 
 
 FIGES = {'sanglier', 'deco_puits'}          # valides par le proprietaire : la reference est livraison/bbmodels, ne plus les reconstruire
@@ -44,10 +64,17 @@ def build(key):
     if key in FIGES:
         raise SystemExit(f'{key} est fige : version validee, ne pas reconstruire.')
     t0 = time.time()
-    mod = importlib.import_module(key)
-    importlib.reload(mod)
-    p = mod.build()
-    p.cull()
+    from decors import TOUS
+    if key in TOUS:
+        p = TOUS[key]()
+    else:
+        mod = importlib.import_module(key)
+        importlib.reload(mod)
+        p = mod.build()
+    if p.kind == 'props':
+        p.resoudre_coplanaires()
+    else:
+        p.cull()
     p.pack(min_size=128)
     p.paint(PEINTRES, RAMPS)
     post_process(p)

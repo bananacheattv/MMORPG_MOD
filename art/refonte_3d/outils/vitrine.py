@@ -31,16 +31,41 @@ def main(out, s, cols, ids):
     cw = max(t[0] for t in tailles) * s + 4
     cz = max(t[1] for t in tailles) * s + 4
     n = len(ids)
-    rows = (n + cols - 1) // cols
+    rows = (n + cols - 1) // cols if cols else 1
+    places = None
+    if cols == 0:
+        # rangement automatique : rangees de largeur limitee, chaque modele garde sa propre largeur
+        LIM, GAP = 84.0, 4.0
+        rangs, cur, lx, lz = [], [], 0.0, 0.0
+        for i, t in enumerate(tailles):
+            w, dp = t[0] * s, t[1] * s
+            if cur and lx + w > LIM:
+                rangs.append((cur, lx - GAP, lz))
+                cur, lx, lz = [], 0.0, 0.0
+            cur.append((i, lx + w / 2))
+            lx += w + GAP
+            lz = max(lz, dp)
+        rangs.append((cur, lx - GAP, lz))
+        total_z = sum(r[2] for r in rangs) + GAP * (len(rangs) - 1)
+        places = {}
+        z = -total_z / 2
+        for items, largeur, prof in rangs:
+            for i, xc in items:
+                places[i] = (xc - largeur / 2, z + prof / 2)
+            z += prof + GAP
     base = dict(docs[0])
     base['name'] = Path(out).stem
     base['resolution'] = {'width': res, 'height': res}
     base['animations'] = []
     base['elements'], base['textures'], base['groups'], base['outliner'] = [], [], [], []
     for i, (key, d, t) in enumerate(zip(ids, docs, tailles)):
-        c, r = i % cols, i // cols
-        ox = (c - (cols - 1) / 2) * cw - t[2] * s
-        oz = (r - (rows - 1) / 2) * cz - t[3] * s
+        if places:
+            ox = places[i][0] - t[2] * s
+            oz = places[i][1] - t[3] * s
+        else:
+            c, r = i % cols, i // cols
+            ox = (c - (cols - 1) / 2) * cw - t[2] * s
+            oz = (r - (rows - 1) / 2) * cz - t[3] * s
         ku = res / d['resolution']['width']
         kv = res / d['resolution']['height']
         ti = len(base['textures'])

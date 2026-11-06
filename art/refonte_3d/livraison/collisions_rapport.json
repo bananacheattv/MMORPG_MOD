@@ -1,0 +1,722 @@
+{
+"deco_arche": {
+"ajoutees": 19,
+"apres": 151,
+"avant": 206,
+"retirees": 74
+},
+"deco_balise_runique": {
+"ajoutees": 0,
+"apres": 23,
+"avant": 31,
+"retirees": 8
+},
+"deco_banc": {
+"ajoutees": 0,
+"apres": 11,
+"avant": 14,
+"retirees": 3
+},
+"deco_bassin": {
+"ajoutees": 15,
+"apres": 62,
+"avant": 47,
+"retirees": 0
+},
+"deco_bibliotheque": {
+"ajoutees": 31,
+"apres": 112,
+"avant": 85,
+"retirees": 4
+},
+"deco_brasero": {
+"ajoutees": 3,
+"apres": 34,
+"avant": 34,
+"retirees": 3
+},
+"deco_caisses_empilees": {
+"ajoutees": 2,
+"apres": 28,
+"avant": 28,
+"retirees": 2
+},
+"deco_cat_ange": {
+"ajoutees": 28,
+"apres": 64,
+"avant": 41,
+"retirees": 5
+},
+"deco_cat_applique": {
+"ajoutees": 3,
+"apres": 14,
+"avant": 21,
+"retirees": 10
+},
+"deco_cat_arc_brise": {
+"ajoutees": 21,
+"apres": 122,
+"avant": 145,
+"retirees": 44
+},
+"deco_cat_arcade_cloitre": {
+"ajoutees": 40,
+"apres": 206,
+"avant": 182,
+"retirees": 16
+},
+"deco_cat_autel_majeur": {
+"ajoutees": 28,
+"apres": 99,
+"avant": 84,
+"retirees": 13
+},
+"deco_cat_baldaquin": {
+"ajoutees": 76,
+"apres": 216,
+"avant": 151,
+"retirees": 11
+},
+"deco_cat_balustrade_choeur": {
+"ajoutees": 4,
+"apres": 62,
+"avant": 70,
+"retirees": 12
+},
+"deco_cat_banc_nef": {
+"ajoutees": 23,
+"apres": 65,
+"avant": 42,
+"retirees": 0
+},
+"deco_cat_benitier": {
+"ajoutees": 0,
+"apres": 23,
+"avant": 27,
+"retirees": 4
+},
+"deco_cat_candelabre": {
+"ajoutees": 7,
+"apres": 31,
+"avant": 24,
+"retirees": 0
+},
+"deco_cat_candelabre_geant": {
+"ajoutees": 6,
+"apres": 35,
+"avant": 42,
+"retirees": 13
+},
+"deco_cat_chaire": {
+"ajoutees": 0,
+"apres": 60,
+"avant": 61,
+"retirees": 1
+},
+"deco_cat_cierge": {
+"ajoutees": 0,
+"apres": 16,
+"avant": 27,
+"retirees": 11
+},
+"deco_cat_clocheton": {
+"ajoutees": 22,
+"apres": 63,
+"avant": 41,
+"retirees": 0
+},
+"deco_cat_colonne_torsadee": {
+"ajoutees": 0,
+"apres": 25,
+"avant": 34,
+"retirees": 9
+},
+"deco_cat_confessionnal": {
+"ajoutees": 0,
+"apres": 100,
+"avant": 100,
+"retirees": 0
+},
+"deco_cat_contrefort": {
+"ajoutees": 8,
+"apres": 122,
+"avant": 139,
+"retirees": 25
+},
+"deco_cat_croix": {
+"ajoutees": 6,
+"apres": 30,
+"avant": 35,
+"retirees": 11
+},
+"deco_cat_encensoir": {
+"ajoutees": 3,
+"apres": 24,
+"avant": 22,
+"retirees": 1
+},
+"deco_cat_escalier_helicoidal": {
+"ajoutees": 39,
+"apres": 70,
+"avant": 86,
+"retirees": 55
+},
+"deco_cat_fleche": {
+"ajoutees": 11,
+"apres": 71,
+"avant": 60,
+"retirees": 0
+},
+"deco_cat_fonts_baptismaux": {
+"ajoutees": 8,
+"apres": 55,
+"avant": 55,
+"retirees": 8
+},
+"deco_cat_gargouille": {
+"ajoutees": 125,
+"apres": 368,
+"avant": 364,
+"retirees": 121
+},
+"deco_cat_gisant": {
+"ajoutees": 2,
+"apres": 60,
+"avant": 70,
+"retirees": 12
+},
+"deco_cat_horloge": {
+"ajoutees": 50,
+"apres": 113,
+"avant": 75,
+"retirees": 12
+},
+"deco_cat_lutrin_aigle": {
+"ajoutees": 17,
+"apres": 43,
+"avant": 33,
+"retirees": 7
+},
+"deco_cat_orgue": {
+"ajoutees": 50,
+"apres": 141,
+"avant": 101,
+"retirees": 10
+},
+"deco_cat_pilier_faisceau": {
+"ajoutees": 1,
+"apres": 82,
+"avant": 85,
+"retirees": 4
+},
+"deco_cat_porche": {
+"ajoutees": 43,
+"apres": 237,
+"avant": 268,
+"retirees": 74
+},
+"deco_cat_portail": {
+"ajoutees": 42,
+"apres": 265,
+"avant": 236,
+"retirees": 13
+},
+"deco_cat_puits_lumiere": {
+"ajoutees": 8,
+"apres": 53,
+"avant": 57,
+"retirees": 12
+},
+"deco_cat_reliquaire": {
+"ajoutees": 12,
+"apres": 54,
+"avant": 46,
+"retirees": 4
+},
+"deco_cat_reliquaire_cristal": {
+"ajoutees": 4,
+"apres": 34,
+"avant": 42,
+"retirees": 12
+},
+"deco_cat_rosace": {
+"ajoutees": 19,
+"apres": 75,
+"avant": 81,
+"retirees": 25
+},
+"deco_cat_stalle": {
+"ajoutees": 17,
+"apres": 91,
+"avant": 95,
+"retirees": 21
+},
+"deco_cat_statue_saint": {
+"ajoutees": 0,
+"apres": 27,
+"avant": 28,
+"retirees": 1
+},
+"deco_cat_tapisserie": {
+"ajoutees": 0,
+"apres": 40,
+"avant": 40,
+"retirees": 0
+},
+"deco_cat_triptyque": {
+"ajoutees": 5,
+"apres": 72,
+"avant": 74,
+"retirees": 7
+},
+"deco_cat_trone_eveque": {
+"ajoutees": 4,
+"apres": 67,
+"avant": 108,
+"retirees": 45
+},
+"deco_cat_vitrail": {
+"ajoutees": 9,
+"apres": 56,
+"avant": 53,
+"retirees": 6
+},
+"deco_chandelier": {
+"ajoutees": 8,
+"apres": 21,
+"avant": 14,
+"retirees": 1
+},
+"deco_colonne_ornee": {
+"ajoutees": 0,
+"apres": 31,
+"avant": 31,
+"retirees": 0
+},
+"deco_cristal_flottant": {
+"ajoutees": 1,
+"apres": 40,
+"avant": 49,
+"retirees": 10
+},
+"deco_enclume_geante": {
+"ajoutees": 3,
+"apres": 26,
+"avant": 23,
+"retirees": 0
+},
+"deco_etal_marche": {
+"ajoutees": 11,
+"apres": 64,
+"avant": 53,
+"retirees": 0
+},
+"deco_etendard": {
+"ajoutees": 2,
+"apres": 20,
+"avant": 18,
+"retirees": 0
+},
+"deco_fontaine": {
+"ajoutees": 8,
+"apres": 46,
+"avant": 38,
+"retirees": 0
+},
+"deco_gargouille": {
+"ajoutees": 12,
+"apres": 44,
+"avant": 38,
+"retirees": 6
+},
+"deco_globe_arcane": {
+"ajoutees": 2,
+"apres": 36,
+"avant": 34,
+"retirees": 0
+},
+"deco_grille_forgee": {
+"ajoutees": 0,
+"apres": 68,
+"avant": 69,
+"retirees": 1
+},
+"deco_horloge": {
+"ajoutees": 0,
+"apres": 91,
+"avant": 91,
+"retirees": 0
+},
+"deco_lampadaire": {
+"ajoutees": 0,
+"apres": 7,
+"avant": 10,
+"retirees": 3
+},
+"deco_lanterne_potence": {
+"ajoutees": 3,
+"apres": 12,
+"avant": 10,
+"retirees": 1
+},
+"deco_obelisque": {
+"ajoutees": 0,
+"apres": 23,
+"avant": 33,
+"retirees": 10
+},
+"deco_ratelier_armes": {
+"ajoutees": 3,
+"apres": 38,
+"avant": 35,
+"retirees": 0
+},
+"deco_sablier_geant": {
+"ajoutees": 2,
+"apres": 42,
+"avant": 42,
+"retirees": 2
+},
+"deco_statue_guerrier": {
+"ajoutees": 2,
+"apres": 23,
+"avant": 21,
+"retirees": 0
+},
+"deco_statue_mage": {
+"ajoutees": 6,
+"apres": 29,
+"avant": 24,
+"retirees": 1
+},
+"deco_table_banquet": {
+"ajoutees": 10,
+"apres": 30,
+"avant": 29,
+"retirees": 9
+},
+"deco_tonneau_geant": {
+"ajoutees": 0,
+"apres": 27,
+"avant": 27,
+"retirees": 0
+},
+"deco_trone": {
+"ajoutees": 1,
+"apres": 59,
+"avant": 59,
+"retirees": 1
+},
+"deco_vase_geant": {
+"ajoutees": 0,
+"apres": 36,
+"avant": 45,
+"retirees": 9
+},
+"decob_arbre_cristal": {
+"ajoutees": 1,
+"apres": 54,
+"avant": 69,
+"retirees": 16
+},
+"decob_arbre_nain": {
+"ajoutees": 11,
+"apres": 50,
+"avant": 45,
+"retirees": 6
+},
+"decob_armoire_geante": {
+"ajoutees": 0,
+"apres": 66,
+"avant": 72,
+"retirees": 6
+},
+"decob_armure_exposition": {
+"ajoutees": 2,
+"apres": 22,
+"avant": 30,
+"retirees": 10
+},
+"decob_autel_lumiere": {
+"ajoutees": 0,
+"apres": 56,
+"avant": 58,
+"retirees": 2
+},
+"decob_autel_runique": {
+"ajoutees": 0,
+"apres": 47,
+"avant": 101,
+"retirees": 54
+},
+"decob_baliste": {
+"ajoutees": 11,
+"apres": 43,
+"avant": 34,
+"retirees": 2
+},
+"decob_balustrade": {
+"ajoutees": 5,
+"apres": 142,
+"avant": 188,
+"retirees": 51
+},
+"decob_brasero_double": {
+"ajoutees": 12,
+"apres": 51,
+"avant": 40,
+"retirees": 1
+},
+"decob_buisson_fleuri": {
+"ajoutees": 1,
+"apres": 77,
+"avant": 90,
+"retirees": 14
+},
+"decob_bureau_scribe": {
+"ajoutees": 2,
+"apres": 45,
+"avant": 50,
+"retirees": 7
+},
+"decob_canon_decoratif": {
+"ajoutees": 1,
+"apres": 38,
+"avant": 45,
+"retirees": 8
+},
+"decob_cercle_invocation": {
+"ajoutees": 0,
+"apres": 25,
+"avant": 25,
+"retirees": 0
+},
+"decob_chariot_marchand": {
+"ajoutees": 14,
+"apres": 44,
+"avant": 43,
+"retirees": 13
+},
+"decob_cheminee": {
+"ajoutees": 2,
+"apres": 72,
+"avant": 79,
+"retirees": 9
+},
+"decob_coffre_tresor": {
+"ajoutees": 2,
+"apres": 40,
+"avant": 52,
+"retirees": 14
+},
+"decob_colonne_lumineuse": {
+"ajoutees": 3,
+"apres": 31,
+"avant": 46,
+"retirees": 18
+},
+"decob_comptoir_taverne": {
+"ajoutees": 0,
+"apres": 65,
+"avant": 66,
+"retirees": 1
+},
+"decob_creneau": {
+"ajoutees": 38,
+"apres": 156,
+"avant": 201,
+"retirees": 83
+},
+"decob_dais": {
+"ajoutees": 0,
+"apres": 38,
+"avant": 50,
+"retirees": 12
+},
+"decob_dragon_pierre": {
+"ajoutees": 30,
+"apres": 93,
+"avant": 77,
+"retirees": 14
+},
+"decob_escalier_monumental": {
+"ajoutees": 57,
+"apres": 393,
+"avant": 386,
+"retirees": 50
+},
+"decob_fauteuil_royal": {
+"ajoutees": 0,
+"apres": 28,
+"avant": 28,
+"retirees": 0
+},
+"decob_fenetre_gothique": {
+"ajoutees": 37,
+"apres": 187,
+"avant": 165,
+"retirees": 15
+},
+"decob_fontaine_murale": {
+"ajoutees": 10,
+"apres": 77,
+"avant": 76,
+"retirees": 9
+},
+"decob_geode": {
+"ajoutees": 2,
+"apres": 61,
+"avant": 74,
+"retirees": 15
+},
+"decob_haie_taillee": {
+"ajoutees": 9,
+"apres": 177,
+"avant": 174,
+"retirees": 6
+},
+"decob_herse": {
+"ajoutees": 0,
+"apres": 107,
+"avant": 147,
+"retirees": 40
+},
+"decob_jardiniere_geante": {
+"ajoutees": 2,
+"apres": 44,
+"avant": 43,
+"retirees": 1
+},
+"decob_lanterne_sol": {
+"ajoutees": 0,
+"apres": 28,
+"avant": 28,
+"retirees": 0
+},
+"decob_lit_royal": {
+"ajoutees": 10,
+"apres": 149,
+"avant": 152,
+"retirees": 13
+},
+"decob_lustre_cristal": {
+"ajoutees": 24,
+"apres": 81,
+"avant": 57,
+"retirees": 0
+},
+"decob_lutrin": {
+"ajoutees": 9,
+"apres": 30,
+"avant": 26,
+"retirees": 5
+},
+"decob_mur_orne": {
+"ajoutees": 48,
+"apres": 291,
+"avant": 249,
+"retirees": 6
+},
+"decob_parterre_fleurs": {
+"ajoutees": 9,
+"apres": 58,
+"avant": 52,
+"retirees": 3
+},
+"decob_passerelle": {
+"ajoutees": 26,
+"apres": 157,
+"avant": 153,
+"retirees": 22
+},
+"decob_phare_arcane": {
+"ajoutees": 0,
+"apres": 66,
+"avant": 70,
+"retirees": 4
+},
+"decob_pilier_court": {
+"ajoutees": 0,
+"apres": 44,
+"avant": 45,
+"retirees": 1
+},
+"decob_pilier_cristal_trio": {
+"ajoutees": 5,
+"apres": 50,
+"avant": 65,
+"retirees": 20
+},
+"decob_portail_monumental": {
+"ajoutees": 35,
+"apres": 249,
+"avant": 216,
+"retirees": 2
+},
+"decob_portail_runique": {
+"ajoutees": 18,
+"apres": 182,
+"avant": 171,
+"retirees": 7
+},
+"decob_pylone_arcane": {
+"ajoutees": 0,
+"apres": 38,
+"avant": 38,
+"retirees": 0
+},
+"decob_rocher_moussu": {
+"ajoutees": 23,
+"apres": 91,
+"avant": 72,
+"retirees": 4
+},
+"decob_saule_arcane": {
+"ajoutees": 8,
+"apres": 93,
+"avant": 93,
+"retirees": 8
+},
+"decob_sphere_cristal": {
+"ajoutees": 2,
+"apres": 59,
+"avant": 69,
+"retirees": 12
+},
+"decob_stele_gravee": {
+"ajoutees": 0,
+"apres": 13,
+"avant": 19,
+"retirees": 6
+},
+"decob_tabouret_geant": {
+"ajoutees": 5,
+"apres": 29,
+"avant": 30,
+"retirees": 6
+},
+"decob_tente_commandement": {
+"ajoutees": 8,
+"apres": 111,
+"avant": 103,
+"retirees": 0
+},
+"decob_torche_geante": {
+"ajoutees": 4,
+"apres": 26,
+"avant": 30,
+"retirees": 8
+},
+"decob_totem_arcane": {
+"ajoutees": 0,
+"apres": 18,
+"avant": 40,
+"retirees": 22
+},
+"decob_tourelle": {
+"ajoutees": 10,
+"apres": 119,
+"avant": 111,
+"retirees": 2
+}
+}

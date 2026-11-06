@@ -17,6 +17,20 @@ def ramp(*colors):
 RAMPS = {
     # --- matieres communes (toute la collection)
     'cuir': ramp('#2a120b', '#4a1f10', '#6e3216', '#94491f', '#b8672d', '#d48c47'),
+    'cuivre_vert': ramp('#0e1e20', '#16323a', '#214a50', '#2f6868', '#468a84', '#6eb0a0', '#a2d4bc'),
+    'marbre': ramp('#5f5c55', '#827f76', '#a3a097', '#c2c0b6', '#dbd9d0', '#efede6', '#fbfaf5'),
+    'marbre_sombre': ramp('#16141a', '#25222a', '#37333d', '#4c4752', '#655f6b', '#837c88'),
+    'flamme': ramp('#5c1206', '#a22408', '#e0490c', '#f97c14', '#fdb02b', '#fee56f', '#fff9d8'),
+    'cire': ramp('#7d6c4d', '#a4916b', '#c7b58f', '#e3d4b1', '#f3e9d0', '#fdf8ea'),
+    'ardoise': ramp('#191c24', '#272b35', '#393f4c', '#505766', '#6c7485', '#8d95a6'),
+    'amethyste': ramp('#1d0b33', '#34145a', '#532286', '#7a39b5', '#a765dd', '#d7a8f7', '#f7e8ff'),
+    'bois_sombre': ramp('#120b07', '#20140c', '#321f12', '#47301c', '#5f4228', '#7a5736'),
+    'fer_noir': ramp('#0c0d11', '#17191f', '#262932', '#3a3e49', '#555a67', '#7c8290'),
+    'pourpre': ramp('#1c0a2c', '#2f1149', '#471b6c', '#632a91', '#8341b8', '#a968da'),
+    'rouge': ramp('#2d0808', '#4f0f0f', '#7a1616', '#a82222', '#d03a32', '#ed6a55'),
+    'pierre_noire': ramp('#101114', '#1b1d22', '#2a2d34', '#3d4149', '#555a64', '#737883'),
+    'terre': ramp('#1d130b', '#2f2013', '#46301c', '#5f4326', '#7a5833'),
+    'feuillage_sombre': ramp('#0a1c10', '#123019', '#1c4824', '#2b6432', '#3f8243', '#5ea356'),
     'fer': ramp('#191b22', '#2c303b', '#474e5c', '#6e7888', '#a0abb9', '#dbe3ec'),
     'or': ramp('#4a2b0c', '#7a4c13', '#ad781d', '#dca534', '#f6d566', '#fff3b6'),
     'ivoire': ramp('#5f4d31', '#8f7a4f', '#bda871', '#e2d5a4', '#f7f0cf', '#fffbe8'),
@@ -390,11 +404,23 @@ def pignon(ctx, **_):
     return name, v, alpha
 
 
-def cristal(ctx, nom='cristal', base=1.6, **_):
-    """Cristal d'Aeloria : facettes nettes, arete lumineuse."""
+def cristal(ctx, nom='cristal', base=1.6, ton=0.0, **_):
+    """Cristal d'Aeloria : facettes nettes, arete lumineuse. Grandes faces : plusieurs facettes triangulaires, chacune sa valeur."""
     g = _vgrad(ctx)
-    u = ctx.Iu / max(1, ctx.W - 1)
-    v = base + 1.2 * (u < .5) + g * 1.0
+    u = (ctx.Iu + .5) / max(1, ctx.W)
+    if ctx.W >= 8 and ctx.H >= 8 and ctx.is_side:
+        t = (ctx.Iv + .5) / ctx.H
+        ph = (hash(ctx.face) + ctx.proj.seed) % 7 / 7
+        s1, s2, s3 = t > .25 + .4 * u + ph * .2, t > .95 - .7 * u, u > .5 + .2 * t - ph * .2
+        fid = s1.astype(int) + 2 * s2.astype(int) + 4 * s3.astype(int)
+        val = np.array([0, .9, -.5, .5, 1.5, -.2, .7, .2])[fid]
+        v = base + ton + val + g * .8
+        lim = np.zeros_like(fid, dtype=bool)
+        lim[1:, :] |= fid[1:, :] != fid[:-1, :]
+        lim[:, 1:] |= fid[:, 1:] != fid[:, :-1]
+        v = np.where(lim, base + ton + 2.6, v)
+        return nom, _face_light(ctx, v, up=.8, down=-1)
+    v = base + ton + 1.2 * (u < .5) + g * 1.0
     v = _face_light(ctx, v, up=.8, down=-1)
     if ctx.W >= 3 and ctx.is_side:
         v[:, ctx.W // 2] += 1.4
@@ -713,7 +739,83 @@ def pics(ctx, nom='dragon_or', base=1.5, ton=0.0, pas=8, dent=6, ecart=3.0, axe=
     return nom, v, alpha
 
 
-PEINTRES = {'pics': pics, 'scutes': scutes, 'cuirasse': cuirasse, 'crete_arriere': crete_arriere, 'membrane_pliee': membrane_pliee, 'segments': segments, 'rayures': rayures, 'aile_plumes': aile_plumes, 'aile_membrane': aile_membrane, 'nacre': nacre, 'griffe': griffe, 'creneau_pierre': creneau_pierre, 'plumes': plumes, 'ecailles': ecailles, 'plaques': plaques, 'peau_plissee': peau_plissee, 'poils_longs': poils_longs, 'laine': laine, 'basalte': basalte, 'etoile': etoile, 'glace': glace, 'uni': uni, 'corne': corne, 'fourrure': fourrure, 'peau': peau, 'soies': soies, 'crete': crete, 'plan': plan_masque, 'coeur_puits': coeur_puits, 'toit': toit, 'seau_bois': seau_bois, 'tambour_corde': tambour_corde, 'pignon': pignon, 'cristal': cristal, 'cuir': cuir, 'metal': metal, 'ivoire': ivoire, 'sabot': sabot, 'tissu': tissu,
+def marbre(ctx, nom='marbre', base=3.4, ton=0.0, **_):
+    """Marbre clair de cathedrale : grandes plages douces, veines fines et rares, biseau haut."""
+    n1, n2 = ctx.noise((.05, .08, .05), 51), ctx.noise((.17, .17, .17), 53)
+    v = _full(ctx, base + ton) + (n1 - .5) * .55 + (n2 - .5) * .3
+    v = np.where(np.abs(n1 - .5 + .32 * (n2 - .5)) < .012, v - .9, v)
+    v = _face_light(ctx, v, up=.4, down=-1.0)
+    return nom, _edges(ctx, v, top=.4, bottom=-.5)
+
+
+def flamme(ctx, nom='flamme', base=1.4, ton=0.0, **_):
+    """Flamme en plan fin : ventre en bas, pointe en haut, coeur clair, bord rouge. Meme decoupe sur les deux faces."""
+    a, b = ctx.cube.frm, ctx.cube.to
+    if ctx.face in ('north', 'south'):
+        u = ((ctx.Plocal[..., 0] - a[0]) / max(1e-6, b[0] - a[0])) * 2 - 1
+    else:
+        u = ((ctx.Plocal[..., 2] - a[2]) / max(1e-6, b[2] - a[2])) * 2 - 1
+    t = (ctx.Plocal[..., 1] - a[1]) / max(1e-6, b[1] - a[1])
+    n = ctx.noise((.3, .18, .3), 61)
+    large = (1 - t) ** .75 * (.62 + .38 * np.sin(np.pi * np.minimum(1, t * 2.4)))
+    large = large + (n - .5) * .3 * (t > .12)
+    alpha = (np.abs(u) <= large).astype(np.uint8) * 255
+    coeur = np.clip(1 - np.abs(u) / np.maximum(.02, large), 0, 1)
+    v = base + ton + 3.4 * coeur * (1 - .35 * t) + 1.0 * (1 - t)
+    return nom, v, alpha
+
+
+def feuilles(ctx, nom='feuillage', base=2.8, ton=0.0, **_):
+    """Feuillage : touffes rondes, trous sombres, dessus eclaire, jamais de quadrillage."""
+    n1, n2 = ctx.noise((.2, .2, .2), 71), ctx.noise((.5, .5, .5), 73)
+    v = _full(ctx, base + ton) + (n1 - .5) * 2.2 + (n2 - .5) * 1.4
+    v = np.where(n2 + .4 * n1 < .42, base + ton - 1.8, v)
+    v = np.where(n2 + .3 * n1 > 1.0, base + ton + 1.6, v)
+    return nom, _face_light(ctx, v, up=.7, down=-1.1)
+
+
+def braises(ctx, nom='basalte', base=4.4, ton=0.0, **_):
+    """Lit de braises : charbon sombre, fissures incandescentes."""
+    n1, n2 = ctx.noise((.3, .3, .3), 81), ctx.noise((.7, .7, .7), 83)
+    v = np.where(n1 + .5 * n2 > .82, base + ton + (n2 - .3) * 3, 1.6 + (n2 - .5))
+    return nom, v
+
+
+def tuyaux(ctx, nom='fer', base=3.0, ton=0.0, pas=6, **_):
+    """Tuyaux d'orgue peints sur une face : colonnes rondes, reflet central, bouche sombre en bas."""
+    q = np.mod(ctx.Iu, pas)
+    v = base + ton + 1.2 * (q == pas // 2) + .5 * (q == pas // 2 - 1) - 1.8 * (q == 0)
+    v = v - 1.5 * ((ctx.H - ctx.Iv) % 30 < 2)
+    return nom, _face_light(ctx, v, up=.4, down=-.8)
+
+
+def cordage(ctx, nom='corde', base=2.2, ton=0.0, pas=4, **_):
+    v = base + ton + 1.2 * (np.mod(ctx.Iu + ctx.Iv, pas) < pas / 2) - .5
+    return nom, v
+
+
+def caisse(ctx, nom='bois_clair', base=3.0, ton=0.0, cadre=4, **_):
+    """Caisse de bois : cadre de planches sombres sur chaque face, panneau de planches, diagonale sur les cotes."""
+    u, w, W, H = ctx.Iu, ctx.Iv, ctx.W, ctx.H
+    q = np.mod(u, 6)
+    from aeloria3d import hash3
+    v = base + ton + (hash3(np.floor(u / 6), 2, 3, 201 + ctx.proj.seed) - .5) * 1.0 - 1.4 * (q == 5)
+    v = v + .4 * (ctx.noise((.4, .05, .4), 203) - .5) * 2
+    bord = (u < cadre) | (u >= W - cadre) | (w < cadre) | (w >= H - cadre)
+    if ctx.is_side and W > 2 * cadre + 4 and H > 2 * cadre + 4:
+        diag = np.abs((u - cadre) * (H - 2 * cadre) - (w - cadre) * (W - 2 * cadre)) < max(W, H) * 1.6
+        v = np.where(diag, base + ton - .3, v)
+    v = np.where(bord, base + ton - 1.0 + .6 * ((u < 1) | (w < 1)) - .8 * ((u >= W - 1) | (w >= H - 1)), v)
+    return nom, _face_light(ctx, v, up=.5, down=-1.0)
+
+
+def peau_tissu(ctx, nom='rouge', base=3.0, ton=0.0, pli=8, **_):
+    """Etoffe pendante : plis verticaux doux, sans motif (robes, rideaux, draps)."""
+    v = base + ton + .9 * np.sin(ctx.Iu * 2 * np.pi / pli) + .4 * (ctx.noise((.15, .05, .15), 211) - .5) * 2
+    return nom, _face_light(ctx, v, up=.5, down=-.9)
+
+
+PEINTRES = {'caisse': caisse, 'peau_tissu': peau_tissu, 'marbre': marbre, 'flamme': flamme, 'feuilles': feuilles, 'braises': braises, 'tuyaux': tuyaux, 'cordage': cordage, 'pics': pics, 'scutes': scutes, 'cuirasse': cuirasse, 'crete_arriere': crete_arriere, 'membrane_pliee': membrane_pliee, 'segments': segments, 'rayures': rayures, 'aile_plumes': aile_plumes, 'aile_membrane': aile_membrane, 'nacre': nacre, 'griffe': griffe, 'creneau_pierre': creneau_pierre, 'plumes': plumes, 'ecailles': ecailles, 'plaques': plaques, 'peau_plissee': peau_plissee, 'poils_longs': poils_longs, 'laine': laine, 'basalte': basalte, 'etoile': etoile, 'glace': glace, 'uni': uni, 'corne': corne, 'fourrure': fourrure, 'peau': peau, 'soies': soies, 'crete': crete, 'plan': plan_masque, 'coeur_puits': coeur_puits, 'toit': toit, 'seau_bois': seau_bois, 'tambour_corde': tambour_corde, 'pignon': pignon, 'cristal': cristal, 'cuir': cuir, 'metal': metal, 'ivoire': ivoire, 'sabot': sabot, 'tissu': tissu,
             'maconnerie': maconnerie, 'dalle': dalle, 'bois': bois, 'tuiles': tuiles, 'corde': corde, 'eau': eau}
 
 
