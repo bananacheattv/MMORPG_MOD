@@ -144,108 +144,162 @@ bloc 3D;decob_tente_commandement;citadelle Blockbench (decob_);ImportedModel + a
 bloc 3D;decob_torche_geante;citadelle Blockbench (decob_);ImportedModel + atlas;7;1;42;2048x1792;5.31;0;0;;REFAIT, a valider
 bloc 3D;decob_totem_arcane;citadelle Blockbench (decob_);ImportedModel + atlas;47;1;282;2048x1792;5.31;54;0;;REFAIT, a valider
 bloc 3D;decob_tourelle;citadelle Blockbench (decob_);ImportedModel + atlas;38;1;204;2048x1792;5.35;30;0;;REFAIT, a valider
-bloc JSON;autel_invocation;Structures fonctionnelles animees (Modded Entity, modele Java + StructureRenderer);blockstate + modele;3;;;;;;;;a refaire
-bloc JSON;banque_aeloria;Structures fonctionnelles animees (Modded Entity, modele Java + StructureRenderer);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;boite_aux_lettres;Structures fonctionnelles animees (Modded Entity, modele Java + StructureRenderer);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;forge_arcanique;Structures fonctionnelles animees (Modded Entity, modele Java + StructureRenderer);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;hdv_aeloria;Structures fonctionnelles animees (Modded Entity, modele Java + StructureRenderer);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;presse_compression;Structures fonctionnelles animees (Modded Entity, modele Java + StructureRenderer);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;quetes_hebdo;Structures fonctionnelles animees (Modded Entity, modele Java + StructureRenderer);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;teleporteur;Structures fonctionnelles animees (Modded Entity, modele Java + StructureRenderer);blockstate + modele;4;;;;;;;;a refaire
-bloc JSON;caisse_commune_bloc;Caisses (JSON Java + CrateRenderer);blockstate + modele;58;;;;;;;;a refaire
-bloc JSON;caisse_epique_bloc;Caisses (JSON Java + CrateRenderer);blockstate + modele;60;;;;;;;;a refaire
-bloc JSON;caisse_legendaire_bloc;Caisses (JSON Java + CrateRenderer);blockstate + modele;60;;;;;;;;a refaire
-bloc JSON;caisse_mythique_bloc;Caisses (JSON Java + CrateRenderer);blockstate + modele;62;;;;;;;;a refaire
-bloc JSON;caisse_quete_bloc;Caisses (JSON Java + CrateRenderer);blockstate + modele;58;;;;;;;;a refaire
-bloc JSON;caisse_rare_bloc;Caisses (JSON Java + CrateRenderer);blockstate + modele;58;;;;;;;;a refaire
-bloc JSON;caisse_vote_bloc;Caisses (JSON Java + CrateRenderer);blockstate + modele;58;;;;;;;;a refaire
-bloc JSON;lucky_block;Lucky Blocks (JSON Java);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;lucky_celeste;Lucky Blocks (JSON Java);blockstate + modele;65;;;;;;;;a refaire
-bloc JSON;lucky_givre;Lucky Blocks (JSON Java);blockstate + modele;67;;;;;;;;a refaire
-bloc JSON;lucky_infernal;Lucky Blocks (JSON Java);blockstate + modele;65;;;;;;;;a refaire
-bloc JSON;lucky_neant;Lucky Blocks (JSON Java);blockstate + modele;64;;;;;;;;a refaire
-bloc JSON;lucky_sylvestre;Lucky Blocks (JSON Java);blockstate + modele;69;;;;;;;;a refaire
-bloc JSON;classement_arene;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;a refaire
-bloc JSON;classement_boss;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;a refaire
-bloc JSON;classement_donjons;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;a refaire
-bloc JSON;classement_fortune;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;a refaire
-bloc JSON;classement_guilde_banque;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;a refaire
-bloc JSON;classement_guilde_gardiens;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;a refaire
-bloc JSON;classement_guilde_niveau;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;a refaire
-bloc JSON;classement_monstres;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;a refaire
-bloc JSON;classement_niveau;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;a refaire
-bloc JSON;classement_quetes;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;a refaire
-bloc JSON;armoire_aeloria;Accessoires de decor (JSON Java Block);blockstate + modele;10;;;;;;;;a refaire
-bloc JSON;buche_camp;Accessoires de decor (JSON Java Block);blockstate + modele;2;;;;;;;;a refaire
-bloc JSON;chaise_aeloria;Accessoires de decor (JSON Java Block);blockstate + modele;14;;;;;;;;a refaire
-bloc JSON;feu_de_camp;Accessoires de decor (JSON Java Block);blockstate + modele;19;;;;;;;;a refaire
-bloc JSON;jarre_ancienne;Accessoires de decor (JSON Java Block);blockstate + modele;3;;;;;;;;a refaire
-bloc JSON;panneau_feuille;Accessoires de decor (JSON Java Block);blockstate + modele;6;;;;;;;;a refaire
-bloc JSON;panneau_quetes;Accessoires de decor (JSON Java Block);blockstate + modele;26;;;;;;;;a refaire
-bloc JSON;pot_decore;Accessoires de decor (JSON Java Block);blockstate + modele;6;;;;;;;;a refaire
-bloc JSON;potion_etoilee;Accessoires de decor (JSON Java Block);blockstate + modele;29;;;;;;;;a refaire
-bloc JSON;table_aeloria;Accessoires de decor (JSON Java Block);blockstate + modele;6;;;;;;;;a refaire
-bloc JSON;viande_deco;Accessoires de decor (JSON Java Block);blockstate + modele;7;;;;;;;;a refaire
-bloc JSON;culture_ambre;Cultures (croix);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;culture_argent;Cultures (croix);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;culture_givre;Cultures (croix);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;culture_lueur;Cultures (croix);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;culture_neant;Cultures (croix);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;bois_ancien;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;bois_ancien_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;bois_ancien_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;colonne_marbre;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;cristal_ambre;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;cristal_arcane;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;cristal_azur;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;dalle_runique;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;fer_noirci;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;fer_noirci_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;fer_noirci_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;marbre;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;marbre_dore;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;marbre_poli;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;marbre_poli_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;marbre_poli_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;marbre_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;marbre_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;minerai_ambrasite;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;minerai_argentite;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;minerai_glacium;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;minerai_neantite;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;minerai_verdite;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;or_ouvrage;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;or_ouvrage_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;or_ouvrage_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;pierre_azur;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;pierre_azur_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;pierre_azur_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;pierre_solaire;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;pierre_solaire_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;pierre_solaire_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;roche_celeste;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;roche_celeste_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;roche_celeste_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;tuile_azur;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;tuile_azur_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;tuile_azur_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;tuile_ecarlate;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;tuile_ecarlate_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;tuile_ecarlate_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;tuile_givre;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;tuile_givre_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;tuile_givre_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;tuile_pourpre;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;tuile_pourpre_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;tuile_pourpre_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;tuile_sylve;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;tuile_sylve_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;tuile_sylve_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;veine_epuisee;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;bloc_lumiere;Autres blocs;blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;camp_aeloria;Autres blocs;blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;coffre_donjon;Autres blocs;blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;decor_part;Autres blocs;blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;drapeau_aeloria;Autres blocs;blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;relais_lumiere;Autres blocs;blockstate + modele;0;;;;;;;;a refaire
-bloc JSON;structure_part;Autres blocs;blockstate + modele;0;;;;;;;;a refaire
+bloc JSON;autel_invocation;Structures fonctionnelles animees (Modded Entity, modele Java + StructureRenderer);blockstate + modele;3;;;;;;;;garde (deja 16 texels par bloc, fait d apres les images du proprietaire)
+bloc JSON;banque_aeloria;Structures fonctionnelles animees (Modded Entity, modele Java + StructureRenderer);blockstate + modele;0;;;;;;;;garde (deja 16 texels par bloc, fait d apres les images du proprietaire)
+bloc JSON;boite_aux_lettres;Structures fonctionnelles animees (Modded Entity, modele Java + StructureRenderer);blockstate + modele;0;;;;;;;;garde (deja 16 texels par bloc, fait d apres les images du proprietaire)
+bloc JSON;forge_arcanique;Structures fonctionnelles animees (Modded Entity, modele Java + StructureRenderer);blockstate + modele;0;;;;;;;;garde (deja 16 texels par bloc, fait d apres les images du proprietaire)
+bloc JSON;hdv_aeloria;Structures fonctionnelles animees (Modded Entity, modele Java + StructureRenderer);blockstate + modele;0;;;;;;;;garde (deja 16 texels par bloc, fait d apres les images du proprietaire)
+bloc JSON;presse_compression;Structures fonctionnelles animees (Modded Entity, modele Java + StructureRenderer);blockstate + modele;0;;;;;;;;garde (deja 16 texels par bloc, fait d apres les images du proprietaire)
+bloc JSON;quetes_hebdo;Structures fonctionnelles animees (Modded Entity, modele Java + StructureRenderer);blockstate + modele;0;;;;;;;;garde (deja 16 texels par bloc, fait d apres les images du proprietaire)
+bloc JSON;teleporteur;Structures fonctionnelles animees (Modded Entity, modele Java + StructureRenderer);blockstate + modele;4;;;;;;;;garde (deja 16 texels par bloc, fait d apres les images du proprietaire)
+bloc JSON;caisse_commune_bloc;Caisses (JSON Java + CrateRenderer);blockstate + modele;58;;;;;;;;REFAIT, a valider
+bloc JSON;caisse_epique_bloc;Caisses (JSON Java + CrateRenderer);blockstate + modele;60;;;;;;;;REFAIT, a valider
+bloc JSON;caisse_legendaire_bloc;Caisses (JSON Java + CrateRenderer);blockstate + modele;60;;;;;;;;REFAIT, a valider
+bloc JSON;caisse_mythique_bloc;Caisses (JSON Java + CrateRenderer);blockstate + modele;62;;;;;;;;REFAIT, a valider
+bloc JSON;caisse_quete_bloc;Caisses (JSON Java + CrateRenderer);blockstate + modele;58;;;;;;;;REFAIT, a valider
+bloc JSON;caisse_rare_bloc;Caisses (JSON Java + CrateRenderer);blockstate + modele;58;;;;;;;;REFAIT, a valider
+bloc JSON;caisse_vote_bloc;Caisses (JSON Java + CrateRenderer);blockstate + modele;58;;;;;;;;REFAIT, a valider
+bloc JSON;lucky_block;Lucky Blocks (JSON Java);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;lucky_celeste;Lucky Blocks (JSON Java);blockstate + modele;65;;;;;;;;REFAIT, a valider
+bloc JSON;lucky_givre;Lucky Blocks (JSON Java);blockstate + modele;67;;;;;;;;REFAIT, a valider
+bloc JSON;lucky_infernal;Lucky Blocks (JSON Java);blockstate + modele;65;;;;;;;;REFAIT, a valider
+bloc JSON;lucky_neant;Lucky Blocks (JSON Java);blockstate + modele;64;;;;;;;;REFAIT, a valider
+bloc JSON;lucky_sylvestre;Lucky Blocks (JSON Java);blockstate + modele;69;;;;;;;;REFAIT, a valider
+bloc JSON;classement_arene;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;REFAIT, a valider
+bloc JSON;classement_boss;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;REFAIT, a valider
+bloc JSON;classement_donjons;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;REFAIT, a valider
+bloc JSON;classement_fortune;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;REFAIT, a valider
+bloc JSON;classement_guilde_banque;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;REFAIT, a valider
+bloc JSON;classement_guilde_gardiens;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;REFAIT, a valider
+bloc JSON;classement_guilde_niveau;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;REFAIT, a valider
+bloc JSON;classement_monstres;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;REFAIT, a valider
+bloc JSON;classement_niveau;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;REFAIT, a valider
+bloc JSON;classement_quetes;Classements (JSON Java + rendu);blockstate + modele;4;;;;;;;;REFAIT, a valider
+bloc JSON;armoire_aeloria;Accessoires de decor (JSON Java Block);blockstate + modele;10;;;;;;;;REFAIT, a valider
+bloc JSON;buche_camp;Accessoires de decor (JSON Java Block);blockstate + modele;2;;;;;;;;REFAIT, a valider
+bloc JSON;chaise_aeloria;Accessoires de decor (JSON Java Block);blockstate + modele;14;;;;;;;;REFAIT, a valider
+bloc JSON;feu_de_camp;Accessoires de decor (JSON Java Block);blockstate + modele;19;;;;;;;;REFAIT, a valider
+bloc JSON;jarre_ancienne;Accessoires de decor (JSON Java Block);blockstate + modele;3;;;;;;;;REFAIT, a valider
+bloc JSON;panneau_feuille;Accessoires de decor (JSON Java Block);blockstate + modele;6;;;;;;;;REFAIT, a valider
+bloc JSON;panneau_quetes;Accessoires de decor (JSON Java Block);blockstate + modele;26;;;;;;;;"modele d origine garde, a la demande du proprietaire ; face sans texture corrigee"
+bloc JSON;pot_decore;Accessoires de decor (JSON Java Block);blockstate + modele;6;;;;;;;;REFAIT, a valider
+bloc JSON;potion_etoilee;Accessoires de decor (JSON Java Block);blockstate + modele;29;;;;;;;;REFAIT, a valider
+bloc JSON;table_aeloria;Accessoires de decor (JSON Java Block);blockstate + modele;6;;;;;;;;REFAIT, a valider
+bloc JSON;viande_deco;Accessoires de decor (JSON Java Block);blockstate + modele;7;;;;;;;;REFAIT, a valider
+bloc JSON;culture_ambre;Cultures (croix);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;culture_argent;Cultures (croix);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;culture_givre;Cultures (croix);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;culture_lueur;Cultures (croix);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;culture_neant;Cultures (croix);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;bois_ancien;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;bois_ancien_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;bois_ancien_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;colonne_marbre;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;cristal_ambre;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;cristal_arcane;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;cristal_azur;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;dalle_runique;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;fer_noirci;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;fer_noirci_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;fer_noirci_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;marbre;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;marbre_dore;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;marbre_poli;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;marbre_poli_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;marbre_poli_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;marbre_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;marbre_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;minerai_ambrasite;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;minerai_argentite;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;minerai_glacium;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;minerai_neantite;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;minerai_verdite;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;or_ouvrage;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;or_ouvrage_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;or_ouvrage_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;pierre_azur;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;pierre_azur_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;pierre_azur_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;pierre_solaire;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;pierre_solaire_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;pierre_solaire_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;roche_celeste;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;roche_celeste_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;roche_celeste_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;tuile_azur;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;tuile_azur_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;tuile_azur_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;tuile_ecarlate;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;tuile_ecarlate_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;tuile_ecarlate_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;tuile_givre;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;tuile_givre_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;tuile_givre_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;tuile_pourpre;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;tuile_pourpre_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;tuile_pourpre_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;tuile_sylve;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;tuile_sylve_slab;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;tuile_sylve_stairs;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;veine_epuisee;Minerais et materiaux (cube, dalle, escalier);blockstate + modele;0;;;;;;;;REFAIT, a valider
+bloc JSON;bloc_lumiere;Autres blocs;blockstate + modele;0;;;;;;;;particule seule, rien a refaire
+bloc JSON;camp_aeloria;Autres blocs;blockstate + modele;0;;;;;;;;particule seule, rien a refaire
+bloc JSON;coffre_donjon;Autres blocs;blockstate + modele;0;;;;;;;;particule seule, rien a refaire
+bloc JSON;decor_part;Autres blocs;blockstate + modele;0;;;;;;;;particule seule, rien a refaire
+bloc JSON;drapeau_aeloria;Autres blocs;blockstate + modele;0;;;;;;;;particule seule, rien a refaire
+bloc JSON;relais_lumiere;Autres blocs;blockstate + modele;0;;;;;;;;particule seule, rien a refaire
+bloc JSON;structure_part;Autres blocs;blockstate + modele;0;;;;;;;;particule seule, rien a refaire
+mob;mousseux;Mobs de zones et importes;ImportedModel;60;11;;256;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;sanglier_ronce;Mobs de zones et importes;ImportedModel;89;16;;256;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;archer_sylvestre;Mobs de zones et importes;ImportedModel;54;12;;128;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;veilleur_champignon;Mobs de zones et importes;ImportedModel;56;12;;256;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;colosse_racine;Mobs de zones et importes;ImportedModel;94;14;;512;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;crapaud_venimeux;Mobs de zones et importes;ImportedModel;51;12;;256;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;limace_acide;Mobs de zones et importes;ImportedModel;27;9;;256;;;;idle 3s, slither 1.5s, attack 1.2s, death 1s;REFAIT, a valider
+mob;luciole_geante;Mobs de zones et importes;ImportedModel;32;14;;128;;;;idle 3s, fly 1.5s, attack 1.2s, death 1s;REFAIT, a valider
+mob;sorcier_roseaux;Mobs de zones et importes;ImportedModel;49;13;;256;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;hydre_marais;Mobs de zones et importes;ImportedModel;104;28;;512;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;osselet;Mobs de zones et importes;ImportedModel;53;12;;128;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;araignee_os;Mobs de zones et importes;ImportedModel;60;21;;128;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;garde_funeraire;Mobs de zones et importes;ImportedModel;81;13;;256;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;spectre_enchaine;Mobs de zones et importes;ImportedModel;66;8;;256;;;;idle 3s, fly 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;roi_cryptes;Mobs de zones et importes;ImportedModel;107;14;;512;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;renard_givre;Mobs de zones et importes;ImportedModel;47;17;;128;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;scarabee_polaire;Mobs de zones et importes;ImportedModel;45;17;;256;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;harpie_neiges;Mobs de zones et importes;ImportedModel;46;9;;128;;;;idle 3s, fly 1.5s, attack 1.2s, death 1s;REFAIT, a valider
+mob;golem_iceberg;Mobs de zones et importes;ImportedModel;63;11;;512;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;wyrm_boreal;Mobs de zones et importes;ImportedModel;71;23;;512;;;;idle 3s, slither 1.5s, attack 1.2s, death 1s;REFAIT, a valider
+mob;scorpion_cuivre;Mobs de zones et importes;ImportedModel;61;32;;256;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;momie_dunes;Mobs de zones et importes;ImportedModel;33;11;;128;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;hyene_cendree;Mobs de zones et importes;ImportedModel;63;15;;256;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;djinn_braises;Mobs de zones et importes;ImportedModel;42;10;;256;;;;idle 3s, fly 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;tortue_volcanique;Mobs de zones et importes;ImportedModel;52;13;;256;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;mite_astrale;Mobs de zones et importes;ImportedModel;21;14;;128;;;;idle 3s, fly 1.5s, attack 1.2s, death 1s;REFAIT, a valider
+mob;rodeur_vide;Mobs de zones et importes;ImportedModel;63;17;;256;;;;idle 3s, walk 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;oeil_chaos;Mobs de zones et importes;ImportedModel;50;7;;256;;;;idle 3s, fly 1.5s, attack 1.2s, death 1s;REFAIT, a valider
+mob;chevalier_fracture;Mobs de zones et importes;ImportedModel;65;13;;256;;;;idle 3s, fly 1.2s, attack 1.2s, death 1s;REFAIT, a valider
+mob;devoreur_etoiles;Mobs de zones et importes;ImportedModel;105;37;;1024;;;;idle 3s, fly 1.5s, attack 1.2s, death 1s;REFAIT, a valider
+mob;fernling;Mobs de zones et importes;ImportedModel;22;13;;128;;;;idle 4s, walk 0.8s, attack 1.8s, death 1s;REFAIT, a valider
+mob;champion_gobelin;Mobs de zones et importes;ImportedModel;39;15;;256;;;;idle 2.5s, walk 1s, attack 1s, death 1s;REFAIT, a valider
+mob;voyageur_squelette;Mobs de zones et importes;ImportedModel;49;13;;128;;;;idle 2.5s, walk 1s, attack 1.25s, death 1s;REFAIT, a valider
+mob;sentinelle_hibou;Mobs de zones et importes;ImportedModel;38;11;;256;;;;idle 4s, walk 1.7s, attack 1.4s, death 1s;REFAIT, a valider
+mob;minotaure;Mobs de zones et importes;ImportedModel;54;15;;256;;;;idle 2s, walk 1.2s, attack 0.75s, death 1s;REFAIT, a valider
+mob;morghul;Mobs de zones et importes;ImportedModel;108;23;;512;;;;idle 4s, walk 1.5s, attack 3s, death 1s;REFAIT, a valider
+mob;gardien_citadelle;Mobs de zones et importes;ImportedModel;105;37;;512;;;;idle 4s, walk 1.8s, attack 1.2s, death 1s;REFAIT, a valider
+mob;seigneur_squelette;Mobs de zones et importes;ImportedModel;84;12;;256;;;;idle 3s, walk 2s, attack 0.96s, death 1s;REFAIT, a valider
+mob;gobelin;Bestiaire classique;ImportedModel;27;15;;128;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
+mob;orc_guerrier;Bestiaire classique;ImportedModel;38;13;;128;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
+mob;bandit_arbaletrier;Bestiaire classique;ImportedModel;35;12;;128;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
+mob;squelette_maudit;Bestiaire classique;ImportedModel;47;13;;128;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
+mob;zombie_des_cryptes;Bestiaire classique;ImportedModel;28;12;;128;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
+mob;chevalier_neant;Bestiaire classique;ImportedModel;36;12;;128;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
+mob;spectre_givre;Bestiaire classique;ImportedModel;32;11;;128;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
+mob;elementaire_feu;Bestiaire classique;ImportedModel;26;11;;128;;;;idle 3s, walk 0.9s, attack 1s, cast 2.4s, death 1s;REFAIT, a valider
+mob;golem_cristal;Bestiaire classique;ImportedModel;36;11;;256;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
+mob;loup_sombre;Bestiaire classique;ImportedModel;29;16;;128;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
+mob;araignee_venimeuse;Bestiaire classique;ImportedModel;27;21;;64;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
+boss;roi_gobelin;boss;Modded Entity;;;;;;;;;a refaire
+boss;liche_ancienne;boss;Modded Entity;;;;;;;;;a refaire
+boss;ignis;boss;Modded Entity;;;;;;;;;a refaire
+boss;titan_glace;boss;Modded Entity;;;;;;;;;a refaire
+boss;avatar_neant;boss;Modded Entity;;;;;;;;;a refaire

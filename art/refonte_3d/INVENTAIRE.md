@@ -1,4 +1,4 @@
-# Inventaire des montures et blocs
+# Inventaire des montures, blocs, mobs et boss
 
 Copie du depot : commit `892a216`. Mesures automatiques (`outils/inventaire.py`).
 
@@ -180,146 +180,221 @@ Geometries strictement identiques : [['hippogriffe', 'drake_ascendant']].
 
 | Bloc | Modeles | Elements max | Etat |
 |---|---:|---:|---|
-| `autel_invocation` | 1 | 3 | a refaire |
-| `banque_aeloria` | 1 | 0 | a refaire |
-| `boite_aux_lettres` | 1 | 0 | a refaire |
-| `forge_arcanique` | 1 | 0 | a refaire |
-| `hdv_aeloria` | 1 | 0 | a refaire |
-| `presse_compression` | 1 | 0 | a refaire |
-| `quetes_hebdo` | 1 | 0 | a refaire |
-| `teleporteur` | 1 | 4 | a refaire |
+| `autel_invocation` | 1 | 3 | garde (deja 16 texels par bloc, fait d apres les images du proprietaire) |
+| `banque_aeloria` | 1 | 0 | garde (deja 16 texels par bloc, fait d apres les images du proprietaire) |
+| `boite_aux_lettres` | 1 | 0 | garde (deja 16 texels par bloc, fait d apres les images du proprietaire) |
+| `forge_arcanique` | 1 | 0 | garde (deja 16 texels par bloc, fait d apres les images du proprietaire) |
+| `hdv_aeloria` | 1 | 0 | garde (deja 16 texels par bloc, fait d apres les images du proprietaire) |
+| `presse_compression` | 1 | 0 | garde (deja 16 texels par bloc, fait d apres les images du proprietaire) |
+| `quetes_hebdo` | 1 | 0 | garde (deja 16 texels par bloc, fait d apres les images du proprietaire) |
+| `teleporteur` | 1 | 4 | garde (deja 16 texels par bloc, fait d apres les images du proprietaire) |
 
 ## Caisses (JSON Java + CrateRenderer) (7)
 
 | Bloc | Modeles | Elements max | Etat |
 |---|---:|---:|---|
-| `caisse_commune_bloc` | 2 | 58 | a refaire |
-| `caisse_epique_bloc` | 2 | 60 | a refaire |
-| `caisse_legendaire_bloc` | 2 | 60 | a refaire |
-| `caisse_mythique_bloc` | 2 | 62 | a refaire |
-| `caisse_quete_bloc` | 2 | 58 | a refaire |
-| `caisse_rare_bloc` | 2 | 58 | a refaire |
-| `caisse_vote_bloc` | 2 | 58 | a refaire |
+| `caisse_commune_bloc` | 2 | 58 | REFAIT, a valider |
+| `caisse_epique_bloc` | 2 | 60 | REFAIT, a valider |
+| `caisse_legendaire_bloc` | 2 | 60 | REFAIT, a valider |
+| `caisse_mythique_bloc` | 2 | 62 | REFAIT, a valider |
+| `caisse_quete_bloc` | 2 | 58 | REFAIT, a valider |
+| `caisse_rare_bloc` | 2 | 58 | REFAIT, a valider |
+| `caisse_vote_bloc` | 2 | 58 | REFAIT, a valider |
 
 ## Lucky Blocks (JSON Java) (6)
 
 | Bloc | Modeles | Elements max | Etat |
 |---|---:|---:|---|
-| `lucky_block` | 1 | 0 | a refaire |
-| `lucky_celeste` | 1 | 65 | a refaire |
-| `lucky_givre` | 1 | 67 | a refaire |
-| `lucky_infernal` | 1 | 65 | a refaire |
-| `lucky_neant` | 1 | 64 | a refaire |
-| `lucky_sylvestre` | 1 | 69 | a refaire |
+| `lucky_block` | 1 | 0 | REFAIT, a valider |
+| `lucky_celeste` | 1 | 65 | REFAIT, a valider |
+| `lucky_givre` | 1 | 67 | REFAIT, a valider |
+| `lucky_infernal` | 1 | 65 | REFAIT, a valider |
+| `lucky_neant` | 1 | 64 | REFAIT, a valider |
+| `lucky_sylvestre` | 1 | 69 | REFAIT, a valider |
 
 ## Classements (JSON Java + rendu) (10)
 
 | Bloc | Modeles | Elements max | Etat |
 |---|---:|---:|---|
-| `classement_arene` | 1 | 4 | a refaire |
-| `classement_boss` | 1 | 4 | a refaire |
-| `classement_donjons` | 1 | 4 | a refaire |
-| `classement_fortune` | 1 | 4 | a refaire |
-| `classement_guilde_banque` | 1 | 4 | a refaire |
-| `classement_guilde_gardiens` | 1 | 4 | a refaire |
-| `classement_guilde_niveau` | 1 | 4 | a refaire |
-| `classement_monstres` | 1 | 4 | a refaire |
-| `classement_niveau` | 1 | 4 | a refaire |
-| `classement_quetes` | 1 | 4 | a refaire |
+| `classement_arene` | 1 | 4 | REFAIT, a valider |
+| `classement_boss` | 1 | 4 | REFAIT, a valider |
+| `classement_donjons` | 1 | 4 | REFAIT, a valider |
+| `classement_fortune` | 1 | 4 | REFAIT, a valider |
+| `classement_guilde_banque` | 1 | 4 | REFAIT, a valider |
+| `classement_guilde_gardiens` | 1 | 4 | REFAIT, a valider |
+| `classement_guilde_niveau` | 1 | 4 | REFAIT, a valider |
+| `classement_monstres` | 1 | 4 | REFAIT, a valider |
+| `classement_niveau` | 1 | 4 | REFAIT, a valider |
+| `classement_quetes` | 1 | 4 | REFAIT, a valider |
 
 ## Accessoires de decor (JSON Java Block) (11)
 
 | Bloc | Modeles | Elements max | Etat |
 |---|---:|---:|---|
-| `armoire_aeloria` | 1 | 10 | a refaire |
-| `buche_camp` | 1 | 2 | a refaire |
-| `chaise_aeloria` | 1 | 14 | a refaire |
-| `feu_de_camp` | 1 | 19 | a refaire |
-| `jarre_ancienne` | 1 | 3 | a refaire |
-| `panneau_feuille` | 1 | 6 | a refaire |
-| `panneau_quetes` | 1 | 26 | a refaire |
-| `pot_decore` | 1 | 6 | a refaire |
-| `potion_etoilee` | 1 | 29 | a refaire |
-| `table_aeloria` | 1 | 6 | a refaire |
-| `viande_deco` | 1 | 7 | a refaire |
+| `armoire_aeloria` | 1 | 10 | REFAIT, a valider |
+| `buche_camp` | 1 | 2 | REFAIT, a valider |
+| `chaise_aeloria` | 1 | 14 | REFAIT, a valider |
+| `feu_de_camp` | 1 | 19 | REFAIT, a valider |
+| `jarre_ancienne` | 1 | 3 | REFAIT, a valider |
+| `panneau_feuille` | 1 | 6 | REFAIT, a valider |
+| `panneau_quetes` | 1 | 26 | modele d origine garde, a la demande du proprietaire ; face sans texture corrigee |
+| `pot_decore` | 1 | 6 | REFAIT, a valider |
+| `potion_etoilee` | 1 | 29 | REFAIT, a valider |
+| `table_aeloria` | 1 | 6 | REFAIT, a valider |
+| `viande_deco` | 1 | 7 | REFAIT, a valider |
 
 ## Cultures (croix) (5)
 
 | Bloc | Modeles | Elements max | Etat |
 |---|---:|---:|---|
-| `culture_ambre` | 4 | 0 | a refaire |
-| `culture_argent` | 4 | 0 | a refaire |
-| `culture_givre` | 4 | 0 | a refaire |
-| `culture_lueur` | 4 | 0 | a refaire |
-| `culture_neant` | 4 | 0 | a refaire |
+| `culture_ambre` | 4 | 0 | REFAIT, a valider |
+| `culture_argent` | 4 | 0 | REFAIT, a valider |
+| `culture_givre` | 4 | 0 | REFAIT, a valider |
+| `culture_lueur` | 4 | 0 | REFAIT, a valider |
+| `culture_neant` | 4 | 0 | REFAIT, a valider |
 
 ## Minerais et materiaux (cube, dalle, escalier) (51)
 
 | Bloc | Modeles | Elements max | Etat |
 |---|---:|---:|---|
-| `bois_ancien` | 1 | 0 | a refaire |
-| `bois_ancien_slab` | 3 | 0 | a refaire |
-| `bois_ancien_stairs` | 3 | 0 | a refaire |
-| `colonne_marbre` | 2 | 0 | a refaire |
-| `cristal_ambre` | 1 | 0 | a refaire |
-| `cristal_arcane` | 1 | 0 | a refaire |
-| `cristal_azur` | 1 | 0 | a refaire |
-| `dalle_runique` | 1 | 0 | a refaire |
-| `fer_noirci` | 1 | 0 | a refaire |
-| `fer_noirci_slab` | 3 | 0 | a refaire |
-| `fer_noirci_stairs` | 3 | 0 | a refaire |
-| `marbre` | 1 | 0 | a refaire |
-| `marbre_dore` | 1 | 0 | a refaire |
-| `marbre_poli` | 1 | 0 | a refaire |
-| `marbre_poli_slab` | 3 | 0 | a refaire |
-| `marbre_poli_stairs` | 3 | 0 | a refaire |
-| `marbre_slab` | 3 | 0 | a refaire |
-| `marbre_stairs` | 3 | 0 | a refaire |
-| `minerai_ambrasite` | 1 | 0 | a refaire |
-| `minerai_argentite` | 1 | 0 | a refaire |
-| `minerai_glacium` | 1 | 0 | a refaire |
-| `minerai_neantite` | 1 | 0 | a refaire |
-| `minerai_verdite` | 1 | 0 | a refaire |
-| `or_ouvrage` | 1 | 0 | a refaire |
-| `or_ouvrage_slab` | 3 | 0 | a refaire |
-| `or_ouvrage_stairs` | 3 | 0 | a refaire |
-| `pierre_azur` | 1 | 0 | a refaire |
-| `pierre_azur_slab` | 3 | 0 | a refaire |
-| `pierre_azur_stairs` | 3 | 0 | a refaire |
-| `pierre_solaire` | 1 | 0 | a refaire |
-| `pierre_solaire_slab` | 3 | 0 | a refaire |
-| `pierre_solaire_stairs` | 3 | 0 | a refaire |
-| `roche_celeste` | 1 | 0 | a refaire |
-| `roche_celeste_slab` | 3 | 0 | a refaire |
-| `roche_celeste_stairs` | 3 | 0 | a refaire |
-| `tuile_azur` | 1 | 0 | a refaire |
-| `tuile_azur_slab` | 3 | 0 | a refaire |
-| `tuile_azur_stairs` | 3 | 0 | a refaire |
-| `tuile_ecarlate` | 1 | 0 | a refaire |
-| `tuile_ecarlate_slab` | 3 | 0 | a refaire |
-| `tuile_ecarlate_stairs` | 3 | 0 | a refaire |
-| `tuile_givre` | 1 | 0 | a refaire |
-| `tuile_givre_slab` | 3 | 0 | a refaire |
-| `tuile_givre_stairs` | 3 | 0 | a refaire |
-| `tuile_pourpre` | 1 | 0 | a refaire |
-| `tuile_pourpre_slab` | 3 | 0 | a refaire |
-| `tuile_pourpre_stairs` | 3 | 0 | a refaire |
-| `tuile_sylve` | 1 | 0 | a refaire |
-| `tuile_sylve_slab` | 3 | 0 | a refaire |
-| `tuile_sylve_stairs` | 3 | 0 | a refaire |
-| `veine_epuisee` | 1 | 0 | a refaire |
+| `bois_ancien` | 1 | 0 | REFAIT, a valider |
+| `bois_ancien_slab` | 3 | 0 | REFAIT, a valider |
+| `bois_ancien_stairs` | 3 | 0 | REFAIT, a valider |
+| `colonne_marbre` | 2 | 0 | REFAIT, a valider |
+| `cristal_ambre` | 1 | 0 | REFAIT, a valider |
+| `cristal_arcane` | 1 | 0 | REFAIT, a valider |
+| `cristal_azur` | 1 | 0 | REFAIT, a valider |
+| `dalle_runique` | 1 | 0 | REFAIT, a valider |
+| `fer_noirci` | 1 | 0 | REFAIT, a valider |
+| `fer_noirci_slab` | 3 | 0 | REFAIT, a valider |
+| `fer_noirci_stairs` | 3 | 0 | REFAIT, a valider |
+| `marbre` | 1 | 0 | REFAIT, a valider |
+| `marbre_dore` | 1 | 0 | REFAIT, a valider |
+| `marbre_poli` | 1 | 0 | REFAIT, a valider |
+| `marbre_poli_slab` | 3 | 0 | REFAIT, a valider |
+| `marbre_poli_stairs` | 3 | 0 | REFAIT, a valider |
+| `marbre_slab` | 3 | 0 | REFAIT, a valider |
+| `marbre_stairs` | 3 | 0 | REFAIT, a valider |
+| `minerai_ambrasite` | 1 | 0 | REFAIT, a valider |
+| `minerai_argentite` | 1 | 0 | REFAIT, a valider |
+| `minerai_glacium` | 1 | 0 | REFAIT, a valider |
+| `minerai_neantite` | 1 | 0 | REFAIT, a valider |
+| `minerai_verdite` | 1 | 0 | REFAIT, a valider |
+| `or_ouvrage` | 1 | 0 | REFAIT, a valider |
+| `or_ouvrage_slab` | 3 | 0 | REFAIT, a valider |
+| `or_ouvrage_stairs` | 3 | 0 | REFAIT, a valider |
+| `pierre_azur` | 1 | 0 | REFAIT, a valider |
+| `pierre_azur_slab` | 3 | 0 | REFAIT, a valider |
+| `pierre_azur_stairs` | 3 | 0 | REFAIT, a valider |
+| `pierre_solaire` | 1 | 0 | REFAIT, a valider |
+| `pierre_solaire_slab` | 3 | 0 | REFAIT, a valider |
+| `pierre_solaire_stairs` | 3 | 0 | REFAIT, a valider |
+| `roche_celeste` | 1 | 0 | REFAIT, a valider |
+| `roche_celeste_slab` | 3 | 0 | REFAIT, a valider |
+| `roche_celeste_stairs` | 3 | 0 | REFAIT, a valider |
+| `tuile_azur` | 1 | 0 | REFAIT, a valider |
+| `tuile_azur_slab` | 3 | 0 | REFAIT, a valider |
+| `tuile_azur_stairs` | 3 | 0 | REFAIT, a valider |
+| `tuile_ecarlate` | 1 | 0 | REFAIT, a valider |
+| `tuile_ecarlate_slab` | 3 | 0 | REFAIT, a valider |
+| `tuile_ecarlate_stairs` | 3 | 0 | REFAIT, a valider |
+| `tuile_givre` | 1 | 0 | REFAIT, a valider |
+| `tuile_givre_slab` | 3 | 0 | REFAIT, a valider |
+| `tuile_givre_stairs` | 3 | 0 | REFAIT, a valider |
+| `tuile_pourpre` | 1 | 0 | REFAIT, a valider |
+| `tuile_pourpre_slab` | 3 | 0 | REFAIT, a valider |
+| `tuile_pourpre_stairs` | 3 | 0 | REFAIT, a valider |
+| `tuile_sylve` | 1 | 0 | REFAIT, a valider |
+| `tuile_sylve_slab` | 3 | 0 | REFAIT, a valider |
+| `tuile_sylve_stairs` | 3 | 0 | REFAIT, a valider |
+| `veine_epuisee` | 1 | 0 | REFAIT, a valider |
 
 ## Autres blocs (7)
 
 | Bloc | Modeles | Elements max | Etat |
 |---|---:|---:|---|
-| `bloc_lumiere` | 1 | 0 | a refaire |
-| `camp_aeloria` | 1 | 0 | a refaire |
-| `coffre_donjon` | 1 | 0 | a refaire |
-| `decor_part` | 1 | 0 | a refaire |
-| `drapeau_aeloria` | 1 | 0 | a refaire |
-| `relais_lumiere` | 1 | 0 | a refaire |
-| `structure_part` | 1 | 0 | a refaire |
+| `bloc_lumiere` | 1 | 0 | particule seule, rien a refaire |
+| `camp_aeloria` | 1 | 0 | particule seule, rien a refaire |
+| `coffre_donjon` | 1 | 0 | particule seule, rien a refaire |
+| `decor_part` | 1 | 0 | particule seule, rien a refaire |
+| `drapeau_aeloria` | 1 | 0 | particule seule, rien a refaire |
+| `relais_lumiere` | 1 | 0 | particule seule, rien a refaire |
+| `structure_part` | 1 | 0 | particule seule, rien a refaire |
+
+## Mobs de zones et importes (38)
+
+| Id | Cubes avant | Cubes apres | Os | Texture avant | Texture apres | Lueurs | Clips | Etat |
+|---|---:|---:|---:|---|---|---:|---|---|
+| `mousseux` | 278 | 60 | 11 | 256x256 | 256x256 | 2 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `sanglier_ronce` | 399 | 89 | 16 | 256x256 | 256x256 | 2 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `archer_sylvestre` | 275 | 54 | 12 | 256x256 | 128x128 | 2 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `veilleur_champignon` | 166 | 56 | 12 | 256x256 | 256x256 | 2 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `colosse_racine` | 690 | 94 | 14 | 256x256 | 512x512 | 4 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `crapaud_venimeux` | 301 | 51 | 12 | 256x256 | 256x256 | 18 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `limace_acide` | 114 | 27 | 9 | 256x256 | 256x256 | 4 | idle 3s, slither 1.5s, attack 1.2s, death 1s | REFAIT, a valider |
+| `luciole_geante` | 163 | 32 | 14 | 256x256 | 128x128 | 4 | idle 3s, fly 1.5s, attack 1.2s, death 1s | REFAIT, a valider |
+| `sorcier_roseaux` | 290 | 49 | 13 | 256x256 | 256x256 | 4 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `hydre_marais` | 705 | 104 | 28 | 256x256 | 512x512 | 6 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `osselet` | 111 | 53 | 12 | 256x256 | 128x128 | 2 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `araignee_os` | 94 | 60 | 21 | 256x256 | 128x128 | 3 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `garde_funeraire` | 201 | 81 | 13 | 256x256 | 256x256 | 3 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `spectre_enchaine` | 240 | 66 | 8 | 256x256 | 256x256 | 3 | idle 3s, fly 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `roi_cryptes` | 351 | 107 | 14 | 256x256 | 512x512 | 7 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `renard_givre` | 351 | 47 | 17 | 256x256 | 128x128 | 2 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `scarabee_polaire` | 147 | 45 | 17 | 256x256 | 256x256 | 4 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `harpie_neiges` | 275 | 46 | 9 | 256x256 | 128x128 | 12 | idle 3s, fly 1.5s, attack 1.2s, death 1s | REFAIT, a valider |
+| `golem_iceberg` | 316 | 63 | 11 | 256x256 | 512x512 | 4 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `wyrm_boreal` | 387 | 71 | 23 | 256x256 | 512x512 | 2 | idle 3s, slither 1.5s, attack 1.2s, death 1s | REFAIT, a valider |
+| `scorpion_cuivre` | 219 | 61 | 32 | 256x256 | 256x256 | 4 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `momie_dunes` | 127 | 33 | 11 | 256x256 | 128x128 | 2 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `hyene_cendree` | 270 | 63 | 15 | 256x256 | 256x256 | 34 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `djinn_braises` | 217 | 42 | 10 | 256x256 | 256x256 | 17 | idle 3s, fly 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `tortue_volcanique` | 386 | 52 | 13 | 256x256 | 256x256 | 24 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `mite_astrale` | 328 | 21 | 14 | 256x256 | 128x128 | 4 | idle 3s, fly 1.5s, attack 1.2s, death 1s | REFAIT, a valider |
+| `rodeur_vide` | 350 | 63 | 17 | 256x256 | 256x256 | 16 | idle 3s, walk 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `oeil_chaos` | 179 | 50 | 7 | 256x256 | 256x256 | 15 | idle 3s, fly 1.5s, attack 1.2s, death 1s | REFAIT, a valider |
+| `chevalier_fracture` | 245 | 65 | 13 | 256x256 | 256x256 | 16 | idle 3s, fly 1.2s, attack 1.2s, death 1s | REFAIT, a valider |
+| `devoreur_etoiles` | 559 | 105 | 37 | 256x256 | 1024x1024 | 8 | idle 3s, fly 1.5s, attack 1.2s, death 1s | REFAIT, a valider |
+| `fernling` | 40 | 22 | 13 | 64x64 | 128x128 | 2 | idle 4s, walk 0.8s, attack 1.8s, death 1s | REFAIT, a valider |
+| `champion_gobelin` | 41 | 39 | 15 | 128x128 | 256x256 | 2 | idle 2.5s, walk 1s, attack 1s, death 1s | REFAIT, a valider |
+| `voyageur_squelette` | 22 | 49 | 13 | 128x128 | 128x128 | 2 | idle 2.5s, walk 1s, attack 1.25s, death 1s | REFAIT, a valider |
+| `sentinelle_hibou` | 50 | 38 | 11 | 128x128 | 256x256 | 3 | idle 4s, walk 1.7s, attack 1.4s, death 1s | REFAIT, a valider |
+| `minotaure` | 29 | 54 | 15 | 256x256 | 256x256 | 3 | idle 2s, walk 1.2s, attack 0.75s, death 1s | REFAIT, a valider |
+| `morghul` | 868 | 108 | 23 | 128x1024 | 512x512 | 16 | idle 4s, walk 1.5s, attack 3s, death 1s | REFAIT, a valider |
+| `gardien_citadelle` | 1328 | 105 | 37 | 1254x2765 | 512x512 | 3 | idle 4s, walk 1.8s, attack 1.2s, death 1s | REFAIT, a valider |
+| `seigneur_squelette` | 286 | 84 | 12 | 256x1024 | 256x256 | 25 | idle 3s, walk 2s, attack 0.96s, death 1s | REFAIT, a valider |
+
+## Bestiaire classique (11)
+
+| Id | Cubes avant | Cubes apres | Os | Texture avant | Texture apres | Lueurs | Clips | Etat |
+|---|---:|---:|---:|---|---|---:|---|---|
+| `gobelin` | 55 | 27 | 15 | 1254x1254 | 128x128 | 2 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
+| `orc_guerrier` | 55 | 38 | 13 | 1254x1254 | 128x128 | 2 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
+| `bandit_arbaletrier` | 51 | 35 | 12 | 1254x1254 | 128x128 | 2 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
+| `squelette_maudit` | 53 | 47 | 13 | 1254x1254 | 128x128 | 3 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
+| `zombie_des_cryptes` | 49 | 28 | 12 | 1254x1254 | 128x128 | 2 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
+| `chevalier_neant` | 60 | 36 | 12 | 1254x1254 | 128x128 | 2 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
+| `spectre_givre` | 56 | 32 | 11 | 1254x1254 | 128x128 | 11 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
+| `elementaire_feu` | 46 | 26 | 11 | 1254x1254 | 128x128 | 14 | idle 3s, walk 0.9s, attack 1s, cast 2.4s, death 1s | REFAIT, a valider |
+| `golem_cristal` | 45 | 36 | 11 | 1254x1254 | 256x256 | 15 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
+| `loup_sombre` | 58 | 29 | 16 | 1254x1254 | 128x128 | 2 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
+| `araignee_venimeuse` | 67 | 27 | 21 | 1254x1254 | 64x64 | 5 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
+
+## Boss (5)
+
+Format Modded Entity, box UV, classes Java `<Boss>Model` et `<Boss>Anims`.
+
+| Id | Etat |
+|---|---|
+| `roi_gobelin` | a refaire |
+| `liche_ancienne` | a refaire |
+| `ignis` | a refaire |
+| `titan_glace` | a refaire |
+| `avatar_neant` | a refaire |
+
+## Dossiers non traites a ce jour
+
+PNJ et divers, hors de la demande (montures, blocs, mobs, boss) : `bbmodels/guides` (15), `bbmodels/yggdrasil` (14), `bbmodels/chests` (2), `bbmodels/cosmetics` (11), `art/familiers_blockbench`.
 
 ## Totaux
 

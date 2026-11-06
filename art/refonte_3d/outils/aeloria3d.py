@@ -487,7 +487,31 @@ class Project:
                 'variable_placeholders': '', 'multi_file_ruleset': '', 'variable_placeholder_buttons': [], 'timeline_setups': [], 'unhandled_root_fields': {},
                 'resolution': {'width': S, 'height': S}, 'elements': elements, 'groups': groups, 'outliner': outliner, 'textures': [tex], 'animations': anims}
 
+    def reduire(self, s):
+        """Mobs : le jeu multiplie le modele par s (ImportedMobs.scale). On dessine en texels de jeu, puis on divise geometrie, pivots et positions animees par s : les UV ne bougent pas, et une face de w texels mesure bien w/16 bloc en jeu."""
+        if abs(s - 1) < 1e-9:
+            return
+        for c in self.cubes:
+            c.frm, c.to = c.frm / s, c.to / s
+            c.pivot = tuple(v / s for v in c.pivot)
+        for b in self.bones.values():
+            b.pivot = tuple(v / s for v in b.pivot)
+        for a in self.anims:
+            for ch in a['tracks'].values():
+                if 'position' in ch:
+                    ch['position'] = [(t, x / s, y / s, z / s) for t, x, y, z in ch['position']]
+
     # ---------------------------------------------------------------- controles
+    @staticmethod
+    def _cle_os(c):
+        """Os tournes au repos au-dessus d'un cube. Deux cubes qui n'ont pas la meme cle ne sont pas dans le meme repere : leurs plans ne se comparent pas."""
+        k, b = [], c.bone
+        while b is not None:
+            if any(abs(v) > 1e-6 for v in b.rot):
+                k.append(b.name)
+            b = b.parent
+        return tuple(k)
+
     def resoudre_coplanaires(self, passes=10):
         """Decors : deux faces de meme sens dans le meme plan scintillent. Au lieu de les laisser, la plus petite des deux avance d'une unite vers l'exterieur, comme une moulure en saillie. Les paires en miroir restent identiques."""
         hide0 = {id(c): set(c.hide) for c in self.cubes}
@@ -507,6 +531,8 @@ class Project:
             reste = []
             for i, a in enumerate(cs):
                 for b in cs[i + 1:]:
+                    if self._cle_os(a) != self._cle_os(b):
+                        continue
                     for f, (ax, side) in axis.items():
                         if f in a.hide or f in b.hide:
                             continue
@@ -521,8 +547,9 @@ class Project:
             for a, b, f, ax in reste:
                 s = a if aire(a, ax) < aire(b, ax) else b
                 if f == 'down' and s.frm[1] <= 1e-6:
-                    hide0[id(a)].add('down')        # au sol : la face du dessous ne se voit jamais
-                    hide0[id(b)].add('down')
+                    hide0[id(s)].add('down')        # au sol : seule la plus petite des deux perd sa face du dessous, un membre leve reste ferme
+                    if s.twin is not None:
+                        hide0[id(s.twin)].add('down')
                     continue
                 g = s.twin if s.twin is not None else s
                 fg = MIRROR_FACE.get(f, f) if s.twin is not None else f
@@ -546,6 +573,8 @@ class Project:
         axis = {'north': (2, 'frm'), 'south': (2, 'to'), 'east': (0, 'to'), 'west': (0, 'frm'), 'up': (1, 'to'), 'down': (1, 'frm')}
         for i, a in enumerate(cs):
             for b in cs[i + 1:]:
+                if self._cle_os(a) != self._cle_os(b):
+                    continue
                 for f, (ax, side) in axis.items():
                     if f not in a.faces or f not in b.faces:
                         continue
@@ -591,6 +620,8 @@ def export_runtime(bb, author='Aeloria', description=''):
             out = {'uuid': uniq(e['name']), 'from': e['from'], 'to': e['to'], 'origin': e.get('origin', [0, 0, 0]), 'rotation': e.get('rotation', [0, 0, 0]), 'faces': faces}
             if e.get('inflate'):
                 out['inflate'] = e['inflate']
+            if 'lueur' in e['name']:
+                out['emissive'] = True                  # regle de nommage : garde l'information dans un fichier re-sauve par Blockbench
             return out
         g = {**grp.get(n['uuid'], {}), **{k: v for k, v in n.items() if k in ('name', 'origin', 'rotation')}} if isinstance(n, dict) else n
         name = uniq(g['name'])
@@ -614,7 +645,7 @@ def export_runtime(bb, author='Aeloria', description=''):
             g = {**grp.get(n['uuid'], {}), **n}
             used.add(g['name'])
             names[n['uuid']] = g['name']
-            return {'uuid': g['name'], 'origin': g.get('origin', [0, 0, 0]), 'rotation': g.get('rotation', [0, 0, 0]), 'children': [walk_bone_first(c) for c in n.get('children', [])]}
+            return {'uuid': g['name'], 'name': g['name'], 'origin': g.get('origin', [0, 0, 0]), 'rotation': g.get('rotation', [0, 0, 0]), 'children': [walk_bone_first(c) for c in n.get('children', [])]}
         return walk(n)
 
     used |= reserved

@@ -1,6 +1,6 @@
 # Refonte 3D Aeloria : livraison à intégrer
 
-État au 2026-11-06 : **22 montures, 123 décors 3D, et les blocs Java livrés** (`sanglier` et `deco_puits` validés par le propriétaire, ne plus les modifier ; les autres à valider). Blocs Java : 7 caisses (fermée et ouverte), 6 Lucky Blocks, 10 accessoires et le panneau de quêtes d'origine corrigé, textures des 10 classements, des 5 cultures et des matériaux. Les mobs et les boss sont en cours. Les 8 structures animées n'ont pas été refaites : elles sont déjà en 16 texels par bloc, faites d'après les images du propriétaire. Rien n'est intégré au mod : ces fichiers sont dans `art/refonte_3d`, le jeu ne les lit pas. Base : commit `892a216`.
+État au 2026-11-06 : **22 montures, 123 décors 3D, les blocs Java et 49 mobs livrés** (`sanglier` et `deco_puits` validés par le propriétaire, ne plus les modifier ; les autres à valider). Blocs Java : 7 caisses (fermée et ouverte), 6 Lucky Blocks, 10 accessoires et le panneau de quêtes d'origine corrigé, textures des 10 classements, des 5 cultures et des matériaux. Les 5 boss sont en cours. Les 8 structures animées n'ont pas été refaites : elles sont déjà en 16 texels par bloc, faites d'après les images du propriétaire. Rien n'est intégré au mod : ces fichiers sont dans `art/refonte_3d`, le jeu ne les lit pas. Base : commit `892a216`, plus `f8169d7` pour les originaux des mobs.
 
 Ce dossier reprend l'arborescence du mod : copier `src/` par-dessus le dépôt suffit. Aucune classe Java n'a besoin de changer pour ces modèles.
 
@@ -16,7 +16,9 @@ Ce dossier reprend l'arborescence du mod : copier `src/` par-dessus le dépôt s
 | `src/main/resources/assets/mmorpg/models/block/<id>.json` + `textures/block/<id>.png` | Blocs Java : `caisse_*_bloc`, `caisse_*_bloc_ouverte`, `lucky_*`, accessoires. Chaque modèle a sa propre texture. Mêmes identifiants, mêmes `display`. Rotation sur un axe à 22,5 ou 45 degrés, coordonnées dans -16..32. |
 | `src/main/resources/assets/mmorpg/models/block/panneau_quetes.json` | Modèle d'origine gardé, à la demande du propriétaire, avec ses textures d'origine. Seul changement : le côté intérieur du montant gauche, vu de face, n'avait pas de texture (`#missing`) et reçoit celle du cadre ; les 18 autres faces `#missing`, invisibles, sont retirées. |
 | `src/main/resources/assets/mmorpg/textures/block/` | Matériaux, minerais, cristaux, cultures, classements : mêmes noms et mêmes tailles que les originaux. Les modèles de cube, dalle et escalier ne changent pas, les classements gardent leurs bandes aux mêmes hauteurs pour le texte du jeu. |
-| `CONTROLES_MONTURES.md`, `CONTROLES_DECORS.md` | Résultat des contrôles automatiques, modèle par modèle, avec les cellules de collision qui changent. |
+| `src/main/resources/assets/mmorpg/bbmodels/mobs/<id>.json` + `textures/imported/mobs/<id>.png` | Les 38 mobs lus par `ImportedMobRenderer`. Remplacent les fichiers de même nom. `ImportedMobs.java` ne change pas : même échelle, même boîte de collision. |
+| `src/main/resources/assets/mmorpg/bbmodels/classic/<id>.json` + `textures/imported/classic/<id>.png` | Les 11 mobs lus par `ClassicMobRenderer`. Plus de clé `texture` : chaque mob a son PNG, l'atlas `textures/entity/bestiary/material_atlas.png` n'est plus lu par eux. Le dossier `textures/imported/classic` est nouveau. |
+| `CONTROLES_MONTURES.md`, `CONTROLES_DECORS.md`, `CONTROLES_MOBS.md` | Résultat des contrôles automatiques, modèle par modèle, avec les cellules de collision qui changent. |
 
 ## Installation
 
@@ -27,7 +29,7 @@ Ce dossier reprend l'arborescence du mod : copier `src/` par-dessus le dépôt s
 
 ## Trois pièges
 
-- **Ne pas relancer les générateurs sur ces modèles.** `tools/gen_mounts.py` réécrit les montures, et `tools/gen_decor_bb.py` réécrit les décors : ils écraseraient la refonte. Exclure ces identifiants, ou ne plus utiliser ces scripts pour eux.
+- **Ne pas relancer les générateurs sur ces modèles.** `tools/gen_mounts.py` réécrit les montures, `tools/gen_decor_bb.py` réécrit les décors, `tools/import_pack2.py`, `tools/refine-bestiary.py` et `tools/generate-classic-bestiary.cjs` réécrivent des mobs : ils écraseraient la refonte. Exclure ces identifiants, ou ne plus utiliser ces scripts pour eux.
 - **`tools/bbmount_lib.py:bbmodel_to_runtime` ne lit pas les fichiers Blockbench 5** : sur un `.bbmodel` re-sauvé, il plante (`KeyError: 'name'`), car les os sont dans `groups`. Pour retoucher un modèle : `outils/aeloria3d.py:export_runtime` lit l'ancien et le nouveau format.
 - **Sens des animations.** Blockbench 5 applique les clés telles quelles pour un fichier 5.0, et inverse X (et Y en rotation) à l'ouverture d'un fichier plus ancien. Les fichiers livrés sont en 5.0. L'export donne `x_jeu = -x`, `y_jeu = -y` en rotation, et `x_jeu = -x` en position. `to_bbmodel` écrit encore du 4.10 avec cette même inversion, donc son aperçu Blockbench est à l'envers du jeu.
 
@@ -44,9 +46,26 @@ Tous les os animés des originaux existent encore (`body`, `head`, `tail`, `leg_
 
 `MountType` reste inchangé pour les 22 montures. Le dessus de chaque selle est calé sur le calcul du jeu (`16 × siège + 1`, arrondi à 0,5) : voir `CONTROLES_MONTURES.md`.
 
+### Mobs
+
+| Modèles | Clip | Joué par le code actuel |
+|---|---|---|
+| Tous les mobs | `idle`, `attack`, `death` | Oui (`ImportedModel.setupAnim`). `attack` dure ce qu'il durait, `death` dure 1 s : le jeu n'avance `deathTime` que jusqu'à 20 ticks et couche déjà le mob. |
+| Les mobs qui marchent | `walk` | Oui. |
+| `chevalier_fracture`, `devoreur_etoiles`, `djinn_braises`, `harpie_neiges`, `luciole_geante`, `mite_astrale`, `oeil_chaos`, `spectre_enchaine` | `fly` | Oui, à la place de `walk`, comme les originaux. |
+| `limace_acide`, `wyrm_boreal` | `slither` | Oui, à la place de `walk`, comme les originaux. |
+| Bestiaire classique | `cast` | Fourni comme à l'origine. Le code actuel ne le joue pas pour ces mobs. |
+
+Comment les mobs tiennent à 16 texels par bloc sans changer le Java : `ImportedMobs` multiplie chaque modèle par son `scale` (2,759 pour le mousseux, 0,445 pour Morghul). Les modèles sont dessinés en texels de jeu, puis l'export divise la géométrie, les pivots et les positions animées par ce `scale`. Les UV ne bougent pas. Un `.bbmodel` de mob est donc à la même échelle que son JSON : ses coordonnées ne sont pas entières, c'est normal, et `outils/aeloria3d.py:export_runtime` redonne le même JSON.
+
+Règle de nommage : un cube dont le nom contient `lueur` est écrit `emissive: true` dans le JSON, donc dessiné par `ImportedGlowLayer`. Les os d'un mob importé portent maintenant un nom lisible (`body`, `head`, `arm_-1`...) et plus un uuid : ni le Java ni rien d'autre ne les référence. Le bestiaire classique garde `root`, `body`, `head`, `arm_-1`, `arm_1`, `leg_-1`, `leg_1` (`leg_-10`... pour le loup et l'araignée), que `ImportedModel` cherche par leur nom pour le regard. `arm_-1` est le bras droit, côté +x dans Blockbench, celui qui tient l'arme.
+
 ## Contrôles
 
 **Faits, sans lancer le jeu**
+
+- Les 49 mobs ouverts dans Blockbench 5.2.2 (cinq planches de contact, hiérarchie des os conservée), `validate_project` sans diagnostic, captures réelles dans `apercus/apres/mobs`. Sur ces planches, chaque mob est ramené à la même taille à l'écran pour qu'on le voie : ce ne sont pas les tailles relatives du jeu.
+- Script `outils/controle_mobs.py`, sans problème sur les 49 : JSON et PNG présents, résolution égale au PNG, plus de clé `texture`, moins de 150 cubes, clips d'origine présents, pistes sur des os existants, os exigés par le code, lueur là où l'original en avait, chaque face à 16 texels par bloc en jeu, pieds au sol. Trois mobs sont nettement plus hauts que l'original (`oeil_chaos`, `elementaire_feu`, `araignee_venimeuse`) : voulu, noté dans `CONTROLES_MOBS.md`.
 
 - Les 22 montures ouvertes dans Blockbench 5.2.2 (trois vitrines, 1503 cubes), `validate_project` sans diagnostic, captures réelles dans `apercus/apres/montures`. Une vitrine réduit et range les modèles côte à côte : mêmes cubes, mêmes UV, mêmes PNG (`outils/vitrine.py`).
 - Script `outils/controle_montures.py`, sans problème sur les 22 : clips et os d'origine présents, pistes sur des os existants, PNG présent, résolution exacte, hauteur de selle, moins de 150 cubes.
@@ -64,7 +83,8 @@ Tous les os animés des originaux existent encore (`body`, `head`, `tail`, `leg_
 - [ ] Cavalier assis sur la selle, à l'arrêt et en marche, à toutes les places ; aperçu dans `MountsScreen`.
 - [ ] Pas de scintillement à distance ni en mouvement.
 - [ ] Décors : collisions, lumière, 4 orientations, animation `chest`, icônes ; les plus grands restent dans `getRenderBoundingBox` (8 blocs sur les côtés, 14 en hauteur).
+- [ ] Mobs : taille et hitbox, pieds au sol, sens des clips `walk`, `fly`, `slither`, moment du coup dans `attack`, regard du bestiaire classique, lueurs la nuit, ailes translucides de `luciole_geante` et `mite_astrale` vues de loin.
 
 ## Refaire ou retoucher
 
-Depuis `refonte_3d/outils` : `python construire.py <id>` (Python 3, numpy, Pillow). Les modèles sont décrits dans `outils/modeles/`, les matières et palettes dans `outils/materiaux.py`, les pièces communes dans `outils/kit.py`, les cycles dans `outils/animations.py`. `sanglier` et `deco_puits` sont figés : leur référence est `bbmodels/`. Contrôles : `python controle_montures.py`, `python inventaire.py`.
+Depuis `refonte_3d/outils` : `python construire.py <id>` pour une monture ou un décor, `python construire_mob.py <id>` pour un mob (Python 3, numpy, Pillow). Les modèles sont décrits dans `outils/modeles/` (`mobs_foret.py`, `mobs_marais.py`, `mobs_cryptes.py`, `mobs_givre.py`, `mobs_desert.py`, `mobs_neant.py`, `mobs_pack.py`, `mobs_classic.py`), les matières et palettes dans `outils/materiaux.py`, les pièces communes dans `outils/kit.py`, les cycles dans `outils/animations.py`. `sanglier` et `deco_puits` sont figés : leur référence est `bbmodels/`. Contrôles : `python controle_montures.py`, `python controle_decors.py`, `python controle_mobs.py`, `python inventaire.py`.

@@ -87,6 +87,37 @@ RAMPS = {
     'dragon_or': ramp('#3b1d08', '#6a3a0e', '#a06214', '#d18f22', '#efbb43', '#fde07f'),
     'membrane': ramp('#2a0d2e', '#431648', '#5f2266', '#7f3086', '#a144a6', '#c663c7'),
     # --- blocs
+    # mobs
+    'ambre': ramp('#5a2a08', '#8f4c0e', '#c97f18', '#f2b23a', '#ffe07a', '#fff6c8'),
+    'champignon': ramp('#3f0a0c', '#6a1215', '#971c1f', '#c22f2a', '#de5140', '#f07f61'),
+    'chair_pale': ramp('#5c5140', '#7f735a', '#a39678', '#c4b897', '#ded4b6', '#f0e9d2'),
+    'lamelles': ramp('#6a5a3e', '#8c7b58', '#ad9c76', '#c9ba95', '#e0d3b0'),
+    'crapaud': ramp('#0b2a26', '#123f38', '#1a5a4b', '#277a60', '#3c9c76', '#65bd8c', '#9bdca6'),
+    'crapaud_ventre': ramp('#3f4f1f', '#5f7428', '#86a033', '#a9c446', '#c8dc68', '#e2ee96'),
+    'limace': ramp('#4a5410', '#6f7e18', '#98aa22', '#bdd030', '#d8e856', '#f0f8a0'),
+    'roseau': ramp('#232d10', '#384618', '#566a24', '#778c34', '#9dac4a', '#c6cd70'),
+    'marais': ramp('#101a12', '#1a2a1b', '#273d26', '#365331', '#49693d', '#60824b'),
+    'hydre': ramp('#07201b', '#0d332a', '#154a3c', '#1f6551', '#2e856c', '#49a68a', '#7dc9a8'),
+    'hydre_ventre': ramp('#3a4a22', '#566b2e', '#76903c', '#98b04f', '#b8cb6a', '#d6e28e'),
+    'os': ramp('#3f3829', '#615844', '#857b62', '#a99f83', '#c9c0a3', '#e2dbc1', '#f5f0dd'),
+    'os_vieux': ramp('#2e2a20', '#494335', '#67604c', '#878068', '#a69f85', '#c2bca2'),
+    'spectre': ramp('#0a1a28', '#10293c', '#183c54', '#22546f', '#31728e', '#4e97ae', '#8cc8d2'),
+    'ame': ramp('#0a3a4a', '#0f6075', '#1c90a6', '#3ac6d4', '#86eef0', '#dcffff'),
+    'chitine_bleue': ramp('#0b1428', '#142440', '#203a60', '#30557f', '#4676a3', '#6c9fc6'),
+    'bandelette': ramp('#4d3f29', '#6f5e40', '#93825c', '#b3a27b', '#cfc09a', '#e6dabb'),
+    'bandelette_sale': ramp('#3a3020', '#544631', '#716146', '#8f7e5e', '#ab9a78'),
+    'cendre': ramp('#161214', '#262022', '#383033', '#4c4344', '#635858', '#7e7270'),
+    'braise': ramp('#3c0f06', '#6e1f08', '#a8360c', '#e05a12', '#fb8f22', '#ffc65a'),
+    'rose_chaos': ramp('#340a2a', '#621248', '#981d70', '#d0389c', '#ef7cc6', '#fcc8ea'),
+    'gobelin': ramp('#1b2a0d', '#2c4215', '#42611f', '#5b802b', '#79a03c', '#9dbf58'),
+    'orc': ramp('#27341a', '#394b24', '#506530', '#6a823e', '#88a052', '#aabd70'),
+    'humain': ramp('#3f2618', '#62402a', '#875b3e', '#ab7a56', '#cb9c76', '#e6be9a'),
+    'zombie': ramp('#172219', '#263628', '#3a4e3a', '#526a4e', '#6d8664', '#8ea384'),
+    'tissu_vert': ramp('#10231a', '#183425', '#234c34', '#316747', '#44865c', '#60a675'),
+    'tissu_brun': ramp('#1e140c', '#302115', '#463220', '#5f462d', '#7a5d3c'),
+    'tissu_bleu': ramp('#0d1830', '#16264a', '#203a68', '#2e5288', '#436fa8', '#648fc4'),
+    'nuit': ramp('#07060c', '#0f0d18', '#1a1726', '#272338', '#37324d', '#4b4566'),
+    'acier': ramp('#1c2028', '#30363f', '#4a525e', '#6c7683', '#98a2ae', '#cdd5dc', '#f2f6f8'),
     'pierre': ramp('#2b2c33', '#41434b', '#5b5e67', '#797c85', '#9a9da4', '#bcbec3'),
     'pierre_chaude': ramp('#2f2a2a', '#474040', '#625a57', '#817873', '#a2978f', '#c4b9ad'),
     'mousse': ramp('#1a2a14', '#2a4019', '#3f5a22', '#5a7a2f', '#7c9c3d'),
@@ -411,7 +442,7 @@ def cristal(ctx, nom='cristal', base=1.6, ton=0.0, **_):
     u = (ctx.Iu + .5) / max(1, ctx.W)
     if ctx.W >= 8 and ctx.H >= 8 and ctx.is_side:
         t = (ctx.Iv + .5) / ctx.H
-        ph = (hash(ctx.face) + ctx.proj.seed) % 7 / 7
+        ph = (sum(map(ord, ctx.face)) + ctx.proj.seed) % 7 / 7
         s1, s2, s3 = t > .25 + .4 * u + ph * .2, t > .95 - .7 * u, u > .5 + .2 * t - ph * .2
         fid = s1.astype(int) + 2 * s2.astype(int) + 4 * s3.astype(int)
         val = np.array([0, .9, -.5, .5, 1.5, -.2, .7, .2])[fid]
@@ -816,7 +847,174 @@ def peau_tissu(ctx, nom='rouge', base=3.0, ton=0.0, pli=8, **_):
     return nom, _face_light(ctx, v, up=.5, down=-.9)
 
 
-PEINTRES = {'caisse': caisse, 'peau_tissu': peau_tissu, 'marbre': marbre, 'flamme': flamme, 'feuilles': feuilles, 'braises': braises, 'tuyaux': tuyaux, 'cordage': cordage, 'pics': pics, 'scutes': scutes, 'cuirasse': cuirasse, 'crete_arriere': crete_arriere, 'membrane_pliee': membrane_pliee, 'segments': segments, 'rayures': rayures, 'aile_plumes': aile_plumes, 'aile_membrane': aile_membrane, 'nacre': nacre, 'griffe': griffe, 'creneau_pierre': creneau_pierre, 'plumes': plumes, 'ecailles': ecailles, 'plaques': plaques, 'peau_plissee': peau_plissee, 'poils_longs': poils_longs, 'laine': laine, 'basalte': basalte, 'etoile': etoile, 'glace': glace, 'uni': uni, 'corne': corne, 'fourrure': fourrure, 'peau': peau, 'soies': soies, 'crete': crete, 'plan': plan_masque, 'coeur_puits': coeur_puits, 'toit': toit, 'seau_bois': seau_bois, 'tambour_corde': tambour_corde, 'pignon': pignon, 'cristal': cristal, 'cuir': cuir, 'metal': metal, 'ivoire': ivoire, 'sabot': sabot, 'tissu': tissu,
+# ------------------------------------------------------------------ mobs
+def ecorce(ctx, nom='ecorce', base=2.6, ton=0.0, pas=5, **_):
+    """Ecorce : cotes verticales larges et calmes, sillon sombre net, reflet a cote du sillon, rares fentes en travers. Le dessus d'une piece montre des cernes."""
+    from aeloria3d import hash3
+    if ctx.face in ('up', 'down'):
+        c = (ctx.cube.frm + ctx.cube.to) / 2
+        r = np.hypot(ctx.Plocal[..., 0] - c[0], ctx.Plocal[..., 2] - c[2])
+        v = base + ton + .6 - 1.2 * (np.mod(np.floor(r), 3) == 0)
+        return nom, v
+    q = ctx.S + (ctx.noise((.04, .07, .04), 241) - .5) * 10
+    r = np.mod(q, pas)
+    k = np.floor(q / pas)
+    v = base + ton + (hash3(k, 3, 7, 243 + ctx.proj.seed) - .5) * .7
+    v = v - 1.25 * (r < 1) + .45 * (r >= pas - 1)
+    f = hash3(k, np.floor(ctx.T / 7), 2, 247 + ctx.proj.seed)
+    v = v - .9 * ((f > .86) & (np.mod(ctx.T, 7) < 1))
+    v = v + (ctx.noise((.06, .06, .06), 245) - .5) * 1.0
+    return nom, _face_light(ctx, v, up=.5, down=-1.0)
+
+
+def chapeau(ctx, nom='champignon', base=3.0, ton=0.0, pas=9, r=2.1, tache='chair_pale', bas=False, **_):
+    """Chapeau de champignon : degrade, cellules de taches claires nettes, le bord descend."""
+    from aeloria3d import hash3
+    g = _vgrad(ctx)
+    v = base + ton + (g - .5) * 1.4 + .5 * (ctx.noise((.2, .2, .2), 251) - .5)
+    v = _face_light(ctx, v, up=.5, down=-1.4)
+    return nom, v
+
+
+def verrues(ctx, nom='crapaud', base=2.8, ton=0.0, pas=6, **_):
+    """Peau grumeleuse : pustules rondes de deux texels, cernees de sombre, reparties en quinconce irregulier ; beaucoup de peau calme entre elles."""
+    idc, lx, ly = ctx.cells(pas, pas, .5, seed=31)
+    cx, cy = lx - pas / 2 + (idc - .5) * 1.5, ly - pas / 2
+    d = np.hypot(cx, cy)
+    v = base + ton + .6 * (ctx.noise((.1, .1, .1), 257) - .5) * 2
+    gros = idc > .42
+    v = v + np.where(gros & (d < 1.25), 1.2, 0) + np.where(gros & (d >= 1.25) & (d < 2.1), -.8, 0)
+    return nom, _face_light(ctx, v, up=.6, down=-1.1)
+
+
+def gluant(ctx, nom='limace', base=3.0, ton=0.0, **_):
+    """Chair humide : plages lisses, un reflet net en haut de chaque piece, coulures sombres rares vers le bas."""
+    g = _vgrad(ctx)
+    n = ctx.noise((.3, .08, .3), 263)
+    v = base + ton + (g - .5) * 1.4 + (ctx.noise((.07, .1, .07), 261) - .5) * .9
+    v = np.where((n > .68) & (g < .55), base + ton - 1.1, v)
+    v = v + 1.3 * (ctx.Iv == 1) * (ctx.noise((.18, .4, .18), 265) > .46)
+    return nom, _face_light(ctx, v, up=.7, down=-1.1)
+
+
+def bandelette(ctx, nom='bandelette', base=3.0, ton=0.0, pas=5, pente=.45, **_):
+    """Bandelettes de momie : bandes en biais qui font le tour de la piece, bord sombre, usure."""
+    from aeloria3d import hash3
+    q = ctx.T + ctx.S * pente
+    r = np.mod(q, pas)
+    idc = hash3(np.floor(q / pas), 5, 3, 271 + ctx.proj.seed)
+    v = base + ton + (idc - .5) * .9 + .7 * (r >= pas - 1) - 1.6 * (r < 1)
+    v = v + .35 * (ctx.noise((.5, .5, .5), 273) - .5)
+    return nom, _face_light(ctx, v, up=.4, down=-.9)
+
+
+def mailles(ctx, nom='fer', base=2.6, ton=0.0, **_):
+    """Cotte de mailles : anneaux en quinconce, deux valeurs nettes."""
+    x, y = ctx.Iu, ctx.Iv
+    v = base + ton + np.where(np.mod(y, 2) == 0, np.where(np.mod(x + y // 2, 2) == 0, 1.1, -.9), np.where(np.mod(x + y // 2, 2) == 0, .2, -1.6))
+    return nom, _face_light(ctx, v, up=.3, down=-.8)
+
+
+def os_(ctx, nom='os', base=3.6, ton=0.0, **_):
+    """Os : surface mate, stries longues, fissures fines et rares, bout clair."""
+    n = ctx.noise((.5, .12, .5), 281)
+    v = base + ton + (n - .5) * 1.4 + (_vgrad(ctx) - .5) * .6
+    n2 = ctx.noise((.2, .2, .2), 283)
+    v = np.where(np.abs(n2 - .5) < .012, base + ton - 2.0, v)
+    return nom, _face_light(ctx, v, up=.5, down=-1.1)
+
+
+def plaque(ctx, nom='fer_noir', base=3.0, ton=0.0, bord=1, rivets=0, liseret=None, **_):
+    """Plaque d'armure : bord net, reflet doux en haut, patine large, rivets optionnels. liseret : rampe du filet colore."""
+    v = base + ton + .8 * (ctx.noise((.1, .1, .1), 287) - .5) * 2 + .6 * (1 - ctx.Iv / max(1, ctx.H - 1))
+    u, w, W, H, d = ctx.Iu, ctx.Iv, ctx.W, ctx.H, bord
+    if W > 2 * d and H > 2 * d:
+        v = np.where((u < d) | (w < d) | (u >= W - d) | (w >= H - d), base + ton - 1.8, v)
+        v = v + .9 * (w == d) + .4 * (u == d)
+    if rivets and W >= 6 and H >= 6:
+        m = (w == d + 1) | (w == H - d - 2)
+        v = np.where(m & (np.mod(u - d - 1, rivets) == 0) & (u > d) & (u < W - d - 1), base + ton + 2.2, v)
+    return nom, _face_light(ctx, v, up=.5, down=-1.0)
+
+
+def voile(ctx, nom='spectre', base=2.6, ton=0.0, pli=7, **_):
+    """Etoffe spectrale : plis verticaux, plus claire en haut, s'efface en sombre vers le bas."""
+    g = _vgrad(ctx)
+    v = base + ton + .8 * np.sin(ctx.Iu * 2 * np.pi / pli + 1.3 * (ctx.noise((.1, .05, .1), 291) - .5)) + (g - .4) * 1.8
+    return nom, _face_light(ctx, v, up=.5, down=-.9)
+
+
+def aile_insecte(ctx, nom='chair_pale', base=3.8, ton=0.0, masque=None, alpha=205, nervure=-2.4, n=5, **_):
+    """Aile d'insecte en plan horizontal : translucide, nervures en eventail depuis l'attache (x bas), bord sombre. Le masque se lit vu du dessus, attache a gauche."""
+    a, b = ctx.cube.frm, ctx.cube.to
+    u = np.clip((ctx.Plocal[..., 0] - a[0]) / max(1e-6, b[0] - a[0]), 0, .999)
+    if ctx.face in ('north', 'south'):                  # aile de face : le masque se lit de haut en bas
+        w = np.clip((b[1] - ctx.Plocal[..., 1]) / max(1e-6, b[1] - a[1]), 0, .999)
+        prof = b[1] - a[1]
+    else:
+        w = np.clip((ctx.Plocal[..., 2] - a[2]) / max(1e-6, b[2] - a[2]), 0, .999)
+        prof = b[2] - a[2]
+    rows = masque or ['#']
+    A = np.zeros(u.shape, np.uint8)
+    H, W = u.shape
+    plein = np.zeros(u.shape, bool)
+    for j in range(H):
+        for i in range(W):
+            r = rows[int(w[j, i] * len(rows))]
+            plein[j, i] = r[int(u[j, i] * len(r))] == '#'
+    bord = plein.copy()
+    bord[1:-1, 1:-1] = plein[1:-1, 1:-1] & ~(plein[:-2, 1:-1] & plein[2:, 1:-1] & plein[1:-1, :-2] & plein[1:-1, 2:])
+    A[plein] = alpha
+    v = _full(ctx, base + ton) + (ctx.noise((.1, .1, .1), 293) - .5) * 1.0
+    L = b[0] - a[0]
+    for k in range(n):
+        v0 = .5 + (k - (n - 1) / 2) / max(1, n - 1) * .95
+        y0 = .5 + (v0 - .5) * u
+        m = np.abs(w - y0) * prof < .55 * ctx.d ** -1
+        v = np.where(m, base + ton + nervure, v)
+    v = np.where(bord, base + ton + nervure, v)
+    A[bord & plein] = 255
+    return nom, v, A
+
+
+def coquille(ctx, nom='turquoise', base=3.0, ton=0.0, autre='pourpre', tours=2.4, **_):
+    """Coquille : spirale peinte sur les flancs (est, ouest), bandes transversales sur le dos."""
+    a, b = ctx.cube.frm, ctx.cube.to
+    if ctx.face in ('east', 'west'):
+        cz, cy = (a[2] + b[2]) / 2, (a[1] + b[1]) / 2
+        dz, dy = (ctx.Plocal[..., 2] - cz) / max(1e-6, (b[2] - a[2]) / 2), (ctx.Plocal[..., 1] - cy) / max(1e-6, (b[1] - a[1]) / 2)
+        r = np.hypot(dz, dy)
+        th = np.arctan2(dy, dz) / (2 * np.pi)
+        q = r * tours + th
+        f = np.mod(q, 1)
+        v = base + ton + (f - .5) * 1.8 - 1.8 * (f < .14)
+    else:
+        q = ctx.Plocal[..., 1 if ctx.face in ('north', 'south') else 2] * ctx.d
+        f = np.mod(q, 5)
+        v = base + ton + (f / 5 - .5) * 1.4 - 1.6 * (f < 1)
+    return nom, _face_light(ctx, v, up=.5, down=-1.0)
+
+
+def lave(ctx, nom='basalte', base=1.4, ton=0.0, large=.05, **_):
+    """Roche fendue de lave : fond sombre, fissures continues d'une face a l'autre, coeur clair au centre de la fissure, bord orange."""
+    n1, n2 = ctx.noise((.13, .13, .13), 311), ctx.noise((.34, .34, .34), 313)
+    d = np.abs(n1 - .5 + .22 * (n2 - .5))
+    v = base + ton + (n2 - .5) * 1.2
+    v = np.where(d < large, 4.0, v)
+    v = np.where(d < large * .55, 5.0, v)
+    v = np.where(d < large * .22, 6.0, v)
+    return nom, v
+
+
+def flamme_pleine(ctx, nom='flamme', base=3.0, ton=0.0, **_):
+    """Volume de feu : clair en haut pres du corps, rouge vers le bas, langues verticales qui se decalent."""
+    g = _vgrad(ctx)
+    n = ctx.noise((.3, .08, .3), 317)
+    v = base + ton + (g - .5) * 3.0 + (n - .5) * 2.4
+    return nom, _face_light(ctx, v, up=.8, down=-.6)
+
+
+PEINTRES = {'lave': lave, 'flamme_pleine': flamme_pleine, 'aile_insecte': aile_insecte, 'coquille': coquille, 'ecorce': ecorce, 'chapeau': chapeau, 'verrues': verrues, 'gluant': gluant, 'bandelette': bandelette, 'mailles': mailles, 'os': os_, 'plaque': plaque, 'voile': voile, 'caisse': caisse, 'peau_tissu': peau_tissu, 'marbre': marbre, 'flamme': flamme, 'feuilles': feuilles, 'braises': braises, 'tuyaux': tuyaux, 'cordage': cordage, 'pics': pics, 'scutes': scutes, 'cuirasse': cuirasse, 'crete_arriere': crete_arriere, 'membrane_pliee': membrane_pliee, 'segments': segments, 'rayures': rayures, 'aile_plumes': aile_plumes, 'aile_membrane': aile_membrane, 'nacre': nacre, 'griffe': griffe, 'creneau_pierre': creneau_pierre, 'plumes': plumes, 'ecailles': ecailles, 'plaques': plaques, 'peau_plissee': peau_plissee, 'poils_longs': poils_longs, 'laine': laine, 'basalte': basalte, 'etoile': etoile, 'glace': glace, 'uni': uni, 'corne': corne, 'fourrure': fourrure, 'peau': peau, 'soies': soies, 'crete': crete, 'plan': plan_masque, 'coeur_puits': coeur_puits, 'toit': toit, 'seau_bois': seau_bois, 'tambour_corde': tambour_corde, 'pignon': pignon, 'cristal': cristal, 'cuir': cuir, 'metal': metal, 'ivoire': ivoire, 'sabot': sabot, 'tissu': tissu,
             'maconnerie': maconnerie, 'dalle': dalle, 'bois': bois, 'tuiles': tuiles, 'corde': corde, 'eau': eau}
 
 

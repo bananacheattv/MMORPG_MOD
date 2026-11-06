@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Inventaire et controle automatique de tous les modeles de montures et de blocs (copie du depot, commit dans originaux/git_main/COMMIT.txt).
+"""Inventaire et controle automatique de tous les modeles de montures, de blocs, de mobs et de boss (copie du depot, commit dans originaux/git_main/COMMIT.txt).
 
 Ecrit refonte_3d/INVENTAIRE.md et inventaire.csv. Mesures faites sur les fichiers, sans rien supposer :
 cubes, os, faces, taille de texture, densite (texels par unite), etirements, surfaces coplanaires visibles (scintillement), faces absentes exposees, grille.
@@ -163,10 +163,55 @@ def statut(key):
     return 'a refaire'
 
 
+def etat_bloc(s, g):
+    if g.startswith('Structures'):
+        return 'garde (deja 16 texels par bloc, fait d apres les images du proprietaire)'
+    if s == 'panneau_quetes':
+        return 'modele d origine garde, a la demande du proprietaire ; face sans texture corrigee'
+    if g.startswith('Autres'):
+        return 'particule seule, rien a refaire'
+    return 'REFAIT, a valider'
+
+
+def section_mobs(rows):
+    """Mobs et boss : mesures sur les fichiers livres, comparees aux originaux."""
+    sys.path.insert(0, str(Path(__file__).parent / 'modeles'))
+    from mobs import TOUS
+    from mobs_classic import CLASSIC
+    md = []
+    groupes = (('Mobs de zones et importes', [k for k in TOUS if k not in CLASSIC], 'mobs'), ('Bestiaire classique', list(CLASSIC), 'classic'))
+    for titre, ids, kind in groupes:
+        md += [f'## {titre} ({len(ids)})', '', '| Id | Cubes avant | Cubes apres | Os | Texture avant | Texture apres | Lueurs | Clips | Etat |', '|---|---:|---:|---:|---|---|---:|---|---|']
+        for k in ids:
+            o = json.loads((A / f'bbmodels/{kind}/{k}.json').read_text(encoding='utf-8'))
+            f = LIV / f'src/main/resources/assets/mmorpg/bbmodels/{kind}/{k}.json'
+            d = json.loads(f.read_text(encoding='utf-8'))
+            c0, b0, c1, b1 = [], [], [], []
+            leafs(o['parts'], c0, b0)
+            leafs(d['parts'], c1, b1)
+            cl = ', '.join(f"{a['name']} {a['length']:g}s" for a in d['animations'])
+            e_ = 'REFAIT, a valider'
+            md.append(f"| `{k}` | {len(c0)} | {len(c1)} | {len(b1)} | {o['resolution']['width']}x{o['resolution']['height']} | {d['resolution']['width']}x{d['resolution']['height']} | {sum(1 for c in c1 if c.get('emissive'))} | {cl} | {e_} |")
+            rows.append(['mob', k, titre, 'ImportedModel', len(c1), len(b1), '', d['resolution']['width'], '', '', '', cl, e_])
+        md.append('')
+    return md
+
+
+def section_boss(rows):
+    md = ['## Boss (5)', '', 'Format Modded Entity, box UV, classes Java `<Boss>Model` et `<Boss>Anims`.', '', '| Id | Etat |', '|---|---|']
+    for k in ('roi_gobelin', 'liche_ancienne', 'ignis', 'titan_glace', 'avatar_neant'):
+        f = LIV / f'bbmodels/{k}.bbmodel'
+        e_ = 'REFAIT, a valider' if f.exists() else 'a refaire'
+        md.append(f'| `{k}` | {e_} |')
+        rows.append(['boss', k, 'boss', 'Modded Entity', '', '', '', '', '', '', '', '', e_])
+    md += ['', '## Dossiers non traites a ce jour', '', 'PNJ et divers, hors de la demande (montures, blocs, mobs, boss) : `bbmodels/guides` (15), `bbmodels/yggdrasil` (14), `bbmodels/chests` (2), `bbmodels/cosmetics` (11), `art/familiers_blockbench`.', '']
+    return md
+
+
 def main():
     rows = []
     enum = mount_enum()
-    md = ['# Inventaire des montures et blocs', '',
+    md = ['# Inventaire des montures, blocs, mobs et boss', '',
           f'Copie du depot : commit `{(GIT / "COMMIT.txt").read_text().strip()[:7]}`. Mesures automatiques (`outils/inventaire.py`).', '',
           '**Legende.** Densite : texels par unite de modele (mediane, min-max). « Scintille » : paires de faces coplanaires qui se recouvrent et restent visibles. « Trous » : faces sans texture mais exposees.', '']
     # ----------------------------------------------------------------- montures
@@ -258,9 +303,12 @@ def main():
     for g, items in groups.items():
         md += [f'## {g} ({len(items)})', '', '| Bloc | Modeles | Elements max | Etat |', '|---|---:|---:|---|']
         for s, nm, el, kind in items:
-            md.append(f'| `{s}` | {nm} | {el} | a refaire |')
-            rows.append(['bloc JSON', s, g, 'blockstate + modele', el, '', '', '', '', '', '', '', 'a refaire'])
+            e_ = etat_bloc(s, g)
+            md.append(f'| `{s}` | {nm} | {el} | {e_} |')
+            rows.append(['bloc JSON', s, g, 'blockstate + modele', el, '', '', '', '', '', '', '', e_])
         md.append('')
+    md += section_mobs(rows)
+    md += section_boss(rows)
     md += ['## Totaux', '', f'- Montures : {len(enum)}', f'- Blocs 3D en ImportedModel : {sum(len(v) for v in fam.values())} ({total_cubes} cubes rendus par bloc-entite)', f'- Autres blocs (blockstates) : {len(others)}', f'- Total a suivre : {len(enum) + sum(len(v) for v in fam.values()) + len(others)}', '']
     (ROOT / 'INVENTAIRE.md').write_text('\n'.join(md), encoding='utf-8')
     with (ROOT / 'inventaire.csv').open('w', newline='', encoding='utf-8-sig') as f:

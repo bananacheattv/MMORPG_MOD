@@ -35,9 +35,9 @@ def main():
             d = json.loads(f.read_text(encoding='utf-8'))
             c, b = [], []
             walk(d['parts'], c, b)
-            xs = [v for e in c if 'from' in e for v in (e['from'][0], e['to'][0])]
-            ys = [v for e in c if 'from' in e for v in (e['from'][1], e['to'][1])]
-            zs = [v for e in c if 'from' in e for v in (e['from'][2], e['to'][2])]
+            xs = [v for e in c if 'from' in e for v in (e['from'][0], e['to'][0])] or [v[0] for e in c if 'vertices' in e for v in e['vertices'].values()]
+            ys = [v for e in c if 'from' in e for v in (e['from'][1], e['to'][1])] or [v[1] for e in c if 'vertices' in e for v in e['vertices'].values()]
+            zs = [v for e in c if 'from' in e for v in (e['from'][2], e['to'][2])] or [v[2] for e in c if 'vertices' in e for v in e['vertices'].values()]
             an = {a['name']: round(float(a['length']), 2) for a in d['animations']}
             pistes = sorted({l.split('|')[0] for a in d['animations'] for l in a['tracks'].splitlines() if l})
             noms = {n.get('uuid'): n.get('name') for n in []}

@@ -125,6 +125,35 @@ class Model:
         out = []
 
         def cube(e, M):
+            if e.get('type') == 'mesh' and e.get('visibility', True):
+                # maillage Blockbench (planches AVANT seulement) : sommets relatifs a l'origine de l'element
+                o = np.array(e.get('origin', [0, 0, 0]), float)
+                CM = M @ m4(t=o) @ m4(euler(e.get('rotation', [0, 0, 0])))
+                V = e.get('vertices', {})
+                for f in e.get('faces', {}).values():
+                    ids = f.get('vertices') or []
+                    tid = f.get('texture')
+                    if tid is None or len(ids) < 3:
+                        continue
+                    ids = list(ids)
+                    if len(ids) == 4:
+                        # ordre en tour de face : Blockbench range les quatre sommets sans garantie
+                        P = np.array([V[i] for i in ids], float)
+                        c0 = P.mean(0)
+                        n = np.cross(P[1] - P[0], P[2] - P[0])
+                        if np.linalg.norm(n) < 1e-9:
+                            n = np.cross(P[2] - P[0], P[3] - P[0])
+                        a0 = P[0] - c0
+                        b0 = np.cross(n, a0)
+                        ang = [math.atan2(np.dot(q - c0, b0), np.dot(q - c0, a0)) for q in P]
+                        ids = [ids[k] for k in np.argsort(ang)]
+                    else:
+                        ids = ids + [ids[-1]]
+                    c = np.c_[np.array([V[i] for i in ids], float), np.ones(4)]
+                    c = (CM @ c.T).T[:, :3]
+                    uv = np.array([f['uv'][i] for i in ids], float)
+                    out.append((c, uv, int(tid) if not isinstance(tid, str) else 0, 'mesh'))
+                return
             if not e.get('visibility', True) or e.get('type', 'cube') != 'cube':
                 return
             g = float(e.get('inflate', 0) or 0)
