@@ -122,6 +122,23 @@ class M(D):
         return n
 
 
+def anneau(m, os_, cx, cy, cz, R, e, h, n, mat, plan='xy', **kw):
+    """Anneau a n segments droits. plan xy : anneau de face (e epaisseur radiale, h profondeur en z), plan xz : anneau couche (h hauteur en y). Les segments se recouvrent aux joints : pas de jour."""
+    L = int(math.ceil(2 * R * math.tan(math.pi / n))) + 2
+    L += L % 2
+    e_, h_ = e + e % 2, h + h % 2
+    for i in range(n):
+        a = i * math.tau / n
+        if plan == 'xy':
+            px, py = cx + R * math.cos(a), cy + R * math.sin(a)
+            x0, y0 = int(round(px)), int(round(py))
+            m.cb(os_, 'seg_anneau', (x0 - e_ // 2, y0 - L // 2, cz - h_ // 2), (x0 + e_ // 2, y0 + L // 2, cz + h_ // 2), mat, rot=(0, 0, math.degrees(a)), pivot=(px, py, cz), **kw)
+        else:
+            px, pz = cx + R * math.cos(a), cz + R * math.sin(a)
+            x0, z0 = int(round(px)), int(round(pz))
+            m.cb(os_, 'seg_anneau', (x0 - e_ // 2, cy - h_ // 2, z0 - L // 2), (x0 + e_ // 2, cy + h_ // 2, z0 + L // 2), mat, rot=(0, -math.degrees(a), 0), pivot=(px, cy, pz), **kw)
+
+
 def feuille(w, h):
     """Masque d'une pousse : feuilles en pointe de chaque cote d'une tige."""
     rows = []

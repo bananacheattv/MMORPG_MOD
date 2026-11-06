@@ -298,6 +298,20 @@ mob;elementaire_feu;Bestiaire classique;ImportedModel;26;11;;128;;;;idle 3s, wal
 mob;golem_cristal;Bestiaire classique;ImportedModel;36;11;;256;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
 mob;loup_sombre;Bestiaire classique;ImportedModel;29;16;;128;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
 mob;araignee_venimeuse;Bestiaire classique;ImportedModel;27;21;;64;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
+mob;scarabee_racines;Gardiens d Yggdrasil, cristal d arene, drone;ImportedModel;83;19;;512;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
+mob;mante_epines;Gardiens d Yggdrasil, cristal d arene, drone;ImportedModel;67;21;;256;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
+mob;raie_celeste;Gardiens d Yggdrasil, cristal d arene, drone;ImportedModel;41;16;;512;;;;idle 3s, walk 1.2s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
+mob;hydre_corail;Gardiens d Yggdrasil, cristal d arene, drone;ImportedModel;135;42;;512;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
+mob;millepattes_ambre;Gardiens d Yggdrasil, cristal d arene, drone;ImportedModel;141;49;;512;;;;idle 3s, walk 0.9s, attack 1s, cast 2.4s, death 1s;REFAIT, a valider
+mob;meduse_oracles;Gardiens d Yggdrasil, cristal d arene, drone;ImportedModel;146;74;;512;;;;idle 3s, walk 1.4s, attack 1s, cast 2.4s, death 1s;REFAIT, a valider
+mob;crabe_bastion;Gardiens d Yggdrasil, cristal d arene, drone;ImportedModel;74;25;;512;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
+mob;papillon_eclipse;Gardiens d Yggdrasil, cristal d arene, drone;ImportedModel;39;16;;256;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
+mob;serpent_couronnes;Gardiens d Yggdrasil, cristal d arene, drone;ImportedModel;118;36;;512;;;;idle 3s, walk 0.9s, attack 1.2s, death 1s, cast 2.4s;REFAIT, a valider
+mob;oeil_yggdrasil;Gardiens d Yggdrasil, cristal d arene, drone;ImportedModel;145;20;;512;;;;idle 3s, walk 0.9s, attack 1s, cast 2.4s, death 1s;REFAIT, a valider
+mob;crystal_neutral;Gardiens d Yggdrasil, cristal d arene, drone;ImportedModel;45;11;;256;;;;idle 3s, walk 0.9s, attack 1s, cast 2.4s, death 1s;REFAIT, a valider
+mob;crystal_red;Gardiens d Yggdrasil, cristal d arene, drone;ImportedModel;45;11;;256;;;;idle 3s, walk 0.9s, attack 1s, cast 2.4s, death 1s;REFAIT, a valider
+mob;crystal_blue;Gardiens d Yggdrasil, cristal d arene, drone;ImportedModel;45;11;;256;;;;idle 3s, walk 0.9s, attack 1s, cast 2.4s, death 1s;REFAIT, a valider
+mob;arena_drone;Gardiens d Yggdrasil, cristal d arene, drone;ImportedModel;11;4;;64;;;;idle 3s, walk 0.9s, attack 1s, cast 2.4s, death 1s;REFAIT, a valider
 boss;roi_gobelin;boss;Modded Entity;;;;;;;;;REFAIT, a valider
 boss;liche_ancienne;boss;Modded Entity;;;;;;;;;REFAIT, a valider
 boss;ignis;boss;Modded Entity;;;;;;;;;REFAIT, a valider

@@ -380,6 +380,25 @@ Geometries strictement identiques : [['hippogriffe', 'drake_ascendant']].
 | `loup_sombre` | 58 | 29 | 16 | 1254x1254 | 128x128 | 2 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
 | `araignee_venimeuse` | 67 | 27 | 21 | 1254x1254 | 64x64 | 5 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
 
+## Gardiens d Yggdrasil, cristal d arene, drone (14)
+
+| Id | Cubes avant | Cubes apres | Os | Texture avant | Texture apres | Lueurs | Clips | Etat |
+|---|---:|---:|---:|---|---|---:|---|---|
+| `scarabee_racines` | 287 | 83 | 19 | 1254x1254 | 512x512 | 10 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
+| `mante_epines` | 328 | 67 | 21 | 1254x1254 | 256x256 | 2 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
+| `raie_celeste` | 229 | 41 | 16 | 1254x1254 | 512x512 | 14 | idle 3s, walk 1.2s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
+| `hydre_corail` | 434 | 135 | 42 | 1254x1254 | 512x512 | 6 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
+| `millepattes_ambre` | 446 | 141 | 49 | 1254x1254 | 512x512 | 2 | idle 3s, walk 0.9s, attack 1s, cast 2.4s, death 1s | REFAIT, a valider |
+| `meduse_oracles` | 880 | 146 | 74 | 1254x1254 | 512x512 | 78 | idle 3s, walk 1.4s, attack 1s, cast 2.4s, death 1s | REFAIT, a valider |
+| `crabe_bastion` | 346 | 74 | 25 | 1254x1254 | 512x512 | 5 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
+| `papillon_eclipse` | 353 | 39 | 16 | 1254x1254 | 256x256 | 10 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
+| `serpent_couronnes` | 388 | 118 | 36 | 1254x1254 | 512x512 | 14 | idle 3s, walk 0.9s, attack 1.2s, death 1s, cast 2.4s | REFAIT, a valider |
+| `oeil_yggdrasil` | 626 | 145 | 20 | 1254x1254 | 512x512 | 32 | idle 3s, walk 0.9s, attack 1s, cast 2.4s, death 1s | REFAIT, a valider |
+| `crystal_neutral` | 150 | 45 | 11 | 1254x1254 | 256x256 | 15 | idle 3s, walk 0.9s, attack 1s, cast 2.4s, death 1s | REFAIT, a valider |
+| `crystal_red` | 150 | 45 | 11 | 1254x1254 | 256x256 | 15 | idle 3s, walk 0.9s, attack 1s, cast 2.4s, death 1s | REFAIT, a valider |
+| `crystal_blue` | 150 | 45 | 11 | 1254x1254 | 256x256 | 15 | idle 3s, walk 0.9s, attack 1s, cast 2.4s, death 1s | REFAIT, a valider |
+| `arena_drone` | 15 | 11 | 4 | 1254x1254 | 64x64 | 1 | idle 3s, walk 0.9s, attack 1s, cast 2.4s, death 1s | REFAIT, a valider |
+
 ## Boss (5)
 
 Format Modded Entity, box UV, classes Java `<Boss>Model` et `<Boss>Anims`.
@@ -394,7 +413,7 @@ Format Modded Entity, box UV, classes Java `<Boss>Model` et `<Boss>Anims`.
 
 ## Dossiers non traites a ce jour
 
-PNJ et divers, hors de la demande (montures, blocs, mobs, boss) : `bbmodels/guides` (15), `bbmodels/yggdrasil` (14), `bbmodels/chests` (2), `bbmodels/cosmetics` (11), `art/familiers_blockbench`.
+PNJ, coffres, cosmetiques et familiers, hors de la demande (montures, blocs, mobs, boss) : `bbmodels/guides` (15), `bbmodels/chests` (2), `bbmodels/cosmetics` (11), `art/familiers_blockbench`.
 
 ## Totaux
 

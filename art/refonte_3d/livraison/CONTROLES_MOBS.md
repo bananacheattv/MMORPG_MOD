@@ -53,5 +53,19 @@ Script `outils/controle_mobs.py`, sans lancer le jeu. Tailles en texels de jeu (
 | `golem_cristal` | 36 | 256 | 15 | attack, cast, death, idle, walk | 44 | 47 |  |
 | `loup_sombre` | 29 | 128 | 2 | attack, cast, death, idle, walk | 21 | 25 |  |
 | `araignee_venimeuse` | 27 | 64 | 5 | attack, cast, death, idle, walk | 8 | 13 | hauteur très différente, à regarder |
+| `scarabee_racines` | 83 | 512 | 10 | attack, cast, death, idle, walk | 88 | 111 |  |
+| `mante_epines` | 67 | 256 | 2 | attack, cast, death, idle, walk | 145 | 147 |  |
+| `raie_celeste` | 41 | 512 | 14 | attack, cast, death, idle, walk | 55 | 50 |  |
+| `hydre_corail` | 135 | 512 | 6 | attack, cast, death, idle, walk | 156 | 172 |  |
+| `millepattes_ambre` | 141 | 512 | 2 | attack, cast, death, idle, walk | 66 | 69 |  |
+| `meduse_oracles` | 146 | 512 | 78 | attack, cast, death, idle, walk | 151 | 166 |  |
+| `crabe_bastion` | 74 | 512 | 5 | attack, cast, death, idle, walk | 84 | 94 |  |
+| `papillon_eclipse` | 39 | 256 | 10 | attack, cast, death, idle, walk | 151 | 151 |  |
+| `serpent_couronnes` | 118 | 512 | 14 | attack, cast, death, idle, walk | 216 | 209 |  |
+| `oeil_yggdrasil` | 145 | 512 | 32 | attack, cast, death, idle, walk | 220 | 226 |  |
+| `crystal_neutral` | 45 | 256 | 15 | attack, cast, death, idle, walk | 65 | 70 |  |
+| `crystal_red` | 45 | 256 | 15 | attack, cast, death, idle, walk | 65 | 70 |  |
+| `crystal_blue` | 45 | 256 | 15 | attack, cast, death, idle, walk | 65 | 70 |  |
+| `arena_drone` | 11 | 64 | 1 | attack, cast, death, idle, walk | 14 | 13 |  |
 
-Modèles : 49. Problèmes : 0.
+Modèles : 63. Problèmes : 0.

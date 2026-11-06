@@ -178,8 +178,9 @@ def section_mobs(rows):
     sys.path.insert(0, str(Path(__file__).parent / 'modeles'))
     from mobs import TOUS
     from mobs_classic import CLASSIC
+    from mobs_yggdrasil import YGGDRASIL
     md = []
-    groupes = (('Mobs de zones et importes', [k for k in TOUS if k not in CLASSIC], 'mobs'), ('Bestiaire classique', list(CLASSIC), 'classic'))
+    groupes = (('Mobs de zones et importes', [k for k in TOUS if k not in CLASSIC and k not in YGGDRASIL], 'mobs'), ('Bestiaire classique', list(CLASSIC), 'classic'), ('Gardiens d Yggdrasil, cristal d arene, drone', list(YGGDRASIL), 'yggdrasil'))
     for titre, ids, kind in groupes:
         md += [f'## {titre} ({len(ids)})', '', '| Id | Cubes avant | Cubes apres | Os | Texture avant | Texture apres | Lueurs | Clips | Etat |', '|---|---:|---:|---:|---|---|---:|---|---|']
         for k in ids:
@@ -204,7 +205,7 @@ def section_boss(rows):
         e_ = 'REFAIT, a valider' if f.exists() else 'a refaire'
         md.append(f'| `{k}` | {e_} |')
         rows.append(['boss', k, 'boss', 'Modded Entity', '', '', '', '', '', '', '', '', e_])
-    md += ['', '## Dossiers non traites a ce jour', '', 'PNJ et divers, hors de la demande (montures, blocs, mobs, boss) : `bbmodels/guides` (15), `bbmodels/yggdrasil` (14), `bbmodels/chests` (2), `bbmodels/cosmetics` (11), `art/familiers_blockbench`.', '']
+    md += ['', '## Dossiers non traites a ce jour', '', 'PNJ, coffres, cosmetiques et familiers, hors de la demande (montures, blocs, mobs, boss) : `bbmodels/guides` (15), `bbmodels/chests` (2), `bbmodels/cosmetics` (11), `art/familiers_blockbench`.', '']
     return md
 
 

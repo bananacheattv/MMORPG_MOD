@@ -8,5 +8,6 @@ from mobs_givre import GIVRE
 from mobs_marais import MARAIS
 from mobs_neant import NEANT
 from mobs_pack import PACK
+from mobs_yggdrasil import YGGDRASIL
 
-TOUS = {**FORET, **MARAIS, **CRYPTES, **GIVRE, **DESERT, **NEANT, **PACK, **CLASSIC}
+TOUS = {**FORET, **MARAIS, **CRYPTES, **GIVRE, **DESERT, **NEANT, **PACK, **CLASSIC, **YGGDRASIL}

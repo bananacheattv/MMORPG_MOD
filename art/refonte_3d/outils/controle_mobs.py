@@ -12,6 +12,7 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE / 'modeles'))
 from aeloria3d import check_runtime
 from mobs import TOUS
+from mobs_yggdrasil import YGGDRASIL
 from render import Model
 import numpy as np
 
@@ -60,7 +61,7 @@ def main():
               '| Mob | Cubes | Texture | Lueurs | Clips | Hauteur avant | Hauteur après | Remarque |', '|---|---:|---:|---:|---|---:|---:|---|']
     pb = 0
     for key, fn in TOUS.items():
-        kind = 'classic' if key in ('gobelin', 'orc_guerrier', 'bandit_arbaletrier', 'squelette_maudit', 'zombie_des_cryptes', 'chevalier_neant', 'spectre_givre', 'elementaire_feu', 'golem_cristal', 'loup_sombre', 'araignee_venimeuse') else 'mobs'
+        kind = 'classic' if key in ('gobelin', 'orc_guerrier', 'bandit_arbaletrier', 'squelette_maudit', 'zombie_des_cryptes', 'chevalier_neant', 'spectre_givre', 'elementaire_feu', 'golem_cristal', 'loup_sombre', 'araignee_venimeuse') else 'yggdrasil' if key in YGGDRASIL else 'mobs'
         rem = []
         f = RES / f'bbmodels/{kind}/{key}.json'
         png = RES / f'textures/imported/{kind}/{key}.png'

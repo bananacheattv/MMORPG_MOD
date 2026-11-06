@@ -1,6 +1,6 @@
 # Refonte 3D Aeloria : livraison à intégrer
 
-État au 2026-11-06 : **22 montures, 123 décors 3D, les blocs Java, 49 mobs et 5 boss livrés** (`sanglier` et `deco_puits` validés par le propriétaire, ne plus les modifier ; les autres à valider). Blocs Java : 7 caisses (fermée et ouverte), 6 Lucky Blocks, 10 accessoires et le panneau de quêtes d'origine corrigé, textures des 10 classements, des 5 cultures et des matériaux. Les 8 structures animées n'ont pas été refaites : elles sont déjà en 16 texels par bloc, faites d'après les images du propriétaire. Rien n'est intégré au mod : ces fichiers sont dans `art/refonte_3d`, le jeu ne les lit pas. Base : commit `892a216`, plus `f8169d7` pour les originaux des mobs.
+État au 2026-11-06 : **22 montures, 123 décors 3D, les blocs Java, 49 mobs, 5 boss et les 10 gardiens d'Yggdrasil livrés**, avec le cristal d'arène et le drone (`sanglier` et `deco_puits` validés par le propriétaire, ne plus les modifier ; les autres à valider). Blocs Java : 7 caisses (fermée et ouverte), 6 Lucky Blocks, 10 accessoires et le panneau de quêtes d'origine corrigé, textures des 10 classements, des 5 cultures et des matériaux. Les 8 structures animées n'ont pas été refaites : elles sont déjà en 16 texels par bloc, faites d'après les images du propriétaire. Rien n'est intégré au mod : ces fichiers sont dans `art/refonte_3d`, le jeu ne les lit pas. Base : commit `892a216`, plus `f8169d7` pour les originaux des mobs.
 
 Ce dossier reprend l'arborescence du mod : copier `src/` par-dessus le dépôt suffit. Aucune classe Java écrite à la main n'a besoin de changer : seuls `<Boss>Model.java` et `<Boss>Anims.java`, générés, sont remplacés.
 
@@ -18,6 +18,7 @@ Ce dossier reprend l'arborescence du mod : copier `src/` par-dessus le dépôt s
 | `src/main/resources/assets/mmorpg/textures/block/` | Matériaux, minerais, cristaux, cultures, classements : mêmes noms et mêmes tailles que les originaux. Les modèles de cube, dalle et escalier ne changent pas, les classements gardent leurs bandes aux mêmes hauteurs pour le texte du jeu. |
 | `src/main/resources/assets/mmorpg/bbmodels/mobs/<id>.json` + `textures/imported/mobs/<id>.png` | Les 38 mobs lus par `ImportedMobRenderer`. Remplacent les fichiers de même nom. `ImportedMobs.java` ne change pas : même échelle, même boîte de collision. |
 | `src/main/resources/assets/mmorpg/bbmodels/classic/<id>.json` + `textures/imported/classic/<id>.png` | Les 11 mobs lus par `ClassicMobRenderer`. Plus de clé `texture` : chaque mob a son PNG, l'atlas `textures/entity/bestiary/material_atlas.png` n'est plus lu par eux. Le dossier `textures/imported/classic` est nouveau. |
+| `src/main/resources/assets/mmorpg/bbmodels/yggdrasil/<id>.json` + `textures/imported/yggdrasil/<id>.png` | Les 10 gardiens de guilde, les 3 états du cristal d'arène et le drone, lus par `YggdrasilRenderer`, `ArenaCrystalRenderer` et `ArenaDroneRenderer`. Plus de clé `texture` : chaque modèle a son PNG, l'atlas `textures/entity/yggdrasil/material_atlas.png` n'est plus lu par eux. Le dossier `textures/imported/yggdrasil` est nouveau. |
 | `src/main/resources/assets/mmorpg/textures/entity/boss/<id>.png`, `<id>_emissive.png` | Textures des 5 boss (box UV). Le Roi gobelin n'a pas de couche émissive, comme aujourd'hui : `AnimatedModels` le rend sans. |
 | `src/main/java/com/mmorpg/client/model/boss/<Boss>Model.java` | Géométrie et animations des boss, générées par `outils/construire_boss.py`, même structure que les classes actuelles. La taille de texture y est écrite (`LayerDefinition.create`) : **à copier en même temps que le PNG**, un modèle sans sa texture aurait de mauvais UV. |
 | `src/main/java/com/mmorpg/entity/boss/anim/<Boss>Anims.java` | Identiques aux classes actuelles, commentaire d'en-tête mis à part : mêmes indices, mêmes durées, mêmes instants de frappe. |
@@ -32,7 +33,7 @@ Ce dossier reprend l'arborescence du mod : copier `src/` par-dessus le dépôt s
 
 ## Trois pièges
 
-- **Ne pas relancer les générateurs sur ces modèles.** `tools/gen_mounts.py` réécrit les montures, `tools/gen_decor_bb.py` réécrit les décors, `tools/import_pack2.py`, `tools/refine-bestiary.py` et `tools/generate-classic-bestiary.cjs` réécrivent des mobs : ils écraseraient la refonte. Exclure ces identifiants, ou ne plus utiliser ces scripts pour eux.
+- **Ne pas relancer les générateurs sur ces modèles.** `tools/gen_mounts.py` réécrit les montures, `tools/gen_decor_bb.py` réécrit les décors, `tools/import_pack2.py`, `tools/refine-bestiary.py`, `tools/generate-classic-bestiary.cjs` et `tools/generate-yggdrasil.cjs` réécrivent des mobs : ils écraseraient la refonte. Exclure ces identifiants, ou ne plus utiliser ces scripts pour eux.
 - **`tools/bbmount_lib.py:bbmodel_to_runtime` ne lit pas les fichiers Blockbench 5** : sur un `.bbmodel` re-sauvé, il plante (`KeyError: 'name'`), car les os sont dans `groups`. Pour retoucher un modèle : `outils/aeloria3d.py:export_runtime` lit l'ancien et le nouveau format.
 - **Sens des animations.** Blockbench 5 applique les clés telles quelles pour un fichier 5.0, et inverse X (et Y en rotation) à l'ouverture d'un fichier plus ancien. Les fichiers livrés sont en 5.0. L'export donne `x_jeu = -x`, `y_jeu = -y` en rotation, et `x_jeu = -x` en position. `to_bbmodel` écrit encore du 4.10 avec cette même inversion, donc son aperçu Blockbench est à l'envers du jeu.
 
@@ -63,6 +64,10 @@ Comment les mobs tiennent à 16 texels par bloc sans changer le Java : `Imported
 
 Règle de nommage : un cube dont le nom contient `lueur` est écrit `emissive: true` dans le JSON, donc dessiné par `ImportedGlowLayer`. Les os d'un mob importé portent maintenant un nom lisible (`body`, `head`, `arm_-1`...) et plus un uuid : ni le Java ni rien d'autre ne les référence. Le bestiaire classique garde `root`, `body`, `head`, `arm_-1`, `arm_1`, `leg_-1`, `leg_1` (`leg_-10`... pour le loup et l'araignée), que `ImportedModel` cherche par leur nom pour le regard. `arm_-1` est le bras droit, côté +x dans Blockbench, celui qui tient l'arme.
 
+### Gardiens d'Yggdrasil
+
+Même format que les mobs, échelle 1 : 1 unité = 1 texel = 1/16 de bloc en jeu. Tous gardent `idle`, `walk`, `attack`, `cast` et `death`. `YggdrasilRenderer` joue `attack` et `cast`, et balance l'os racine en phase 2 et 3 : il ne cherche aucun autre os par son nom. Le renderer du cristal ne bascule jamais sur `walk`, d'où l'orbite posée dans `idle`.
+
 ### Boss
 
 Les boss gardent leur format Modded Entity : le Java les construit par `texOffs` et `addBox`, chaque cube a donc son patron box UV complet et des tailles entières. `outils/construire_boss.py` prend le squelette et les animations dans les modules d'origine (`art/boss_blockbench/<id>.py`, repris tels quels) et seuls les volumes et les textures sont neufs (`outils/modeles/boss_*.py`). Mêmes os aux mêmes pivots, mêmes clips, mêmes instants de frappe (`STRIKES`) : le code serveur et les `Profile` d'`AnimatedModels` restent valables. Seule exception sans effet sur les clips : les cornes et les piques d'Ignis sont un peu plus longues, et chaque épaulière gagne une pique (`pique_droit_3`, `pique_gauche_3`).
@@ -73,6 +78,7 @@ Ne pas relancer `art/boss_blockbench/generer_boss.py` ni `tools/refine-bestiary.
 
 **Faits, sans lancer le jeu**
 
+- Les 14 modèles d'Yggdrasil ouverts dans Blockbench 5.2.2 (planches de contact), `validate_project` sans diagnostic, captures réelles dans `apercus/apres/boss`. Script `outils/controle_mobs.py` : mêmes contrôles que pour les mobs.
 - Les 5 boss ouverts dans Blockbench 5.2.2 (planche de contact, avec la hiérarchie des os), `validate_project` sans diagnostic, capture réelle dans `apercus/apres/boss`. `liche_ancienne.bbmodel` ouvert aussi tel quel, reconnu en Modded Entity, sans diagnostic.
 - Script `outils/controle_boss.py`, sans problème sur les 5 : os, pivots et parents d'origine, animations dans le même ordre avec la même durée, PNG à la taille écrite dans `Model.java`, `Anims.java` identique à l'original, aucune face coplanaire entre cubes droits d'un même os.
 - Les animations des boss rejouées sur les nouveaux volumes par le rendu logiciel d'`art/entity_kit.py` : planches de travail dans `apercus/travail/boss`, non livrées. Ce n'est pas un test en jeu.
@@ -97,9 +103,10 @@ Ne pas relancer `art/boss_blockbench/generer_boss.py` ni `tools/refine-bestiary.
 - [ ] Cavalier assis sur la selle, à l'arrêt et en marche, à toutes les places ; aperçu dans `MountsScreen`.
 - [ ] Pas de scintillement à distance ni en mouvement.
 - [ ] Décors : collisions, lumière, 4 orientations, animation `chest`, icônes ; les plus grands restent dans `getRenderBoundingBox` (8 blocs sur les côtés, 14 en hauteur).
+- [ ] Gardiens : taille face à leur boîte de collision (`Yggdrasil.ALL`), ailes de `papillon_eclipse` vues de dos, anneaux de `oeil_yggdrasil` et de `serpent_couronnes`, cristal aux 3 couleurs d'équipe.
 - [ ] Boss : compilation des classes régénérées, chargement de la couche, coups alignés sur `STRIKES`, couche émissive de la lave, des cristaux et du noyau, pose de mort au sol.
 - [ ] Mobs : taille et hitbox, pieds au sol, sens des clips `walk`, `fly`, `slither`, moment du coup dans `attack`, regard du bestiaire classique, lueurs la nuit, ailes translucides de `luciole_geante` et `mite_astrale` vues de loin.
 
 ## Refaire ou retoucher
 
-Depuis `refonte_3d/outils` : `python construire.py <id>` pour une monture ou un décor, `python construire_mob.py <id>` pour un mob, `python construire_boss.py <id>` pour un boss (Python 3, numpy, Pillow). Les modèles sont décrits dans `outils/modeles/` (`mobs_foret.py`, `mobs_marais.py`, `mobs_cryptes.py`, `mobs_givre.py`, `mobs_desert.py`, `mobs_neant.py`, `mobs_pack.py`, `mobs_classic.py`, `boss_roi.py`, `boss_liche.py`, `boss_ignis.py`, `boss_titan.py`, `boss_avatar.py`), les matières et palettes dans `outils/materiaux.py`, les pièces communes dans `outils/kit.py`, les cycles dans `outils/animations.py`. `sanglier` et `deco_puits` sont figés : leur référence est `bbmodels/`. Contrôles : `python controle_montures.py`, `python controle_decors.py`, `python controle_mobs.py`, `python controle_boss.py`, `python inventaire.py`.
+Depuis `refonte_3d/outils` : `python construire.py <id>` pour une monture ou un décor, `python construire_mob.py <id>` pour un mob, `python construire_boss.py <id>` pour un boss (Python 3, numpy, Pillow). Les modèles sont décrits dans `outils/modeles/` (`mobs_foret.py`, `mobs_marais.py`, `mobs_cryptes.py`, `mobs_givre.py`, `mobs_desert.py`, `mobs_neant.py`, `mobs_pack.py`, `mobs_classic.py`, `mobs_yggdrasil.py`, `boss_roi.py`, `boss_liche.py`, `boss_ignis.py`, `boss_titan.py`, `boss_avatar.py`), les matières et palettes dans `outils/materiaux.py`, les pièces communes dans `outils/kit.py`, les cycles dans `outils/animations.py`. `sanglier` et `deco_puits` sont figés : leur référence est `bbmodels/`. Contrôles : `python controle_montures.py`, `python controle_decors.py`, `python controle_mobs.py`, `python controle_boss.py`, `python inventaire.py`.
