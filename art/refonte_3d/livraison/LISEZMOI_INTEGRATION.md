@@ -1,6 +1,6 @@
 # Refonte 3D Aeloria : livraison à intégrer
 
-État au 2026-11-06 : **22 montures, 123 décors 3D, et les blocs Java livrés** (`sanglier` et `deco_puits` validés par le propriétaire, ne plus les modifier ; les autres à valider). Blocs Java : 7 caisses (fermée et ouverte), 6 Lucky Blocks, 11 accessoires, textures des 10 classements, des 5 cultures et des matériaux. Les mobs et les boss sont en cours. Les 8 structures animées n'ont pas été refaites : elles sont déjà en 16 texels par bloc, faites d'après les images du propriétaire. Rien n'est intégré au mod : ces fichiers sont dans `art/refonte_3d`, le jeu ne les lit pas. Base : commit `892a216`.
+État au 2026-11-06 : **22 montures, 123 décors 3D, et les blocs Java livrés** (`sanglier` et `deco_puits` validés par le propriétaire, ne plus les modifier ; les autres à valider). Blocs Java : 7 caisses (fermée et ouverte), 6 Lucky Blocks, 10 accessoires et le panneau de quêtes d'origine corrigé, textures des 10 classements, des 5 cultures et des matériaux. Les mobs et les boss sont en cours. Les 8 structures animées n'ont pas été refaites : elles sont déjà en 16 texels par bloc, faites d'après les images du propriétaire. Rien n'est intégré au mod : ces fichiers sont dans `art/refonte_3d`, le jeu ne les lit pas. Base : commit `892a216`.
 
 Ce dossier reprend l'arborescence du mod : copier `src/` par-dessus le dépôt suffit. Aucune classe Java n'a besoin de changer pour ces modèles.
 
@@ -14,6 +14,7 @@ Ce dossier reprend l'arborescence du mod : copier `src/` par-dessus le dépôt s
 | `src/main/resources/assets/mmorpg/textures/item/<id>.png` | Icône d'inventaire, fond transparent (les 121 anciennes ont un fond bleu opaque). |
 | `decor_shapes_patch.json` | Collisions recalculées sur les nouvelles formes par la logique de `tools/gen_decor_shapes.py`, à reporter dans `data/mmorpg/decor_shapes.json`. |
 | `src/main/resources/assets/mmorpg/models/block/<id>.json` + `textures/block/<id>.png` | Blocs Java : `caisse_*_bloc`, `caisse_*_bloc_ouverte`, `lucky_*`, accessoires. Chaque modèle a sa propre texture. Mêmes identifiants, mêmes `display`. Rotation sur un axe à 22,5 ou 45 degrés, coordonnées dans -16..32. |
+| `src/main/resources/assets/mmorpg/models/block/panneau_quetes.json` | Modèle d'origine gardé, à la demande du propriétaire, avec ses textures d'origine. Seul changement : le côté intérieur du montant gauche, vu de face, n'avait pas de texture (`#missing`) et reçoit celle du cadre ; les 18 autres faces `#missing`, invisibles, sont retirées. |
 | `src/main/resources/assets/mmorpg/textures/block/` | Matériaux, minerais, cristaux, cultures, classements : mêmes noms et mêmes tailles que les originaux. Les modèles de cube, dalle et escalier ne changent pas, les classements gardent leurs bandes aux mêmes hauteurs pour le texte du jeu. |
 | `CONTROLES_MONTURES.md`, `CONTROLES_DECORS.md` | Résultat des contrôles automatiques, modèle par modèle, avec les cellules de collision qui changent. |
 

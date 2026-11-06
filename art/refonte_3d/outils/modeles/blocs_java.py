@@ -215,22 +215,6 @@ def panneau_feuille():
     return d.fin()
 
 
-def panneau_quetes():
-    d = D('panneau_quetes', 527)
-    d.c('fond', (-16, 2, 0), (16, 26, 2), BOIS, sens='x', planche=5)
-    M = FER_N
-    d.c('cadre', (-17, 25, -1), (17, 27, 3), M, ton=.5)
-    d.c('cadre', (-17, 1, -1), (17, 3, 3), M, ton=.5)
-    with d.miroir():
-        d.c('cadre_v', (15, 3, -1), (17, 25, 3), M, ton=.5)
-        d.c('pied', (11, -8, 0), (13, 1, 2), BOIS_N, sens='y')
-    for i, (x0, y0, x1, y1) in enumerate(((-13, 12, -5, 23), (-3, 15, 5, 23), (7, 8, 14, 22), (-12, 4, -4, 11), (-2, 5, 5, 13))):
-        n = d.c('affiche', (x0, y0, -1), (x1, y1, 0), ('peau_tissu', 'creme'), base=5, pli=40, **CF)
-        d.p.decal(n, 'north', stamp(['kkkkkk', '......', 'kkkkk.', '......', 'kkkkkk'], PAL, x1 - 1, y1 - 2))
-        d.c('punaise', ((x0 + x1) // 2, y1 - 1, -2), ((x0 + x1) // 2 + 1, y1, -1), ('metal', 'or'))
-    return d.fin()
-
-
 def pot_decore():
     d = D('pot_decore', 528)
     T = ('cuir', 'cuivre_sombre')
@@ -287,5 +271,5 @@ for _c, (_b, _m, _g, _s) in TIERS.items():
 for _k, (_p, _b, _q, _f, _s) in LUCKY.items():
     _pp = ('uni', _p[1]) if _p[0] in ('glace', 'peau') else _p
     BLOCS[_k] = (lambda k=_k, p=_pp, b=_b, q=_q, f=_f, s=_s: _lucky(k, s, (p[0], p[1]) if p[0] != 'uni' else p, couleur=q, couronne=f))
-BLOCS.update({'armoire_aeloria': armoire, 'buche_camp': buche, 'chaise_aeloria': chaise, 'feu_de_camp': feu_de_camp, 'jarre_ancienne': jarre, 'panneau_feuille': panneau_feuille, 'panneau_quetes': panneau_quetes,
+BLOCS.update({'armoire_aeloria': armoire, 'buche_camp': buche, 'chaise_aeloria': chaise, 'feu_de_camp': feu_de_camp, 'jarre_ancienne': jarre, 'panneau_feuille': panneau_feuille,
               'pot_decore': pot_decore, 'potion_etoilee': potion_etoilee, 'table_aeloria': table, 'viande_deco': viande})
