@@ -78,10 +78,10 @@ public final class ModEntities {
                     b -> b.sized(0.2F, 0.2F).clientTrackingRange(10).updateInterval(1).noSave().fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.NpcEntity>> NPC =
             ENTITIES.registerEntityType("pnj", com.mmorpg.entity.NpcEntity::new, MobCategory.MISC,
-                    b -> b.sized(0.6F, 1.95F).clientTrackingRange(16));
+                    b -> b.sized(0.6F, 1.95F).clientTrackingRange(32));
     public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.hub.HubGuideEntity>> HUB_GUIDE =
             ENTITIES.registerEntityType("guide_hub", com.mmorpg.entity.hub.HubGuideEntity::new, MobCategory.MISC,
-                    b -> b.sized(.7F,2.15F).clientTrackingRange(16));
+                    b -> b.sized(.7F,2.15F).clientTrackingRange(32));
     /** Les montures sont affichees 2x plus grandes que leur modele. */
     public static final float MOUNT_SCALE = 2f;
     /** Une entite par monture 3D (taille et hauteur de selle propres). */
@@ -115,7 +115,7 @@ public final class ModEntities {
     private ModEntities() {
     }
     public static final java.util.List<DeferredHolder<EntityType<?>,EntityType<com.mmorpg.competition.GuildGuardian>>> GUILD_GUARDIANS=new java.util.ArrayList<>();
-    static {for(int i=0;i<10;i++){final int tier=i;var def=com.mmorpg.guild.Yggdrasil.ALL[i];GUILD_GUARDIANS.add(ENTITIES.registerEntityType("yggdrasil_"+def.id(),(type,level)->new com.mmorpg.competition.GuildGuardian(type,level,tier),MobCategory.MONSTER,b->b.sized(def.width(),def.height()).fireImmune().noSave().clientTrackingRange(16)));}}
+    static {for(int i=0;i<10;i++){final int tier=i;var def=com.mmorpg.guild.Yggdrasil.ALL[i];GUILD_GUARDIANS.add(ENTITIES.registerEntityType("yggdrasil_"+def.id(),(type,level)->new com.mmorpg.competition.GuildGuardian(type,level,tier),MobCategory.MONSTER,b->b.sized(def.width(),def.height()).fireImmune().noSave().clientTrackingRange(32)));}}
     public static final DeferredHolder<EntityType<?>,EntityType<com.mmorpg.competition.ArenaDrone>> ARENA_DRONE=ENTITIES.registerEntityType("drone_arene",com.mmorpg.competition.ArenaDrone::new,MobCategory.MISC,b->b.sized(1,1).fireImmune().noSave().clientTrackingRange(12).updateInterval(1));
     public static final DeferredHolder<EntityType<?>,EntityType<com.mmorpg.competition.ArenaCrystal>> ARENA_CRYSTAL=ENTITIES.registerEntityType("cristal_arene",com.mmorpg.competition.ArenaCrystal::new,MobCategory.MISC,b->b.sized(2.4F,3.5F).fireImmune().noSave().clientTrackingRange(14).updateInterval(1));
 
