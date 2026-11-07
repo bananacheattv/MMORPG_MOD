@@ -45,6 +45,7 @@ public final class DevShowcase {
             return;
         }
         DevFreshWorld.tick(mc);
+        if (MODE.equals("integration_checks")) { DevSkinModelChecks.tick(mc); return; }
         if (MODE.equals("guide_polish")) { DevGuidePolish.tick(mc); return; }
         if (MODE.equals("metiers")) {          // menu Metiers (sans monde) : verifications puis captures de chaque onglet
             int t = ++jobTick;

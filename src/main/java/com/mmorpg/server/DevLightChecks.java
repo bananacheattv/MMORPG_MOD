@@ -97,8 +97,38 @@ public final class DevLightChecks {
                 if (level.getBlockState(pos.offset(x, 0, z)).is(ModBlocks.LIGHT_FIELD.get())) relays++;
             MMORPG.LOGGER.info("[LIGHTTEST] portee 100 : {} relais dans le plan, {} ticks", relays, ticks);
             check(relays > 100, "range 100 builds relays through the real path: " + relays);
+            // Deux sources sur la meme grille : ni le remplissage ni le nettoyage de B ne doivent effacer A.
+            var second = pos.offset(32, 0, 0);
+            var shared = pos.offset(8, 0, 0);
+            var firstOnly = pos.offset(-48, 0, 64); // dans le cube de B mais hors de sa sphere de portee 100
+            var strength = net.minecraft.world.level.block.state.properties.BlockStateProperties.LEVEL;
+            int bright = level.getBlockState(shared).getValue(strength);
+            check(level.getBlockState(firstOnly).is(ModBlocks.LIGHT_FIELD.get()), "first source lights exclusive cell");
+            level.setBlock(second, ModBlocks.BLOC_LUMIERE.get().defaultBlockState()
+                    .setValue(LightEmitterBlock.RANGE, 5).setValue(LightEmitterBlock.LEVEL, 15), 3);
+            LightNetwork.changed(level, second);
+            LightNetwork.pump(level);
+            check(level.getBlockState(shared).getValue(strength) == bright, "two range-100 sources preserve the strongest contribution");
+            check(level.getBlockState(firstOnly).is(ModBlocks.LIGHT_FIELD.get()), "two range-100 sources preserve the union of both spheres");
+            level.setBlock(second, level.getBlockState(second).setValue(LightEmitterBlock.LEVEL, 3), 3);
+            LightNetwork.changed(level, second);
+            LightNetwork.pump(level);
+            check(level.getBlockState(shared).getValue(strength) == bright, "weaker overlapping source cannot dim stronger source");
+            check(level.getBlockState(firstOnly).is(ModBlocks.LIGHT_FIELD.get()), "range 100 does not erase another source outside its sphere");
+            level.setBlock(second, level.getBlockState(second).setValue(LightEmitterBlock.RANGE, 0), 3);
+            LightNetwork.changed(level, second);
+            LightNetwork.pump(level);
+            check(level.getBlockState(firstOnly).is(ModBlocks.LIGHT_FIELD.get()), "shortening one source does not erase the other");
+            level.setBlock(second, level.getBlockState(second).setValue(LightEmitterBlock.LEVEL, 0), 3);
+            LightNetwork.changed(level, second);
+            LightNetwork.pump(level);
+            check(level.getBlockState(shared).getValue(strength) == bright, "switching one source off preserves the other");
+            level.removeBlock(second, false);
+            LightNetwork.runNow(level, second, 0, 0, false);
+            check(level.getBlockState(shared).getValue(strength) == bright, "removing one source preserves the other");
             level.removeBlock(pos, false);
             LightNetwork.runNow(level, pos, 0, 0, false);
+            check(!level.getBlockState(shared).is(ModBlocks.LIGHT_FIELD.get()), "last source removal cleans shared light");
             // Sol sûr et distance de suivi minimale de la mascotte.
             p.snapTo(0,150,0,0,0);
             for(int x=-10;x<=10;x++)for(int z=-10;z<=10;z++)level.setBlock(new BlockPos(x,149,z),net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),3);

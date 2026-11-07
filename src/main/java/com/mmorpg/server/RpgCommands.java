@@ -41,8 +41,9 @@ public final class RpgCommands {
 
     private static int setSkin(ServerPlayer p, String v) {
         RpgPlayers.get(p).skin = v;
+        RpgPlayers.get(p).dirty = true;
         RpgPlayers.updatePublic(p);
-        p.sendSystemMessage(ok(v.isEmpty() ? "Skin d'origine rétabli." : "Skin changé : " + v));
+        p.sendSystemMessage(ok(v.isEmpty() ? "Skin d'origine rétabli." : "Chargement du skin demandé…"));
         return 1;
     }
 

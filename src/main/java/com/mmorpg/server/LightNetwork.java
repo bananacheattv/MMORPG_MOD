@@ -42,6 +42,33 @@ public final class LightNetwork {
         Job(BlockPos src, int range, int lvl, boolean fill, boolean cleared) { this.src = src; this.range = range; this.lvl = lvl; this.fill = fill; this.cleared = cleared; }
     }
 
+    private record Source(BlockPos pos, int range, int level, boolean loaded) { }
+
+    /** Une cellule partagee appartient a toutes les sources de sa grille, jamais au dernier travail execute. */
+    private static List<Source> contributors(ServerLevel level, Job job) {
+        var result = new ArrayList<Source>();
+        if (job.fill) result.add(new Source(job.src, job.range, job.lvl, true));
+        String prefix = mine(level);
+        for (String key : Sources.get(level).set) {
+            if (!key.startsWith(prefix)) continue;
+            var pos = BlockPos.of(Long.parseLong(key.substring(prefix.length())));
+            int dx = pos.getX() - job.src.getX(), dy = pos.getY() - job.src.getY(), dz = pos.getZ() - job.src.getZ();
+            if (pos.equals(job.src) || Math.abs(dx) > 2 * MAX_RANGE || Math.abs(dy) > 2 * MAX_RANGE
+                    || Math.abs(dz) > 2 * MAX_RANGE || dx % STEP != 0 || dy % STEP != 0 || dz % STEP != 0) continue;
+            if (!level.hasChunkAt(pos)) {
+                // Ne pas effacer la contribution d'une source dont le chunk est temporairement decharge.
+                result.add(new Source(pos, MAX_RANGE, 0, false));
+                continue;
+            }
+            var state = level.getBlockState(pos);
+            if (!(state.getBlock() instanceof LightEmitterBlock)) continue;
+            int range = rangeOf(state.getValue(LightEmitterBlock.RANGE));
+            int strength = state.getValue(LightEmitterBlock.LEVEL);
+            if (range > 15 && strength > 0) result.add(new Source(pos, range, strength, true));
+        }
+        return result;
+    }
+
     private static String key(ServerLevel l, BlockPos p) { return l.dimension() + ";" + p.asLong(); }
     private static String mine(ServerLevel l) { return l.dimension() + ";"; }
 
@@ -82,6 +109,9 @@ public final class LightNetwork {
     /** Avance un travail ; renvoie vrai quand il est termine. */
     private static boolean step(ServerLevel l, Job j, int iters, int air) {
         var field = ModBlocks.LIGHT_FIELD.get();
+        var sources = contributors(l, j);
+        // Le budget borne aussi les rayons lorsque plusieurs sources se chevauchent.
+        int points = Math.max(1, air / Math.max(1, sources.size()));
         int total = N * N * N, h = N / 2;
         while (iters-- > 0) {
             if (j.idx >= total) return true;
@@ -91,14 +121,21 @@ public final class LightNetwork {
             var p = j.src.offset(dx, dy, dz);
             if (p.getY() < l.getMinY() || p.getY() >= l.getMaxY() || !l.hasChunkAt(p)) continue;
             var old = l.getBlockState(p);
-            double d = Math.sqrt((double) dx * dx + dy * dy + dz * dz);
-            if (!j.fill || d > j.range || !l.getWorldBorder().isWithinBounds(p)) { if (old.is(field)) l.removeBlock(p, false); continue; }
             if (!old.is(field) && !old.isAir()) continue;
-            if (--air < 0) { j.idx--; return false; }
-            int los = clear(l, j.src, p);
-            if (los < 0) continue;
-            if (los == 0) { if (old.is(field)) l.removeBlock(p, false); continue; }
-            var next = field.defaultBlockState().setValue(BlockStateProperties.LEVEL, relayLevel(j.lvl, j.range, d));
+            if (--points < 0) { j.idx--; return false; }
+            int strength = 0;
+            boolean uncertain = false;
+            if (l.getWorldBorder().isWithinBounds(p)) for (var source : sources) {
+                double distance = source.pos.distSqr(p);
+                if (distance > (double) source.range * source.range) continue;
+                if (!source.loaded) { uncertain = true; continue; }
+                int los = clear(l, source.pos, p);
+                if (los < 0) { uncertain = true; continue; }
+                if (los > 0) strength = Math.max(strength, relayLevel(source.level, source.range, Math.sqrt(distance)));
+            }
+            if (uncertain && old.is(field)) strength = Math.max(strength, old.getValue(BlockStateProperties.LEVEL));
+            if (strength == 0) { if (old.is(field)) l.removeBlock(p, false); continue; }
+            var next = field.defaultBlockState().setValue(BlockStateProperties.LEVEL, strength);
             if (!old.equals(next)) l.setBlock(p, next, Block.UPDATE_ALL);
         }
         return false;
@@ -148,7 +185,7 @@ public final class LightNetwork {
             if (!(s.getBlock() instanceof LightEmitterBlock)) {
                 data.set.remove(ks); data.setDirty();
                 q.put(k, new Job(pos, 0, 0, false, false));
-            } else if ((DIRTY.remove(ks) || refresh) && !q.containsKey(k) && rangeOf(s.getValue(LightEmitterBlock.RANGE)) > 15 && s.getValue(LightEmitterBlock.LEVEL) > 0) {
+            } else if (!q.containsKey(k) && (DIRTY.remove(ks) || refresh) && rangeOf(s.getValue(LightEmitterBlock.RANGE)) > 15 && s.getValue(LightEmitterBlock.LEVEL) > 0) {
                 q.put(k, new Job(pos, rangeOf(s.getValue(LightEmitterBlock.RANGE)), s.getValue(LightEmitterBlock.LEVEL), true, true));
             }
         }
