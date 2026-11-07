@@ -119,6 +119,13 @@ class Model:
             pos = self.channel(by['position'], t, pos)
         return rot, pos
 
+    def scale_of(self, bone_uuid, anim, t):
+        if anim is None:
+            return None
+        an = anim.get('animators', {}).get(bone_uuid)
+        ks = [k for k in an.get('keyframes', []) if k['channel'] == 'scale'] if an else []
+        return self.channel(ks, t, np.ones(3)) if ks else None
+
     def quads(self, anim_name=None, t=0.0, hidden=()):
         """Liste (corners[4,3], uv[4,2], tex_index, face) dans le repere modele."""
         anim = self.anim.get(anim_name) if anim_name else None
@@ -187,7 +194,8 @@ class Model:
             ar, ap = self.pose_of(node.get('uuid'), anim, t)
             # Blockbench 5 : une cle 5.0 s'ajoute telle quelle a mesh.rotation/position ; un fichier < 5.0 est inverse en X (et Y en rotation) au chargement
             R = euler(r0 + ar * self.rot_sign)
-            N = M @ m4(t=ap * self.pos_sign) @ m4(t=o) @ m4(R) @ m4(t=-o)
+            sc = self.scale_of(node.get('uuid'), anim, t)
+            N = M @ m4(t=ap * self.pos_sign) @ m4(t=o) @ m4(R) @ (np.diag([*sc, 1.0]) if sc is not None else np.eye(4)) @ m4(t=-o)
             for c in node.get('children', []):
                 walk(c, N, hide)
 

@@ -368,17 +368,17 @@ Geometries strictement identiques : [['hippogriffe', 'drake_ascendant']].
 
 | Id | Cubes avant | Cubes apres | Os | Texture avant | Texture apres | Lueurs | Clips | Etat |
 |---|---:|---:|---:|---|---|---:|---|---|
-| `gobelin` | 55 | 27 | 15 | 1254x1254 | 128x128 | 2 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
-| `orc_guerrier` | 55 | 38 | 13 | 1254x1254 | 128x128 | 2 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
-| `bandit_arbaletrier` | 51 | 35 | 12 | 1254x1254 | 128x128 | 2 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
-| `squelette_maudit` | 53 | 47 | 13 | 1254x1254 | 128x128 | 3 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
-| `zombie_des_cryptes` | 49 | 28 | 12 | 1254x1254 | 128x128 | 2 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
-| `chevalier_neant` | 60 | 36 | 12 | 1254x1254 | 128x128 | 2 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
-| `spectre_givre` | 56 | 32 | 11 | 1254x1254 | 128x128 | 11 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
-| `elementaire_feu` | 46 | 26 | 11 | 1254x1254 | 128x128 | 14 | idle 3s, walk 0.9s, attack 1s, cast 2.4s, death 1s | REFAIT, a valider |
-| `golem_cristal` | 45 | 36 | 11 | 1254x1254 | 256x256 | 15 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
-| `loup_sombre` | 58 | 29 | 16 | 1254x1254 | 128x128 | 2 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
-| `araignee_venimeuse` | 67 | 27 | 21 | 1254x1254 | 64x64 | 5 | idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s | REFAIT, a valider |
+| `gobelin` | 55 | 54 | 16 | 1254x1254 | 128x128 | 2 | idle 2.8s, walk 0.62s, attack 1s, cast 1.3s, death 1s | REFAIT, a valider |
+| `orc_guerrier` | 55 | 55 | 14 | 1254x1254 | 128x128 | 2 | idle 3.6s, walk 1.15s, attack 1s, cast 1.5s, death 1s | REFAIT, a valider |
+| `bandit_arbaletrier` | 51 | 47 | 13 | 1254x1254 | 128x128 | 2 | idle 3.2s, walk 0.98s, attack 1s, cast 1.2s, death 1s | REFAIT, a valider |
+| `squelette_maudit` | 53 | 56 | 15 | 1254x1254 | 128x128 | 3 | idle 3s, walk 1.15s, attack 1s, cast 1.7s, death 1s | REFAIT, a valider |
+| `zombie_des_cryptes` | 49 | 34 | 14 | 1254x1254 | 128x128 | 1 | idle 4.2s, walk 1.9s, attack 1s, cast 1.6s, death 1s | REFAIT, a valider |
+| `chevalier_neant` | 60 | 54 | 16 | 1254x1254 | 128x128 | 8 | idle 4.4s, walk 1.3s, attack 1s, cast 1.7s, death 1s | REFAIT, a valider |
+| `spectre_givre` | 56 | 56 | 13 | 1254x1254 | 128x128 | 5 | idle 4s, walk 2.2s, attack 1s, cast 1.6s, death 1s | REFAIT, a valider |
+| `elementaire_feu` | 46 | 33 | 11 | 1254x1254 | 128x128 | 14 | idle 1.6s, walk 1.2s, attack 1s, cast 1.5s, death 1s | REFAIT, a valider |
+| `golem_cristal` | 45 | 77 | 13 | 1254x1254 | 256x256 | 3 | idle 5s, walk 1.9s, attack 1s, cast 1.8s, death 1s | REFAIT, a valider |
+| `loup_sombre` | 58 | 46 | 18 | 1254x1254 | 128x128 | 2 | idle 2.8s, walk 0.6s, attack 1s, cast 1.8s, death 1s | REFAIT, a valider |
+| `araignee_venimeuse` | 67 | 54 | 24 | 1254x1254 | 128x128 | 9 | idle 3.4s, walk 0.56s, attack 1s, cast 1.6s, death 1s | REFAIT, a valider |
 
 ## Gardiens d Yggdrasil, cristal d arene, drone (14)
 

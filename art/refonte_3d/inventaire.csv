@@ -287,17 +287,17 @@ mob;minotaure;Mobs de zones et importes;ImportedModel;54;15;;256;;;;idle 2s, wal
 mob;morghul;Mobs de zones et importes;ImportedModel;108;23;;512;;;;idle 4s, walk 1.5s, attack 3s, death 1s;REFAIT, a valider
 mob;gardien_citadelle;Mobs de zones et importes;ImportedModel;105;37;;512;;;;idle 4s, walk 1.8s, attack 1.2s, death 1s;REFAIT, a valider
 mob;seigneur_squelette;Mobs de zones et importes;ImportedModel;84;12;;256;;;;idle 3s, walk 2s, attack 0.96s, death 1s;REFAIT, a valider
-mob;gobelin;Bestiaire classique;ImportedModel;27;15;;128;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
-mob;orc_guerrier;Bestiaire classique;ImportedModel;38;13;;128;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
-mob;bandit_arbaletrier;Bestiaire classique;ImportedModel;35;12;;128;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
-mob;squelette_maudit;Bestiaire classique;ImportedModel;47;13;;128;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
-mob;zombie_des_cryptes;Bestiaire classique;ImportedModel;28;12;;128;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
-mob;chevalier_neant;Bestiaire classique;ImportedModel;36;12;;128;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
-mob;spectre_givre;Bestiaire classique;ImportedModel;32;11;;128;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
-mob;elementaire_feu;Bestiaire classique;ImportedModel;26;11;;128;;;;idle 3s, walk 0.9s, attack 1s, cast 2.4s, death 1s;REFAIT, a valider
-mob;golem_cristal;Bestiaire classique;ImportedModel;36;11;;256;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
-mob;loup_sombre;Bestiaire classique;ImportedModel;29;16;;128;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
-mob;araignee_venimeuse;Bestiaire classique;ImportedModel;27;21;;64;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
+mob;gobelin;Bestiaire classique;ImportedModel;54;16;;128;;;;idle 2.8s, walk 0.62s, attack 1s, cast 1.3s, death 1s;REFAIT, a valider
+mob;orc_guerrier;Bestiaire classique;ImportedModel;55;14;;128;;;;idle 3.6s, walk 1.15s, attack 1s, cast 1.5s, death 1s;REFAIT, a valider
+mob;bandit_arbaletrier;Bestiaire classique;ImportedModel;47;13;;128;;;;idle 3.2s, walk 0.98s, attack 1s, cast 1.2s, death 1s;REFAIT, a valider
+mob;squelette_maudit;Bestiaire classique;ImportedModel;56;15;;128;;;;idle 3s, walk 1.15s, attack 1s, cast 1.7s, death 1s;REFAIT, a valider
+mob;zombie_des_cryptes;Bestiaire classique;ImportedModel;34;14;;128;;;;idle 4.2s, walk 1.9s, attack 1s, cast 1.6s, death 1s;REFAIT, a valider
+mob;chevalier_neant;Bestiaire classique;ImportedModel;54;16;;128;;;;idle 4.4s, walk 1.3s, attack 1s, cast 1.7s, death 1s;REFAIT, a valider
+mob;spectre_givre;Bestiaire classique;ImportedModel;56;13;;128;;;;idle 4s, walk 2.2s, attack 1s, cast 1.6s, death 1s;REFAIT, a valider
+mob;elementaire_feu;Bestiaire classique;ImportedModel;33;11;;128;;;;idle 1.6s, walk 1.2s, attack 1s, cast 1.5s, death 1s;REFAIT, a valider
+mob;golem_cristal;Bestiaire classique;ImportedModel;77;13;;256;;;;idle 5s, walk 1.9s, attack 1s, cast 1.8s, death 1s;REFAIT, a valider
+mob;loup_sombre;Bestiaire classique;ImportedModel;46;18;;128;;;;idle 2.8s, walk 0.6s, attack 1s, cast 1.8s, death 1s;REFAIT, a valider
+mob;araignee_venimeuse;Bestiaire classique;ImportedModel;54;24;;128;;;;idle 3.4s, walk 0.56s, attack 1s, cast 1.6s, death 1s;REFAIT, a valider
 mob;scarabee_racines;Gardiens d Yggdrasil, cristal d arene, drone;ImportedModel;83;19;;512;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
 mob;mante_epines;Gardiens d Yggdrasil, cristal d arene, drone;ImportedModel;67;21;;256;;;;idle 3s, walk 0.9s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider
 mob;raie_celeste;Gardiens d Yggdrasil, cristal d arene, drone;ImportedModel;41;16;;512;;;;idle 3s, walk 1.2s, attack 1s, death 1s, cast 2.4s;REFAIT, a valider

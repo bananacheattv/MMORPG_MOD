@@ -38,21 +38,21 @@ Script `outils/controle_mobs.py`, sans lancer le jeu. Tailles en texels de jeu (
 | `champion_gobelin` | 39 | 256 | 2 | attack, death, idle, walk | 45 | 50 |  |
 | `voyageur_squelette` | 49 | 128 | 2 | attack, death, idle, walk | 34 | 38 |  |
 | `sentinelle_hibou` | 38 | 256 | 3 | attack, death, idle, walk | 58 | 66 |  |
-| `minotaure` | 54 | 256 | 3 | attack, death, idle, walk | 70 | 81 |  |
+| `minotaure` | 54 | 256 | 3 | attack, death, idle, walk | 70 | 76 |  |
 | `morghul` | 108 | 512 | 16 | attack, death, idle, walk | 100 | 93 |  |
 | `gardien_citadelle` | 105 | 512 | 3 | attack, death, idle, walk | 106 | 107 |  |
 | `seigneur_squelette` | 84 | 256 | 25 | attack, death, idle, walk | 88 | 98 |  |
-| `gobelin` | 27 | 128 | 2 | attack, cast, death, idle, walk | 27 | 28 |  |
-| `orc_guerrier` | 38 | 128 | 2 | attack, cast, death, idle, walk | 33 | 39 |  |
-| `bandit_arbaletrier` | 35 | 128 | 2 | attack, cast, death, idle, walk | 32 | 37 |  |
-| `squelette_maudit` | 47 | 128 | 3 | attack, cast, death, idle, walk | 33 | 36 |  |
-| `zombie_des_cryptes` | 28 | 128 | 2 | attack, cast, death, idle, walk | 33 | 37 |  |
-| `chevalier_neant` | 36 | 128 | 2 | attack, cast, death, idle, walk | 38 | 45 |  |
-| `spectre_givre` | 32 | 128 | 11 | attack, cast, death, idle, walk | 36 | 45 |  |
-| `elementaire_feu` | 26 | 128 | 14 | attack, cast, death, idle, walk | 22 | 46 | hauteur très différente, à regarder |
-| `golem_cristal` | 36 | 256 | 15 | attack, cast, death, idle, walk | 44 | 47 |  |
-| `loup_sombre` | 29 | 128 | 2 | attack, cast, death, idle, walk | 21 | 25 |  |
-| `araignee_venimeuse` | 27 | 64 | 5 | attack, cast, death, idle, walk | 8 | 13 | hauteur très différente, à regarder |
+| `gobelin` | 54 | 128 | 2 | attack, cast, death, idle, walk | 27 | 26 |  |
+| `orc_guerrier` | 55 | 128 | 2 | attack, cast, death, idle, walk | 33 | 40 |  |
+| `bandit_arbaletrier` | 47 | 128 | 2 | attack, cast, death, idle, walk | 32 | 36 |  |
+| `squelette_maudit` | 56 | 128 | 3 | attack, cast, death, idle, walk | 33 | 37 |  |
+| `zombie_des_cryptes` | 34 | 128 | 1 | attack, cast, death, idle, walk | 33 | 35 |  |
+| `chevalier_neant` | 54 | 128 | 8 | attack, cast, death, idle, walk | 38 | 46 |  |
+| `spectre_givre` | 56 | 128 | 5 | attack, cast, death, idle, walk | 36 | 44 |  |
+| `elementaire_feu` | 33 | 128 | 14 | attack, cast, death, idle, walk | 22 | 34 | hauteur très différente, à regarder |
+| `golem_cristal` | 77 | 256 | 3 | attack, cast, death, idle, walk | 44 | 51 |  |
+| `loup_sombre` | 46 | 128 | 2 | attack, cast, death, idle, walk | 21 | 26 |  |
+| `araignee_venimeuse` | 54 | 128 | 9 | attack, cast, death, idle, walk | 8 | 15 | hauteur très différente, à regarder |
 | `scarabee_racines` | 83 | 512 | 10 | attack, cast, death, idle, walk | 88 | 111 |  |
 | `mante_epines` | 67 | 256 | 2 | attack, cast, death, idle, walk | 145 | 147 |  |
 | `raie_celeste` | 41 | 512 | 14 | attack, cast, death, idle, walk | 55 | 50 |  |

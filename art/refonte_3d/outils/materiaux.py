@@ -15,6 +15,8 @@ def ramp(*colors):
 
 
 RAMPS = {
+    'venin_vert': ramp('#123a12', '#1f6a1c', '#35a02c', '#62d043', '#a6f06a', '#e4ffc0'),
+    'rouille': ramp('#1f110d', '#3d2015', '#5f3119', '#83482a', '#a96c44', '#c79a72'),
     # --- matieres communes (toute la collection)
     'cuir': ramp('#2a120b', '#4a1f10', '#6e3216', '#94491f', '#b8672d', '#d48c47'),
     'cuivre_vert': ramp('#0e1e20', '#16323a', '#214a50', '#2f6868', '#468a84', '#6eb0a0', '#a2d4bc'),
@@ -210,7 +212,7 @@ def crete(ctx, nom='soie_noire', base=1.2, ton=0.0, pas=6, dent=5, sens=1, bas=F
     return nom, v, alpha
 
 
-def plan_masque(ctx, nom='fourrure_brune', base=2.5, ton=0.0, masque=None, **_):
+def plan_masque(ctx, nom='fourrure_brune', base=2.5, ton=0.0, masque=None, fil=0, **_):
     """Plan fin decoupe selon un masque ASCII (oreille, etrier, feuille...). '#' plein, '.' vide. Le masque se lit vu depuis le nord, l'est ou le dessus, et les deux faces du plan decoupent la meme forme."""
     H, W = ctx.H, ctx.W
     rows = masque or ['#']
@@ -232,6 +234,13 @@ def plan_masque(ctx, nom='fourrure_brune', base=2.5, ton=0.0, masque=None, **_):
             if r[min(int(tc[y, x] * len(r)), len(r) - 1)] == '#':
                 alpha[y, x] = 255
     v = _full(ctx, base + ton) + .6 * (ctx.noise((.5, .5, .5), 29) - .5) * 2
+    if fil:
+        # tranchant : les derniers texels pleins de chaque rangee sont plus clairs, le plat un peu plus sombre
+        for y in range(H):
+            for x in range(W):
+                if alpha[y, x]:
+                    j = x + fil
+                    v[y, x] = base + ton + (1.8 if j >= W or not alpha[y, j] else -.5)
     return nom, v, alpha
 
 
@@ -939,10 +948,12 @@ def plaque(ctx, nom='fer_noir', base=3.0, ton=0.0, bord=1, rivets=0, liseret=Non
     return nom, _face_light(ctx, v, up=.5, down=-1.0)
 
 
-def voile(ctx, nom='spectre', base=2.6, ton=0.0, pli=7, **_):
-    """Etoffe spectrale : plis verticaux, plus claire en haut, s'efface en sombre vers le bas."""
+def voile(ctx, nom='spectre', base=2.6, ton=0.0, pli=7, alpha=None, **_):
+    """Etoffe spectrale : plis verticaux, plus claire en haut, s'efface en sombre vers le bas. alpha : etoffe translucide (0 a 255), plus legere vers le bas."""
     g = _vgrad(ctx)
     v = base + ton + .8 * np.sin(ctx.Iu * 2 * np.pi / pli + 1.3 * (ctx.noise((.1, .05, .1), 291) - .5)) + (g - .4) * 1.8
+    if alpha is not None:
+        return nom, _face_light(ctx, v, up=.5, down=-.9), np.full((ctx.H, ctx.W), alpha, np.uint8)
     return nom, _face_light(ctx, v, up=.5, down=-.9)
 
 

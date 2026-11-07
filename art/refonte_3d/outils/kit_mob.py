@@ -206,8 +206,32 @@ def remiges_peintre(ctx, nom='plume_blanche', base=3.6, ton=0.0, mini=.55, pas=4
     return nom, v, alpha
 
 
+def langue(w, h, graine=1, bas=False):
+    """Masque d'une flamme : colonnes de hauteurs irregulieres sous une enveloppe en pointe. bas=True : pointe vers le bas (tourbillon)."""
+    rng = np.random.RandomState(graine)
+    hauts = []
+    for i in range(w):
+        t = 1 - abs(2 * (i + .5) / w - 1)
+        hauts.append(max(1, int(round(h * (t ** .6) * (.3 + .7 * rng.rand())))))
+    for i in range(1, w - 1):
+        if i % 2 and hauts[i] > hauts[i - 1] and hauts[i] > hauts[i + 1] and rng.rand() < .4:
+            hauts[i] = max(1, hauts[i] - 2)
+    rows = [''.join('#' if hauts[i] >= h - j else '.' for i in range(w)) for j in range(h)]
+    return rows[::-1] if bas else rows
+
+
+def flamme_plan(ctx, nom='flamme', base=5.6, ton=0.0, masque=None, **_):
+    """Langue de feu en plan fin : jaune pale au pied, orange au milieu, rouge a la pointe."""
+    from materiaux import plan_masque
+    n, v, alpha = plan_masque(ctx, nom=nom, base=base, ton=ton, masque=masque)
+    a, b = ctx.cube.frm, ctx.cube.to
+    t = (ctx.Plocal[..., 1] - a[1]) / max(1e-6, b[1] - a[1])
+    return n, base + ton - 4.6 * t + .5 * (ctx.noise((.4, .4, .4), 37) - .5), alpha
+
+
 def enregistre():
     from materiaux import PEINTRES
+    PEINTRES['flamme_plan'] = flamme_plan
     PEINTRES['frange'] = frange_peintre
     PEINTRES['remiges'] = remiges_peintre
 
@@ -215,3 +239,4 @@ def enregistre():
 enregistre()
 FR = lambda ramp: ('frange', ramp)
 RE = lambda ramp: ('remiges', ramp)
+FL = ('flamme_plan', 'flamme')

@@ -11,3 +11,10 @@ from mobs_pack import PACK
 from mobs_yggdrasil import YGGDRASIL
 
 TOUS = {**FORET, **MARAIS, **CRYPTES, **GIVRE, **DESERT, **NEANT, **PACK, **CLASSIC, **YGGDRASIL}
+
+# Modeles repris un par un : chaque modele a son fichier mob_<id>.py (fonction build), qui remplace la version de zone.
+import importlib
+from pathlib import Path
+
+for f in sorted(Path(__file__).parent.glob('mob_*.py')):
+    TOUS[f.stem[4:]] = importlib.import_module(f.stem).build
