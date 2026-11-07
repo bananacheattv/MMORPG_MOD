@@ -163,6 +163,38 @@ def add_all(proj, clips):
         proj.animation(name, T, tr, loop)
 
 
+APPUI = .58        # part du cycle ou la patte reste au sol : elle recule a vitesse constante, le pied ne glisse pas
+
+
+def pattes_alternees(legs, vague=.06):
+    """Marche des bêtes a 6 ou 8 pattes, comme dans la nature : tetrapode alterne. Gauche 1, droite 2, gauche 3, droite 4 ensemble, l'autre groupe a l'oppose ; chaque rang en retard sur celui de derriere, la vague remonte vers l'avant.
+    legs : [(haut, bas, cote)], rang compte par cote de l'avant vers l'arriere. Renvoie [(haut, bas, phase, cote)]."""
+    rang = {}
+    out = []
+    for up, low, side in legs:
+        k = rang.get(side, 0)
+        rang[side] = k + 1
+        out.append((up, low, ((k % 2) * .5 + (.5 if side < 0 else 0) + k * vague) % 1, side))
+    return out
+
+
+def pas_patte_levee(q):
+    """0 pendant l'appui, puis arc de levee pendant le retour vers l'avant."""
+    q = q % 1
+    return 0.0 if q < APPUI else math.sin(math.pi * (q - APPUI) / (1 - APPUI))
+
+
+def pas_patte(q, s, balayage, levee):
+    """Rotation (x, y, z) du haut de patte. y > 0 envoie le cote +x vers l'avant : s * y fait avancer le pied des deux cotes. z leve la patte, cote par cote."""
+    q = q % 1
+    if q < APPUI:
+        a = 1 - 2 * q / APPUI                                   # de devant vers derriere, vitesse constante
+    else:
+        t = (q - APPUI) / (1 - APPUI)
+        a = -1 + 2 * (t * t * (3 - 2 * t))                      # retour rapide, depart et arrivee adoucis
+    return (0, s * balayage * a, s * levee * pas_patte_levee(q))
+
+
 def octopode(rig, walk=.5):
     """Araignee, scorpion : pattes par paires alternees (os historiques leg0l...leg3r), un seul segment articule par os + bas de patte. Corps tres stable."""
     out = {}
@@ -185,12 +217,10 @@ def octopode(rig, walk=.5):
         tr[rig['tail']] = {'rotation': rot(T, x=sin(3, 2, .2), z=sin(5, 1, .25))}
     for c, s in rig.get('claws', ()):
         tr[c] = {'rotation': rot(T, x=sin(5, 2, .3), y=sin(s * 5, 1, .2))}
-    for i, (up, low, side) in enumerate(rig['legs']):
-        ph = (i % 2) * .5 + (.5 if side < 0 else 0)
-        # rotation du haut de patte autour de Y : la patte balaie vers l'avant et l'arriere ; le bas se leve pendant le retour
-        tr[up] = {'rotation': rot(T, y=lambda p, ph=ph, s=side: s * 16 * math.sin(TAU * (p + ph)), z=lambda p, ph=ph, s=side: s * 9 * max(0.0, math.cos(TAU * (p + ph))))}
+    for up, low, ph, side in pattes_alternees(rig['legs']):
+        tr[up] = {'rotation': keys(T, lambda p, ph=ph, s=side: pas_patte(p + ph, s, rig.get('balayage', 15), rig.get('levee', 13)), 16)}
         if low:
-            tr[low] = {'rotation': rot(T, z=lambda p, ph=ph, s=side: -s * 10 * max(0.0, math.cos(TAU * (p + ph))))}
+            tr[low] = {'rotation': keys(T, lambda p, ph=ph, s=side: (0, 0, -s * rig.get('pli', 16) * pas_patte_levee(p + ph)), 16)}
     out['walk'] = (T, True, tr)
     return out
 
