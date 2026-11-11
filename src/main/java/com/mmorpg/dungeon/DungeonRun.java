@@ -299,9 +299,14 @@ public final class DungeonRun extends SavedData {
         if (door < 0) return;
         e.setCanceled(true);
         Run r = find(server, slot);
-        if (r == null) return;
+        if (r == null) {
+            if (floorDone(server, slot, door)) openDoor(level, slot, null, door);       // expedition perdue (plantage, remise a neuf) : la grille ne doit jamais bloquer
+            return;
+        }
         if ((r.opened >> door & 1) == 1) return;
-        if (takeKey(p, door, r)) {
+        if (floorDone(server, slot, door)) {
+            openDoor(level, slot, r, door);
+        } else if (takeKey(p, door, r)) {
             openDoor(level, slot, r, door);
         } else if ((r.keys >> door & 1) == 1) {
             if (giveKey(p, door, r)) p.sendOverlayMessage(Component.literal("Clé d'étage " + ROMAN[door] + " retrouvée : cliquez à nouveau sur la grille.").withColor(0xFFD060));
@@ -311,7 +316,7 @@ public final class DungeonRun extends SavedData {
         }
     }
 
-    private static void openDoor(ServerLevel level, InstanceData.Slot slot, Run r, int door) {
+    private static void openDoor(ServerLevel level, InstanceData.Slot slot, @Nullable Run r, int door) {
         BlockPos origin = new BlockPos(slot.x, slot.y, slot.z);
         for (int x = -6; x <= 6; x++) {
             for (int y = 0; y <= 9; y++) {
@@ -322,8 +327,10 @@ public final class DungeonRun extends SavedData {
         BlockPos mid = origin.offset(0, 1, DOOR_Z[door]);
         level.playSound(null, mid, SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 1.4F, 0.7F);
         level.sendParticles(ParticleTypes.CLOUD, mid.getX() + 0.5, mid.getY() + 1, mid.getZ() + 0.5, 30, 2, 1.5, 0.3, 0.02);
-        r.opened |= 1 << door;
-        get(level.getServer()).setDirty();
+        if (r != null) {
+            r.opened |= 1 << door;
+            get(level.getServer()).setDirty();
+        }
         String next = door < 2 ? "L'étage " + ROMAN[door + 1] + " s'ouvre devant vous." : "La voie vers l'antre du boss est ouverte !";
         for (ServerPlayer q : inside(level, slot)) q.sendSystemMessage(Component.literal("🗝 Grille de l'étage " + ROMAN[door] + " ouverte. " + next).withColor(0xFFD060));
     }
@@ -369,6 +376,14 @@ public final class DungeonRun extends SavedData {
             List<ServerPlayer> in = inside(level, s);
             if (in.isEmpty()) continue;
             Run r = find(server, s);
+            if (keyTick) {
+                // les grilles s'ouvrent d'elles-memes des que les epreuves de l'etage sont reussies (plus de cle a chercher)
+                for (int f = 0; f < 3; f++) {
+                    if (r != null && (r.opened >> f & 1) == 1) continue;
+                    if (!doorBlock(level.getBlockState(new BlockPos(s.x, s.y + 1, s.z + DOOR_Z[f])))) continue;
+                    if (floorDone(server, s, f)) openDoor(level, s, r, f);
+                }
+            }
             if (r == null || r.done) continue;
             for (ServerPlayer p : in) {
                 int bit = 1 << nodeAt((int) p.getZ() - s.z);
@@ -383,6 +398,7 @@ public final class DungeonRun extends SavedData {
                 if ((r.keys >> f & 1) == 1 || !floorDone(server, s, f)) continue;
                 r.keys |= 1 << f;
                 data.setDirty();
+                if ((r.opened >> f & 1) == 1) continue;
                 for (ServerPlayer p : in) {
                     boolean ok = giveKey(p, f, r);
                     p.sendSystemMessage(Component.literal("🗝 Étage " + ROMAN[f] + " terminé ! Clé d'étage " + ROMAN[f] + (ok ? " reçue : ouvrez la grille au bout du couloir."
