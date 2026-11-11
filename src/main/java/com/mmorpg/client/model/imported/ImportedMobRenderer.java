@@ -34,6 +34,6 @@ public final class ImportedMobRenderer extends MobRenderer<ImportedMobEntity, Im
     @Override public void extractRenderState(ImportedMobEntity entity,State state,float partial) {
         super.extractRenderState(entity,state,partial);
         float elapsed=entity.tickCount-entity.attackStarted+partial;
-        state.attackTicks=elapsed<24?elapsed:-1;
+        state.attackTicks=elapsed<model.clipLength("attack")*20+1?elapsed:-1;
     }
 }

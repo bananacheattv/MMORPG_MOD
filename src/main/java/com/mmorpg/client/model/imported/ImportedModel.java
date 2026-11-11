@@ -17,6 +17,9 @@ import java.util.*;
 /** Blockbench geometry with original per-face UVs, cube pivots and UUID-addressed animation bones. */
 public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
     private final Map<String, KeyframeAnimation> animations = new HashMap<>();
+    private final Map<String, Float> lengths = new HashMap<>();
+    /** Duree en secondes d'un clip (0 s'il n'existe pas). */
+    public float clipLength(String name) { return lengths.getOrDefault(name, 0f); }
     public final Identifier texture;
     private final ModelPart head;
     private final Map<String,ModelPart> standBones=new HashMap<>();
@@ -32,6 +35,7 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
             var def = BlockbenchAnimations.parse(new String[]{a.get("tracks").getAsString()},
                     a.get("length").getAsFloat(), a.get("loop").getAsBoolean());
             animations.put(a.get("name").getAsString(), def.bake(root()));
+            lengths.put(a.get("name").getAsString(), a.get("length").getAsFloat());
         }
     }
     private static String findNamed(JsonArray nodes,String name){for(var node:nodes){var n=node.getAsJsonObject();if(n.has("name")&&n.get("name").getAsString().equals(name))return n.get("uuid").getAsString();if(n.has("children")){String id=findNamed(n.getAsJsonArray("children"),name);if(id!=null)return id;}}return null;}
@@ -173,7 +177,7 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
         animate("idle",state.ageInTicks,1-moving);
         String move=animations.containsKey("walk")?"walk":animations.containsKey("fly")?"fly":"slither";
         animate(move,state.ageInTicks,moving);
-        if(state instanceof ClassicMobRenderer.State s){if(s.attackTicks>=0)animate("attack",s.attackTicks,1);if(head!=null){head.yRot+=state.yRot*(float)Math.PI/180;head.xRot+=state.xRot*(float)Math.PI/180;}}
+        if(state instanceof ClassicMobRenderer.State s){if(s.attackTicks>=0)animate("attack",s.attackTicks,1);if(s.castTicks>=0)animate("cast",s.castTicks,1);if(head!=null){head.yRot+=state.yRot*(float)Math.PI/180;head.xRot+=state.xRot*(float)Math.PI/180;}}
         if(state instanceof ImportedMobRenderer.State s && s.attackTicks>=0) animate("attack",s.attackTicks,1);
         if(state instanceof com.mmorpg.client.model.YggdrasilRenderer.State s){if(s.attackTicks>=0)animate("attack",s.attackTicks,1);if(s.castTicks>=0)animate("cast",s.castTicks*(s.phase==3?1.5f:s.phase==2?1.2f:1),1);if(s.phase>=2){var rootPart=root();rootPart.zRot+=(float)Math.sin(state.ageInTicks*.08)*.012f*(s.phase-1);}}
         if(state instanceof AuthoredNpcRenderer.State s&&s.sitting){poseBone("leg_-1",new net.minecraft.core.Rotations(-81,-10,0));poseBone("leg_1",new net.minecraft.core.Rotations(-81,10,0));poseBone("arm_-1",new net.minecraft.core.Rotations(-36,0,0));poseBone("arm_1",new net.minecraft.core.Rotations(-36,0,0));}

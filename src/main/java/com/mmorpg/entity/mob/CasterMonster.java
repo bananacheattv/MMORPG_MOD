@@ -23,6 +23,14 @@ import net.minecraft.world.level.Level;
 public abstract class CasterMonster extends RpgMonster implements RangedAttackMob {
     private final ItemDefs.Element element;
     private final SoundEvent castSound;
+    /** Tick client du dernier lancer : declenche le clip cast du bestiaire classique. */
+    public int castStarted = -100;
+
+    @Override
+    public void handleEntityEvent(byte event) {
+        if (event == 70) castStarted = tickCount;
+        else super.handleEntityEvent(event);
+    }
 
     protected CasterMonster(EntityType<? extends Monster> type, Level level, String key, ItemDefs.Element element, SoundEvent castSound) {
         super(type, level, key);
@@ -43,6 +51,7 @@ public abstract class CasterMonster extends RpgMonster implements RangedAttackMo
 
     @Override
     public void performRangedAttack(LivingEntity target, float power) {
+        this.level().broadcastEntityEvent(this, (byte) 70);
         MobAbilities.bolt(this, target, element, 1.0, 1.2F, element == ItemDefs.Element.FEU ? 1.5 : 0);
         this.level().playSound(null, this.blockPosition(), castSound, SoundSource.HOSTILE, 1f, 1.2f);
     }
