@@ -52,4 +52,9 @@ public class DungeonChestRenderer implements BlockEntityRenderer<DungeonChestBlo
     public AABB getRenderBoundingBox(DungeonChestBlockEntity be) {
         return new AABB(be.getBlockPos()).inflate(1, 0, 1).expandTowards(0, 1.5, 0);
     }
+
+    @Override
+    public int getViewDistance() {
+        return com.mmorpg.util.RenderDist.BLOCK;
+    }
 }

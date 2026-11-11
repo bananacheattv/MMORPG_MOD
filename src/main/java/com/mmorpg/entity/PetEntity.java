@@ -24,6 +24,11 @@ import net.minecraft.world.phys.Vec3;
  * laisse une traine de particules et n'interagit pas avec le monde.
  */
 public class PetEntity extends Entity implements ItemSupplier {
+    @Override
+    public boolean shouldRenderAtSqrDistance(double distance) {
+        return com.mmorpg.util.RenderDist.entity(distance);
+    }
+
     private static final EntityDataAccessor<String> PET = SynchedEntityData.defineId(PetEntity.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Integer> OWNER = SynchedEntityData.defineId(PetEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> LOOT_TARGET = SynchedEntityData.defineId(PetEntity.class, EntityDataSerializers.INT);

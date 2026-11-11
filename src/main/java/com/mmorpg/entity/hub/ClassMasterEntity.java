@@ -31,6 +31,11 @@ import org.jspecify.annotations.Nullable;
  * Blockbench anime et ses effets. Immobile, invulnerable et persistant ; un clic gauche ou droit ouvre le dialogue.
  */
 public class ClassMasterEntity extends PathfinderMob {
+    @Override
+    public boolean shouldRenderAtSqrDistance(double distance) {
+        return com.mmorpg.util.RenderDist.entity(distance);
+    }
+
     public static final int GUERRIER = 0, MAGE = 1, ARCHER = 2, TANK = 3, EPREUVE = 4;
     public static final String[] IDS = {"guerrier", "mage", "archer", "tank", "epreuve"};
     public static final String[] NAMES = {"Maître Guerrier", "Maître Mage", "Maître Archer", "Maître Paladin", "Gardien de l'épreuve"};

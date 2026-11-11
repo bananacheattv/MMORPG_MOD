@@ -33,49 +33,49 @@ public final class ModEntities {
     public static final Map<String, DeferredHolder<EntityType<?>, ? extends EntityType<?>>> SPAWNABLE = new LinkedHashMap<>();
 
     public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.mob.CryptZombieEntity>> CRYPT_ZOMBIE = mob("zombie_des_cryptes",
-            ENTITIES.registerEntityType("zombie_des_cryptes", com.mmorpg.entity.mob.CryptZombieEntity::new, MobCategory.MONSTER, b -> b.sized(0.6F, 1.95F).clientTrackingRange(8)));
+            ENTITIES.registerEntityType("zombie_des_cryptes", com.mmorpg.entity.mob.CryptZombieEntity::new, MobCategory.MONSTER, b -> b.sized(0.6F, 1.95F).clientTrackingRange(16)));
     public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.mob.VenomSpiderEntity>> VENOM_SPIDER = mob("araignee_venimeuse",
-            ENTITIES.registerEntityType("araignee_venimeuse", com.mmorpg.entity.mob.VenomSpiderEntity::new, MobCategory.MONSTER, b -> b.sized(0.7F, 0.5F).clientTrackingRange(8)));
+            ENTITIES.registerEntityType("araignee_venimeuse", com.mmorpg.entity.mob.VenomSpiderEntity::new, MobCategory.MONSTER, b -> b.sized(0.7F, 0.5F).clientTrackingRange(16)));
     public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.mob.BanditEntity>> BANDIT = mob("bandit_arbaletrier",
-            ENTITIES.registerEntityType("bandit_arbaletrier", com.mmorpg.entity.mob.BanditEntity::new, MobCategory.MONSTER, b -> b.sized(0.6F, 1.95F).clientTrackingRange(8)));
+            ENTITIES.registerEntityType("bandit_arbaletrier", com.mmorpg.entity.mob.BanditEntity::new, MobCategory.MONSTER, b -> b.sized(0.6F, 1.95F).clientTrackingRange(16)));
 
     public static final DeferredHolder<EntityType<?>, EntityType<GoblinEntity>> GOBLIN = mob("gobelin",
-            ENTITIES.registerEntityType("gobelin", GoblinEntity::new, MobCategory.MONSTER, b -> b.sized(0.55F, 1.6F).clientTrackingRange(8)));
+            ENTITIES.registerEntityType("gobelin", GoblinEntity::new, MobCategory.MONSTER, b -> b.sized(0.55F, 1.6F).clientTrackingRange(16)));
     public static final DeferredHolder<EntityType<?>, EntityType<DarkWolfEntity>> DARK_WOLF = mob("loup_sombre",
-            ENTITIES.registerEntityType("loup_sombre", DarkWolfEntity::new, MobCategory.MONSTER, b -> b.sized(0.7F, 0.9F).clientTrackingRange(10)));
+            ENTITIES.registerEntityType("loup_sombre", DarkWolfEntity::new, MobCategory.MONSTER, b -> b.sized(0.7F, 0.9F).clientTrackingRange(16)));
     public static final DeferredHolder<EntityType<?>, EntityType<CursedSkeletonEntity>> CURSED_SKELETON = mob("squelette_maudit",
-            ENTITIES.registerEntityType("squelette_maudit", CursedSkeletonEntity::new, MobCategory.MONSTER, b -> b.sized(0.6F, 1.99F).clientTrackingRange(8)));
+            ENTITIES.registerEntityType("squelette_maudit", CursedSkeletonEntity::new, MobCategory.MONSTER, b -> b.sized(0.6F, 1.99F).clientTrackingRange(16)));
     public static final DeferredHolder<EntityType<?>, EntityType<OrcEntity>> ORC = mob("orc_guerrier",
-            ENTITIES.registerEntityType("orc_guerrier", OrcEntity::new, MobCategory.MONSTER, b -> b.sized(0.6F, 1.95F).clientTrackingRange(8)));
+            ENTITIES.registerEntityType("orc_guerrier", OrcEntity::new, MobCategory.MONSTER, b -> b.sized(0.6F, 1.95F).clientTrackingRange(16)));
     public static final DeferredHolder<EntityType<?>, EntityType<FireElementalEntity>> FIRE_ELEMENTAL = mob("elementaire_feu",
-            ENTITIES.registerEntityType("elementaire_feu", FireElementalEntity::new, MobCategory.MONSTER, b -> b.sized(0.6F, 1.8F).fireImmune().clientTrackingRange(8)));
+            ENTITIES.registerEntityType("elementaire_feu", FireElementalEntity::new, MobCategory.MONSTER, b -> b.sized(0.6F, 1.8F).fireImmune().clientTrackingRange(16)));
     public static final DeferredHolder<EntityType<?>, EntityType<IceWraithEntity>> ICE_WRAITH = mob("spectre_givre",
-            ENTITIES.registerEntityType("spectre_givre", IceWraithEntity::new, MobCategory.MONSTER, b -> b.sized(0.6F, 1.95F).clientTrackingRange(8)));
+            ENTITIES.registerEntityType("spectre_givre", IceWraithEntity::new, MobCategory.MONSTER, b -> b.sized(0.6F, 1.95F).clientTrackingRange(16)));
     public static final DeferredHolder<EntityType<?>, EntityType<CrystalGolemEntity>> CRYSTAL_GOLEM = mob("golem_cristal",
-            ENTITIES.registerEntityType("golem_cristal", CrystalGolemEntity::new, MobCategory.MONSTER, b -> b.sized(1.4F, 2.7F).clientTrackingRange(10)));
+            ENTITIES.registerEntityType("golem_cristal", CrystalGolemEntity::new, MobCategory.MONSTER, b -> b.sized(1.4F, 2.7F).clientTrackingRange(16)));
     public static final DeferredHolder<EntityType<?>, EntityType<VoidKnightEntity>> VOID_KNIGHT = mob("chevalier_neant",
-            ENTITIES.registerEntityType("chevalier_neant", VoidKnightEntity::new, MobCategory.MONSTER, b -> b.sized(0.6F, 1.95F).fireImmune().clientTrackingRange(8)));
+            ENTITIES.registerEntityType("chevalier_neant", VoidKnightEntity::new, MobCategory.MONSTER, b -> b.sized(0.6F, 1.95F).fireImmune().clientTrackingRange(16)));
 
     public static final DeferredHolder<EntityType<?>, EntityType<GoblinKingBoss>> GOBLIN_KING = mob("roi_gobelin",
-            ENTITIES.registerEntityType("roi_gobelin", GoblinKingBoss::new, MobCategory.MONSTER, b -> b.sized(1.8F, 3.0F).clientTrackingRange(12)));
+            ENTITIES.registerEntityType("roi_gobelin", GoblinKingBoss::new, MobCategory.MONSTER, b -> b.sized(1.8F, 3.0F).clientTrackingRange(16)));
     public static final DeferredHolder<EntityType<?>, EntityType<LichBoss>> LICH = mob("liche_ancienne",
-            ENTITIES.registerEntityType("liche_ancienne", LichBoss::new, MobCategory.MONSTER, b -> b.sized(1.2F, 3.2F).clientTrackingRange(12)));
+            ENTITIES.registerEntityType("liche_ancienne", LichBoss::new, MobCategory.MONSTER, b -> b.sized(1.2F, 3.2F).clientTrackingRange(16)));
     public static final DeferredHolder<EntityType<?>, EntityType<IgnisBoss>> IGNIS = mob("seigneur_ignis",
-            ENTITIES.registerEntityType("seigneur_ignis", IgnisBoss::new, MobCategory.MONSTER, b -> b.sized(1.8F, 4.0F).fireImmune().clientTrackingRange(12)));
+            ENTITIES.registerEntityType("seigneur_ignis", IgnisBoss::new, MobCategory.MONSTER, b -> b.sized(1.8F, 4.0F).fireImmune().clientTrackingRange(16)));
     public static final DeferredHolder<EntityType<?>, EntityType<FrostTitanBoss>> FROST_TITAN = mob("titan_glace",
-            ENTITIES.registerEntityType("titan_glace", FrostTitanBoss::new, MobCategory.MONSTER, b -> b.sized(3.0F, 6.0F).clientTrackingRange(12)));
+            ENTITIES.registerEntityType("titan_glace", FrostTitanBoss::new, MobCategory.MONSTER, b -> b.sized(3.0F, 6.0F).clientTrackingRange(16)));
     public static final DeferredHolder<EntityType<?>, EntityType<VoidAvatarBoss>> VOID_AVATAR = mob("avatar_neant",
-            ENTITIES.registerEntityType("avatar_neant", VoidAvatarBoss::new, MobCategory.MONSTER, b -> b.sized(1.4F, 4.0F).fireImmune().clientTrackingRange(14)));
+            ENTITIES.registerEntityType("avatar_neant", VoidAvatarBoss::new, MobCategory.MONSTER, b -> b.sized(1.4F, 4.0F).fireImmune().clientTrackingRange(16)));
 
     public static final DeferredHolder<EntityType<?>, EntityType<MagicProjectile>> MAGIC_PROJECTILE =
             ENTITIES.registerEntityType("projectile_magique", MagicProjectile::new, MobCategory.MISC,
-                    b -> b.sized(0.4F, 0.4F).clientTrackingRange(6).updateInterval(1));
+                    b -> b.sized(0.4F, 0.4F).clientTrackingRange(16).updateInterval(1));
     public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.SpellProjectile>> SPELL_PROJECTILE =
             ENTITIES.registerEntityType("projectile_sort", com.mmorpg.entity.SpellProjectile::new, MobCategory.MISC,
-                    b -> b.sized(0.35F, 0.35F).clientTrackingRange(8).updateInterval(1));
+                    b -> b.sized(0.35F, 0.35F).clientTrackingRange(16).updateInterval(1));
     public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.SkillFxEntity>> SKILL_FX =
             ENTITIES.registerEntityType("effet_competence", com.mmorpg.entity.SkillFxEntity::new, MobCategory.MISC,
-                    b -> b.sized(0.2F, 0.2F).clientTrackingRange(10).updateInterval(1).noSave().fireImmune());
+                    b -> b.sized(0.2F, 0.2F).clientTrackingRange(16).updateInterval(1).noSave().fireImmune());
     public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.NpcEntity>> NPC =
             ENTITIES.registerEntityType("pnj", com.mmorpg.entity.NpcEntity::new, MobCategory.MISC,
                     b -> b.sized(0.6F, 1.95F).clientTrackingRange(32));
@@ -96,34 +96,34 @@ public final class ModEntities {
         for (var m : com.mmorpg.mount.MountType.values()) {
             MOUNTS.put(m, ENTITIES.registerEntityType("monture_" + m.id, com.mmorpg.entity.MountEntity::new, MobCategory.CREATURE,
                     b -> b.sized(m.width * MOUNT_SCALE, m.height * MOUNT_SCALE).eyeHeight(m.height * MOUNT_SCALE * .9f)
-                            .passengerAttachments(attachments(m)).clientTrackingRange(10)));
+                            .passengerAttachments(attachments(m)).clientTrackingRange(16)));
         }
     }
     public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.dummy.TrainingDummyEntity>> TRAINING_DUMMY =
             ENTITIES.registerEntityType("mannequin_entrainement", com.mmorpg.entity.dummy.TrainingDummyEntity::new, MobCategory.MISC,
-                    b -> b.sized(1.0F, 2.0F).fireImmune().clientTrackingRange(10).noSummon());
+                    b -> b.sized(1.0F, 2.0F).fireImmune().clientTrackingRange(16).noSummon());
     public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.hub.ClassMasterEntity>> CLASS_MASTER =
             ENTITIES.registerEntityType("maitre_classe", com.mmorpg.entity.hub.ClassMasterEntity::new, MobCategory.MISC,
-                    b -> b.sized(0.7F, 2.1F).fireImmune().clientTrackingRange(12).noSummon());
+                    b -> b.sized(0.7F, 2.1F).fireImmune().clientTrackingRange(16).noSummon());
     public static final DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.MascotEntity>> MASCOT =
             ENTITIES.registerEntityType("mascotte", com.mmorpg.entity.MascotEntity::new, MobCategory.MISC,
-                    b -> b.sized(1.1F, 1.5F).fireImmune().clientTrackingRange(12).noSummon());
+                    b -> b.sized(1.1F, 1.5F).fireImmune().clientTrackingRange(16).noSummon());
     public static final DeferredHolder<EntityType<?>, EntityType<PetEntity>> PET =
             ENTITIES.registerEntityType("familier", PetEntity::new, MobCategory.MISC,
-                    b -> b.sized(0.5F, 0.5F).clientTrackingRange(8).updateInterval(1));
+                    b -> b.sized(0.5F, 0.5F).clientTrackingRange(16).updateInterval(1));
 
     private ModEntities() {
     }
     public static final java.util.List<DeferredHolder<EntityType<?>,EntityType<com.mmorpg.competition.GuildGuardian>>> GUILD_GUARDIANS=new java.util.ArrayList<>();
     static {for(int i=0;i<10;i++){final int tier=i;var def=com.mmorpg.guild.Yggdrasil.ALL[i];GUILD_GUARDIANS.add(ENTITIES.registerEntityType("yggdrasil_"+def.id(),(type,level)->new com.mmorpg.competition.GuildGuardian(type,level,tier),MobCategory.MONSTER,b->b.sized(def.width(),def.height()).fireImmune().noSave().clientTrackingRange(32)));}}
-    public static final DeferredHolder<EntityType<?>,EntityType<com.mmorpg.competition.ArenaDrone>> ARENA_DRONE=ENTITIES.registerEntityType("drone_arene",com.mmorpg.competition.ArenaDrone::new,MobCategory.MISC,b->b.sized(1,1).fireImmune().noSave().clientTrackingRange(12).updateInterval(1));
-    public static final DeferredHolder<EntityType<?>,EntityType<com.mmorpg.competition.ArenaCrystal>> ARENA_CRYSTAL=ENTITIES.registerEntityType("cristal_arene",com.mmorpg.competition.ArenaCrystal::new,MobCategory.MISC,b->b.sized(2.4F,3.5F).fireImmune().noSave().clientTrackingRange(14).updateInterval(1));
+    public static final DeferredHolder<EntityType<?>,EntityType<com.mmorpg.competition.ArenaDrone>> ARENA_DRONE=ENTITIES.registerEntityType("drone_arene",com.mmorpg.competition.ArenaDrone::new,MobCategory.MISC,b->b.sized(1,1).fireImmune().noSave().clientTrackingRange(16).updateInterval(1));
+    public static final DeferredHolder<EntityType<?>,EntityType<com.mmorpg.competition.ArenaCrystal>> ARENA_CRYSTAL=ENTITIES.registerEntityType("cristal_arene",com.mmorpg.competition.ArenaCrystal::new,MobCategory.MISC,b->b.sized(2.4F,3.5F).fireImmune().noSave().clientTrackingRange(16).updateInterval(1));
 
     public static final Map<String, DeferredHolder<EntityType<?>, EntityType<com.mmorpg.entity.mob.ImportedMobEntity>>> IMPORTED = new LinkedHashMap<>();
     static {
         for (var entry : com.mmorpg.entity.mob.ImportedMobs.ALL) {
             var type = ENTITIES.registerEntityType(entry.key(), com.mmorpg.entity.mob.ImportedMobEntity::new, MobCategory.MONSTER,
-                    b -> b.sized(entry.scaledWidth(), entry.scaledHeight()).clientTrackingRange(10));
+                    b -> b.sized(entry.scaledWidth(), entry.scaledHeight()).clientTrackingRange(16));
             IMPORTED.put(entry.key(), type);
             mob(entry.key(), type);
         }

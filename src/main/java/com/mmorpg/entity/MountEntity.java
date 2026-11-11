@@ -28,6 +28,11 @@ import java.util.UUID;
  * L'Hippogriffe vole : regarder vers le haut en avancant pour monter, vers le bas pour descendre, saut = battement d'ailes.
  */
 public class MountEntity extends Horse {
+    @Override
+    public boolean shouldRenderAtSqrDistance(double distance) {
+        return com.mmorpg.util.RenderDist.entity(distance);
+    }
+
     private UUID rider;
     private final MountType mountType;
 

@@ -83,6 +83,6 @@ public class RankingBoardRenderer implements BlockEntityRenderer<RankingBoardBlo
 
     @Override
     public int getViewDistance() {
-        return 48;
+        return com.mmorpg.util.RenderDist.BLOCK;
     }
 }

@@ -185,6 +185,6 @@ public class CrateRenderer implements BlockEntityRenderer<CrateBlockEntity, Crat
 
     @Override
     public int getViewDistance() {
-        return 48;
+        return com.mmorpg.util.RenderDist.BLOCK;
     }
 }

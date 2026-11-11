@@ -39,7 +39,12 @@ import org.jspecify.annotations.Nullable;
  * statistiques (DPS sur une fenetre glissante, total, plus gros coup, critiques) affichees au-dessus de lui.
  * Clic droit accroupi : remise a zero. Trois variantes : standard, blinde (defense physique) et magique (resistance magique).
  */
-public class TrainingDummyEntity extends PathfinderMob {
+public class TrainingDummyEntity extends PathfinderMob {
+    @Override
+    public boolean shouldRenderAtSqrDistance(double distance) {
+        return com.mmorpg.util.RenderDist.entity(distance);
+    }
+
     public static final String[] VARIANTS = {"standard", "blinde", "magique", "duelliste"};
     /** Taille du tampon des coups recents (25 coups/s sur 10 s sont deja largement couverts). */
     private static final int RING = 512;

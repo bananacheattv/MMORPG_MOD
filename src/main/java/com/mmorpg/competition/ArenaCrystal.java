@@ -8,6 +8,11 @@ import net.minecraft.server.level.*;
 import java.util.UUID;
 
 public final class ArenaCrystal extends Monster {
+    @Override
+    public boolean shouldRenderAtSqrDistance(double distance) {
+        return com.mmorpg.util.RenderDist.entity(distance);
+    }
+
     private static final EntityDataAccessor<Integer> TEAM=SynchedEntityData.defineId(ArenaCrystal.class,EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> HITS=SynchedEntityData.defineId(ArenaCrystal.class,EntityDataSerializers.INT);
     public UUID match;

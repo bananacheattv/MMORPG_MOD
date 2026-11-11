@@ -75,4 +75,9 @@ public class DecorModelRenderer implements BlockEntityRenderer<DecorModelBlock.E
     public AABB getRenderBoundingBox(DecorModelBlock.Entity be) {
         return new AABB(be.getBlockPos()).inflate(8, 1, 8).expandTowards(0, 14, 0);
     }
+
+    @Override
+    public int getViewDistance() {
+        return com.mmorpg.util.RenderDist.BLOCK;
+    }
 }

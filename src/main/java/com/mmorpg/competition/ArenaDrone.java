@@ -5,6 +5,11 @@ import net.minecraft.world.level.Level;
 
 /** Decorative one-block guardian eye. Targeting and damage are authoritative match rules, never vanilla mob AI. */
 public final class ArenaDrone extends PathfinderMob {
+    @Override
+    public boolean shouldRenderAtSqrDistance(double distance) {
+        return com.mmorpg.util.RenderDist.entity(distance);
+    }
+
     public ArenaDrone(EntityType<? extends PathfinderMob> type,Level level){super(type,level);setNoAi(true);setNoGravity(true);setPersistenceRequired();}
     @Override protected void registerGoals(){}
     @Override public boolean isPushable(){return false;}

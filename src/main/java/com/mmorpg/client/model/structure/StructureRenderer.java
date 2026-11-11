@@ -149,6 +149,6 @@ public class StructureRenderer implements BlockEntityRenderer<StructureBlockEnti
 
     @Override
     public int getViewDistance() {
-        return 96;
+        return com.mmorpg.util.RenderDist.BLOCK;
     }
 }

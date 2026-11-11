@@ -25,6 +25,11 @@ import org.jspecify.annotations.Nullable;
 
 /** Base des monstres RPG : IA de melee standard, niveau et statistiques issus de la configuration. */
 public abstract class RpgMonster extends Monster implements RpgMob {
+    @Override
+    public boolean shouldRenderAtSqrDistance(double distance) {
+        return com.mmorpg.util.RenderDist.entity(distance);
+    }
+
     private final String key;
 
     protected RpgMonster(EntityType<? extends Monster> type, Level level, String key) {
