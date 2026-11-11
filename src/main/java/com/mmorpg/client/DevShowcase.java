@@ -2249,7 +2249,7 @@ public final class DevShowcase {
         if (bossSteps == null) {
             bossSteps = new java.util.ArrayList<>();
             String only = System.getProperty("mmorpg.attaques", "");
-            for (String key : new String[]{"roi_gobelin", "liche_ancienne", "seigneur_ignis", "titan_glace", "avatar_neant", "orc_guerrier", "colosse_racine", "elementaire_feu", "loup_sombre"}) {
+            for (String key : new String[]{"roi_gobelin", "liche_ancienne", "seigneur_ignis", "titan_glace", "avatar_neant", "orc_guerrier", "colosse_racine", "elementaire_feu", "loup_sombre", "gobelin"}) {
                 if (!only.isEmpty() && !java.util.Arrays.asList(only.split(",")).contains(key)) continue;
                 var type = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getValue(MMORPG.id(key));
                 var probe = type.create(srv.overworld(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
