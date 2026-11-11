@@ -10,12 +10,15 @@ public final class IgnisAnims {
     public static final int SOUFFLE_FEU = 4;
     public static final int RUGISSEMENT = 5;
     public static final int MORT = 6;
-    public static final int COUNT = 7;
-    public static final int[] LENGTH_TICKS = {48, 32, 38, 46, 56, 48, 80};
-    public static final int[] STRIKE_TICKS = {0, 0, 17, 20, 20, 17, 0};
-    public static final boolean[] LOOPING = {true, true, false, false, false, false, false};
+    public static final int ESTOC = 7;
+    public static final int LAME_ARDENTE = 8;
+    public static final int ERUPTION = 9;
+    public static final int COUNT = 10;
+    public static final int[] LENGTH_TICKS = {48, 32, 38, 46, 56, 48, 80, 40, 44, 52};
+    public static final int[] STRIKE_TICKS = {0, 0, 17, 20, 20, 17, 0, 18, 19, 25};
+    public static final boolean[] LOOPING = {true, true, false, false, false, false, false, false, false, false};
     /** Animation qui reste figee sur sa derniere pose jusqu'a l'animation suivante. */
-    public static final boolean[] HOLD = {false, false, false, false, false, false, true};
+    public static final boolean[] HOLD = {false, false, false, false, false, false, true, false, false, false};
 
     private IgnisAnims() {
     }

@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.resources.Identifier;
 
 public final class ImportedMobRenderer extends MobRenderer<ImportedMobEntity, ImportedMobRenderer.State, ImportedModel> {
-    public static class State extends LivingEntityRenderState { public float attackTicks=-1; }
+    public static class State extends LivingEntityRenderState { public float attackTicks=-1; public String clip; }
     /** Echelle du modele (la boite de collision de l'entite suit la meme echelle). */
     private final float modelScale;
     /** Hauteur de lévitation (0 pour les monstres qui marchent). */
@@ -33,7 +33,12 @@ public final class ImportedMobRenderer extends MobRenderer<ImportedMobEntity, Im
     }
     @Override public void extractRenderState(ImportedMobEntity entity,State state,float partial) {
         super.extractRenderState(entity,state,partial);
-        float elapsed=entity.tickCount-entity.attackStarted+partial;
-        state.attackTicks=elapsed<model.clipLength("attack")*20+1?elapsed:-1;
+        state.attackTicks=-1;state.clip=null;
+        if(entity.clip>=0){
+            String name=com.mmorpg.entity.mob.ImportedSpells.CLIPS[entity.clip];
+            if(model.clipLength(name)<=0)name="attack";
+            float elapsed=entity.tickCount-entity.clipStarted+partial;
+            if(elapsed<model.clipLength(name)*20+1){state.clip=name;state.attackTicks=elapsed;}
+        }
     }
 }

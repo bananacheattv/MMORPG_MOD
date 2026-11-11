@@ -10,9 +10,9 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 
 /** Elementaire de Feu : incarnation des flammes qui projette des boules de feu explosives. */
-public class FireElementalEntity extends CasterMonster {
+public class FireElementalEntity extends SmartMonster {
     public FireElementalEntity(EntityType<? extends Monster> type, Level level) {
-        super(type, level, "elementaire_feu", ItemDefs.Element.FEU, SoundEvents.BLAZE_SHOOT);
+        super(type, level, "elementaire_feu");
     }
 
     @Override

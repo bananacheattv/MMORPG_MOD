@@ -1,7 +1,6 @@
 package com.mmorpg.entity.mob;
 
 import com.mmorpg.entity.MobAbilities;
-import com.mmorpg.entity.RpgMonster;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -18,9 +17,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 
 /** Chevalier du Neant : guerrier d'outre-monde qui se teleporte derriere ses adversaires. */
-public class VoidKnightEntity extends RpgMonster {
-    private int blinkCooldown = 160;
-
+public class VoidKnightEntity extends SmartMonster {
     public VoidKnightEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level, "chevalier_neant");
     }
@@ -28,16 +25,6 @@ public class VoidKnightEntity extends RpgMonster {
     @Override
     protected void populateDefaultEquipmentSlots(RandomSource random, DifficultyInstance difficulty) {
         this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.NETHERITE_SWORD));
-    }
-
-    @Override
-    protected void customServerAiStep(ServerLevel level) {
-        super.customServerAiStep(level);
-        LivingEntity target = this.getTarget();
-        if (target != null && --blinkCooldown <= 0 && this.distanceTo(target) > 4 && this.distanceTo(target) < 20) {
-            blinkCooldown = 200;
-            MobAbilities.blinkBehind(this, target);
-        }
     }
 
     @Override

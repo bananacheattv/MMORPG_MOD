@@ -2,11 +2,12 @@ package com.mmorpg.entity.boss;
 
 import com.mmorpg.combat.RpgCombat;
 import com.mmorpg.entity.MagicProjectile;
-import com.mmorpg.entity.MobAbilities;
 import com.mmorpg.entity.boss.anim.IgnisAnims;
 import com.mmorpg.item.ItemDefs;
 import com.mmorpg.server.Scheduler;
+import com.mmorpg.entity.FxKind;
 import net.minecraft.core.particles.ParticleTypes;
+import java.util.List;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -32,66 +33,96 @@ public class IgnisBoss extends RpgBoss {
         return ANIMS;
     }
 
+    private static final int COLOR = 0xFF6020;
+
+    /** Sept attaques : balayage (melee), souffle de feu, frappe au sol, meteores, estoc, lame ardente, eruption. */
     @Override
-    protected void bossTick(ServerLevel level) {
-        if (busy()) return;
-        LivingEntity target = this.getTarget();
-        if (ready("fireballCooldown", 120)) {
+    protected void defineMoves(List<Move> out) {
+        move(out, "souffle", IgnisAnims.SOUFFLE_FEU, 150, 1, 0, 13, level -> {
+            int strike = IgnisAnims.STRIKE_TICKS[IgnisAnims.SOUFFLE_FEU];
+            telegraphCone(level, 11, 35, strike, ParticleTypes.SMALL_FLAME);
+            warn(level, "⚠ Souffle de feu : sortez du cône !");
             playThen(level, IgnisAnims.SOUFFLE_FEU, () -> {
-                if (!target.isAlive()) return;
-                int count = (int) ability("fireballCount", 5) + phase;
-                Vec3 dir = target.position().subtract(this.position()).normalize();
-                double baseAngle = Math.atan2(dir.z, dir.x);
-                for (int i = 0; i < count; i++) {
-                    double a = baseAngle + (i - (count - 1) / 2.0) * 0.18;
-                    MagicProjectile p = MagicProjectile.create(level, this, ItemDefs.Element.FEU, RpgCombat.mobAtk(this) * 0.8, 2.0);
-                    p.setPos(this.getX(), this.getEyeY(), this.getZ());
-                    p.shoot(Math.cos(a), (target.getY() - this.getEyeY()) / Math.max(1, this.distanceTo(target)), Math.sin(a), 1.1F, 1F);
-                    level.addFreshEntity(p);
-                }
-                level.playSound(null, this.blockPosition(), SoundEvents.BLAZE_SHOOT, SoundSource.HOSTILE, 2f, 0.6f);
-            });
-            return;
-        }
-        if (ready("ringCooldown", 240)) {
-            playThen(level, IgnisAnims.FRAPPE_SOL, () -> {
-                for (int r = 1; r <= 7; r++) {
-                    final int radius = r;
-                    Scheduler.later(level, r * 3, () -> {
-                        for (int i = 0; i < 24; i++) {
-                            double a = Math.PI * 2 * i / 24;
-                            level.sendParticles(ParticleTypes.FLAME, this.getX() + Math.cos(a) * radius, this.getY() + 0.2, this.getZ() + Math.sin(a) * radius, 2, 0.1, 0.1, 0.1, 0.02);
-                        }
-                    });
-                }
-                for (LivingEntity e : MobAbilities.enemiesAround(this, this.position(), 7)) {
-                    RpgCombat.mobHit(this, e, 1.1);
-                    e.igniteForSeconds(4);
-                }
-                level.playSound(null, this.blockPosition(), SoundEvents.FIRECHARGE_USE, SoundSource.HOSTILE, 2f, 0.5f);
-            });
-            return;
-        }
-        if (phase >= 2 && ready("meteorCooldown", 300)) {
-            playThen(level, IgnisAnims.RUGISSEMENT, () -> {
-                for (LivingEntity e : MobAbilities.enemiesAround(this, this.position(), 24)) {
-                    Vec3 impact = e.position();
-                    for (int t = 0; t < 20; t += 2) {
-                        final int tt = t;
-                        Scheduler.later(level, t, () -> level.sendParticles(ParticleTypes.LAVA, impact.x, impact.y + 12 - tt * 0.6, impact.z, 3, 0.2, 0.2, 0.2, 0));
+                level.playSound(null, this.blockPosition(), SoundEvents.BLAZE_SHOOT, SoundSource.HOSTILE, 2f, 0.5f);
+                channel(24, 1.5F, 6, () -> {
+                    Vec3 dir = facing();
+                    double base = Math.atan2(dir.z, dir.x);
+                    for (int i = 0; i < 40; i++) {
+                        double a = base + (this.random.nextDouble() - 0.5) * 1.2, r = 1.5 + this.random.nextDouble() * 9.5;
+                        level.sendParticles(ParticleTypes.FLAME, this.getX() + Math.cos(a) * r, this.getY() + 0.6 + this.random.nextDouble() * 1.5, this.getZ() + Math.sin(a) * r, 1, 0.1, 0.1, 0.1, 0.02);
                     }
-                    Scheduler.later(level, 20, () -> {
-                        if (!this.isAlive() || this.isRemoved()) return;          // boss vaincu pendant la chute : plus de meteore
-                        level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, impact.x, impact.y, impact.z, 1, 0, 0, 0, 0);
-                        level.playSound(null, impact.x, impact.y, impact.z, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.HOSTILE, 2f, 0.8f);
-                        for (LivingEntity v : MobAbilities.enemiesAround(this, impact, 3.5)) {
-                            RpgCombat.mobHit(this, v, 1.8);
-                            v.igniteForSeconds(3);
+                    hitCone(dir, 11, 35, ability("souffleDamage", 0.6), e -> e.igniteForSeconds(4));
+                });
+            });
+        });
+        move(out, "ring", IgnisAnims.FRAPPE_SOL, 220, 1, 0, 8, level -> {
+            telegraph(level, this.position(), 9, COLOR, IgnisAnims.STRIKE_TICKS[IgnisAnims.FRAPPE_SOL]);
+            playThen(level, IgnisAnims.FRAPPE_SOL, () -> {
+                Vec3 c = this.position();
+                level.playSound(null, this.blockPosition(), SoundEvents.FIRECHARGE_USE, SoundSource.HOSTILE, 2f, 0.5f);
+                // trois vagues de flammes qui s'eloignent : on peut sauter entre deux
+                for (int w = 0; w < 3; w++) {
+                    final int wave = w;
+                    Scheduler.later(level, w * 6, () -> {
+                        if (!this.isAlive()) return;
+                        double in = wave * 3, outR = in + 3;
+                        fx(level, FxKind.RING, c, outR, COLOR, 10);
+                        for (int i = 0; i < 28; i++) {
+                            double a = Math.PI * 2 * i / 28;
+                            level.sendParticles(ParticleTypes.FLAME, c.x + Math.cos(a) * (in + 1.5), c.y + 0.2, c.z + Math.sin(a) * (in + 1.5), 2, 0.4, 0.1, 0.4, 0.02);
                         }
+                        hitRing(c, in, outR, ability("ringDamage", 1.1), e -> e.igniteForSeconds(4));
                     });
                 }
             });
-        }
+        });
+        move(out, "meteor", IgnisAnims.RUGISSEMENT, 300, 2, 0, 40, level -> {
+            warn(level, "⚠ Météores : quittez les cercles !");
+            level.playSound(null, this.blockPosition(), SoundEvents.RAVAGER_ROAR, SoundSource.HOSTILE, 2f, 0.6f);
+            playThen(level, IgnisAnims.RUGISSEMENT, () ->
+                    rain(level, 1 + phase, 3.5, 24, ability("meteorDamage", 1.8), 0xFF4010, FxKind.BURST, ParticleTypes.LAVA, e -> e.igniteForSeconds(3)));
+        });
+        move(out, "estoc", IgnisAnims.ESTOC, 180, 1, 6, 24, level -> {
+            Vec3 at = aim();
+            telegraphLine(level, dirTo(at), Math.min(20, Math.sqrt(this.distanceToSqr(at)) + 4), 0xFF3010, IgnisAnims.STRIKE_TICKS[IgnisAnims.ESTOC]);
+            warn(level, "⚠ Estoc : écartez-vous de sa trajectoire !");
+            playThen(level, IgnisAnims.ESTOC, () -> {
+                LivingEntity now = this.getTarget();
+                dash(now == null ? facing() : dirTo(now.position()), 12, 1.25, ability("estocDamage", 1.7));
+                level.playSound(null, this.blockPosition(), SoundEvents.TRIDENT_RIPTIDE_3.value(), SoundSource.HOSTILE, 2f, 0.6f);
+            });
+        });
+        move(out, "fireball", IgnisAnims.LAME_ARDENTE, 130, 1, 4, 32, level -> playThen(level, IgnisAnims.LAME_ARDENTE, () -> {
+            LivingEntity target = this.getTarget();
+            if (target == null || !target.isAlive()) return;
+            int count = (int) ability("fireballCount", 5) + phase;
+            Vec3 dir = dirTo(target.position());
+            double baseAngle = Math.atan2(dir.z, dir.x);
+            fx(level, FxKind.SLASH, this.position().add(0, 1.5, 0), 4, COLOR, 10);
+            for (int i = 0; i < count; i++) {
+                double a = baseAngle + (i - (count - 1) / 2.0) * 0.18;
+                MagicProjectile p = MagicProjectile.create(level, this, ItemDefs.Element.FEU, RpgCombat.mobAtk(this) * 0.8, 2.0);
+                p.setPos(this.getX(), this.getEyeY(), this.getZ());
+                p.shoot(Math.cos(a), (target.getY() - this.getEyeY()) / Math.max(1, this.distanceTo(target)), Math.sin(a), 1.1F, 1F);
+                level.addFreshEntity(p);
+            }
+            level.playSound(null, this.blockPosition(), SoundEvents.BLAZE_SHOOT, SoundSource.HOSTILE, 2f, 0.8f);
+        }));
+        move(out, "eruption", IgnisAnims.ERUPTION, 320, 2, 0, 40, level -> {
+            warn(level, "⚠ Éruption : le sol se fissure sous vos pieds !");
+            playThen(level, IgnisAnims.ERUPTION, () -> {
+                rain(level, 3 + phase * 2, 2.6, 22, ability("eruptionDamage", 1.6), COLOR, FxKind.PILLAR, ParticleTypes.FLAME, e -> {
+                    e.igniteForSeconds(4);
+                    if (com.mmorpg.combat.CrowdControl.allow(e)) {
+                        e.push(0, 0.7, 0);
+                        e.needsSync = true;
+                    }
+                });
+                if (phase >= 4) Scheduler.later(level, 16, () -> {
+                    if (this.isAlive()) rain(level, 6, 2.6, 22, ability("eruptionDamage", 1.6), COLOR, FxKind.PILLAR, ParticleTypes.FLAME, e -> e.igniteForSeconds(4));
+                });
+            });
+        });
     }
 
     @Override

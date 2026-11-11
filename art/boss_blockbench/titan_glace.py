@@ -186,7 +186,7 @@ def knuckles(f):
 
 
 # instant de l'impact de chaque attaque (s) : les degats sont appliques a ce moment en jeu
-STRIKES = {'frappe_poing': 1.02, 'double_frappe_sol': 1.3, 'pietinement': 1.0, 'exposition_noyau': 1.0}
+STRIKES = {'frappe_poing': 1.02, 'double_frappe_sol': 1.3, 'pietinement': 1.0, 'exposition_noyau': 1.0, 'lancer_glace': 1.5, 'revers': 1.1, 'blizzard': 1.1}
 
 COLORS = {'racine': 0, 'bassin': 3, 'torse': 1, 'tete': 2, 'noyau': 8, 'cristaux': 5, 'epaule_droite': 4, 'epaule_gauche': 4,
           'jambe_droite': 6, 'jambe_gauche': 6}
@@ -301,3 +301,37 @@ def animations(m):
           (3.3, M(kneel, {'racine': (0, 21.5, 0)})), (3.55, M(kneel, {'racine': (0, 20.5, 0)})), (4.6, M(kneel, {'racine': (0, 20.5, 0)}))], 'position')
     P(a, [(0, {}), (0.3, {'noyau': SC(1.4)}), (0.5, {'noyau': SC(0.7)}), (0.7, {'noyau': SC(1.2)}), (1.1, {'noyau': SC(0.8)}),
           (1.6, {'noyau': SC(0.6)}), (3.1, {'noyau': SC(0.4)}), (4.6, {'noyau': SC(0.35)})], 'scale')
+
+    # ------------------------------------------------------------------ attaques ajoutees (IA refaite)
+    # --- lancer de glace (2,8 s) : arrache un bloc au sol, le porte au-dessus de la tete et le projette
+    a = m.anim('lancer_glace', 2.8, 'once')
+    saisit = M(crouch(9, spread=5), {'torse': (-30, 0, 0), 'tete': (16, 0, 0), 'bras_droit': (50, 0, -10), 'bras_gauche': (50, 0, 10),
+                                     'avant_bras_droit': (10, 0, 0), 'avant_bras_gauche': (10, 0, 0)})
+    porte = {'torse': (16, 0, 0), 'tete': (12, 0, 0), 'bras_droit': (175, 0, -14), 'bras_gauche': (175, 0, 14),
+             'avant_bras_droit': (30, 0, 0), 'avant_bras_gauche': (30, 0, 0), 'cristaux': (-8, 0, 0)}
+    lance = M(crouch(4), {'torse': (-28, 0, 0), 'tete': (18, 0, 0), 'bras_droit': (70, 0, -6), 'bras_gauche': (70, 0, 6),
+                          'avant_bras_droit': (-10, 0, 0), 'avant_bras_gauche': (-10, 0, 0), 'cristaux': (6, 0, 0)})
+    P(a, [(0, {}), (0.6, saisit), (1.2, porte), (1.35, porte, L), (1.5, lance, L), (1.9, lance), (2.8, {})])
+    P(a, [(0, {}), (0.6, down(9)), (1.2, {'racine': (0, 1, 0)}), (1.35, {'racine': (0, 1, 0)}, L), (1.5, down(4), L), (1.9, down(4)), (2.8, {})], 'position')
+    P(a, [(0, {}), (1.2, {'noyau': SC(1.3)}), (1.5, {'noyau': SC(1.5)}, L), (1.9, {'noyau': SC(1.1)}), (2.8, {})], 'scale')
+
+    # --- revers du bras gauche (2,4 s) : bras ramene en travers du torse, puis grand balayage vers l'exterieur
+    a = m.anim('revers', 2.4, 'once')
+    arme = M(crouch(4, spread=5), {'torse': (-6, -34, 0), 'tete': (0, 24, 0), 'bras_gauche': (70, -60, 0), 'avant_bras_gauche': (40, 0, 0),
+                                   'bras_droit': (-10, 0, 20), 'epaule_gauche': (0, 0, -8)})
+    balaye = M(crouch(4, spread=5), {'torse': (-10, 38, 0), 'tete': (0, -26, 0), 'bras_gauche': (85, 75, 0), 'avant_bras_gauche': (-10, 0, 0),
+                                     'poing_gauche': (-10, 0, 0), 'bras_droit': (20, 0, 14), 'epaule_gauche': (0, 0, 6), 'cristaux': (0, 0, 6)})
+    P(a, [(0, {}), (0.8, arme), (0.9, arme, L), (1.1, balaye, L), (1.5, balaye), (2.4, {})])
+    P(a, [(0, {}), (0.8, down(4)), (1.5, down(4)), (2.4, {})], 'position')
+
+    # --- souffle de blizzard (3,2 s) : inspire, les plaques s'ouvrent, le noyau crache un blizzard devant lui
+    a = m.anim('blizzard', 3.2, 'once')
+    inspire = {'torse': (14, 0, 0), 'tete': (18, 0, 0), 'bras_droit': (-20, 0, 26), 'bras_gauche': (-20, 0, -26),
+               'plaque_droite': (0, -30, 0), 'plaque_gauche': (0, 30, 0), 'cristaux': (-8, 0, 0)}
+    souffle = M(crouch(5, spread=6), {'torse': (-22, 0, 0), 'tete': (-10, 0, 0), 'bras_droit': (-30, 0, 34), 'bras_gauche': (-30, 0, -34),
+                                      'avant_bras_droit': (20, 0, 0), 'avant_bras_gauche': (20, 0, 0), 'plaque_droite': (0, -95, 0),
+                                      'plaque_gauche': (0, 95, 0), 'plaque_ventre': (-60, 0, 0), 'cristaux': (8, 0, 0)})
+    vib = [(1.2 + 0.14 * i, M(souffle, {'torse': (0, 2.5 if i % 2 else -2.5, 0), 'tete': (0, 0, 2 if i % 2 else -2)}), L) for i in range(8)]
+    P(a, [(0, {}), (0.8, inspire), (0.95, inspire, L), (1.1, souffle, L)] + vib + [(2.4, souffle), (3.2, {})])
+    P(a, [(0, {}), (0.8, {'racine': (0, 1, 0)}), (0.95, {'racine': (0, 1, 0)}, L), (1.1, down(5), L), (2.4, down(5)), (3.2, {})], 'position')
+    P(a, [(0, {}), (0.8, {'noyau': SC(0.8)}), (1.1, {'noyau': SC(1.6)}, L), (1.7, {'noyau': SC(1.4)}), (2.4, {'noyau': SC(1.6)}), (3.2, {})], 'scale')

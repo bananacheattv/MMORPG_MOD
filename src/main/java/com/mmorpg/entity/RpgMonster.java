@@ -43,6 +43,14 @@ public abstract class RpgMonster extends Monster implements RpgMob {
                 .add(Attributes.ARMOR, 0);
     }
 
+    /** Controles uniquement : cible imposee (un faux joueur ne figure pas dans la liste des joueurs du monde). */
+    public net.minecraft.world.entity.@Nullable LivingEntity testTarget;
+
+    @Override
+    public net.minecraft.world.entity.@Nullable LivingEntity getTarget() {
+        return testTarget != null ? testTarget : super.getTarget();
+    }
+
     @Override
     public String mobKey() {
         return key;

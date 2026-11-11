@@ -12,12 +12,15 @@ public final class RoiGobelinAnims {
     public static final int MORT = 6;
     public static final int RAGE_REPOS = 7;
     public static final int RAGE_MARCHE = 8;
-    public static final int COUNT = 9;
-    public static final int[] LENGTH_TICKS = {48, 24, 30, 34, 44, 40, 52, 24, 18};
-    public static final int[] STRIKE_TICKS = {0, 0, 14, 16, 17, 0, 0, 0, 0};
-    public static final boolean[] LOOPING = {true, true, false, false, false, true, false, true, true};
+    public static final int TOURBILLON = 9;
+    public static final int CHARGE = 10;
+    public static final int BOND_ECRASANT = 11;
+    public static final int COUNT = 12;
+    public static final int[] LENGTH_TICKS = {48, 24, 30, 34, 44, 40, 52, 24, 18, 42, 34, 44};
+    public static final int[] STRIKE_TICKS = {0, 0, 14, 16, 17, 0, 0, 0, 0, 15, 13, 22};
+    public static final boolean[] LOOPING = {true, true, false, false, false, true, false, true, true, false, false, false};
     /** Animation qui reste figee sur sa derniere pose jusqu'a l'animation suivante. */
-    public static final boolean[] HOLD = {false, false, false, false, false, false, true, false, false};
+    public static final boolean[] HOLD = {false, false, false, false, false, false, true, false, false, false, false, false};
 
     private RoiGobelinAnims() {
     }

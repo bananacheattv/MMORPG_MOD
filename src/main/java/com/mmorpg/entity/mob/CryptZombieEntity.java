@@ -1,12 +1,30 @@
 package com.mmorpg.entity.mob;
 
-import com.mmorpg.entity.RpgMob;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.monster.zombie.Zombie;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 
-/** Archetype RPG utilisant l'IA et les animations natives de Zombie. */
-public final class CryptZombieEntity extends Zombie implements RpgMob {
-    public CryptZombieEntity(EntityType<? extends Zombie> type, Level level) { super(type, level); }
-    @Override public String mobKey() { return "zombie_des_cryptes"; }
+/** Zombie des cryptes : mort-vivant lent et tenace, griffe, mord et crache un nuage putride. */
+public final class CryptZombieEntity extends SmartMonster {
+    public CryptZombieEntity(EntityType<? extends Monster> type, Level level) {
+        super(type, level, "zombie_des_cryptes");
+    }
+
+    @Override
+    protected SoundEvent getAmbientSound() {
+        return SoundEvents.ZOMBIE_AMBIENT;
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource source) {
+        return SoundEvents.ZOMBIE_HURT;
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return SoundEvents.ZOMBIE_DEATH;
+    }
 }

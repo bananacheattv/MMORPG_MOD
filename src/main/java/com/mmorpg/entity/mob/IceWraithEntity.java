@@ -10,9 +10,9 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 
 /** Spectre de Givre : apparition glaciale qui ralentit ses victimes avec des eclats de glace. */
-public class IceWraithEntity extends CasterMonster {
+public class IceWraithEntity extends SmartMonster {
     public IceWraithEntity(EntityType<? extends Monster> type, Level level) {
-        super(type, level, "spectre_givre", ItemDefs.Element.GIVRE, SoundEvents.PLAYER_HURT_FREEZE);
+        super(type, level, "spectre_givre");
     }
 
     @Override

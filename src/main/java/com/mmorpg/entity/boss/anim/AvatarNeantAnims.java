@@ -10,12 +10,15 @@ public final class AvatarNeantAnims {
     public static final int TELEPORTATION_PREPARATION = 4;
     public static final int REFORMATION = 5;
     public static final int MORT = 6;
-    public static final int COUNT = 7;
-    public static final int[] LENGTH_TICKS = {60, 40, 48, 52, 28, 32, 68};
-    public static final int[] STRIKE_TICKS = {0, 0, 39, 24, 22, 9, 0};
-    public static final boolean[] LOOPING = {true, true, false, false, false, false, false};
+    public static final int GRIFFES = 7;
+    public static final int RAYON = 8;
+    public static final int PLUIE_ECLATS = 9;
+    public static final int COUNT = 10;
+    public static final int[] LENGTH_TICKS = {60, 40, 48, 52, 28, 32, 68, 34, 60, 52};
+    public static final int[] STRIKE_TICKS = {0, 0, 39, 24, 22, 9, 0, 14, 20, 27};
+    public static final boolean[] LOOPING = {true, true, false, false, false, false, false, false, false, false};
     /** Animation qui reste figee sur sa derniere pose jusqu'a l'animation suivante. */
-    public static final boolean[] HOLD = {false, false, false, false, true, false, true};
+    public static final boolean[] HOLD = {false, false, false, false, true, false, true, false, false, false};
 
     private AvatarNeantAnims() {
     }

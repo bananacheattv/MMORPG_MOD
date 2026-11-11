@@ -10,6 +10,10 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE / 'modeles'))
 from aeloria3d import check_runtime, export_runtime
 from materiaux import PEINTRES, RAMPS, post_process
+import clips_extra
+
+# le cristal d'arene et le drone n'attaquent pas : pas de clips supplementaires
+SANS_EXTRA = {'crystal_blue', 'crystal_red', 'crystal_neutral', 'arena_drone'}
 
 ROOT = HERE.parent
 LIV = ROOT / 'livraison'
@@ -38,6 +42,8 @@ def enveloppe(model):
 def build(key, TOUS):
     t0 = time.time()
     p = TOUS[key]()
+    if key not in SANS_EXTRA:
+        clips_extra.ajoute(p)
     reste = p.resoudre_coplanaires()
     p.pack(min_size=64)
     p.paint(PEINTRES, RAMPS)

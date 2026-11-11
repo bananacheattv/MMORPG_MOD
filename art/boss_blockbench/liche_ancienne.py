@@ -217,7 +217,7 @@ def build():
 
 
 # instant de l'impact de chaque attaque (s) : les degats sont appliques a ce moment en jeu
-STRIKES = {'projectile': 0.57, 'invocation': 1.1, 'canalisation': 0.5, 'recul': 0.0}
+STRIKES = {'projectile': 0.57, 'invocation': 1.1, 'canalisation': 0.5, 'recul': 0.0, 'frappe_baton': 0.9, 'pluie_ames': 1.0, 'rayon': 0.95}
 
 COLORS = {'racine': 0, 'torse': 1, 'tete': 2, 'couronne': 5, 'bras_droit': 4, 'bras_gauche': 4, 'baton': 7,
           'cristal_ame': 3, 'robe_avant': 6, 'robe_arriere': 6}
@@ -326,3 +326,48 @@ def animations(m):
           (1.3, {'cristal_ame': (0.7, 0.7, 0.7), 'cristal_baton': (0.8, 0.8, 0.8), 'robe_interieure': (1, 0.6, 1)}),
           (1.75, {'cristal_ame': (0.65, 0.65, 0.65), 'cristal_baton': (0.7, 0.7, 0.7), 'robe_interieure': (1.1, 0.35, 1.1)}),
           (3.2, {'cristal_ame': (0.6, 0.6, 0.6), 'cristal_baton': (0.7, 0.7, 0.7), 'robe_interieure': (1.1, 0.35, 1.1)})], 'scale')
+
+    # ------------------------------------------------------------------ attaques ajoutees (IA refaite)
+    import math
+    S = lambda v: (v, v, v)
+
+    # --- frappe du baton (2 s) : baton leve haut, plante dans le sol, la robe se souleve sous l'onde
+    a = m.anim('frappe_baton', 2.0, 'once')
+    leve = {'torse': (10, -10, 0), 'tete': (14, 8, 0), 'machoire': (-14, 0, 0), 'bras_droit': (150, 0, 8), 'avant_bras_droit': (-25, 0, 0),
+            'baton': (-150, 0, 0), 'bras_gauche': (-20, 0, -30), 'avant_bras_gauche': (20, 0, 0)}
+    plante = {'torse': (-22, 6, 0), 'tete': (16, -4, 0), 'machoire': (-24, 0, 0), 'bras_droit': (42, 0, 4), 'avant_bras_droit': (-20, 0, 0),
+              'baton': (-24, 0, 0), 'bras_gauche': (30, 0, -50), 'avant_bras_gauche': (-30, 0, 0), 'main_gauche': (-25, 0, 0)}
+    trem = [(1.0 + 0.08 * i, dict(plante, torse=(-22, 6, 1.5 if i % 2 else -1.5)), L) for i in range(4)]
+    P(a, [(0, {}), (0.6, leve), (0.75, leve, L), (0.9, plante, L)] + trem + [(1.4, plante), (2.0, {})])
+    P(a, [(0, {}), (0.6, flare(4, back=-6)), (0.75, flare(4, back=-6), L), (0.9, flare(26), L), (1.4, flare(12)), (2.0, {})], bones=PANNEAUX)
+    P(a, [(0, {}), (0.6, {'racine': (0, 3.5, 0)}), (0.75, {'racine': (0, 3.5, 0)}, L), (0.9, {'racine': (0, -1.5, 0)}, L),
+          (1.4, {'racine': (0, -1, 0)}), (2.0, {})], 'position')
+    P(a, [(0, {}), (0.75, {'cristal_baton': S(1.3)}), (0.9, {'cristal_baton': S(1.7), 'cristal_ame': S(1.3)}, L),
+          (1.4, {'cristal_baton': S(1.2)}), (2.0, {})], 'scale')
+
+    # --- pluie d'ames (2,8 s) : la main gauche levee trace un cercle au-dessus de la tete, les ames tombent du ciel
+    a = m.anim('pluie_ames', 2.8, 'once')
+
+    def cercle(i):
+        an = i * math.pi / 3
+        return {'torse': (12, 0, 0), 'tete': (26, 0, 0), 'machoire': (-20, 0, 0), 'bras_gauche': (160 + 12 * math.cos(an), 0, -14 + 16 * math.sin(an)),
+                'avant_bras_gauche': (-30, 0, 0), 'main_gauche': (-30, 0, 0), 'bras_droit': (25, 0, 10), 'baton': (-25, 0, 0), 'couronne': (0, 0, 3)}
+    P(a, [(0, {}), (0.5, {'torse': (-8, 0, 0), 'tete': (-8, 0, 0), 'bras_gauche': (20, 0, -10), 'avant_bras_gauche': (40, 0, 0)}), (1.0, cercle(0))]
+      + [(1.0 + 0.2 * i, cercle(i), L) for i in range(1, 6)] + [(2.2, cercle(6), L), (2.8, {})])
+    P(a, [(0, {}), (0.5, flare(2, back=-4)), (1.0, flare(14))] + [(1.0 + 0.2 * i, flare(14 + (3 if i % 2 else -3)), L) for i in range(1, 6)]
+      + [(2.2, flare(12)), (2.8, {})], bones=PANNEAUX)
+    P(a, [(0, {}), (1.0, {'racine': (0, 3, 0)}), (2.2, {'racine': (0, 3.5, 0)}), (2.8, {})], 'position')
+    P(a, [(0, {}), (1.0, {'cristal_ame': S(1.45)}), (1.6, {'cristal_ame': S(1.2)}), (2.2, {'cristal_ame': S(1.45)}), (2.8, {})], 'scale')
+
+    # --- rayon d'ombre (2,6 s) : recule, puis tient le baton a deux mains pointe devant elle ; le jeu fait pivoter la liche vers sa cible
+    a = m.anim('rayon', 2.6, 'once')
+    recul = {'torse': (8, -30, 0), 'tete': (0, 22, 0), 'bras_droit': (20, 0, 10), 'baton': (-30, 0, 0), 'bras_gauche': (10, 0, -20), 'machoire': (-6, 0, 0)}
+
+    def vise(j):
+        return dict(can, baton=(-93 + 1.5 * j, 0, j), tete=(6, -6, j), torse=(-10, 8, 0.6 * j), machoire=(-22, 0, 0))
+    P(a, [(0, {}), (0.6, recul), (0.85, recul, L), (0.95, vise(0), L)] + [(0.95 + 0.14 * i, vise(1 if i % 2 else -1), L) for i in range(1, 9)]
+      + [(2.1, vise(0)), (2.6, {})])
+    P(a, [(0, {}), (0.6, flare(3, back=8)), (0.95, flare(8, back=-14), L), (2.1, flare(6, back=-10)), (2.6, {})], bones=PANNEAUX)
+    P(a, [(0, {}), (0.6, {'racine': (0, 1, 2)}), (0.95, {'racine': (0, 1.5, -1)}, L), (2.1, {'racine': (0, 1.5, -1)}), (2.6, {})], 'position')
+    P(a, [(0, {}), (0.6, {'cristal_baton': S(1.5)}), (0.95, {'cristal_baton': S(1.9), 'cristal_ame': S(1.3)}, L),
+          (2.1, {'cristal_baton': S(1.6), 'cristal_ame': S(1.2)}), (2.6, {})], 'scale')

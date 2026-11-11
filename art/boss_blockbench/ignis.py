@@ -215,7 +215,7 @@ def build():
 
 
 # instant de l'impact de chaque attaque (s) : les degats sont appliques a ce moment en jeu
-STRIKES = {'balayage': 0.86, 'frappe_sol': 1.0, 'souffle_feu': 1.0, 'rugissement': 0.85}
+STRIKES = {'balayage': 0.86, 'frappe_sol': 1.0, 'souffle_feu': 1.0, 'rugissement': 0.85, 'estoc': 0.9, 'lame_ardente': 0.95, 'eruption': 1.25}
 
 COLORS = {'racine': 0, 'bassin': 3, 'torse': 1, 'tete': 2, 'cornes': 5, 'bras_droit': 4, 'bras_gauche': 4,
           'jambe_droite': 6, 'jambe_gauche': 6, 'epee': 7, 'noyau': 8}
@@ -364,3 +364,37 @@ def animations(m):
           (2.95, M(kneel, {'racine': (0, 10, 0), 'epee': (0, 0.6, 2.6)})), (4.0, M(kneel, {'racine': (0, 10, 0), 'epee': (0, 0.6, 2.6)}))], 'position')
     P(a, [(0, {}), (0.35, {'noyau': SC(1.5)}), (0.5, {'noyau': SC(0.8)}), (0.7, {'noyau': SC(1.2)}), (1.1, {'noyau': SC(0.8)}),
           (2.6, {'noyau': SC(0.6)}), (4.0, {'noyau': SC(0.5)})], 'scale')
+
+    # ------------------------------------------------------------------ attaques ajoutees (IA refaite)
+    # --- estoc (2 s) : epee ramenee a la hanche, puis fente en avant (le jeu fait la charge)
+    a = m.anim('estoc', 2.0, 'once')
+    arme = M(crouch(2.5, spread=5), {'torse': (4, -32, 0), 'tete': (0, 26, 0), 'bras_droit': (-35, 0, 8), 'avant_bras_droit': (80, 0, 0),
+                                     'epee': (40, 0, 0), 'bras_gauche': (60, 0, -10), 'avant_bras_gauche': (20, 0, 0), 'pagne': (6, 0, 0)})
+    fente = M(legs((38, -45, 8), (-28, -4, 22)), {'torse': (-18, 22, 0), 'tete': (14, -18, 0), 'bras_droit': (88, 8, 0),
+                                                  'avant_bras_droit': (-8, 0, 0), 'epee': (0, 0, 0), 'bras_gauche': (-35, 0, -20),
+                                                  'pagne': (22, 0, 0), 'pagne_arriere': (-16, 0, 0)})
+    P(a, [(0, {}), (0.65, arme), (0.78, arme, L), (0.9, fente, L), (1.3, fente), (2.0, {})])
+    P(a, [(0, {}), (0.65, {'bassin': (0, -2.5, 0), 'racine': (0, 0, 2)}), (0.78, {'bassin': (0, -2.5, 0), 'racine': (0, 0, 2)}, L),
+          (0.9, {'bassin': (0, -3, 0), 'racine': (0, 0, -5)}, L), (1.3, {'bassin': (0, -3, 0), 'racine': (0, 0, -5)}), (2.0, {})], 'position')
+    P(a, [(0, {}), (0.78, {'noyau': SC(1.3)}), (0.9, {'noyau': SC(1.5)}, L), (1.3, {'noyau': SC(1.1)}), (2.0, {})], 'scale')
+
+    # --- lame ardente (2,2 s) : epee levee d'une main, abattue en diagonale ; une vague de feu part devant lui
+    a = m.anim('lame_ardente', 2.2, 'once')
+    leve = {'torse': (10, -24, 0), 'tete': (6, 20, 0), 'bras_droit': (150, -25, 20), 'avant_bras_droit': (15, 0, 0), 'epee': (40, 0, 0),
+            'bras_gauche': (30, 0, -20), 'pagne': (-4, 0, 0)}
+    coupe = M(crouch(3, spread=6), {'torse': (-24, 26, 0), 'tete': (14, -20, 0), 'bras_droit': (40, 35, -10), 'avant_bras_droit': (-20, 0, 0),
+                                    'epee': (-10, 0, 0), 'bras_gauche': (-20, 0, -30), 'pagne': (16, 0, 4)})
+    P(a, [(0, {}), (0.7, leve), (0.82, leve, L), (0.95, coupe, L), (1.4, coupe), (2.2, {})])
+    P(a, [(0, {}), (0.7, {'racine': (0, 1, 0)}), (0.82, {'racine': (0, 1, 0)}, L), (0.95, {'bassin': (0, -3, -1)}, L), (1.4, {'bassin': (0, -3, -1)}), (2.2, {})], 'position')
+    P(a, [(0, {}), (0.82, {'noyau': SC(1.35)}), (0.95, {'noyau': SC(1.6)}, L), (1.4, {'noyau': SC(1.15)}), (2.2, {})], 'scale')
+
+    # --- eruption (2,6 s) : epee plantee, poing gauche leve puis abattu ; des colonnes de feu jaillissent sous les joueurs
+    a = m.anim('eruption', 2.6, 'once')
+    plante = M(crouch(5, spread=6), {'torse': (-16, 0, 0), 'tete': (10, 0, 0), 'bras_droit': (52, 0, -8), 'avant_bras_droit': (-20, 0, 0),
+                                     'epee': (-2, 0, 0), 'bras_gauche': (20, 0, -20), 'pagne': (20, 0, 0), 'pagne_arriere': (-12, 0, 0)})
+    poing = M(plante, {'torse': (10, 0, 0), 'tete': (14, 0, 0), 'bras_gauche': (145, 0, 16), 'avant_bras_gauche': (30, 0, 0), 'main_gauche': (-30, 0, 0)})
+    abat = M(plante, {'torse': (-10, 0, 0), 'bras_gauche': (40, 0, 10), 'avant_bras_gauche': (-10, 0, 0), 'main_gauche': (20, 0, 0)})
+    trem = [(1.33 + 0.08 * i, M(abat, {'torse': (0, 0, 1.5 if i % 2 else -1.5)}), L) for i in range(4)]
+    P(a, [(0, {}), (0.5, plante), (1.0, poing), (1.12, poing, L), (1.25, abat, L)] + trem + [(1.9, abat), (2.6, {})])
+    P(a, [(0, {}), (0.5, {'bassin': (0, -5, -2)}), (1.9, {'bassin': (0, -5, -2)}), (2.6, {})], 'position')
+    P(a, [(0, {}), (1.0, {'noyau': SC(1.4)}), (1.25, {'noyau': SC(1.7)}, L), (1.9, {'noyau': SC(1.2)}), (2.6, {})], 'scale')

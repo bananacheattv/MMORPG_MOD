@@ -1,12 +1,30 @@
 package com.mmorpg.entity.mob;
 
-import com.mmorpg.entity.RpgMob;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.monster.spider.CaveSpider;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 
-/** Archetype RPG utilisant l'IA et les animations natives de CaveSpider. */
-public final class VenomSpiderEntity extends CaveSpider implements RpgMob {
-    public VenomSpiderEntity(EntityType<? extends CaveSpider> type, Level level) { super(type, level); }
-    @Override public String mobKey() { return "araignee_venimeuse"; }
+/** Araignee venimeuse : bondit sur sa proie, tourne autour et crache son venin. */
+public final class VenomSpiderEntity extends SmartMonster {
+    public VenomSpiderEntity(EntityType<? extends Monster> type, Level level) {
+        super(type, level, "araignee_venimeuse");
+    }
+
+    @Override
+    protected SoundEvent getAmbientSound() {
+        return SoundEvents.SPIDER_AMBIENT;
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource source) {
+        return SoundEvents.SPIDER_HURT;
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return SoundEvents.SPIDER_DEATH;
+    }
 }

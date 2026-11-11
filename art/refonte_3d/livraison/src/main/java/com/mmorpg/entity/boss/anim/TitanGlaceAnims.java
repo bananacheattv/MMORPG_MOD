@@ -11,12 +11,15 @@ public final class TitanGlaceAnims {
     public static final int PIETINEMENT = 5;
     public static final int EXPOSITION_NOYAU = 6;
     public static final int MORT = 7;
-    public static final int COUNT = 8;
-    public static final int[] LENGTH_TICKS = {80, 80, 48, 44, 56, 44, 80, 92};
-    public static final int[] STRIKE_TICKS = {0, 0, 0, 20, 26, 20, 20, 0};
-    public static final boolean[] LOOPING = {false, true, true, false, false, false, false, false};
+    public static final int LANCER_GLACE = 8;
+    public static final int REVERS = 9;
+    public static final int BLIZZARD = 10;
+    public static final int COUNT = 11;
+    public static final int[] LENGTH_TICKS = {80, 80, 48, 44, 56, 44, 80, 92, 56, 48, 64};
+    public static final int[] STRIKE_TICKS = {0, 0, 0, 20, 26, 20, 20, 0, 30, 22, 22};
+    public static final boolean[] LOOPING = {false, true, true, false, false, false, false, false, false, false, false};
     /** Animation qui reste figee sur sa derniere pose jusqu'a l'animation suivante. */
-    public static final boolean[] HOLD = {false, false, false, false, false, false, false, true};
+    public static final boolean[] HOLD = {false, false, false, false, false, false, false, true, false, false, false};
 
     private TitanGlaceAnims() {
     }

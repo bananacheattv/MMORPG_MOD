@@ -137,12 +137,12 @@ public final class ModEntities {
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         IMPORTED.values().forEach(type -> event.put(type.get(), RpgMonster.createAttributes()
                 .add(net.minecraft.world.entity.ai.attributes.Attributes.FLYING_SPEED, 0.45).build()));
-        event.put(CRYPT_ZOMBIE.get(), net.minecraft.world.entity.monster.zombie.Zombie.createAttributes().build());
-        event.put(VENOM_SPIDER.get(), net.minecraft.world.entity.monster.spider.CaveSpider.createCaveSpider().build());
-        event.put(BANDIT.get(), net.minecraft.world.entity.monster.illager.Pillager.createAttributes().build());
+        event.put(CRYPT_ZOMBIE.get(), RpgMonster.createAttributes().build());
+        event.put(VENOM_SPIDER.get(), RpgMonster.createAttributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED, 0.32).build());
+        event.put(BANDIT.get(), RpgMonster.createAttributes().build());
         event.put(GOBLIN.get(), RpgMonster.createAttributes().build());
         event.put(DARK_WOLF.get(), RpgMonster.createAttributes().build());
-        event.put(CURSED_SKELETON.get(), CursedSkeletonEntity.createAttributes().build());
+        event.put(CURSED_SKELETON.get(), RpgMonster.createAttributes().build());
         event.put(ORC.get(), RpgMonster.createAttributes().build());
         event.put(FIRE_ELEMENTAL.get(), RpgMonster.createAttributes().build());
         event.put(ICE_WRAITH.get(), RpgMonster.createAttributes().build());

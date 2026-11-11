@@ -2,12 +2,9 @@ package com.mmorpg.entity.boss;
 
 import com.mmorpg.combat.RpgCombat;
 import com.mmorpg.combat.ThreatGoal;
-import com.mmorpg.entity.FxKind;
-import com.mmorpg.entity.SkillFxEntity;
 import com.mmorpg.registry.ModAttachments;
 import com.mmorpg.rpg.MobData;
 import com.mmorpg.server.MobSpawner;
-import com.mmorpg.server.Scheduler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -23,8 +20,8 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Durcissement commun a tous les boss (donjons et gardiens de guilde) : zones telegraphiees, onde de choc, charge,
- * marque anti-kiting, renforts, enrage progressif, puissance et robustesse selon le nombre de joueurs.
+ * Durcissement commun a tous les boss (donjons et gardiens de guilde) : marque anti-kiting, renforts, enrage progressif,
+ * puissance et robustesse selon le nombre de joueurs. Les attaques, elles, sont propres a chaque boss ({@link RpgBoss#defineMoves}).
  * Tout reste dans le rayon de la base du boss ; aucune modification du terrain.
  */
 public final class BossFury {
@@ -44,10 +41,8 @@ public final class BossFury {
 
     public static final class State {
         long combatStart = -1;
-        long nextRain, nextNova, nextCharge, nextMark, nextAdds;
-        int chargeWind, chargeLeft;
-        Vec3 chargeDir = Vec3.ZERO;
-        boolean chargeHit, enrageAnnounced;
+        long nextMark, nextAdds;
+        boolean enrageAnnounced;
         int near = 1;
         final List<UUID> adds = new ArrayList<>();
     }
@@ -78,10 +73,6 @@ public final class BossFury {
                 && RpgCombat.isEnemy(boss, p) && boss.distanceToSqr(p) < range * range).toList();
     }
 
-    private static void fx(ServerLevel level, FxKind kind, Vec3 pos, double radius, int color, int life) {
-        level.addFreshEntity(SkillFxEntity.create(level, kind, pos, radius, color, life));
-    }
-
     private static void warn(List<ServerPlayer> players, String text) {
         Component msg = Component.literal(text).withColor(0xFF8050);
         for (ServerPlayer p : players) p.sendOverlayMessage(msg);
@@ -89,14 +80,11 @@ public final class BossFury {
 
     // ------------------------------------------------------------------------------------------ boucle
 
-    /** Appelee a chaque tick d'IA quand le boss a une cible. Renvoie vrai si une action telegraphiee occupe le boss. */
-    public static boolean tick(RpgBoss boss, ServerLevel level, int phase, State s) {
+    /** Appelee a chaque tick d'IA quand le boss a une cible : enrage, marque anti-kiting et renforts. Les attaques sont propres a chaque boss. */
+    public static void tick(RpgBoss boss, ServerLevel level, int phase, State s) {
         long now = level.getGameTime();
         if (s.combatStart < 0) {
             s.combatStart = boss.tickCount;
-            s.nextRain = now + 140;
-            s.nextNova = now + 220;
-            s.nextCharge = now + 100;
             s.nextMark = now + 160;
             s.nextAdds = now + 500;
         }
@@ -108,32 +96,11 @@ public final class BossFury {
                 warn(targets(boss, level, 64), "☠ " + boss.getName().getString() + " entre en rage : finissez-le !");
             }
         }
-        // charge en cours
-        if (s.chargeLeft > 0) {
-            dash(boss, level, s);
-            return true;
-        }
-        if (s.chargeWind > 0) {
-            boss.getNavigation().stop();
-            if (--s.chargeWind == 0) {
-                var t = boss.getTarget();
-                if (t != null) {
-                    Vec3 d = t.position().subtract(boss.position());
-                    d = new Vec3(d.x, 0, d.z);
-                    s.chargeDir = d.lengthSqr() < 1e-4 ? Vec3.ZERO : d.normalize();
-                    s.chargeLeft = 14;
-                    s.chargeHit = false;
-                }
-            }
-            return true;
-        }
-        if (boss.busy()) return false;
+        if (boss.busy()) return;
         var target = boss.getTarget();
-        if (target == null || !target.isAlive()) return false;
+        if (target == null || !target.isAlive()) return;
         List<ServerPlayer> near = targets(boss, level, 40);
-        if (near.isEmpty()) return false;
-        double d2 = boss.distanceToSqr(target);
-
+        if (near.isEmpty()) return;
         if (phase >= 2 && now >= s.nextMark) {
             s.nextMark = now + (phase >= 3 ? 200 : 260);
             mark(boss, near);
@@ -141,109 +108,6 @@ public final class BossFury {
         if (phase >= 3 && now >= s.nextAdds) {
             s.nextAdds = now + (phase >= 4 ? 420 : 560);
             summon(boss, level, 2, 3 + s.near, s);
-        }
-        if (phase >= 2 && now >= s.nextRain) {
-            s.nextRain = now + (phase >= 4 ? 140 : phase == 3 ? 190 : 240);
-            rain(boss, level, phase, near);
-            return false;
-        }
-        if (phase >= 3 && now >= s.nextNova && d2 < 14 * 14) {
-            s.nextNova = now + (phase >= 4 ? 170 : 230);
-            nova(boss, level, phase, s);
-            return true;
-        }
-        if (phase >= 2 && now >= s.nextCharge && d2 > 8 * 8 && d2 < 28 * 28 && boss.hasLineOfSight(target)) {
-            s.nextCharge = now + (phase >= 4 ? 150 : phase == 3 ? 200 : 260);
-            s.chargeWind = 20;
-            Vec3 to = target.position().subtract(boss.position());
-            fx(level, FxKind.BEAM, boss.position().add(0, 0.2, 0), 2, 0xFF5030, 20);
-            fx(level, FxKind.CIRCLE, boss.position(), Math.max(2, boss.getBbWidth()), 0xFF5030, 20);
-            warn(near, "⚠ Charge : écartez-vous de sa trajectoire !");
-            boss.pressureAnimation();
-            return true;
-        }
-        return false;
-    }
-
-    // ------------------------------------------------------------------------------------------ attaques
-
-    /** Pluie de zones : un cercle sous chaque joueur plus quelques cercles autour du boss, tous annonces. */
-    private static void rain(RpgBoss boss, ServerLevel level, int phase, List<ServerPlayer> near) {
-        int wind = phase >= 4 ? 28 : 36;
-        List<Vec3> spots = new ArrayList<>();
-        for (ServerPlayer p : near) spots.add(p.position());
-        var rnd = level.getRandom();
-        Vec3 home = boss.hasHome() ? Vec3.atCenterOf(boss.getHomePosition()) : boss.position();
-        double max = Math.max(6, boss.getHomeRadius() - 3);
-        for (int i = 0; i < phase; i++) {
-            double a = rnd.nextDouble() * Math.PI * 2, r = 3 + rnd.nextDouble() * max;
-            spots.add(new Vec3(home.x + Math.cos(a) * r, boss.getY(), home.z + Math.sin(a) * r));
-        }
-        int color = 0xEF5070;
-        for (Vec3 c : spots) fx(level, FxKind.CIRCLE, c, 3.4, color, wind);
-        warn(near, "⚠ Pluie de ruines : quittez les cercles !");
-        boss.pressureAnimation();
-        Scheduler.later(level, wind, () -> {
-            if (!boss.isAlive() || boss.isRemoved()) return;
-            for (Vec3 c : spots) {
-                level.sendParticles(ParticleTypes.EXPLOSION, c.x, c.y + 0.5, c.z, 2, 1, 0.2, 1, 0);
-                level.sendParticles(ParticleTypes.FLAME, c.x, c.y + 0.3, c.z, 18, 1.2, 0.1, 1.2, 0.03);
-            }
-            for (ServerPlayer p : targets(boss, level, 64)) {
-                for (Vec3 c : spots) {
-                    if (Math.hypot(p.getX() - c.x, p.getZ() - c.z) < 3.4 && Math.abs(p.getY() - c.y) < 4) {
-                        RpgCombat.mobHit(boss, p, 1.5 + 0.1 * phase);
-                        break;
-                    }
-                }
-            }
-        });
-    }
-
-    /** Onde de choc autour du boss : il s'immobilise puis frappe toute la zone. */
-    private static void nova(RpgBoss boss, ServerLevel level, int phase, State s) {
-        int wind = phase >= 4 ? 26 : 32;
-        double radius = 9;
-        boss.immobile(wind + 6);
-        fx(level, FxKind.CIRCLE, boss.position(), radius, 0xFF4030, wind);
-        warn(targets(boss, level, 48), "⚠ Onde de choc : éloignez-vous du boss !");
-        boss.pressureAnimation();
-        Scheduler.later(level, wind, () -> {
-            if (!boss.isAlive() || boss.isRemoved()) return;
-            fx(level, FxKind.SHOCKWAVE, boss.position(), radius, 0xFF6040, 14);
-            level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, boss.getX(), boss.getY() + 0.5, boss.getZ(), 1, 0, 0, 0, 0);
-            for (ServerPlayer p : targets(boss, level, radius + 1)) {
-                if (Math.hypot(p.getX() - boss.getX(), p.getZ() - boss.getZ()) <= radius) {
-                    RpgCombat.mobHit(boss, p, 1.8 + 0.1 * phase);
-                    Vec3 push = p.position().subtract(boss.position()).multiply(1, 0, 1).normalize().scale(1.1);
-                    if (com.mmorpg.combat.CrowdControl.allow(p)) p.push(push.x, 0.5, push.z);
-                }
-            }
-        });
-    }
-
-    private static void dash(RpgBoss boss, ServerLevel level, State s) {
-        s.chargeLeft--;
-        boss.getNavigation().stop();
-        BlockPos home = boss.getHomePosition();
-        double dx = boss.getX() - (home.getX() + 0.5), dz = boss.getZ() - (home.getZ() + 0.5);
-        boolean edge = boss.hasHome() && dx * dx + dz * dz > Math.pow(boss.getHomeRadius() - 1.5, 2)
-                && dx * s.chargeDir.x + dz * s.chargeDir.z > 0;
-        if (edge) {
-            s.chargeLeft = 0;
-            return;
-        }
-        boss.setDeltaMovement(s.chargeDir.x * 1.1, boss.getDeltaMovement().y, s.chargeDir.z * 1.1);
-        level.sendParticles(ParticleTypes.CLOUD, boss.getX(), boss.getY() + 0.2, boss.getZ(), 4, 0.4, 0.1, 0.4, 0.02);
-        if (!s.chargeHit) {
-            for (ServerPlayer p : targets(boss, level, 6)) {
-                if (boss.distanceTo(p) < boss.getBbWidth() / 2 + p.getBbWidth() / 2 + 1.6) {
-                    s.chargeHit = true;
-                    RpgCombat.mobHit(boss, p, 1.6);
-                    Vec3 push = s.chargeDir.scale(1.2);
-                    if (com.mmorpg.combat.CrowdControl.allow(p)) p.push(push.x, 0.45, push.z);
-                }
-            }
         }
     }
 

@@ -273,7 +273,7 @@ def build():
 
 
 # instant de l'impact de chaque attaque (s) : les degats sont appliques a ce moment en jeu
-STRIKES = {'coup_horizontal': 0.68, 'frappe_verticale': 0.8, 'cri_ralliement': 0.85}
+STRIKES = {'coup_horizontal': 0.68, 'frappe_verticale': 0.8, 'cri_ralliement': 0.85, 'tourbillon': 0.75, 'charge': 0.65, 'bond_ecrasant': 1.1}
 
 COLORS = {'racine': 0, 'bassin': 3, 'torse': 1, 'tete': 2, 'couronne': 5, 'bras_droit': 4, 'bras_gauche': 4,
           'jambe_droite': 6, 'jambe_gauche': 6, 'cape_haut': 0, 'couperet': 7}
@@ -397,3 +397,53 @@ def animations(m):
     walk('rage_marche', 0.9, 28, 26, -14, 1.4,
          extra={'bras_droit': (20, 0, 18), 'avant_bras_droit': (20, 0, 0), 'bras_gauche': (0, 0, -18), 'tete': (10, 0, 0),
                 'machoire': (-10, 0, 0), 'oreille_droite': (0, 16, -6), 'oreille_gauche': (0, -16, 6)})
+
+    # ------------------------------------------------------------------ attaques ajoutees (IA refaite)
+    # --- tourbillon (2,1 s) : se ramasse, puis deux tours complets couperet tendu, cape et etendard a l'horizontale
+    a = m.anim('tourbillon', 2.1, 'once')
+    ramasse = {'torse': (-16, -28, 0), 'tete': (8, 20, 0), 'bras_droit': (60, -100, 0), 'avant_bras_droit': (-20, 0, 0),
+               'couperet': (-110, -90, 0), 'bras_gauche': (30, 0, -35), 'jambe_droite': (-6, 0, 8), 'jambe_gauche': (6, 0, -8),
+               'pied_droit': (6, 0, -8), 'pied_gauche': (-6, 0, 8), 'machoire': (-8, 0, 0)}
+    tourne = {'torse': (-12, 10, 0), 'tete': (6, -10, 0), 'bras_droit': (85, -60, 0), 'avant_bras_droit': (-30, 0, 0),
+              'couperet': (-118, -90, 0), 'bras_gauche': (15, 0, -80), 'avant_bras_gauche': (10, 0, 0),
+              'jambe_droite': (0, 0, 10), 'jambe_gauche': (0, 0, -10), 'pied_droit': (0, 0, -10), 'pied_gauche': (0, 0, 10),
+              'machoire': (-20, 0, 0), 'cape_haut': (-30, 0, 0), 'cape_milieu': (-20, 0, 0), 'cape_bas': (-14, 0, 0),
+              'oreille_droite': (0, -20, 0), 'oreille_gauche': (0, 20, 0), 'etendard': (20, 0, 0)}
+    P(a, [(0, {}), (0.5, ramasse), (0.62, ramasse, L), (0.75, tourne, L), (1.55, tourne), (2.1, {})])
+    a.rot('racine', [(0, 0, 0, 0, L), (0.5, 0, -25, 0, L), (0.62, 0, -25, 0, L), (1.55, 0, 695, 0, L), (1.8, 0, 720, 0, L), (2.1, 0, 720, 0, L)])
+    P(a, [(0, {}), (0.5, {'bassin': (0, -1.5, 0)}), (1.55, {'bassin': (0, -1, 0)}), (2.1, {})], 'position')
+
+    # --- charge d'epaule (1,7 s) : recule, puis fonce l'epauliere en avant (le deplacement est fait par le jeu)
+    a = m.anim('charge', 1.7, 'once')
+    recule = {'torse': (10, 18, 0), 'tete': (-6, -14, 0), 'bras_gauche': (-30, 0, -10), 'avant_bras_gauche': (40, 0, 0),
+              'bras_droit': (-25, 0, 14), 'couperet': (-20, 0, 0), 'jambe_droite': (-14, 0, 0), 'jambe_gauche': (16, 0, 0),
+              'pied_droit': (12, 0, 0), 'pied_gauche': (-14, 0, 0), 'machoire': (-6, 0, 0)}
+
+    def fonce(s):
+        return {'torse': (-38, -24, 0), 'tete': (30, 20, 0), 'bras_gauche': (55, 30, -12), 'avant_bras_gauche': (70, 0, 0),
+                'bras_droit': (-40, 0, 16), 'avant_bras_droit': (-20, 0, 0), 'couperet': (-30, 0, 0),
+                'jambe_droite': (30 * s, 0, 0), 'jambe_gauche': (-30 * s, 0, 0), 'pied_droit': (-22 * s, 0, 0), 'pied_gauche': (22 * s, 0, 0),
+                'machoire': (-22, 0, 0), 'cape_haut': (-34, 0, 0), 'cape_milieu': (-18, 0, 0), 'cape_bas': (-12, 0, 0),
+                'oreille_droite': (0, -24, 0), 'oreille_gauche': (0, 24, 0), 'etendard': (28, 0, 0)}
+    P(a, [(0, {}), (0.45, recule), (0.55, recule, L), (0.65, fonce(1), L), (0.8, fonce(-1), L), (0.95, fonce(1), L), (1.1, fonce(-1), L),
+          (1.25, fonce(0.3)), (1.7, {})])
+    P(a, [(0, {}), (0.45, {'racine': (0, 0, 2)}), (0.65, {'racine': (0, -1, -3)}, L), (1.25, {'racine': (0, -1, -3)}), (1.7, {})], 'position')
+
+    # --- bond ecrasant (2,2 s) : se tasse, saute couperet a deux mains, retombe en fendant le sol
+    a = m.anim('bond_ecrasant', 2.2, 'once')
+    tasse = {'torse': (-24, 0, 0), 'tete': (16, 0, 0), 'bras_droit': (30, 0, 10), 'avant_bras_droit': (30, 0, 0), 'bras_gauche': (30, 0, -10),
+             'avant_bras_gauche': (40, 0, 0), 'jambe_droite': (0, 0, 8), 'jambe_gauche': (0, 0, -8), 'pied_droit': (0, 0, -8),
+             'pied_gauche': (0, 0, 8), 'cape_haut': (-4, 0, 0)}
+    vol = {'torse': (16, 0, 0), 'tete': (10, 0, 0), 'bras_droit': (170, 0, -10), 'avant_bras_droit': (-10, 0, 0), 'couperet': (-30, 0, 0),
+           'bras_gauche': (165, 0, 14), 'avant_bras_gauche': (10, 0, 0), 'jambe_droite': (-30, 0, 4), 'jambe_gauche': (20, 0, -4),
+           'pied_droit': (25, 0, 0), 'pied_gauche': (10, 0, 0), 'machoire': (-24, 0, 0), 'cape_haut': (-40, 0, 0), 'cape_milieu': (-25, 0, 0),
+           'cape_bas': (-15, 0, 0), 'oreille_droite': (0, 0, 16), 'oreille_gauche': (0, 0, -16), 'etendard': (-10, 0, 0)}
+    choc = {'torse': (-34, 0, 0), 'tete': (20, 0, 0), 'bras_droit': (58, 0, -6), 'avant_bras_droit': (-40, 0, 0), 'couperet': (-74, 0, 0),
+            'bras_gauche': (56, 0, 8), 'avant_bras_gauche': (-25, 0, 0), 'jambe_droite': (14, 0, 10), 'jambe_gauche': (-14, 0, -10),
+            'pied_droit': (-14, 0, -10), 'pied_gauche': (14, 0, 10), 'machoire': (-20, 0, 0), 'cape_haut': (-18, 0, 0),
+            'cape_milieu': (-10, 0, 0), 'etendard': (14, 0, 0)}
+    trem = [(1.16 + 0.07 * i, dict(choc, torse=(-34, 0, 1.6 if i % 2 else -1.6)), L) for i in range(4)]
+    P(a, [(0, {}), (0.45, tasse), (0.55, tasse, L), (0.8, vol, L), (0.95, vol, L), (1.1, choc, L)] + trem + [(1.5, choc), (2.2, {})])
+    P(a, [(0, {}), (0.45, {'bassin': (0, -2.5, 0)}), (0.55, {'bassin': (0, -2.5, 0)}, L), (0.8, {'racine': (0, 16, 0)}, L),
+          (0.9, {'racine': (0, 17, 0)}, L), (1.1, {'torse': (0, -2.5, -2), 'bassin': (0, -1.5, 0)}, L),
+          (1.5, {'torse': (0, -2.5, -2), 'bassin': (0, -1.5, 0)}), (2.2, {})], 'position')

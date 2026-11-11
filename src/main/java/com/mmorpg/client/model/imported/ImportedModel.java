@@ -177,9 +177,9 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
         animate("idle",state.ageInTicks,1-moving);
         String move=animations.containsKey("walk")?"walk":animations.containsKey("fly")?"fly":"slither";
         animate(move,state.ageInTicks,moving);
-        if(state instanceof ClassicMobRenderer.State s){if(s.attackTicks>=0)animate("attack",s.attackTicks,1);if(s.castTicks>=0)animate("cast",s.castTicks,1);if(head!=null){head.yRot+=state.yRot*(float)Math.PI/180;head.xRot+=state.xRot*(float)Math.PI/180;}}
-        if(state instanceof ImportedMobRenderer.State s && s.attackTicks>=0) animate("attack",s.attackTicks,1);
-        if(state instanceof com.mmorpg.client.model.YggdrasilRenderer.State s){if(s.attackTicks>=0)animate("attack",s.attackTicks,1);if(s.castTicks>=0)animate("cast",s.castTicks*(s.phase==3?1.5f:s.phase==2?1.2f:1),1);if(s.phase>=2){var rootPart=root();rootPart.zRot+=(float)Math.sin(state.ageInTicks*.08)*.012f*(s.phase-1);}}
+        if(state instanceof ClassicMobRenderer.State s){if(s.attackTicks>=0&&s.clip!=null)animate(s.clip,s.attackTicks,1);if(head!=null){head.yRot+=state.yRot*(float)Math.PI/180;head.xRot+=state.xRot*(float)Math.PI/180;}}
+        if(state instanceof ImportedMobRenderer.State s && s.attackTicks>=0 && s.clip!=null) animate(s.clip,s.attackTicks,1);
+        if(state instanceof com.mmorpg.client.model.YggdrasilRenderer.State s){if(s.attackTicks>=0&&s.clip!=null)animate(s.clip,s.attackTicks,1);if(s.phase>=2){var rootPart=root();rootPart.zRot+=(float)Math.sin(state.ageInTicks*.08)*.012f*(s.phase-1);}}
         if(state instanceof AuthoredNpcRenderer.State s&&s.sitting){poseBone("leg_-1",new net.minecraft.core.Rotations(-81,-10,0));poseBone("leg_1",new net.minecraft.core.Rotations(-81,10,0));poseBone("arm_-1",new net.minecraft.core.Rotations(-36,0,0));poseBone("arm_1",new net.minecraft.core.Rotations(-36,0,0));}
         if((state instanceof HubGuideRenderer.State||state instanceof AuthoredNpcRenderer.State)&&head!=null){head.yRot+=state.yRot*(float)Math.PI/180;head.xRot+=state.xRot*(float)Math.PI/180;}
         if(state instanceof AuthoredMasterRenderer.State s){if(head!=null){head.yRot+=state.yRot*(float)Math.PI/180;head.xRot+=state.xRot*(float)Math.PI/180;}if(s.presenting>=0)animate("cast",s.presenting,1);}

@@ -156,7 +156,7 @@ def build():
 
 
 # instant de l'impact de chaque attaque (s) : les degats sont appliques a ce moment en jeu
-STRIKES = {'charge_energie': 1.95, 'ouverture_torse': 1.2, 'teleportation_preparation': 1.1, 'reformation': 0.45}
+STRIKES = {'charge_energie': 1.95, 'ouverture_torse': 1.2, 'teleportation_preparation': 1.1, 'reformation': 0.45, 'griffes': 0.72, 'rayon': 1.0, 'pluie_eclats': 1.35}
 
 COLORS = {'racine': 0, 'torse': 1, 'masque': 2, 'couronne': 5, 'bras_droit': 4, 'bras_gauche': 4, 'noyau': 8,
           'epauliere_droite': 3, 'epauliere_gauche': 3, 'fragments': 6, 'bas_1': 7}
@@ -301,3 +301,39 @@ def animations(m):
     # 2e passe : animation definitive avec ces positions (memes tirages aleatoires)
     rng2 = __import__('random').Random(11)
     death({k: tuple(v) for k, v in final.items()})
+
+    # ------------------------------------------------------------------ attaques ajoutees (IA refaite)
+    # --- balayage de griffes (1,7 s) : main droite armee haut, griffe en diagonale devant lui
+    a = m.anim('griffes', 1.7, 'once')
+    arme = {'torse': (8, -30, 0), 'masque': (-4, 24, 0), 'bras_droit': (125, -45, 10), 'avant_bras_droit': (35, 0, 0),
+            'doigts_droite': (-35, 0, 0), 'bras_gauche': (20, 0, -30), 'bas_1': (6, 0, 0), 'bas_2': (8, 0, 0)}
+    griffe = {'torse': (-18, 30, 0), 'masque': (8, -22, 0), 'bras_droit': (38, 50, 0), 'avant_bras_droit': (-12, 0, 0),
+              'doigts_droite': (40, 0, 0), 'bras_gauche': (-30, 0, -24), 'bas_1': (-10, 8, 0), 'bas_2': (-14, 8, 0), 'bas_3': (-16, 0, 0)}
+    P(a, [(0, {}), (0.5, arme), (0.6, arme, L), (0.72, griffe, L), (1.0, griffe), (1.7, {})])
+    P(a, [(0, {}), (0.5, {'racine': (0, 2, 2)}), (0.72, {'racine': (0, -1, -4)}, L), (1.0, {'racine': (0, -1, -4)}), (1.7, {})], 'position')
+
+    # --- rayon du neant (3 s) : rassemble l'energie, puis pointe la main gauche ; le jeu fait pivoter l'avatar vers sa cible
+    a = m.anim('rayon', 3.0, 'once')
+    vise = {'torse': (-8, 0, 0), 'masque': (-8, 0, 0), 'bras_gauche': (88, 0, -6), 'avant_bras_gauche': (-10, 0, 0), 'doigts_gauche': (45, 0, 0),
+            'bras_droit': (70, 0, 30), 'avant_bras_droit': (50, 0, 0), 'doigts_droite': (20, 0, 0), 'cage_droite': (0, -30, 0),
+            'cage_gauche': (0, 30, 0), 'couronne': (-6, 0, 0)}
+    charge = {'torse': (6, 0, 0), 'masque': (6, 0, 0), 'bras_gauche': (40, 0, -20), 'avant_bras_gauche': (70, 0, 0), 'bras_droit': (40, 0, 20),
+              'avant_bras_droit': (70, 0, 0)}
+    trem = [(1.0 + 0.15 * i, M(vise, {'masque': (0, 0, 2 if i % 2 else -2), 'bras_gauche': (1.5 if i % 2 else -1.5, 0, 0)}), L) for i in range(1, 9)]
+    P(a, [(0, {}), (0.6, charge), (0.9, charge, L), (1.0, vise, L)] + trem + [(2.4, vise), (3.0, {})])
+    tend = M(toward_core(m, CHIPS, -0.2), {'noyau': (0, 0, -2)})
+    P(a, [(0, {}), (0.6, toward_core(m, CHIPS, 0.5)), (1.0, tend, L), (2.4, tend), (3.0, {})], 'position')
+    P(a, [(0, {}), (0.6, {'noyau': SC(1.5)}), (1.0, {'noyau': SC(1.2)}, L), (1.7, {'noyau': SC(1.5)}), (2.4, {'noyau': SC(1.2)}), (3.0, {})], 'scale')
+
+    # --- pluie d'eclats (2,6 s) : bras leves, les eclats montent et s'ecartent, puis sont abattus sur l'arene
+    a = m.anim('pluie_eclats', 2.6, 'once')
+    leve = {'torse': (10, 0, 0), 'masque': (20, 0, 0), 'bras_droit': (160, 0, 22), 'bras_gauche': (160, 0, -22), 'avant_bras_droit': (-10, 0, 0),
+            'avant_bras_gauche': (-10, 0, 0), 'doigts_droite': (40, 0, 0), 'doigts_gauche': (40, 0, 0), 'couronne': (-12, 0, 0),
+            'epauliere_droite': (0, 0, -8), 'epauliere_gauche': (0, 0, 8)}
+    abat = {'torse': (-16, 0, 0), 'masque': (-10, 0, 0), 'bras_droit': (25, 0, 14), 'bras_gauche': (25, 0, -14), 'avant_bras_droit': (20, 0, 0),
+            'avant_bras_gauche': (20, 0, 0), 'doigts_droite': (-20, 0, 0), 'doigts_gauche': (-20, 0, 0)}
+    P(a, [(0, {}), (0.9, leve), (1.2, leve, L), (1.35, abat, L), (1.8, abat), (2.6, {})])
+    haut = M(toward_core(m, CHIPS, -0.6), {n: (0, 14, 0) for n in CHIPS}, {'couronne': (0, 3, 0), 'racine': (0, 2, 0)})
+    bas = M(toward_core(m, CHIPS, -0.9), {n: (0, -10, 0) for n in CHIPS}, {'racine': (0, -1, 0)})
+    P(a, [(0, {}), (0.9, haut), (1.2, haut, L), (1.35, bas, L), (1.8, {}), (2.6, {})], 'position')
+    P(a, [(0, {}), (0.9, dict({n: SC(1.4) for n in CHIPS}, noyau=SC(1.4))), (1.35, dict({n: SC(1.1) for n in CHIPS}, noyau=SC(0.9)), L), (1.8, {}), (2.6, {})], 'scale')
