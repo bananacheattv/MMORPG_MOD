@@ -23,6 +23,8 @@ public final class AeloriaSchematic {
     /** Octets bruts des varints (null en mode en-tête seul). */
     byte[] blockRaw;
     byte[] biomeRaw;
+    /** Biomes déjà réduits à une valeur par cellule 4x4x4 (lecture en flux, évite 96 Mo de tampon). */
+    byte[] biomeCells;
     int blockEntities;
 
     long volume() {
@@ -92,7 +94,9 @@ public final class AeloriaSchematic {
                 int len = in.readInt();
                 boolean blocks = path.equals(P + "Blocks.Data");
                 boolean biomes = path.equals(P + "Biomes.Data");
-                if ((blocks || biomes) && !headerOnly) {
+                if (biomes && !headerOnly && width > 0 && height > 0 && length > 0) {
+                    biomeCells = streamCells(in, len);
+                } else if ((blocks || biomes) && !headerOnly) {
                     byte[] raw = new byte[len];
                     in.readFully(raw);
                     if (blocks) {
@@ -137,6 +141,60 @@ public final class AeloriaSchematic {
             case 12 -> in.skipNBytes(8L * in.readInt());
             default -> throw new IOException("type NBT inconnu " + t + " en " + path);
         }
+    }
+
+    /** Lit le tableau de biomes en flux et ne garde que le coin de chaque cellule 4x4x4. */
+    private byte[] streamCells(DataInputStream in, int len) throws IOException {
+        int cw = (width + 3) / 4;
+        int ch = (height + 3) / 4;
+        int cl = (length + 3) / 4;
+        byte[] cells = new byte[cw * ch * cl];
+        byte[] buf = new byte[1 << 16];
+        int x = 0;
+        int y = 0;
+        int z = 0;
+        long count = 0;
+        int value = 0;
+        int shift = 0;
+        long left = len;
+        while (left > 0) {
+            int n = in.read(buf, 0, (int) Math.min(buf.length, left));
+            if (n < 0) {
+                throw new IOException("tableau de biomes tronqué");
+            }
+            left -= n;
+            for (int i = 0; i < n; i++) {
+                int b = buf[i] & 0xFF;
+                value |= (b & 0x7F) << shift;
+                if ((b & 0x80) != 0) {
+                    shift += 7;
+                    if (shift > 28) {
+                        throw new IOException("varint invalide");
+                    }
+                    continue;
+                }
+                if (value > 255) {
+                    throw new IOException("palette de biomes de plus de 256 entrées non prise en charge");
+                }
+                if (((x | y | z) & 3) == 0) {
+                    cells[((y >> 2) * cl + (z >> 2)) * cw + (x >> 2)] = (byte) value;
+                }
+                value = 0;
+                shift = 0;
+                count++;
+                if (++x == width) {
+                    x = 0;
+                    if (++z == length) {
+                        z = 0;
+                        y++;
+                    }
+                }
+            }
+        }
+        if (count != volume()) {
+            throw new IOException("tableau de biomes de " + count + " valeurs au lieu de " + volume());
+        }
+        return cells;
     }
 
     private static String[] palette(DataInputStream in) throws IOException {

@@ -67,6 +67,7 @@ public final class AeloriaImport {
 
     private static volatile Job job;
     private static long budgetMs = 20;
+    private static boolean budgetSet;
     private static int savedPause = -1;
 
     private AeloriaImport() {}
@@ -85,6 +86,7 @@ public final class AeloriaImport {
                 .then(Commands.literal("budget")
                         .then(Commands.argument("ms", IntegerArgumentType.integer(1, 45)).executes(c -> {
                             budgetMs = IntegerArgumentType.getInteger(c, "ms");
+                            budgetSet = true;
                             c.getSource().sendSuccess(() -> Component.literal("Budget d'écriture : " + budgetMs + " ms par tick."), true);
                             return 1;
                         })));
@@ -346,6 +348,10 @@ public final class AeloriaImport {
 
         void announce() {
             MinecraftServer server = server();
+            if (!server.isDedicatedServer() && !budgetSet) {
+                budgetMs = 8;
+                say(server, "Serveur intégré (solo) : budget d'écriture réduit à 8 ms par tick (/aeloriaimport budget <ms> pour changer).");
+            }
             String what = mode == Mode.PASTE ? "Import" : "Vérification";
             say(server, "§a" + what + " d'Aéloria dans le monde « " + level.dimension().identifier() + " » ("
                     + selected.size() + " secteur(s)). La position du joueur ne sert qu'à choisir le monde : vous pouvez vous déconnecter.");
@@ -354,8 +360,8 @@ public final class AeloriaImport {
                 return;
             }
             long maxMb = Runtime.getRuntime().maxMemory() / (1024 * 1024);
-            if (maxMb < 2500) {
-                say(server, "§eMémoire maximale " + maxMb + " Mo : prévoyez au moins -Xmx4G (un secteur occupe ~200 Mo).");
+            if (maxMb < 3000) {
+                say(server, "§eMémoire maximale " + maxMb + " Mo : prévoyez au moins -Xmx4G (un secteur occupe ~110 Mo, en plus du jeu).");
             }
             loadProgress(server);
             if (mode == Mode.VERIFY && done.isEmpty()) {
@@ -553,7 +559,13 @@ public final class AeloriaImport {
                 int cl = (s.length + 3) / 4;
                 byte[] cells = null;
                 Holder<Biome>[] bio = new Holder[0];
-                if (s.biomeRaw != null && s.biomePalette.length > 0) {
+                if (s.biomeCells != null && s.biomePalette.length > 0) {
+                    cells = s.biomeCells;
+                    bio = new Holder[s.biomePalette.length];
+                    for (int i = 0; i < bio.length; i++) {
+                        bio[i] = s.biomePalette[i] == null ? null : biomes.get(s.biomePalette[i]);
+                    }
+                } else if (s.biomeRaw != null && s.biomePalette.length > 0) {
                     byte[] full = AeloriaSchematic.indices(s.biomeRaw, s.volume());
                     s.biomeRaw = null;
                     cells = new byte[cw * ch * cl];

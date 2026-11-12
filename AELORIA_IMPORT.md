@@ -6,7 +6,7 @@ Module du mod (`com.mmorpg.aeloria`), autonome : ni WorldEdit ni plugin de gamep
 
 1. Déposer le JAR du mod dans `mods/` (comme d'habitude).
 2. Copier les 100 fichiers `.schem` dans `config/worldedit/schematics/` (le même dossier que `/schem`). Le CSV d'ordre, d'origines et d'empreintes de l'édition **Relief** est intégré au mod. Si vos `.schem` viennent d'une autre édition, copiez leur `importation.csv` **à côté des `.schem`** (ou dans `config/mmorpg/aeloria/`) : il est utilisé en priorité. Sans cela, les tailles et SHA-256 ne correspondent pas et l'import refuse de démarrer.
-3. Le monde doit couvrir Y −64 à 319 (Overworld). Prévoir `-Xmx4G` ou plus (un secteur occupe environ 200 Mo) et de la place disque.
+3. Le monde doit couvrir Y −64 à 319 (Overworld). **Mémoire** : un secteur occupe environ 110 Mo en plus du jeu (essai réussi sur un serveur dédié limité à `-Xmx1500M`). Serveur dédié : `-Xmx4G` conseillé. **En solo** (client + serveur intégré, le client seul consomme déjà ~2 Go), allouer **`-Xmx4G` minimum** dans les arguments JVM du launcher ; le budget d'écriture y est réduit à 8 ms par tick. En cas de « Out of memory », l'import s'arrête et `/aeloriaimport` reprend au dernier secteur enregistré. Prévoir aussi de la place disque.
 4. Sauvegarder le monde. Pour un premier essai, utiliser un monde de test.
 
 ## Commande exacte
