@@ -13,14 +13,14 @@ Les descriptions et valeurs au rang choisi sont affichées dans le menu en jeu. 
 | Guerrier | Charge Brutale | 50 | Active | 20 | 10 s |
 | Guerrier | Rage Sanguinaire | 75 | Active | 30 | 45 s |
 | Guerrier | Fureur du Dieu de la Guerre | 100 | Ultime | 60 | 60 s |
-| Mage | Boule de Feu | 1 | Active | 15 | 2 s |
-| Mage | Nova de Givre | 1 | Active | 25 | 10 s |
+| Mage | Boule de Feu | 1 | Active | 15 | 6 s |
+| Mage | Nova de Givre | 1 | Active | 25 | 6 s |
 | Mage | Flux Arcanique | 1 | Passive | — | — |
 | Mage | Éclair en Chaîne | 25 | Active | 30 | 7 s |
 | Mage | Transfert Arcanique | 50 | Active | 20 | 8 s |
 | Mage | Bouclier de Mana | 75 | Active | 30 | 40 s |
 | Mage | Météore Céleste | 100 | Ultime | 80 | 60 s |
-| Archer | Tir Perçant | 1 | Active | 10 | 3 s |
+| Archer | Invocation : Chimère | 1 | Active | 30 | 45 s |
 | Archer | Pluie de Flèches | 1 | Active | 25 | 12 s |
 | Archer | Œil de Lynx | 1 | Passive | — | — |
 | Archer | Saut Acrobatique | 25 | Active | 15 | 6 s |
@@ -43,7 +43,7 @@ Les descriptions et valeurs au rang choisi sont affichées dans le menu en jeu. 
 | Mage | Implosion | 65 | Active | 40 | 18 s |
 | Mage | Méditation | 90 | Active | 0 | 45 s |
 | Archer | Tir Entravant | 10 | Active | 12 | 8 s |
-| Archer | Tir Venimeux | 40 | Active | 22 | 14 s |
+| Archer | Esquive | 40 | Active | 15 | 8 s |
 | Archer | Tir de Recul | 65 | Active | 22 | 10 s |
 | Archer | Pas Léger | 90 | Active | 25 | 30 s |
 | Paladin | Crochet du Gardien | 10 | Active | 15 | 10 s |

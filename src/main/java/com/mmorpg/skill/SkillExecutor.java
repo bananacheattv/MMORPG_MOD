@@ -195,20 +195,23 @@ public final class SkillExecutor {
             case "boule_de_feu" -> {
                 Fx.cast(p, CastAnim.RAISE, 10);
                 Fx.attach(level, FxKind.CIRCLE, p, 1.5, 0xFF7A1E, 14);
-                SpellProjectile fb = SpellProjectile.create(level, p, SpellProjectile.Kind.FIREBALL, mag * s.scaled(rank), s.radius)
-                        .aoeFraction(s.power2 / s.power);
+                SpellProjectile fb = SpellProjectile.create(level, p, SpellProjectile.Kind.FIREBALL, mag * s.scaled(rank), 0)
+                        .stun(s.duration);
                 fb.shootFromRotation(p, p.getXRot(), p.getYRot(), 0, 1.5F, 0.2F);
                 level.addFreshEntity(fb);
                 sound(p, SoundEvents.BLAZE_SHOOT, 1f, 1f);
             }
             case "nova_de_givre" -> {
-                Fx.cast(p, CastAnim.CHANNEL, 10);
-                Fx.spawn(level, FxKind.NOVA, pos, s.radius, 0x9AE4FF, 26);
-                Fx.spawn(level, FxKind.RING, pos, s.radius * 1.1, 0xCFF4FF, 14);
-                for (LivingEntity e : SkillHelper.enemiesInRadius(p, pos.add(0, 1, 0), s.radius)) {
-                    RpgCombat.playerHit(p, e, mag * s.scaled(rank), true);
-                    e.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, s.duration, 2));
+                LivingEntity target = SkillHelper.aimedEnemy(p, 14);
+                if (target == null) {
+                    p.sendOverlayMessage(Component.literal("Aucune cible à portée").withColor(0xFF7070));
+                    return false;
                 }
+                Fx.cast(p, CastAnim.CHANNEL, 10);
+                Vec3 tc = target.position();
+                Fx.spawn(level, FxKind.NOVA, tc, 1.8, 0x9AE4FF, 26);
+                Fx.spawn(level, FxKind.RING, tc, 2.0, 0xCFF4FF, 14);
+                if (RpgCombat.playerHit(p, target, mag * s.scaled(rank), true)) stun(target, s.duration);
                 sound(p, SoundEvents.GLASS_BREAK, 1f, 0.6f);
                 sound(p, SoundEvents.PLAYER_HURT_FREEZE, 1f, 1f);
             }
@@ -285,14 +288,36 @@ public final class SkillExecutor {
                 sound(p, SoundEvents.FIRECHARGE_USE, 1f, 0.5f);
             }
             // ============================================================ ARCHER
-            case "tir_percant" -> {
-                Fx.cast(p, CastAnim.AIM, 10);
-                SpellProjectile arrow = SpellProjectile.create(level, p, SpellProjectile.Kind.LIGHT_ARROW, atk * s.scaled(rank), 0)
-                        .pierce().life((int) Math.ceil(s.radius / 3.5) + 2);
-                arrow.shootFromRotation(p, p.getXRot(), p.getYRot(), 0, 3.5F, 0F);
-                level.addFreshEntity(arrow);
-                sound(p, SoundEvents.CROSSBOW_SHOOT, 1f, 0.8f);
-                sound(p, SoundEvents.ARROW_SHOOT, 1f, 1.4f);
+            case "chimere" -> {
+                Fx.cast(p, CastAnim.RAISE, 10);
+                for (var old : level.getEntitiesOfClass(com.mmorpg.entity.MountEntity.class, p.getBoundingBox().inflate(64))) {
+                    if (old.isAllyOf(p)) old.discard();
+                }
+                var chim = com.mmorpg.registry.ModEntities.MOUNTS.get(com.mmorpg.mount.MountType.CHIMERE_ARENE).get().create(level, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
+                if (chim == null) return false;
+                Vec3 sp = p.position().add(p.getLookAngle().multiply(1, 0, 1).normalize().scale(2));
+                chim.setPos(sp.x, sp.y, sp.z);
+                chim.setupAlly(p, atk * s.scaled(rank), s.duration, s.radius);
+                level.addFreshEntity(chim);
+                Fx.spawn(level, FxKind.BURST, sp, 2.0, 0xB8FF7A, 14);
+                Fx.spawn(level, FxKind.RING, sp, 2.5, 0xB8FF7A, 14);
+                sound(p, SoundEvents.RAVAGER_ROAR, 0.8f, 1.2f);
+            }
+            case "esquive" -> {
+                Vec3 back = p.getLookAngle().multiply(1, 0, 1).normalize().scale(-1);
+                Fx.attach(level, FxKind.TRAIL, p, 1, 0xD8F0FF, 14);
+                com.mmorpg.anticheat.AntiCheat.grace(p, 40);
+                for (int i = 1; i <= 6; i++) {
+                    Scheduler.later(level, i - 1, () -> {
+                        if (!p.isAlive() || p.level() != level) return;
+                        net.minecraft.world.phys.AABB moved = p.getBoundingBox().move(back);
+                        if (!level.noCollision(p, moved)) return;
+                        double nx = p.getX() + back.x, nz = p.getZ() + back.z;
+                        p.teleportTo(nx, p.getY(), nz);
+                        if (Math.abs(p.getX() - nx) > 1.0E-3 || Math.abs(p.getZ() - nz) > 1.0E-3) p.setPos(nx, p.getY(), nz);
+                    });
+                }
+                sound(p, SoundEvents.ENDER_DRAGON_FLAP, 0.6f, 1.8f);
             }
             case "pluie_de_fleches" -> {
                 Vec3 target = SkillHelper.targetPoint(p, 28);
@@ -450,5 +475,11 @@ public final class SkillExecutor {
             }
         }
         return true;
+    }
+
+    static void stun(LivingEntity e, int ticks) {
+        e.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, ticks, 9));
+        e.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, ticks, 2));
+        if (e instanceof Mob m) m.getNavigation().stop();
     }
 }

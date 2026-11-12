@@ -1,6 +1,7 @@
 package com.mmorpg.entity;
 
 import com.mmorpg.mount.MountType;
+import com.mmorpg.skill.Fx;
 import com.mmorpg.server.RpgPlayers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
@@ -34,6 +35,46 @@ public class MountEntity extends Horse {
     }
 
     private UUID rider;
+    // --- chimere alliee invoquee (competence d'Archer) : sans cavalier, combat pour son maitre un temps limite
+    private UUID allyOwner;
+    private int allyLife;
+    private double allyDamage;
+    private double allyRange;
+    private int allyCooldown;
+    public boolean isAllyOf(Player p) { return allyOwner != null && allyOwner.equals(p.getUUID()); }
+    public void setupAlly(ServerPlayer owner, double damage, int ticks, double range) {
+        allyOwner = owner.getUUID(); allyDamage = damage; allyLife = ticks; allyRange = range;
+        setTamed(true); setAge(0); setPersistenceRequired(); setCustomName(Component.literal("Chimère de " + owner.getName().getString()));
+        getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(.34);
+    }
+    private void tickAlly(net.minecraft.server.level.ServerLevel sl) {
+        var owner = sl.getServer().getPlayerList().getPlayer(allyOwner);
+        if (owner == null || !owner.isAlive() || owner.level() != sl || --allyLife <= 0 || distanceToSqr(owner) > 4096) {
+            Fx.spawn(sl, com.mmorpg.entity.FxKind.BURST, position(), 1.5, 0xB8FF7A, 10);
+            discard();
+            return;
+        }
+        if (allyCooldown > 0) allyCooldown--;
+        net.minecraft.world.entity.LivingEntity best = null;
+        double bd = Double.MAX_VALUE;
+        for (var e : com.mmorpg.combat.SkillHelper.enemiesInRadius(owner, owner.position(), allyRange)) {
+            double d = e.distanceToSqr(this);
+            if (d < bd) { bd = d; best = e; }
+        }
+        if (best != null) {
+            getLookControl().setLookAt(best);
+            if (bd > 6.25) getNavigation().moveTo(best, 1.4);
+            else if (allyCooldown == 0) {
+                allyCooldown = 20;
+                swing(InteractionHand.MAIN_HAND, net.minecraft.world.item.component.SwingAnimation.DEFAULT);
+                com.mmorpg.combat.RpgCombat.playerHit(owner, best, allyDamage, false);
+                playSound(com.mmorpg.registry.ModSounds.GROWL.get(), 1f, 1f);
+            }
+        } else if (distanceToSqr(owner) > 16) {
+            getNavigation().moveTo(owner, 1.2);
+        } else getNavigation().stop();
+        if (distanceToSqr(owner) > 900) teleportTo(owner.getX(), owner.getY(), owner.getZ());
+    }
     private final MountType mountType;
 
     public MountEntity(EntityType<? extends Horse> type, Level level) {
@@ -119,13 +160,13 @@ public class MountEntity extends Horse {
     }
 
     @Override protected boolean canAddPassenger(Entity passenger) {
-        if (display || getPassengers().size() >= mountType.seats.length) return false;
+        if (display || allyOwner != null || getPassengers().size() >= mountType.seats.length) return false;
         return level().isClientSide() || passenger.getUUID().equals(rider) || TEST_PASSENGERS.contains(passenger.getUUID()) || (passenger instanceof Player && isShared((Player) passenger));
     }
 
     @Override public InteractionResult mobInteract(Player player, InteractionHand hand) {
         if (level().isClientSide()) return InteractionResult.SUCCESS;
-        if (display) return InteractionResult.SUCCESS;
+        if (display || allyOwner != null) return InteractionResult.SUCCESS;
         if (player.isSpectator()) return InteractionResult.FAIL;
         if (player.getUUID().equals(rider)) { doPlayerRide(player); return InteractionResult.SUCCESS; }
         if (!isShared(player)) return InteractionResult.FAIL;
@@ -217,6 +258,10 @@ public class MountEntity extends Horse {
 
     @Override public void tick() {
         super.tick();
+        if (allyOwner != null) {
+            if (level() instanceof net.minecraft.server.level.ServerLevel sl) tickAlly(sl);
+            return;
+        }
         if (display) return;
         if (mountType.flies && !isVehicle() && isNoGravity()) setNoGravity(false);
         if (level() instanceof net.minecraft.server.level.ServerLevel sl && tickCount % 20 == 0) {
