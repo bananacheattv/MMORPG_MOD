@@ -124,6 +124,11 @@ public final class AeloriaImport {
     }
 
     private static int begin(CommandSourceStack src, Mode mode) {
+        if (!src.getLevel().dimension().equals(net.minecraft.world.level.Level.OVERWORLD)) {
+            src.sendFailure(Component.literal("Dimension « " + src.getLevel().dimension().identifier()
+                    + " » refusée : l'import écraserait ses constructions. Placez-vous dans l'Overworld (minecraft:overworld) puis retapez /aeloriaimport."));
+            return 0;
+        }
         if (job != null) {
             src.sendFailure(Component.literal("Un import est déjà en cours : " + job.statusLine()));
             return 0;
@@ -181,9 +186,13 @@ public final class AeloriaImport {
     }
 
     static List<AeloriaSector> loadPlan(MinecraftServer server) throws IOException {
-        Path csv = server.getServerDirectory().resolve("config").resolve("mmorpg").resolve("aeloria").resolve("importation.csv");
+        Path csv = dir(server).resolve("importation.csv"); // à côté des .schem : suit toujours leur version
+        if (!Files.isRegularFile(csv)) {
+            csv = server.getServerDirectory().resolve("config").resolve("mmorpg").resolve("aeloria").resolve("importation.csv");
+        }
         List<AeloriaSector> all;
         if (Files.isRegularFile(csv)) {
+            MMORPG.LOGGER.info(TAG + "CSV utilisé : {}", csv);
             all = AeloriaSector.parse(csv);
         } else {
             try (InputStream in = AeloriaImport.class.getResourceAsStream("/aeloria/importation.csv")) {

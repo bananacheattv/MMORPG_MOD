@@ -5,7 +5,7 @@ Module du mod (`com.mmorpg.aeloria`), autonome : ni WorldEdit ni plugin de gamep
 ## Installation
 
 1. Déposer le JAR du mod dans `mods/` (comme d'habitude).
-2. Copier les 100 fichiers `.schem` dans `config/worldedit/schematics/` (le même dossier que `/schem`). Le CSV d'ordre, d'origines et d'empreintes est déjà **intégré au mod** ; pour le remplacer, poser `config/mmorpg/aeloria/importation.csv`.
+2. Copier les 100 fichiers `.schem` dans `config/worldedit/schematics/` (le même dossier que `/schem`). Le CSV d'ordre, d'origines et d'empreintes de l'édition **Relief** est intégré au mod. Si vos `.schem` viennent d'une autre édition, copiez leur `importation.csv` **à côté des `.schem`** (ou dans `config/mmorpg/aeloria/`) : il est utilisé en priorité. Sans cela, les tailles et SHA-256 ne correspondent pas et l'import refuse de démarrer.
 3. Le monde doit couvrir Y −64 à 319 (Overworld). Prévoir `-Xmx4G` ou plus (un secteur occupe environ 200 Mo) et de la place disque.
 4. Sauvegarder le monde. Pour un premier essai, utiliser un monde de test.
 
@@ -15,7 +15,7 @@ Module du mod (`com.mmorpg.aeloria`), autonome : ni WorldEdit ni plugin de gamep
 /aeloriaimport
 ```
 
-À taper en jeu (permission opérateur niveau 2) dans la dimension à remplir ; depuis la console, elle vise l'Overworld. La dimension est annoncée au démarrage. Le joueur ne sert qu'à choisir la dimension : l'import continue s'il se déconnecte, et la pause « serveur vide » est suspendue pendant l'import.
+À taper en jeu (permission opérateur niveau 2) **dans l'Overworld** (`minecraft:overworld`) : toute autre dimension (hub, spawn, mines…) est refusée pour ne rien écraser. Depuis la console, elle vise l'Overworld. La dimension est annoncée au démarrage. Le joueur ne sert qu'à choisir la dimension : l'import continue s'il se déconnecte, et la pause « serveur vide » est suspendue pendant l'import.
 
 Autres usages : `/aeloriaimport status` (progression), `/aeloriaimport stop` (arrêt propre), `/aeloriaimport verify` (relit les secteurs déjà importés et compte les blocs différents), `/aeloriaimport reset` (efface la reprise), `/aeloriaimport budget <ms>` (temps d'écriture par tick, 20 par défaut).
 
