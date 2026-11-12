@@ -40,7 +40,7 @@ public final class StoryQuests {
 
     /** Fin d'un chapitre : le dernier declenche l'epilogue. */
     public static void onFinish(ServerPlayer p, QuestDef q) {
-        if (q == null || q.story.isEmpty() || !q.story.equals("hist_" + com.mmorpg.quest.DefaultQuests.STORY_LEVELS.length)) return;
+        if (q == null || q.story.isEmpty() || !q.story.equals("hist_12")) return;
         Scheduler.later(p.level(), 100, () -> {
             if (p.isAlive() && !p.isRemoved()) play(p, StoryBook.EPILOGUE);
         });
@@ -80,7 +80,7 @@ public final class StoryQuests {
             if (d.activeQuests.isEmpty() || !p.isAlive() || p.isSpectator()) continue;
             for (String id : new java.util.ArrayList<>(d.activeQuests.keySet())) {
                 QuestDef q = ConfigManager.quests().get(id);
-                if (q == null || q.story.isEmpty() || !QuestManager.completable(p, d, id)) continue;
+                if (q == null || q.story.isEmpty() && !q.auto || !QuestManager.completable(p, d, id)) continue;
                 QuestManager.finish(p, d, id, q);
             }
         }

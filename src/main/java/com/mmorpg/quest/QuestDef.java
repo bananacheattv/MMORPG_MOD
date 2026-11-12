@@ -40,6 +40,30 @@ public class QuestDef {
     public String speech = "", speechDone = "";
     public List<Objective> objectives = new ArrayList<>();
     public Rewards rewards = new Rewards();
+    /** Repetition : "" (une fois), "daily" ou "weekly" (remise a zero a 4 h, lundi pour l'hebdomadaire). Les quetes journalieres historiques utilisent {@link #daily}. */
+    public String repeat = "";
+    /** Quete rendue automatiquement des que ses objectifs sont atteints (trame principale), sans retour au donneur. */
+    public boolean auto = false;
+    /** Donnees du lore d'Aeloria (null pour les quetes hors plan de quetes). */
+    public Lore lore;
+
+    /** Metadonnees du plan de quetes (Quetes_Aeloria_v1) : trame, secondaires, evenements. */
+    public static class Lore {
+        /** principale, secondaire ou evenement. */
+        public String kind = "secondaire";
+        public String code = "", donor = "", donorKey = "", type = "", objective = "", region = "", act = "", chapter = "", category = "", companion = "", gameplay = "";
+        /** Texte des recompenses non gerees par le mod (monnaies, titres, coffres...). */
+        public List<String> extras = new ArrayList<>();
+        /** Variantes par classe (guerrier, mage, archer, tank). */
+        public java.util.Map<String, String> variants = new java.util.LinkedHashMap<>();
+        public String event = "", from = "", to = "", conditionText = "";
+        /** Condition en jeu : night, dawn, storm, sunday ou vide. */
+        public String when = "";
+        /** Creneau en heure serveur : {mois (0 = chaque jour), jour, minute de debut, minute de fin}, ou vide. */
+        public int[] slot;
+        /** Duree limite en minutes (0 = aucune). */
+        public int limit = 0;
+    }
 
     public static class Navigation {
         public String dimension="minecraft:overworld";

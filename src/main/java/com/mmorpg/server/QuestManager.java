@@ -8,6 +8,7 @@ import com.mmorpg.network.Net;
 import com.mmorpg.network.Payloads;
 import com.mmorpg.network.S2COpenScreen;
 import com.mmorpg.pet.PetType;
+import com.mmorpg.quest.LoreQuests;
 import com.mmorpg.quest.QuestDef;
 import com.mmorpg.rpg.LevelSystem;
 import com.mmorpg.rpg.PlayerData;
@@ -34,7 +35,47 @@ public final class QuestManager {
     }
 
     public static long today() {
-        return LocalDate.now().toEpochDay();
+        return java.time.LocalDateTime.now().minusHours(4).toLocalDate().toEpochDay();      // remise a zero des quetes a 4 h
+    }
+
+    /** Semaine courante (lundi 4 h) : repere des quetes hebdomadaires. */
+    public static long weekIndex() {
+        return (today() + 3) / 7;
+    }
+
+    /** Dates, creneau horaire (heure serveur) et fenetre d'evenement d'une quete du lore. */
+    public static boolean windowOpen(QuestDef q) {
+        var l = q.lore;
+        if (l == null) return true;
+        var now = java.time.LocalDateTime.now();
+        var day = now.toLocalDate();
+        if (!l.from.isEmpty() && day.isBefore(LocalDate.parse(l.from))) return false;
+        if (!l.to.isEmpty() && day.isAfter(LocalDate.parse(l.to))) return false;
+        if (l.slot != null && l.slot.length == 4) {
+            int from = l.slot[2], to = l.slot[3];
+            boolean wraps = to <= from;
+            for (int back = 0; back <= (wraps ? 1 : 0); back++) {
+                LocalDate start = day.minusDays(back);
+                if (l.slot[0] != 0 && (start.getMonthValue() != l.slot[0] || start.getDayOfMonth() != l.slot[1])) continue;
+                var begin = start.atStartOfDay().plusMinutes(from);
+                var end = start.atStartOfDay().plusMinutes(wraps ? to + 1440 : to);
+                if (!now.isBefore(begin) && now.isBefore(end)) return true;
+            }
+            return false;
+        }
+        if ("sunday".equals(l.when)) return day.getDayOfWeek() == java.time.DayOfWeek.SUNDAY;
+        return true;
+    }
+
+    /** Condition en jeu (nuit, aube, orage) d'une quete du lore. */
+    public static boolean worldOk(ServerPlayer p, QuestDef q) {
+        if (q.lore == null || q.lore.when.isEmpty()) return true;
+        var level = p.level();
+        return switch (q.lore.when) {
+            case "night", "dawn" -> !level.isBrightOutside();          // nuit ou aube : ciel sombre (le jeu n'expose plus l'heure exacte)
+            case "storm" -> level.isThundering();
+            default -> true;
+        };
     }
 
     public static QuestDef def(String id) {
@@ -50,6 +91,11 @@ public final class QuestManager {
         for (String r : q.requires) {
             if (!d.completedQuests.contains(r)) return false;
         }
+        if (!windowOpen(q)) return false;
+        if ("weekly".equals(q.repeat)) {
+            Long done = d.dailyQuests.get(id);
+            return done == null || done != weekIndex();
+        }
         if (q.daily) {
             Long done = d.dailyQuests.get(id);
             return done == null || done != today();
@@ -59,6 +105,9 @@ public final class QuestManager {
 
     public static boolean matchesNpc(QuestDef q, NpcEntity npc) {
         if (npc instanceof com.mmorpg.entity.MascotEntity) return q.giver.equalsIgnoreCase(npc.group());
+        if (q.lore != null && !"principale".equals(q.lore.kind) && q.giver.isEmpty() && (q.npc == null || q.npc.isEmpty()))
+            return com.mmorpg.quest.LoreQuests.keysOf(npc.displayName(), npc.group()).contains(q.lore.donorKey)
+                    || LoreQuests.norm(npc.group()).equals("lore_" + q.lore.donorKey);
         if(npc.level().dimension().equals(com.mmorpg.hub.SpawnBuilder.DIM)&&(q.npc==null||q.npc.isEmpty())&&q.giver.isEmpty())return false;
         return (q.npc == null || q.npc.isEmpty() || q.npc.equals(npc.getUUID().toString()))
                 && (q.giver.isEmpty() || q.giver.equalsIgnoreCase(npc.group()));
@@ -125,6 +174,13 @@ public final class QuestManager {
         t.putBoolean("weekly", q.weekly);
         t.putBoolean("story", !q.story.isEmpty());
         t.putBoolean("classQuest", !q.classes.isEmpty());
+        if (q.lore != null) {
+            t.putString("loreKind", q.lore.kind);
+            t.putString("loreCode", q.lore.code);
+            t.putString("loreRegion", q.lore.region);
+            String v = q.lore.variants.get(d.playerClass.id());
+            if (v != null && !v.isEmpty()) t.putString("desc", q.description + "\n\nVotre voie : " + v);
+        }
         boolean active = d.activeQuests.containsKey(id);
         t.putBoolean("active", active);
         ListTag objs = new ListTag();
@@ -222,7 +278,7 @@ public final class QuestManager {
             QuestDef q = e.getValue();
             if (d.activeQuests.containsKey(e.getKey())) {
                 if (matchesNpc(q, npc)) active.add(questTag(p, d, e.getKey(), q));
-            } else if (matchesNpc(q, npc) && isAvailable(d, e.getKey(), q, npc.group())) {
+            } else if (matchesNpc(q, npc) && isAvailable(d, e.getKey(), q, npc.group()) && worldOk(p, q)) {
                 available.add(questTag(p, d, e.getKey(), q));
             }
         }
@@ -255,7 +311,7 @@ public final class QuestManager {
         PlayerData d = RpgPlayers.get(p);
         QuestDef q = def(id);
         // les quetes hebdomadaires ne se prennent qu'a la pancarte (tirage de la semaine, une par palier)
-        if (npc == null || q == null || q.weekly || !matchesNpc(q, npc) || !isAvailable(d, id, q, npc.group())) return false;
+        if (npc == null || q == null || q.weekly || !matchesNpc(q, npc) || !isAvailable(d, id, q, npc.group()) || !worldOk(p, q)) return false;
         if (d.activeQuests.size() >= MAX_ACTIVE) {
             p.sendOverlayMessage(Component.literal("Journal de quêtes plein (" + MAX_ACTIVE + " quêtes maximum).").withColor(0xFF5050));
             return false;
@@ -333,7 +389,7 @@ public final class QuestManager {
             if (!matchesNpc(q, npc) || q.weekly) continue;
             if (d.activeQuests.containsKey(e.getKey())) {
                 if (active == null) active = e.getKey();
-            } else if (available == null && isAvailable(d, e.getKey(), q, npc.group())) available = e.getKey();
+            } else if (available == null && isAvailable(d, e.getKey(), q, npc.group()) && worldOk(p, q)) available = e.getKey();
         }
         if (active != null) {
             QuestDef q = def(active);
@@ -379,6 +435,7 @@ public final class QuestManager {
         if (id.equals(d.trackedQuest)) d.trackedQuest = "";
         if (q.weekly) d.dailyQuests.put(WeeklyQuests.doneKey(id), WeeklyQuests.week());
         else if (id.startsWith(DailyQuests.PREFIX)) d.dailyQuests.put(DailyQuests.doneKey(id), today());
+        else if ("weekly".equals(q.repeat)) d.dailyQuests.put(id, weekIndex());
         else if (q.daily) d.dailyQuests.put(id, today());
         else d.completedQuests.add(id);
         com.mmorpg.db.Audit.log(p, com.mmorpg.db.Audit.QUEST_DONE, 0, id);
@@ -428,7 +485,26 @@ public final class QuestManager {
         if(!p.isAlive() || p.isSpectator() || !npc.isAlive() || p.level()!=npc.level() || p.distanceToSqr(npc)>49
                 || !FeatureFlags.enabled(p.level().getServer(),"quetes")) return;
         advanceObjective(p,npc.getUUID().toString(),1,"talk");
+        for (String key : talkKeys(p.level().getServer(), npc)) advanceObjective(p, "lore:" + key, 1, "action");
     }
+    /**
+     * Donneurs du lore « rencontres » en parlant a ce PNJ : ceux dont le nom correspond. La Mascotte (Flammeche) fait le relais des donneurs
+     * qui n'ont encore aucun PNJ place dans le monde, pour que la trame principale ne reste jamais bloquee.
+     */
+    static java.util.Set<String> talkKeys(net.minecraft.server.MinecraftServer server, NpcEntity npc) {
+        var keys = new java.util.LinkedHashSet<>(LoreQuests.keysOf(npc.displayName(), npc.group()));
+        if (npc instanceof com.mmorpg.entity.MascotEntity) {
+            var present = new java.util.HashSet<String>();
+            var snap = com.mmorpg.world.NpcDirectory.get(server).snapshot();
+            for (int i = 0; i < snap.size(); i++) {
+                var e = snap.getCompoundOrEmpty(i);
+                present.addAll(LoreQuests.keysOf(e.getStringOr("name", ""), e.getStringOr("group", "")));
+            }
+            for (String k : LoreQuests.allKeys()) if (!present.contains(k)) keys.add(k);
+        }
+        return keys;
+    }
+
     private static void advanceObjective(ServerPlayer p, String key, int amount, String kind) {
         PlayerData d = RpgPlayers.get(p);
         if (d.activeQuests.isEmpty() || amount <= 0) return;

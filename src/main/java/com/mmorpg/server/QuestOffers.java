@@ -36,6 +36,7 @@ public final class QuestOffers {
     }
 
     private static boolean campaign(String id, QuestDef q) {
+        if (q != null && q.lore != null) return q.auto && com.mmorpg.quest.LoreQuests.GROUP_STORY.equals(q.giver);
         return q != null && !q.daily && !q.weekly && !"maitre_classes".equals(q.giver);
     }
 

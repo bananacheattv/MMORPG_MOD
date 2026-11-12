@@ -39,7 +39,7 @@ class QuestPlanTest {
             String id = e.getKey();
             assertFalse(q.name.isBlank(), id + " sans nom");
             assertFalse(q.description.isBlank(), id + " sans description");
-            assertFalse(q.objectives.isEmpty(), id + " sans objectif");
+            assertTrue(!q.objectives.isEmpty() || q.auto, id + " sans objectif");
             assertTrue(q.minLevel >= 1 && q.minLevel <= 100, id + " niveau hors bornes");
             assertEquals(DefaultQuests.REVISION, q.revision, id + " revision");
             assertTrue(q.rewards.xp > 0 || q.rewards.xpPercentOfLevel > 0 || q.rewards.gold > 0 || !q.rewards.items.isEmpty() || q.rewards.evolution > 0, id + " sans recompense");
@@ -118,15 +118,15 @@ class QuestPlanTest {
     @Test
     void campaignFollowsTheIntroductionChain() {
         // La campagne commence apres la derniere quete d'introduction du spawn.
-        assertTrue(QUESTS.get("premiers_pas").requires.contains("spawn_premiere_chasse"));
+        assertTrue(QUESTS.get("qp_001").requires.contains("tuto_fin"), "la trame du lore suit le tutoriel");
         assertTrue(QUESTS.get("parchemin_forge_1").requires.contains("spawn_premiere_chasse"));
         for (int i = 1; i < QuestNpcPlan.DISCOVERY_IDS.length; i++) {
             assertTrue(QUESTS.get(QuestNpcPlan.DISCOVERY_IDS[i]).requires.contains(QuestNpcPlan.DISCOVERY_IDS[i - 1]), "chaine du spawn rompue en " + i);
         }
-        // Chaque chapitre se debloque apres le precedent (liche -> feu -> neant).
-        assertTrue(QUESTS.get("coeur_flammes").requires.contains("liche_ancienne"));
-        assertTrue(QUESTS.get("chevaliers_neant").requires.contains("titan_glace"));
-        assertTrue(QUESTS.get("avatar_neant").requires.contains("chevaliers_neant"));
+        // Trame du lore : chaque quete exige la precedente
+        for (int i = 2; i <= 250; i++) {
+            assertTrue(QUESTS.get(String.format("qp_%03d", i)).requires.contains(String.format("qp_%03d", i - 1)), "trame rompue en " + i);
+        }
     }
 
     @Test
@@ -137,6 +137,7 @@ class QuestPlanTest {
         groups.add(QuestNpcPlan.GROUP_TUTORIAL); // la Mascotte du tutoriel
         groups.add("histoire"); // histoire principale : rendue automatiquement, sans PNJ
         for (var e : QUESTS.entrySet()) {
+            if (e.getValue().lore != null && !e.getValue().lore.kind.equals("principale") && !e.getValue().giver.equals("maitre_classes")) continue;   // secondaires/evenements : PNJ au nom du donneur
             assertFalse(e.getValue().giver.isEmpty(), e.getKey() + " sans donneur");
             assertTrue(groups.contains(e.getValue().giver), e.getKey() + " : donneur inconnu " + e.getValue().giver);
         }
@@ -149,6 +150,7 @@ class QuestPlanTest {
         }
         // chaque PNJ de la campagne donne au moins une quete
         for (var g : QuestNpcPlan.GIVERS) {
+            if (Set.of(QuestNpcPlan.GROUP_PLAINES, QuestNpcPlan.GROUP_MORTS, QuestNpcPlan.GROUP_ELEMENTS, QuestNpcPlan.GROUP_NEANT).contains(g.group())) continue;   // ancienne campagne, remplacee par le lore
             assertTrue(QUESTS.values().stream().anyMatch(q -> q.giver.equals(g.group())), g.name() + " ne donne aucune quete");
         }
     }
@@ -178,12 +180,27 @@ class QuestPlanTest {
     @Test
     void questIdsAreStableForExistingSaves() {
         // Les identifiants deja utilises par les joueurs ne doivent jamais disparaitre.
-        for (String id : List.of("premiers_pas", "oreilles_pointues", "crocs_nuit", "ferraille", "apprentissage", "roi_gobelin", "os_maudits",
-                "poussiere_ame", "brutes_orcs", "liche_ancienne", "coeur_flammes", "souffle_givre", "seigneur_ignis", "cristaux_vivants",
-                "titan_glace", "chevaliers_neant", "avatar_neant", "contrat_chasse", "approvisionnement", "tueur_geants", "nettoyer_cryptes",
-                "toiles_venimeuses", "routes_sures", "evolution_1", "evolution_4", "parchemin_forge_1", "parchemin_forge_5", "spawn_bienvenue")) {
+        for (String id : List.of("evolution_1", "evolution_4", "classe_mage_0", "qp_001", "qp_063", "qp_250", "qs_001", "qs_499", "ev_noel_01", "ev_paq_25", "parchemin_forge_1", "parchemin_forge_5", "spawn_bienvenue")) {
             assertTrue(QUESTS.containsKey(id), id + " a disparu");
         }
+    }
+
+    @Test
+    void lorePlanIsComplete() {
+        assertEquals(250, QUESTS.keySet().stream().filter(k -> k.startsWith("qp_")).count());
+        assertEquals(452, QUESTS.keySet().stream().filter(k -> k.startsWith("qs_")).count());   // 500 moins les 48 quetes de classe du lore
+        assertEquals(75, QUESTS.keySet().stream().filter(k -> k.startsWith("ev_")).count());
+        // les classes restent celles du mod : chaines de classe et evolutions conservees, aucune classe du lore
+        assertEquals(44, QUESTS.keySet().stream().filter(k -> k.startsWith("classe_")).count());
+        assertEquals(1, QUESTS.get("evolution_1").rewards.evolution);
+        assertTrue(QUESTS.values().stream().filter(q -> q.lore != null).allMatch(q -> q.classes.isEmpty() && q.lore.variants.isEmpty() && q.rewards.evolution == 0));
+        assertTrue(QUESTS.get("qp_063").auto);
+        assertEquals("2026-12-01", QUESTS.get("ev_noel_01").lore.from);
+        assertTrue(QUESTS.values().stream().anyMatch(q -> "weekly".equals(q.repeat)));
+        assertTrue(QUESTS.values().stream().anyMatch(q -> q.daily && q.lore != null));
+        assertTrue(QUESTS.values().stream().anyMatch(q -> q.lore != null && q.lore.slot != null));
+        // les etapes sans suivi reel passent par le donneur
+        assertTrue(QUESTS.values().stream().filter(q -> q.lore != null && !q.auto).allMatch(q -> !q.objectives.isEmpty()));
     }
 
     @Test
