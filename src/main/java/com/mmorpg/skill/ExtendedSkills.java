@@ -63,7 +63,7 @@ final class ExtendedSkills {
                 if (s.id.equals("impact_vampirique") && hits > 0) RpgPlayers.healPercent(p, .03 * Math.min(5, hits));
                 Fx.spawn(level, FxKind.RING, center, s.radius, data.playerClass.color, 20);
             }
-            case "frappe_fragilisante", "execution", "lance_de_givre", "tir_entravant", "tir_venimeux", "tir_de_recul", "crochet_du_gardien" -> {
+            case "frappe_fragilisante", "execution", "lance_de_givre", "tir_entravant", "tir_de_recul", "crochet_du_gardien" -> {
                 LivingEntity e = SkillHelper.aimedEnemy(p, s.radius);
                 if (e == null) {
                     p.sendOverlayMessage(Component.literal("Aucune cible à portée").withColor(0xFF7070));
@@ -82,15 +82,6 @@ final class ExtendedSkills {
                     case "crochet_du_gardien" -> {
                         SkillHelper.knock(e, p.position(), -1, .2);
                         if (e instanceof Mob mob) ThreatGoal.taunt(mob, p, s.duration);
-                    }
-                    case "tir_venimeux" -> {
-                        final double poison = damage;
-                        for (int tick = 20; tick <= s.duration; tick += 20) {
-                            Scheduler.later(level, tick, () -> {
-                                if (!p.isRemoved() && p.isAlive() && p.level() == level && e.level() == level && !e.isRemoved() && RpgCombat.isEnemy(p, e))
-                                    RpgCombat.playerHit(p, e, poison, false);
-                            });
-                        }
                     }
                 }
                 SkillHelper.line(level, p.getEyePosition(), e.position().add(0, 1, 0),

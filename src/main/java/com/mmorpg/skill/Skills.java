@@ -49,12 +49,12 @@ public final class Skills {
 
     // ------------------------------------------------------------------ MAGE
     public static final Skill BOULE_DE_FEU = reg(Skill.builder("boule_de_feu", "Boule de Feu", PlayerClass.MAGE, 1)
-            .cost(15, 2).power(1.6).power2(0.5).radius(2.5)
-            .desc((s, r) -> "Lance une boule de feu qui inflige " + pct(s.scaled(r)) + " de la Puissance magique à l'impact et " + pct(s.scaled2(r)) + " aux ennemis proches, et les enflamme.")
+            .cost(15, 6).power(1.6).duration(2)
+            .desc((s, r) -> "Lance une boule de feu qui inflige " + pct(s.scaled(r)) + " de la Puissance magique à la cible touchée, l'enflamme et l'étourdit " + sec(s.duration) + ".")
             .build());
     public static final Skill NOVA_DE_GIVRE = reg(Skill.builder("nova_de_givre", "Nova de Givre", PlayerClass.MAGE, 1)
-            .cost(25, 10).power(1.2).radius(5).duration(4)
-            .desc((s, r) -> "Libère une onde glaciale infligeant " + pct(s.scaled(r)) + " de la Puissance magique dans un rayon de " + (int) s.radius + " blocs et ralentit fortement les ennemis pendant " + sec(s.duration) + ".")
+            .cost(25, 6).power(1.2).duration(2)
+            .desc((s, r) -> "Libère une onde glaciale sur la cible visée : " + pct(s.scaled(r)) + " de la Puissance magique et étourdissement " + sec(s.duration) + ".")
             .build());
     public static final Skill FLUX_ARCANIQUE = reg(Skill.builder("flux_arcanique", "Flux Arcanique", PlayerClass.MAGE, 1)
             .passive().power(0.04).power2(0.08)
@@ -73,14 +73,14 @@ public final class Skills {
             .desc((s, r) -> "Pendant " + sec(s.duration + 40 * (r - 1)) + ", les dégâts subis sont absorbés par votre mana (1 mana pour " + s.power + " dégâts).")
             .build());
     public static final Skill METEORE = reg(Skill.builder("meteore_celeste", "Météore Céleste", PlayerClass.MAGE, 100)
-            .ultimate().cost(80, 60).power(5.0).radius(6)
+            .ultimate().cost(80, 60).power(5.0).radius(15)
             .desc((s, r) -> "ULTIME — Invoque un météore sur la zone visée : après 1 s, il inflige " + pct(s.scaled(r)) + " de la Puissance magique dans un rayon de " + (int) s.radius + " blocs.")
             .build());
 
     // ------------------------------------------------------------------ ARCHER
-    public static final Skill TIR_PERCANT = reg(Skill.builder("tir_percant", "Tir Perçant", PlayerClass.ARCHER, 1)
-            .cost(10, 3).power(1.7).radius(28)
-            .desc((s, r) -> "Décoche une flèche surpuissante qui transperce tous les ennemis sur " + (int) s.radius + " blocs, infligeant " + pct(s.scaled(r)) + " de l'Attaque à chacun.")
+    public static final Skill CHIMERE = reg(Skill.builder("chimere", "Invocation : Chimère", PlayerClass.ARCHER, 1)
+            .cost(30, 45).power(0.9).radius(20).duration(20)
+            .desc((s, r) -> "Invoque une chimère qui combat à vos côtés pendant " + sec(s.duration) + " : elle attaque les ennemis proches et inflige " + pct(s.scaled(r)) + " de l'Attaque par coup.")
             .build());
     public static final Skill PLUIE_DE_FLECHES = reg(Skill.builder("pluie_de_fleches", "Pluie de Flèches", PlayerClass.ARCHER, 1)
             .cost(25, 12).power(0.5).radius(4).duration(2)
@@ -164,9 +164,9 @@ public final class Skills {
     public static final Skill TIR_ENTRAVANT = reg(Skill.builder("tir_entravant", "Tir Entravant", PlayerClass.ARCHER, 10)
             .cost(12, 8).power(1.3).radius(28).duration(4)
             .desc((s, r) -> "Inflige " + pct(s.scaled(r)) + " de l’Attaque à la cible visée et la ralentit fortement pendant 4 s.").build());
-    public static final Skill TIR_VENIMEUX = reg(Skill.builder("tir_venimeux", "Tir Venimeux", PlayerClass.ARCHER, 40)
-            .cost(22, 14).power(0.5).radius(26).duration(6)
-            .desc((s, r) -> "Inflige " + pct(s.scaled(r)) + " de l’Attaque à l’impact puis le même montant chaque seconde pendant 6 s.").build());
+    public static final Skill ESQUIVE = reg(Skill.builder("esquive", "Esquive", PlayerClass.ARCHER, 40)
+            .cost(15, 8).radius(6)
+            .desc((s, r) -> "Effectue un dash arrière de " + (int) s.radius + " blocs.").build());
     public static final Skill TIR_DE_RECUL = reg(Skill.builder("tir_de_recul", "Tir de Recul", PlayerClass.ARCHER, 65)
             .cost(22, 10).power(1.8).radius(20).duration(0)
             .desc((s, r) -> "Inflige " + pct(s.scaled(r)) + " de l’Attaque à la cible visée et la repousse.").build());

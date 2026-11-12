@@ -60,6 +60,7 @@ public class SpellProjectile extends ThrowableProjectile {
     private double aoeFraction = 0.6;
     private boolean magic = true;
     private boolean pierce;
+    private int stunTicks;
     private int life;
     private int maxLife = 60;
     private UUID homing;
@@ -84,6 +85,11 @@ public class SpellProjectile extends ThrowableProjectile {
 
     public SpellProjectile pierce() {
         this.pierce = true;
+        return this;
+    }
+
+    public SpellProjectile stun(int ticks) {
+        this.stunTicks = ticks;
         return this;
     }
 
@@ -184,6 +190,11 @@ public class SpellProjectile extends ThrowableProjectile {
             }
         }
         if (kind() == Kind.FIREBALL || kind() == Kind.METEOR) target.igniteForSeconds(4);
+        if (stunTicks > 0) {
+            target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOWNESS, stunTicks, 9));
+            target.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.WEAKNESS, stunTicks, 2));
+            if (target instanceof net.minecraft.world.entity.Mob m) m.getNavigation().stop();
+        }
     }
 
     @Override

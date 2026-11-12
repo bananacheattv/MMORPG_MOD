@@ -410,6 +410,11 @@ public final class QuestManager {
     }
 
     /** Remise d'une quete terminee : objets a rapporter retires, quete cloturee, recompenses versees. */
+    /** Remise directe (ateliers de verification uniquement). */
+    public static void finishForChecks(ServerPlayer p, PlayerData d, String id, QuestDef q) {
+        finish(p, d, id, q);
+    }
+
     static void finish(ServerPlayer p, PlayerData d, String id, QuestDef q) {
         finish(p, d, id, q, null);
     }
@@ -530,7 +535,7 @@ public final class QuestManager {
             }
             if (!wasComplete && completable(p, d, e.getKey())) {
                 Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "OBJECTIFS ACCOMPLIS",
-                        q.name + " — retournez voir " + (q.giver.equals(MascotGuide.GROUP) ? "la Mascotte" : "un Maître des Quêtes"), 0x60FF80));
+                        q.name + (q.auto ? " — étape validée" : " — retournez voir " + (q.giver.equals(MascotGuide.GROUP) ? "la Mascotte" : q.lore != null ? q.lore.donor : "un Maître des Quêtes")), 0x60FF80));
                 p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.CHIME.get(), SoundSource.PLAYERS, 0.9f, 1.1f);
                 if (q.giver.equals(MascotGuide.GROUP)) MascotGuide.say(p, "Bravo ! Reviens me voir pour ta récompense.");
             }
@@ -572,7 +577,7 @@ public final class QuestManager {
             }
             if (!wasComplete && completable(p, d, e.getKey())) {
                 Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "OBJECTIFS ACCOMPLIS",
-                        q.name + " — retournez voir un Maître des Quêtes", 0x60FF80));
+                        q.name + (q.auto ? " — étape validée" : " — retournez voir " + (q.lore != null ? q.lore.donor : "un Maître des Quêtes")), 0x60FF80));
                 p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.CHIME.get(), SoundSource.PLAYERS, 0.9f, 1.1f);
             }
         }

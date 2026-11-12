@@ -31,7 +31,8 @@ public final class StoryQuests {
 
     /** Quete d'histoire acceptee : la scene du chapitre se joue juste apres. */
     public static void onAccept(ServerPlayer p, QuestDef q) {
-        if (q == null || q.story.isEmpty()) return;
+        // les cartes de chapitre du lore ne s'ouvrent pas a l'acceptation (trop envahissant) : elles se rejouent depuis le journal
+        if (q == null || q.story.isEmpty() || q.lore != null) return;
         var level = p.level();
         Scheduler.later(level, 30, () -> {
             if (p.isAlive() && !p.isRemoved()) play(p, q.story);
@@ -40,6 +41,13 @@ public final class StoryQuests {
 
     /** Fin d'un chapitre : le dernier declenche l'epilogue. */
     public static void onFinish(ServerPlayer p, QuestDef q) {
+        FlammecheScenes.onFinish(p, q);
+        if (q != null && q.lore != null && "QP-250".equals(q.lore.code)) {
+            Scheduler.later(p.level(), 160, () -> {
+                if (p.isAlive() && !p.isRemoved()) play(p, StoryBook.EPILOGUE);
+            });
+            return;
+        }
         if (q == null || q.story.isEmpty() || !q.story.equals("hist_12")) return;
         Scheduler.later(p.level(), 100, () -> {
             if (p.isAlive() && !p.isRemoved()) play(p, StoryBook.EPILOGUE);

@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -143,13 +144,53 @@ public final class LoreQuests {
         if ("Choix de classe".equals(l.type)) {          // la classe est deja choisie a l'arrivee : etape rendue d'office
             d.giver = GROUP_STORY;
             d.auto = true;
+        } else if ("eclosion".equals(str(o, "scene"))) {     // l'eclosion de Flammeche (scene jouee par FlammecheScenes) valide l'etape
+            d.objectives.add(new QuestDef.Objective("action", "lore:eclosion|Assister à l'éclosion de Flammèche", 1));
         } else if (d.objectives.isEmpty() && !l.donor.isEmpty()) {
             d.objectives.add(new QuestDef.Objective("action", "lore:" + l.donorKey + "|" + narrativeLabel(l), 1));
         }
         d.description = description(d, str(o, "desc"));
         d.revision = DefaultQuests.REVISION;
         if (main && d.requires.isEmpty()) d.requires.add(AFTER);
+        // premiere quete d'un chapitre : carte de chapitre jouee a l'acceptation, rejouable depuis le journal
+        if (main && o.has("num") && o.get("num").getAsInt() == 1) d.story = chapterSceneId(l.chapter);
         return d;
+    }
+
+    /** Identifiant de scene d'un chapitre (« Ch.3 – ... » -> lore_ch3). */
+    public static String chapterSceneId(String chapter) {
+        var m = java.util.regex.Pattern.compile("Ch\\.(\\d+)").matcher(chapter);
+        return m.find() ? "lore_ch" + m.group(1) : "";
+    }
+
+    private static final int[] ACT_COLORS = {0xFFFFB050, 0xFF8FD0FF, 0xFFC08CFF, 0xFFFF6A5A};
+
+    /** Cartes de chapitre de la trame (StoryBook) : acte, titre, ouverture du chapitre et region. */
+    public static Map<String, StoryBook.Scene> chapterScenes() {
+        Map<String, StoryBook.Scene> out = new LinkedHashMap<>();
+        Map<String, java.util.List<QuestDef>> byChapter = new LinkedHashMap<>();
+        for (QuestDef d : (cache != null ? cache : (cache = build())).values())
+            if (d.lore != null && "principale".equals(d.lore.kind)) byChapter.computeIfAbsent(d.lore.chapter, k -> new java.util.ArrayList<>()).add(d);
+        int act = -1;
+        String lastAct = "";
+        for (var e : byChapter.entrySet()) {
+            var qs = e.getValue();
+            var first = qs.get(0).lore;
+            if (!first.act.equals(lastAct)) { act++; lastAct = first.act; }
+            String title = e.getKey().replaceFirst("^Ch\\.\\d+\\s*[–-]\\s*", "");
+            var lines = new java.util.ArrayList<String>();
+            String intro = qs.get(0).description.split("\n\n")[0];
+            if (!intro.startsWith("Objectif")) lines.add(intro);
+            if (qs.size() > 1) {
+                String next = qs.get(1).description.split("\n\n")[0];
+                if (!next.startsWith("Objectif") && !next.startsWith("Fin du chapitre")) lines.add(next);
+            }
+            int lo = qs.stream().mapToInt(q -> q.minLevel).min().orElse(1), hi = qs.stream().mapToInt(q -> q.minLevel).max().orElse(lo);
+            lines.add(first.region + " — niveaux " + lo + " à " + hi + ".");
+            String chapterNo = e.getKey().replaceFirst("^(Ch\\.\\d+).*", "$1").replace("Ch.", "Chapitre ");
+            out.put(chapterSceneId(e.getKey()), new StoryBook.Scene(first.act + " · " + chapterNo, title, ACT_COLORS[Math.min(act, ACT_COLORS.length - 1)], List.copyOf(lines)));
+        }
+        return out;
     }
 
     private static String jobLabel(String job, int count) {

@@ -1412,6 +1412,10 @@ public final class DevShowcase {
             skinPhase(mc);
             return;
         }
+        if (MODE.equals("flammeche")) {       // lore : eclosion de Flammeche, Eveil, depart vers le Seuil, carte de chapitre
+            DevFlammecheShowcase.phase(mc);
+            return;
+        }
         if (MODE.equals("mascotte")) {        // la Mascotte du tutoriel et sa bulle de dialogue
             mascotPhase(mc, me);
             return;
@@ -1654,7 +1658,7 @@ public final class DevShowcase {
         String[][] skills = {
                 {"frappe_puissante", "cri_de_guerre", "tourbillon", "charge_brutale", "rage_sanguinaire", "fureur_divine"},
                 {"boule_de_feu", "nova_de_givre", "eclair_en_chaine", "teleportation_arcanique", "bouclier_de_mana", "meteore_celeste"},
-                {"tir_percant", "pluie_de_fleches", "saut_arriere", "fleche_explosive", "volee_de_fleches", "tempete_divine"},
+                {"chimere", "pluie_de_fleches", "saut_arriere", "fleche_explosive", "volee_de_fleches", "tempete_divine"},
                 {"coup_de_bouclier", "provocation", "forteresse", "onde_de_choc", "aura_sacree", "rempart_du_titan"}};
         int[][] delay = {{6, 7, 6, 6, 9, 25}, {9, 9, 4, 5, 9, 19}, {3, 20, 5, 9, 5, 24}, {4, 7, 9, 9, 10, 10}};
         if (tick == 20) {

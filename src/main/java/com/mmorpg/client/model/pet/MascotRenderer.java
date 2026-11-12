@@ -31,6 +31,11 @@ public class MascotRenderer extends EntityRenderer<MascotEntity, MascotRenderer.
 
     public static class State extends PetRenderState {
         public boolean mine;
+        public float growth = 1F;
+        /** Eclosion (0 = dragon visible) et horloge pour faire trembler l'oeuf. */
+        public int egg;
+        public float clock;
+        public final net.minecraft.client.renderer.item.ItemStackRenderState eggItem = new net.minecraft.client.renderer.item.ItemStackRenderState();
     }
 
     private final PetModel model;
@@ -79,7 +84,12 @@ public class MascotRenderer extends EntityRenderer<MascotEntity, MascotRenderer.
         state.type = com.mmorpg.pet.PetType.DRAGONNET;
         state.speed = (float) Math.min(1, entity.getDeltaMovement().horizontalDistance() * 6);
         state.still = state.speed < .02F ? 1F : 0F;
-        state.fly = 0.0F;
+        state.fly = entity.isNoGravity() ? 1.0F : 0.0F;      // envol (depart de Flammeche) : animation de vol
+        state.growth = entity.growth();
+        state.egg = entity.egg();
+        state.clock = entity.tickCount + partialTicks;
+        if (state.egg > 0) Minecraft.getInstance().getItemModelResolver().updateForTopItem(state.eggItem, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DRAGON_EGG),
+                net.minecraft.world.item.ItemDisplayContext.FIXED, entity.level(), null, entity.getId());
         state.yRot = Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
         var me = Minecraft.getInstance().player;
         state.mine = me != null && me.getId() == entity.ownerId();
@@ -88,10 +98,15 @@ public class MascotRenderer extends EntityRenderer<MascotEntity, MascotRenderer.
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         if (!state.mine) return;
+        if (state.egg > 0) {
+            egg(state, poseStack, collector);
+            super.submit(state, poseStack, collector, camera);
+            return;
+        }
         poseStack.pushPose();
         poseStack.pushPose();
         poseStack.rotateDegrees(Axis.YP, 180.0F - state.yRot);
-        poseStack.scale(SCALE, SCALE, SCALE);
+        poseStack.scale(SCALE * state.growth, SCALE * state.growth, SCALE * state.growth);
         poseStack.scale(-1.0F, -1.0F, 1.0F);
         poseStack.translate(0.0F, -1.501F, 0.0F);
         collector.submitModel(model, state, poseStack, RenderTypes.entityTranslucent(texture), state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null,
@@ -102,6 +117,29 @@ public class MascotRenderer extends EntityRenderer<MascotEntity, MascotRenderer.
         poseStack.popPose();
         poseStack.popPose();
         super.submit(state, poseStack, collector, camera);
+    }
+
+    /**
+     * L'oeuf brulant : il tremble de plus en plus vite et fort, sautille puis gonfle juste avant l'eclosion. Lueur pulsee (pleine lumiere au
+     * dernier quart).
+     */
+    private void egg(State state, PoseStack pose, SubmitNodeCollector collector) {
+        float k = state.egg / 100F;
+        float t = state.clock;
+        float amp = 4F + 26F * k * k;
+        float freq = 0.35F + 1.4F * k;
+        float wobble = Mth.sin(t * freq) * amp * (0.6F + 0.4F * Mth.sin(t * 0.23F));
+        float hop = k > 0.55F ? Math.max(0, Mth.sin(t * freq * 0.5F)) * 0.12F * k : 0F;
+        float swell = 1F + (k > 0.85F ? (k - 0.85F) * 1.6F : 0F);
+        pose.pushPose();
+        pose.translate(0F, 0.9F + hop, 0F);
+        pose.rotateDegrees(Axis.YP, t * 2F);
+        pose.rotateDegrees(Axis.ZP, wobble);
+        pose.rotateDegrees(Axis.XP, wobble * 0.5F);
+        pose.scale(1.9F * swell, 1.9F * swell, 1.9F * swell);
+        int light = k > 0.75F || Mth.sin(t * 0.3F) > 0.3F ? FULL_BRIGHT : state.lightCoords;
+        state.eggItem.submit(pose, collector, light, OverlayTexture.NO_OVERLAY, 0);
+        pose.popPose();
     }
 
     /** Bulle de dialogue : lignes centrees au-dessus de la Mascotte, face a la camera. */

@@ -137,7 +137,7 @@ public final class DevContentQuestChecks {
             var re2 = new PlayerData();
             re2.load(d.save());
             check(ExplorationQuests.found(re2) == 1, "persistance exploration");
-            check(QuestManager.extraTag(p, d).getListOrEmpty("story").isEmpty(), "sync extra");
+            check(QuestManager.extraTag(p, d).getListOrEmpty("story").size() == 1, "sync extra : carte du chapitre 1 rejouable");
             MMORPG.LOGGER.info("[CODEX CHECKS] CONTENT QUESTS PASS: classes du mod (44), lore (Eveil, trame, chasse, hebdo, evenement), quotidiennes, exploration (20 lieux)");
         } catch (Throwable t) {
             MMORPG.LOGGER.error("[CODEX CHECKS] CONTENT QUESTS FAIL", t);
