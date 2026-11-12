@@ -31,7 +31,8 @@ public final class StoryQuests {
 
     /** Quete d'histoire acceptee : la scene du chapitre se joue juste apres. */
     public static void onAccept(ServerPlayer p, QuestDef q) {
-        if (q == null || q.story.isEmpty()) return;
+        // les cartes de chapitre du lore ne s'ouvrent pas a l'acceptation (trop envahissant) : elles se rejouent depuis le journal
+        if (q == null || q.story.isEmpty() || q.lore != null) return;
         var level = p.level();
         Scheduler.later(level, 30, () -> {
             if (p.isAlive() && !p.isRemoved()) play(p, q.story);

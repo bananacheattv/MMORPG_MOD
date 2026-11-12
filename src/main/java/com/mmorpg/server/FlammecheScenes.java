@@ -145,7 +145,6 @@ public final class FlammecheScenes {
         m.setGrowth(0.3F);
         SCENES.put(p.getUUID(), new Scene(Kind.HATCH));
         line(p, "Ysméralde", "Regarde ! L'œuf brûlant au pied du Seuil... il bouge !");
-        title(p, "", "Une étincelle de Braise", 10, 50, 10);
     }
 
     @SubscribeEvent

@@ -6,7 +6,7 @@ relancer le script puis augmenter `DefaultQuests.REVISION` pour que les `quests.
 
 ## Contenu
 - **Trame** `qp_001` à `qp_250` (4 actes, 20 chapitres) : proposée automatiquement après le tutoriel de la Mascotte
-  (`tuto_fin`), rendue automatiquement. Chaque 1re quête de chapitre joue une carte de chapitre (rejouable dans le journal) ;
+  (`tuto_fin`), rendue automatiquement. Chaque chapitre a sa carte de titre, à rejouer depuis le journal (rien ne s'ouvre à l'acceptation d'une quête) ;
   la dernière lance l'épilogue.
 - **Secondaires** `qs_*` (452 : les 48 quêtes de classe du plan sont écartées, les classes du mod restent) et
   **événements** `ev_noel_*`, `ev_val_*`, `ev_paq_*` (dates du plan) : donnés par le PNJ dont le **nom contient**
