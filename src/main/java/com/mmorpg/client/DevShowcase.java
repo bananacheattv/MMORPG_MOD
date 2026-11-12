@@ -1412,6 +1412,10 @@ public final class DevShowcase {
             skinPhase(mc);
             return;
         }
+        if (MODE.equals("flammeche")) {       // lore : eclosion de Flammeche, Eveil, depart vers le Seuil, carte de chapitre
+            DevFlammecheShowcase.phase(mc);
+            return;
+        }
         if (MODE.equals("mascotte")) {        // la Mascotte du tutoriel et sa bulle de dialogue
             mascotPhase(mc, me);
             return;

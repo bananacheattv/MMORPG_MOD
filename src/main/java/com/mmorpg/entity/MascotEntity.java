@@ -22,6 +22,10 @@ public final class MascotEntity extends NpcEntity {
     public static final UUID ID = com.mmorpg.quest.QuestNpcPlan.MASCOT_ID;
     public static final String NAME = "Mascotte";
     private static final EntityDataAccessor<Integer> OWNER = SynchedEntityData.defineId(MascotEntity.class, EntityDataSerializers.INT);
+    /** Taille de Flammeche (1 = dragonnet ; grandit a chaque Eveil). */
+    private static final EntityDataAccessor<Float> GROWTH = SynchedEntityData.defineId(MascotEntity.class, EntityDataSerializers.FLOAT);
+    /** Eclosion : 0 = pas d'oeuf, 1 a 100 = l'oeuf tremble de plus en plus fort avant d'eclore. */
+    private static final EntityDataAccessor<Integer> EGG = SynchedEntityData.defineId(MascotEntity.class, EntityDataSerializers.INT);
 
     public MascotEntity(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
@@ -34,6 +38,8 @@ public final class MascotEntity extends NpcEntity {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(OWNER, -1);
+        builder.define(GROWTH, 1F);
+        builder.define(EGG, 0);
     }
 
     /** Id d'entite du joueur proprietaire (-1 : aucun). */
@@ -44,6 +50,22 @@ public final class MascotEntity extends NpcEntity {
     /** Proprietaire par id d'entite (vitrine cliente). */
     public void setOwnerId(int id) {
         entityData.set(OWNER, id);
+    }
+
+    public float growth() {
+        return entityData.get(GROWTH);
+    }
+
+    public void setGrowth(float g) {
+        entityData.set(GROWTH, g);
+    }
+
+    public int egg() {
+        return entityData.get(EGG);
+    }
+
+    public void setEgg(int progress) {
+        entityData.set(EGG, progress);
     }
 
     public void initFor(ServerPlayer owner) {
@@ -71,7 +93,11 @@ public final class MascotEntity extends NpcEntity {
     @Override
     protected InteractionResult mobInteract(Player player, InteractionHand hand) {
         if (player instanceof ServerPlayer sp && hand == InteractionHand.MAIN_HAND && sp.getId() == ownerId())
+        {
+            if (egg() > 0) return InteractionResult.SUCCESS;
+            com.mmorpg.server.QuestManager.onNpcTalk(sp, this);       // Flammeche relaie les donneurs du lore absents
             com.mmorpg.server.QuestManager.talk(sp, this);
+        }
         return InteractionResult.SUCCESS;
     }
 }

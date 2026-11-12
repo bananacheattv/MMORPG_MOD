@@ -77,7 +77,22 @@ public final class StoryBook {
                 "Merci d'avoir sauvé Aeloria.");
     }
 
+    private static boolean lore;
+
+    /** Ajoute une fois les cartes de chapitre du lore (LoreQuests). */
+    private static synchronized void loadLore() {
+        if (lore) return;
+        lore = true;
+        try {
+            SCENES.putAll(LoreQuests.chapterScenes());
+        } catch (RuntimeException ex) {
+            lore = false;
+            throw ex;
+        }
+    }
+
     public static Scene get(String id) {
+        if (id != null && id.startsWith("lore_")) loadLore();
         return SCENES.get(id);
     }
 

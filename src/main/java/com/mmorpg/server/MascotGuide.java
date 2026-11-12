@@ -80,6 +80,31 @@ public final class MascotGuide {
         return id != null && p.level().getEntity(id) instanceof MascotEntity m && m.isAlive() ? m : null;
     }
 
+    /** Mascotte (ou Flammeche) du joueur, ou null. */
+    public static MascotEntity mascot(ServerPlayer p) {
+        return mine(p);
+    }
+
+    /** Retire la Mascotte du joueur (fin d'une scene de Flammeche). */
+    static void release(ServerPlayer p) {
+        drop(p);
+    }
+
+    /** Mascotte du joueur, creee pres de lui au besoin (scenes de Flammeche). */
+    public static MascotEntity ensure(ServerPlayer p) {
+        MascotEntity m = mine(p);
+        if (m != null) return m;
+        MASCOTS.remove(p.getUUID());
+        m = ModEntities.MASCOT.get().create(p.level(), EntitySpawnReason.COMMAND);
+        if (m == null) return null;
+        m.initFor(p);
+        var ground = safeGround(p, m, target(p, 0));
+        m.snapTo(ground != null ? ground : p.position().add(p.getLookAngle().multiply(2.5, 0, 2.5)), p.getYRot() + 180, 0);
+        if (!p.level().addFreshEntity(m)) return null;
+        MASCOTS.put(p.getUUID(), m.getUUID());
+        return m;
+    }
+
     private static void drop(ServerPlayer p) {
         UUID id = MASCOTS.remove(p.getUUID());
         if (id != null && p.level().getEntity(id) instanceof MascotEntity m) m.discard();
@@ -95,9 +120,11 @@ public final class MascotGuide {
                 boolean forced = FORCED.contains(p.getUUID());
                 String pend = pending(d);
                 boolean alive = p.isAlive() && !p.isSpectator() && d.playerClass.isPlayable() && pend != null && FeatureFlags.allow(p, "quetes");
-                boolean follow = forced || (alive && (followUntil < 0 || step(pend) < followUntil));
+                boolean tutorial = forced || (alive && (followUntil < 0 || step(pend) < followUntil));
+                boolean follow = tutorial || FlammecheScenes.companion(p, d);
                 boolean atPost = !follow && alive && postDim != null && postDim.equals(p.level().dimension().identifier().toString());
                 if (!follow && !atPost || !p.isAlive() || p.isSpectator()) {
+                    if (p.isAlive() && FlammecheScenes.holds(p, m)) continue;       // Flammeche s'envole vers le Seuil
                     if (m != null || MASCOTS.containsKey(p.getUUID())) drop(p);
                     continue;
                 }
@@ -114,8 +141,9 @@ public final class MascotGuide {
                     if (p.level().addFreshEntity(m)) MASCOTS.put(p.getUUID(), m.getUUID());
                 }
                 if (atPost) look(p, m);
+                FlammecheScenes.dress(p, d, m, tutorial || atPost);
             }
-            if (m != null && !fixedFor(p, d)) follow(p, m);
+            if (m != null && !fixedFor(p, d) && !FlammecheScenes.busy(p)) follow(p, m);
         }
         if (server.getTickCount() % 40 != 0) return;
         for (ServerPlayer p : server.getPlayerList().getPlayers()) {

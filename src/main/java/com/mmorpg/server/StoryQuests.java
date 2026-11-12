@@ -40,6 +40,13 @@ public final class StoryQuests {
 
     /** Fin d'un chapitre : le dernier declenche l'epilogue. */
     public static void onFinish(ServerPlayer p, QuestDef q) {
+        FlammecheScenes.onFinish(p, q);
+        if (q != null && q.lore != null && "QP-250".equals(q.lore.code)) {
+            Scheduler.later(p.level(), 160, () -> {
+                if (p.isAlive() && !p.isRemoved()) play(p, StoryBook.EPILOGUE);
+            });
+            return;
+        }
         if (q == null || q.story.isEmpty() || !q.story.equals("hist_12")) return;
         Scheduler.later(p.level(), 100, () -> {
             if (p.isAlive() && !p.isRemoved()) play(p, StoryBook.EPILOGUE);

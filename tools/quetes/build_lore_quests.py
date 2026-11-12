@@ -89,9 +89,10 @@ for r in tab['Quêtes principales']:
     out.append({'id': qid(r['ID']), 'code': r['ID'], 'kind': 'principale', 'name': r['Titre'], 'donor': r['Donneur'], 'level': lvl,
         'requires': [qid(r['Prérequis'])] if r['Prérequis'] not in ('—', '') else [],
         'type': r["Type d'objectif"], 'obj': r['Objectif'], 'objs': objective(r["Type d'objectif"], r['Objectif'], r['Quantité'], lvl),
-        'act': r['Acte'], 'chapter': r['Chapitre'], 'region': r['Région'], 'gameplay': r['Gameplay introduit'], 'companion': r['Compagnon'],
+        'act': r['Acte'], 'chapter': r['Chapitre'], 'num': int(r['N° dans le chapitre']), 'region': r['Région'], 'gameplay': r['Gameplay introduit'], 'companion': r['Compagnon'],
         'desc': r['Description / lore'], 'rewards': rw})
     q = out[-1]
+    if r['ID'] == 'QP-002': q['scene'] = 'eclosion'
     if r["Type d'objectif"] == 'Évolution de classe':
         # les classes et evolutions restent celles du mod : l'Eveil du lore devient une etape de la trame (Flammeche grandit)
         stage = re.search(r'stade (\d)', r['Compagnon'])
