@@ -4337,6 +4337,8 @@ public final class DevShowcase {
         if (t == 130) shot(mc, "qol_hud_ping_dps");
         if (t == 140) mc.gui.setScreen(new com.mmorpg.client.screen.WorldMapScreen());
         if (t == 200) shot(mc, "qol_carte");
+        if (t == 205 && mc.gui.screen() instanceof com.mmorpg.client.screen.WorldMapScreen m) for (int i = 0; i < 9; i++) m.mouseScrolled(0, 0, 0, -1);
+        if (t == 208) shot(mc, "qol_carte_dezoom");
         if (t == 210) mc.gui.setScreen(new com.mmorpg.client.screen.JournalScreen());
         if (t == 235) { ClientData.DATA.counters.put("kills", 1432L); ClientData.DATA.counters.put("j_dmg_dealt", 2845000L); ClientData.DATA.counters.put("j_minutes", 725L); ClientData.DATA.kills.put("loup", 310); ClientData.DATA.kills.put("gobelin", 120); }
         if (t == 260) shot(mc, "qol_journal");

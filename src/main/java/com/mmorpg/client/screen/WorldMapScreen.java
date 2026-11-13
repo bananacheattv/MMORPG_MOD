@@ -1,5 +1,6 @@
 package com.mmorpg.client.screen;
 
+import net.minecraft.world.level.ChunkPos;
 import com.mmorpg.client.QolClient;
 import com.mmorpg.client.ui.MmoScreen;
 import com.mmorpg.client.ui.Ui;
@@ -38,7 +39,16 @@ public class WorldMapScreen extends MmoScreen {
         g.fill(x0, y0, x0 + w, y0 + h, 0xFF0C0814);
         g.enableScissor(x0, y0, x0 + w, y0 + h);
         Map<Long, int[]> chunks = QolClient.chunks();
-        int step = zoom >= 2 ? 1 : 2;
+        int step = zoom >= 2 ? 1 : zoom >= 0.25 ? 2 : 3;
+        if (zoom < 0.25) {   // dezoom extreme : une case par chunk explore (aucun trou, cout proportionnel aux chunks)
+            int cs = Math.max(1, (int) Math.ceil(16 * zoom));
+            for (Map.Entry<Long, int[]> e : chunks.entrySet()) {
+                int sx = (int) Math.round(w / 2.0 + (ChunkPos.getX(e.getKey()) * 16 - cx) * zoom), sy = (int) Math.round(h / 2.0 + (ChunkPos.getZ(e.getKey()) * 16 - cz) * zoom);
+                if (sx + cs <= 0 || sy + cs <= 0 || sx >= w || sy >= h) continue;
+                int c = e.getValue()[136];
+                if (c != 0) g.fill(x0 + Math.max(0, sx), y0 + Math.max(0, sy), x0 + Math.min(w, sx + cs), y0 + Math.min(h, sy + cs), c);
+            }
+        } else
         for (int row = 0; row < h; row += step) {
             int z = (int) Math.floor(cz + (row - h / 2.0) / zoom);
             int runStart = 0, runColor = 0;
@@ -77,7 +87,7 @@ public class WorldMapScreen extends MmoScreen {
             g.text(font, t, lx + 11, ly + 1, Ui.MUTED, false);
             lx += font.width(t) + 20;
         }
-        String coords = QolClient.streamer() ? "Coordonnées masquées" : (int) cx + ", " + (int) cz + "   zoom x" + String.format("%.1f", zoom);
+        String coords = QolClient.streamer() ? "Coordonnées masquées" : (int) cx + ", " + (int) cz + "   zoom x" + String.format(zoom < 0.1 ? "%.3f" : "%.1f", zoom);
         g.text(font, coords, x0 + w - font.width(coords), top + 10, Ui.MUTED, false);
         if (hover != null) {
             String t = hover.name() + " (" + QolClient.poiLabel(hover.kind()) + ")";
@@ -96,7 +106,7 @@ public class WorldMapScreen extends MmoScreen {
 
     @Override
     public boolean mouseScrolled(double x, double y, double sx, double sy) {
-        zoom = Math.clamp(zoom * (sy > 0 ? 1.25 : 0.8), 0.25, 6);
+        zoom = Math.clamp(zoom * (sy > 0 ? 1.25 : 0.8), 0.025, 6);
         return true;
     }
 
