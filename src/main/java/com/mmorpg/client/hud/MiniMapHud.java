@@ -13,6 +13,7 @@ import java.util.Map;
 /** Minimap, compteur de degats du groupe et marqueurs de ping. */
 public final class MiniMapHud {
     public static final int SIZE = 84;
+    private static final MapTexture MAP = new MapTexture("minimap");
 
     private MiniMapHud() {
     }
@@ -33,22 +34,10 @@ public final class MiniMapHud {
         Ui.rounded(g, 0, 0, SIZE + 6, SIZE + 22, 5, 0xB8140E22);
         Ui.border(g, x0 - 1, y0 - 1, SIZE + 2, SIZE + 2, Ui.GOLD_DARK);
         g.fill(x0, y0, x0 + SIZE, y0 + SIZE, 0xFF0C0814);
-        Map<Long, int[]> chunks = QolClient.chunks();
         int px = mc.player.getBlockX(), pz = mc.player.getBlockZ();
         int half = SIZE / 2;
-        for (int row = 0; row < SIZE; row++) {
-            int z = pz - half + row;
-            int runStart = 0, runColor = 0;
-            for (int col = 0; col <= SIZE; col++) {
-                int c = col < SIZE ? QolClient.colorAt(chunks, px - half + col, z) : -1;
-                if (c != runColor || col == SIZE) {
-                    if (runColor != 0 && col > runStart) g.fill(x0 + runStart, y0 + row, x0 + col, y0 + row + 1, runColor);
-                    runStart = col;
-                    runColor = c;
-                }
-            }
-        }
-        for (QolClient.Poi p : QolClient.allPois()) {
+        MAP.draw(g, x0, y0, SIZE, SIZE, px, pz, 1.0);
+        if (QolClient.hasPois()) for (QolClient.Poi p : QolClient.allPois()) {
             int dx = p.x() - px, dz = p.z() - pz;
             if (Math.abs(dx) >= half - 2 || Math.abs(dz) >= half - 2) continue;
             dot(g, x0 + half + dx, y0 + half + dz, QolClient.poiColor(p.kind()), 2);

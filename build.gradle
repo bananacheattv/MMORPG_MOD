@@ -71,6 +71,8 @@ neoForge {
             }
             // Atelier replay (dev uniquement, jamais en production) : -PreplayClientChecks -PmpServer=localhost -Pusername=ReplayChecks
             if (project.hasProperty('replayClientChecks')) jvmArgument '-Dmmorpg.replayClientChecks=true'
+            // Profilage : -PclientJvm="-XX:StartFlightRecording=..." ajoute des options JVM au client
+            if (project.hasProperty('clientJvm')) project.property('clientJvm').toString().split(' ').each { jvmArgument it }
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }

@@ -66,8 +66,7 @@ public class DecorModelRenderer implements BlockEntityRenderer<DecorModelBlock.E
         pose.rotateDegrees(Axis.YP, yaw);
         pose.translate(0f, 1.5f, 0f);
         pose.scale(-1f, -1f, 1f);
-        Identifier texture = model.texture;
-        collector.submitModel(model, state.anim, pose, RenderTypes.entityTranslucent(texture), state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, 0);
+        collector.submitModel(model, state.anim, pose, model.modelType(), state.lightCoords, OverlayTexture.NO_OVERLAY, -1, null, 0);
         pose.popPose();
     }
 

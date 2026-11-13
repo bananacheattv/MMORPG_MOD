@@ -12,7 +12,9 @@ import java.util.function.Function;
 
 /** Only the authored eyes, runes and cores emit light; armor retains normal world shading. */
 public final class ImportedGlowLayer<S extends LivingEntityRenderState> extends RenderLayer<S,ImportedModel> {
+    /** Au-dela, les yeux et runes lumineux ne font plus qu'un pixel : la seconde passe du modele est inutile. */
+    private static final double GLOW_RANGE_SQ=96*96;
     private final Function<S,ImportedModel> models;
     public ImportedGlowLayer(RenderLayerParent<S,ImportedModel> parent,Function<S,ImportedModel> models){super(parent);this.models=models;}
-    @Override public void submit(PoseStack pose,SubmitNodeCollector collector,int light,S state,float yaw,float pitch){var glow=models.apply(state);collector.order(1).submitModel(glow,state,pose,RenderTypes.eyes(glow.texture),0xF000F0,OverlayTexture.NO_OVERLAY,0xFFFFFFFF,null,state.outlineColor);}
+    @Override public void submit(PoseStack pose,SubmitNodeCollector collector,int light,S state,float yaw,float pitch){var glow=models.apply(state);if(!glow.hasGeometry||state.distanceToCameraSq>GLOW_RANGE_SQ)return;collector.order(1).submitModel(glow,state,pose,RenderTypes.eyes(glow.texture),0xF000F0,OverlayTexture.NO_OVERLAY,0xFFFFFFFF,null,state.outlineColor);}
 }

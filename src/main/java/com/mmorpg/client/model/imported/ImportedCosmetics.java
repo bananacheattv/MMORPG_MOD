@@ -76,7 +76,7 @@ public final class ImportedCosmetics extends RenderLayer<AvatarRenderState,Playe
                     default -> pose.translate(0,.38,.33);
                 }
             }
-            collector.submitModel(model,state,pose,RenderTypes.entityTranslucent(model.texture),light,OverlayTexture.NO_OVERLAY,state.outlineColor);
+            collector.submitModel(model,state,pose,model.modelType(),light,OverlayTexture.NO_OVERLAY,state.outlineColor);
             pose.popPose();
         }
     }

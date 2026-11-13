@@ -22,11 +22,11 @@ public final class AuthoredNpcRenderer extends MobRenderer<NpcEntity,AuthoredNpc
     @Override public boolean shouldRender(NpcEntity e,net.minecraft.client.renderer.culling.Frustum frustum,double camX,double camY,double camZ,float partial){return com.mmorpg.client.PerfClient.withinNpcDistance(e,camX,camY,camZ)&&super.shouldRender(e,frustum,camX,camY,camZ,partial);}
     @Override public State createRenderState(){return new State();}
     @Override public void extractRenderState(NpcEntity entity,State state,float partial){super.extractRenderState(entity,state,partial);state.skin=Math.clamp(entity.skin(),0,NpcEntity.SKINS-1);state.sitting=entity.poseStyle()==1;state.isPassenger=state.sitting;faceViewer(entity,state);}
-    private static final java.util.Map<Integer,float[]> FACING=new java.util.HashMap<>();
+    private static final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<float[]> FACING=new it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<>();
     /** Le PNJ se tourne (corps puis tete) vers le joueur local proche : calcul purement client, donc propre a chaque joueur. */
     private static void faceViewer(NpcEntity e,State state){
         var me=net.minecraft.client.Minecraft.getInstance().player;if(me==null)return;
-        float dt=Math.min(0.1F,net.minecraft.client.Minecraft.getInstance().getDeltaTracker().getRealtimeDeltaTicks()/20F);float[] f=FACING.computeIfAbsent(e.getId(),k->new float[]{state.bodyRot,0,0});
+        float dt=Math.min(0.1F,net.minecraft.client.Minecraft.getInstance().getDeltaTracker().getRealtimeDeltaTicks()/20F);float[] f=FACING.get(e.getId());if(f==null){f=new float[]{state.bodyRot,0,0};FACING.put(e.getId(),f);}
         double dx=me.getX()-e.getX(),dz=me.getZ()-e.getZ(),dy=me.getEyeY()-e.getEyeY();boolean near=dx*dx+dz*dz<100&&Math.abs(dy)<6&&!me.isSpectator();
         float baseBody=state.bodyRot;float targetBody=near?(float)(Math.toDegrees(Math.atan2(-dx,dz))):baseBody;
         float k=1F-(float)Math.exp(-dt*7F);f[0]+=net.minecraft.util.Mth.wrapDegrees(targetBody-f[0])*k;

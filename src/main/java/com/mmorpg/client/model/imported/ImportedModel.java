@@ -9,6 +9,7 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
@@ -25,8 +26,11 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
     private final Map<String,ModelPart> standBones=new HashMap<>();
     public ImportedModel(String kind, String key) { this(kind, key, read(kind, key),false); }
     public ImportedModel(String kind,String key,boolean emissiveOnly){this(kind,key,read(kind,key),emissiveOnly);}
+    /** Vrai si le modele dessine au moins une face (un modele de lueur sans partie lumineuse est vide). */
+    public final boolean hasGeometry;
     private ImportedModel(String kind, String key, JsonObject data,boolean emissiveOnly) {
-        super(root(data, kind.equals("cosmetics") ? 0 : 24,emissiveOnly), RenderTypes::entityTranslucent);
+        super(build(data, kind, emissiveOnly), ImportedModel::typeFor);
+        boolean any=false;for(ModelPart p:allParts())any|=!p.isEmpty();hasGeometry=any;
         for(String name:new String[]{"head","body","arm_-1","arm_1","leg_-1","leg_1"}){String id=null;for(String alias:boneAliases(name)){id=findNamed(data.getAsJsonArray("parts"),alias);if(id!=null)break;}if(id!=null)standBones.put(name,root().createPartLookup().apply(id));}
         String headId=findHead(data.getAsJsonArray("parts"));head=headId==null?null:root().createPartLookup().apply(headId);
         texture = data.has("texture")?Identifier.parse(data.get("texture").getAsString()):MMORPG.id("textures/imported/" + kind + "/" + key + ".png");
@@ -37,6 +41,45 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
             animations.put(a.get("name").getAsString(), def.bake(root()));
             lengths.put(a.get("name").getAsString(), a.get("length").getAsFloat());
         }
+    }
+    /** Type de rendu du modele pour sa texture : decoupe opaque si possible (regroupee, sans tri), sinon translucide. */
+    public RenderType modelType(){return typeFor(texture);}
+    private static final Map<Identifier,Boolean> OPAQUE=new HashMap<>();
+    private static Object opaqueOwner;
+    /**
+     * Une texture sans pixel semi-transparent n'a pas besoin du rendu translucide : la decoupe (alpha 0 ou 1) donne la meme image,
+     * mais les modeles d'une meme texture partent en un seul envoi et leurs faces ne sont plus triees a chaque image.
+     */
+    private static synchronized RenderType typeFor(Identifier texture){
+        var manager=Minecraft.getInstance().getResourceManager();
+        if(opaqueOwner!=manager){OPAQUE.clear();opaqueOwner=manager;}
+        boolean opaque=OPAQUE.computeIfAbsent(texture,t->{
+            try(var in=manager.open(t);var image=com.mojang.blaze3d.platform.NativeImage.read(in)){
+                for(int pixel:image.getPixels()){int a=pixel>>>24;if(a>25&&a<255)return false;}   // sous 0.1 d'alpha, le pixel est ecarte dans les deux rendus
+                return true;
+            }catch(Exception e){return false;}
+        });
+        return opaque?RenderTypes.entityCutout(texture):RenderTypes.entityTranslucent(texture);
+    }
+    private static ModelPart build(JsonObject data,String kind,boolean emissiveOnly){
+        ModelPart root=root(data, kind.equals("cosmetics") ? 0 : 24,emissiveOnly);
+        return kind.equals("props")&&data.getAsJsonArray("animations").isEmpty()?flatten(root):root;
+    }
+    /**
+     * Decor sans animation : toutes les faces sont ramenees dans le repere de la racine, en une seule piece.
+     * Le rendu ne parcourt plus la hierarchie d'os (une matrice et un quaternion par os et par image).
+     */
+    private static ModelPart flatten(ModelPart root){
+        List<ModelPart.Cube> cubes=new ArrayList<>();
+        root.visit(new com.mojang.blaze3d.vertex.PoseStack(),(pose,path,index,cube)->{
+            for(int i=0;i<cube.polygons.length;i++){
+                var polygon=cube.polygons[i];var vertices=new ModelPart.Vertex[polygon.vertices().length];
+                for(int v=0;v<vertices.length;v++){var old=polygon.vertices()[v];var p=pose.pose().transformPosition(old.worldX(),old.worldY(),old.worldZ(),new org.joml.Vector3f());vertices[v]=new ModelPart.Vertex(p.x*16,p.y*16,p.z*16,old.u(),old.v());}
+                var normal=pose.transformNormal(polygon.normal(),new org.joml.Vector3f());
+                var flat=new ModelPart.Cube(0,0,0,0,0,1,1,1,0,0,0,false,64,64,java.util.Set.of(Direction.NORTH));flat.polygons[0]=new ModelPart.Polygon(vertices,normal);cubes.add(flat);
+            }
+        });
+        return new ModelPart(cubes,Map.of());
     }
     private static String findNamed(JsonArray nodes,String name){for(var node:nodes){var n=node.getAsJsonObject();if(n.has("name")&&n.get("name").getAsString().equals(name))return n.get("uuid").getAsString();if(n.has("children")){String id=findNamed(n.getAsJsonArray("children"),name);if(id!=null)return id;}}return null;}
     /** Noms alternatifs des os (modeles importes Blockbench varies) pour la pose assise/armor stand. */
@@ -103,6 +146,10 @@ public final class ImportedModel extends EntityModel<LivingEntityRenderState> {
             else cubes.add(cube(n,origin,res));
         }
         ModelPart part = new ModelPart(cubes, children);
+        // branche sans aucune face (frequent dans les modeles de lueur) : cachee, donc plus parcourue au rendu
+        boolean drawn = !cubes.isEmpty();
+        for (ModelPart child : children.values()) drawn |= child.visible;
+        part.visible = drawn;
         var pose = PartPose.offsetAndRotation(parent[0] - origin[0], parent[1] - origin[1] + rootY,
                 origin[2] - parent[2], (float)Math.toRadians(-rotation[0]),
                 (float)Math.toRadians(-rotation[1]), (float)Math.toRadians(rotation[2]));

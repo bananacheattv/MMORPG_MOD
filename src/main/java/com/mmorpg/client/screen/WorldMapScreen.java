@@ -15,6 +15,7 @@ public class WorldMapScreen extends MmoScreen {
     private double cx, cz;
     private boolean centered;
     private String shownMap = "";
+    private static final com.mmorpg.client.hud.MapTexture map = new com.mmorpg.client.hud.MapTexture("carte");
 
     public WorldMapScreen() {
         super("Carte du monde");
@@ -39,29 +40,7 @@ public class WorldMapScreen extends MmoScreen {
         g.fill(x0 - 1, y0 - 1, x0 + w + 1, y0 + h + 1, Ui.GOLD_DARK);
         g.fill(x0, y0, x0 + w, y0 + h, 0xFF0C0814);
         g.enableScissor(x0, y0, x0 + w, y0 + h);
-        Map<Long, int[]> chunks = QolClient.chunks();
-        int step = zoom >= 2 ? 1 : zoom >= 0.25 ? 2 : 3;
-        if (zoom < 0.25) {   // dezoom extreme : une case par chunk explore (aucun trou, cout proportionnel aux chunks)
-            int cs = Math.max(1, (int) Math.ceil(16 * zoom));
-            for (Map.Entry<Long, int[]> e : chunks.entrySet()) {
-                int sx = (int) Math.round(w / 2.0 + (ChunkPos.getX(e.getKey()) * 16 - cx) * zoom), sy = (int) Math.round(h / 2.0 + (ChunkPos.getZ(e.getKey()) * 16 - cz) * zoom);
-                if (sx + cs <= 0 || sy + cs <= 0 || sx >= w || sy >= h) continue;
-                int c = e.getValue()[136];
-                if (c != 0) g.fill(x0 + Math.max(0, sx), y0 + Math.max(0, sy), x0 + Math.min(w, sx + cs), y0 + Math.min(h, sy + cs), c);
-            }
-        } else
-        for (int row = 0; row < h; row += step) {
-            int z = (int) Math.floor(cz + (row - h / 2.0) / zoom);
-            int runStart = 0, runColor = 0;
-            for (int col = 0; col <= w; col += step) {
-                int c = col < w ? QolClient.colorAt(chunks, (int) Math.floor(cx + (col - w / 2.0) / zoom), z) : -1;
-                if (c != runColor || col >= w) {
-                    if (runColor != 0 && col > runStart) g.fill(x0 + runStart, y0 + row, x0 + Math.min(col, w), y0 + row + step, runColor);
-                    runStart = col;
-                    runColor = c;
-                }
-            }
-        }
+        map.draw(g, x0, y0, w, h, cx, cz, zoom);
         QolClient.Poi hover = null;
         for (QolClient.Poi p : QolClient.allPois()) {
             int sx = x0 + (int) Math.round(w / 2.0 + (p.x() - cx) * zoom), sy = y0 + (int) Math.round(h / 2.0 + (p.z() - cz) * zoom);

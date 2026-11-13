@@ -36,7 +36,9 @@ public final class QolClient {
         public long seen;
     }
 
-    private static final Map<String, Map<Long, int[]>> CHUNKS = new HashMap<>();
+    private static final Map<String, it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap<int[]>> CHUNKS = new HashMap<>();
+    /** Augmente a chaque changement reel de la carte : les images de carte ne sont recalculees que dans ce cas. */
+    private static long mapVersion;
     private static final Map<String, Map<String, Poi>> KNOWN = new HashMap<>();
     private static final Map<Long, Long> SCANNED = new HashMap<>();
     public static final Map<String, Dps> DPS = new LinkedHashMap<>();
@@ -146,7 +148,24 @@ public final class QolClient {
     }
 
     public static Map<Long, int[]> chunks() {
-        return CHUNKS.computeIfAbsent(dim(), k -> new HashMap<>());
+        return chunkMap();
+    }
+
+    /** Carte de la dimension courante, indexee par position de chunk compactee (sans objets Long). */
+    public static it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap<int[]> chunkMap() {
+        String dim = dim();
+        if (chunkMapOf == null || !dim.equals(chunkMapDim)) {
+            chunkMapDim = dim;
+            chunkMapOf = CHUNKS.computeIfAbsent(dim, k -> new it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap<>());
+        }
+        return chunkMapOf;
+    }
+
+    private static String chunkMapDim = "";
+    private static it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap<int[]> chunkMapOf;
+
+    public static long mapVersion() {
+        return mapVersion;
     }
 
     public static Map<String, Poi> known() {
@@ -193,7 +212,7 @@ public final class QolClient {
     private static void scan(Minecraft mc, int budget, long time) {
         Level level = mc.level;
         int pcx = mc.player.blockPosition().getX() >> 4, pcz = mc.player.blockPosition().getZ() >> 4;
-        Map<Long, int[]> map = chunks();
+        var map = chunkMap();
         for (int r = 0; r <= 8 && budget > 0; r++) {
             for (int dx = -r; dx <= r && budget > 0; dx++) {
                 for (int dz = -r; dz <= r && budget > 0; dz++) {
@@ -203,7 +222,8 @@ public final class QolClient {
                     if (last != null && time - last < (r <= 1 ? 100 : 600)) continue;
                     LevelChunk chunk = level.getChunkSource().getChunkNow(pcx + dx, pcz + dz);
                     if (chunk == null) continue;
-                    map.put(key, scanChunk(level, pcx + dx, pcz + dz));
+                    int[] colors = scanChunk(level, pcx + dx, pcz + dz);
+                    if (!java.util.Arrays.equals(colors, map.put(key, colors))) mapVersion++;
                     SCANNED.put(key, time);
                     budget--;
                 }
@@ -303,5 +323,10 @@ public final class QolClient {
         List<Poi> list = new ArrayList<>(known().values());
         list.addAll(LIVE);
         return list;
+    }
+
+    /** Vrai si au moins un point d'interet existe (evite de construire une liste a chaque image). */
+    public static boolean hasPois() {
+        return !LIVE.isEmpty() || !known().isEmpty();
     }
 }

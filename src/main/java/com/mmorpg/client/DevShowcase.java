@@ -33,6 +33,7 @@ public final class DevShowcase {
     private DevShowcase() {
     }
 
+    @SubscribeEvent public static void onFrame(net.neoforged.neoforge.client.event.RenderFrameEvent.Post event){DevPerfBench.frame();}
     private static int jobTick;
     @SubscribeEvent
     public static void onTick(ClientTickEvent.Post event) {
@@ -127,6 +128,7 @@ public final class DevShowcase {
             if(tick==640)stop(mc);
             return;
         }
+        if(MODE.equals("perf")){DevPerfBench.phase(mc);return;}
         if(MODE.equals("ui_frames")){DevUiFrames.tick(mc);return;}
         if(MODE.equals("outils_retires")){DevToolsRemoved.tick(mc);return;}
         if(MODE.equals("pvp_polish")){DevPvpVisual.tick(mc);return;}
