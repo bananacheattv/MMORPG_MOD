@@ -57,7 +57,9 @@ public final class QolClient {
         Minecraft mc = Minecraft.getInstance();
         String kind = t.getStringOr("kind", "");
         long now = System.currentTimeMillis();
-        if (kind.equals("dps")) {
+        if (kind.equals("world")) {
+            role = t.getStringOr("role", "SOLO");
+        } else if (kind.equals("dps")) {
             Dps d = DPS.computeIfAbsent(t.getStringOr("name", "?"), k -> new Dps());
             d.dps = t.getFloatOr("dps", 0);
             d.total = t.getLongOr("total", 0);
@@ -66,6 +68,11 @@ public final class QolClient {
             PINGS.add(new Ping(t.getStringOr("name", "?"), t.getIntOr("x", 0), t.getIntOr("y", 0), t.getIntOr("z", 0), now + 8000));
             if (mc.player != null) mc.player.playSound(net.minecraft.sounds.SoundEvents.EXPERIENCE_ORB_PICKUP, 0.6f, 1.6f);
         }
+    }
+
+    /** A la deconnexion : le prochain serveur annoncera son role. */
+    public static void reset() {
+        role = "";
     }
 
     public static void prune() {
@@ -101,9 +108,34 @@ public final class QolClient {
 
     // ------------------------------------------------------------------ carte
 
+    /** Role du serveur courant (HUB, MAIN, MINES...), annonce par le serveur ; sert a separer les cartes. */
+    private static String role = "";
+    private static Level lastLevel;
+
     public static String dim() {
         Minecraft mc = Minecraft.getInstance();
-        return mc.level == null ? "" : mc.level.dimension().toString();
+        return mc.level == null ? "" : role + "|" + mc.level.dimension().identifier();
+    }
+
+    /** Nom lisible de la carte courante (selon le serveur et la dimension). */
+    public static String mapName() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null) return "Carte du monde";
+        String d = mc.level.dimension().identifier().toString();
+        return switch (d) {
+            case "mmorpg:hub" -> "Hub des classes";
+            case "mmorpg:spawn" -> "Spawn";
+            case "mmorpg:donjons" -> "Donjons";
+            case "mmorpg:competitions" -> "Arènes";
+            case "mmorpg:guildes" -> "Guildes";
+            case "minecraft:overworld" -> switch (role) {
+                case "MINES" -> "Mines";
+                case "PLAINS" -> "Plaines";
+                case "MAIN" -> "Monde d'Aeloria";
+                default -> "Monde ouvert";
+            };
+            default -> d;
+        };
     }
 
     /** Couleur ARGB de la colonne (x, z) connue du cache, 0 si inexplore. */
@@ -126,6 +158,11 @@ public final class QolClient {
         if (mc.player == null || mc.level == null) return;
         long time = mc.level.getGameTime();
         String dim = dim();
+        if (mc.level != lastLevel) {   // nouveau niveau (changement de serveur/dimension) : attendre l'annonce
+            lastLevel = mc.level;
+            role = "";
+        }
+        if (role.isEmpty()) return;   // serveur pas encore annonce : ne rien melanger
         if (!dim.equals(lastDim)) {
             lastDim = dim;
             SCANNED.clear();

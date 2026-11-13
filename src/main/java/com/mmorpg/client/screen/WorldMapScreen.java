@@ -13,6 +13,7 @@ public class WorldMapScreen extends MmoScreen {
     private static double zoom = 1.0;
     private double cx, cz;
     private boolean centered;
+    private String shownMap = "";
 
     public WorldMapScreen() {
         super("Carte du monde");
@@ -21,13 +22,17 @@ public class WorldMapScreen extends MmoScreen {
     @Override
     protected void renderContent(GuiGraphicsExtractor g, int mx, int my, float a) {
         var mc = net.minecraft.client.Minecraft.getInstance();
+        if (!QolClient.dim().equals(shownMap)) {   // changement de dimension/serveur : nouvelle carte, recentrage
+            shownMap = QolClient.dim();
+            centered = false;
+        }
         if (!centered && mc.player != null) {
             cx = mc.player.getX();
             cz = mc.player.getZ();
             centered = true;
         }
         Ui.panel(g, left, top, pw, ph);
-        Ui.title(g, left + pw / 2, top + 8, "CARTE DU MONDE", Ui.GOLD_LIGHT);
+        Ui.title(g, left + pw / 2, top + 8, ("CARTE · " + QolClient.mapName()).toUpperCase(java.util.Locale.ROOT), Ui.GOLD_LIGHT);
         int x0 = left + 8, y0 = top + 24, w = pw - 16, h = ph - 24 - 26;
         g.fill(x0 - 1, y0 - 1, x0 + w + 1, y0 + h + 1, Ui.GOLD_DARK);
         g.fill(x0, y0, x0 + w, y0 + h, 0xFF0C0814);

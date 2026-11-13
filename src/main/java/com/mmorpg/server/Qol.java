@@ -149,6 +149,7 @@ public final class Qol {
             d.counters.merge(MINUTES, 1L, Long::sum);
             d.dirty = true;
         }
+        if (p.tickCount % 5 == 0) syncWorld(p);
         if (p.tickCount % 20 != 0) return;
         Fight f = FIGHTS.get(p.getUUID());
         if (f == null) return;
@@ -169,7 +170,21 @@ public final class Qol {
         if (idle) f.idleSent = true;
     }
 
+    private static final Map<UUID, String> WORLD = new HashMap<>();
+
+    /** Annonce au client le serveur et la dimension courants pour qu'il charge la bonne carte. */
+    private static void syncWorld(ServerPlayer p) {
+        String id = com.mmorpg.network.NetworkConfig.current.enabled ? com.mmorpg.network.NetworkConfig.current.role.name() : "SOLO";
+        String key = id + "|" + p.level().dimension().identifier();
+        if (key.equals(WORLD.put(p.getUUID(), key)) && p.tickCount % 100 != 0) return;
+        CompoundTag t = new CompoundTag();
+        t.putString("kind", "world");
+        t.putString("role", id);
+        Net.toPlayer(p, new Payloads.QolSync(t));
+    }
+
     public static void forget(UUID id) {
+        WORLD.remove(id);
         FIGHTS.remove(id);
         LAST_PING.remove(id);
     }
