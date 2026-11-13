@@ -40,7 +40,7 @@ public final class PerfClient {
 
     /** Vrai si l'entite est assez proche pour etre dessinee selon la distance choisie pour les PNJ. */
     public static boolean withinNpcDistance(Entity e, double camX, double camY, double camZ) {
-        double d = ClientConfig.NPC_RENDER_DISTANCE.get();
+        double d = Math.max(ClientConfig.NPC_RENDER_DISTANCE.get(), com.mmorpg.util.RenderDist.ENTITY);
         double dx = e.getX() - camX, dy = e.getY() - camY, dz = e.getZ() - camZ;
         return dx * dx + dy * dy + dz * dz <= d * d;
     }
