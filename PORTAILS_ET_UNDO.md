@@ -4,9 +4,8 @@ Commandes réservées aux opérateurs (permission maître du jeu). L'arche appar
 
 | Commande | Résultat |
 | --- | --- |
-| `/portail mine` | Arche ouvrant le choix des mines |
+| `/portail openworld` | Grand portail (9 de large, 9 de haut) vers le monde ouvert importé (Overworld, 0 84 0) |
 | `/portail mine 1` | Accès direct à la première mine (numéros 1 à 5) |
-| `/portail plaines` | Arche ouvrant le choix des plaines |
 | `/portail plaines 1` | Accès direct à la première plaine (numéros 1 à 6) |
 | `/portail donjon crypte_gobeline` | Instance de la Crypte Gobeline en difficulté normale |
 | `/portail donjon crypte_gobeline heroique` | Même donjon en héroïque |
@@ -14,7 +13,7 @@ Commandes réservées aux opérateurs (permission maître du jeu). L'arche appar
 | `/portail liste` | Liste des portails enregistrés, identifiants, dimensions et coordonnées |
 | `/portail supprimer` | Supprime le portail situé à moins de 8 blocs le plus proche |
 
-Utiliser les suggestions de commande pour les autres identifiants de donjon. Sans difficulté précisée, le donjon est normal. Les arches utilisent les blocs de marbre et cristaux du mod ; leurs particules sont orange pour les mines, vertes pour les plaines et violettes pour les donjons. Le nom de la destination s'affiche en s'approchant.
+Le niveau est toujours fixé à la pose : région des mines/plaines (numéro obligatoire), donjon et difficulté. Le choix libre (menus mine, plaines, donjons) n'est plus posable ; les anciens portails restent valables. `/portail bloc` et `/portail zone` acceptent aussi `openworld`, et l'outil portail propose « Monde ouvert ». Utiliser les suggestions de commande pour les autres identifiants de donjon. Sans difficulté précisée, le donjon est normal. Les arches utilisent les blocs de marbre et cristaux du mod ; leurs particules sont orange pour les mines, vertes pour les plaines et violettes pour les donjons. Le nom de la destination s'affiche en s'approchant.
 
 Traverser l'ouverture active le portail une seule fois ; il faut ressortir pour le réactiver. Revenir d'une instance à l'intérieur de son portail d'entrée ne relance pas immédiatement une nouvelle instance. Une arche dont le cadre a été cassé devient inactive ; elle peut toujours être supprimée par commande. Au premier passage d'un joueur après chaque démarrage du serveur, les blocs **manquants** (air) du cadre d'un portail enregistré sont reposés ; un bloc différent n'est jamais remplacé.
 

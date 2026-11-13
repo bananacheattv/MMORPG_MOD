@@ -254,6 +254,19 @@ public final class HubManager {
         return true;
     }
 
+    /** Grand portail : monde ouvert importe (Overworld, spawn 0 84 0). En reseau, serveur "openworld". */
+    public static boolean goToOpenWorld(ServerPlayer p) {
+        if (com.mmorpg.network.NetworkPlayers.route(p, com.mmorpg.network.NetworkConfig.Role.OPENWORLD, "openworld")) return true;
+        ServerLevel level = p.level().getServer().overworld();
+        if (CinematicManager.isLocked(p)) return true;
+        if (ClassTrial.active(p)) ClassTrial.end(p, false, null);
+        p.stopRiding();
+        p.teleportTo(level, 0.5, 84, 0.5, Set.of(), 0F, 0F, true);
+        p.resetFallDistance();
+        p.sendOverlayMessage(Component.literal("Monde ouvert d'Aeloria").withColor(0x60C8FF));
+        return true;
+    }
+
     /** /hub reset : repart de zero (cinematique, essais et classe), comme a la toute premiere connexion. */
     public static void reset(ServerPlayer p) {
         if (ClassTrial.active(p)) ClassTrial.end(p, false, null);

@@ -96,7 +96,10 @@ public final class DevPortalChecks {
         p.setPos(48.5, 100, 44.5); p.setYRot(0);
         var commands = level.getServer().getCommands().getDispatcher();
         var source = level.getServer().createCommandSourceStack().withLevel(level).withEntity(p).withPosition(p.position()).withSuppressedOutput();
-        check(commands.execute("portail mine", source) == 1, "operator placement command");
+        boolean menuRefused = false;
+        try { commands.execute("portail mine", source); } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) { menuRefused = true; }
+        check(menuRefused, "menu portal without level refused");
+        check(commands.execute("portail mine 1", source) == 1, "operator placement command");
         String undoCommand = net.neoforged.fml.ModList.get().isLoaded("worldedit") ? "undoportail" : "undo";
         check(commands.execute(undoCommand, source) == 1 && data.all().size() == baseline, "bare /undo alias executes");
         check(AdventurePortals.place(p, mine), "first placement for multi undo");
@@ -122,6 +125,13 @@ public final class DevPortalChecks {
         check(zone.pos().equals(new BlockPos(46, 100, 46)) && zone.max().get().equals(new BlockPos(50, 101, 50)) && AdventurePortals.passage(zone).contains(48.5, 100.5, 48.5), "zone corners normalised, inside passage");
         check(Portal.CODEC.encodeStart(NbtOps.INSTANCE, zone).result().flatMap(t -> Portal.CODEC.parse(NbtOps.INSTANCE, t).result()).orElseThrow().equals(zone), "zone portal persisted");
         check(AdventurePortals.undo(p) && data.find(zone.id()) == null, "undo removes zone portal");
+        for (int y = 107; y <= 109; y++) for (int x = 42; x <= 54; x++) for (int z = 42; z <= 54; z++) level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
+        Portal big = portal(p, true, "openworld", -1, "", 0);
+        check(AdventurePortals.valid(big) && AdventurePortals.place(p, big), "big openworld arch placement");
+        check(AdventurePortals.passage(big).contains(51.9, 105, 48.5) && AdventurePortals.passage(big).contains(45.1, 105, 48.5), "big arch passage 9 wide");
+        check(!level.getBlockState(new BlockPos(52, 105, 48)).isAir() && level.getBlockState(new BlockPos(48, 105, 48)).isAir(), "big arch frame");
+        check(AdventurePortals.remove(p, big) && AdventurePortals.undo(p), "big arch remove/undo");
+        check(AdventurePortals.remove(p, big), "big arch final removal");
         com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] PORTALS PASS: placement, both orientations, persistence, overlap, undo/undo deletion, exact terrain restoration, containers, conflicts, access gates");
     }
 }
