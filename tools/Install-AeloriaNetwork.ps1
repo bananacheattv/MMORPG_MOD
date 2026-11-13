@@ -15,7 +15,7 @@ if (-not $ModJar) {
 $jarPath = (Resolve-Path -LiteralPath $ModJar).Path
 $configPath = Join-Path $panelPath 'config.json'
 $panelConfig = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
-$roles = @{ hub = 'HUB'; serveur = 'MAIN'; mines = 'MINES'; plaines = 'PLAINS'; donjons = 'DUNGEONS' }
+$roles = @{ hub = 'HUB'; serveur = 'MAIN'; mines = 'MINES'; plaines = 'PLAINS'; donjons = 'DUNGEONS'; lobby = 'LOBBY'; openworld = 'OPENWORLD' }
 $createDungeons = $AddDungeons -and -not ($panelConfig.services | Where-Object { $_.id -eq 'donjons' })
 if ($createDungeons -and (Test-Path -LiteralPath (Join-Path $panelPath 'servers/donjons'))) { throw 'Le dossier donjons existe deja sans service enregistre. Installation interrompue pour le preserver.' }
 if ($createDungeons) {
@@ -117,7 +117,7 @@ foreach ($service in $panelConfig.services) {
     New-Item -ItemType Directory -Path $modConfig -Force | Out-Null
     $network = [ordered]@{
         enabled = $true; role = $roles[$service.id]; sharedDirectory = $sharedPath.Replace('\', '/')
-        hub = 'hub'; main = 'serveur'; mines = 'mines'; plains = 'plaines'; dungeons = 'donjons'
+        hub = 'hub'; main = 'serveur'; mines = 'mines'; plains = 'plaines'; dungeons = 'donjons'; lobby = 'lobby'; openworld = 'openworld'
         dungeonMaxInstancesPerPool = 8; dungeonBuildBudgetMs = 8
     }
     $network | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $modConfig 'network.json') -Encoding utf8

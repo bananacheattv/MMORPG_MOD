@@ -1,6 +1,6 @@
 # Réseau Aeloria sur un même PC
 
-Java 25 et NeoForge 26.3.0.39-beta. Installer **le même nouveau JAR sur les quatre serveurs et sur les clients**. Les nouveaux objets sont des entrées de registre : un ancien client doit être mis à jour.
+Java 25 et NeoForge 26.3.0.39-beta. Installer **le même nouveau JAR sur tous les serveurs de jeu et sur les clients**. Les nouveaux objets sont des entrées de registre : un ancien client doit être mis à jour.
 
 ## Rôles et stockage partagé
 
@@ -16,6 +16,8 @@ Le fonctionnement solo habituel reste actif tant que `config/mmorpg/network.json
   "mines": "mines",
   "plains": "plaines",
   "dungeons": "donjons",
+  "lobby": "lobby",
+  "openworld": "openworld",
   "dungeonMaxInstancesPerPool": 8,
   "dungeonBuildBudgetMs": 8
 }
@@ -28,6 +30,10 @@ Le fonctionnement solo habituel reste actif tant que `config/mmorpg/network.json
 | donjons | DUNGEONS | 25574 | Accueil sécurisé et instances de donjons |
 | mines | MINES | 25572 | Mines uniquement |
 | plaines | PLAINS | 25573 | Plaines uniquement |
+| lobby | LOBBY | 25575 | Choix de personnage, sans construction de hub |
+| openworld | OPENWORLD | 25576 | Monde d'exploration, sans hub ni instances |
+
+L'ajout du serveur Openworld avec une mémoire de 4 à 16 Gio est décrit dans [SERVEUR_OPENWORLD.md](docs/SERVEUR_OPENWORLD.md).
 
 Les cinq fichiers doivent désigner **exactement le même dossier partagé sur le disque local**. Ce mécanisme utilise les verrous du système d'exploitation ; il ne constitue pas une configuration multi-machine. Ce partage fichier reste la référence des profils en réseau ; MariaDB (`GUIDE_SERVEUR.md` §10) est facultative : elle reflète profils et banque, journalise et stocke les données partagées (guildes, hôtel des ventes) quand elle est activée.
 
