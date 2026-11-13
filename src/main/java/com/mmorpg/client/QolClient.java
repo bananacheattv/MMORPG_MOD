@@ -157,7 +157,7 @@ public final class QolClient {
     public static void tick() {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.level == null) return;
-        long time = mc.level.getGameTime();
+        long time = ++ticks;   // compteur propre : l'heure du monde peut etre figee ou resynchronisee par le serveur
         String dim = dim();
         if (mc.level != lastLevel) {   // nouveau niveau (changement de serveur/dimension) : attendre l'annonce
             lastLevel = mc.level;
@@ -175,18 +175,26 @@ public final class QolClient {
             SCANNED.clear();
             PINGS.clear();
         }
-        if (time % 10 == 0) scan(mc);
+        if (time % 5 == 0) scan(mc, 3, time);
         if (time % 20 == 0) pois(mc);
         if (time % 40 == 0) prune();
     }
 
-    private static void scan(Minecraft mc) {
+    private static long ticks;
+
+    /** Releve immediat (ouverture de la carte) : remplit la zone autour du joueur sans attendre. */
+    public static void scanNow() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.level == null) return;
+        if (role.isEmpty()) role = "SOLO";
+        scan(mc, 60, ticks);
+    }
+
+    private static void scan(Minecraft mc, int budget, long time) {
         Level level = mc.level;
         int pcx = mc.player.blockPosition().getX() >> 4, pcz = mc.player.blockPosition().getZ() >> 4;
         Map<Long, int[]> map = chunks();
-        long time = level.getGameTime();
-        int budget = 3;
-        for (int r = 0; r <= 5 && budget > 0; r++) {
+        for (int r = 0; r <= 8 && budget > 0; r++) {
             for (int dx = -r; dx <= r && budget > 0; dx++) {
                 for (int dz = -r; dz <= r && budget > 0; dz++) {
                     if (Math.max(Math.abs(dx), Math.abs(dz)) != r) continue;

@@ -18,6 +18,7 @@ public class WorldMapScreen extends MmoScreen {
 
     public WorldMapScreen() {
         super("Carte du monde");
+        QolClient.scanNow();
     }
 
     @Override
