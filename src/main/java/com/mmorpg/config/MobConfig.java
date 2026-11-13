@@ -28,6 +28,8 @@ public class MobConfig {
     public double scale = 1.0;
     /** Version du butin par defaut deja fusionnee dans ce fichier (voir DefaultMobs.DROPS_VERSION). */
     public int dropsVersion = 0;
+    /** Version des regles d'apparition par defaut deja appliquee a ce fichier (voir DefaultMobs.SPAWN_VERSION). */
+    public int spawnVersion = 0;
     public boolean boss = false;
     public Spawn spawn = new Spawn();
     public List<Drop> drops = new ArrayList<>();
@@ -44,6 +46,8 @@ public class MobConfig {
         public List<String> dimensions = new ArrayList<>(List.of("minecraft:overworld"));
         /** N'apparait que dans l'obscurite (nuit ou grottes). */
         public boolean darkOnly = false;
+        /** Dans l'Overworld, le niveau croit avec la distance au centre de la carte (de minLevel au centre a maxLevel au bord). */
+        public boolean distanceLevel = false;
         public int minY = -64;
         public int maxY = 320;
     }

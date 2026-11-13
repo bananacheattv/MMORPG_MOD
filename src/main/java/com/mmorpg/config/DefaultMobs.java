@@ -9,6 +9,8 @@ import java.util.Map;
 public final class DefaultMobs {
     /** A augmenter quand de nouveaux objets sont ajoutes au butin par defaut : ils sont fusionnes dans les mobs.json existants. */
     public static final int DROPS_VERSION = 3;
+    /** A augmenter quand les biomes/poids d'apparition par defaut changent : ils remplacent ceux des mobs.json existants (monstres importes). */
+    public static final int SPAWN_VERSION = 1;
     /** Materiau propre a chaque monstre importe. */
     private static final Map<String, String> MOB_MATERIAL = new java.util.HashMap<>();
 
@@ -60,6 +62,7 @@ public final class DefaultMobs {
         c.speed = speed;
         c.scale = scale;
         c.dropsVersion = DROPS_VERSION;
+        c.spawnVersion = SPAWN_VERSION;
         return c;
     }
 
@@ -257,9 +260,15 @@ public final class DefaultMobs {
     public static Map<String, MobConfig> create() {
         Map<String, MobConfig> m = core();
         List<String> ow = List.of("minecraft:overworld");
-        String[][] biomes = {{"#minecraft:is_forest"}, {"minecraft:swamp", "minecraft:mangrove_swamp"},
-                {"minecraft:dripstone_caves", "minecraft:deep_dark"}, {"minecraft:snowy_plains", "minecraft:ice_spikes", "minecraft:grove"},
-                {"minecraft:desert", "#minecraft:is_badlands"}, {"#minecraft:is_end"}};
+        // un biome par zone de monstres : foret/plaines, marais/rivieres, cryptes (sombre), terres gelees/montagnes enneigees, desert/mesa/savane, vide/iles du large
+        String[][] biomes = {
+                {"#minecraft:is_forest", "#minecraft:is_jungle", "minecraft:plains", "minecraft:sunflower_plains", "minecraft:meadow", "minecraft:cherry_grove"},
+                {"minecraft:swamp", "minecraft:mangrove_swamp", "minecraft:mushroom_fields", "#minecraft:is_river"},
+                {"minecraft:dripstone_caves", "minecraft:deep_dark", "minecraft:dark_forest", "minecraft:pale_garden", "minecraft:lush_caves"},
+                {"minecraft:snowy_plains", "minecraft:ice_spikes", "minecraft:grove", "minecraft:snowy_slopes", "minecraft:frozen_peaks", "minecraft:jagged_peaks",
+                        "#minecraft:is_taiga", "minecraft:frozen_river", "minecraft:snowy_beach", "minecraft:frozen_ocean", "minecraft:deep_frozen_ocean"},
+                {"minecraft:desert", "#minecraft:is_badlands", "#minecraft:is_savanna", "minecraft:stony_peaks", "minecraft:stony_shore"},
+                {"#minecraft:is_end", "minecraft:the_void", "#minecraft:is_deep_ocean"}};
         String[] loot = {"minecraft:oak_log", "minecraft:slime_ball", "os_maudit", "eclat_givre", "noyau_flamme", "essence_neant"};
         // butin propre a chaque zone : commun, peu commun, et rare (reserve aux grandes creatures de la zone)
         String[][] zoneLoot = {{"ecorce_ancienne", "seve_lumineuse", "coeur_racine"}, {"mucus_acide", "venin_marais", "ecaille_hydre"},
@@ -271,7 +280,9 @@ public final class DefaultMobs {
             MobConfig c = mob(1 + z * 16, Math.min(100, 18 + z * 16), 70 + z * 70, 22 + z * 8, 8 + z * 5, 2.4 + z * .6, 1 + z * .4, .27, 1);
             c.displayName = entry.name();
             c.family = com.mmorpg.entity.mob.ImportedMobs.ZONES[z];
-            spawn(c, 4, 1, 2, z == 2, z == 5 ? List.of("minecraft:the_end") : ow, biomes[z]);
+            boolean elite = elites.contains(entry.key());
+            spawn(c, elite ? 1 : 4, 1, elite ? 1 : 2, z == 2, z == 5 ? List.of("minecraft:overworld", "minecraft:the_end") : ow, biomes[z]);
+            c.spawn.distanceLevel = true;
             drop(c, loot[z], .5, 1, 2);
             drop(c, zoneLoot[z][0], .55, 1, 2);
             drop(c, zoneLoot[z][1], .25, 1, 1);

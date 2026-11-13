@@ -40,6 +40,7 @@ public final class DevNetworkChecks {
         NetworkConfig original = NetworkConfig.current;
         try {
             DevAdminPlayerChecks.run(p);
+            DevBossChecks.biomeSpawns(p.level());
             DevSkillChecks.run(p);
             UUID id = UUID.randomUUID();
             try (ProfileStore a = ProfileStore.acquire(directory, id)) {

@@ -185,4 +185,24 @@ public final class DevBossChecks {
         check(count >= 49, "all monsters covered: " + count);
         MMORPG.LOGGER.info("[CODEX CHECKS] MOB AI PASS: {} monsters, {} attacks executed", count, spellsRun);
     }
+
+    /** Chaque zone de monstres importes apparait dans ses biomes ; le niveau croit avec la distance au centre. */
+    static void biomeSpawns(ServerLevel level) {
+        var reg = level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.BIOME);
+        String[][] expect = {{"mousseux", "minecraft:forest"}, {"mousseux", "minecraft:jungle"}, {"limace_acide", "minecraft:swamp"}, {"osselet", "minecraft:deep_dark"},
+                {"renard_givre", "minecraft:jagged_peaks"}, {"renard_givre", "minecraft:taiga"}, {"scorpion_cuivre", "minecraft:desert"}, {"scorpion_cuivre", "minecraft:badlands"},
+                {"rodeur_vide", "minecraft:the_void"}};
+        for (String[] e : expect) {
+            var holder = reg.get(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BIOME, net.minecraft.resources.Identifier.parse(e[1])));
+            var cfg = com.mmorpg.config.ConfigManager.mob(e[0]);
+            check(holder.isPresent() && cfg.spawn.enabled && MobSpawner.biomeMatches(holder.get(), cfg.spawn.biomes), e[0] + " spawns in " + e[1]);
+        }
+        var forestHolder = reg.get(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BIOME, net.minecraft.resources.Identifier.parse("minecraft:desert"))).get();
+        check(!MobSpawner.biomeMatches(forestHolder, com.mmorpg.config.ConfigManager.mob("mousseux").spawn.biomes), "forest mob does not spawn in desert");
+        var cfg = com.mmorpg.config.ConfigManager.mob("mousseux");
+        var r = level.getRandom();
+        int near = MobSpawner.distanceLevel(cfg, 10, 10, r), far = MobSpawner.distanceLevel(cfg, 2400, 0, r);
+        check(near <= cfg.minLevel + 2 && far >= cfg.maxLevel - 2 && far > near, "level grows with distance: " + near + " -> " + far);
+        MMORPG.LOGGER.info("[CODEX CHECKS] MOB BIOMES PASS: biomes per zone, level {} near spawn -> {} at the edge", near, far);
+    }
 }

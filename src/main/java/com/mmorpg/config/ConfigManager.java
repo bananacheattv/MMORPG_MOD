@@ -187,6 +187,10 @@ public final class ConfigManager {
                 MobConfig existing = result.putIfAbsent(e.getKey(), e.getValue());
                 if (existing != null) e.getValue().abilities.forEach(existing.abilities::putIfAbsent);          // nouveaux reglages de sorts
                 if (existing != null && existing.dropsVersion < DefaultMobs.DROPS_VERSION) mergeDrops(existing, e.getValue());
+                if (existing != null && existing.spawnVersion < DefaultMobs.SPAWN_VERSION) {                // nouvelles regles d'apparition par biome
+                    if (e.getValue().spawn.distanceLevel) existing.spawn = e.getValue().spawn;
+                    existing.spawnVersion = DefaultMobs.SPAWN_VERSION;
+                }
             }
             for (MobConfig cfg : result.values()) {
                 sanitize(cfg);

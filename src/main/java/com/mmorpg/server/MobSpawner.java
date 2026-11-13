@@ -109,8 +109,22 @@ public final class MobSpawner {
                 continue;
             }
             mob.finalizeSpawn(level, level.getCurrentDifficultyAt(p), EntitySpawnReason.NATURAL, null);
+            if (chosen.cfg.spawn.distanceLevel && level.dimension() == net.minecraft.world.level.Level.OVERWORLD) {
+                com.mmorpg.server.MobLevels.forceLevel(mob, chosen.key, distanceLevel(chosen.cfg, p.getX(), p.getZ(), random));
+            }
             level.addFreshEntity(mob);
         }
+    }
+
+    /** Rayon de la carte d'Aeloria importee (centre 0, 0) : niveau minimum au centre, maximum au bord. */
+    public static final double MAP_RADIUS = 2500;
+
+    /** Niveau d'un monstre selon sa distance au centre de la carte, dans sa fourchette [minLevel, maxLevel], a quelques niveaux pres. */
+    public static int distanceLevel(MobConfig cfg, double x, double z, net.minecraft.util.RandomSource random) {
+        double t = Math.min(1.0, Math.sqrt(x * x + z * z) / MAP_RADIUS);
+        int span = cfg.maxLevel - cfg.minLevel;
+        int lvl = cfg.minLevel + (int) Math.round(span * t) + random.nextInt(3) - 1;
+        return Math.max(cfg.minLevel, Math.min(cfg.maxLevel, lvl));
     }
 
     private static BlockPos findGround(ServerLevel level, int x, int nearY, int z) {
