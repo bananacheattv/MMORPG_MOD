@@ -176,7 +176,7 @@ public final class Qol {
     private static void syncWorld(ServerPlayer p) {
         String id = com.mmorpg.network.NetworkConfig.current.enabled ? com.mmorpg.network.NetworkConfig.current.role.name() : "SOLO";
         String key = id + "|" + p.level().dimension().identifier();
-        if (key.equals(WORLD.put(p.getUUID(), key)) && p.tickCount % 100 != 0) return;
+        if (key.equals(WORLD.put(p.getUUID(), key)) && p.tickCount % 40 != 0) return;
         CompoundTag t = new CompoundTag();
         t.putString("kind", "world");
         t.putString("role", id);

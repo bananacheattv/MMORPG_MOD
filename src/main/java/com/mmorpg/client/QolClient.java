@@ -111,6 +111,7 @@ public final class QolClient {
     /** Role du serveur courant (HUB, MAIN, MINES...), annonce par le serveur ; sert a separer les cartes. */
     private static String role = "";
     private static Level lastLevel;
+    private static long levelSince;
 
     public static String dim() {
         Minecraft mc = Minecraft.getInstance();
@@ -161,8 +162,14 @@ public final class QolClient {
         if (mc.level != lastLevel) {   // nouveau niveau (changement de serveur/dimension) : attendre l'annonce
             lastLevel = mc.level;
             role = "";
+            levelSince = 0;
         }
-        if (role.isEmpty()) return;   // serveur pas encore annonce : ne rien melanger
+        if (role.isEmpty()) {   // serveur pas encore annonce : attendre 3 s puis charger quand meme (serveur ancien ou annonce perdue)
+            if (levelSince == 0) levelSince = time;
+            if (time - levelSince < 60) return;
+            role = "SOLO";
+        }
+
         if (!dim.equals(lastDim)) {
             lastDim = dim;
             SCANNED.clear();
