@@ -378,6 +378,7 @@ public final class NetworkPlayers {
                 }
             } else if (destination.equals("hub") && NetworkConfig.hosts(NetworkConfig.Role.HUB)) com.mmorpg.hub.HubManager.goToHub(p);
             else if (destination.equals("spawn") && NetworkConfig.hosts(NetworkConfig.Role.MAIN)) com.mmorpg.hub.HubManager.goToSpawn(p);
+            else if (destination.equals("openworld") && NetworkConfig.hosts(NetworkConfig.Role.OPENWORLD)) com.mmorpg.hub.HubManager.goToOpenWorld(p);
             save(p); // consume the travel instruction; later reconnects retain their local position
         } catch (Exception e) { MMORPG.LOGGER.error("[Aeloria] Invalid travel instruction {}", destination, e); }
         finally { ARRIVALS.remove(p.getUUID()); }

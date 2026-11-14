@@ -4,7 +4,7 @@ Commandes réservées aux opérateurs (permission maître du jeu). L'arche appar
 
 | Commande | Résultat |
 | --- | --- |
-| `/portail openworld` | Grand portail (9 de large, 9 de haut) vers le monde ouvert importé (Overworld, 0 84 0) |
+| `/portail openworld` | Grand portail (9 de large, 9 de haut) vers le serveur Openworld, à l'entrée de sa carte (Overworld, 0 84 0) |
 | `/portail mine 1` | Accès direct à la première mine (numéros 1 à 5) |
 | `/portail plaines 1` | Accès direct à la première plaine (numéros 1 à 6) |
 | `/portail donjon crypte_gobeline` | Instance de la Crypte Gobeline en difficulté normale |
@@ -18,6 +18,8 @@ Le niveau est toujours fixé à la pose : région des mines/plaines (numéro obl
 Traverser l'ouverture active le portail une seule fois ; il faut ressortir pour le réactiver. Revenir d'une instance à l'intérieur de son portail d'entrée ne relance pas immédiatement une nouvelle instance. Une arche dont le cadre a été cassé devient inactive ; elle peut toujours être supprimée par commande. Au premier passage d'un joueur après chaque démarrage du serveur, les blocs **manquants** (air) du cadre d'un portail enregistré sont reposés ; un bloc différent n'est jamais remplacé.
 
 Les niveaux, difficultés, choix de classe et découvertes des mines/plaines sont contrôlés côté serveur. Un portail vers une région avancée ne la débloque pas. Les essais, cinématiques et combats PvP empêchent l'entrée. Les voyages utilisent les mécanismes existants (écran de chargement, instance personnelle/de groupe et, en réseau, transfert vers le serveur approprié). Les arches et leurs destinations sont sauvegardées dans les données du monde et conservées au redémarrage.
+
+En réseau, le portail « Monde ouvert » utilise la destination Velocity configurée par `openworld` dans `network.json` (par défaut `openworld`, port local `25576`). À l'arrivée, le rôle `OPENWORLD` place le joueur à l'entrée `(0.5, 84, 0.5)` de son Overworld. Une reconnexion ordinaire conserve ensuite sa position d'exploration. En partie solo, le portail utilise l'Overworld local.
 
 ## Annuler
 

@@ -86,6 +86,7 @@ neoForge {
             if (project.hasProperty('sharedChecks')) systemProperty 'mmorpg.checkShared', 'true'
             if (project.hasProperty('securityChecks')) systemProperty 'mmorpg.checkSecurity', 'true'
             if (project.hasProperty('networkChecks')) systemProperty 'mmorpg.checkNetwork', 'true'
+            if (project.hasProperty('openworldPortalChecks')) systemProperty 'mmorpg.checkOpenworldPortal', 'true'
             if (project.hasProperty('tutorialChecks')) systemProperty 'mmorpg.checkTutorial', 'true'
             if (project.hasProperty('contentQuestChecks')) systemProperty 'mmorpg.checkContentQuests', 'true'
             if (project.hasProperty('fishingChecks')) systemProperty 'mmorpg.checkFishing', 'true'
