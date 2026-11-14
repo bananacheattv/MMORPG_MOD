@@ -91,6 +91,7 @@ public final class DevTutorialChecks {
                 check(QuestManager.isAvailable(d, id, q, MascotGuide.GROUP), cls + " : " + id + " indisponible");
                 QuestManager.accept(p, id, mascot.getId());
                 check(d.activeQuests.containsKey(id), cls + " : " + id + " non acceptee");
+                if (id.equals("tuto_peche")) check(p.getInventory().contains(new ItemStack(com.mmorpg.registry.ModItems.get("canne_apprenti"))), cls + " : canne recue a l'acceptation");
                 for (var o : q.objectives) {
                     switch (o.type) {
                         case "action" -> {

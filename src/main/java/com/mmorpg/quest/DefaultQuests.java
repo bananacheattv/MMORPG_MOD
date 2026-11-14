@@ -8,7 +8,7 @@ import java.util.function.IntFunction;
 /** Quetes par defaut : une campagne qui suit la progression des niveaux 1 a 100, plus des quetes journalieres. */
 public final class DefaultQuests {
     /** Incremente quand les quetes par defaut changent : les quetes d'un quests.json plus ancien sont alors remplacees une fois. */
-    public static final int REVISION = 7;
+    public static final int REVISION = 8;
 
     private DefaultQuests() {
     }
@@ -131,8 +131,8 @@ public final class DefaultQuests {
                 "Chaque palier de métier offre des récompenses : titres, plats, cosmétiques...", 150, 20), "JobsScreen", "Ouvrir l'onglet Métiers");
         act(tq(m, "metiers", "peche", "Une journée de pêche", "Pêchez un poisson dans un lac ou une rivière.",
                 "Voici une canne ! Équipe-la, lance-la dans l'eau et, quand ça mord, clique dans la zone de la jauge pour ramener la prise.",
-                "Quelle prise ! Les poissons rares, les coffres et les trésors t'attendent dans les eaux profondes.", 200, 20, "canne_apprenti", 1),
-                "stat:fish_caught", "Pêcher un poisson", 1);
+                "Quelle prise ! Les poissons rares, les coffres et les trésors t'attendent dans les eaux profondes.", 200, 20),
+                "stat:fish_caught", "Pêcher un poisson", 1).startItems.add(new QuestDef.ItemReward("mmorpg:canne_apprenti", 1));
         act(tq(m, "peche", "ferme", "Les premières récoltes", "Labourez avec votre houe, plantez des graines et récoltez.",
                 "Laboure la terre avec ta houe, plante des graines de Lueur et récolte-les quand elles sont mûres !",
                 "Un vrai fermier ! Les plats de métier renforcent ton personnage.", 200, 20), "job:fermier", "Récolter des plantes", 3);

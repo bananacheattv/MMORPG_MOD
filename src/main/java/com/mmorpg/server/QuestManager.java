@@ -316,6 +316,21 @@ public final class QuestManager {
             p.sendOverlayMessage(Component.literal("Journal de quêtes plein (" + MAX_ACTIVE + " quêtes maximum).").withColor(0xFF5050));
             return false;
         }
+        // outil necessaire : remis a l'acceptation, jamais en double ; inventaire plein = refus (rien n'est jete au sol)
+        java.util.List<net.minecraft.world.item.ItemStack> toGive = new java.util.ArrayList<>();
+        for (QuestDef.ItemReward ir : q.startItems) {
+            Item it = ForgeRecipes.resolveItem(ir.item);
+            if (it == null || it == Items.AIR) continue;
+            boolean has = false;
+            var inv = p.getInventory();
+            for (int i = 0; i < inv.getContainerSize() && !has; i++) has = inv.getItem(i).is(it);
+            if (!has) toGive.add(new net.minecraft.world.item.ItemStack(it, ir.count));
+        }
+        if (!toGive.isEmpty() && p.getInventory().getFreeSlot() < 0) {
+            p.sendOverlayMessage(Component.literal("Inventaire plein : libère une place pour recevoir l'outil de la quête.").withColor(0xFF5050));
+            return false;
+        }
+        for (var st : toGive) RpgPlayers.give(p, st.getItem(), st.getCount());
         d.declinedQuests.remove(id);
         d.activeQuests.put(id, new int[q.objectives.size()]);
         d.trackedQuest=id;d.questGuidanceMuted=false;

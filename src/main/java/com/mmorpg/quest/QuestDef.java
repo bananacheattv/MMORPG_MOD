@@ -40,6 +40,8 @@ public class QuestDef {
     public String speech = "", speechDone = "";
     public List<Objective> objectives = new ArrayList<>();
     public Rewards rewards = new Rewards();
+    /** Objets remis a l'acceptation (outil necessaire a la quete) ; non redonnes si deja possedes. */
+    public List<ItemReward> startItems = new ArrayList<>();
     /** Repetition : "" (une fois), "daily" ou "weekly" (remise a zero a 4 h, lundi pour l'hebdomadaire). Les quetes journalieres historiques utilisent {@link #daily}. */
     public String repeat = "";
     /** Quete rendue automatiquement des que ses objectifs sont atteints (trame principale), sans retour au donneur. */
