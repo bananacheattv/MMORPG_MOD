@@ -66,6 +66,7 @@ public final class MobSpawner {
         int x = (int) (player.getX() + Math.cos(angle) * dist);
         int z = (int) (player.getZ() + Math.sin(angle) * dist);
         if (!level.hasChunkAt(new BlockPos(x, player.getBlockY(), z))) return;
+        if (level.dimension() == net.minecraft.world.level.Level.OVERWORLD && OpenWorldRules.nearSpawn(x, z)) return;   // 200 blocs autour du spawn sans mobs
         BlockPos pos = findGround(level, x, player.getBlockY(), z);
         if (pos == null) return;
         Holder<Biome> biome = level.getBiome(pos);
