@@ -32,6 +32,8 @@ public enum MountType {
     DRAKE_ASCENDANT("drake_ascendant","Drake ascendant",Rarity.MYTHIQUE,1.0f,1.6f,1.6f,true);
 
     public final String id, label;
+    /** Echelle d'affichage et de collision (la chimere est 2x plus petite que les autres montures). */
+    public float scale() { return this == CHIMERE_ARENE ? 1f : com.mmorpg.registry.ModEntities.MOUNT_SCALE; }
     public final Rarity rarity;
     public final double speed;
     public final float width, height, seat;

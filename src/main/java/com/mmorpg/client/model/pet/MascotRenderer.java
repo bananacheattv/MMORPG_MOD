@@ -23,7 +23,7 @@ import java.util.List;
 /** La Mascotte du tutoriel : le Dragonnet du Neant, un peu plus grand qu'en familier, avec une bulle de dialogue au-dessus de la tete. */
 public class MascotRenderer extends EntityRenderer<MascotEntity, MascotRenderer.State> {
     private static final int FULL_BRIGHT = 0xF000F0;
-    private static final float SCALE = 3.3F;
+    private static final float SCALE = 1.65F;
     private static final long SPEECH_MS = 11_000;
     private static final int WRAP = 30;
     private static String speech = "";

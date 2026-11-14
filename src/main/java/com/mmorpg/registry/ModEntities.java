@@ -89,13 +89,13 @@ public final class ModEntities {
             new java.util.EnumMap<>(com.mmorpg.mount.MountType.class);
     private static net.minecraft.world.phys.Vec3[] attachments(com.mmorpg.mount.MountType m) {
         var out = new net.minecraft.world.phys.Vec3[m.seats.length];
-        for (int i = 0; i < out.length; i++) out[i] = new net.minecraft.world.phys.Vec3(m.seats[i][0] * MOUNT_SCALE, m.seat * MOUNT_SCALE + .1f, m.seats[i][1] * MOUNT_SCALE);
+        for (int i = 0; i < out.length; i++) out[i] = new net.minecraft.world.phys.Vec3(m.seats[i][0] * m.scale(), m.seat * m.scale() + .1f, m.seats[i][1] * m.scale());
         return out;
     }
     static {
         for (var m : com.mmorpg.mount.MountType.values()) {
             MOUNTS.put(m, ENTITIES.registerEntityType("monture_" + m.id, com.mmorpg.entity.MountEntity::new, MobCategory.CREATURE,
-                    b -> b.sized(m.width * MOUNT_SCALE, m.height * MOUNT_SCALE).eyeHeight(m.height * MOUNT_SCALE * .9f)
+                    b -> b.sized(m.width * m.scale(), m.height * m.scale()).eyeHeight(m.height * m.scale() * .9f)
                             .passengerAttachments(attachments(m)).clientTrackingRange(16)));
         }
     }

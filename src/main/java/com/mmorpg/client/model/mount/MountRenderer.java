@@ -14,13 +14,16 @@ public class MountRenderer extends MobRenderer<MountEntity, MountRenderer.State,
         public boolean flying;
     }
 
+    private final float scale;
+
     public MountRenderer(EntityRendererProvider.Context ctx, MountType type) {
-        super(ctx, new ImportedModel("mounts", type.id), type.width * .55f * com.mmorpg.registry.ModEntities.MOUNT_SCALE);
+        super(ctx, new ImportedModel("mounts", type.id), type.width * .55f * type.scale());
+        this.scale = type.scale();
     }
 
     @Override
     protected void scale(State state, com.mojang.blaze3d.vertex.PoseStack pose) {
-        float s = com.mmorpg.registry.ModEntities.MOUNT_SCALE;
+        float s = scale;
         pose.scale(s, s, s);
     }
 

@@ -30,7 +30,7 @@ public final class MountCameraClient {
         var player = Minecraft.getInstance().player;
         event.setDistance(Math.max(1f, event.getDistance() + zoomOffset));
         if (player == null || !(player.getVehicle() instanceof MountEntity mount)) return;
-        float size = Math.max(Math.max(mount.mountType().width, mount.mountType().height), mount.mountType().seat) * ModEntities.MOUNT_SCALE;
+        float size = Math.max(Math.max(mount.mountType().width, mount.mountType().height), mount.mountType().seat) * mount.mountType().scale();
         event.setDistance(Math.max(event.getDistance(), event.getDistance() + size * 1.5F));
     }
 }
