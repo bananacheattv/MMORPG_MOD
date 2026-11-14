@@ -391,6 +391,7 @@ public final class MineManager {
             int region = regionOf(p);
             if (region < 0 || p.isSpectator()) continue;
             MineLayout layout = MineLayout.get(region);
+            double[] sp = spawnPoint(region);                                                          // aucun mob a 50 blocs du point d'arrivee
             int px = (int) p.getX() - layout.x0(), pz = (int) p.getZ() - MineLayout.Z0;
             if (Math.hypot(px - MineLayout.PLAZA_X, pz - MineLayout.PLAZA_Z) < 42) continue;           // la place d'entree est sure
             AABB area = p.getBoundingBox().inflate(36, 30, 36);
@@ -401,7 +402,7 @@ public final class MineManager {
                 int x = (int) (p.getX() + Math.cos(a) * dist), z = (int) (p.getZ() + Math.sin(a) * dist);
                 int lx = x - layout.x0(), lz = z - MineLayout.Z0;
                 if (layout.kind(lx, lz) != 1 || layout.isPillar(lx, lz) || layout.liquid(lx, lz) > layout.floor(lx, lz)) continue;
-                if (Math.hypot(lx - MineLayout.PLAZA_X, lz - MineLayout.PLAZA_Z) < 34 || Math.hypot(lx - layout.exitX, lz - layout.exitZ) < 14) continue;
+                if (Math.hypot(lx - (sp[0] - layout.x0()), lz - (sp[2] - MineLayout.Z0)) < 50 || Math.hypot(lx - layout.exitX, lz - layout.exitZ) < 14) continue;
                 BlockPos pos = new BlockPos(x, layout.floor(lx, lz) + 1, z);
                 if (!level.hasChunkAt(pos) || !level.getBlockState(pos).isAir() || !level.getBlockState(pos.above()).isAir()) continue;
                 Sector s = layout.style;

@@ -428,6 +428,7 @@ public final class PlainsManager {
                 if (!inside(lx, lz) || edge(lx, lz) < WALL + 4 || lz < ENTRY + 4) continue;
                 int h = lay.height(lx, lz);
                 if (h < BASE) continue;                                                              // pas dans les lacs
+                if (Math.hypot(lx - PLAZA_X, lz - PLAZA_Z) < 50) continue;                          // aucun mob a 50 blocs du point d'arrivee
                 if (Math.hypot(lx - lay.exitX, lz - lay.exitZ) < 12) continue;                       // ni dans le sanctuaire du portail
                 BlockPos pos = new BlockPos(x, h + 1, z);
                 if (!level.hasChunkAt(pos) || !level.getBlockState(pos).isAir() || !level.getBlockState(pos.above()).isAir()) continue;
