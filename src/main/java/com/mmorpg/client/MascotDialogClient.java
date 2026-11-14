@@ -19,7 +19,7 @@ public final class MascotDialogClient {
     private static NpcEntity portrait, fallback;
 
     public static void say(String name, String line) {
-        speaker = name.isEmpty() ? "Mascotte" : name;
+        speaker = name.isEmpty() ? "Flammèche" : name;
         text = line;
         since = System.currentTimeMillis();
         until = since + Math.max(8000, 5000 + 65L * line.length());
@@ -45,7 +45,7 @@ public final class MascotDialogClient {
         int[] size = element.contentSize(g.guiWidth(), g.guiHeight());
         int w = size[0], h = size[1], tx = 82;
         String shown = demo ? "Bienvenue sur Aeloria ! Je suis ta guide. Suis mes missions pour découvrir la forge, les mines et tes premières quêtes." : text;
-        String who = demo ? "Mascotte" : speaker;
+        String who = demo ? "Flammèche" : speaker;
         Ui.panel(g, 0, 0, w, h); Ui.inset(g, 6, 7, 68, h - 14);
         g.text(mc.font, mc.font.plainSubstrByWidth(who.toUpperCase(java.util.Locale.ROOT), w - tx - 12), tx, 10, 0xFFD6A4FF, false);
         var lines = mc.font.split(AeloriaFont.of(shown), Math.max(40, w - tx - 12));
@@ -59,7 +59,7 @@ public final class MascotDialogClient {
         NpcEntity actor = portrait;
         if (actor == null || actor.level() != mc.level || actor.isRemoved() || demo) {
             if (fallback == null || fallback.level() != mc.level) {
-                if (demo || speaker.equals("Mascotte")) {
+                if (demo || speaker.equals("Flammèche")) {
                     var mascot = new MascotEntity(com.mmorpg.registry.ModEntities.MASCOT.get(), mc.level);
                     mascot.setId(-160002); mascot.setOwnerId(mc.player.getId()); fallback = mascot;
                 } else {

@@ -136,7 +136,7 @@ public final class FlammecheScenes {
     }
 
     /** Lance l'eclosion (aussi apres une reconnexion tant que l'etape n'est pas validee). */
-    static void hatch(ServerPlayer p) {
+    static void hatch(ServerPlayer p, boolean welcome) {
         MascotEntity m = MascotGuide.ensure(p);
         if (m == null) return;
         m.getNavigation().stop();
@@ -144,7 +144,7 @@ public final class FlammecheScenes {
         m.setEgg(1);
         m.setGrowth(0.3F);
         SCENES.put(p.getUUID(), new Scene(Kind.HATCH));
-        line(p, "Ysméralde", "Regarde ! L'œuf brûlant au pied du Seuil... il bouge !");
+        line(p, welcome ? "Aeloria" : "Ysméralde", welcome ? "Un œuf de Braise frémit près de toi... il va éclore !" : "Regarde ! L'œuf brûlant au pied du Seuil... il bouge !");
     }
 
     @SubscribeEvent
@@ -154,8 +154,12 @@ public final class FlammecheScenes {
             PlayerData d = RpgPlayers.get(p);
             Scene s = SCENES.get(p.getUUID());
             if (s == null) {
-                if (server.getTickCount() % 20 == 3 && d.activeQuests.containsKey(HATCH_QUEST) && !QuestManager.completable(p, d, HATCH_QUEST)
-                        && p.isAlive() && !p.isSpectator()) hatch(p);
+                boolean alive = p.isAlive() && !p.isSpectator();
+                if (server.getTickCount() % 20 == 3 && alive && d.activeQuests.containsKey(HATCH_QUEST) && !QuestManager.completable(p, d, HATCH_QUEST)) {
+                    if (d.flammecheHatched) QuestManager.onAction(p, "lore:eclosion", 1);       // deja ne a l'accueil : l'etape est validee
+                    else hatch(p, false);
+                } else if (server.getTickCount() % 20 == 3 && alive && !d.flammecheHatched && !d.completedQuests.contains(HATCH_QUEST)
+                        && !d.completedQuests.contains("tuto_fin") && MascotGuide.mascot(p) != null) hatch(p, true);       // accueil : le guide du tutoriel nait de l'oeuf
                 else if (server.getTickCount() % 8 == 0) aura(p, d);
                 continue;
             }
@@ -210,6 +214,8 @@ public final class FlammecheScenes {
                 if (p.isAlive() && !p.isRemoved()) MascotGuide.say(p, NAME, "Croaa ! ... Je veux dire : salut ! Je m'appelle Flammèche, et je te suis partout !");
             });
             SCENES.remove(p.getUUID());
+            RpgPlayers.get(p).flammecheHatched = true;
+            RpgPlayers.get(p).dirty = true;
             QuestManager.onAction(p, "lore:eclosion", 1);
         }
     }

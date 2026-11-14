@@ -20,7 +20,7 @@ import java.util.UUID;
 public final class MascotEntity extends NpcEntity {
     /** Ancien UUID fixe de la Mascotte unique du spawn (nettoyage des anciens mondes). */
     public static final UUID ID = com.mmorpg.quest.QuestNpcPlan.MASCOT_ID;
-    public static final String NAME = "Mascotte";
+    public static final String NAME = "Flammèche";
     private static final EntityDataAccessor<Integer> OWNER = SynchedEntityData.defineId(MascotEntity.class, EntityDataSerializers.INT);
     /** Taille de Flammeche (1 = dragonnet ; grandit a chaque Eveil). */
     private static final EntityDataAccessor<Float> GROWTH = SynchedEntityData.defineId(MascotEntity.class, EntityDataSerializers.FLOAT);

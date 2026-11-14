@@ -293,13 +293,13 @@ public final class MascotGuide {
                     postZ = p.getZ();
                     postYaw = p.getYRot();
                     save(c.getSource().getServer());
-                    c.getSource().sendSuccess(() -> Component.literal("Poste de la Mascotte posé ici (" + (int) postX + " " + (int) postY + " " + (int) postZ + ")."), true);
+                    c.getSource().sendSuccess(() -> Component.literal("Poste de Flammèche posé ici (" + (int) postX + " " + (int) postY + " " + (int) postZ + ")."), true);
                     return 1;
                 }))
                 .then(Commands.literal("retirer").executes(c -> {
                     postDim = null;
                     save(c.getSource().getServer());
-                    c.getSource().sendSuccess(() -> Component.literal("Poste de la Mascotte retiré."), true);
+                    c.getSource().sendSuccess(() -> Component.literal("Poste de Flammèche retiré."), true);
                     return 1;
                 }))
                 .then(Commands.literal("suit")
@@ -310,7 +310,7 @@ public final class MascotGuide {
     private static int setFollow(net.minecraft.commands.CommandSourceStack src, int n) {
         followUntil = n;
         save(src.getServer());
-        src.sendSuccess(() -> Component.literal(n < 0 ? "La Mascotte suit le joueur pendant tout le tutoriel." : "La Mascotte suit le joueur pendant les " + n + " premières quêtes, puis reste à son poste."), true);
+        src.sendSuccess(() -> Component.literal(n < 0 ? "Flammèche suit le joueur pendant tout le tutoriel." : "Flammèche suit le joueur pendant les " + n + " premières quêtes, puis reste à son poste."), true);
         return 1;
     }
 
@@ -320,7 +320,7 @@ public final class MascotGuide {
             FORCED.remove(p.getUUID());
             drop(p);
         }
-        String msg = on ? "Mascotte invoquée pour " + p.getGameProfile().name() + "." : "Mascotte renvoyée pour " + p.getGameProfile().name() + ".";
+        String msg = on ? "Flammèche invoqué pour " + p.getGameProfile().name() + "." : "Flammèche renvoyé pour " + p.getGameProfile().name() + ".";
         src.sendSuccess(() -> Component.literal(msg), true);
         return 1;
     }

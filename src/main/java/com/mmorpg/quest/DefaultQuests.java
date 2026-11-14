@@ -8,7 +8,7 @@ import java.util.function.IntFunction;
 /** Quetes par defaut : une campagne qui suit la progression des niveaux 1 a 100, plus des quetes journalieres. */
 public final class DefaultQuests {
     /** Incremente quand les quetes par defaut changent : les quetes d'un quests.json plus ancien sont alors remplacees une fois. */
-    public static final int REVISION = 6;
+    public static final int REVISION = 7;
 
     private DefaultQuests() {
     }
@@ -77,8 +77,8 @@ public final class DefaultQuests {
     public static Map<String, QuestDef> tutorial() {
         Map<String, QuestDef> m = new LinkedHashMap<>();
         // --- partie 1 : tout se fabrique, rien n'est offert au depart
-        tq(m, null, "bienvenue", "Bienvenue, voyageur", "La Mascotte, votre guide, vous accueille. Vous n'avez rien sur vous : tout se fabrique.",
-                "Salut, voyageur ! Je suis la Mascotte, ton guide. Tu n'as rien sur toi : ici, tout se fabrique. Suis mes missions et tu deviendras un héros !",
+        tq(m, null, "bienvenue", "Bienvenue, voyageur", "Flammèche, votre guide, vous accueille. Vous n'avez rien sur vous : tout se fabrique.",
+                "Salut, voyageur ! Je suis Flammèche, ton guide. Tu n'as rien sur toi : ici, tout se fabrique. Suis mes missions et tu deviendras un héros !",
                 "Voici de quoi forger ta première pioche et ta houe. Direction la Forge Arcanique !", 40, 20, "ecorce_ancienne", 4, "ferraille_gobeline", 5);
         obj(m.get(M + "bienvenue"), "level", "niveau", 1);
         open(tq(m, "bienvenue", "forge", "La Forge Arcanique", "La forge transforme les matériaux en outils, armes et armures.",
