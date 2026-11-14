@@ -180,7 +180,12 @@ public final class InstanceManager {
         long at = server.overworld().getGameTime() + MIN_LOADING_TICKS;
         for (ServerPlayer m : groupEntry && !setup ? PartyManager.onlineMembers(player) : java.util.List.of(player)) {
             if (!setup && RpgPlayers.get(m).level < com.mmorpg.dungeon.DungeonMaster.requiredLevel(typeOf(pool), difficultyOf(pool))) continue;
-            if (!m.level().dimension().equals(DIM)) RETURNS.put(m.getUUID(), new Return(m.level().dimension(), m.getX(), m.getY(), m.getZ(), m.getYRot()));
+            if (!m.level().dimension().equals(DIM)) {
+                var front = com.mmorpg.server.PortalOrigin.local(m);                    // devant le portail franchi, sinon position actuelle
+                var frontDim = front == null ? null : net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION, net.minecraft.resources.Identifier.parse(front.dimension()));
+                if (front != null && frontDim.equals(m.level().dimension())) RETURNS.put(m.getUUID(), new Return(frontDim, front.x(), front.y(), front.z(), front.yaw()));
+                else RETURNS.put(m.getUUID(), new Return(m.level().dimension(), m.getX(), m.getY(), m.getZ(), m.getYRot()));
+            }
             com.mmorpg.server.AdventureSummary.begin(m,"donjon");
             BossReveal.hold(m, MIN_LOADING_TICKS + 400);
             TRANSITIONS.removeIf(x -> x.player().equals(m.getUUID()));

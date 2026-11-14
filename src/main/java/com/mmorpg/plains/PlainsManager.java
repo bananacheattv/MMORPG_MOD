@@ -358,7 +358,7 @@ public final class PlainsManager {
             }
             if (arch(lay).contains(p.getX(), p.getY(), p.getZ()) && !cooling(p, now)) {
                 level.playSound(null, p.blockPosition(), SoundEvents.PORTAL_TRAVEL, SoundSource.PLAYERS, 0.4f, 1.5f);
-                HubManager.goToSpawn(p);
+                if (!com.mmorpg.server.PortalOrigin.exit(p)) HubManager.goToSpawn(p);
             }
         }
     }

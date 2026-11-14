@@ -84,6 +84,8 @@ public class PlayerData implements ValueIOSerializable {
     public boolean starterTools = false;
     /** Vrai une fois la migration du tutoriel faite (les anciens joueurs ont le tutoriel termine d'office). */
     public boolean tutorialInit = false;
+    /** Point devant le dernier portail d'aventure franchi (retour a la sortie ou apres une mort), voir PortalOrigin. */
+    public CompoundTag portalOrigin = null;
     /** Vrai une fois l'oeuf de Flammeche eclos (scene d'accueil ou quete qp_002). */
     public boolean flammecheHatched = false;
     /** Permanent forge scroll licenses (bits 0..4); preserved by save/load, death and network travel. */
@@ -252,6 +254,7 @@ public class PlayerData implements ValueIOSerializable {
         t.putBoolean("chosen", classChosenOnce);
         t.putBoolean("starterTools", starterTools);
         t.putBoolean("tutorialInit", tutorialInit);
+        if (portalOrigin != null) t.put("portalOrigin", portalOrigin.copy());
         t.putBoolean("flammecheHatched", flammecheHatched);
         t.putInt("forgeBlueprints", forgeBlueprints);
         t.putInt("minesUnlocked", minesUnlocked);
@@ -337,6 +340,7 @@ public class PlayerData implements ValueIOSerializable {
         classChosenOnce = t.getBooleanOr("chosen", playerClass != PlayerClass.NONE);
         starterTools = t.getBooleanOr("starterTools", false);
         tutorialInit = t.getBooleanOr("tutorialInit", false);
+        portalOrigin = t.getCompound("portalOrigin").map(CompoundTag::copy).orElse(null);
         flammecheHatched = t.getBooleanOr("flammecheHatched", false);
         forgeBlueprints = t.getIntOr("forgeBlueprints", 0) & 31;
         if (forgeBlueprints != 0) {

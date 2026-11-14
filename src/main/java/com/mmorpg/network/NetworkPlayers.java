@@ -359,6 +359,8 @@ public final class NetworkPlayers {
             }
             if (destination.startsWith("admin-tp:")) {
                 AdminTravel.arrive(p, destination.substring(9));
+            } else if (destination.equals("portal-return")) {
+                com.mmorpg.server.PortalOrigin.arrive(p);
             } else if (destination.equals("dungeon-return")) {
                 DungeonTravel.arriveHome(p);
             } else if (((destination.startsWith("arena:")||destination.startsWith("arena-match:"))||(destination.startsWith("guild-raid")||destination.equals("guild-hall"))||destination.startsWith("admin-test:")) && NetworkConfig.hosts(NetworkConfig.Role.DUNGEONS)) {

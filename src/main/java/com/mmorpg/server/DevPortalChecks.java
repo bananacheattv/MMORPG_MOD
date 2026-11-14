@@ -15,6 +15,42 @@ public final class DevPortalChecks {
     private static Portal portal(ServerPlayer p, boolean widthX, String kind, int region, String dungeon, int difficulty) {
         return new Portal(UUID.randomUUID(), p.level().dimension(), new BlockPos(48, 100, 48), widthX, kind, region, dungeon, difficulty);
     }
+    /** Retour devant le portail apres sortie ou mort (independant de la classe du joueur de test). */
+    public static void origin(ServerPlayer p) throws Exception {
+        var level = p.level();
+        var data = AdventurePortalData.get(level.getServer());
+        for (int x = 42; x <= 54; x++) for (int z = 42; z <= 54; z++) {
+            level.getChunkAt(new BlockPos(x, 99, z));
+            level.setBlockAndUpdate(new BlockPos(x, 99, z), Blocks.STONE.defaultBlockState());
+            for (int y = 100; y <= 106; y++) level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
+        }
+        for (Portal old : java.util.List.copyOf(data.all())) if (old.dimension().equals(level.dimension()) && old.pos().getX()>=42 && old.pos().getX()<=54 && old.pos().getZ()>=42 && old.pos().getZ()<=54) data.remove(old.id());
+        // retour devant le portail apres sortie ou mort
+        Portal back = portal(p, true, "mine", 2, "", 0);
+        check(AdventurePortals.place(p, back), "origin portal placed");
+        p.setPos(48.5, 100, 48.9);
+        PortalOrigin.capture(p, back);
+        var origin = PortalOrigin.get(p);
+        check(origin != null && Math.abs(origin.x() - 48.5) < .01 && Math.abs(origin.z() - 51.0) < .01 && origin.yaw() == 0F, "origin 2.5 blocks in front, entered side (+Z)");
+        p.setPos(48.5, 100, 47.9);
+        PortalOrigin.capture(p, back);
+        check(Math.abs(PortalOrigin.get(p).z() - 46.0) < .01 && PortalOrigin.get(p).yaw() == 180F, "origin follows the side of entry (-Z)");
+        var rpgCopy = new com.mmorpg.rpg.PlayerData(); rpgCopy.load(RpgPlayers.get(p).save());
+        check(rpgCopy.portalOrigin != null && rpgCopy.portalOrigin.equals(RpgPlayers.get(p).portalOrigin), "origin persisted with the player data");
+        p.setPos(1000.5, 100, 1000.5);
+        boolean exited = PortalOrigin.exit(p);
+        check(exited && PortalOrigin.get(p) == null, "exit accepted and consumed the origin (le faux joueur du test ne se deplace pas : teleportation reelle non verifiee ici)");
+        check(PortalOrigin.get(p) == null && !PortalOrigin.exit(p), "origin consumed; no known portal -> fallback");
+        p.setPos(48.5, 100, 47.9); PortalOrigin.capture(p, back); p.setPos(1000.5, 100, 1000.5);
+        PortalOrigin.markDeath(p);
+        check(PortalOrigin.available(p) && PortalOrigin.afterDeath(p) && PortalOrigin.get(p) == null, "respawn after death returns in front of the portal");
+        p.setPos(48.5, 100, 47.9); PortalOrigin.capture(p, back); level.setBlockAndUpdate(BlockPos.containing(48.5, 100, 46.0), Blocks.STONE.defaultBlockState());
+        p.setPos(1000.5, 100, 1000.5);
+        check(!PortalOrigin.exit(p) && PortalOrigin.get(p) == null, "blocked spot -> fallback and stale origin dropped");
+        level.setBlockAndUpdate(BlockPos.containing(48.5, 100, 46.0), Blocks.AIR.defaultBlockState());
+        check(AdventurePortals.remove(p, back), "origin portal removed");
+        com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] PORTAL ORIGIN PASS: front position, both sides, persistence, exit, death, obstructed fallback");
+    }
     public static void run(ServerPlayer p) throws Exception {
         var level = p.level();
         for (int x = 42; x <= 54; x++) for (int z = 42; z <= 54; z++) {

@@ -41,6 +41,7 @@ public final class DevNetworkChecks {
         try {
             DevAdminPlayerChecks.run(p);
             DevBossChecks.biomeSpawns(p.level());
+            DevPortalChecks.origin(p);
             DevSkillChecks.run(p);
             UUID id = UUID.randomUUID();
             try (ProfileStore a = ProfileStore.acquire(directory, id)) {

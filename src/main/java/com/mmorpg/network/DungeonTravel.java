@@ -36,7 +36,9 @@ public final class DungeonTravel {
     public static void forget(ServerPlayer p) { RETURNS.remove(p.getUUID()); }
     public static void clear() { RETURNS.clear(); }
     public static void capture(ServerPlayer p) {
-        restore(p, new ReturnPoint(NetworkConfig.current.role, p.level().dimension().identifier().toString(), p.getX(), p.getY(), p.getZ(), p.getYRot(), p.getXRot()));
+        var front = com.mmorpg.server.PortalOrigin.inAdventure(p) ? com.mmorpg.server.PortalOrigin.local(p) : null;   // devant le portail franchi
+        if (front != null) restore(p, new ReturnPoint(front.role(), front.dimension(), front.x(), front.y(), front.z(), front.yaw(), 0F));
+        else restore(p, new ReturnPoint(NetworkConfig.current.role, p.level().dimension().identifier().toString(), p.getX(), p.getY(), p.getZ(), p.getYRot(), p.getXRot()));
     }
     public static boolean enterRemote(ServerPlayer player, String pool) {
         if (NetworkConfig.hosts(NetworkConfig.Role.DUNGEONS)) return false;

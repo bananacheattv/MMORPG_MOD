@@ -193,6 +193,7 @@ public final class HubManager {
 
     /** /hub n : va dans la copie n (1, 2...) si elle existe et n'est pas pleine ; -1 pour sa copie habituelle. */
     public static boolean goToHub(ServerPlayer p, int wanted) {
+        com.mmorpg.server.PortalOrigin.forget(p);
         if (com.mmorpg.network.NetworkPlayers.route(p, com.mmorpg.network.NetworkConfig.Role.HUB, "hub")) return true;
         HubData hub = HubData.get(p.level().getServer());
         ServerLevel level = hub.level(p.level().getServer());
@@ -236,6 +237,7 @@ public final class HubManager {
 
     /** /spawn et /marche : le Spawn d'Aeloria, monde commun a tous les joueurs (cote est de la fontaine, face au portail de la Citadelle). */
     public static boolean goToSpawn(ServerPlayer p) {
+        com.mmorpg.server.PortalOrigin.forget(p);
         if (com.mmorpg.network.NetworkPlayers.route(p, com.mmorpg.network.NetworkConfig.Role.MAIN, "spawn")) return true;
         SpawnData spawn = SpawnData.get(p.level().getServer());
         ServerLevel level = p.level().getServer().getLevel(SpawnBuilder.DIM);

@@ -211,7 +211,7 @@ public final class MineManager {
             }
             if (returnArch(lay).contains(p.getX(), p.getY(), p.getZ()) && !cooling(p, now)) {
                 level.playSound(null, p.blockPosition(), SoundEvents.PORTAL_TRAVEL, SoundSource.PLAYERS, 0.4f, 1.5f);
-                com.mmorpg.hub.HubManager.goToSpawn(p);
+                if (!com.mmorpg.server.PortalOrigin.exit(p)) com.mmorpg.hub.HubManager.goToSpawn(p);
             }
         }
     }

@@ -41,3 +41,6 @@ Le bloc devient le portail : marcher dessus ou contre lui téléporte. Le bloc n
 
 ## Zone portail
 Baguette de zone (onglet créatif) : clic droit sur 2 coins, puis `/portail zone <hub|spawn|mine [n]|plaines [n]|donjon [type [difficulté]]>` (40 blocs max par côté). Entrer dans la zone téléporte. Retirer : `/portail supprimer` (à moins de 8 blocs de la zone), annuler : `/undoportail`.
+
+## Retour devant le portail
+En franchissant un portail d'aventure (donjon, mine, plaines, monde ouvert, menu des donjons), le joueur mémorise un point **2,5 blocs devant le portail**, du côté par lequel il est entré (pour un bloc ou une zone portail : sa position d'entrée). Ce point est sauvegardé avec ses données (il suit aussi les transferts Velocity). À la sortie (arche de retour des mines/plaines, fin ou sortie de donjon, portail « spawn » du monde ouvert) et au respawn après une mort en zone d'aventure, le joueur est replacé à ce point, face à l'extérieur. Sans point connu, ou si l'endroit est obstrué, le repli habituel (spawn) s'applique. `/spawn` et `/hub` effacent le point.

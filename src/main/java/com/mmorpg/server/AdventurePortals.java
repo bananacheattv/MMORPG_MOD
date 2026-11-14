@@ -198,9 +198,10 @@ public final class AdventurePortals {
         if (!FeatureFlags.allow(p, "portails")) return;
         if (!allowed(p, portal)) { fail(p, "Accès refusé : choisissez votre classe, respectez le niveau et découvrez d'abord cette région. Terminez aussi tout essai, cinématique ou combat PvP."); return; }
         PortalAccess.grant(p, portal.kind().equals("donjons")?"donjon":portal.kind());
+        PortalOrigin.capture(p, portal);
         switch (portal.kind()) {
             case "hub" -> com.mmorpg.hub.HubManager.goToHub(p);
-            case "spawn" -> com.mmorpg.hub.HubManager.goToSpawn(p);
+            case "spawn" -> { if (!PortalOrigin.exit(p)) com.mmorpg.hub.HubManager.goToSpawn(p); }
             case "openworld" -> com.mmorpg.hub.HubManager.goToOpenWorld(p);
             case "mine" -> { if (portal.region() < 0) com.mmorpg.mine.MineManager.open(p, null); else com.mmorpg.mine.MineManager.startTransition(p, portal.region()); }
             case "plaines" -> { if (portal.region() < 0) com.mmorpg.plains.PlainsManager.open(p); else com.mmorpg.plains.PlainsManager.enterChosen(p, portal.region()); }

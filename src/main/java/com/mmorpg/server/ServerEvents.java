@@ -116,11 +116,13 @@ public final class ServerEvents {
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (event.getEntity() instanceof ServerPlayer sp) {
             RpgPlayers.onRespawn(sp);
+            // mort en zone d'aventure : retour devant le portail d'entree, sinon repli sur le spawn
+            boolean back = !event.isEndConquered() && com.mmorpg.server.PortalOrigin.afterDeath(sp);
             if (sp.level().dimension().equals(com.mmorpg.dungeon.InstanceManager.DIM)) {
                 com.mmorpg.dungeon.InstanceManager.forgetReturn(sp);
-                com.mmorpg.hub.HubManager.goToSpawn(sp);
+                if (!back) com.mmorpg.hub.HubManager.goToSpawn(sp);
             }
-            if (!event.isEndConquered()) Scheduler.later(sp.level(), 5, () -> {
+            if (!event.isEndConquered() && !back) Scheduler.later(sp.level(), 5, () -> {
                 if (!sp.isRemoved()) com.mmorpg.hub.HubManager.goToSpawn(sp);
             });
         }
