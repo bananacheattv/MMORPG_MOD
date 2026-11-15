@@ -32,6 +32,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,12 @@ public final class KillRewards {
         if (sourceEntity instanceof ServerPlayer sp) return sp;
         Player last = dead.getLastHurtByPlayer() instanceof Player p ? p : null;
         return last instanceof ServerPlayer sp ? sp : null;
+    }
+
+    /** Pas d'XP vanilla : aucune orbe d'experience ne apparait (mobs, competences, autres sources). */
+    @SubscribeEvent
+    public static void noVanillaXp(EntityJoinLevelEvent e) {
+        if (e.getEntity() instanceof net.minecraft.world.entity.ExperienceOrb) e.setCanceled(true);
     }
 
     @SubscribeEvent

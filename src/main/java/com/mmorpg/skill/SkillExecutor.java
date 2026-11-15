@@ -324,14 +324,21 @@ public final class SkillExecutor {
                 int arrows = 10 + 2 * rank;
                 double dmg = atk * s.scaled(rank);
                 Fx.cast(p, CastAnim.AIM, 12);
-                Fx.spawn(level, FxKind.CIRCLE, target, s.radius, 0xB8FF7A, s.duration + 12);
+                final double zone = s.radius * 1.5;
+                Fx.spawn(level, FxKind.CIRCLE, target, zone, 0xB8FF7A, s.duration + 12);
                 for (int i = 0; i < arrows; i++) {
                     final int k = i;
                     Scheduler.later(level, 6 + (int) (k * (s.duration / (double) arrows)), () -> {
-                        double ox = (p.getRandom().nextDouble() - 0.5) * s.radius * 2;
-                        double oz = (p.getRandom().nextDouble() - 0.5) * s.radius * 2;
+                        double ox = (p.getRandom().nextDouble() - 0.5) * zone * 2;
+                        double oz = (p.getRandom().nextDouble() - 0.5) * zone * 2;
+                        java.util.List<LivingEntity> inside = SkillHelper.enemiesInRadius(p, target.add(0, 1, 0), zone);
+                        double tx = target.x + ox, ty = target.y, tz = target.z + oz;
+                        if (!inside.isEmpty()) {
+                            LivingEntity v = inside.get(p.getRandom().nextInt(inside.size()));
+                            tx = v.getX(); ty = v.getY(); tz = v.getZ();
+                        }
                         SpellProjectile a = SpellProjectile.create(level, p, SpellProjectile.Kind.RAIN_ARROW, dmg, 0).life(24);
-                        a.setPos(target.x + ox, target.y + 14, target.z + oz);
+                        a.setPos(tx, ty + 14, tz);
                         a.shoot(0, -1, 0, 1.8F, 0F);
                         level.addFreshEntity(a);
                     });
