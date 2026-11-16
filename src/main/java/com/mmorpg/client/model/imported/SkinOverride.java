@@ -47,9 +47,18 @@ public final class SkinOverride {
     /** Applied before renderer/model selection: slim arms, first-person hands and entity previews agree. */
     public static PlayerSkin forPlayer(AbstractClientPlayer player, PlayerSkin original) {
         var pub = player.getExistingDataOrNull(ModAttachments.PUBLIC);
-        if (pub == null || pub.skin == null || pub.skin.isBlank()) return original;
-        PlayerSkin chosen = resolve(pub.skin);
+        String spec = pub == null || pub.skin == null ? "" : pub.skin;
+        // Réseau Velocity : les serveurs de jeu sont hors-ligne et ne transmettent aucune texture, donc le client
+        // verrait un skin par défaut. À défaut de skin choisi, on charge le skin officiel du pseudo (aperçu inclus).
+        if (spec.isBlank() && isDefaultSkin(original)) spec = player.getGameProfile().name();
+        if (spec == null || spec.isBlank()) return original;
+        PlayerSkin chosen = resolve(spec);
         return chosen == null ? original : new PlayerSkin(chosen.body(), original.cape(), original.elytra(), chosen.model(), false);
+    }
+
+    private static boolean isDefaultSkin(PlayerSkin skin) {
+        var path = skin.body().texturePath();
+        return "minecraft".equals(path.getNamespace()) && path.getPath().startsWith("textures/entity/player/");
     }
 
     private static PlayerSkin resolve(String spec) {
