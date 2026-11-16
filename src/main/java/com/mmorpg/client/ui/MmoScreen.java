@@ -130,7 +130,7 @@ public abstract class MmoScreen extends Screen {
         if (compact()) {
             this.uiScale = 1f;
         } else if (hasNav()) {
-            this.uiScale = Math.max(1f, (fh - UiFrame.NAV_H) / (float) Math.max(1, designHeight() - bandHeight()));
+            this.uiScale = Math.max(UiFrame.MIN_SCALE, (fh - UiFrame.NAV_H) / (float) Math.max(1, designHeight() - bandHeight()));
         } else {
             this.uiScale = UiFrame.scale(realH, designHeight());
         }

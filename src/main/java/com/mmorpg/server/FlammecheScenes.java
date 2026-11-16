@@ -117,7 +117,7 @@ public final class FlammecheScenes {
     /** Flammeche ne suit plus : il s'envole vers le Seuil au lieu de disparaitre. Vrai tant que la scene tient la Mascotte. */
     static boolean holds(ServerPlayer p, MascotEntity m) {
         if (busy(p)) return true;
-        if (m == null || !NAME.equals(m.displayName()) || m.egg() > 0) return false;
+        if (!mainServer() || m == null || !NAME.equals(m.displayName()) || m.egg() > 0) return false;
         Scene s = new Scene(Kind.FAREWELL);
         SCENES.put(p.getUUID(), s);
         line(p, NAME, "Je retourne au Seuil... On se reverra, promis !");

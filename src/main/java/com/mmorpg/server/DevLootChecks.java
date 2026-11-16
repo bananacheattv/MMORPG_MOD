@@ -20,6 +20,9 @@ public final class DevLootChecks {
         for (int i = 0; i < saved.length; i++) saved[i] = inv.getItem(i).copy();
         var pos = p.blockPosition().offset(2, 0, 0); var block = p.level().getBlockState(pos);
         try {
+            var gson = new com.google.gson.Gson(); var defs = com.mmorpg.config.LootTables.defaults();
+            var back = gson.fromJson(defs.toPrettyJson(), com.mmorpg.config.LootTables.class);
+            check(gson.toJson(back.tables).equals(gson.toJson(defs.tables)) && defs.toPrettyJson().split("\n").length > 100, "butins.json pretty round-trip");
             p.setGameMode(GameType.SURVIVAL);
             for (int i = 0; i < saved.length; i++) inv.setItem(i, ItemStack.EMPTY);
             var crate = new ItemStack(ModItems.CAISSE_AVENTURE.get(), 2); inv.setItem(0, crate);

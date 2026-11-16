@@ -423,7 +423,7 @@ public final class MmoHud {
         int y = 2;
         if (quests.isEmpty()) {
             if (!HudLayout.editing) return;
-            questBox(g, x, y, w, 30, false);
+            questBox(g, x, y, w, 30, 0xFFFFB830);
             g.text(f, "Menace gobeline", x, y, Ui.GOLD_LIGHT, true);
             questLine(g, f, x, y + 11, w, "Gobelins vaincus", "3 / 8", false);
             questLine(g, f, x, y + 20, w, "Parler au capitaine", "", true);
@@ -435,8 +435,10 @@ public final class MmoHud {
             net.minecraft.nbt.ListTag objs = q.getListOrEmpty("objectives");
             int h = questHeight(q);
             boolean ready = q.getBooleanOr("completable", false);
-            questBox(g, x, y, w, h, ready);
-            g.text(f, f.plainSubstrByWidth(q.getStringOr("name", "?"), w - 4), x, y, ready ? Ui.GREEN : Ui.GOLD_LIGHT, true);
+            com.mmorpg.quest.QuestKind kind = com.mmorpg.client.screen.QuestPanel.kindOf(q);
+            questBox(g, x, y, w, h, ready ? 0xFF60E060 : kind.color);
+            g.text(f, kind.glyph, x, y, kind.color, true);
+            g.text(f, Ui.fit(q.getStringOr("name", "?"), w - 16), x + 10, y, ready ? Ui.GREEN : Ui.GOLD_LIGHT, true);
             int oy = y + 11;
             for (int j = 0; j < objs.size(); j++) {
                 net.minecraft.nbt.CompoundTag o = objs.getCompoundOrEmpty(j);
@@ -451,16 +453,16 @@ public final class MmoHud {
         }
     }
 
-    private static void questBox(GuiGraphicsExtractor g, int x, int y, int w, int h, boolean ready) {
+    private static void questBox(GuiGraphicsExtractor g, int x, int y, int w, int h, int bar) {
         Ui.rounded(g,x-3,y-2,w+3,h+2,6,0xA0221735);
-        g.fill(x - 3, y - 2, x - 2, y + h, ready ? 0xFF60E060 : 0xFFE8C060);
+        g.fill(x - 3, y - 2, x - 1, y + h, bar);
     }
 
     private static void questLine(GuiGraphicsExtractor g, Font f, int x, int y, int w, String text, String prog, boolean done) {
         g.pose().pushMatrix();
         g.pose().translate(x + 3, y);
         g.pose().scale(0.8f, 0.8f);
-        String line = f.plainSubstrByWidth(text, (int) ((w - 10) / 0.8f) - f.width(prog) - 4);
+        String line = Ui.fit(text, (int) ((w - 10) / 0.8f) - f.width(prog) - 4);
         g.text(f, line, 0, 0, done ? 0xFF80E080 : 0xFFE0D8C8, true);
         g.text(f, prog, (int) ((w - 8) / 0.8f) - f.width(prog), 0, done ? 0xFF80E080 : 0xFFFFFFFF, true);
         g.pose().popMatrix();

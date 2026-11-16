@@ -339,6 +339,13 @@ public final class Ui {
         return lines.size() * 10;
     }
 
+    /** Texte tronque avec « … » s'il depasse la largeur. */
+    public static String fit(String text, int width) {
+        Font f = font();
+        if (f.width(text) <= width) return text;
+        return f.plainSubstrByWidth(text, Math.max(0, width - f.width("…"))) + "…";
+    }
+
     public static int wrapHeight(String text, int width) {
         return font().split(FormattedText.of(text), width).size() * 10;
     }

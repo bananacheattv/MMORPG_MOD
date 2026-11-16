@@ -136,7 +136,7 @@ public class ForgeScreen extends MmoScreen {
             if (!q.isEmpty() && !name.contains(q)) continue;
             list.add(r);
         }
-        list.sort(java.util.Comparator.comparingInt(ForgeRecipes.Recipe::level).thenComparing(ForgeRecipes.Recipe::id));
+        list.sort(java.util.Comparator.<ForgeRecipes.Recipe>comparingInt(r -> r.id().equals("pioche_debutant") ? 0 : r.id().equals("houe_debutant") ? 1 : 2).thenComparingInt(ForgeRecipes.Recipe::level).thenComparing(ForgeRecipes.Recipe::id));
         int rowH = 30;
         int visible = (top + ph - 10 - listTop) / rowH;
         scroll = Math.min(scroll, Math.max(0, list.size() - visible));

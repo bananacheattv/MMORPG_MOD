@@ -25,58 +25,17 @@ import java.util.UUID;
  */
 @EventBusSubscriber(modid = MMORPG.MODID)
 public final class WorldNpcs {
-    public static final String RESOURCE = "/data/mmorpg/lore/world_npcs.json";
+    public static final String RESOURCE = WorldNpcData.RESOURCE;
     public static final String GROUP = "pnj_monde";
     /** Distance (blocs) au joueur sous laquelle un PNJ manquant est pose. */
     private static final double RANGE = 64;
 
-    public record Entry(String id, String name, int skin, String quest, String dialogue, String dim, String region, int dx, int dz) {
-        public UUID uuid() {
-            return UUID.nameUUIDFromBytes(("aeloria:world-npc:" + id).getBytes(StandardCharsets.UTF_8));
-        }
+    public static List<WorldNpcData.Entry> entries() {
+        return WorldNpcData.entries();
     }
 
-    private static List<Entry> entries;
-    private static Map<String, int[]> anchors;
-
-    private WorldNpcs() {
-    }
-
-    public static synchronized List<Entry> entries() {
-        if (entries == null) load();
-        return entries;
-    }
-
-    /** Ancre (x, z) d'une region du monde ouvert. */
     public static int[] anchor(String region) {
-        entries();
-        return anchors.getOrDefault(region, new int[]{0, 0});
-    }
-
-    private static void load() {
-        var list = new ArrayList<Entry>();
-        var map = new java.util.HashMap<String, int[]>();
-        try (Reader r = new InputStreamReader(WorldNpcs.class.getResourceAsStream(RESOURCE), StandardCharsets.UTF_8)) {
-            JsonObject root = new Gson().fromJson(r, JsonObject.class);
-            root.getAsJsonObject("regions").entrySet().forEach(e -> map.put(e.getKey(), new int[]{e.getValue().getAsJsonArray().get(0).getAsInt(), e.getValue().getAsJsonArray().get(1).getAsInt()}));
-            for (var e : root.getAsJsonArray("npcs")) {
-                JsonObject o = e.getAsJsonObject();
-                list.add(new Entry(o.get("id").getAsString(), o.get("name").getAsString(), o.get("skin").getAsInt(), o.get("quest").getAsString(),
-                        o.get("dialogue").getAsString(), o.get("dim").getAsString(), o.get("region").getAsString(), o.get("dx").getAsInt(), o.get("dz").getAsInt()));
-            }
-        } catch (Exception ex) {
-            throw new IllegalStateException("PNJ du monde illisibles : " + ex, ex);
-        }
-        anchors = map;
-        entries = list;
-    }
-
-    /** Lie chaque quete a son PNJ (identifiant fixe) : seul ce PNJ la propose. */
-    static void assign(Map<String, QuestDef> quests) {
-        for (var e : entries()) {
-            var q = quests.get(e.quest());
-            if (q != null) q.npc = e.uuid().toString();
-        }
+        return WorldNpcData.anchor(region);
     }
 
     // ------------------------------------------------------------------ pose

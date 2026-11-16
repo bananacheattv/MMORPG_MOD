@@ -31,6 +31,12 @@ class QuestPlanTest {
         return QuestPlanTest.class.getResource("/assets/mmorpg/items/" + itemKey(id) + ".json") != null;
     }
 
+    /** Objets obtenus par les metiers (minage, fonte, culture, peche, cuisine) plutot que par le butin. */
+    private static boolean isGathered(String key) {
+        return key.startsWith("lingot_") || Set.of("baie_ambree", "racine_lueur", "goujon_des_marais", "ble_argent", "anchois_des_abysses", "poisson_lanterne",
+                "orchidee_neant", "soupe_de_racine", "ragout_des_profondeurs", "tourte_aux_baies", "banquet_des_moissons").contains(key);
+    }
+
     @Test
     void everyQuestIsWellFormed() {
         assertFalse(QUESTS.isEmpty());
@@ -76,6 +82,11 @@ class QuestPlanTest {
                         assertTrue(itemExists(o.target), where + " : objet inexistant");
                         boolean dropped = MOBS.values().stream().anyMatch(m -> !m.boss && m.spawn.enabled && m.minLevel <= q.minLevel + 15
                                 && m.drops.stream().anyMatch(d -> itemKey(d.item).equals(key) && d.chance > 0));
+                        if (DefaultMobs.isMobMaterial(key) || isGathered(key)) dropped = true;
+        for (int z = 0; z < DefaultMobs.ZONE_LOOT.length; z++) {
+                            // monstres importes (niveau selon la distance au spawn) : leur butin n'est pas dans core(), qui reste sans classe Minecraft
+                            if (java.util.Arrays.asList(DefaultMobs.ZONE_LOOT[z]).contains(key)) dropped = true;
+                        }
                         assertTrue(dropped, where + " : aucun monstre accessible ne le laisse");
                     }
                     case "level" -> assertTrue(o.count <= 100 && o.count >= q.minLevel, where + " : niveau cible incoherent");

@@ -168,6 +168,7 @@ public final class QuestManager {
             var npc = com.mmorpg.world.NpcDirectory.get(p.level().getServer()).entry(q.npc);
             if (npc != null) t.putString("giver", npc.getStringOr("name", "Maître des Quêtes") + " — " + npc.getStringOr("zone", "Sans zone"));
         }
+        t.putString("qkind", com.mmorpg.quest.QuestKind.of(id, q).id);
         t.putBoolean("tracked", id.equals(d.trackedQuest));
         t.putInt("minLevel", q.minLevel);
         t.putBoolean("daily", q.daily);
@@ -335,7 +336,7 @@ public final class QuestManager {
         d.activeQuests.put(id, new int[q.objectives.size()]);
         d.trackedQuest=id;d.questGuidanceMuted=false;
         var giver=new CompoundTag();giver.putString("backend",com.mmorpg.network.NetworkConfig.current.role.name());giver.putString("id",npc.getUUID().toString());giver.putString("name",npc.displayName());giver.putString("dimension",npc.level().dimension().identifier().toString());giver.putLong("pos",npc.blockPosition().asLong());d.questGivers.put(id,giver);
-        Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "QUÊTE ACCEPTÉE", q.name, 0xFFD040));
+        Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, com.mmorpg.quest.QuestKind.of(id, q).notice("ACCEPTÉE"), q.name, com.mmorpg.quest.QuestKind.of(id, q).rgb()));
         p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.QUEST_ACCEPT.get(), SoundSource.PLAYERS, 1f, 1f);
         d.dirty = true;
         if (!menu) MascotGuide.say(p, npc.displayName(), q.speech.isEmpty() ? q.description : q.speech);
@@ -473,7 +474,7 @@ public final class QuestManager {
             if (co != null && d.cosmetics.add(co.id)) { Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.DISCOVERY, "COSMÉTIQUE OBTENU", co.label, co.color)); RpgPlayers.sync(p); }
         }
         if (q.rewards.evolution > 0) RpgPlayers.unlockEvolution(p, q.rewards.evolution);
-        Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "QUÊTE TERMINÉE", q.name, 0x60FF80));
+        Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, com.mmorpg.quest.QuestKind.of(id, q).notice("TERMINÉE"), q.name, com.mmorpg.quest.QuestKind.of(id, q).rgb()));
         p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.SUCCESS.get(), SoundSource.PLAYERS, 1f, 1f);
         if (xp > 0) RpgPlayers.giveXp(p, xp, false);
         com.mmorpg.achievement.Achievements.add(p, com.mmorpg.achievement.Achievement.QUESTS, 1);
@@ -549,7 +550,7 @@ public final class QuestManager {
                 d.dirty = true;
             }
             if (!wasComplete && completable(p, d, e.getKey())) {
-                Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "OBJECTIFS ACCOMPLIS",
+                Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, com.mmorpg.quest.QuestKind.of(e.getKey(), q).label.toUpperCase(java.util.Locale.ROOT) + " : OBJECTIFS ACCOMPLIS",
                         q.name + (q.auto ? " — étape validée" : " — retournez voir " + (q.giver.equals(MascotGuide.GROUP) ? "Flammèche" : q.lore != null ? q.lore.donor : "un Maître des Quêtes")), 0x60FF80));
                 p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.CHIME.get(), SoundSource.PLAYERS, 0.9f, 1.1f);
                 if (q.giver.equals(MascotGuide.GROUP)) MascotGuide.say(p, "Bravo ! Reviens me voir pour ta récompense.");
@@ -591,7 +592,7 @@ public final class QuestManager {
                 d.dirty = true;
             }
             if (!wasComplete && completable(p, d, e.getKey())) {
-                Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "OBJECTIFS ACCOMPLIS",
+                Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, com.mmorpg.quest.QuestKind.of(e.getKey(), q).label.toUpperCase(java.util.Locale.ROOT) + " : OBJECTIFS ACCOMPLIS",
                         q.name + (q.auto ? " — étape validée" : " — retournez voir " + (q.lore != null ? q.lore.donor : "un Maître des Quêtes")), 0x60FF80));
                 p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.CHIME.get(), SoundSource.PLAYERS, 0.9f, 1.1f);
             }
