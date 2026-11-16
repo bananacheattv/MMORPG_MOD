@@ -312,6 +312,46 @@ public final class InstanceManager {
         return false;
     }
 
+    /** Joueurs morts dans une expedition en cours : ils reapparaissent au depart du donjon, sans reinitialiser l'instance. */
+    private static final java.util.Map<UUID, int[]> DIED_INSIDE = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /** A la mort : memorise l'exemplaire si le joueur est dans une expedition en cours. */
+    public static boolean noteDeath(ServerPlayer p) {
+        return noteDeathAt(p.getUUID(), p.level(), p.getX(), p.getZ());
+    }
+
+    static boolean noteDeathAt(UUID id, net.minecraft.world.level.Level where, double x, double z) {
+        DIED_INSIDE.remove(id);
+        if (!(where instanceof ServerLevel level) || !level.dimension().equals(DIM)) return false;
+        Slot s = slotAt(level.getServer(), level, x, z);
+        if (s == null || s.owner.isEmpty() || isSetupSlot(s)) return false;
+        DungeonRun.Run r = DungeonRun.find(level.getServer(), s);
+        if (r == null || r.done) return false;
+        DIED_INSIDE.put(id, new int[]{s.x, s.z});
+        return true;
+    }
+
+    /** Au respawn : retour au depart du donjon (progression conservee). false = repli habituel. */
+    public static boolean respawnInside(ServerPlayer p) {
+        return respawnInside(p, DIED_INSIDE.remove(p.getUUID()));
+    }
+
+    static boolean respawnInside(ServerPlayer p, int[] k) {
+        if (k == null) return false;
+        MinecraftServer server = p.level().getServer();
+        ServerLevel level = server.getLevel(DIM);
+        if (level == null) return false;
+        for (Slot s : InstanceData.get(server).slots) {
+            if (s.x != k[0] || s.z != k[1] || s.owner.isEmpty()) continue;
+            p.stopRiding();
+            p.teleportTo(level, s.x + 0.5, s.y, s.z + Theme.HALL_Z - 6 + 0.5, Set.<Relative>of(), 0F, 4F, true);
+            s.lastBusy = server.getTickCount();
+            InstanceData.get(server).dirty();
+            return true;
+        }
+        return false;
+    }
+
     static void teleportIn(ServerPlayer p, Slot slot) {
         ServerLevel level = p.level().getServer().getLevel(DIM);
         if (level == null) return;

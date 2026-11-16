@@ -41,7 +41,7 @@ public abstract class RpgMonster extends Monster implements RpgMob {
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
                 .add(Attributes.MAX_HEALTH, 100)
-                .add(Attributes.MOVEMENT_SPEED, 0.28)
+                .add(Attributes.MOVEMENT_SPEED, 0.18)
                 .add(Attributes.ATTACK_DAMAGE, 5)
                 .add(Attributes.FOLLOW_RANGE, 32)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.2)
@@ -56,6 +56,12 @@ public abstract class RpgMonster extends Monster implements RpgMob {
         return testTarget != null ? testTarget : super.getTarget();
     }
 
+    /** Zone sure : un joueur qui s'y trouve n'est jamais une cible valide (les objectifs de ciblage passent par ici). */
+    @Override
+    public boolean canAttack(net.minecraft.world.entity.LivingEntity target) {
+        return !(target instanceof net.minecraft.server.level.ServerPlayer p && com.mmorpg.server.SafeSpawn.safe(p)) && super.canAttack(target);
+    }
+
     @Override
     public String mobKey() {
         return key;
@@ -64,7 +70,7 @@ public abstract class RpgMonster extends Monster implements RpgMob {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 1.15, false));
+        this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 1.0, false));
         this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.85));
         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 10.0F));
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
@@ -100,6 +106,12 @@ public abstract class RpgMonster extends Monster implements RpgMob {
     @Override public void aiStep(){
         // monstre loin de tout joueur : un tick sur quatre seulement (IA, deplacements, collisions), sans changer ce que voit un joueur proche
         if (!this.level().isClientSide() && dormant() && (this.tickCount + this.getId()) % 4 != 0) return;
+        // cible entree en zone sure : aggro effacee, le monstre s'arrete (verifie une fois par demi-seconde)
+        if (!this.level().isClientSide() && this.tickCount % 10 == (this.getId() & 7) && super.getTarget() instanceof net.minecraft.server.level.ServerPlayer tp
+                && com.mmorpg.server.SafeSpawn.safe(tp)) {
+            this.setTarget(null);
+            this.getNavigation().stop();
+        }
         super.aiStep();if(level() instanceof ServerLevel server)MobCooperation.tick(this,server);
     }
 

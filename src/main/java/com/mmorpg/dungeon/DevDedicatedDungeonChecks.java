@@ -47,6 +47,18 @@ public final class DevDedicatedDungeonChecks {
             check(InstanceManager.reserve(server, pool, UUID.randomUUID().toString()) == null, "configured capacity enforced");
             InstanceManager.release(server, pool, first.owner);
             check(InstanceManager.reserve(server, pool, "replacement") == first && InstanceManager.count(server, pool) == 3, "released slot reused");
+            // mort en expedition : pas de reinitialisation, retour au depart ; sans expedition en cours : repli habituel
+            var dim = server.getLevel(InstanceManager.DIM);
+            var run = new DungeonRun.Run(pool, first.index, first.owner, 0L);
+            DungeonRun.get(server).runs.add(run);
+            check(InstanceManager.noteDeathAt(p.getUUID(), dim, first.x + 0.5, first.z + 40), "death inside a live run is kept in the instance");
+            check(InstanceManager.noteDeathAt(p.getUUID(), p.level(), 5, 5) == false && !InstanceManager.respawnInside(p), "death outside the dungeon dimension: usual fallback");
+            run.done = true;
+            check(!InstanceManager.noteDeathAt(p.getUUID(), dim, first.x + 0.5, first.z + 40), "finished run: usual exit");
+            run.done = false;
+            InstanceManager.noteDeathAt(p.getUUID(), dim, first.x + 0.5, first.z + 40);
+            check(InstanceManager.respawnInside(p, new int[]{first.x, first.z}) && first.owner.equals("replacement") && DungeonRun.find(server, first) == run && !run.done, "respawn inside keeps owner and run");
+            DungeonRun.get(server).runs.remove(run);
             PartyManager.leave(mate); PartyManager.clear(); SharedParties.refresh();
             check(PartyManager.partyOf(p) == null && PartyManager.partyOf(mate) == null, "leave persisted without resurrection");
             PartyManager.installShared(List.of(group)); // simulate another JVM holding an obsolete cache

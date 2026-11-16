@@ -36,10 +36,12 @@ public final class ServerEvents {
         // les apparitions naturelles vanilla sont toutes annulees par OpenWorldRules : autant ne pas les calculer (balayage de chaque chunk a chaque tick) ; MobSpawner fait les apparitions du mod
         event.getServer().getGameRules().set(net.minecraft.world.level.gamerules.GameRules.SPAWN_MOBS, false, event.getServer());
         // monde neuf : le hub est construit tout seul (un peu apres le demarrage), la premiere connexion s'y fait toujours
-        // distance de rendu : 64 demandee, mais Minecraft plafonne a 32 (ChunkMap) -> on met le maximum possible
-        event.getServer().getPlayerList().setViewDistance(32);
-        // simulation : 32 chunks (512 blocs) pour que PNJ, decors et lumieres lointains restent actifs (defaut serveur souvent 5-10)
-        event.getServer().getPlayerList().setSimulationDistance(32);
+        // distances : 32 chunks (4225 par joueur) rendaient connexion, teleportation et deplacement tres lents (lecture disque + envoi reseau + simulation) ;
+        // plafond 12 de rendu / 8 de simulation, modifiable par -Dmmorpg.viewDistance=N et -Dmmorpg.simulationDistance=N
+        int view = Integer.getInteger("mmorpg.viewDistance", 12), sim = Integer.getInteger("mmorpg.simulationDistance", 8);
+        var players = event.getServer().getPlayerList();
+        players.setViewDistance(Math.min(players.getViewDistance(), view));
+        players.setSimulationDistance(Math.min(players.getSimulationDistance(), sim));
         var server = event.getServer();
         Scheduler.later(server.overworld(), 60, () -> com.mmorpg.hub.HubManager.ensureHub(server));
     }
@@ -119,6 +121,7 @@ public final class ServerEvents {
         if (event.getEntity() instanceof ServerPlayer sp) {
             RpgPlayers.onRespawn(sp);
             // mort en zone d'aventure : retour devant le portail d'entree, sinon repli sur le spawn
+            if (com.mmorpg.dungeon.InstanceManager.respawnInside(sp)) return;          // mort en donjon : retour au depart, instance conservee
             boolean back = !event.isEndConquered() && com.mmorpg.server.PortalOrigin.afterDeath(sp);
             if (sp.level().dimension().equals(com.mmorpg.dungeon.InstanceManager.DIM)) {
                 com.mmorpg.dungeon.InstanceManager.forgetReturn(sp);

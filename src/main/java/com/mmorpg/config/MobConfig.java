@@ -30,6 +30,8 @@ public class MobConfig {
     public int dropsVersion = 0;
     /** Version des regles d'apparition par defaut deja appliquee a ce fichier (voir DefaultMobs.SPAWN_VERSION). */
     public int spawnVersion = 0;
+    /** Version des vitesses par defaut deja appliquee (voir DefaultMobs.SPEED_VERSION). */
+    public int speedVersion = 0;
     public boolean boss = false;
     public Spawn spawn = new Spawn();
     public List<Drop> drops = new ArrayList<>();

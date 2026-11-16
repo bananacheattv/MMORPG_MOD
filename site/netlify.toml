@@ -1,0 +1,24 @@
+# Configuration Netlify (dossier de base : site/). Aucune étape de build : site statique.
+[build]
+  publish = "."
+
+# En-têtes de sécurité pour toutes les pages
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Polices : jamais modifiées → cache long
+[[headers]]
+  for = "/assets/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Images : cache d'une semaine (remplaçables sans changer de nom)
+[[headers]]
+  for = "/assets/img/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

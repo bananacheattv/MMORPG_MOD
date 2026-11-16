@@ -52,20 +52,20 @@ public final class WeeklyQuests {
     private static final Template[][] TEMPLATES = {
             {
                     new Template("Chasseur de la semaine", "Éliminez 60 monstres, quels qu'ils soient.", kill("*", 60)),
-                    new Template("Réserve de charbon", "Rapportez 48 charbons pour les forges d'Aeloria.", collect("minecraft:coal", 48)),
-                    new Template("Fer pour les armuriers", "Rapportez 24 lingots de fer.", collect("minecraft:iron_ingot", 24)),
-                    new Template("Patrouille et ravitaillement", "Éliminez 45 monstres et rapportez 24 charbons.", kill("*", 45), collect("minecraft:coal", 24)),
+                    new Template("Ferraille de gobelins", "Rapportez 36 ferrailles gobelines pour les forges d'Aeloria.", collect("mmorpg:ferraille_gobeline", 36)),
+                    new Template("Verdite pour les armuriers", "Rapportez 24 lingots de verdite.", collect("mmorpg:lingot_verdite", 24)),
+                    new Template("Patrouille et ravitaillement", "Éliminez 45 monstres et rapportez 18 ferrailles gobelines.", kill("*", 45), collect("mmorpg:ferraille_gobeline", 18)),
             },
             {
                     new Template("Grande battue", "Éliminez 200 monstres.", kill("*", 200)),
                     new Template("Chasseur de boss", "Vainquez 2 boss.", kill("boss", 2)),
-                    new Template("Commande de la forge", "Rapportez 96 lingots de fer et 32 lingots d'or.", collect("minecraft:iron_ingot", 96), collect("minecraft:gold_ingot", 32)),
+                    new Template("Commande de la forge", "Rapportez 96 lingots de verdite et 32 lingots d'argentite.", collect("mmorpg:lingot_verdite", 96), collect("mmorpg:lingot_argentite", 32)),
                     new Template("Brigade d'élite", "Éliminez 120 monstres et vainquez 1 boss.", kill("*", 120), kill("boss", 1)),
             },
             {
                     new Template("Fléau des ténèbres", "Éliminez 500 monstres.", kill("*", 500)),
                     new Template("Tueur de titans", "Vainquez 5 boss.", kill("boss", 5)),
-                    new Template("Trésor de la couronne", "Rapportez 24 diamants.", collect("minecraft:diamond", 24)),
+                    new Template("Trésor de la couronne", "Rapportez 12 gemmes brutes.", collect("mmorpg:gemme_brute", 12)),
                     new Template("Campagne légendaire", "Éliminez 300 monstres et vainquez 3 boss.", kill("*", 300), kill("boss", 3)),
             },
     };
@@ -146,7 +146,7 @@ public final class WeeklyQuests {
         for (Obj o : t.objectives()) q.objectives.add(new QuestDef.Objective(o.type(), o.target(), o.count()));
         q.rewards.gold = GOLD[tier];
         q.rewards.xpPercentOfLevel = XP_PERCENT[tier];
-        q.rewards.items.add(new QuestDef.ItemReward("minecraft:emerald", EMERALDS[tier]));
+        q.rewards.items.add(new QuestDef.ItemReward("mmorpg:gemme_brute", EMERALDS[tier]));
         return q;
     }
 
