@@ -19,6 +19,8 @@ public class CosmeticsScreen extends MenuScreen {
     @Override protected String backdrop() { return "cosmetics_stage"; }
     private static Cosmetic.Category category = Cosmetic.Category.AURA;
     private static Cosmetic selected;
+    private static int listScroll;
+    private static final int ROW = 30;
 
     public CosmeticsScreen() {
         super(Tab.COSMETIQUES);
@@ -39,6 +41,7 @@ public class CosmeticsScreen extends MenuScreen {
             button(g, x0, cy, 80, 15, c.label, true, c == category ? 0xFFE2B85A : 0xFF3B3350, () -> {
                 category = c;
                 selected = null;
+                listScroll = 0;
             });
         }
         int owned = 0;
@@ -62,9 +65,18 @@ public class CosmeticsScreen extends MenuScreen {
         List<Cosmetic> list = Cosmetic.ofCategory(category);
         if (selected == null || selected.category != category) selected = list.isEmpty() ? null : list.get(0);
         String equipped = d.equippedCosmetics.get(category);
-        for (int i = 0; i < list.size(); i++) {
+        int visible = Math.max(1, (ph - 54 - 10) / ROW);
+        int maxScroll = Math.max(0, list.size() - visible);
+        int sel = list.indexOf(selected);
+        if (sel >= 0 && sel < listScroll) listScroll = sel;
+        if (sel >= listScroll + visible) listScroll = sel - visible + 1;
+        listScroll = Mth.clamp(listScroll, 0, maxScroll);
+        if (maxScroll > 0) {
+            g.text(font, (listScroll + 1) + "-" + Math.min(list.size(), listScroll + visible) + " / " + list.size() + "  (molette)", lx + 2, y0 + visible * ROW + 1, Ui.MUTED, false);
+        }
+        for (int i = listScroll; i < Math.min(list.size(), listScroll + visible); i++) {
             Cosmetic c = list.get(i);
-            int ry = y0 + i * 30;
+            int ry = y0 + (i - listScroll) * ROW;
             boolean has = d.cosmetics.contains(c.id);
             boolean eq = c.id.equals(equipped);
             Ui.frame(g, lx, ry, lw, 27, c.color, c == selected || hovered(lx, ry, lw, 27));
@@ -110,6 +122,16 @@ public class CosmeticsScreen extends MenuScreen {
                 g.centeredText(font, Component.literal("Verrouillé"), px + pwid / 2, by + 4, Ui.RED);
             }
         }
+    }
+
+    @Override
+    public boolean mouseScrolled(double x, double y, double sx, double sy) {
+        int lx = left + 8 + 88;
+        if (x >= lx && x <= lx + 150 && y >= contentTop) {
+            listScroll = Math.max(0, listScroll - (int) Math.signum(sy));
+            return true;
+        }
+        return super.mouseScrolled(x, y, sx, sy);
     }
 
     /** Petite animation 2D illustrant le cosmetique autour du modele. */
