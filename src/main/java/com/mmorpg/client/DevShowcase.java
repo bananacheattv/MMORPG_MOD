@@ -832,14 +832,14 @@ public final class DevShowcase {
             if (t == 32) {
                 var d = new CompoundTag(); d.putInt("npc", -1); d.putString("name", "Maître des métiers de la Grand-Forge de Valdhéris"); d.putInt("completed", 12);
                 var act = new net.minecraft.nbt.ListTag(); var av = new net.minecraft.nbt.ListTag();
-                for (int i = 0; i < ClientData.quests.size(); i++) av.add(ClientData.quests.getCompoundOrEmpty(i).copy());
+                var demo = typesDemoQuests(); ClientData.quests = demo; for (int i = 0; i < demo.size(); i++) av.add(demo.getCompoundOrEmpty(i).copy());
                 d.put("active", act); d.put("available", av);
                 mc.gui.setScreen(new com.mmorpg.client.screen.QuestGiverScreen(d));
             }
             if (t == 40) shot(mc, "qt_" + tag + "_pnj");
             if (t == 42) mc.gui.setScreen(new com.mmorpg.client.screen.WeeklyQuestScreen(typesDemoWeekly()));
             if (t == 50) shot(mc, "qt_" + tag + "_hebdo");
-            if (t == 52) mc.gui.setScreen(null);
+            if (t == 52) { ClientData.quests = typesDemoQuests(); mc.gui.setScreen(null); }
             if (t == 58) shot(mc, "qt_" + tag + "_hud");
             return;
         }
