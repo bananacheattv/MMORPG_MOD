@@ -291,6 +291,12 @@ public final class DevShowcase {
             if(tick==320)shot(mc,"shaders_cinema");
             if(tick==330){ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.OFF);stop(mc);}return;
         }
+        if(MODE.equals("boutique_web")){          // boutique en jeu réelle (serveur) : crédits achetés sur le site, cf. backend/README.md
+            if(mc.player==null||mc.level==null)return;tick++;
+            if(tick==80){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();mc.player.connection.sendCommand("boutique");}
+            if(tick==170)shot(mc,"boutique_web");
+            if(tick==190)stop(mc);return;
+        }
         if(MODE.equals("deconnexion")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
             if(tick==80){mc.getWindow().setWindowed(1280,720);mc.resizeGui();mc.gui.setScreen(new net.minecraft.client.gui.screens.DisconnectedScreen(null,net.minecraft.network.chat.Component.translatable("disconnect.lost"),net.minecraft.network.chat.Component.literal("Vous avez été expulsé du serveur : Server closed")));}
