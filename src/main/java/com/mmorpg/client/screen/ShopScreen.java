@@ -27,6 +27,7 @@ import java.util.List;
 
 /** Boutique d'un marchand : achat d'articles et vente du butin contre de l'or. */
 public class ShopScreen extends MmoScreen {
+    @Override protected boolean hasNav() { return false; }
     private final int npc;
     private final String npcName;
     private final ShopConfig shop;

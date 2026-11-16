@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 /** In-world character conversation, rather than a destination menu or an automatic book of pages. */
 public final class HubGuideScreen extends MmoScreen {
+    @Override protected boolean hasNav() { return false; }
     private final int guide,entity,completed;private final boolean hasClass;private int page;
     private com.mmorpg.entity.hub.HubGuideEntity portrait;
     private static final String[][][] DIALOGUE={

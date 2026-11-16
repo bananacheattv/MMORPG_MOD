@@ -32,6 +32,12 @@ public final class QuestOfferScreen extends MmoScreen {
         return Math.min(height - 12, 230);
     }
 
+    @Override
+    public boolean mouseScrolled(double x, double y, double sx, double sy) {
+        QuestPanel.scrollBy(-(int) Math.signum(sy));
+        return true;
+    }
+
     private void answer(int action) {
         ClientNet.send(new Payloads.QuestAction(action, quest.getStringOr("id", ""), -1));
         net.minecraft.client.Minecraft.getInstance().gui.setScreen(null);
@@ -40,7 +46,8 @@ public final class QuestOfferScreen extends MmoScreen {
     @Override
     protected void renderContent(GuiGraphicsExtractor g, int mx, int my, float a) {
         Ui.panel(g, left, top, pw, ph);
-        Ui.title(g, left + pw / 2, top + 8, "NOUVELLE QUÊTE", Ui.GOLD_LIGHT);
+        var kind = QuestPanel.kindOf(quest);
+        Ui.title(g, left + pw / 2, top + 8, font.plainSubstrByWidth(kind.label.toUpperCase(java.util.Locale.ROOT).replace("QUÊTE", "NOUVELLE QUÊTE") + "", pw - 20), kind.color);
         Ui.inset(g, left + 8, top + 24, pw - 16, ph - 24 - 52);
         QuestPanel.render(g, quest, left + 8, top + 24, pw - 16, top + ph - 54, mx, my);
         button(g, left + 12, top + ph - 46, pw - 24, 20, "Accepter la quête", true, 0xFF7A5A1A, () -> answer(Payloads.QuestAction.ACCEPT));

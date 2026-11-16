@@ -99,7 +99,7 @@ public final class QuestOffers {
         d.trackedQuest = id;
         d.questGuidanceMuted = false;
         if (!fromJournal) OFFERS.put(p.getUUID(), new Offer("", p.level().getServer().getTickCount() + 100));
-        Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, "QUÊTE ACCEPTÉE", q.name, 0xFFD040));
+        Net.toPlayer(p, new Payloads.Notify(Payloads.Notify.QUEST, com.mmorpg.quest.QuestKind.of(id, q).notice("ACCEPTÉE"), q.name, com.mmorpg.quest.QuestKind.of(id, q).rgb()));
         p.level().playSound(null, p.blockPosition(), com.mmorpg.registry.ModSounds.QUEST_ACCEPT.get(), SoundSource.PLAYERS, 1f, 1f);
         GuidanceManager.refresh(p);
         d.dirty = true;

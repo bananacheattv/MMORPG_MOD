@@ -65,6 +65,7 @@ final class DevUiFrames {
     }
 
     static {
+        if ("pnj_ui".equals(System.getProperty("mmorpg.showcase", ""))) pnjScreens();
         add("inventory", () -> new CharacterScreen(Minecraft.getInstance().player));
         add("pause", AeloriaPauseScreen::new);
         add("admin_players", () -> adminPlayers(0));
@@ -278,8 +279,94 @@ final class DevUiFrames {
     }
 
     /** Tailles de fenetre et echelles d'interface testees (0 = automatique). */
-    private static final int[][] CONFIGS = {{1280, 720, 2}, {1280, 720, 1}, {1280, 720, 3}, {1280, 720, 4}, {1280, 720, 0}, {854, 480, 2}, {854, 480, 0}, {1920, 1080, 0}, {1920, 1080, 3}};
+    private static int[][] CONFIGS = {{1280, 720, 2}, {1280, 720, 1}, {1280, 720, 3}, {1280, 720, 4}, {1280, 720, 0}, {854, 480, 2}, {854, 480, 0}, {1920, 1080, 0}, {1920, 1080, 3}};
     private static int cfg = -1, cfgTick, reference[];
+    private static boolean pnjOnly;
+
+    /** Mode pnj_ui : seulement les interfaces de PNJ, a trois resolutions, toutes capturees. */
+    static void pnjMode() {
+        pnjOnly = true;
+        for (int i = NAMES.size() - 1; i >= 0; i--) if (!NAMES.get(i).startsWith("pnj_")) { NAMES.remove(i); SCREENS.remove(i); }
+        CONFIGS = new int[][]{{854, 480, 0}, {1280, 720, 0}, {1920, 1080, 0}};
+    }
+
+    private static void pnjScreens() {
+        add("pnj_quest_giver", () -> {
+            var d = new CompoundTag();
+            d.putString("name", "Borin · Maître artisan");
+            d.putInt("completed", 5);
+            d.putString("dialogue", "Une arme se mérite. Prouve ta valeur et la forge t'ouvrira ses portes, voyageur.");
+            var av = new net.minecraft.nbt.ListTag();
+            for (int i = 0; i < 3; i++) {
+                var q = new CompoundTag();
+                q.putString("id", "q" + i);
+                q.putString("name", "Une arme se mérite " + (i + 1));
+                q.putInt("minLevel", 5 + i);
+                q.putString("description", "Rapporte du minerai de fer et de la verdite à la forge pour forger ta première arme.");
+                av.add(q);
+            }
+            d.put("available", av);
+            return new QuestGiverScreen(d);
+        });
+        add("pnj_shop", () -> {
+            var d = new CompoundTag();
+            d.putString("name", "Marchande");
+            d.putString("shop", "{}");
+            return new ShopScreen(d);
+        });
+        add("pnj_hub_guide", () -> {
+            var d = new CompoundTag();
+            d.putInt("guide", 0);
+            d.putInt("completed", 2);
+            return new HubGuideScreen(d);
+        });
+        add("pnj_class_master", () -> {
+            var d = new CompoundTag();
+            d.putInt("kind", 0);
+            d.putBoolean("hasClass", true);
+            return new ClassMasterScreen(d);
+        });
+        add("pnj_teleporter", () -> {
+            var d = new CompoundTag();
+            var l = new net.minecraft.nbt.ListTag();
+            for (int i = 0; i < 6; i++) {
+                var e = new CompoundTag();
+                e.putString("name", "Destination " + (i + 1));
+                e.putInt("category", i % 3);
+                l.add(e);
+            }
+            d.put("list", l);
+            return new TeleporterScreen(d);
+        });
+        add("pnj_mine_master", () -> {
+            var d = new CompoundTag();
+            d.putInt("playerLevel", 25);
+            var l = new net.minecraft.nbt.ListTag();
+            for (int i = 0; i < 4; i++) {
+                var e = new CompoundTag();
+                e.putString("name", "Mine " + (i + 1));
+                e.putInt("level", 5 + i * 10);
+                e.putBoolean("locked", i > 1);
+                l.add(e);
+            }
+            d.put("sectors", l);
+            return new MineMasterScreen(d);
+        });
+        add("pnj_pvp_store", () -> new PvpStoreScreen(new CompoundTag()));
+        add("pnj_bank", () -> {
+            var d = new CompoundTag();
+            d.putLong("bank", 12500);
+            d.putLong("wallet", 830);
+            d.putInt("level", 3);
+            return new BankScreen(d);
+        });
+        add("pnj_forge", () -> new ForgeScreen(net.minecraft.core.BlockPos.ZERO));
+        add("pnj_auction", () -> {
+            var screen = new AuctionScreen(auctionData());
+            screen.previewTab(0);
+            return screen;
+        });
+    }
     private static final List<String> REPORT = new ArrayList<>();
     private static int gaps;
 
@@ -338,6 +425,6 @@ final class DevUiFrames {
                 REPORT.add("  " + NAMES.get(i) + " : cadre " + f[2] + "x" + f[3] + " en (" + f[0] + "," + f[1] + ") barre " + f[4] + (same ? "" : "   <-- ECART"));
             }
         }
-        if (step == 7 && cfg == 0) DevShowcase.shot(mc, "frame_" + NAMES.get(i)); // capture asynchrone : un tick de recul pour voir le bon ecran
+        if (step == 7 && (cfg == 0 || pnjOnly)) DevShowcase.shot(mc, (pnjOnly ? NAMES.get(i) + "_" + mc.getWindow().getWidth() + "x" + mc.getWindow().getHeight() : "frame_" + NAMES.get(i))); // capture asynchrone : un tick de recul pour voir le bon ecran
     }
 }
