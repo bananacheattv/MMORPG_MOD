@@ -11,6 +11,8 @@ public final class DefaultMobs {
     public static final int DROPS_VERSION = 3;
     /** A augmenter quand les biomes/poids d'apparition par defaut changent : ils remplacent ceux des mobs.json existants (monstres importes). */
     public static final int SPAWN_VERSION = 1;
+    /** Version des vitesses par defaut (v1 : mobs plus lents que le sprint du joueur). */
+    public static final int SPEED_VERSION = 1;
     /** Materiau propre a chaque monstre importe. */
     private static final Map<String, String> MOB_MATERIAL = new java.util.HashMap<>();
 
@@ -63,6 +65,7 @@ public final class DefaultMobs {
         c.scale = scale;
         c.dropsVersion = DROPS_VERSION;
         c.spawnVersion = SPAWN_VERSION;
+        c.speedVersion = SPEED_VERSION;
         return c;
     }
 
@@ -92,7 +95,7 @@ public final class DefaultMobs {
         Map<String, MobConfig> m = new LinkedHashMap<>();
         List<String> ow = List.of("minecraft:overworld");
 
-        MobConfig gob = mob(1, 12, 60, 22, 8, 2.4, 1.0, 0.31, 0.85);
+        MobConfig gob = mob(1, 12, 60, 22, 8, 2.4, 1.0, 0.19, 0.85);
         spawn(gob, 30, 2, 4, false, ow, "#minecraft:is_forest", "minecraft:plains", "minecraft:sunflower_plains", "minecraft:meadow", "minecraft:savanna");
         drop(gob, "oreille_gobelin", 0.6, 1, 2);
         drop(gob, "ferraille_gobeline", 0.4, 1, 2);
@@ -100,14 +103,14 @@ public final class DefaultMobs {
         drop(gob, "soie_araignee", 0.15, 1, 1);
         m.put("gobelin", gob);
 
-        MobConfig wolf = mob(5, 18, 80, 25, 10, 2.8, 0.8, 0.36, 1.0);
+        MobConfig wolf = mob(5, 18, 80, 25, 10, 2.8, 0.8, 0.21, 1.0);
         spawn(wolf, 22, 2, 3, true, ow, "#minecraft:is_taiga", "#minecraft:is_forest", "minecraft:snowy_plains", "minecraft:grove");
         drop(wolf, "croc_loup", 0.6, 1, 2);
         drop(wolf, "fourrure_sombre", 0.35, 1, 1);
         drop(wolf, "griffe_loup", 0.45, 1, 2);
         m.put("loup_sombre", wolf);
 
-        MobConfig skel = mob(15, 32, 120, 28, 12, 3.0, 1.2, 0.27, 1.0);
+        MobConfig skel = mob(15, 32, 120, 28, 12, 3.0, 1.2, 0.17, 1.0);
         spawn(skel, 20, 1, 3, true, ow, "*");
         drop(skel, "os_maudit", 0.6, 1, 2);
         drop(skel, "poussiere_ame", 0.4, 1, 2);
@@ -115,7 +118,7 @@ public final class DefaultMobs {
         drop(skel, "crane_maudit", 0.06, 1, 1);
         m.put("squelette_maudit", skel);
 
-        MobConfig orc = mob(25, 45, 300, 45, 20, 4.5, 2.0, 0.27, 1.25);
+        MobConfig orc = mob(25, 45, 300, 45, 20, 4.5, 2.0, 0.17, 1.25);
         spawn(orc, 18, 1, 3, false, ow, "#minecraft:is_savanna", "#minecraft:is_badlands", "#minecraft:is_mountain", "#minecraft:is_hill", "minecraft:windswept_hills");
         drop(orc, "defense_orc", 0.5, 1, 1);
         drop(orc, "acier_orc", 0.5, 1, 2);
@@ -123,13 +126,13 @@ public final class DefaultMobs {
         drop(orc, "sang_orc", 0.35, 1, 2);
         m.put("orc_guerrier", orc);
 
-        MobConfig fire = mob(40, 60, 400, 55, 25, 5.0, 2.0, 0.26, 1.0);
+        MobConfig fire = mob(40, 60, 400, 55, 25, 5.0, 2.0, 0.17, 1.0);
         spawn(fire, 16, 1, 2, false, List.of("minecraft:overworld", "minecraft:the_nether"), "#minecraft:is_nether", "minecraft:desert", "#minecraft:is_badlands");
         drop(fire, "noyau_flamme", 0.55, 1, 2);
         drop(fire, "cendre_ardente", 0.45, 1, 3);
         m.put("elementaire_feu", fire);
 
-        MobConfig ice = mob(50, 70, 450, 60, 28, 5.5, 2.2, 0.28, 1.0);
+        MobConfig ice = mob(50, 70, 450, 60, 28, 5.5, 2.2, 0.18, 1.0);
         spawn(ice, 16, 1, 2, false, ow, "minecraft:snowy_plains", "minecraft:ice_spikes", "minecraft:frozen_peaks", "minecraft:snowy_slopes",
                 "minecraft:jagged_peaks", "minecraft:snowy_taiga", "minecraft:grove", "minecraft:frozen_river", "minecraft:snowy_beach");
         drop(ice, "eclat_givre", 0.55, 1, 2);
@@ -137,13 +140,13 @@ public final class DefaultMobs {
         drop(ice, "voile_spectral", 0.2, 1, 1);
         m.put("spectre_givre", ice);
 
-        MobConfig golem = mob(60, 80, 900, 90, 35, 6.0, 3.5, 0.22, 1.0);
+        MobConfig golem = mob(60, 80, 900, 90, 35, 6.0, 3.5, 0.14, 1.0);
         spawn(golem, 12, 1, 1, true, ow, "#minecraft:is_mountain", "minecraft:dripstone_caves", "minecraft:lush_caves", "minecraft:deep_dark");
         drop(golem, "cristal_arcanique", 0.45, 1, 2);
         drop(golem, "gemme_brute", 0.3, 1, 2);
         m.put("golem_cristal", golem);
 
-        MobConfig knight = mob(75, 95, 1000, 100, 40, 7.0, 3.5, 0.28, 1.15);
+        MobConfig knight = mob(75, 95, 1000, 100, 40, 7.0, 3.5, 0.18, 1.15);
         spawn(knight, 12, 1, 2, true, List.of("minecraft:overworld", "minecraft:the_nether", "minecraft:the_end"),
                 "#minecraft:is_end", "minecraft:deep_dark", "minecraft:soul_sand_valley", "minecraft:warped_forest");
         drop(knight, "essence_neant", 0.45, 1, 2);
@@ -152,7 +155,7 @@ public final class DefaultMobs {
         m.put("chevalier_neant", knight);
 
         // ---------------- Boss
-        MobConfig king = boss(20, 1500, 250, 15, 3.5, 2.5, 0.30, 1.7);
+        MobConfig king = boss(20, 1500, 250, 15, 3.5, 2.5, 0.19, 1.7);
         drop(king, "couronne_roi_gobelin", 1.0, 1, 1);
         drop(king, "trefle_chance", 0.5, 1, 2);
         drop(king, "piece_or", 1.0, 20, 40);
@@ -168,7 +171,7 @@ public final class DefaultMobs {
         king.abilities.put("enrageThreshold", 0.3);
         m.put("roi_gobelin", king);
 
-        MobConfig lich = boss(45, 3000, 400, 20, 5.0, 3.0, 0.27, 1.4);
+        MobConfig lich = boss(45, 3000, 400, 20, 5.0, 3.0, 0.17, 1.4);
         drop(lich, "phylactere_liche", 1.0, 1, 1);
         drop(lich, "trefle_quatre_feuilles", 0.4, 1, 2);
         drop(lich, "piece_or", 1.0, 50, 90);
@@ -185,7 +188,7 @@ public final class DefaultMobs {
         lich.abilities.put("drainCooldown", 300.0);
         m.put("liche_ancienne", lich);
 
-        MobConfig ignis = boss(65, 4000, 600, 30, 6.0, 3.5, 0.28, 2.0);
+        MobConfig ignis = boss(65, 4000, 600, 30, 6.0, 3.5, 0.18, 2.0);
         drop(ignis, "coeur_infernal", 1.0, 1, 1);
         drop(ignis, "trefle_dore", 0.5, 1, 1);
         drop(ignis, "piece_or", 1.0, 90, 150);
@@ -200,7 +203,7 @@ public final class DefaultMobs {
         ignis.abilities.put("meteorCooldown", 300.0);
         m.put("seigneur_ignis", ignis);
 
-        MobConfig titan = boss(80, 6000, 800, 40, 7.0, 4.0, 0.22, 1.6);
+        MobConfig titan = boss(80, 6000, 800, 40, 7.0, 4.0, 0.15, 1.6);
         drop(titan, "coeur_glace_eternelle", 1.0, 1, 1);
         drop(titan, "trefle_celeste", 0.4, 1, 1);
         drop(titan, "piece_or", 1.0, 150, 250);
@@ -212,7 +215,7 @@ public final class DefaultMobs {
         titan.abilities.put("auraRadius", 7.0);
         m.put("titan_glace", titan);
 
-        MobConfig avatar = boss(100, 10000, 1000, 50, 8.0, 4.5, 0.30, 2.2);
+        MobConfig avatar = boss(100, 10000, 1000, 50, 8.0, 4.5, 0.19, 2.2);
         drop(avatar, "fragment_divin", 1.0, 2, 3);
         drop(avatar, "trefle_divin", 0.5, 1, 1);
         drop(avatar, "piece_or", 1.0, 300, 500);
@@ -226,7 +229,7 @@ public final class DefaultMobs {
         avatar.abilities.put("voidCooldown", 300.0);
         avatar.abilities.put("summonCount", 2.0);
         m.put("avatar_neant", avatar);
-        MobConfig zombie = mob(8, 22, 110, 26, 11, 2.7, 1.1, 0.25, 1);
+        MobConfig zombie = mob(8, 22, 110, 26, 11, 2.7, 1.1, 0.16, 1);
         zombie.displayName = "Zombie des Cryptes";
         zombie.family = "Morts-vivants";
         spawn(zombie, 14, 1, 3, true, ow, "*");
@@ -235,7 +238,7 @@ public final class DefaultMobs {
         drop(zombie, "ichor_cryptes", .35, 1, 2);
         m.put("zombie_des_cryptes", zombie);
 
-        MobConfig spider = mob(18, 35, 140, 24, 13, 3, .8, .32, 1.5);
+        MobConfig spider = mob(18, 35, 140, 24, 13, 3, .8, .20, 1.5);
         spider.displayName = "Araignée Venimeuse";
         spider.family = "Bêtes";
         spawn(spider, 12, 1, 2, true, ow, "#minecraft:is_forest", "minecraft:swamp", "minecraft:lush_caves");
@@ -245,7 +248,7 @@ public final class DefaultMobs {
         drop(spider, "glande_venin", .35, 1, 1);
         m.put("araignee_venimeuse", spider);
 
-        MobConfig bandit = mob(30, 50, 250, 35, 18, 4, 1.7, .30, 1);
+        MobConfig bandit = mob(30, 50, 250, 35, 18, 4, 1.7, .19, 1);
         bandit.displayName = "Bandit Arbalétrier";
         bandit.family = "Humanoïdes";
         spawn(bandit, 12, 1, 3, false, ow, "minecraft:plains", "#minecraft:is_forest", "minecraft:savanna");
@@ -277,7 +280,7 @@ public final class DefaultMobs {
         List<String> elites = List.of("colosse_racine", "hydre_marais", "roi_cryptes", "wyrm_boreal", "djinn_braises", "devoreur_etoiles", "chevalier_fracture", "champion_gobelin", "seigneur_squelette", "minotaure", "sentinelle_hibou", "morghul", "gardien_citadelle");
         for (var entry : com.mmorpg.entity.mob.ImportedMobs.ALL) {
             int z = entry.zone();
-            MobConfig c = mob(1 + z * 16, Math.min(100, 18 + z * 16), 70 + z * 70, 22 + z * 8, 8 + z * 5, 2.4 + z * .6, 1 + z * .4, .27, 1);
+            MobConfig c = mob(1 + z * 16, Math.min(100, 18 + z * 16), 70 + z * 70, 22 + z * 8, 8 + z * 5, 2.4 + z * .6, 1 + z * .4, .18, 1);
             c.displayName = entry.name();
             c.family = com.mmorpg.entity.mob.ImportedMobs.ZONES[z];
             boolean elite = elites.contains(entry.key());

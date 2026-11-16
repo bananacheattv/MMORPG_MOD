@@ -24,7 +24,7 @@ public final class MobCooperation {
                 if(ally==null)return;var d=ally.getExistingDataOrNull(com.mmorpg.registry.ModAttachments.MOB);d.hp=Math.min(d.maxHp,d.hp+d.maxHp*.12f);ally.setData(com.mmorpg.registry.ModAttachments.MOB,d);ally.addEffect(new MobEffectInstance(MobEffects.RESISTANCE,60,0));
                 level.addFreshEntity(SkillFxEntity.create(level,FxKind.BEAM,mob.position(),.25,0x70FF90,18).points(List.of(mob.getEyePosition(),ally.getEyePosition())));persistent.putLong("squad_next",now+160);
             }
-            case SCOUT->{int called=0;for(var ally:allies)if(called<4&&ally.getTarget()==null&&ally.hasLineOfSight(target)){ally.setTarget(target);ally.getNavigation().moveTo(target,1.2);called++;}if(called==0)return;level.addFreshEntity(SkillFxEntity.create(level,FxKind.SHOCKWAVE,mob.position(),4,0xFFD060,24));persistent.putLong("squad_next",now+240);}
+            case SCOUT->{int called=0;for(var ally:allies)if(called<4&&ally.getTarget()==null&&ally.hasLineOfSight(target)){ally.setTarget(target);ally.getNavigation().moveTo(target,1.0);called++;}if(called==0)return;level.addFreshEntity(SkillFxEntity.create(level,FxKind.SHOCKWAVE,mob.position(),4,0xFFD060,24));persistent.putLong("squad_next",now+240);}
             case ENGINEER->{
                 // Barricades are effects, not permanent world edits; only generated dungeon floors can receive one.
                 if(com.mmorpg.dungeon.InstanceManager.slotAt(level.getServer(),level,mob.getX(),mob.getZ())==null)return;

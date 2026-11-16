@@ -349,11 +349,11 @@ public final class ImportedSpells {
                 level.addFreshEntity(SkillFxEntity.create(level, FxKind.SHOCKWAVE, mob.position(), 4, 0xFF8040, 16));
                 for (Mob ally : level.getEntitiesOfClass(Mob.class, mob.getBoundingBox().inflate(radius), m -> m instanceof com.mmorpg.entity.RpgMob
                         && !(m instanceof com.mmorpg.entity.boss.RpgBoss) && m.isAlive() && !RpgCombat.isEnemy(mob, m))) {
-                    ally.addEffect(new MobEffectInstance(MobEffects.SPEED, 140, 1));
+                    ally.addEffect(new MobEffectInstance(MobEffects.SPEED, 140, 0));
                     ally.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 140, 0));
                     if (ally.getTarget() == null) ally.setTarget(target);
                 }
-                mob.addEffect(new MobEffectInstance(MobEffects.SPEED, 140, 1));
+                mob.addEffect(new MobEffectInstance(MobEffects.SPEED, 140, 0));
                 level.sendParticles(ParticleTypes.ANGRY_VILLAGER, mob.getX(), mob.getY() + mob.getBbHeight() + 0.3, mob.getZ(), 6, 0.5, 0.3, 0.5, 0);
                 level.playSound(null, mob.blockPosition(), SoundEvents.RAVAGER_ROAR, SoundSource.HOSTILE, 1f, 1.2f);
             }
