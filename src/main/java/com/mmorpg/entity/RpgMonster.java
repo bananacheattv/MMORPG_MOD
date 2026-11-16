@@ -56,6 +56,12 @@ public abstract class RpgMonster extends Monster implements RpgMob {
         return testTarget != null ? testTarget : super.getTarget();
     }
 
+    /** Zone sure : un joueur qui s'y trouve n'est jamais une cible valide (les objectifs de ciblage passent par ici). */
+    @Override
+    public boolean canAttack(net.minecraft.world.entity.LivingEntity target) {
+        return !(target instanceof net.minecraft.server.level.ServerPlayer p && com.mmorpg.server.SafeSpawn.safe(p)) && super.canAttack(target);
+    }
+
     @Override
     public String mobKey() {
         return key;
@@ -100,6 +106,12 @@ public abstract class RpgMonster extends Monster implements RpgMob {
     @Override public void aiStep(){
         // monstre loin de tout joueur : un tick sur quatre seulement (IA, deplacements, collisions), sans changer ce que voit un joueur proche
         if (!this.level().isClientSide() && dormant() && (this.tickCount + this.getId()) % 4 != 0) return;
+        // cible entree en zone sure : aggro effacee, le monstre s'arrete (verifie une fois par demi-seconde)
+        if (!this.level().isClientSide() && this.tickCount % 10 == (this.getId() & 7) && super.getTarget() instanceof net.minecraft.server.level.ServerPlayer tp
+                && com.mmorpg.server.SafeSpawn.safe(tp)) {
+            this.setTarget(null);
+            this.getNavigation().stop();
+        }
         super.aiStep();if(level() instanceof ServerLevel server)MobCooperation.tick(this,server);
     }
 

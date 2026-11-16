@@ -35,6 +35,19 @@ final class DevSafeSpawnChecks {
         check(!SafeSpawn.safe(attacker), "far from the spawn is not safe");
         mob.hurtServer(level, level.damageSources().playerAttack(attacker), 5F);
         check(mob.getHealth() < mhp, "damage outside the zone is untouched");
+        // aggro : un monstre ne cible plus un joueur en zone sure et perd sa cible
+        attacker.setPos(sp[0] + 200, sp[1], sp[2]);
+        var orc = com.mmorpg.registry.ModEntities.GOBLIN_KING.get().create(level, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
+        orc.setPos(sp[0] + 3, sp[1], sp[2]);
+        level.addFreshEntity(orc);
+        check(!orc.canAttack(victim), "monster cannot target a player in the safe zone");
+        check(!com.mmorpg.combat.RpgCombat.isEnemy(orc, victim), "player in the safe zone is not an enemy of monsters");
+        check(com.mmorpg.combat.RpgCombat.isEnemy(orc, attacker), "player outside the zone stays an enemy");
+        orc.setTarget(victim);
+        orc.tickCount = 10 - (orc.getId() & 7) + (orc.getId() & 7);   // cycle de verification
+        for (int i = 0; i < 16 && orc.getTarget() != null; i++) { orc.tickCount++; orc.aiStep(); }
+        check(orc.getTarget() == null, "aggro cleared when the target is in the safe zone");
+        orc.discard();
         mob.discard();
         com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] SAFE SPAWN PASS: mine arrival point, damage taken and dealt cancelled, outside untouched");
     }
