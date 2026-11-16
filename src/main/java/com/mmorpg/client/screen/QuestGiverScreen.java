@@ -14,6 +14,7 @@ import java.util.List;
 
 /** Dialogue avec un Maitre des Quetes : quetes a rendre, en cours et disponibles. */
 public class QuestGiverScreen extends MmoScreen {
+    @Override protected boolean hasNav() { return false; }
     private final int npc;
     private final String npcName;
     private final List<CompoundTag> entries = new ArrayList<>();

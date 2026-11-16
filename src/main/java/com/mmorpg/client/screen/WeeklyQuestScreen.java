@@ -15,6 +15,7 @@ import java.util.List;
 
 /** Pancarte des quetes hebdomadaires : trois cartes (facile, difficile, tres difficile) propres au joueur, a accepter puis a remettre ici. */
 public class WeeklyQuestScreen extends MmoScreen {
+    @Override protected boolean hasNav() { return false; }
     private BlockPos pos = BlockPos.ZERO;
     private final List<CompoundTag> tiers = new ArrayList<>();
     private long resetSeconds;

@@ -129,7 +129,7 @@ public final class DevShowcase {
             return;
         }
         if(MODE.equals("perf")){DevPerfBench.phase(mc);return;}
-        if(MODE.equals("ui_frames")){DevUiFrames.tick(mc);return;}
+        if(MODE.equals("ui_frames")){DevUiFrames.tick(mc);return;}if(MODE.equals("pnj_ui")){if(!pnjInit){pnjInit=true;DevUiFrames.pnjMode();}DevUiFrames.tick(mc);return;}
         if(MODE.equals("outils_retires")){DevToolsRemoved.tick(mc);return;}
         if(MODE.equals("pvp_polish")){DevPvpVisual.tick(mc);return;}
         if(MODE.equals("trade")){DevTradeVisual.tick(mc);return;}
@@ -5866,6 +5866,7 @@ public final class DevShowcase {
         var data=new CompoundTag();data.putLong("credits",12000);data.putInt("pending",2);var products=new ListTag();
         for(var product:com.mmorpg.store.StoreConfig.defaults().products){var v=new CompoundTag();v.putString("id",product.id);v.putString("label",product.label);v.putString("item",product.item);v.putString("category",product.category);v.putLong("price",product.credits);v.putInt("count",product.count);if(product.rank>0)v.putString("benefits","Préfixe coloré · Annonces HDV · Cosmétique exclusif");products.add(v);}data.put("products",products);return data;
     }
+    private static boolean pnjInit;
     static void shot(Minecraft mc, String name) {
         Screenshot.grab(mc.gameDirectory, "showcase_" + name + ".png", mc.gameRenderer.mainRenderTarget(), 1,
                 msg -> MMORPG.LOGGER.info("[MMORPG] Capture {}", name));

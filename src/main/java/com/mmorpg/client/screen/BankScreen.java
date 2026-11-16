@@ -14,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 
 /** Banque d'Aeloria : solde d'or (depot, retrait) et trois pages de coffre. */
 public class BankScreen extends MmoScreen {
+    @Override protected boolean hasNav() { return false; }
     @Override protected String backdrop() { return "storage_header"; }
 
     private BlockPos pos;
