@@ -30,7 +30,7 @@ enable-rcon=false           # (ou un mot de passe fort et le port jamais ouvert 
 enforce-whitelist=true      # seulement si l'accès est limité ; sinon false
 max-players=40              # à ajuster après mesure (non mesuré)
 motd=Aeloria                # le nom affiché dans la liste des serveurs
-view-distance=12   # plafonné à 12 par le mod (-Dmmorpg.viewDistance=N pour changer) ; 32 rendait le chargement très lent
+view-distance=32   # plafonné à 32 par le mod (-Dmmorpg.viewDistance=N pour baisser si le serveur peine) ; coûteux en disque/réseau, voir le pré-chargement du spawn
 pause-when-empty-seconds=0   # sinon le serveur vide se met en pause et le pré-chargement attend un joueur
 simulation-distance=8   # plafonné à 8 par le mod (-Dmmorpg.simulationDistance=N)
 ```

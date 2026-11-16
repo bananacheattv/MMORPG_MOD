@@ -36,9 +36,9 @@ public final class ServerEvents {
         // les apparitions naturelles vanilla sont toutes annulees par OpenWorldRules : autant ne pas les calculer (balayage de chaque chunk a chaque tick) ; MobSpawner fait les apparitions du mod
         event.getServer().getGameRules().set(net.minecraft.world.level.gamerules.GameRules.SPAWN_MOBS, false, event.getServer());
         // monde neuf : le hub est construit tout seul (un peu apres le demarrage), la premiere connexion s'y fait toujours
-        // distances : 32 chunks (4225 par joueur) rendaient connexion, teleportation et deplacement tres lents (lecture disque + envoi reseau + simulation) ;
-        // plafond 12 de rendu / 8 de simulation, modifiable par -Dmmorpg.viewDistance=N et -Dmmorpg.simulationDistance=N
-        int view = Integer.getInteger("mmorpg.viewDistance", 12), sim = Integer.getInteger("mmorpg.simulationDistance", 8);
+        // distances : 32 chunks de rendu (4225 par joueur) = lecture disque + envoi reseau couteux, d'ou la simulation basse et le pre-chargement du spawn ;
+        // plafond 32 de rendu (maximum vanilla) / 8 de simulation, modifiable par -Dmmorpg.viewDistance=N et -Dmmorpg.simulationDistance=N
+        int view = Integer.getInteger("mmorpg.viewDistance", 32), sim = Integer.getInteger("mmorpg.simulationDistance", 8);
         var players = event.getServer().getPlayerList();
         players.setViewDistance(Math.min(players.getViewDistance(), view));
         players.setSimulationDistance(Math.min(players.getSimulationDistance(), sim));
