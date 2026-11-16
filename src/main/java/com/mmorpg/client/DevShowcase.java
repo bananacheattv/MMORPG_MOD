@@ -415,6 +415,13 @@ public final class DevShowcase {
             if(tick>=615&&tick<990&&tick%25==15)shot(mc,"bestiary_"+((tick-615)/25));
             if(tick==1000)stop(mc);return;
         }
+        if(MODE.equals("forge_outils")){
+            if(mc.player==null||mc.level==null)return;tick++;
+            if(tick==80){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();try{var f=ForgeScreen.class.getDeclaredField("tab");f.setAccessible(true);f.set(null,com.mmorpg.crafting.ForgeRecipes.Category.OUTILS.ordinal());}catch(Exception e){throw new IllegalStateException(e);}mc.gui.setScreen(new ForgeScreen(net.minecraft.core.BlockPos.ZERO));}
+            if(tick==110)shot(mc,"forge_outils");
+            if(tick==120)mc.stop();
+            return;
+        }
         if(MODE.equals("new_rules_ui")){
             if(mc.player==null||mc.level==null)return;tick++;
             if(tick==80){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();mc.gui.setScreen(new com.mmorpg.client.screen.HubTutorialScreen());}
