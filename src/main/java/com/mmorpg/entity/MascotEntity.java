@@ -85,6 +85,12 @@ public final class MascotEntity extends NpcEntity {
         // aucune IA : la position et le regard sont pilotes par MascotGuide
     }
 
+    /** Flammeche n'est envoyee qu'a son proprietaire : aucun autre joueur ne voit l'entite ni son nom. */
+    @Override
+    public boolean broadcastToPlayer(net.minecraft.server.level.ServerPlayer player) {
+        return player.getId() == ownerId();
+    }
+
     @Override
     public boolean shouldBeSaved() {
         return false;
