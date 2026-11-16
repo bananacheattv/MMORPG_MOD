@@ -16,6 +16,11 @@ public final class DefaultMobs {
     /** Materiau propre a chaque monstre importe. */
     private static final Map<String, String> MOB_MATERIAL = new java.util.HashMap<>();
 
+    /** Materiaux propres a un monstre importe (cle du monstre -> objet). */
+    public static boolean isMobMaterial(String item) {
+        return MOB_MATERIAL.containsValue(item);
+    }
+
     static {
         MOB_MATERIAL.put("mousseux", "mousse_vivante");
         MOB_MATERIAL.put("sanglier_ronce", "defense_ronce");
@@ -260,6 +265,11 @@ public final class DefaultMobs {
         return m;
     }
 
+    /** Butin (commun, peu commun, rare) des monstres importes, par zone ; les monstres de la zone z commencent au niveau 1 + 16 z. */
+    public static final String[][] ZONE_LOOT = {{"ecorce_ancienne", "seve_lumineuse", "coeur_racine"}, {"mucus_acide", "venin_marais", "ecaille_hydre"},
+                {"fragment_ossuaire", "relique_funeraire", "couronne_cryptes"}, {"fourrure_polaire", "carapace_givree", "croc_wyrm"},
+                {"carapace_cuivre", "bandelette_ancienne", "braise_djinn"}, {"eclat_astral", "poussiere_etoile", "eclat_fracture"}};
+
     public static Map<String, MobConfig> create() {
         Map<String, MobConfig> m = core();
         List<String> ow = List.of("minecraft:overworld");
@@ -274,9 +284,7 @@ public final class DefaultMobs {
                 {"#minecraft:is_end", "minecraft:the_void", "#minecraft:is_deep_ocean"}};
         String[] loot = {"minecraft:oak_log", "minecraft:slime_ball", "os_maudit", "eclat_givre", "noyau_flamme", "essence_neant"};
         // butin propre a chaque zone : commun, peu commun, et rare (reserve aux grandes creatures de la zone)
-        String[][] zoneLoot = {{"ecorce_ancienne", "seve_lumineuse", "coeur_racine"}, {"mucus_acide", "venin_marais", "ecaille_hydre"},
-                {"fragment_ossuaire", "relique_funeraire", "couronne_cryptes"}, {"fourrure_polaire", "carapace_givree", "croc_wyrm"},
-                {"carapace_cuivre", "bandelette_ancienne", "braise_djinn"}, {"eclat_astral", "poussiere_etoile", "eclat_fracture"}};
+        String[][] zoneLoot = ZONE_LOOT;
         List<String> elites = List.of("colosse_racine", "hydre_marais", "roi_cryptes", "wyrm_boreal", "djinn_braises", "devoreur_etoiles", "chevalier_fracture", "champion_gobelin", "seigneur_squelette", "minotaure", "sentinelle_hibou", "morghul", "gardien_citadelle");
         for (var entry : com.mmorpg.entity.mob.ImportedMobs.ALL) {
             int z = entry.zone();

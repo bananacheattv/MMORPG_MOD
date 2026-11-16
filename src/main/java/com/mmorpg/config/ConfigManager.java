@@ -91,7 +91,7 @@ public final class ConfigManager {
         Files.createDirectories(dir());
         Path temp = Files.createTempFile(dir(), "butins-", ".tmp");
         try {
-            Files.writeString(temp, GSON.toJson(updated), StandardCharsets.UTF_8);
+            Files.writeString(temp, updated.toPrettyJson(), StandardCharsets.UTF_8);
             try { Files.move(temp, dir().resolve("butins.json"), java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE); }
             catch (java.nio.file.AtomicMoveNotSupportedException e) { Files.move(temp, dir().resolve("butins.json"), java.nio.file.StandardCopyOption.REPLACE_EXISTING); }
             loot = updated;
@@ -256,7 +256,7 @@ public final class ConfigManager {
                 }
             }
             loot = (lootCfg == null ? LootTables.defaults() : lootCfg).sanitize();
-            write(lt, loot);
+            Files.writeString(lt, loot.toPrettyJson(), StandardCharsets.UTF_8);
             Path dm = dir().resolve("mannequin.json");
             DummyConfig dummyCfg = null;
             if (Files.exists(dm)) {

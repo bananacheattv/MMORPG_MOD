@@ -114,9 +114,11 @@ public final class DevTutorialChecks {
             var inv = p.getInventory();
             check(inv.contains(new ItemStack(com.mmorpg.registry.ModItems.get("pioche_debutant"))), cls + " : pioche fabriquee");
             check(inv.contains(new ItemStack(com.mmorpg.registry.ModItems.get("houe_debutant"))), cls + " : houe fabriquee");
-            check(inv.contains(new ItemStack(com.mmorpg.registry.ModItems.get(TutorialKit.weapon(cls)))), cls + " : arme fabriquee");
+            var weapon = com.mmorpg.registry.ModItems.get(TutorialKit.weapon(cls));
+            // l'arme fabriquee porte des affixes tires au hasard : on compare le type d'objet, pas les composants
+            check(inv.hasAnyMatching(st -> st.is(weapon)), cls + " : arme fabriquee");
             for (String piece : com.mmorpg.item.ItemDefs.PIECES)
-                check(inv.contains(new ItemStack(com.mmorpg.registry.ModItems.get(TutorialKit.set(cls) + "_" + piece))), cls + " : " + piece + " fabrique");
+                { var armor = com.mmorpg.registry.ModItems.get(TutorialKit.set(cls) + "_" + piece); check(inv.hasAnyMatching(st -> st.is(armor)), cls + " : " + piece + " fabrique"); }
             check(d.gold >= gold, "or non negatif");
         } finally {
             mascot.discard();

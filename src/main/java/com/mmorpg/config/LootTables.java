@@ -53,6 +53,38 @@ public class LootTables {
         }
     }
 
+    /** Texte d'aide ecrit en tete de butins.json (JSON n'a pas de commentaires ; la cle est ignoree a la lecture). */
+    public static final String DOC = "Butins des caisses, Lucky Blocks, oeufs/sceaux mystere et coffres de donjon. Une table par cle de 'tables', une ligne par objet : "
+            + "item = identifiant (ou \"or\" pour des pieces), min/max = quantite, weight = poids relatif de tirage (0 = jamais). Maximum " + MAX_ENTRIES + " lignes par table. "
+            + "Modifiable ici (redemarrer le serveur) ou en jeu avec /mmorpg butins.";
+
+    /**
+     * JSON lisible et stable : _doc en tete, tables dans l'ordre de l'editeur (caisses par rarete, Lucky Blocks, mystere, donjons),
+     * un objet par ligne. Le contenu est identique a celui de Gson (seule la mise en page change).
+     */
+    public String toPrettyJson() {
+        com.google.gson.Gson q = new com.google.gson.GsonBuilder().disableHtmlEscaping().create();
+        List<String> order = new ArrayList<>(ALL);
+        order.addAll(dungeonTables());
+        for (String id : tables.keySet()) if (!order.contains(id)) order.add(id);
+        StringBuilder sb = new StringBuilder("{\n  \"_doc\": ").append(q.toJson(DOC)).append(",\n  \"tables\": {\n");
+        boolean firstTable = true;
+        for (String id : order) {
+            List<Entry> list = tables.get(id);
+            if (list == null) continue;
+            if (!firstTable) sb.append(",\n");
+            firstTable = false;
+            sb.append("\n    ").append(q.toJson(id)).append(": [");
+            for (int i = 0; i < list.size(); i++) {
+                Entry x = list.get(i);
+                sb.append(i == 0 ? "\n" : ",\n").append("      { \"item\": ").append(q.toJson(x.item))
+                        .append(", \"min\": ").append(x.min).append(", \"max\": ").append(x.max).append(", \"weight\": ").append(x.weight).append(" }");
+            }
+            sb.append(list.isEmpty() ? "]" : "\n    ]");
+        }
+        return sb.append("\n  }\n}\n").toString();
+    }
+
     public List<Entry> table(String id) {
         return tables.getOrDefault(id, List.of());
     }
