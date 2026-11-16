@@ -492,6 +492,9 @@ public final class MmoHud {
         g.centeredText(f, Component.literal(sub), x + w / 2, y + 24, 0xFFE0A090);
     }
 
+    /** Infobulle de compétence en attente (affichée par l'écran de curseur libre). */
+    public static java.util.List<Component> pendingTip; public static int tipX, tipY;
+
     private static void skillBar(GuiGraphicsExtractor g) {
         PlayerData d = ClientData.DATA;
         if (!d.playerClass.isPlayable() && !HudLayout.editing) return;
@@ -503,6 +506,24 @@ public final class MmoHud {
         Font f = font();
         Ui.rounded(g,x-3,y-3,total+6,slot+6,7,0xB524193A);
         Ui.border(g, x - 3, y - 3, total + 6, slot + 6, Ui.GOLD_DARK);
+        // curseur libre : infobulle de la compétence survolée
+        Skill hovered = null; double amx = 0, amy = 0;
+        var mcx = net.minecraft.client.Minecraft.getInstance();
+        if (mcx.gui.screen() instanceof com.mmorpg.client.FreeCursorScreen) {
+            amx = mcx.mouseHandler.xpos() / mcx.getWindow().getGuiScale(); amy = mcx.mouseHandler.ypos() / mcx.getWindow().getGuiScale();
+            var el = HudLayout.SORTS; var rr = el.rect(g.guiWidth(), g.guiHeight());
+            double lx = (amx - rr[0]) / el.scale(), ly = (amy - rr[1]) / el.scale();
+            for (int i = 0; i < PlayerData.SKILL_SLOTS; i++)
+                if (Ui.in(lx, ly, x + i * (slot + gap), y, slot, slot)) hovered = Skills.get(d.skillBar[i]);
+        }
+        pendingTip = null;
+        if (hovered != null) {
+            var lines = new java.util.ArrayList<Component>();
+            lines.add(Component.literal(hovered.name).withColor(Ui.GOLD));
+            lines.add(Component.literal(hovered.typeLabel() + " · rang " + Math.max(1, d.skillRank(hovered.id)) + " · " + hovered.manaCost + " mana · " + Skill.sec(hovered.cooldown)).withColor(Ui.MUTED));
+            for (String part : hovered.describe(Math.max(1, d.skillRank(hovered.id))).split("\\n")) lines.add(Component.literal(part).withColor(Ui.TEXT));
+            pendingTip = lines; tipX = (int) amx; tipY = (int) amy;
+        }
         for (int i = 0; i < PlayerData.SKILL_SLOTS; i++) {
             int sx = x + i * (slot + gap);
             Ui.rounded(g,sx,y,slot,slot,5,0xB519112C);
