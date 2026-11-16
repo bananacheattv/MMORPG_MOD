@@ -13,6 +13,8 @@ public final class UiFrame {
     public static final int NAV_H = 54;
     /** Hauteur de conception par defaut des ecrans (ancien panneau 440 x 272). */
     public static final int DESIGN_H = 272;
+    /** Echelle minimale du contenu : sur petite fenetre le contenu est reduit pour tenir dans le cadre au lieu de deborder. */
+    public static final float MIN_SCALE = 0.6f;
 
     private UiFrame() {
     }
@@ -27,6 +29,6 @@ public final class UiFrame {
 
     /** Echelle de contenu : le cadre fait toujours la taille de l'inventaire, le contenu est agrandi en proportion. */
     public static float scale(int guiHeight, int designHeight) {
-        return Math.max(1f, height(guiHeight) / (float) Math.max(1, designHeight));
+        return Math.max(MIN_SCALE, height(guiHeight) / (float) Math.max(1, designHeight));
     }
 }

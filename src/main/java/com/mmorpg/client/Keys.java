@@ -28,6 +28,8 @@ public final class Keys {
     public static final KeyMapping CAMERA_NEAR = new KeyMapping("key.mmorpg.camera_near", InputConstants.KEY_PAGEUP, CATEGORY);
     public static final KeyMapping CAMERA_FAR = new KeyMapping("key.mmorpg.camera_far", InputConstants.KEY_PAGEDOWN, CATEGORY);
     public static final KeyMapping ZOOM = new KeyMapping("key.mmorpg.zoom", InputConstants.KEY_C, CATEGORY);
+    /** Maintenu : libère le curseur (caméra figée) pour cliquer les dialogues. */
+    public static final KeyMapping FREE_CURSOR = new KeyMapping("key.mmorpg.free_cursor", InputConstants.KEY_LALT, CATEGORY);
     public static final KeyMapping[] SKILLS = createSkills();
 
     private Keys() {
@@ -57,6 +59,7 @@ public final class Keys {
         event.register(CAMERA_NEAR);
         event.register(CAMERA_FAR);
         event.register(ZOOM);
+        event.register(FREE_CURSOR);
         for (KeyMapping skill : SKILLS) event.register(skill);
     }
 
@@ -65,6 +68,7 @@ public final class Keys {
         Minecraft mc = Minecraft.getInstance();
         QolClient.tick();
         boolean free = mc.player != null && mc.level != null && mc.gui.screen() == null;
+        while (FREE_CURSOR.consumeClick()) if (free && !(mc.gui.screen() instanceof FreeCursorScreen)) mc.gui.setScreen(new FreeCursorScreen());
         while (MAP.consumeClick()) if (free) mc.gui.setScreen(new com.mmorpg.client.screen.WorldMapScreen());
         while (PING.consumeClick()) if (free) QolClient.sendPing();
         while (STREAMER.consumeClick()) {
