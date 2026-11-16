@@ -33,6 +33,9 @@ public final class ClientEvents {
         });
         event.replaceLayer(VanillaGuiLayers.ARMOR_LEVEL, (g, delta) -> {
         });
+        // effets de potion vanilla masques (HUD) ; les effets restent actifs
+        event.replaceLayer(VanillaGuiLayers.EFFECTS, (g, delta) -> {
+        });
         event.replaceLayer(VanillaGuiLayers.TAB_LIST, com.mmorpg.client.hud.PlayerListHud::render);
         event.registerAbove(VanillaGuiLayers.HOTBAR, MMORPG.id("hud"), MmoHud::render);
         event.registerAbove(VanillaGuiLayers.HOTBAR, FishFightClient.LAYER, FishFightClient::render);
@@ -57,6 +60,12 @@ public final class ClientEvents {
             return;
         }
         if (HudLayout.pushVanilla(event.getGuiGraphics(), e)) MOVED.add(event.getName());
+    }
+
+    /** Masque la liste des effets de potion a gauche de l'inventaire. */
+    @SubscribeEvent
+    public static void onInventoryEffects(net.neoforged.neoforge.client.event.ScreenEvent.RenderInventoryMobEffects event) {
+        event.setCanceled(true);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
