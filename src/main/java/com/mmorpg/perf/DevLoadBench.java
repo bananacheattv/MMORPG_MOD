@@ -56,12 +56,13 @@ public final class DevLoadBench {
         int tick = server.getTickCount();
         String[] a = PROP.split(":");
         int players = Integer.parseInt(a[0]), mobs = a.length > 1 ? Integer.parseInt(a[1]) : 30;
+        int far = a.length > 2 ? Integer.parseInt(a[2]) : 0;
         if (setupAt < 0) {
             // la premiere fois, le monde construit ses mines et ses plaines (des minutes) : on attend la fin pour ne mesurer que le jeu
             idle = com.mmorpg.mine.MineManager.building() || com.mmorpg.plains.PlainsManager.building() ? 0 : idle + 1;
             if (idle >= 200) {
                 setupAt = tick;
-                setup(server, players, mobs);
+                setup(server, players, mobs, far);
             }
             return;
         }
@@ -113,7 +114,7 @@ public final class DevLoadBench {
         return c;
     }
 
-    private static void setup(net.minecraft.server.MinecraftServer server, int players, int mobs) {
+    private static void setup(net.minecraft.server.MinecraftServer server, int players, int mobs, int far) {
         if (System.getProperty("mmorpg.loadBenchJfr") != null) {
             try {
                 jfr = new jdk.jfr.Recording(jdk.jfr.Configuration.getConfiguration("profile"));
@@ -122,6 +123,7 @@ public final class DevLoadBench {
                 MMORPG.LOGGER.warn("[LOAD BENCH] JFR indisponible : {}", ex.toString());
             }
         }
+        com.mmorpg.server.FeatureFlags.set(server, "apparition_mobs", false);       // effectif constant pendant la mesure
         var level = server.overworld();
         var random = new Random(42);
         var keys = new ArrayList<String>();
@@ -142,20 +144,20 @@ public final class DevLoadBench {
                 }
             };
             addPlayer(server, bot);
-            bot.setPos(900.5 + (i % 5) * 60, 80, 900.5 + (i / 5) * 60);
+            bot.setPos(900.5 + (i % 5) * 200, 80, 900.5 + (i / 5) * 200);
             level.addNewPlayer(bot);
             bot.setGameMode(GameType.SURVIVAL);
             var d = RpgPlayers.get(bot);
             if (!d.playerClass.isPlayable()) d.playerClass = PlayerClass.GUERRIER;
             d.level = 40;
             BOTS.add(bot);
-            int cx = 900 + (i % 5) * 60, cz = 900 + (i / 5) * 60;     // zones d'ecart : les monstres des bots ne se melangent pas
+            int cx = 900 + (i % 5) * 200, cz = 900 + (i / 5) * 200;     // zones d'ecart : les monstres des bots ne se melangent pas
             level.getChunkAt(new BlockPos(cx, 64, cz));
             int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, cx, cz);
             bot.teleportTo(level, cx + 0.5, y, cz + 0.5, java.util.Set.of(), 0, 0, true);
             bot.setHealth(bot.getMaxHealth());
-            for (int m = 0; m < mobs && !keys.isEmpty(); m++) {
-                double ang = random.nextDouble() * Math.PI * 2, dist = 5 + random.nextDouble() * 14;
+            for (int m = 0; m < mobs + far && !keys.isEmpty(); m++) {
+                double ang = random.nextDouble() * Math.PI * 2, dist = m < mobs ? 5 + random.nextDouble() * 14 : 45 + random.nextDouble() * 12;
                 int x = (int) (cx + Math.cos(ang) * dist), z = (int) (cz + Math.sin(ang) * dist);
                 level.getChunkAt(new BlockPos(x, 64, z));
                 int yy = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);

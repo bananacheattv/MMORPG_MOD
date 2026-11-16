@@ -83,7 +83,25 @@ public abstract class RpgMonster extends Monster implements RpgMob {
         return data;
     }
 
-    @Override public void aiStep(){super.aiStep();if(level() instanceof ServerLevel server)MobCooperation.tick(this,server);}
+    /** Vrai quand aucun joueur n'est a moins de 40 blocs (recalcule une fois par seconde) : le monstre n'a rien a faire d'important. */
+    private boolean farFromPlayers;
+
+    private static final boolean NO_DORMANT = Boolean.getBoolean("mmorpg.noDormant");       // comparaisons de performance uniquement
+
+    private boolean dormant() {
+        if (NO_DORMANT) return false;
+        if (this.tickCount % 20 == (this.getId() & 15)) {
+            farFromPlayers = this.level().getNearestPlayer(this, 40.0) == null;
+        }
+        // seulement au repos (pas de cible, au sol, pas de degats recents) ; en cas de doute le monstre garde son comportement normal
+        return farFromPlayers && this.getTarget() == null && this.onGround() && this.hurtTime == 0 && this.tickCount > 40;
+    }
+
+    @Override public void aiStep(){
+        // monstre loin de tout joueur : un tick sur quatre seulement (IA, deplacements, collisions), sans changer ce que voit un joueur proche
+        if (!this.level().isClientSide() && dormant() && (this.tickCount + this.getId()) % 4 != 0) return;
+        super.aiStep();if(level() instanceof ServerLevel server)MobCooperation.tick(this,server);
+    }
 
     public MobData rpgData() {
         return this.getExistingDataOrNull(ModAttachments.MOB);
