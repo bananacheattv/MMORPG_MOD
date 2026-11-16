@@ -45,7 +45,8 @@ public final class SharedArenaQueue {
         if(!NetworkConfig.current.enabled||server.getTickCount()%20!=0)return;
         try {
             long now=System.currentTimeMillis();
-            cached=access(server,s->{
+            boolean idle=SharedLedger.read(server,"arena-queue",State.class,State::new,st->st.queue.isEmpty()&&st.matches.isEmpty());      // file vide : rien a coordonner, pas de verrou ni d'ecriture
+            cached=idle?new State():access(server,s->{
                 for(var p:server.getPlayerList().getPlayers()){var e=s.queue.get(p.getUUID());if(e!=null){if(ArenaRules.bracket(RpgPlayers.get(p).level)!=e.bracket||p.isCreative()||p.isSpectator())s.queue.remove(p.getUUID());else e.seen=now;}}
                 s.queue.values().removeIf(e->now-e.seen>20000);
                 s.matches.removeIf(m->now>m.deadline||(m.started&&NetworkConfig.hosts(NetworkConfig.Role.DUNGEONS)&&!ArenaManager.hasShared(m.id)));

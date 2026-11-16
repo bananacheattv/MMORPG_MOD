@@ -69,6 +69,7 @@ public final class GroupTravel {
         if(!NetworkConfig.current.enabled||server.getTickCount()%10!=0)return;
         try {
             SharedParties.refresh();var departures=new ArrayList<Map.Entry<ServerPlayer,Trip>>();
+            if(!SharedLedger.read(server,"group-travel",State.class,State::new,st->!st.trips.isEmpty()))return;      // aucun depart de groupe en cours : pas de verrou ni d'ecriture
             SharedLedger.access(server,"group-travel",State.class,State::new,s->{
                 long now=System.currentTimeMillis();
                 for(var t:s.trips){

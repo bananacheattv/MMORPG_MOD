@@ -58,7 +58,7 @@ public final class BossTerrain {
         try{
         for(var id:new ArrayList<>(PENDING.keySet())){var p=PENDING.get(id);var boss=p.level().getEntity(id);if(boss==null||!boss.isAlive()){PENDING.remove(id);continue;}if(p.level().getGameTime()>=p.at()){PENDING.remove(id);change(p,id);}}
         if(e.getServer().getTickCount()%100==0&&com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.DUNGEONS)){
-            var ids=com.mmorpg.network.SharedLedger.access(e.getServer(),"boss-terrain",Journal.class,Journal::new,j->new ArrayList<>(j.battles.keySet()));
+            var ids=com.mmorpg.network.SharedLedger.read(e.getServer(),"boss-terrain",Journal.class,Journal::new,j->new ArrayList<>(j.battles.keySet()));
             for(var id:ids){boolean alive=false;for(var level:e.getServer().getAllLevels()){var boss=level.getEntity(UUID.fromString(id));if(boss!=null&&boss.isAlive()){alive=true;break;}}if(!alive)restore(e.getServer(),id);}
         }
         }catch(IllegalStateException ex){com.mmorpg.MMORPG.LOGGER.warn("[MMORPG] Terrain des boss : journal indisponible ({})",ex.getMessage());}

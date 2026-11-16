@@ -168,8 +168,13 @@ public class PetEntity extends Entity implements ItemSupplier {
         }
         net.minecraft.world.entity.item.ItemEntity loot = null;
         if (owner instanceof net.minecraft.server.level.ServerPlayer sp) {
-            loot = com.mmorpg.server.PetLoot.target(this, sp);
-            this.entityData.set(LOOT_TARGET,loot==null?-1:loot.getId());
+            // la recherche d'objets a ramasser (balayage des entites + test d'inventaire) se fait tous les 5 ticks ; entre deux, la cible trouvee est conservee
+            if (this.tickCount % 5 == 0) {
+                loot = com.mmorpg.server.PetLoot.target(this, sp);
+                this.entityData.set(LOOT_TARGET,loot==null?-1:loot.getId());
+            } else if (this.level().getEntity(this.entityData.get(LOOT_TARGET)) instanceof net.minecraft.world.entity.item.ItemEntity item && item.isAlive()) {
+                loot = item;
+            }
         } else if (this.level().getEntity(this.entityData.get(LOOT_TARGET)) instanceof net.minecraft.world.entity.item.ItemEntity item) {
             loot=item;
         }

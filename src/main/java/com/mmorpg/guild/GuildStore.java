@@ -52,7 +52,21 @@ public final class GuildStore {
         validate(state);state.revision++;Path temp=Files.createTempFile(file.getParent(),"guilds-",".tmp");
         try{Files.writeString(temp,JSON.toJson(state));try(var c=FileChannel.open(temp,StandardOpenOption.WRITE)){c.force(true);}if(Files.exists(file))Files.copy(file,file.resolveSibling("guilds.json.bak"),StandardCopyOption.REPLACE_EXISTING);Files.move(temp,file,StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.ATOMIC_MOVE);}finally{Files.deleteIfExists(temp);}
     }
+    /** Copie lue du registre (lectures seules, jamais modifiee) : evite de relire, reparser et revalider tout le registre pour chaque joueur toutes les quelques secondes. */
+    private static volatile State readCache;
+    private static volatile long readCacheAt;
+    private static volatile long readCacheStamp;
+    private static final long READ_TTL_MS=1500;
+    private static long stamp(MinecraftServer server){try{var f=directory(server).resolve("guilds.json");return Files.exists(f)?Files.getLastModifiedTime(f).toMillis()*31+Files.size(f):-1;}catch(java.io.IOException e){return -2;}}
     public static synchronized <T>T access(MinecraftServer server,boolean write,Function<State,T> action){
+        boolean db=com.mmorpg.db.SharedDocs.useDb();
+        if(write)readCache=null;
+        else{var c=readCache;if(c!=null&&System.currentTimeMillis()-readCacheAt<READ_TTL_MS&&(db||stamp(server)==readCacheStamp))return action.apply(c);}
+        long st=!write&&!db?stamp(server):0;
+        Function<State,T> act=write?action:state->{readCache=state;readCacheAt=System.currentTimeMillis();readCacheStamp=st;return action.apply(state);};
+        return access0(server,write,act);
+    }
+    private static <T>T access0(MinecraftServer server,boolean write,Function<State,T> action){
         if(com.mmorpg.db.SharedDocs.useDb())return com.mmorpg.db.SharedDocs.access("guilds",State.class,State::new,directory(server).resolve("guilds.json"),write,state->{
             try{validate(state);}catch(RuntimeException e){throw new IllegalStateException("Registre de guildes illisible : intervention administrateur nécessaire",e);}
             T result=action.apply(state);if(write){validate(state);state.revision++;}return result;});

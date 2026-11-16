@@ -25,6 +25,14 @@ public final class SharedDocs {
     private SharedDocs() {
     }
 
+    /** Copie recente d'un document (lectures sans ecriture) : evite un aller-retour base bloquant a chaque sondage du serveur. */
+    private static final long READ_TTL_MS = 1000;
+    private static final long FAIL_BACKOFF_MS = 3000;
+    private record Cached(String data, long at) {
+    }
+    private static final java.util.concurrent.ConcurrentHashMap<String, Cached> CACHE = new java.util.concurrent.ConcurrentHashMap<>();
+    private static volatile long failUntil;
+
     /** Vrai quand les documents partages vivent dans la base (activee et {@code syncShared}). */
     public static boolean active() {
         return Database.enabled() && Database.config().syncShared;
@@ -43,6 +51,27 @@ public final class SharedDocs {
      * @throws IllegalStateException si la base est injoignable ou occupee (rien n'est ecrit)
      */
     public static <S, T> T access(String name, Type type, Supplier<S> empty, Path legacy, boolean write, Function<S, T> action) {
+        if (System.currentTimeMillis() < failUntil) throw new IllegalStateException("Base de donnees indisponible : " + name);   // base en panne : pas de nouvelle attente de plusieurs secondes sur le thread du serveur
+        if (!write) {
+            // lecture seule : une copie de moins d'une seconde, sinon une seule requete sans verrou (au lieu de verrou + lecture + liberation)
+            Cached c = CACHE.get(name);
+            String json = c != null && System.currentTimeMillis() - c.at() < READ_TTL_MS ? c.data() : null;
+            if (json == null) {
+                Doc d = read(name);
+                if (d == null) {
+                    failUntil = System.currentTimeMillis() + FAIL_BACKOFF_MS;
+                    throw new IllegalStateException("Base de donnees indisponible : " + name);
+                }
+                json = d.data();
+                if (json != null) CACHE.put(name, new Cached(json, System.currentTimeMillis()));
+            }
+            if (json != null) {
+                S state = GSON.fromJson(json, type);
+                if (state == null) throw new IllegalStateException("Document vide : " + name);
+                return action.apply(state);
+            }
+            // document absent : l'ancien fichier est peut-etre a importer, voie complete ci-dessous
+        }
         final String lock = "aeloria:" + name;
         // lecture abandonnee (delai depasse) mais finie plus tard : le verrou pris doit etre rendu, par la tache ou par l'appelant
         final java.util.concurrent.atomic.AtomicBoolean claimed = new java.util.concurrent.atomic.AtomicBoolean();
@@ -68,6 +97,7 @@ public final class SharedDocs {
                 release(c, lock);
                 return null;
             });
+            failUntil = System.currentTimeMillis() + FAIL_BACKOFF_MS;
             throw new IllegalStateException("Base de donnees indisponible : " + name);
         }
         boolean released = false;
@@ -85,7 +115,9 @@ public final class SharedDocs {
             S state = json == null ? empty.get() : GSON.fromJson(json, type);
             if (state == null) throw new IllegalStateException("Document vide : " + name);
             T result = action.apply(state);
-            if (write || migrated) {
+            if ((write || migrated) && !migrated && json != null && GSON.toJson(state, type).equals(json)) {
+                CACHE.put(name, new Cached(json, System.currentTimeMillis()));     // rien n'a change : pas d'ecriture, juste la liberation du verrou
+            } else if (write || migrated) {
                 final String out = GSON.toJson(state, type);
                 final long rev = row.revision();
                 final boolean existed = row.data() != null;
@@ -112,7 +144,11 @@ public final class SharedDocs {
                     return n == 1;
                 });
                 released = true;
-                if (ok == null || !ok) throw new IllegalStateException("Ecriture refusee dans la base : " + name);
+                if (ok == null || !ok) {
+                    CACHE.remove(name);
+                    throw new IllegalStateException("Ecriture refusee dans la base : " + name);
+                }
+                CACHE.put(name, new Cached(out, System.currentTimeMillis()));
                 if (migrated) {
                     try {
                         Files.move(legacy, legacy.resolveSibling(legacy.getFileName() + ".migre"), StandardCopyOption.REPLACE_EXISTING);
@@ -221,6 +257,7 @@ public final class SharedDocs {
 
     /** Ecrit (remplace) un document sans attendre : pour les donnees tenues par un seul serveur (hotel des ventes). */
     public static void put(String name, String json) {
+        CACHE.remove(name);
         Database.fire("ecriture de " + name, c -> {
             try (PreparedStatement ps = c.prepareStatement("INSERT INTO shared_docs (name, data, revision) VALUES (?,?,1) "
                     + "ON DUPLICATE KEY UPDATE data = VALUES(data), revision = revision + 1")) {

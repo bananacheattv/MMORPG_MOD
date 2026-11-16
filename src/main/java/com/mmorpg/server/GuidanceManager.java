@@ -23,6 +23,16 @@ public final class GuidanceManager {
         var server=event.getServer();if(server.getTickCount()%20!=0)return;
         for(var p:server.getPlayerList().getPlayers())send(p,false);
     }
+    /** Les balayages d'entites du guidage (jusqu'a 160 blocs autour du joueur) sont couteux : le resultat est garde 3 secondes (ou jusqu'a la mort de l'entite trouvee). */
+    private record Hit(long at,String key,net.minecraft.world.level.Level level,net.minecraft.world.entity.Entity found){}
+    private static final Map<String,Hit> HITS=new HashMap<>();
+    @SuppressWarnings("unchecked")
+    private static <E extends net.minecraft.world.entity.Entity> Optional<E> scan(ServerPlayer p,String key,java.util.function.Supplier<Optional<E>> find){
+        String id=p.getUUID()+key.substring(0,Math.min(key.length(),5));long now=p.level().getGameTime();var old=HITS.get(id);
+        if(old!=null&&old.key().equals(key)&&old.level()==p.level()&&now-old.at()<60&&(old.found()==null||old.found().isAlive()&&!old.found().isRemoved()))return Optional.ofNullable((E)old.found());
+        var result=find.get();HITS.put(id,new Hit(now,key,p.level(),result.orElse(null)));return result;
+    }
+    @net.neoforged.bus.api.SubscribeEvent public static void forgetHits(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent e){String id=e.getEntity().getUUID().toString();HITS.keySet().removeIf(k->k.startsWith(id));}
     public static void refresh(ServerPlayer p){send(p,true);}
     private static void send(ServerPlayer p,boolean force){
         long now=p.level().getServer().getTickCount();var target=resolve(p);var data=target==null?new CompoundTag():target.tag();var old=SENT.get(p.getUUID());
@@ -70,13 +80,13 @@ public final class GuidanceManager {
         if(o.navigation!=null){var n=o.navigation;return route(p,new Target("quest",q.name,"Rejoindre l’objectif",n.dimension,new Vec3(n.x,n.y,n.z),n.backend.isEmpty()?NetworkConfig.current.role.name():n.backend));}
         if(o.type.equals("collect")){
             var item=com.mmorpg.crafting.ForgeRecipes.resolveItem(o.target);
-            var dropped=p.level().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,p.getBoundingBox().inflate(64),e->e.isAlive()&&e.getItem().is(item)&&(e.getOwner()==null||e.getOwner()==p)&&e.entityTags().stream().noneMatch(tag->tag.startsWith("aeloria_loot:")&&!tag.equals(PetLoot.tag(p)))).stream().min(Comparator.comparingDouble(p::distanceToSqr));
+            var dropped=scan(p,"item:"+o.target,()->p.level().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,p.getBoundingBox().inflate(64),e->e.isAlive()&&e.getItem().is(item)&&(e.getOwner()==null||e.getOwner()==p)&&e.entityTags().stream().noneMatch(tag->tag.startsWith("aeloria_loot:")&&!tag.equals(PetLoot.tag(p)))).stream().min(Comparator.comparingDouble(p::distanceToSqr)));
             if(dropped.isPresent())return new Target("quest",q.name,"Ramasser les objets",dim(p),dropped.get().position());
         }
         Set<String> wanted=new HashSet<>();if(o.type.equals("kill"))wanted.add(o.target.replace("mmorpg:",""));
         else if(o.type.equals("collect"))ConfigManager.mobs().forEach((key,cfg)->{if(cfg.drops.stream().anyMatch(drop->drop.chance>0&&!VanillaMobDrops.vanilla(drop.item)&&sameItem(drop.item,o.target)))wanted.add(key);});
         if(!wanted.isEmpty()){
-            var mob=p.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class,p.getBoundingBox().inflate(80,40,80),m->m.isAlive()&&!(m instanceof com.mmorpg.entity.NpcEntity)&&!(m instanceof com.mmorpg.entity.hub.ClassMasterEntity)&&!(m instanceof com.mmorpg.entity.dummy.TrainingDummyEntity)&&matches(m,wanted)).stream().min(Comparator.comparingDouble(p::distanceToSqr));
+            var mob=scan(p,"mob:"+new TreeSet<>(wanted),()->p.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class,p.getBoundingBox().inflate(80,40,80),m->m.isAlive()&&!(m instanceof com.mmorpg.entity.NpcEntity)&&!(m instanceof com.mmorpg.entity.hub.ClassMasterEntity)&&!(m instanceof com.mmorpg.entity.dummy.TrainingDummyEntity)&&matches(m,wanted)).stream().min(Comparator.comparingDouble(p::distanceToSqr)));
             if(mob.isPresent())return new Target("quest",q.name,o.type.equals("collect")?"Récupérer le butin":"Vaincre la cible",dim(p),mob.get().position());
             var region=region(p,q,wanted);if(region!=null)return region;
         }
@@ -119,7 +129,7 @@ public final class GuidanceManager {
         int r=com.mmorpg.plains.PlainsManager.regionOf(p);if(r>=0){var l=com.mmorpg.plains.PlainsLayout.get(r);return new Target("quest",title,"Portail de retour au spawn",dim(p),new Vec3(l.x0()+com.mmorpg.plains.PlainsLayout.PLAZA_X+.5,com.mmorpg.plains.PlainsLayout.BASE+1,com.mmorpg.plains.PlainsLayout.Z0+com.mmorpg.plains.PlainsBuilder.ARCH_Z+1));}
         r=com.mmorpg.mine.MineManager.regionOf(p);if(r>=0){var l=com.mmorpg.mine.MineLayout.get(r);return new Target("quest",title,"Portail de retour au spawn",dim(p),new Vec3(l.x0()+com.mmorpg.mine.MineLayout.PLAZA_X+.5,l.floor(com.mmorpg.mine.MineLayout.PLAZA_X,com.mmorpg.mine.MineLayout.PLAZA_Z)+1,com.mmorpg.mine.MineLayout.Z0+com.mmorpg.mine.MineLayout.PLAZA_Z-11));}
         var hub=HubData.get(p.level().getServer());if(hub.exists()&&p.level().dimension().equals(hub.dimension()))return new Target("quest",title,"Portail du spawn",dim(p),Vec3.atCenterOf(hub.originAt(p.getX()).offset(HubPortals.HUB_GATE_X,0,0)));
-        var passer=p.level().getEntitiesOfClass(com.mmorpg.entity.NpcEntity.class,p.getBoundingBox().inflate(160),n->n.role()==com.mmorpg.entity.NpcEntity.Role.SORTIE).stream().min(Comparator.comparingDouble(p::distanceToSqr));if(passer.isPresent())return new Target("quest",title,"Passeur · Retour au spawn",dim(p),passer.get().position());
+        var passer=scan(p,"passer",()->p.level().getEntitiesOfClass(com.mmorpg.entity.NpcEntity.class,p.getBoundingBox().inflate(160),n->n.role()==com.mmorpg.entity.NpcEntity.Role.SORTIE).stream().min(Comparator.comparingDouble(p::distanceToSqr)));if(passer.isPresent())return new Target("quest",title,"Passeur · Retour au spawn",dim(p),passer.get().position());
         if(NetworkConfig.current.role==NetworkConfig.Role.MAIN)return null;
         var placed=com.mmorpg.world.AdventurePortalData.get(p.level().getServer()).all().stream().filter(a->a.dimension().equals(p.level().dimension())&&a.kind().equals("spawn")).findFirst();return placed.map(a->new Target("quest",title,"Portail du spawn",dim(p),Vec3.atCenterOf(a.pos()))).orElse(null);
     }

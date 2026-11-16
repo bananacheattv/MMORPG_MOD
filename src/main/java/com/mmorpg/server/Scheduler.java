@@ -65,16 +65,26 @@ public final class Scheduler {
             TASKS.addAll(PENDING);
             PENDING.clear();
         }
-        Iterator<Task> it = TASKS.iterator();
-        while (it.hasNext()) {
-            Task t = it.next();
+        if (TASKS.isEmpty()) return;
+        // une seule passe : retirer les taches une par une d'une ArrayList decale tout le reste a chaque retrait (quadratique avec beaucoup d'effets en attente)
+        List<Task> due = null;
+        int keep = 0;
+        for (int i = 0, n = TASKS.size(); i < n; i++) {
+            Task t = TASKS.get(i);
             if (t.level.getGameTime() >= t.runAt) {
-                it.remove();
-                try {
-                    t.action.run();
-                } catch (Exception e) {
-                    com.mmorpg.MMORPG.LOGGER.error("[MMORPG] Erreur dans une tâche différée", e);
-                }
+                if (due == null) due = new ArrayList<>();
+                due.add(t);
+            } else {
+                TASKS.set(keep++, t);
+            }
+        }
+        if (due == null) return;
+        TASKS.subList(keep, TASKS.size()).clear();
+        for (Task t : due) {
+            try {
+                t.action.run();
+            } catch (Exception e) {
+                com.mmorpg.MMORPG.LOGGER.error("[MMORPG] Erreur dans une tâche différée", e);
             }
         }
     }

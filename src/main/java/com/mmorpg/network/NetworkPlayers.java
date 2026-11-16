@@ -296,8 +296,12 @@ public final class NetworkPlayers {
     }
 
     public static void tick(net.minecraft.server.MinecraftServer server) {
-        if (!NetworkConfig.current.enabled || server.getTickCount() % 600 != 0) return;
-        for (ServerPlayer p : server.getPlayerList().getPlayers()) save(p);
+        if (!NetworkConfig.current.enabled || server.getTickCount() % 20 != 0) return;
+        // une sauvegarde par joueur toutes les 30 s, etalees d'un joueur a l'autre et ecrites hors du thread du serveur (avant : tous les joueurs d'un coup, compression et fsync dans le tick)
+        long sec = server.getTickCount() / 20;
+        for (ServerPlayer p : server.getPlayerList().getPlayers()) {
+            if ((sec + Math.floorMod(p.getUUID().hashCode(), 30)) % 30 == 0) saveAsync(p);
+        }
     }
 
     /** True means this destination belongs to another server, including a refused/failed transfer. */

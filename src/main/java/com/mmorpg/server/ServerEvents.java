@@ -33,6 +33,8 @@ public final class ServerEvents {
     public static void onServerStarted(net.neoforged.neoforge.event.server.ServerStartedEvent event) {
         event.getServer().getGameRules().set(net.minecraft.world.level.gamerules.GameRules.KEEP_INVENTORY, true, event.getServer());
         event.getServer().getGameRules().set(net.minecraft.world.level.gamerules.GameRules.NATURAL_HEALTH_REGENERATION, false, event.getServer());
+        // les apparitions naturelles vanilla sont toutes annulees par OpenWorldRules : autant ne pas les calculer (balayage de chaque chunk a chaque tick) ; MobSpawner fait les apparitions du mod
+        event.getServer().getGameRules().set(net.minecraft.world.level.gamerules.GameRules.SPAWN_MOBS, false, event.getServer());
         // monde neuf : le hub est construit tout seul (un peu apres le demarrage), la premiere connexion s'y fait toujours
         // distance de rendu : 64 demandee, mais Minecraft plafonne a 32 (ChunkMap) -> on met le maximum possible
         event.getServer().getPlayerList().setViewDistance(32);

@@ -20,7 +20,7 @@ public final class AdminTravel {
     public static final class Ticket {public UUID id=UUID.randomUUID(),player,target;public long expires=System.currentTimeMillis()+30000;}
     public static final class State {public Map<UUID,Location> players=new HashMap<>();public Map<UUID,Ticket> tickets=new HashMap<>();}
     public static void tick(net.minecraft.server.MinecraftServer server){
-        if(!NetworkConfig.current.enabled||server.getTickCount()%20!=0)return;
+        if(!NetworkConfig.current.enabled||server.getTickCount()%60!=0)return;
         try{SharedLedger.access(server,"admin-travel",State.class,State::new,s->{
             long now=System.currentTimeMillis();s.players.values().removeIf(x->now-x.seen>10000);s.tickets.values().removeIf(t->now>t.expires);
             for(var p:server.getPlayerList().getPlayers()){Location l=new Location();l.id=p.getUUID();l.name=p.getName().getString();l.role=NetworkConfig.current.role;l.seen=now;s.players.put(l.id,l);}return null;

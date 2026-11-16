@@ -15,12 +15,21 @@ public final class ImportedMobEntity extends SmartMonster {
         super(type, level, BuiltInRegistries.ENTITY_TYPE.getKey(type).getPath());
     }
 
+    private ImportedMobs.Entry cachedEntry;
+    private boolean entryKnown;
+
+    /** Fiche du monstre : cherchee une seule fois (avant, un parcours de toute la liste a chaque tick, par monstre). */
     public ImportedMobs.Entry entry() {
+        if (entryKnown) return cachedEntry;
         String key = BuiltInRegistries.ENTITY_TYPE.getKey(this.getType()).getPath();
         for (ImportedMobs.Entry e : ImportedMobs.ALL) {
-            if (e.key().equals(key)) return e;
+            if (e.key().equals(key)) {
+                cachedEntry = e;
+                break;
+            }
         }
-        return null;
+        entryKnown = true;
+        return cachedEntry;
     }
 
     /** Les monstres en lévitation flottent juste au-dessus du sol (rendu) mais se déplacent comme les autres. */

@@ -18,12 +18,15 @@ public final class SharedLedger {
             try (var channel = FileChannel.open(directory.resolve(name + ".lock"), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
                  var lock = channel.lock()) {
                 Path file = directory.resolve(name + ".json");
-                S state = Files.exists(file) ? JSON.fromJson(Files.readString(file), type) : empty.get();
+                String before = Files.exists(file) ? Files.readString(file) : null;
+                S state = before != null ? JSON.fromJson(before, type) : empty.get();
                 if (state == null) throw new IllegalStateException("Registre vide : " + name);
                 T result = action.apply(state);
+                String after = JSON.toJson(state);
+                if (before != null && after.equals(before)) return result;       // inchange : ni ecriture, ni fsync, ni copie de secours
                 Path temp = Files.createTempFile(directory, name, ".tmp");
                 try {
-                    Files.writeString(temp, JSON.toJson(state));
+                    Files.writeString(temp, after);
                     try(var output=FileChannel.open(temp,StandardOpenOption.WRITE)){output.force(true);}
                     if(Files.exists(file))Files.copy(file,file.resolveSibling(name+".json.bak"),StandardCopyOption.REPLACE_EXISTING);
                     int retries=0;while(true){try{Files.move(temp,file,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);break;}
