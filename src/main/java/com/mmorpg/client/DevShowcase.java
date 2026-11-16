@@ -1424,6 +1424,10 @@ public final class DevShowcase {
             DevFlammecheShowcase.phase(mc);
             return;
         }
+        if (MODE.equals("nameplate")) {       // pseudo + badge de rang au-dessus d'un joueur
+            nameplatePhase(mc);
+            return;
+        }
         if (MODE.equals("mascotte")) {        // la Mascotte du tutoriel et sa bulle de dialogue
             mascotPhase(mc, me);
             return;
@@ -4311,6 +4315,35 @@ public final class DevShowcase {
         }
         if (t == 140) shot(mc, "mascotte");
         if (t == 150) stop(mc);
+    }
+
+    private static int npTick, npWait; private static net.minecraft.client.player.RemotePlayer npEntity;
+    private static void nameplatePhase(Minecraft mc) {
+        if (com.mmorpg.client.LoadingClient.active()) return;
+        if (mc.gui.screen() instanceof com.mmorpg.client.screen.CharacterSelectScreen cs) { if (++npWait == 40) try { var m = cs.getClass().getDeclaredMethod("play"); m.setAccessible(true); m.invoke(cs); } catch (Exception ex) { throw new RuntimeException(ex); } return; }
+        if (mc.gui.screen() != null) return;
+        int t = ++npTick;
+        if (t == 5) mc.getWindow().setWindowed(1280, 720);
+        if (t == 30) {
+            var prof = new com.mojang.authlib.GameProfile(java.util.UUID.nameUUIDFromBytes("BlazzVirus".getBytes()), "BlazzVirus");
+            npEntity = new net.minecraft.client.player.RemotePlayer(mc.level, prof);
+            npEntity.setId(-7000);
+            var d = npEntity.getData(com.mmorpg.registry.ModAttachments.PUBLIC);
+            d.rankLabel = "Modérateur"; d.rankColor = 0xFF5555;
+            mc.player.setYRot(0); mc.player.setXRot(0);
+            npEntity.setPos(mc.player.getX(), mc.player.getY(), mc.player.getZ() + 3);
+            npEntity.setYRot(180); npEntity.setYBodyRot(180); npEntity.setYHeadRot(180);
+            mc.level.addEntity(npEntity);
+        }
+        double[] dist = {3, 8, 16};
+        if (t >= 60 && t < 60 + 90 * dist.length) {
+            int k = (t - 60) / 90, r = (t - 60) % 90;
+            if (r == 0) { npEntity.setPos(mc.player.getX(), mc.player.getY(), mc.player.getZ() + dist[k]); npEntity.xo = npEntity.getX(); npEntity.yo = npEntity.getY(); npEntity.zo = npEntity.getZ(); }
+            if (r == 60) shot(mc, "nameplate_" + (int) dist[k] + "m");
+        }
+        if (t == 60 + 90 * dist.length) { mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK); }
+        if (t == 60 + 90 * dist.length + 40) shot(mc, "nameplate_3e_personne");
+        if (t == 60 + 90 * dist.length + 50) stop(mc);
     }
 
     private static int skinTick, skinWait;
