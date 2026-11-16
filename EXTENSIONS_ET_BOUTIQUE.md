@@ -50,13 +50,14 @@ Commandes réservées au propriétaire/opérateur de niveau 4 :
 
 Les badges staff n’accordent pas automatiquement les permissions opérateur. Celles-ci restent contrôlées par les outils d’administration habituels. La rune de classe s’utilise au spawn, hors combat ; elle conserve niveau et expérience, réinitialise compétences et attributs, puis ouvre le choix de classe.
 
-## Futur site : passerelle préparée, paiements désactivés
+## Site : passerelle crédits (paiements désactivés par défaut)
 
-`paymentBridgeEnabled` vaut `false` et `websiteUrl` est vide par défaut. Aucun paiement réel ni coordonnées bancaires ne sont traités par le mod. Les packs de crédits sont configurables ; le prix en argent et le prestataire de paiement seront définis avec le site.
+`paymentBridgeEnabled` vaut `false` et `websiteUrl` est vide par défaut. Aucun paiement réel ni coordonnées bancaires ne sont traités par le mod. Les packs de crédits sont configurables ; les prix en argent sont dans `backend/packs.json`.
 
-Quand le backend web sera prêt, il devra vérifier le paiement auprès du prestataire avant de signer la livraison. Activer la passerelle sur le serveur principal et définir la variable d’environnement `AELORIA_CREDIT_SECRET` (au moins 32 caractères). Redémarrer pour appliquer l’activation ou le port.
+Le back-end web (`backend/`, voir `backend/README.md`) vérifie le paiement auprès du prestataire avant de signer la livraison. Activer la passerelle sur le serveur principal et définir la variable d’environnement `AELORIA_CREDIT_SECRET` (au moins 32 caractères). Redémarrer pour appliquer l’activation ou le port.
 
 - Adresse locale : `POST http://127.0.0.1:8099/credits`, exclusivement sur loopback.
+- Solde : `POST http://127.0.0.1:8099/balance` avec `{"player":"UUID","timestamp":…}`, même signature ; réponse `{"ok":true,"credits":1200}` (affiché sur le site et le launcher).
 - Corps JSON UTF-8 : `{"player":"UUID","pack":"decouverte","payment":"identifiant-du-paiement","timestamp":1793000000}`.
 - En-tête `X-Aeloria-Signature` : HMAC-SHA256 hexadécimal du corps exact, signé avec le secret.
 - Tolérance d’horodatage : cinq minutes. Le serveur calcule les crédits depuis son pack, jamais depuis un montant envoyé par le navigateur.

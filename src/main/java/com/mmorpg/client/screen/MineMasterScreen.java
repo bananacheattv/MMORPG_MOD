@@ -20,6 +20,7 @@ import java.util.Locale;
  * ses informations ; une zone verrouillee se debloque en trouvant le portail cache de la precedente.
  */
 public class MineMasterScreen extends MmoScreen {
+    @Override protected boolean hasNav() { return false; }
     private final int npc;
     private final String npcName;
     private final String tagline;

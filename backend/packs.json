@@ -1,0 +1,8 @@
+{
+  "currency": "eur",
+  "packs": [
+    { "id": "decouverte", "name": "Pack Découverte", "credits": 500, "price": 499 },
+    { "id": "aventurier", "name": "Pack Aventurier", "credits": 1200, "price": 999, "bonus": "+20 %" },
+    { "id": "legende", "name": "Pack Légende", "credits": 3000, "price": 1999, "bonus": "+50 %", "highlight": true }
+  ]
+}

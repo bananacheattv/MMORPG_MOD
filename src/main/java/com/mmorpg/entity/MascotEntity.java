@@ -85,6 +85,22 @@ public final class MascotEntity extends NpcEntity {
         // aucune IA : la position et le regard sont pilotes par MascotGuide
     }
 
+    /** Flammeche n'est envoyee qu'a son proprietaire : aucun autre joueur ne voit l'entite ni son nom. */
+    @Override
+    public boolean broadcastToPlayer(net.minecraft.server.level.ServerPlayer player) {
+        return player.getId() == ownerId();
+    }
+
+    /** Aucune hitbox cote serveur : ni collision, ni poussee, ni ciblage, ni projectile (le client du proprietaire garde le clic). */
+    @Override public boolean isPickable() { return level().isClientSide(); }
+    @Override public boolean canBeCollidedWith(net.minecraft.world.entity.Entity other) { return false; }
+    @Override public boolean isPushable() { return false; }
+    @Override public void push(net.minecraft.world.entity.Entity entity) { }
+    @Override public boolean isAttackable() { return false; }
+    @Override public boolean canBeHitByProjectile() { return false; }
+    @Override public boolean isInvulnerable() { return true; }
+    @Override public boolean ignoreExplosion(net.minecraft.world.level.Explosion explosion) { return true; }
+
     @Override
     public boolean shouldBeSaved() {
         return false;

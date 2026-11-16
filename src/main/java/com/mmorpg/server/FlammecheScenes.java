@@ -96,6 +96,11 @@ public final class FlammecheScenes {
         return false;
     }
 
+    /** Flammeche (oeuf, eclosion, Eveils, mascotte) n'existe que sur le serveur principal du reseau (ou en solo). */
+    public static boolean mainServer() {
+        return com.mmorpg.network.NetworkConfig.hosts(com.mmorpg.network.NetworkConfig.Role.MAIN);
+    }
+
     /** Une scene est en cours : la Mascotte ne suit pas et ne doit pas etre retiree. */
     public static boolean busy(ServerPlayer p) {
         return SCENES.containsKey(p.getUUID());
@@ -123,7 +128,7 @@ public final class FlammecheScenes {
     /** Fin d'une quete du lore : Eveil (le dragonnet grandit). */
     public static void onFinish(ServerPlayer p, QuestDef q) {
         int stage = stageOf(q);
-        if (stage < 2 || q.lore == null || !q.lore.companion.contains("plus grand")) return;
+        if (!mainServer() || stage < 2 || q.lore == null || !q.lore.companion.contains("plus grand")) return;
         MascotEntity m = MascotGuide.ensure(p);
         if (m == null) return;
         Scene s = new Scene(Kind.AWAKEN);
@@ -150,6 +155,7 @@ public final class FlammecheScenes {
     @SubscribeEvent
     public static void tick(ServerTickEvent.Post event) {
         var server = event.getServer();
+        if (!mainServer()) { SCENES.clear(); return; }
         for (ServerPlayer p : server.getPlayerList().getPlayers()) {
             PlayerData d = RpgPlayers.get(p);
             Scene s = SCENES.get(p.getUUID());

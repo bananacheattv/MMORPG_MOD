@@ -129,7 +129,7 @@ public final class DevShowcase {
             return;
         }
         if(MODE.equals("perf")){DevPerfBench.phase(mc);return;}
-        if(MODE.equals("ui_frames")){DevUiFrames.tick(mc);return;}
+        if(MODE.equals("ui_frames")){DevUiFrames.tick(mc);return;}if(MODE.equals("pnj_ui")){if(!pnjInit){pnjInit=true;DevUiFrames.pnjMode();}DevUiFrames.tick(mc);return;}
         if(MODE.equals("outils_retires")){DevToolsRemoved.tick(mc);return;}
         if(MODE.equals("pvp_polish")){DevPvpVisual.tick(mc);return;}
         if(MODE.equals("trade")){DevTradeVisual.tick(mc);return;}
@@ -290,6 +290,12 @@ public final class DevShowcase {
             if(tick==290)ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.CINEMA);
             if(tick==320)shot(mc,"shaders_cinema");
             if(tick==330){ClientConfig.SHADER_MODE.set(ClientConfig.ShaderMode.OFF);stop(mc);}return;
+        }
+        if(MODE.equals("boutique_web")){          // boutique en jeu réelle (serveur) : crédits achetés sur le site, cf. backend/README.md
+            if(mc.player==null||mc.level==null)return;tick++;
+            if(tick==80){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();mc.player.connection.sendCommand("boutique");}
+            if(tick==170)shot(mc,"boutique_web");
+            if(tick==190)stop(mc);return;
         }
         if(MODE.equals("deconnexion")){
             if(mc.player==null||mc.level==null)return;tick++;mc.gui.toastManager().clear();
@@ -5932,6 +5938,7 @@ public final class DevShowcase {
         return d;
     }
 
+    private static boolean pnjInit;
     static void shot(Minecraft mc, String name) {
         Screenshot.grab(mc.gameDirectory, "showcase_" + name + ".png", mc.gameRenderer.mainRenderTarget(), 1,
                 msg -> MMORPG.LOGGER.info("[MMORPG] Capture {}", name));

@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- Sécurité : connect-src 'self' suffit avec le proxy Netlify /api ; sinon ajouter l’adresse du back-end (CONFIG.api.url). -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://mc-heads.net; font-src 'self'; connect-src 'self'; manifest-src 'self'; base-uri 'self'; form-action 'none'; object-src 'none'">
+
+  <title>Mon compte · Aéloria</title>
+  <meta name="description" content="Crée ton compte Aéloria : il te connecte au launcher, lie ton personnage Minecraft et donne accès à la boutique de crédits.">
+  <meta name="robots" content="noindex, follow">
+  <meta name="theme-color" content="#0b0e14">
+  <meta name="color-scheme" content="dark">
+
+  <link rel="preload" href="assets/fonts/cinzel-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/inter-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+  <script src="espace.js" defer></script>
+
+  <link rel="icon" href="assets/img/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+</head>
+
+<body data-portal="compte">
+  <!-- Sprite d’icônes SVG (réutilisées avec <use href="#…">). -->
+  <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-sword" viewBox="0 0 24 24"><path d="M20.5 3.5v4l-10 10-4-4 10-10h4Z"/><path d="m5 12.5 6.5 6.5M8 16l-4 4M3 19l2 2"/></symbol>
+    <symbol id="icon-staff" viewBox="0 0 24 24"><path d="M4 21 13.5 10.5"/><circle cx="16.5" cy="7.5" r="3.5"/><path d="M16.5 1.5v1.2M22.5 7.5h-1.2M20.8 3.2l-.9.9M11 4.5l1 .6"/></symbol>
+    <symbol id="icon-bow" viewBox="0 0 24 24"><path d="M9 2.5c-6 4.5-6 14.5 0 19"/><path d="M9 2.5v19"/><path d="M6.5 12h15M18 8.5l3.5 3.5-3.5 3.5M6.5 12 5 10.5M6.5 12 5 13.5"/></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 2.5 20 5.5V12c0 4.6-3.4 8.1-8 9.5-4.6-1.4-8-4.9-8-9.5V5.5l8-3Z"/><path d="M12 7v10M8.5 11h7"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24"><path d="M12 3.5v12M7 10.5l5 5 5-5M4.5 20.5h15"/></symbol>
+    <symbol id="icon-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.4-4 4.4-6 8-6s6.6 2 8 6"/></symbol>
+    <symbol id="icon-play" viewBox="0 0 24 24"><path d="M7.5 4.5v15l12-7.5-12-7.5Z"/></symbol>
+    <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="12" height="12" rx="1.5"/><path d="M15.5 8.5V5a1.5 1.5 0 0 0-1.5-1.5H5A1.5 1.5 0 0 0 3.5 5v9A1.5 1.5 0 0 0 5 15.5h3.5"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M4.5 12h15M13.5 6l6 6-6 6"/></symbol>
+    <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M3.5 7h17M3.5 12h17M3.5 17h17"/></symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="icon-crown" viewBox="0 0 24 24"><path d="m3.5 8 4.5 4 4-7 4 7 4.5-4-2 11h-13l-2-11Z"/></symbol>
+    <symbol id="icon-discord" viewBox="0 0 24 24"><path class="sprite__fill" d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03ZM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418Zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418Z"/></symbol>
+  </svg>
+
+  <a class="skip-link" href="#contenu">Aller au contenu</a>
+
+  <!-- ===================== EN-TÊTE / NAVIGATION ===================== -->
+  <header class="site-header" data-header>
+    <div class="site-header__inner container">
+      <a class="brand" href="index.html" aria-label="Aéloria, page d’accueil">
+        <img class="brand__emblem" src="assets/img/embleme-96.webp" width="40" height="40" alt="">
+        <span class="brand__name">Aéloria</span>
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
+        <svg class="icon nav-toggle__icon nav-toggle__icon--open" aria-hidden="true"><use href="#icon-menu"/></svg>
+        <svg class="icon nav-toggle__icon nav-toggle__icon--close" aria-hidden="true"><use href="#icon-close"/></svg>
+        <span class="visually-hidden" data-nav-toggle-label>Ouvrir le menu</span>
+      </button>
+
+      <nav class="site-nav" id="site-nav" aria-label="Navigation principale" data-nav>
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" href="index.html#univers">Univers</a></li>
+          <li><a class="site-nav__link" href="index.html#classes">Classes</a></li>
+          <li><a class="site-nav__link" href="index.html#rejoindre">Rejoindre</a></li>
+          <li><a class="site-nav__link" href="index.html#actualites">Actus</a></li>
+          <li><a class="site-nav__link" href="index.html#reglement">Règlement</a></li>
+          <li><a class="site-nav__link" href="index.html#faq">FAQ</a></li>
+          <li data-requires-api><a class="site-nav__link" href="boutique.html">Boutique</a></li>
+        </ul>
+        <div class="site-nav__actions">
+          <a class="button button--ghost button--small button--account" href="compte.html" aria-current="page" data-requires-api>
+            <svg class="icon" aria-hidden="true"><use href="#icon-user"/></svg>
+            <span class="button__label">Mon compte</span>
+          </a>
+          <a class="button button--ghost button--small button--discord" href="https://discord.gg/aeloria-mmorpg" data-config-href="links.discord" target="_blank" rel="noopener">
+            <svg class="icon" aria-hidden="true"><use href="#icon-discord"/></svg>
+            <span class="button__label">Discord</span><span class="visually-hidden"> (nouvel onglet)</span>
+          </a>
+          <a class="button button--primary button--small" href="https://github.com/bananacheattv/gfrpg-launcher/releases/latest" data-config-href="launcher.url" data-action="download" target="_blank" rel="noopener">
+            <svg class="icon" aria-hidden="true"><use href="#icon-play"/></svg>
+            Jouer<span class="visually-hidden"> : télécharger le launcher (nouvel onglet)</span>
+          </a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenu" class="portal" tabindex="-1">
+    <div class="portal__inner container">
+      <header class="portal__header">
+        <p class="section__eyebrow">Espace joueur</p>
+        <h1 class="portal__title" data-portal-title>Mon compte Aéloria</h1>
+        <p class="portal__lead" data-portal-lead>Un seul compte pour le site, le launcher et la boutique.</p>
+      </header>
+
+      <noscript><p class="notice">JavaScript est nécessaire pour te connecter.</p></noscript>
+      <p class="notice" data-portal-off hidden>
+        <span class="notice__title">Les comptes ouvrent bientôt.</span>
+        <span>En attendant, télécharge le launcher et connecte-toi avec ton compte Microsoft.</span>
+      </p>
+
+      <!-- Connexion / inscription -->
+      <section class="auth frame" aria-label="Connexion ou création de compte" data-auth hidden>
+        <div class="auth__tabs" role="tablist" aria-label="Choisir">
+          <button class="auth__tab" type="button" role="tab" id="tab-login" aria-controls="panel-login" aria-selected="true" data-auth-tab="login">Se connecter</button>
+          <button class="auth__tab" type="button" role="tab" id="tab-register" aria-controls="panel-register" aria-selected="false" tabindex="-1" data-auth-tab="register">Créer un compte</button>
+        </div>
+
+        <form class="form" id="panel-login" role="tabpanel" aria-labelledby="tab-login" data-form="login" novalidate>
+          <div class="field">
+            <label class="field__label" for="login-id">Pseudo ou e-mail</label>
+            <input class="field__input" id="login-id" name="login" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="254" required>
+          </div>
+          <div class="field">
+            <label class="field__label" for="login-password">Mot de passe</label>
+            <input class="field__input" id="login-password" name="password" type="password" autocomplete="current-password" maxlength="128" required>
+          </div>
+          <p class="form__error" role="alert" data-form-error></p>
+          <button class="button button--primary" type="submit">Se connecter</button>
+          <p class="form__hint">Mot de passe oublié&nbsp;? Dans le launcher, page <strong>Compte</strong> puis «&nbsp;Mot de passe oublié&nbsp;» : ton compte Microsoft sert de preuve.</p>
+        </form>
+
+        <form class="form" id="panel-register" role="tabpanel" aria-labelledby="tab-register" data-form="register" novalidate hidden>
+          <div class="field">
+            <label class="field__label" for="register-name">Pseudo Aéloria</label>
+            <input class="field__input" id="register-name" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" minlength="3" maxlength="16" pattern="[A-Za-z0-9_]{3,16}" aria-describedby="register-name-hint" required>
+            <p class="field__hint" id="register-name-hint">3 à 16 caractères : lettres, chiffres ou _.</p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="register-email">Adresse e-mail</label>
+            <input class="field__input" id="register-email" name="email" type="email" autocomplete="email" spellcheck="false" maxlength="254" required>
+          </div>
+          <div class="field">
+            <label class="field__label" for="register-password">Mot de passe</label>
+            <input class="field__input" id="register-password" name="password" type="password" autocomplete="new-password" minlength="10" maxlength="128" aria-describedby="register-password-hint" required>
+            <p class="field__hint" id="register-password-hint">10 caractères minimum. Une phrase de passe est idéale.</p>
+          </div>
+          <label class="field field--check">
+            <input type="checkbox" name="acceptRules" required>
+            <span>J’ai lu et j’accepte le <a class="link" href="index.html#reglement">règlement d’Aéloria</a>.</span>
+          </label>
+          <p class="form__error" role="alert" data-form-error></p>
+          <button class="button button--primary" type="submit">Créer mon compte</button>
+          <p class="form__hint">Ensuite, connecte-toi dans le launcher avec ce compte : ton personnage Minecraft sera lié automatiquement.</p>
+        </form>
+      </section>
+
+      <!-- Tableau de bord -->
+      <section class="dashboard" aria-labelledby="dashboard-title" data-dashboard hidden>
+        <h2 class="visually-hidden" id="dashboard-title">Tableau de bord</h2>
+        <div class="dashboard__grid">
+          <article class="panel frame">
+            <h3 class="panel__title">Personnage Minecraft</h3>
+            <div class="player">
+              <img class="player__head" width="56" height="56" alt="" data-player-head hidden>
+              <div>
+                <p class="player__name" data-player-name>Pas encore lié</p>
+                <p class="panel__text" data-player-text>Ouvre le launcher, connecte-toi avec ce compte puis avec Microsoft : la liaison est automatique.</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel frame">
+            <h3 class="panel__title">Crédits</h3>
+            <p class="panel__value" data-credits>—</p>
+            <p class="panel__text" data-credits-text>Ton solde en jeu, utilisable avec /boutique.</p>
+            <a class="button button--primary button--small" href="boutique.html">Acheter des crédits</a>
+          </article>
+
+          <article class="panel panel--wide frame">
+            <h3 class="panel__title">Dernières commandes</h3>
+            <ol class="orders" data-orders></ol>
+            <p class="panel__text" data-orders-empty>Aucune commande pour l’instant.</p>
+          </article>
+
+          <article class="panel panel--wide frame">
+            <h3 class="panel__title">Sécurité</h3>
+            <details class="panel__details">
+              <summary class="link">Changer de mot de passe</summary>
+              <form class="form" data-form="password" novalidate>
+                <div class="field">
+                  <label class="field__label" for="password-current">Mot de passe actuel</label>
+                  <input class="field__input" id="password-current" name="currentPassword" type="password" autocomplete="current-password" maxlength="128" required>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="password-new">Nouveau mot de passe</label>
+                  <input class="field__input" id="password-new" name="newPassword" type="password" autocomplete="new-password" minlength="10" maxlength="128" required>
+                  <p class="field__hint">Tes autres sessions (launcher compris) seront déconnectées.</p>
+                </div>
+                <p class="form__error" role="alert" data-form-error></p>
+                <button class="button button--primary button--small" type="submit">Enregistrer</button>
+              </form>
+            </details>
+            <button class="button button--ghost button--small" type="button" data-action="logout">Se déconnecter</button>
+          </article>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <template id="order-template">
+    <li class="order">
+      <span class="order__what" data-order-what></span>
+      <span class="order__meta" data-order-meta></span>
+      <span class="chip" data-order-status></span>
+    </li>
+  </template>
+
+  <!-- ===================== PIED DE PAGE ===================== -->
+  <footer class="site-footer">
+    <div class="site-footer__inner container">
+      <div class="site-footer__brand">
+        <a class="brand" href="index.html" aria-label="Aéloria, page d’accueil">
+          <img class="brand__emblem" src="assets/img/embleme-96.webp" width="40" height="40" loading="lazy" decoding="async" alt="">
+          <span class="brand__name">Aéloria</span>
+        </a>
+        <p class="site-footer__tagline" data-config-text="slogan">Le Seuil s’ouvre. Écris ta légende.</p>
+      </div>
+
+      <nav class="site-footer__col" aria-label="Plan du site">
+        <h2 class="site-footer__title">Explorer</h2>
+        <ul class="site-footer__list">
+          <li><a class="site-footer__link" href="index.html#univers">Univers</a></li>
+          <li><a class="site-footer__link" href="index.html#classes">Classes</a></li>
+          <li><a class="site-footer__link" href="index.html#rejoindre">Rejoindre</a></li>
+          <li><a class="site-footer__link" href="index.html#actualites">Actualités</a></li>
+        </ul>
+      </nav>
+
+      <div class="site-footer__col">
+        <h2 class="site-footer__title">Communauté</h2>
+        <ul class="site-footer__list" data-social-list>
+          <li><a class="site-footer__link" href="https://discord.gg/aeloria-mmorpg" data-config-href="links.discord" target="_blank" rel="noopener">Discord<span class="visually-hidden"> (nouvel onglet)</span></a></li>
+        </ul>
+      </div>
+
+      <div class="site-footer__col">
+        <h2 class="site-footer__title">Infos</h2>
+        <ul class="site-footer__list">
+          <li><a class="site-footer__link" href="index.html#reglement">Règlement</a></li>
+          <li><a class="site-footer__link" href="index.html#faq">FAQ</a></li>
+          <li><a class="site-footer__link" href="compte.html">Mon compte</a></li>
+          <li><a class="site-footer__link" href="boutique.html">Boutique de crédits</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="site-footer__bottom container">
+      <p>© <span data-year>2026</span> Aéloria. Projet communautaire non affilié à Mojang Studios ni à Microsoft. Minecraft est une marque de Mojang Synergies AB.</p>
+    </div>
+  </footer>
+
+  <div class="toast" role="status" aria-live="polite" aria-atomic="true" data-toast>
+    <svg class="icon toast__icon" aria-hidden="true"><use href="#icon-check"/></svg>
+    <span class="toast__text" data-toast-text></span>
+  </div>
+</body>
+</html>

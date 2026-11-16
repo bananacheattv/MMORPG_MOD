@@ -21,7 +21,7 @@ def make(q, zone, idx):
         full = f"{name} · {t}"
         if full not in used and name not in {u.split(" · ")[0] for u in used if u.endswith(t)}: break
     used.add(full)
-    return {"id": f"{zone}_{idx:03d}", "name": full, "skin": SKINS[h(q['id'] + 's') % len(SKINS)], "quest": q["id"], "dialogue": q.get("desc", "")}
+    return {"id": f"{zone}_{idx:03d}", "name": full, "skin": SKINS[h(q['id'] + 's') % len(SKINS)], "quest": q["id"], "dialogue": (q.get("desc", "") + " " + q.get("ask", "")).strip()}
 cands = [q for q in quests if q["kind"] == "secondaire"]
 spawn_q = sorted([q for q in cands if q.get("category") == "PNJ de la citadelle"], key=lambda q: (q["level"], q["id"]))[:30]
 taken = {q["id"] for q in spawn_q}

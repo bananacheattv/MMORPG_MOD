@@ -11,11 +11,13 @@ import java.util.*;
 /** Shared runtime switches. File replacement is atomic and backends observe changes within one second. */
 @EventBusSubscriber(modid=MMORPG.MODID)
 public final class FeatureFlags {
- public static final Set<String> KEYS=new LinkedHashSet<>(List.of("wiki","arenes","donjons","drones","boutique_pvp","boutique","quetes","sacs","hdv","courrier","guildes","boss_guilde","cinematique","epreuves_classes","apparition_mobs","competences","bouclier","luckyblocks","coffres","montures","familiers","mines","plaines","forge","banque","marchands","cosmetiques","echange","metiers","peche","succes","classements","groupes","bestiaire","portails","quetes_hebdo","chat_guilde","anticheat","drop_objets","autolock","personnages"));
+ public static final Set<String> KEYS=new LinkedHashSet<>(List.of("wiki","arenes","donjons","drones","boutique_pvp","boutique","quetes","sacs","hdv","courrier","guildes","boss_guilde","cinematique","epreuves_classes","apparition_mobs","competences","bouclier","luckyblocks","coffres","montures","familiers","mines","plaines","forge","banque","marchands","cosmetiques","echange","metiers","peche","succes","classements","groupes","bestiaire","portails","quetes_hebdo","chat_guilde","anticheat","drop_objets","autolock","personnages","mobs_plaines_mines"));
+ /** Interrupteurs désactivés tant qu'un admin ne les active pas. */
+ public static final Set<String> DEFAULT_OFF=Set.of("mobs_plaines_mines");
  public static final class State{public Map<String,Boolean> enabled=new HashMap<>();}
  private static final class Cache{State state=new State();long checked;long stamp;final com.mmorpg.db.SharedDocs.Poller poller=new com.mmorpg.db.SharedDocs.Poller("ledger-features");}
  private static final Map<MinecraftServer,Cache> CACHE=new WeakHashMap<>();
- public static boolean enabled(MinecraftServer server,String key){if(!KEYS.contains(key))throw new IllegalArgumentException("Fonctionnalité inconnue : "+key);var c=CACHE.computeIfAbsent(server,s->new Cache());long now=System.currentTimeMillis();if(now-c.checked>=1000){boolean first=c.checked==0;c.checked=now;refresh(server,c,first);applyLegacy(c.state);}return c.state.enabled.getOrDefault(key,true);}
+ public static boolean enabled(MinecraftServer server,String key){if(!KEYS.contains(key))throw new IllegalArgumentException("Fonctionnalité inconnue : "+key);var c=CACHE.computeIfAbsent(server,s->new Cache());long now=System.currentTimeMillis();if(now-c.checked>=1000){boolean first=c.checked==0;c.checked=now;refresh(server,c,first);applyLegacy(c.state);}return c.state.enabled.getOrDefault(key,!DEFAULT_OFF.contains(key));}
  /** Avec la base, set() ecrit dans la base (registre partage) : on la relit (tout de suite au premier acces, puis en arriere-plan) ; sinon le fichier partage. */
  private static void refresh(MinecraftServer server,Cache c,boolean first){
   var path=com.mmorpg.guild.GuildStore.directory(server).resolveSibling("coordination").resolve("features.json");

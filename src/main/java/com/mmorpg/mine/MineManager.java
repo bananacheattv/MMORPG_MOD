@@ -385,6 +385,10 @@ public final class MineManager {
     // ================================================================== monstres
 
     private static void spawnMobs(ServerLevel level) {
+        if (!com.mmorpg.server.FeatureFlags.enabled(level.getServer(), "mobs_plaines_mines")) {                // interrupteur coupe : aucun mob, on retire ceux deja presents
+            for (Mob m : level.getEntitiesOfClass(Mob.class, new AABB(-3.0E7, level.getMinY(), -3.0E7, 3.0E7, level.getMaxY(), 3.0E7), m -> m instanceof com.mmorpg.entity.RpgMob)) m.discard();
+            return;
+        }
         var random = level.getRandom();
         for (ServerPlayer p : level.players()) {
             if (com.mmorpg.network.NetworkPlayers.portalBlocked(p)) continue;
@@ -575,6 +579,7 @@ public final class MineManager {
         }
         ZoneManager.forgetAnnouncements(p.getUUID());               // l'annonce de la mine (titre et ambiance) se rejoue a l'arrivee
         PORTAL_COOLDOWN.put(p.getUUID(), (long) p.level().getServer().getTickCount());
+        com.mmorpg.server.LoadingShield.grant(p);
         p.teleportTo(level, at[0], at[1], at[2], Set.of(), 0F, 6F, true);
         p.resetFallDistance();
         level.sendParticles(ParticleTypes.END_ROD, at[0], at[1] + 1, at[2], 30, 0.6, 0.9, 0.6, 0.05);
