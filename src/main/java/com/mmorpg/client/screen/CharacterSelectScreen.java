@@ -176,7 +176,7 @@ public final class CharacterSelectScreen extends MmoScreen {
         int cxm = (lx - 10) / 2;
         var pv = isOwned(sel) && !isEmpty(sel) ? preview(sel) : null;
         if (pv != null) {
-            int bot = height - 60, topY = 24, size = Math.max(20, Math.round((bot - topY) / 3.0f));
+            int bot = height - 60, topY = 46, size = Math.max(20, Math.round((bot - topY) / 3.0f));
             Ui.entityFollowsMouse(g, cxm - 100, topY, cxm + 100, bot, size, .0625f, mx, my, pv);
             var s = slot(sel);
             Ui.scaledText(g, s.getStringOr("name", ""), cxm, 12, 1.4f, Ui.GOLD_LIGHT, true);
