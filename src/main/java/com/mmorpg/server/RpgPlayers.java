@@ -620,7 +620,7 @@ public final class RpgPlayers {
     public static void onDeath(ServerPlayer player, String cause) {
         PlayerData d = get(player);
         d.hp = 0;
-        com.mmorpg.server.PortalOrigin.markDeath(player);
+        if (com.mmorpg.dungeon.InstanceManager.noteDeath(player)) com.mmorpg.server.PortalOrigin.clearDeath(player); else com.mmorpg.server.PortalOrigin.markDeath(player);
         int mr = com.mmorpg.mine.MineManager.regionOf(player), pr = com.mmorpg.plains.PlainsManager.regionOf(player);
         if (mr >= 0) DEATH_ZONE.put(player.getUUID(), new int[]{0, mr});
         else if (pr >= 0) DEATH_ZONE.put(player.getUUID(), new int[]{1, pr});

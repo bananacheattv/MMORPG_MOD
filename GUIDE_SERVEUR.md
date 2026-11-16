@@ -30,8 +30,8 @@ enable-rcon=false           # (ou un mot de passe fort et le port jamais ouvert 
 enforce-whitelist=true      # seulement si l'accès est limité ; sinon false
 max-players=40              # à ajuster après mesure (non mesuré)
 motd=Aeloria                # le nom affiché dans la liste des serveurs
-view-distance=32   # maximum vanilla (64 impossible : plafonné à 32 par Minecraft)
-simulation-distance=8
+view-distance=12   # plafonné à 12 par le mod (-Dmmorpg.viewDistance=N pour changer) ; 32 rendait le chargement très lent
+simulation-distance=8   # plafonné à 8 par le mod (-Dmmorpg.simulationDistance=N)
 ```
 
 `user_jvm_args.txt` : commencer par `-Xms6G -Xmx6G` et ajuster selon la consommation observée *(non mesuré)* ; ne pas donner toute la mémoire de la machine.
