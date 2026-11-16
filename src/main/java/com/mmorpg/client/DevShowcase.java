@@ -806,6 +806,37 @@ public final class DevShowcase {
             if (tick == 140) { mc.options.keyPlayerList.setDown(false); stop(mc); }
             return;
         }
+        if (MODE.equals("quetes_types")) {
+            int[][] cfg = {{854, 480, 2}, {1280, 720, 2}, {1280, 720, 3}, {1280, 720, 4}, {1920, 1080, 2}, {1920, 1080, 4}};
+            int ci = tick / 60, t = tick % 60;
+            if (ci >= cfg.length) { stop(mc); return; }
+            String tag = cfg[ci][0] + "x" + cfg[ci][1] + "_gui" + cfg[ci][2];
+            if (t == 2) {
+                mc.getWindow().setWindowed(cfg[ci][0], cfg[ci][1]); mc.options.guiScale().set(cfg[ci][2]); mc.resizeGui();
+                ClientData.quests = typesDemoQuests();
+                var offers = new net.minecraft.nbt.ListTag();
+                ClientData.questExtra = new CompoundTag(); ClientData.questExtra.put("offers", offers);
+                mc.gui.setScreen(new com.mmorpg.client.screen.QuestOfferScreen(ClientData.quests.getCompoundOrEmpty(0)));
+            }
+            if (t == 12) shot(mc, "qt_" + tag + "_offre");
+            if (t == 14) mc.gui.setScreen(new com.mmorpg.client.screen.QuestLogScreen());
+            if (t == 22) shot(mc, "qt_" + tag + "_journal_principale");
+            if (t == 23) { try { var f = com.mmorpg.client.screen.QuestLogScreen.class.getDeclaredField("selected"); f.setAccessible(true); f.set(null, "qs_reput"); } catch (ReflectiveOperationException ex) { throw new IllegalStateException(ex); } }
+            if (t == 30) shot(mc, "qt_" + tag + "_journal_reputation");
+            if (t == 32) {
+                var d = new CompoundTag(); d.putInt("npc", -1); d.putString("name", "Maître des métiers de la Grand-Forge de Valdhéris"); d.putInt("completed", 12);
+                var act = new net.minecraft.nbt.ListTag(); var av = new net.minecraft.nbt.ListTag();
+                for (int i = 0; i < ClientData.quests.size(); i++) av.add(ClientData.quests.getCompoundOrEmpty(i).copy());
+                d.put("active", act); d.put("available", av);
+                mc.gui.setScreen(new com.mmorpg.client.screen.QuestGiverScreen(d));
+            }
+            if (t == 40) shot(mc, "qt_" + tag + "_pnj");
+            if (t == 42) mc.gui.setScreen(new com.mmorpg.client.screen.WeeklyQuestScreen(typesDemoWeekly()));
+            if (t == 50) shot(mc, "qt_" + tag + "_hebdo");
+            if (t == 52) mc.gui.setScreen(null);
+            if (t == 58) shot(mc, "qt_" + tag + "_hud");
+            return;
+        }
         if (MODE.equals("quetes_refusees")) {
             if (tick == 5) {
                 mc.getWindow().setWindowed(1280, 720); mc.gui.setScreen(null);
@@ -816,7 +847,7 @@ public final class DevShowcase {
             }
             if (tick == 15) {
                 var log = new com.mmorpg.client.screen.QuestLogScreen(); mc.gui.setScreen(log);
-                try { var f = com.mmorpg.client.screen.QuestLogScreen.class.getDeclaredField("filter"); f.setAccessible(true); f.setInt(log, 4); } catch (ReflectiveOperationException ex) { throw new IllegalStateException(ex); }
+                try { var f = com.mmorpg.client.screen.QuestLogScreen.class.getDeclaredField("filter"); f.setAccessible(true); f.setInt(log, 6); } catch (ReflectiveOperationException ex) { throw new IllegalStateException(ex); }
             }
             if (tick == 30) shot(mc, "quetes_refusees");
             if (tick == 40) stop(mc);
@@ -5860,6 +5891,47 @@ public final class DevShowcase {
         var data=new CompoundTag();data.putLong("credits",12000);data.putInt("pending",2);var products=new ListTag();
         for(var product:com.mmorpg.store.StoreConfig.defaults().products){var v=new CompoundTag();v.putString("id",product.id);v.putString("label",product.label);v.putString("item",product.item);v.putString("category",product.category);v.putLong("price",product.credits);v.putInt("count",product.count);if(product.rank>0)v.putString("benefits","Préfixe coloré · Annonces HDV · Cosmétique exclusif");products.add(v);}data.put("products",products);return data;
     }
+    private static CompoundTag demoQuest(String id, String kind, String name, String giver, String region, boolean active) {
+        var t = new CompoundTag();
+        t.putString("id", id); t.putString("qkind", kind); t.putString("name", name); t.putString("giver", giver); t.putString("loreRegion", region);
+        t.putString("desc", "Flammèche, dragonnet né d'une étincelle du Cœur-Lige, s'attache au joueur et le suivra pendant tout le chapitre. Les anciens du Seuil racontent que la lueur de la braise guide les égarés vers la citadelle de Valdhéris, mais personne n'ose s'aventurer seul dans les Contreforts brisés après la tombée de la nuit.");
+        t.putInt("minLevel", 12); t.putBoolean("active", active); t.putBoolean("daily", kind.equals("journaliere"));
+        var objs = new net.minecraft.nbt.ListTag();
+        String[] labels = {"Choisir : A) le livrer à la Garde (rép. Garde du Seuil) · B) le laisser partir avec des vivres (rép. Cadets) · C) le recruter dans la Compagnie (rép. Compagnie).", "Récolter 12 Bois de Chêne-Haut (Bûcheronnage)", "Parler au Grand Archivaire"};
+        for (int i = 0; i < 3; i++) { var o = new CompoundTag(); o.putString("type", "action"); o.putString("target", "x"); o.putString("label", labels[i]); o.putInt("count", i == 1 ? 12 : 1); o.putInt("progress", i == 1 ? 5 : 0); objs.add(o); }
+        t.put("objectives", objs);
+        var rw = new CompoundTag(); rw.putLong("xp", 12500); rw.putLong("gold", 480);
+        var items = new net.minecraft.nbt.ListTag();
+        for (String it : new String[]{"minecraft:diamond", "minecraft:emerald", "minecraft:gold_ingot", "minecraft:iron_ingot", "minecraft:apple"}) { var i2 = new CompoundTag(); i2.putString("item", it); i2.putInt("count", 3); items.add(i2); }
+        rw.put("items", items); t.put("rewards", rw);
+        return t;
+    }
+
+    private static net.minecraft.nbt.ListTag typesDemoQuests() {
+        var l = new net.minecraft.nbt.ListTag();
+        l.add(demoQuest("qp_demo", "principale", "Une étincelle de Braise qui ne s'éteint jamais dans la nuit", "Ysméralde — Valdhéris, Grand Seuil", "Valdhéris et les Contreforts", true));
+        l.add(demoQuest("qs_demo", "secondaire", "Prime : l'Alpha des Éclaireurs des Fils de la Brisure", "Maître des métiers (Grand-Forge)", "Contreforts du Nord", true));
+        l.add(demoQuest("qs_reput", "reputation", "Le serment de la Garde du Seuil envers les Cadets", "Capitaine de la Garde du Seuil", "Valdhéris", true));
+        l.add(demoQuest("qj_demo", "journaliere", "Contrat du jour : les loups des Contreforts", "Maître des Quêtes", "", true));
+        l.add(demoQuest("ev_demo", "evenement", "Les lanternes de la nuit des Moissons", "Aubergiste de la Chope Renversée", "Valdhéris", true));
+        return l;
+    }
+
+    private static CompoundTag typesDemoWeekly() {
+        var d = new CompoundTag(); d.putLong("reset", 200000); d.putInt("doneCount", 1);
+        var tiers = new net.minecraft.nbt.ListTag();
+        String[] names = {"Exterminateur des Cryptes de Givre de l'Ancien Nord", "Chasseur de boss légendaires du Désert du Néant", "Collecteur de reliques oubliées"};
+        for (int i = 0; i < 3; i++) {
+            var q = demoQuest("w" + i, "journaliere", names[i], "", "", true);
+            q.putInt("tier", i); q.putInt("state", i == 2 ? 0 : 1); q.putString("tierName", i == 0 ? "Bronze" : i == 1 ? "Argent" : "Or — Légendaire");
+            var o = new net.minecraft.nbt.ListTag(); var o1 = new CompoundTag(); o1.putString("type", "collect"); o1.putString("target", "minecraft:diamond"); o1.putInt("count", 40); o1.putInt("progress", 12); o.add(o1);
+            var o2 = new CompoundTag(); o2.putString("type", "kill"); o2.putString("target", "boss"); o2.putInt("count", 3); o2.putInt("progress", 1); o.add(o2);
+            q.put("objectives", o); tiers.add(q);
+        }
+        d.put("tiers", tiers); d.put("daily", new net.minecraft.nbt.ListTag());
+        return d;
+    }
+
     static void shot(Minecraft mc, String name) {
         Screenshot.grab(mc.gameDirectory, "showcase_" + name + ".png", mc.gameRenderer.mainRenderTarget(), 1,
                 msg -> MMORPG.LOGGER.info("[MMORPG] Capture {}", name));

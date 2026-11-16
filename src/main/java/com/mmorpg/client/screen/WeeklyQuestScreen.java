@@ -66,10 +66,10 @@ public class WeeklyQuestScreen extends MmoScreen {
     @Override
     protected void renderContent(GuiGraphicsExtractor g, int mx, int my, float a) {
         Ui.panel(g, left, top, pw, ph);
-        Ui.title(g, left + pw / 2, top + 8, dailyMode ? "QUÊTES QUOTIDIENNES" : "QUÊTES HEBDOMADAIRES", Ui.GOLD_LIGHT);
+        Ui.title(g, left + pw / 2, top + 8, dailyMode ? "QUÊTES QUOTIDIENNES" : "QUÊTES HEBDOMADAIRES", com.mmorpg.quest.QuestKind.JOURNALIERE.color);
         int doneDaily = (int) dailies.stream().filter(q -> q.getIntOr("state", 0) == 2).count();
         String sub = dailyMode ? doneDaily + " / 3 terminées · nouvelles quêtes demain" : doneCount + " / 3 terminées · remise à zéro dans " + reset(resetSeconds);
-        g.centeredText(font, net.minecraft.network.chat.Component.literal(sub), left + pw / 2, top + 22, Ui.MUTED);
+        g.centeredText(font, net.minecraft.network.chat.Component.literal(font.plainSubstrByWidth(sub, pw - 24)), left + pw / 2, top + 22, Ui.MUTED);
         button(g, left + 8, top + 6, 96, 14, dailyMode ? "Hebdomadaires >" : "Quotidiennes >", true, 0xFF1A5A7A, () -> dailyMode = !dailyMode);
         int gap = 6, cw = (pw - 16 - gap * 2) / 3, cy = top + 38, ch = ph - 38 - 34;
         List<CompoundTag> shown = dailyMode ? dailies : tiers;
@@ -84,32 +84,44 @@ public class WeeklyQuestScreen extends MmoScreen {
         boolean complete = q.getBooleanOr("completable", false);
         Ui.frame(g, x, y, w, h, state == 2 ? 0xFF3A6A3A : accent, hovered(x, y, w, h));
         g.fill(x + 1, y + 1, x + w - 1, y + 17, Ui.alpha(accent, 0.35f));
-        g.centeredText(font, net.minecraft.network.chat.Component.literal(q.getStringOr("tierName", "")), x + w / 2, y + 5, Ui.TEXT);
+        g.centeredText(font, net.minecraft.network.chat.Component.literal(font.plainSubstrByWidth(q.getStringOr("tierName", ""), w - 8)), x + w / 2, y + 5, Ui.TEXT);
         for (int s = 0; s <= tier; s++) Ui.diamond(g, x + w / 2 - tier * 5 + s * 10, y + 24, 3, Ui.GOLD_LIGHT);
         int ty = y + 33;
-        g.text(font, font.plainSubstrByWidth(q.getStringOr("name", ""), w - 8), x + 5, ty, Ui.GOLD_LIGHT, false);
-        ty += 12;
+        var nameLines = font.split(net.minecraft.network.chat.FormattedText.of(q.getStringOr("name", "")), w - 10);
+        for (int i = 0; i < Math.min(2, nameLines.size()); i++) {
+            g.text(font, nameLines.get(i), x + 5, ty, Ui.GOLD_LIGHT, false);
+            ty += 10;
+        }
+        ty += 2;
+        boolean compact = h < 170;
+        g.enableScissor(x + 1, ty, x + w - 1, y + h - (compact ? 50 : 74));
         ListTag objs = q.getListOrEmpty("objectives");
         for (int i = 0; i < objs.size(); i++) {
             CompoundTag o = objs.getCompoundOrEmpty(i);
             int count = o.getIntOr("count", 1), prog = state == 1 ? o.getIntOr("progress", 0) : state == 2 ? count : 0;
-            ty += Ui.wrap(g, targetName(o), x + 5, ty, w - 10, Ui.TEXT) + 2;
+            if (!compact) ty += Ui.wrap(g, targetName(o), x + 5, ty, w - 10, Ui.TEXT) + 2;
             Ui.bar(g, x + 5, ty, w - 10, 9, Math.min(1f, prog / (float) count), 0xFF2A8A4A, 0xFF1A5A30, prog + "/" + count);
-            ty += 14;
+            ty += compact ? 12 : 14;
         }
+        g.disableScissor();
         CompoundTag rw = q.getCompoundOrEmpty("rewards");
-        int ry = y + h - 62;
-        Ui.squareArt(g, "weekly_reward_chest", 256, x + w - 34, ry - 2, 30);
-        g.text(font, "Récompenses", x + 5, ry, Ui.GOLD, false);
-        g.text(font, rw.getLongOr("gold", 0) + " or", x + 5, ry + 11, 0xFFFFD040, false);
-        g.text(font, rw.getLongOr("xp", 0) + " XP", x + 5, ry + 22, Ui.BLUE, false);
+        int ry = compact ? y + h - 46 : y + h - 72;
+        if (!compact) Ui.squareArt(g, "weekly_reward_chest", 256, x + w - 34, ry - 2, 30);
+        if (compact) {
+            g.text(font, font.plainSubstrByWidth(rw.getLongOr("gold", 0) + " or · " + rw.getLongOr("xp", 0) + " XP", w - 8), x + 5, ry, 0xFFFFD040, false);
+        } else {
+            g.text(font, "Récompenses", x + 5, ry, Ui.GOLD, false);
+            g.text(font, rw.getLongOr("gold", 0) + " or", x + 5, ry + 11, 0xFFFFD040, false);
+            g.text(font, rw.getLongOr("xp", 0) + " XP", x + 5, ry + 22, Ui.BLUE, false);
+        }
         ListTag items = rw.getListOrEmpty("items");
-        for (int i = 0; i < items.size(); i++) {
+        int iy = compact ? ry + 11 : ry + 31;
+        for (int i = 0; i < items.size() && 5 + i * 18 + 16 <= w - 5; i++) {
             CompoundTag it = items.getCompoundOrEmpty(i);
             var item = net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.parse(it.getStringOr("item", "minecraft:air")));
             var stack = new net.minecraft.world.item.ItemStack(item, it.getIntOr("count", 1));
-            g.item(stack, x + 5 + i * 18, ry + 31);
-            g.itemDecorations(font, stack, x + 5 + i * 18, ry + 31);
+            g.item(stack, x + 5 + i * 18, iy);
+            g.itemDecorations(font, stack, x + 5 + i * 18, iy);
         }
         int by = y + h - 18;
         if (state == 2) {

@@ -43,14 +43,14 @@ public class QuestGiverScreen extends MmoScreen {
 
     @Override
     public boolean mouseScrolled(double x, double y, double sx, double sy) {
-        if(greetingPage)dialogueScroll=Math.max(0,dialogueScroll-(int)Math.signum(sy));else scroll = Math.max(0, scroll - (int) Math.signum(sy));
+        if(greetingPage)dialogueScroll=Math.max(0,dialogueScroll-(int)Math.signum(sy));else if(x>left+176)QuestPanel.scrollBy(-(int)Math.signum(sy));else scroll = Math.max(0, scroll - (int) Math.signum(sy));
         return true;
     }
 
     @Override
     protected void renderContent(GuiGraphicsExtractor g, int mx, int my, float a) {
         Ui.panel(g, left, top, pw, ph);
-        Ui.title(g, left + pw / 2, top + 8, npcName.toUpperCase(java.util.Locale.ROOT), Ui.GOLD_LIGHT);
+        Ui.title(g, left + pw / 2, top + 8, font.plainSubstrByWidth(npcName.toUpperCase(java.util.Locale.ROOT), pw - 20), Ui.GOLD_LIGHT);
         g.centeredText(font, Component.literal("Maître des Quêtes"), left + pw / 2, top + 19, Ui.MUTED);
         if(greetingPage){int art=Math.min(ph-75,Math.max(60,pw/3));int tx=left+10+art+6;var lines=font.split(Component.literal(greeting),pw-art-46);int rows=Math.max(1,(ph-85)/12);dialogueScroll=Math.clamp(dialogueScroll,0,Math.max(0,lines.size()-rows));Ui.squareArt(g,"quest_guide_portrait",512,left+10,top+35+(ph-75-art),art);Ui.inset(g,tx,top+35,left+pw-10-tx,ph-75);for(int i=0;i<rows&&i+dialogueScroll<lines.size();i++)g.text(font,lines.get(i+dialogueScroll),tx+10,top+45+i*12,Ui.TEXT,false);button(g,left+12,top+ph-29,pw-24,20,"Voir les quêtes",true,Ui.GOLD,()->greetingPage=false);return;}
         int x0 = left + 8;
@@ -68,11 +68,17 @@ public class QuestGiverScreen extends MmoScreen {
             int ry = y0 + i * rowH;
             boolean active = q.getBooleanOr("active", false);
             boolean ready = q.getBooleanOr("completable", false);
-            int color = ready ? Ui.GREEN : active ? 0xFF9C9282 : Ui.GOLD;
+            com.mmorpg.quest.QuestKind kind = QuestPanel.kindOf(q);
+            int color = ready ? Ui.GREEN : active ? 0xFF9C9282 : kind.color;
             Ui.frame(g, x0, ry, lw, rowH - 2, color, id.equals(selected) || hovered(x0, ry, lw, rowH - 2));
             String mark = ready ? "?" : active ? "…" : "!";
-            Ui.scaledText(g, mark, x0 + 8, ry + 3, 1.4f, color, true);
-            g.text(font, font.plainSubstrByWidth(q.getStringOr("name", "?"), lw - 40), x0 + 17, ry + 5, ready ? Ui.GREEN : Ui.TEXT, false);
+            Ui.scaledText(g, mark, x0 + 7, ry + 3, 1.4f, color, true);
+            g.fill(x0 + 1, ry + 2, x0 + 3, ry + rowH - 4, kind.color);
+            String nm = q.getStringOr("name", "?");
+            String shown = Ui.fit(nm, lw - 62);
+            g.text(font, shown, x0 + 24, ry + 5, ready ? Ui.GREEN : Ui.TEXT, false);
+            if (!shown.equals(nm) && hovered(x0, ry, lw, rowH - 2)) g.setTooltipForNextFrame(font, Component.literal(nm), mx, my);
+            g.text(font, kind.glyph, x0 + lw - 15 - font.width(String.valueOf(q.getIntOr("minLevel", 1))) - 8, ry + 5, kind.color, true);
             String lv = String.valueOf(q.getIntOr("minLevel", 1));
             g.text(font, lv, x0 + lw - 5 - font.width(lv), ry + 5, Ui.MUTED, false);
             click(x0, ry, lw, rowH - 2, () -> selected = id);
