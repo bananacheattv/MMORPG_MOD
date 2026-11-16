@@ -1,0 +1,14 @@
+{
+  "name": "aeloria-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Comptes Aéloria (site + launcher) et boutique de crédits (Stripe), reliés à la passerelle crédits du serveur",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env src/server.js",
+    "test": "node --disable-warning=ExperimentalWarning --test --test-concurrency=1"
+  }
+}

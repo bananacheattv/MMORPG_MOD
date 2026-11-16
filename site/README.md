@@ -30,6 +30,12 @@ Tout se change dans l’objet `CONFIG`, en haut de `script.js` :
 | `news`, `newsCount` | Actualités (les 3 plus récentes s’affichent) |
 | `staff` | Membres du staff (`skin` = pseudo Minecraft, tête via mc-heads.net) |
 | `legal.host` | Hébergeur cité dans les mentions légales |
+| `legal.seller` | Vendeur affiché dans les conditions de vente de la boutique (obligatoire avant de vrais paiements) |
+| `api.url` | Back-end des comptes et de la boutique (`backend/`). **Vide** = pages Compte et Boutique masquées ; `'/'` = même domaine via le proxy Netlify (bloc à décommenter dans `netlify.toml`) |
+
+### Comptes et boutique de crédits
+
+`compte.html` (inscription, connexion, personnage lié, solde, commandes) et `boutique.html` (packs, paiement Stripe) utilisent `espace.js` et le back-end du dossier `backend/` (installation, Stripe en mode test, sécurité : voir `backend/README.md`). Tant que `api.url` est vide, rien ne change pour les visiteurs.
 
 Les classes, le règlement et la FAQ sont rédigés directement dans `index.html` (meilleur pour le SEO ; la FAQ porte le balisage schema.org `FAQPage`).
 
@@ -126,3 +132,4 @@ Adresse obtenue : `https://bananacheattv.github.io/mmorpg_mod/` (tous les chemin
 - Clavier : lien d’évitement, focus visibles, menu mobile (Échap, reste de la page inerte), cartes de classes (Entrée/Échap), accordéons natifs, mentions légales en `<dialog>`.
 - `prefers-reduced-motion` : particules, parallaxe, animations et transitions coupées.
 - Statut serveur testé en ligne / hors ligne / API en erreur, copie de l’IP + toast.
+- Compte et boutique testés dans Chromium avec le vrai back-end et la passerelle du vrai serveur de dev : inscription, validation, liaison du personnage, solde, achat (Stripe simulé), retour de paiement, commande livrée, déconnexion ; 360 à 1440 px sans défilement horizontal.
