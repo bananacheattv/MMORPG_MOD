@@ -155,7 +155,7 @@ public final class DevWeeklyChecks {
             long gold = d.gold;
             WeeklyQuests.action(p, board, WeeklyQuests.ACT_CLAIM, 1);
             check(d.gold == gold + 450, "gold reward " + (d.gold - gold));
-            check(p.getInventory().countItem(Items.EMERALD) == 10, "item reward");
+            check(p.getInventory().countItem(com.mmorpg.registry.ModItems.GEMME_BRUTE.get()) == 10, "item reward");
             check(!d.activeQuests.containsKey(id) && WeeklyQuests.done(d, w, 1), "quest closed and recorded as done");
             for (var o : q.objectives) if (o.type.equals("collect")) check(p.getInventory().countItem(ForgeRecipes.resolveItem(o.target)) == 0, "collected items consumed");
             WeeklyQuests.action(p, board, WeeklyQuests.ACT_CLAIM, 1);

@@ -87,6 +87,7 @@ public final class PortalOrigin {
     /** Joueurs morts en zone d'aventure (le respawn vanilla les place ailleurs : la zone doit etre retenue a la mort). */
     private static final Set<java.util.UUID> DIED = java.util.concurrent.ConcurrentHashMap.newKeySet();
     public static void markDeath(ServerPlayer p) { if (inAdventure(p) && get(p) != null) DIED.add(p.getUUID()); else DIED.remove(p.getUUID()); }
+    public static void clearDeath(ServerPlayer p) { DIED.remove(p.getUUID()); }
     /** Un retour devant le portail apres la mort est-il prevu ? */
     public static boolean available(ServerPlayer p) { return DIED.contains(p.getUUID()) && get(p) != null; }
     /** Apres la mort (au respawn) : retour devant le portail ; false = repli habituel. */

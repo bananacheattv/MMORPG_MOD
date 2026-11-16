@@ -114,18 +114,18 @@ public final class DailyQuests {
                 if (band == 0) { desc = "Éliminez " + 30 + " monstres : les boss viendront plus tard."; q.objectives.add(kill("*", 30)); }
                 else { desc = "Vainquez " + Math.max(1, f / 2) + " boss."; q.objectives.add(kill("boss", Math.max(1, f / 2))); }
             }
-            case 2 -> { name = "Fer pour la forge"; desc = "Rapportez " + 8 * f + " lingots de fer."; q.objectives.add(collect("minecraft:iron_ingot", 8 * f)); }
-            case 3 -> { name = "Réserve de charbon"; desc = "Rapportez " + 16 * f + " charbons."; q.objectives.add(collect("minecraft:coal", 16 * f)); }
-            case 4 -> { name = "Lingots d'or"; desc = "Rapportez " + 4 * f + " lingots d'or."; q.objectives.add(collect("minecraft:gold_ingot", 4 * f)); }
-            case 5 -> { name = "Patrouille"; desc = "Éliminez " + 10 * f + " monstres et rapportez " + 8 * f + " charbons."; q.objectives.add(kill("*", 10 * f)); q.objectives.add(collect("minecraft:coal", 8 * f)); }
+            case 2 -> { name = "Verdite pour la forge"; desc = "Rapportez " + 8 * f + " lingots de verdite."; q.objectives.add(collect("mmorpg:lingot_verdite", 8 * f)); }
+            case 3 -> { name = "Ferraille de gobelins"; desc = "Rapportez " + 16 * f + " ferrailles gobelines."; q.objectives.add(collect("mmorpg:ferraille_gobeline", 16 * f)); }
+            case 4 -> { name = "Lingots d'argentite"; desc = "Rapportez " + 4 * f + " lingots d'argentite."; q.objectives.add(collect("mmorpg:lingot_argentite", 4 * f)); }
+            case 5 -> { name = "Patrouille"; desc = "Éliminez " + 10 * f + " monstres et rapportez " + 8 * f + " ferrailles gobelines."; q.objectives.add(kill("*", 10 * f)); q.objectives.add(collect("mmorpg:ferraille_gobeline", 8 * f)); }
             case 6 -> { name = "Grande purge"; desc = "Éliminez " + 25 * f + " monstres."; q.objectives.add(kill("*", 25 * f)); }
-            default -> { name = "Quartier de roche"; desc = "Rapportez " + 24 * f + " blocs de cobblestone pour les remparts."; q.objectives.add(collect("minecraft:cobblestone", 24 * f)); }
+            default -> { name = "Quartier de roche"; desc = "Rapportez " + 12 * f + " lingots de verdite pour les remparts."; q.objectives.add(collect("mmorpg:lingot_verdite", 12 * f)); }
         }
         q.name = name;
         q.description = "Quête quotidienne : " + desc;
         q.rewards.gold = (40L + 30L * slot) * f;
         q.rewards.xpPercentOfLevel = 10 + 8 * slot;
-        if (slot == SLOTS - 1) q.rewards.items.add(new QuestDef.ItemReward("minecraft:emerald", 1 + band));
+        if (slot == SLOTS - 1) q.rewards.items.add(new QuestDef.ItemReward("mmorpg:gemme_brute", 1 + band));
         return q;
     }
 
