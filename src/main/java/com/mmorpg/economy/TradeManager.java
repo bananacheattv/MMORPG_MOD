@@ -111,6 +111,12 @@ public final class TradeManager {
     public static void commands(RegisterCommandsEvent e) {
         for (String name : new String[]{"trade", "echange"}) {
             LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal(name);
+            root.executes(c -> {
+                ServerPlayer p = c.getSource().getPlayerOrException();
+                com.mmorpg.server.MascotGuide.screen(p, "TradeScreen");      // tutoriel : validable seul
+                msg(p, "Tapez /trade suivi du pseudo d'un joueur pour lui proposer un échange.", 0xE0D8C0);
+                return 1;
+            });
             root.then(Commands.literal("accepter").executes(c -> {
                 accept(c.getSource().getPlayerOrException());
                 return 1;
@@ -155,6 +161,7 @@ public final class TradeManager {
 
     public static void request(ServerPlayer from, ServerPlayer target, String targetName) {
         if (!FeatureFlags.allow(from, "echange")) return;
+        com.mmorpg.server.MascotGuide.screen(from, "TradeScreen");          // tutoriel : tenter un /trade suffit, meme seul
         if (target == null) {
             msg(from, "Joueur introuvable : " + targetName, 0xFF6060);
             return;

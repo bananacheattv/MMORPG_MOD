@@ -8,7 +8,7 @@ import java.util.function.IntFunction;
 /** Quetes par defaut : une campagne qui suit la progression des niveaux 1 a 100, plus des quetes journalieres. */
 public final class DefaultQuests {
     /** Incremente quand les quetes par defaut changent : les quetes d'un quests.json plus ancien sont alors remplacees une fois. */
-    public static final int REVISION = 8;
+    public static final int REVISION = 9;
 
     private DefaultQuests() {
     }
@@ -161,8 +161,8 @@ public final class DefaultQuests {
                 "Dans l'arène, tu affrontes d'autres joueurs et gagnes des points de rang. Ouvre l'onglet Arène !",
                 "Les récompenses d'arène s'échangent chez l'Intendant.", 150, 20), "ArenaScreen", "Ouvrir l'onglet Arène");
         open(tq(m, "arene", "echange", "Les échanges", "La commande /trade permet d'échanger des objets en toute sécurité.",
-                "Pour échanger avec un autre joueur, tape /trade suivi de son pseudo. Un double accord est demandé : aucune arnaque possible !",
-                "Les deux joueurs doivent confirmer l'échange.", 100, 10), "TradeScreen", "Ouvrir une fenêtre d'échange (/trade)");
+                "Pour échanger avec un autre joueur, tape /trade suivi de son pseudo. Un double accord est demandé : aucune arnaque possible ! Seul ? Tape simplement /trade pour valider.",
+                "Les deux joueurs doivent confirmer l'échange.", 100, 10), "TradeScreen", "Taper la commande /trade");
         open(tq(m, "echange", "succes", "Les succès", "Les succès récompensent vos exploits avec des titres et des médailles.",
                 "Chaque exploit débloque un succès et parfois un titre. Ouvre l'onglet Succès pour voir lesquels t'attendent !",
                 "Tu peux afficher ton titre favori au-dessus de ta tête.", 100, 10), "AchievementsScreen", "Ouvrir l'onglet Succès");
