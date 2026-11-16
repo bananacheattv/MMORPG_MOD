@@ -47,6 +47,17 @@ public final class RpgCommands {
         return 1;
     }
 
+    private static int purge(net.minecraft.commands.CommandSourceStack src, String pseudo, boolean confirm) {
+        try {
+            String r = com.mmorpg.admin.PurgePlayer.run(src.getServer(), pseudo, confirm);
+            src.sendSuccess(() -> ok(r), true);
+            return 1;
+        } catch (Exception e) {
+            src.sendFailure(Component.literal("Suppression impossible : " + e.getMessage()));
+            return 0;
+        }
+    }
+
     private static Component ok(String msg) {
         return Component.literal("[MMORPG] ").withColor(0xE8C060).append(Component.literal(msg).withColor(0xE0D8C0));
     }
@@ -124,6 +135,9 @@ public final class RpgCommands {
                                     c.getSource().sendSuccess(() -> ok("Personnage renommé."), true);
                                     return 1;
                                 })))))
+                .then(Commands.literal("supprimerpersonnages").then(Commands.argument("pseudo", StringArgumentType.word())
+                        .executes(c -> purge(c.getSource(), StringArgumentType.getString(c, "pseudo"), false))
+                        .then(Commands.literal("confirmer").executes(c -> purge(c.getSource(), StringArgumentType.getString(c, "pseudo"), true)))))
                 .then(Commands.literal("reset").then(Commands.argument("joueur", EntityArgument.player()).executes(c -> {
                     ServerPlayer p = EntityArgument.getPlayer(c, "joueur");
                     PlayerData data = RpgPlayers.get(p);

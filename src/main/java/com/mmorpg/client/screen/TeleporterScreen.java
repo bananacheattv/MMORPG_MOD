@@ -21,6 +21,7 @@ import java.util.List;
 
 /** Reseau de teleportation : liste des villes, donjons et points de passage decouverts. */
 public class TeleporterScreen extends MmoScreen {
+    @Override protected boolean hasNav() { return false; }
     private final List<CompoundTag> entries = new ArrayList<>();
     private final String current;
     private final boolean scroll;

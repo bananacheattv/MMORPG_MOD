@@ -92,6 +92,7 @@ public final class MascotGuide {
 
     /** Mascotte du joueur, creee pres de lui au besoin (scenes de Flammeche). */
     public static MascotEntity ensure(ServerPlayer p) {
+        if (!FlammecheScenes.mainServer()) return null;
         MascotEntity m = mine(p);
         if (m != null) return m;
         MASCOTS.remove(p.getUUID());
@@ -116,6 +117,10 @@ public final class MascotGuide {
         for (ServerPlayer p : server.getPlayerList().getPlayers()) {
             PlayerData d = RpgPlayers.get(p);
             MascotEntity m = mine(p);
+            if (!FlammecheScenes.mainServer()) {        // Flammeche et la Mascotte n'existent que sur le serveur principal
+                if (m != null || MASCOTS.containsKey(p.getUUID())) drop(p);
+                continue;
+            }
             if (server.getTickCount() % 20 == 0) {
                 boolean forced = FORCED.contains(p.getUUID());
                 String pend = pending(d);
@@ -148,7 +153,7 @@ public final class MascotGuide {
         if (server.getTickCount() % 40 != 0) return;
         for (ServerPlayer p : server.getPlayerList().getPlayers()) {
             PlayerData d = RpgPlayers.get(p);
-            if (mine(p) == null || !p.isAlive()) continue;
+            if (!FlammecheScenes.mainServer() || mine(p) == null || !p.isAlive()) continue;
             long now = server.getTickCount();
             if (now - LAST_REMINDER.getOrDefault(p.getUUID(), -10_000L) < 20 * 40) continue;
             String id = pending(d);

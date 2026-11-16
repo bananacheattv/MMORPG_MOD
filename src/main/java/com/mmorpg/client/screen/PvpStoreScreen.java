@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.*;
 import net.minecraft.world.item.ItemStack;
 public final class PvpStoreScreen extends MmoScreen {
+    @Override protected boolean hasNav() { return false; }
  private final CompoundTag data;private final java.util.List<CompoundTag> products=new java.util.ArrayList<>();private int category,scroll,selected;private final ItemPreview3D preview=new ItemPreview3D();
  public PvpStoreScreen(CompoundTag t){super("Intendant des arènes");data=t;var list=t.getListOrEmpty("products");for(int i=0;i<list.size();i++)products.add(list.getCompoundOrEmpty(i));}
  public void selectCategory(int value){category=Math.clamp(value,0,2);selected=scroll=0;}
