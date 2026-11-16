@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- Sécurité : seules nos ressources + les deux API publiques (statut serveur, têtes de skins) sont autorisées. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://mc-heads.net; font-src 'self'; connect-src 'self' https://api.mcsrvstat.us; manifest-src 'self'; base-uri 'self'; form-action 'none'; object-src 'none'">
+
+  <title>Aéloria · Serveur Minecraft MMORPG en français</title>
+  <meta name="description" content="Aéloria, serveur Minecraft Java MMORPG gratuit en français : Guerrier, Mage, Archer ou Tank, 100 niveaux, 250 quêtes, donjons et boss. En jeu en 2 minutes.">
+  <link rel="canonical" href="https://aeloria.netlify.app/">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="theme-color" content="#0b0e14">
+  <meta name="color-scheme" content="dark">
+
+  <!-- Ressources critiques : polices auto-hébergées + image du hero (LCP). -->
+  <link rel="preload" href="assets/fonts/cinzel-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/inter-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" as="image" type="image/avif" fetchpriority="high"
+        imagesrcset="assets/img/logo-560.avif 560w, assets/img/logo-840.avif 840w, assets/img/logo-1120.avif 1120w"
+        imagesizes="(min-width: 40rem) 35rem, 86vw">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+
+  <!-- Icônes -->
+  <link rel="icon" href="assets/img/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+
+  <!-- Open Graph / Twitter Card -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Aéloria">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:url" content="https://aeloria.netlify.app/">
+  <meta property="og:title" content="Aéloria · Le Seuil s’ouvre. Écris ta légende.">
+  <meta property="og:description" content="Serveur Minecraft Java MMORPG gratuit en français : 4 classes, 100 niveaux, 250 quêtes, donjons et boss.">
+  <meta property="og:image" content="https://aeloria.netlify.app/assets/img/og-aeloria.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Logo d’Aéloria devant la citadelle de Valdhéris, suspendue au-dessus des nuages">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Aéloria · Le Seuil s’ouvre. Écris ta légende.">
+  <meta name="twitter:description" content="Serveur Minecraft Java MMORPG gratuit en français : 4 classes, 100 niveaux, 250 quêtes, donjons et boss.">
+  <meta name="twitter:image" content="https://aeloria.netlify.app/assets/img/og-aeloria.jpg">
+  <meta name="twitter:image:alt" content="Logo d’Aéloria devant la citadelle de Valdhéris">
+
+  <!-- Données structurées (la FAQ est balisée en microdonnées plus bas, directement sur l’accordéon). -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://aeloria.netlify.app/#site",
+        "url": "https://aeloria.netlify.app/",
+        "name": "Aéloria",
+        "description": "Site officiel d’Aéloria, serveur Minecraft Java MMORPG en français.",
+        "inLanguage": "fr-FR",
+        "publisher": { "@id": "https://aeloria.netlify.app/#organisation" }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://aeloria.netlify.app/#organisation",
+        "name": "Aéloria",
+        "url": "https://aeloria.netlify.app/",
+        "logo": "https://aeloria.netlify.app/assets/img/icon-512.png",
+        "sameAs": ["https://discord.gg/aeloria-mmorpg"]
+      }
+    ]
+  }
+  </script>
+</head>
+
+<body>
+  <!-- Sprite d’icônes SVG (réutilisées avec <use href="#…">). -->
+  <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-sword" viewBox="0 0 24 24"><path d="M20.5 3.5v4l-10 10-4-4 10-10h4Z"/><path d="m5 12.5 6.5 6.5M8 16l-4 4M3 19l2 2"/></symbol>
+    <symbol id="icon-staff" viewBox="0 0 24 24"><path d="M4 21 13.5 10.5"/><circle cx="16.5" cy="7.5" r="3.5"/><path d="M16.5 1.5v1.2M22.5 7.5h-1.2M20.8 3.2l-.9.9M11 4.5l1 .6"/></symbol>
+    <symbol id="icon-bow" viewBox="0 0 24 24"><path d="M9 2.5c-6 4.5-6 14.5 0 19"/><path d="M9 2.5v19"/><path d="M6.5 12h15M18 8.5l3.5 3.5-3.5 3.5M6.5 12 5 10.5M6.5 12 5 13.5"/></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 2.5 20 5.5V12c0 4.6-3.4 8.1-8 9.5-4.6-1.4-8-4.9-8-9.5V5.5l8-3Z"/><path d="M12 7v10M8.5 11h7"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24"><path d="M12 3.5v12M7 10.5l5 5 5-5M4.5 20.5h15"/></symbol>
+    <symbol id="icon-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.4-4 4.4-6 8-6s6.6 2 8 6"/></symbol>
+    <symbol id="icon-play" viewBox="0 0 24 24"><path d="M7.5 4.5v15l12-7.5-12-7.5Z"/></symbol>
+    <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="12" height="12" rx="1.5"/><path d="M15.5 8.5V5a1.5 1.5 0 0 0-1.5-1.5H5A1.5 1.5 0 0 0 3.5 5v9A1.5 1.5 0 0 0 5 15.5h3.5"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M4.5 12h15M13.5 6l6 6-6 6"/></symbol>
+    <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M3.5 7h17M3.5 12h17M3.5 17h17"/></symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="icon-crown" viewBox="0 0 24 24"><path d="m3.5 8 4.5 4 4-7 4 7 4.5-4-2 11h-13l-2-11Z"/></symbol>
+    <symbol id="icon-discord" viewBox="0 0 24 24"><path class="sprite__fill" d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03ZM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418Zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418Z"/></symbol>
+  </svg>
+
+  <a class="skip-link" href="#contenu">Aller au contenu</a>
+
+  <!-- ===================== EN-TÊTE / NAVIGATION ===================== -->
+  <header class="site-header" data-header>
+    <div class="site-header__inner container">
+      <a class="brand" href="#accueil" aria-label="Aéloria, retour en haut de page">
+        <img class="brand__emblem" src="assets/img/embleme-96.webp" width="40" height="40" alt="">
+        <span class="brand__name">Aéloria</span>
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
+        <svg class="icon nav-toggle__icon nav-toggle__icon--open" aria-hidden="true"><use href="#icon-menu"/></svg>
+        <svg class="icon nav-toggle__icon nav-toggle__icon--close" aria-hidden="true"><use href="#icon-close"/></svg>
+        <span class="visually-hidden" data-nav-toggle-label>Ouvrir le menu</span>
+      </button>
+
+      <nav class="site-nav" id="site-nav" aria-label="Navigation principale" data-nav>
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" href="#univers">Univers</a></li>
+          <li><a class="site-nav__link" href="#classes">Classes</a></li>
+          <li><a class="site-nav__link" href="#rejoindre">Rejoindre</a></li>
+          <li><a class="site-nav__link" href="#actualites">Actus</a></li>
+          <li><a class="site-nav__link" href="#reglement">Règlement</a></li>
+          <li><a class="site-nav__link" href="#staff">Staff</a></li>
+          <li><a class="site-nav__link" href="#faq">FAQ</a></li>
+        </ul>
+        <div class="site-nav__actions">
+          <a class="button button--ghost button--small" href="https://discord.gg/aeloria-mmorpg" data-config-href="links.discord" target="_blank" rel="noopener">
+            <svg class="icon" aria-hidden="true"><use href="#icon-discord"/></svg>
+            Discord<span class="visually-hidden"> (nouvel onglet)</span>
+          </a>
+          <a class="button button--primary button--small" href="https://github.com/bananacheattv/gfrpg-launcher/releases/latest" data-config-href="launcher.url" data-action="download" target="_blank" rel="noopener">
+            <svg class="icon" aria-hidden="true"><use href="#icon-play"/></svg>
+            Jouer<span class="visually-hidden"> : télécharger le launcher (nouvel onglet)</span>
+          </a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenu" tabindex="-1">
+
+    <!-- ===================== 1. HERO ===================== -->
+    <section class="hero" id="accueil" aria-labelledby="hero-title" data-hero>
+      <div class="hero__media" data-parallax>
+        <picture>
+          <source type="image/avif" srcset="assets/img/hero-citadelle-960.avif 960w, assets/img/hero-citadelle-1672.avif 1672w" sizes="100vw">
+          <source type="image/webp" srcset="assets/img/hero-citadelle-960.webp 960w, assets/img/hero-citadelle-1672.webp 1672w" sizes="100vw">
+          <img class="hero__image" src="assets/img/hero-citadelle-1672.webp" width="1672" height="941" decoding="async"
+               alt="La citadelle de Valdhéris, suspendue au-dessus d’une mer de nuages au crépuscule, un cristal violet en son cœur">
+        </picture>
+      </div>
+      <!-- Particules : braises et éclats arcaniques animés en CSS (transform/opacity, hors thread principal). -->
+      <div class="hero__embers" aria-hidden="true">
+        <span class="ember"></span>
+        <span class="ember"></span>
+        <span class="ember"></span>
+        <span class="ember ember--arcane"></span>
+        <span class="ember"></span>
+        <span class="ember"></span>
+        <span class="ember"></span>
+        <span class="ember"></span>
+        <span class="ember ember--arcane"></span>
+        <span class="ember"></span>
+        <span class="ember"></span>
+        <span class="ember"></span>
+        <span class="ember"></span>
+        <span class="ember ember--arcane"></span>
+        <span class="ember"></span>
+        <span class="ember"></span>
+        <span class="ember"></span>
+        <span class="ember ember--arcane"></span>
+        <span class="ember"></span>
+        <span class="ember"></span>
+      </div>
+      <div class="hero__veil" aria-hidden="true"></div>
+
+      <div class="hero__content container" data-hero-content>
+        <p class="hero__eyebrow">Serveur Minecraft Java · MMORPG</p>
+        <h1 class="hero__title" id="hero-title">
+          <picture>
+            <source type="image/avif" srcset="assets/img/logo-560.avif 560w, assets/img/logo-840.avif 840w, assets/img/logo-1120.avif 1120w" sizes="(min-width: 40rem) 35rem, 86vw">
+            <source type="image/webp" srcset="assets/img/logo-560.webp 560w, assets/img/logo-840.webp 840w, assets/img/logo-1120.webp 1120w" sizes="(min-width: 40rem) 35rem, 86vw">
+            <img class="hero__logo" src="assets/img/logo-560.webp" width="560" height="231" fetchpriority="high" alt="Aéloria">
+          </picture>
+        </h1>
+        <p class="hero__slogan" data-config-text="slogan">Le Seuil s’ouvre. Écris ta légende.</p>
+        <p class="hero__pitch">Un vrai MMORPG sur Minecraft Java&nbsp;: 4 classes, 100 niveaux, 250 quêtes, donjons et boss. Gratuit, en français.</p>
+
+        <div class="hero__actions">
+          <a class="button button--primary button--large" href="https://github.com/bananacheattv/gfrpg-launcher/releases/latest" data-config-href="launcher.url" data-action="download" target="_blank" rel="noopener">
+            <svg class="icon" aria-hidden="true"><use href="#icon-download"/></svg>
+            Télécharger le launcher<span class="visually-hidden"> (nouvel onglet)</span>
+          </a>
+          <a class="button button--ghost button--large" href="https://discord.gg/aeloria-mmorpg" data-config-href="links.discord" target="_blank" rel="noopener">
+            <svg class="icon" aria-hidden="true"><use href="#icon-discord"/></svg>
+            Rejoindre le Discord<span class="visually-hidden"> (nouvel onglet)</span>
+          </a>
+        </div>
+
+        <!-- Statut serveur : compteur temps réel (mcsrvstat.us) si une adresse publique est définie dans CONFIG, sinon « via le launcher ». -->
+        <div class="server-status" data-server-status data-state="launcher">
+          <p class="server-status__live" role="status">
+            <span class="server-status__dot" aria-hidden="true"></span>
+            <span class="server-status__text" data-server-text>Connexion via le launcher</span>
+          </p>
+          <div class="server-status__side">
+            <p class="server-status__meta" data-server-meta>Java <span data-config-text="game.minecraftVersion">26.3</span></p>
+            <button class="server-status__copy" type="button" data-action="copy-ip" hidden>
+              <svg class="icon" aria-hidden="true"><use href="#icon-copy"/></svg>
+              Copier l’IP
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <a class="hero__scroll" href="#univers">
+        <span class="visually-hidden">Découvrir l’univers</span>
+        <svg class="icon" aria-hidden="true"><use href="#icon-chevron"/></svg>
+      </a>
+    </section>
+
+    <!-- ===================== 2. UNIVERS ===================== -->
+    <section class="section universe" id="univers" aria-labelledby="univers-title">
+      <div class="container">
+        <header class="section__header">
+          <p class="section__eyebrow">L’univers</p>
+          <h2 class="section__title" id="univers-title">Un monde brisé attend ses Appelés</h2>
+          <p class="section__lead">Valdhéris flotte au-dessus des nuages, mais sous elle, le monde se fissure. Quatre actes, vingt régions et 250&nbsp;quêtes racontent la Brisure.</p>
+        </header>
+
+        <ol class="universe__list">
+          <li class="universe__item reveal">
+            <article class="lore-card frame">
+              <div class="lore-card__media">
+                <picture>
+                  <source type="image/avif" srcset="assets/img/univers-seuil-480.avif 480w, assets/img/univers-seuil-836.avif 836w" sizes="(min-width: 56rem) 38rem, calc(100vw - 2.5rem)">
+                  <source type="image/webp" srcset="assets/img/univers-seuil-480.webp 480w, assets/img/univers-seuil-836.webp 836w" sizes="(min-width: 56rem) 38rem, calc(100vw - 2.5rem)">
+                  <img class="lore-card__image" src="assets/img/univers-seuil-836.webp" width="836" height="470" loading="lazy" decoding="async"
+                       alt="Un portail violet s’ouvre sur des îles flottantes et une citadelle au coucher du soleil">
+                </picture>
+              </div>
+              <div class="lore-card__body">
+                <p class="lore-card__chapter"><span class="lore-card__numeral" aria-hidden="true">I</span>Acte I · L’Appel</p>
+                <h3 class="lore-card__title">Le Seuil</h3>
+                <p class="lore-card__text">Au sommet de Valdhéris, le Seuil appelle ceux qui viennent d’ailleurs. Ysméralde t’y accueille, et un œuf de braise éclot à tes pieds&nbsp;: Flammèche, ton dragonnet, ne te quittera plus.</p>
+              </div>
+            </article>
+          </li>
+          <li class="universe__item reveal">
+            <article class="lore-card frame">
+              <div class="lore-card__media">
+                <picture>
+                  <source type="image/avif" srcset="assets/img/univers-terres-brisees-480.avif 480w, assets/img/univers-terres-brisees-836.avif 836w" sizes="(min-width: 56rem) 38rem, calc(100vw - 2.5rem)">
+                  <source type="image/webp" srcset="assets/img/univers-terres-brisees-480.webp 480w, assets/img/univers-terres-brisees-836.webp 836w" sizes="(min-width: 56rem) 38rem, calc(100vw - 2.5rem)">
+                  <img class="lore-card__image" src="assets/img/univers-terres-brisees-836.webp" width="836" height="470" loading="lazy" decoding="async"
+                       alt="Une arène de pierre cernée de lave et de remparts en flammes">
+                </picture>
+              </div>
+              <div class="lore-card__body">
+                <p class="lore-card__chapter"><span class="lore-card__numeral" aria-hidden="true">II</span>Acte II</p>
+                <h3 class="lore-card__title">Les Terres Brisées</h3>
+                <p class="lore-card__text">La Brisure a fendu le monde. Des Plaines de Cendrelune aux marais de Fangeterre, réactive les Pierres-Relais et repousse les créatures qui rôdent entre les ruines.</p>
+              </div>
+            </article>
+          </li>
+          <li class="universe__item reveal">
+            <article class="lore-card frame">
+              <div class="lore-card__media">
+                <picture>
+                  <source type="image/avif" srcset="assets/img/univers-malvorn-480.avif 480w, assets/img/univers-malvorn-836.avif 836w" sizes="(min-width: 56rem) 38rem, calc(100vw - 2.5rem)">
+                  <source type="image/webp" srcset="assets/img/univers-malvorn-480.webp 480w, assets/img/univers-malvorn-836.webp 836w" sizes="(min-width: 56rem) 38rem, calc(100vw - 2.5rem)">
+                  <img class="lore-card__image" src="assets/img/univers-malvorn-836.webp" width="836" height="470" loading="lazy" decoding="async"
+                       alt="L’entrée monumentale d’une crypte, gardée par des cristaux violets et des braseros">
+                </picture>
+              </div>
+              <div class="lore-card__body">
+                <p class="lore-card__chapter"><span class="lore-card__numeral" aria-hidden="true">III</span>Acte III</p>
+                <h3 class="lore-card__title">Le Murmure de Malvorn</h3>
+                <p class="lore-card__text">Au-delà des Pics d’Hivernoir, un murmure ancien réveille les morts. Rassemble ta guilde, descends dans les cryptes et remonte sa trace jusqu’au cœur de la Brisure.</p>
+              </div>
+            </article>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ===================== 3. CLASSES ===================== -->
+    <section class="section section--alt classes" id="classes" aria-labelledby="classes-title">
+      <div class="container">
+        <header class="section__header">
+          <p class="section__eyebrow">Les classes</p>
+          <h2 class="section__title" id="classes-title">Choisis ta voie</h2>
+          <p class="section__lead">Quatre classes, quatre évolutions jusqu’au niveau&nbsp;100. Survole ou touche une carte pour découvrir son rôle.</p>
+        </header>
+
+        <ul class="classes__list" data-classes>
+          <!-- Guerrier -->
+          <li class="classes__item">
+            <article class="class-card class-card--guerrier" aria-labelledby="classe-guerrier-nom" data-class-card>
+              <div class="class-card__media">
+                <picture>
+                  <source type="image/avif" srcset="assets/img/classe-guerrier-480.avif">
+                  <img class="class-card__image" src="assets/img/classe-guerrier-480.webp" width="480" height="780" loading="lazy" decoding="async"
+                       alt="Guerrier en armure sombre et cape rouge, épée à la main, devant une forteresse en flammes">
+                </picture>
+              </div>
+              <div class="class-card__head">
+                <svg class="class-card__icon" aria-hidden="true"><use href="#icon-sword"/></svg>
+                <h3 class="class-card__name" id="classe-guerrier-nom">Guerrier</h3>
+                <p class="class-card__role">Mêlée · Dégâts</p>
+              </div>
+              <div class="class-card__details" id="classe-guerrier-details">
+                <div class="class-card__details-inner">
+                  <div class="class-card__details-body">
+                    <p class="class-card__desc">Au cœur de la mêlée, il encaisse et frappe fort. Simple à prendre en main, redoutable en groupe.</p>
+                    <ul class="stats" aria-label="Statistiques du Guerrier">
+                      <li class="stat"><span class="stat__label">Dégâts</span><span class="stat__bar stat__bar--5" role="meter" aria-label="Dégâts" aria-valuemin="0" aria-valuemax="5" aria-valuenow="5" aria-valuetext="5 sur 5"></span></li>
+                      <li class="stat"><span class="stat__label">Survie</span><span class="stat__bar stat__bar--3" role="meter" aria-label="Survie" aria-valuemin="0" aria-valuemax="5" aria-valuenow="3" aria-valuetext="3 sur 5"></span></li>
+                      <li class="stat"><span class="stat__label">Mobilité</span><span class="stat__bar stat__bar--3" role="meter" aria-label="Mobilité" aria-valuemin="0" aria-valuemax="5" aria-valuenow="3" aria-valuetext="3 sur 5"></span></li>
+                      <li class="stat"><span class="stat__label">Portée</span><span class="stat__bar stat__bar--1" role="meter" aria-label="Portée" aria-valuemin="0" aria-valuemax="5" aria-valuenow="1" aria-valuetext="1 sur 5"></span></li>
+                      <li class="stat"><span class="stat__label">Difficulté</span><span class="stat__bar stat__bar--2" role="meter" aria-label="Difficulté" aria-valuemin="0" aria-valuemax="5" aria-valuenow="2" aria-valuetext="2 sur 5"></span></li>
+                    </ul>
+                    <h4 class="class-card__subtitle">Compétences clés</h4>
+                    <ul class="skills">
+                      <li class="skills__item">Frappe Puissante</li>
+                      <li class="skills__item">Tourbillon d’Acier</li>
+                      <li class="skills__item">Charge Brutale</li>
+                      <li class="skills__item skills__item--ultimate"><svg class="icon" aria-hidden="true"><use href="#icon-crown"/></svg>Fureur du Dieu de la Guerre</li>
+                    </ul>
+                    <p class="class-card__evolution">Évolution ultime&nbsp;: <strong>Dieu de la Guerre</strong></p>
+                  </div>
+                </div>
+              </div>
+              <button class="class-card__toggle" type="button" aria-expanded="false" aria-controls="classe-guerrier-details" data-class-toggle>
+                <span data-class-toggle-label>Voir le rôle</span><span class="visually-hidden"> du Guerrier</span>
+                <svg class="icon" aria-hidden="true"><use href="#icon-chevron"/></svg>
+              </button>
+            </article>
+          </li>
+
+          <!-- Mage -->
+          <li class="classes__item">
+            <article class="class-card class-card--mage" aria-labelledby="classe-mage-nom" data-class-card>
+              <div class="class-card__media">
+                <picture>
+                  <source type="image/avif" srcset="assets/img/classe-mage-480.avif">
+                  <img class="class-card__image" src="assets/img/classe-mage-480.webp" width="480" height="780" loading="lazy" decoding="async"
+                       alt="Mage en robe violette et chapeau pointu, une flamme arcanique dans la main et un bâton orné d’un cristal">
+                </picture>
+              </div>
+              <div class="class-card__head">
+                <svg class="class-card__icon" aria-hidden="true"><use href="#icon-staff"/></svg>
+                <h3 class="class-card__name" id="classe-mage-nom">Mage</h3>
+                <p class="class-card__role">Distance · Magie de zone</p>
+              </div>
+              <div class="class-card__details" id="classe-mage-details">
+                <div class="class-card__details-inner">
+                  <div class="class-card__details-body">
+                    <p class="class-card__desc">Feu, givre et foudre&nbsp;: fragile, mais capable de balayer une meute entière depuis l’arrière.</p>
+                    <ul class="stats" aria-label="Statistiques du Mage">
+                      <li class="stat"><span class="stat__label">Dégâts</span><span class="stat__bar stat__bar--5" role="meter" aria-label="Dégâts" aria-valuemin="0" aria-valuemax="5" aria-valuenow="5" aria-valuetext="5 sur 5"></span></li>
+                      <li class="stat"><span class="stat__label">Survie</span><span class="stat__bar stat__bar--2" role="meter" aria-label="Survie" aria-valuemin="0" aria-valuemax="5" aria-valuenow="2" aria-valuetext="2 sur 5"></span></li>
+                      <li class="stat"><span class="stat__label">Mobilité</span><span class="stat__bar stat__bar--3" role="meter" aria-label="Mobilité" aria-valuemin="0" aria-valuemax="5" aria-valuenow="3" aria-valuetext="3 sur 5"></span></li>
+                      <li class="stat"><span class="stat__label">Portée</span><span class="stat__bar stat__bar--4" role="meter" aria-label="Portée" aria-valuemin="0" aria-valuemax="5" aria-valuenow="4" aria-valuetext="4 sur 5"></span></li>
+                      <li class="stat"><span class="stat__label">Difficulté</span><span class="stat__bar stat__bar--4" role="meter" aria-label="Difficulté" aria-valuemin="0" aria-valuemax="5" aria-valuenow="4" aria-valuetext="4 sur 5"></span></li>
+                    </ul>
+                    <h4 class="class-card__subtitle">Compétences clés</h4>
+                    <ul class="skills">
+                      <li class="skills__item">Boule de Feu</li>
+                      <li class="skills__item">Nova de Givre</li>
+                      <li class="skills__item">Éclair en Chaîne</li>
+                      <li class="skills__item skills__item--ultimate"><svg class="icon" aria-hidden="true"><use href="#icon-crown"/></svg>Météore Céleste</li>
+                    </ul>
+                    <p class="class-card__evolution">Évolution ultime&nbsp;: <strong>Avatar des Arcanes</strong></p>
+                  </div>
+                </div>
+              </div>
+              <button class="class-card__toggle" type="button" aria-expanded="false" aria-controls="classe-mage-details" data-class-toggle>
+                <span data-class-toggle-label>Voir le rôle</span><span class="visually-hidden"> du Mage</span>
+                <svg class="icon" aria-hidden="true"><use href="#icon-chevron"/></svg>
+              </button>
+            </article>
+          </li>
+
+          <!-- Archer -->
+          <li class="classes__item">
+            <article class="class-card class-card--archer" aria-labelledby="classe-archer-nom" data-class-card>
+              <div class="class-card__media">
+                <picture>
+                  <source type="image/avif" srcset="assets/img/classe-archer-480.avif">
+                  <img class="class-card__image" src="assets/img/classe-archer-480.webp" width="480" height="780" loading="lazy" decoding="async"
+                       alt="Archer encapuchonné de vert, arc bandé, dans une forêt éclairée par la lune">
+                </picture>
+              </div>
+              <div class="class-card__head">
+                <svg class="class-card__icon" aria-hidden="true"><use href="#icon-bow"/></svg>
+                <h3 class="class-card__name" id="classe-archer-nom">Archer</h3>
+                <p class="class-card__role">Distance · Mobilité</p>
+              </div>
+              <div class="class-card__details" id="classe-archer-details">
+                <div class="class-card__details-inner">
+                  <div class="class-card__details-body">
+                    <p class="class-card__desc">Rapide et insaisissable, il harcèle à distance et contrôle le terrain. Sa Chimère combat à ses côtés.</p>
+                    <ul class="stats" aria-label="Statistiques de l’Archer">
+                      <li class="stat"><span class="stat__label">Dégâts</span><span class="stat__bar stat__bar--4" role="meter" aria-label="Dégâts" aria-valuemin="0" aria-valuemax="5" aria-valuenow="4" aria-valuetext="4 sur 5"></span></li>
+                      <li class="stat"><span class="stat__label">Survie</span><span class="stat__bar stat__bar--2" role="meter" aria-label="Survie" aria-valuemin="0" aria-valuemax="5" aria-valuenow="2" aria-valuetext="2 sur 5"></span></li>
+                      <li class="stat"><span class="stat__label">Mobilité</span><span class="stat__bar stat__bar--5" role="meter" aria-label="Mobilité" aria-valuemin="0" aria-valuemax="5" aria-valuenow="5" aria-valuetext="5 sur 5"></span></li>
+                      <li class="stat"><span class="stat__label">Portée</span><span class="stat__bar stat__bar--5" role="meter" aria-label="Portée" aria-valuemin="0" aria-valuemax="5" aria-valuenow="5" aria-valuetext="5 sur 5"></span></li>
+                      <li class="stat"><span class="stat__label">Difficulté</span><span class="stat__bar stat__bar--3" role="meter" aria-label="Difficulté" aria-valuemin="0" aria-valuemax="5" aria-valuenow="3" aria-valuetext="3 sur 5"></span></li>
+                    </ul>
+                    <h4 class="class-card__subtitle">Compétences clés</h4>
+                    <ul class="skills">
+                      <li class="skills__item">Pluie de Flèches</li>
+                      <li class="skills__item">Invocation&nbsp;: Chimère</li>
+                      <li class="skills__item">Saut Acrobatique</li>
+                      <li class="skills__item skills__item--ultimate"><svg class="icon" aria-hidden="true"><use href="#icon-crown"/></svg>Tempête Divine</li>
+                    </ul>
+                    <p class="class-card__evolution">Évolution ultime&nbsp;: <strong>Archer Divin</strong></p>
+                  </div>
+                </div>
+              </div>
+              <button class="class-card__toggle" type="button" aria-expanded="false" aria-controls="classe-archer-details" data-class-toggle>
+                <span data-class-toggle-label>Voir le rôle</span><span class="visually-hidden"> de l’Archer</span>
+                <svg class="icon" aria-hidden="true"><use href="#icon-chevron"/></svg>
+              </button>
+            </article>
+          </li>
+
+          <!-- Tank -->
+          <li class="classes__item">
+            <article class="class-card class-card--tank" aria-labelledby="classe-tank-nom" data-class-card>
+              <div class="class-card__media">
+                <picture>
+                  <source type="image/avif" srcset="assets/img/classe-tank-480.avif">
+                  <img class="class-card__image" src="assets/img/classe-tank-480.webp" width="480" height="780" loading="lazy" decoding="async"
+                       alt="Tank en armure blanche et or, marteau de guerre et grand bouclier frappé d’une croix">
+                </picture>
+              </div>
+              <div class="class-card__head">
+                <svg class="class-card__icon" aria-hidden="true"><use href="#icon-shield"/></svg>
+                <h3 class="class-card__name" id="classe-tank-nom">Tank</h3>
+                <p class="class-card__role">Protection · Soutien</p>
+              </div>
+              <div class="class-card__details" id="classe-tank-details">
+                <div class="class-card__details-inner">
+                  <div class="class-card__details-body">
+                    <p class="class-card__desc">Le rempart du groupe&nbsp;: il provoque, protège ses alliés et tient la ligne face aux boss.</p>
+                    <ul class="stats" aria-label="Statistiques du Tank">
+                      <li class="stat"><span class="stat__label">Dégâts</span><span class="stat__bar stat__bar--2" role="meter" aria-label="Dégâts" aria-valuemin="0" aria-valuemax="5" aria-valuenow="2" aria-valuetext="2 sur 5"></span></li>
+                      <li class="stat"><span class="stat__label">Survie</span><span class="stat__bar stat__bar--5" role="meter" aria-label="Survie" aria-valuemin="0" aria-valuemax="5" aria-valuenow="5" aria-valuetext="5 sur 5"></span></li>
+                      <li class="stat"><span class="stat__label">Mobilité</span><span class="stat__bar stat__bar--2" role="meter" aria-label="Mobilité" aria-valuemin="0" aria-valuemax="5" aria-valuenow="2" aria-valuetext="2 sur 5"></span></li>
+                      <li class="stat"><span class="stat__label">Portée</span><span class="stat__bar stat__bar--2" role="meter" aria-label="Portée" aria-valuemin="0" aria-valuemax="5" aria-valuenow="2" aria-valuetext="2 sur 5"></span></li>
+                      <li class="stat"><span class="stat__label">Difficulté</span><span class="stat__bar stat__bar--3" role="meter" aria-label="Difficulté" aria-valuemin="0" aria-valuemax="5" aria-valuenow="3" aria-valuetext="3 sur 5"></span></li>
+                    </ul>
+                    <h4 class="class-card__subtitle">Compétences clés</h4>
+                    <ul class="skills">
+                      <li class="skills__item">Coup de Bouclier</li>
+                      <li class="skills__item">Provocation</li>
+                      <li class="skills__item">Forteresse</li>
+                      <li class="skills__item skills__item--ultimate"><svg class="icon" aria-hidden="true"><use href="#icon-crown"/></svg>Rempart du Titan</li>
+                    </ul>
+                    <p class="class-card__evolution">Évolution ultime&nbsp;: <strong>Titan Immortel</strong></p>
+                  </div>
+                </div>
+              </div>
+              <button class="class-card__toggle" type="button" aria-expanded="false" aria-controls="classe-tank-details" data-class-toggle>
+                <span data-class-toggle-label>Voir le rôle</span><span class="visually-hidden"> du Tank</span>
+                <svg class="icon" aria-hidden="true"><use href="#icon-chevron"/></svg>
+              </button>
+            </article>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== 4. REJOINDRE ===================== -->
+    <section class="section join" id="rejoindre" aria-labelledby="rejoindre-title">
+      <div class="container">
+        <header class="section__header">
+          <p class="section__eyebrow">Rejoindre</p>
+          <h2 class="section__title" id="rejoindre-title">En jeu en 3 étapes</h2>
+          <p class="section__lead">Pas d’IP à retenir, pas de mods à installer&nbsp;: le launcher s’occupe de tout.</p>
+        </header>
+
+        <ul class="requirements" aria-label="Configuration requise">
+          <li class="requirements__item">Minecraft Java <strong data-config-text="game.minecraftVersion">26.3</strong></li>
+          <li class="requirements__item"><span data-config-text="game.loader">NeoForge</span> inclus</li>
+          <li class="requirements__item" data-config-text="launcher.platform">Windows 10 / 11</li>
+        </ul>
+
+        <ol class="steps">
+          <li class="step reveal">
+            <span class="step__number" aria-hidden="true">1</span>
+            <svg class="step__icon" aria-hidden="true"><use href="#icon-download"/></svg>
+            <h3 class="step__title">Télécharge le launcher</h3>
+            <p class="step__text">Gratuit et léger. Il installe tout seul Minecraft Java <span data-config-text="game.minecraftVersion">26.3</span>, NeoForge et le modpack Aéloria.</p>
+            <a class="button button--primary step__action" href="https://github.com/bananacheattv/gfrpg-launcher/releases/latest" data-config-href="launcher.url" data-action="download" target="_blank" rel="noopener">
+              <svg class="icon" aria-hidden="true"><use href="#icon-download"/></svg>
+              Télécharger<span class="visually-hidden"> le launcher (nouvel onglet)</span>
+            </a>
+          </li>
+          <li class="step reveal">
+            <span class="step__number" aria-hidden="true">2</span>
+            <svg class="step__icon" aria-hidden="true"><use href="#icon-user"/></svg>
+            <h3 class="step__title">Connecte ton compte</h3>
+            <p class="step__text">Identifie-toi avec ton compte Microsoft (Minecraft Java Edition). Le launcher télécharge le modpack et le tient à jour.</p>
+          </li>
+          <li class="step reveal">
+            <span class="step__number" aria-hidden="true">3</span>
+            <svg class="step__icon" aria-hidden="true"><use href="#icon-play"/></svg>
+            <h3 class="step__title">Clique sur Jouer</h3>
+            <p class="step__text">Le launcher te connecte directement au Seuil, sans IP à saisir. Flammèche t’attend pour ta première quête.</p>
+          </li>
+        </ol>
+
+        <p class="join__help">Un souci d’installation&nbsp;? <a class="link" href="https://discord.gg/aeloria-mmorpg" data-config-href="links.discord" target="_blank" rel="noopener">Demande de l’aide sur le Discord<span class="visually-hidden"> (nouvel onglet)</span></a>.</p>
+      </div>
+    </section>
+
+    <!-- ===================== 5. ACTUALITÉS (générées depuis CONFIG.news) ===================== -->
+    <section class="section section--alt news" id="actualites" aria-labelledby="actualites-title">
+      <div class="container">
+        <header class="section__header">
+          <p class="section__eyebrow">Actualités</p>
+          <h2 class="section__title" id="actualites-title">Dernières mises à jour</h2>
+        </header>
+
+        <ol class="news__list" data-news-list></ol>
+        <noscript><p class="news__fallback">Active JavaScript pour afficher les actualités, ou retrouve-les sur notre Discord.</p></noscript>
+
+        <p class="news__more">
+          <a class="link link--arrow" href="https://discord.gg/aeloria-mmorpg" data-config-href="links.discord" target="_blank" rel="noopener">
+            Toutes les annonces sur le Discord<span class="visually-hidden"> (nouvel onglet)</span>
+            <svg class="icon" aria-hidden="true"><use href="#icon-arrow"/></svg>
+          </a>
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== 6. RÈGLEMENT ===================== -->
+    <section class="section rules" id="reglement" aria-labelledby="reglement-title">
+      <div class="container container--narrow">
+        <header class="section__header">
+          <p class="section__eyebrow">Règlement</p>
+          <h2 class="section__title" id="reglement-title">Les lois du Seuil</h2>
+          <p class="section__lead">Quelques règles simples pour que l’aventure reste juste et agréable pour tous.</p>
+        </header>
+
+        <div class="accordion">
+          <details class="accordion__item" open>
+            <summary class="accordion__summary">
+              <span class="accordion__index" aria-hidden="true">I</span>
+              <span class="accordion__label">Respect et chat</span>
+              <svg class="icon accordion__chevron" aria-hidden="true"><use href="#icon-chevron"/></svg>
+            </summary>
+            <div class="accordion__panel">
+              <ul class="accordion__list">
+                <li>Aucune insulte, aucun harcèlement, aucun propos discriminatoire ou haineux.</li>
+                <li>Pas de spam, de flood ni de messages entièrement en majuscules.</li>
+                <li>Pas de publicité pour d’autres serveurs ou services.</li>
+                <li>Pseudo, skin et nom de guilde doivent rester corrects.</li>
+              </ul>
+            </div>
+          </details>
+          <details class="accordion__item">
+            <summary class="accordion__summary">
+              <span class="accordion__index" aria-hidden="true">II</span>
+              <span class="accordion__label">Triche et bugs</span>
+              <svg class="icon accordion__chevron" aria-hidden="true"><use href="#icon-chevron"/></svg>
+            </summary>
+            <div class="accordion__panel">
+              <ul class="accordion__list">
+                <li>Clients modifiés, macros, auto-clics, x-ray et mods non fournis par le launcher sont interdits.</li>
+                <li>Exploiter un bug est sanctionné&nbsp;; le signaler sur le Discord aide tout le monde.</li>
+                <li>Pas de multi-compte pour contourner les limites, les classements ou l’économie.</li>
+              </ul>
+            </div>
+          </details>
+          <details class="accordion__item">
+            <summary class="accordion__summary">
+              <span class="accordion__index" aria-hidden="true">III</span>
+              <span class="accordion__label">Combat, groupes et donjons</span>
+              <svg class="icon accordion__chevron" aria-hidden="true"><use href="#icon-chevron"/></svg>
+            </summary>
+            <div class="accordion__panel">
+              <ul class="accordion__list">
+                <li>Le PvP se joue dans les arènes et les zones prévues&nbsp;; les zones sûres sont à respecter.</li>
+                <li>Pas d’anti-jeu en groupe ou en donjon&nbsp;: abandon volontaire, sabotage, blocage d’un boss.</li>
+                <li>Les invitations de groupe et de guilde ne doivent pas servir à harceler.</li>
+              </ul>
+            </div>
+          </details>
+          <details class="accordion__item">
+            <summary class="accordion__summary">
+              <span class="accordion__index" aria-hidden="true">IV</span>
+              <span class="accordion__label">Économie et échanges</span>
+              <svg class="icon accordion__chevron" aria-hidden="true"><use href="#icon-chevron"/></svg>
+            </summary>
+            <div class="accordion__panel">
+              <ul class="accordion__list">
+                <li>Échange via l’hôtel des ventes ou la fenêtre d’échange, et vérifie toujours l’écran de confirmation.</li>
+                <li>Aucune vente d’objets, de comptes ou de services contre de l’argent réel.</li>
+                <li>Les arnaques sont sanctionnées comme de la triche.</li>
+              </ul>
+            </div>
+          </details>
+          <details class="accordion__item">
+            <summary class="accordion__summary">
+              <span class="accordion__index" aria-hidden="true">V</span>
+              <span class="accordion__label">Sanctions</span>
+              <svg class="icon accordion__chevron" aria-hidden="true"><use href="#icon-chevron"/></svg>
+            </summary>
+            <div class="accordion__panel">
+              <ul class="accordion__list">
+                <li>Selon la gravité&nbsp;: avertissement, mute, exclusion temporaire ou bannissement définitif.</li>
+                <li>Une décision se conteste calmement sur le Discord, jamais en jeu.</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 7. STAFF (généré depuis CONFIG.staff) ===================== -->
+    <section class="section section--alt staff" id="staff" aria-labelledby="staff-title">
+      <div class="container">
+        <header class="section__header">
+          <p class="section__eyebrow">L’équipe</p>
+          <h2 class="section__title" id="staff-title">Les gardiens du Seuil</h2>
+          <p class="section__lead">Une équipe passionnée qui construit, anime et protège Aéloria.</p>
+        </header>
+
+        <ul class="staff__list" data-staff-list>
+          <!-- Carte « recrutement » toujours en dernier : les membres de CONFIG.staff sont insérés avant elle. -->
+          <li class="staff__item" data-staff-recruit>
+            <a class="staff-card staff-card--recruit frame" href="https://discord.gg/aeloria-mmorpg" data-config-href="links.discord" target="_blank" rel="noopener">
+              <span class="staff-card__avatar staff-card__avatar--empty" aria-hidden="true">+</span>
+              <span class="staff-card__name">Rejoins l’équipe</span>
+              <span class="staff-card__role">Recrutement ouvert</span>
+              <span class="staff-card__bio">Modération, animation, construction&nbsp;: candidate sur le Discord.<span class="visually-hidden"> (nouvel onglet)</span></span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== 8. FAQ (microdonnées schema.org FAQPage) ===================== -->
+    <section class="section faq" id="faq" aria-labelledby="faq-title" itemscope itemtype="https://schema.org/FAQPage">
+      <div class="container container--narrow">
+        <header class="section__header">
+          <p class="section__eyebrow">FAQ</p>
+          <h2 class="section__title" id="faq-title">Questions fréquentes</h2>
+        </header>
+
+        <div class="accordion">
+          <details class="accordion__item" name="faq" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+            <summary class="accordion__summary">
+              <span class="accordion__label" itemprop="name">Le serveur est-il gratuit&nbsp;?</span>
+              <svg class="icon accordion__chevron" aria-hidden="true"><use href="#icon-chevron"/></svg>
+            </summary>
+            <div class="accordion__panel" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+              <p itemprop="text">Oui. Aéloria est entièrement gratuit, et les achats en argent réel sont désactivés.</p>
+            </div>
+          </details>
+          <details class="accordion__item" name="faq" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+            <summary class="accordion__summary">
+              <span class="accordion__label" itemprop="name">Faut-il un compte Minecraft officiel&nbsp;?</span>
+              <svg class="icon accordion__chevron" aria-hidden="true"><use href="#icon-chevron"/></svg>
+            </summary>
+            <div class="accordion__panel" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+              <p itemprop="text">Oui, un compte Minecraft Java Edition (compte Microsoft). Tu te connectes une fois dans le launcher, il retient ta session.</p>
+            </div>
+          </details>
+          <details class="accordion__item" name="faq" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+            <summary class="accordion__summary">
+              <span class="accordion__label" itemprop="name">Je joue sur mobile, console ou Bedrock&nbsp;: je peux venir&nbsp;?</span>
+              <svg class="icon accordion__chevron" aria-hidden="true"><use href="#icon-chevron"/></svg>
+            </summary>
+            <div class="accordion__panel" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+              <p itemprop="text">Pas encore&nbsp;: Aéloria est un serveur Minecraft Java pour ordinateur. Depuis ton téléphone, rejoins le Discord pour suivre l’actualité et préparer ton arrivée.</p>
+            </div>
+          </details>
+          <details class="accordion__item" name="faq" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+            <summary class="accordion__summary">
+              <span class="accordion__label" itemprop="name">Dois-je installer les mods moi-même&nbsp;?</span>
+              <svg class="icon accordion__chevron" aria-hidden="true"><use href="#icon-chevron"/></svg>
+            </summary>
+            <div class="accordion__panel" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+              <p itemprop="text">Non. Le launcher installe Minecraft, NeoForge et le modpack Aéloria, puis les tient à jour pour toi.</p>
+            </div>
+          </details>
+          <details class="accordion__item" name="faq" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+            <summary class="accordion__summary">
+              <span class="accordion__label" itemprop="name">Quelle configuration faut-il&nbsp;?</span>
+              <svg class="icon accordion__chevron" aria-hidden="true"><use href="#icon-chevron"/></svg>
+            </summary>
+            <div class="accordion__panel" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+              <p itemprop="text">Un PC sous Windows 10 ou 11 capable de faire tourner Minecraft Java. Avec les modèles 3D d’Aéloria, 8&nbsp;Go de RAM ou plus sont conseillés.</p>
+            </div>
+          </details>
+          <details class="accordion__item" name="faq" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+            <summary class="accordion__summary">
+              <span class="accordion__label" itemprop="name">Puis-je changer de classe&nbsp;?</span>
+              <svg class="icon accordion__chevron" aria-hidden="true"><use href="#icon-chevron"/></svg>
+            </summary>
+            <div class="accordion__panel" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+              <p itemprop="text">Oui, avec une rune de changement de classe. Armes et compétences sont liées à la classe&nbsp;: pense à t’équiper pour ta nouvelle voie.</p>
+            </div>
+          </details>
+          <details class="accordion__item" name="faq" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+            <summary class="accordion__summary">
+              <span class="accordion__label" itemprop="name">Quel est le niveau maximum&nbsp;?</span>
+              <svg class="icon accordion__chevron" aria-hidden="true"><use href="#icon-chevron"/></svg>
+            </summary>
+            <div class="accordion__panel" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+              <p itemprop="text">Le niveau 100. Ta classe évolue aux niveaux 25, 50, 75 et 100, jusqu’à sa forme ultime.</p>
+            </div>
+          </details>
+          <details class="accordion__item" name="faq" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+            <summary class="accordion__summary">
+              <span class="accordion__label" itemprop="name">Comment signaler un bug ou un joueur&nbsp;?</span>
+              <svg class="icon accordion__chevron" aria-hidden="true"><use href="#icon-chevron"/></svg>
+            </summary>
+            <div class="accordion__panel" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+              <p itemprop="text">Sur le Discord, dans le salon prévu à cet effet. Ajoute une capture d’écran si tu peux&nbsp;: le staff traite chaque signalement.</p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== APPEL FINAL ===================== -->
+    <section class="cta-band" aria-labelledby="cta-title">
+      <div class="cta-band__inner container frame">
+        <img class="cta-band__emblem" src="assets/img/embleme-256.webp" width="128" height="128" loading="lazy" decoding="async" alt="">
+        <h2 class="cta-band__title" id="cta-title" data-config-text="slogan">Le Seuil s’ouvre. Écris ta légende.</h2>
+        <p class="cta-band__text">Ton aventure commence dans deux minutes.</p>
+        <div class="cta-band__actions">
+          <a class="button button--primary button--large" href="https://github.com/bananacheattv/gfrpg-launcher/releases/latest" data-config-href="launcher.url" data-action="download" target="_blank" rel="noopener">
+            <svg class="icon" aria-hidden="true"><use href="#icon-download"/></svg>
+            Télécharger le launcher<span class="visually-hidden"> (nouvel onglet)</span>
+          </a>
+          <a class="button button--ghost button--large" href="https://discord.gg/aeloria-mmorpg" data-config-href="links.discord" target="_blank" rel="noopener">
+            <svg class="icon" aria-hidden="true"><use href="#icon-discord"/></svg>
+            Rejoindre le Discord<span class="visually-hidden"> (nouvel onglet)</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== 9. PIED DE PAGE ===================== -->
+  <footer class="site-footer">
+    <div class="site-footer__inner container">
+      <div class="site-footer__brand">
+        <a class="brand" href="#accueil" aria-label="Aéloria, retour en haut de page">
+          <img class="brand__emblem" src="assets/img/embleme-96.webp" width="40" height="40" loading="lazy" decoding="async" alt="">
+          <span class="brand__name">Aéloria</span>
+        </a>
+        <p class="site-footer__tagline" data-config-text="slogan">Le Seuil s’ouvre. Écris ta légende.</p>
+      </div>
+
+      <nav class="site-footer__col" aria-label="Plan du site">
+        <h2 class="site-footer__title">Explorer</h2>
+        <ul class="site-footer__list">
+          <li><a class="site-footer__link" href="#univers">Univers</a></li>
+          <li><a class="site-footer__link" href="#classes">Classes</a></li>
+          <li><a class="site-footer__link" href="#rejoindre">Rejoindre</a></li>
+          <li><a class="site-footer__link" href="#actualites">Actualités</a></li>
+        </ul>
+      </nav>
+
+      <div class="site-footer__col">
+        <h2 class="site-footer__title">Communauté</h2>
+        <ul class="site-footer__list" data-social-list>
+          <li><a class="site-footer__link" href="https://discord.gg/aeloria-mmorpg" data-config-href="links.discord" target="_blank" rel="noopener">Discord<span class="visually-hidden"> (nouvel onglet)</span></a></li>
+        </ul>
+      </div>
+
+      <div class="site-footer__col">
+        <h2 class="site-footer__title">Infos</h2>
+        <ul class="site-footer__list">
+          <li><a class="site-footer__link" href="#reglement">Règlement</a></li>
+          <li><a class="site-footer__link" href="#faq">FAQ</a></li>
+          <li><button class="site-footer__link site-footer__link--button" type="button" data-dialog-open="mentions">Mentions légales</button></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="site-footer__bottom container">
+      <p>© <span data-year>2026</span> Aéloria. Projet communautaire non affilié à Mojang Studios ni à Microsoft. Minecraft est une marque de Mojang Synergies AB.</p>
+    </div>
+  </footer>
+
+  <!-- Mentions légales (boîte de dialogue native : focus piégé et Échap gérés par le navigateur). -->
+  <dialog class="dialog frame" id="mentions" aria-labelledby="mentions-title" data-dialog>
+    <div class="dialog__header">
+      <h2 class="dialog__title" id="mentions-title">Mentions légales</h2>
+      <button class="dialog__close" type="button" data-dialog-close>
+        <svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg>
+        <span class="visually-hidden">Fermer</span>
+      </button>
+    </div>
+    <div class="dialog__body">
+      <h3>Éditeur</h3>
+      <p>Aéloria, projet communautaire non commercial. Contact&nbsp;: <a class="link" href="https://discord.gg/aeloria-mmorpg" data-config-href="links.discord" target="_blank" rel="noopener">Discord officiel<span class="visually-hidden"> (nouvel onglet)</span></a>.</p>
+      <h3>Hébergement</h3>
+      <p data-config-text="legal.host">Netlify, Inc., San Francisco, Californie, États-Unis (netlify.com).</p>
+      <h3>Données personnelles</h3>
+      <p>Ce site ne dépose aucun cookie et ne collecte aucune donnée personnelle. Il interroge api.mcsrvstat.us (statut du serveur) et mc-heads.net (têtes des skins du staff)&nbsp;; ces services reçoivent, comme pour toute page web, l’adresse IP du visiteur.</p>
+      <h3>Propriété intellectuelle</h3>
+      <p>Illustrations, logo et textes © Aéloria. Polices Cinzel et Inter sous licence SIL Open Font License. Aéloria n’est ni approuvé ni affilié à Mojang Studios ou Microsoft.</p>
+    </div>
+  </dialog>
+
+  <!-- Templates utilisés par script.js (aucun innerHTML : contenu inséré via textContent). -->
+  <template id="news-template">
+    <li class="news__item reveal">
+      <article class="news-card frame">
+        <p class="news-card__meta">
+          <span class="news-card__tag"></span>
+          <time class="news-card__date"></time>
+        </p>
+        <h3 class="news-card__title"></h3>
+        <p class="news-card__text"></p>
+      </article>
+    </li>
+  </template>
+
+  <template id="staff-template">
+    <li class="staff__item">
+      <article class="staff-card frame">
+        <div class="staff-card__avatar">
+          <img class="staff-card__image" width="120" height="120" loading="lazy" decoding="async" alt="">
+        </div>
+        <h3 class="staff-card__name"></h3>
+        <p class="staff-card__role"></p>
+        <p class="staff-card__bio"></p>
+      </article>
+    </li>
+  </template>
+
+  <!-- Notifications (copie de l’IP, téléchargement…) -->
+  <div class="toast" role="status" aria-live="polite" aria-atomic="true" data-toast>
+    <svg class="icon toast__icon" aria-hidden="true"><use href="#icon-check"/></svg>
+    <span class="toast__text" data-toast-text></span>
+  </div>
+</body>
+</html>
