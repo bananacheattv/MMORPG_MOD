@@ -75,9 +75,9 @@ public abstract class RpgBoss extends RpgMonster {
     private static final byte EVENT_CLIP = 80;
     private final BossFury.State fury=new BossFury.State();
     /** Base de la puissance offensive du boss (surchargee par les gardiens de guilde, deja tres puissants). */
-    protected double baseDamage(){return 1.5;}
+    protected double baseDamage(){return 1.25;}
     /** Base de la robustesse du boss : les degats recus sont divises par ce facteur. */
-    protected double baseToughness(){return 1.8;}
+    protected double baseToughness(){return 1.5;}
     public double damageMultiplier(){return BossFury.damageMultiplier(this,fury,phase,baseDamage());}
     public double toughness(){return BossFury.toughness(fury,baseToughness())*(exposed()?0.5:1.0);}
     @Override public void die(DamageSource source){if(level() instanceof ServerLevel sl)BossFury.discardAdds(sl,fury);super.die(source);}

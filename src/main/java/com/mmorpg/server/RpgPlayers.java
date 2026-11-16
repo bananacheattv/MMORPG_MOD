@@ -211,7 +211,7 @@ public final class RpgPlayers {
             double maxMana = d.stats.get(Stat.MAX_MANA);
             // One discrete pulse every five seconds, independent of food and the old base regen stat.
             if (player.tickCount % 100 == 0) d.hp = (float) Math.min(maxHp, d.hp + maxHp * 0.01*com.mmorpg.combat.MobDebuffs.healingMultiplier(player));
-            d.mana = (float) Math.min(maxMana, d.mana + d.stats.get(Stat.MANA_REGEN) / 20.0);
+            d.mana = (float) Math.min(maxMana, d.mana + d.stats.get(Stat.MANA_REGEN) * (com.mmorpg.dungeon.DungeonBalance.inDungeon(player.level()) ? com.mmorpg.dungeon.DungeonBalance.manaRegen(d.playerClass) : 1.0) / 20.0);
             syncVanillaHealth(player);
         }
         // pieces d'or ramassees -> porte-monnaie ; suivi des objectifs de collecte

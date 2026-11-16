@@ -320,6 +320,8 @@ public final class RpgCombat {
         if (target instanceof ServerPlayer tp) {
             damage = incomingModifiers(tp, damage);damage=ShieldGuard.absorb(tp,source,damage,h.max());
         }
+        if (playerAttacker != null && !(target instanceof ServerPlayer)) damage *= com.mmorpg.dungeon.DungeonBalance.dealt(playerAttacker);
+        if (target instanceof ServerPlayer dp && !(attacker instanceof ServerPlayer) && attacker instanceof LivingEntity && !environmental) damage *= com.mmorpg.dungeon.DungeonBalance.taken(dp);
         if(playerAttacker!=null)damage*=com.mmorpg.competition.PvpEquipment.outgoing(playerAttacker,target instanceof ServerPlayer);
         if(target instanceof ServerPlayer pv&&attacker instanceof LivingEntity)damage*=com.mmorpg.competition.PvpEquipment.incoming(pv,playerAttacker!=null);
         damage = Math.max(0, damage);

@@ -24,7 +24,7 @@ public final class DevBossChecks {
         check(boss != null, "boss spawned");
         try {
             var md = boss.getExistingDataOrNull(ModAttachments.MOB);
-            check(boss.toughness() >= 1.79 && boss.damageMultiplier() >= 1.49, "base toughness/damage " + boss.toughness() + "/" + boss.damageMultiplier());
+            check(boss.toughness() >= 1.49 && boss.damageMultiplier() >= 1.24, "base toughness/damage " + boss.toughness() + "/" + boss.damageMultiplier());
             boss.setTarget(p);
             for (int i = 0; i < 60; i++) boss.tick();
             check(boss.combatPhase() == 1, "phase 1 at full life");
