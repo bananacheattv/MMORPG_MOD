@@ -254,7 +254,7 @@ public final class StyledDungeon {
         private void gameElements(Trials.Plan plan) {
             RandomSource r = level.getRandom();
             var mobs = t.mobs.get();
-            c.set(0, 1, Theme.HALL_Z, ModBlocks.TELEPORTEUR.get());
+            if (!level.dimension().equals(InstanceManager.DIM)) c.set(0, 1, Theme.HALL_Z, ModBlocks.TELEPORTEUR.get());   // pas de portail dans les exemplaires : sortie par le Passeur ou /spawn
             for (int i = 0; i < Layout.ROOMS.length; i++) {
                 Layout.Room rm = Layout.ROOMS[i];
                 // sans epreuve : deux generateurs de monstres comme un donjon classique

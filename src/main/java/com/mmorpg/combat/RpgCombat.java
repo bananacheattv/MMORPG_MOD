@@ -125,6 +125,7 @@ public final class RpgCombat {
                 if (com.mmorpg.server.PartyManager.sameParty(ap, p)) return false;
                 return ConfigManager.general().skillsHitPlayers && p.level() instanceof net.minecraft.server.level.ServerLevel psl && psl.isPvpAllowed();
             }
+            if (attacker instanceof net.minecraft.world.entity.Mob && com.mmorpg.server.SafeSpawn.safe(p)) return false;   // zone sure : les monstres ignorent le joueur
             return true;
         }
         if (target instanceof OwnableEntity own && own.getOwner() != null) {

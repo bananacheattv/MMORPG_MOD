@@ -54,6 +54,7 @@ public class PetsScreen extends MenuScreen {
         for (PetType p : PetType.values()) if (d.petXp.containsKey(p.id)) owned++;
         Ui.header(g, x0, y0, 196, "COLLECTION (" + owned + "/" + PetType.values().length + ")");
         int cell = 46;
+        PetType hoverLabel = null;
         PetType[] pets = PetType.values();
         for (int i = 0; i < pets.length; i++) {
             PetType p = pets[i];
@@ -65,10 +66,11 @@ public class PetsScreen extends MenuScreen {
             g.fill(cx + 2, cy + 2, cx + cell - 2, cy + cell + 12, rarityBg(p));
             if (active) Ui.border(g, cx + 1, cy + 1, cell - 2, cell + 12, 0xFF60FF60);
             preview(g, p, cx + 3, cy + 2, cell - 6);
-            if (hovered(cx, cy, cell, cell + 14)) tooltip(g, List.of(Component.literal(p.label).withColor(p.rarity.color)));
+            if (hovered(cx, cy, cell, cell + 14)) hoverLabel = p;
             if (!has) {
                 g.fill(cx + 1, cy + 1, cx + cell - 1, cy + cell + 13, 0x70000000);
-                g.centeredText(font, Component.literal("?"), cx + cell / 2, cy + 16, Ui.MUTED);
+                g.fill(cx + 3, cy + 3, cx + 13, cy + 14, 0xB0000000);
+                g.centeredText(font, Component.literal("?"), cx + 8, cy + 5, Ui.TEXT);
             } else {
                 String lv = "Niv. " + d.petLevel(p.id);
                 g.centeredText(font, Component.literal(lv), cx + cell / 2, cy + cell + 2, Ui.TEXT);
@@ -76,8 +78,10 @@ public class PetsScreen extends MenuScreen {
             final PetType pt = p;
             click(cx, cy, cell, cell + 14, () -> selected = pt);
         }
-        g.text(font, "Obtenez des œufs sur les boss", x0, y0 + 14 + 2 * (cell + 18) + 4, Ui.MUTED, false);
-        g.text(font, "ou fabriquez-les à la Forge.", x0, y0 + 14 + 2 * (cell + 18) + 14, Ui.MUTED, false);
+        int hy = y0 + 14 + 2 * (cell + 18) + 2;
+        g.fill(x0 - 2, hy, x0 + 4 * (cell + 4) - 2, hy + 26, 0xA0000000);
+        g.text(font, "Obtenez des œufs sur les boss", x0 + 2, hy + 4, Ui.TEXT, false);
+        g.text(font, "ou fabriquez-les à la Forge.", x0 + 2, hy + 14, Ui.TEXT, false);
 
         // ------------------------------------------------ details
         int dx = left + 214;
@@ -94,6 +98,10 @@ public class PetsScreen extends MenuScreen {
         g.text(font, "Glisser pour tourner", dx + 76, y0 + 33, Ui.MUTED, false);
         int ty = y0 + 74;
         ty += Ui.wrap(g, p.description, dx + 8, ty, dw - 16, Ui.TEXT) + 4;
+        if (!has) {
+            g.text(font, "Familier non obtenu", dx + 8, ty, Ui.RED, true);
+            ty += 14;
+        }
         int level = has ? d.petLevel(p.id) : 1;
         if (has) {
             int xp = d.petXp.getOrDefault(p.id, 0);
@@ -125,8 +133,15 @@ public class PetsScreen extends MenuScreen {
             boolean active = p.id.equals(d.activePet);
             button(g, dx + 8, by, dw - 16, 16, active ? "Renvoyer le familier" : "Invoquer", true, active ? 0xFF6A2A2A : 0xFF2A6A3A,
                     () -> ClientNet.send(new Payloads.PetAction(active ? "" : p.id)));
-        } else {
-            g.centeredText(font, Component.literal("Familier non obtenu"), dx + dw / 2, by + 4, Ui.RED);
+        }
+        if (hoverLabel != null) {
+            String t = hoverLabel.label;
+            int tw = font.width(t) + 8;
+            int tx = Math.min(mx + 12, width - tw - 2);
+            int tyy = Math.min(my + 16, height - 16);
+            g.fill(tx, tyy, tx + tw, tyy + 14, 0xF0100010);
+            Ui.border(g, tx, tyy, tw, 14, hoverLabel.rarity.color);
+            g.text(font, t, tx + 4, tyy + 3, hoverLabel.rarity.color, false);
         }
     }
     private static int rarityBg(PetType p) {
