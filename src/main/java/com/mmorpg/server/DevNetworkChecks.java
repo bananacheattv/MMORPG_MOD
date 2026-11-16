@@ -28,6 +28,26 @@ public final class DevNetworkChecks {
             var stack=p.getInventory().getItem(i);if(stack.getItem() instanceof com.mmorpg.item.ForgeScrollItem plan&&!plan.recipe().isEmpty())result+=stack.getCount();
         }return result;
     }
+    private static void purgeCheck(net.minecraft.server.MinecraftServer server) throws Exception {
+        UUID acc = UUID.randomUUID();
+        server.services().nameToIdCache().add(new net.minecraft.server.players.NameAndId(acc, "PurgeCible"));
+        Path chars = com.mmorpg.character.CharacterStore.directory(server);
+        Files.createDirectories(chars);
+        Path f = chars.resolve(acc + ".dat");
+        Files.write(f, new byte[]{1});
+        Path other = chars.resolve(UUID.randomUUID() + ".dat");
+        Files.write(other, new byte[]{2});
+        var src = server.createCommandSourceStack();
+        server.getCommands().performPrefixedCommand(src, "mmorpg supprimerpersonnages PurgeCible");
+        check(Files.exists(f), "purge: simulation ne supprime rien");
+        server.getCommands().performPrefixedCommand(src, "mmorpg supprimerpersonnages PurgeCible confirmer");
+        check(!Files.exists(f), "purge: fiche supprimee");
+        check(Files.exists(other), "purge: autre joueur intact");
+        try (var st = Files.list(com.mmorpg.moderation.ModUtil.dir().resolve("suppressions"))) {
+            check(st.anyMatch(x -> x.getFileName().toString().startsWith("PurgeCible_")), "purge: sauvegarde creee");
+        }
+        Files.deleteIfExists(other);
+    }
     private static void check(boolean condition, String message) { if (!condition) throw new AssertionError(message); }
     @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.HIGHEST)
     public static void run(ServerStartedEvent event) throws Exception {
@@ -40,6 +60,7 @@ public final class DevNetworkChecks {
         NetworkConfig original = NetworkConfig.current;
         try {
             DevAdminPlayerChecks.run(p);
+            purgeCheck(server);
             DevBossChecks.biomeSpawns(p.level());
             DevPortalChecks.origin(p);
             DevSafeSpawnChecks.run(server);

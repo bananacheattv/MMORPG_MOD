@@ -28,3 +28,7 @@ Aucun serveur supplémentaire n'est nécessaire : l'écran s'affiche sur le serv
 ## Vérification
 
 `./gradlew runServer -PnetworkChecks` : marqueur `[CODEX CHECKS] CHARACTERS PASS`. Capture : `tools/screens/capture.sh personnages`.
+
+## Supprimer tous les personnages d'un joueur (admin)
+
+`/mmorpg supprimerpersonnages <pseudo>` simule ; `/mmorpg supprimerpersonnages <pseudo> confirmer` supprime (joueur hors ligne, pseudo exact, console ou opérateur). Efface la fiche des personnages, les données du joueur, le profil réseau, les lignes MariaDB (profil, banque) et sort des guildes ; refusé si le joueur est chef d'une guilde qui a d'autres membres. Sauvegarde préalable dans `config/mmorpg/moderation/suppressions/<pseudo>_<heure>/`. Sur un réseau, lancer la commande sur un serveur qui voit le dossier partagé et la base.
