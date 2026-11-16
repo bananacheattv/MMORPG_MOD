@@ -412,6 +412,10 @@ public final class PlainsManager {
     // ================================================================== monstres
 
     private static void spawnMobs(ServerLevel level) {
+        if (!com.mmorpg.server.FeatureFlags.enabled(level.getServer(), "mobs_plaines_mines")) {                // interrupteur coupe : aucun mob, on retire ceux deja presents
+            for (Mob m : level.getEntitiesOfClass(Mob.class, new AABB(-3.0E7, level.getMinY(), -3.0E7, 3.0E7, level.getMaxY(), 3.0E7), m -> m instanceof com.mmorpg.entity.RpgMob)) m.discard();
+            return;
+        }
         var random = level.getRandom();
         for (ServerPlayer p : level.players()) {
             int region = regionOf(p);
