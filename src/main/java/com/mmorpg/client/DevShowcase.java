@@ -129,7 +129,7 @@ public final class DevShowcase {
             return;
         }
         if(MODE.equals("perf")){DevPerfBench.phase(mc);return;}
-        if(MODE.equals("ui_frames")){DevUiFrames.tick(mc);return;}if(MODE.equals("pnj_ui")){if(!pnjInit){pnjInit=true;DevUiFrames.pnjMode();}DevUiFrames.tick(mc);return;}
+        if(MODE.equals("ui_frames")){DevUiFrames.tick(mc);return;}if(MODE.equals("debordements")){if(!pnjInit){pnjInit=true;DevUiFrames.overflowMode();}DevUiFrames.tick(mc);return;}if(MODE.equals("pnj_ui")){if(!pnjInit){pnjInit=true;DevUiFrames.pnjMode();}DevUiFrames.tick(mc);return;}
         if(MODE.equals("outils_retires")){DevToolsRemoved.tick(mc);return;}
         if(MODE.equals("pvp_polish")){DevPvpVisual.tick(mc);return;}
         if(MODE.equals("trade")){DevTradeVisual.tick(mc);return;}

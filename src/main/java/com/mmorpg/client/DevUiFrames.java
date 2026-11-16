@@ -281,7 +281,14 @@ final class DevUiFrames {
     /** Tailles de fenetre et echelles d'interface testees (0 = automatique). */
     private static int[][] CONFIGS = {{1280, 720, 2}, {1280, 720, 1}, {1280, 720, 3}, {1280, 720, 4}, {1280, 720, 0}, {854, 480, 2}, {854, 480, 0}, {1920, 1080, 0}, {1920, 1080, 3}};
     private static int cfg = -1, cfgTick, reference[];
-    private static boolean pnjOnly;
+    private static boolean pnjOnly, overflowMode;
+
+    /** Mode debordements : toutes les interfaces hors PNJ, a 7 combinaisons resolution/echelle, toutes capturees. */
+    static void overflowMode() {
+        overflowMode = true;
+        for (int i = NAMES.size() - 1; i >= 0; i--) if (NAMES.get(i).startsWith("pnj_")) { NAMES.remove(i); SCREENS.remove(i); }
+        CONFIGS = new int[][]{{854, 480, 2}, {854, 480, 0}, {1280, 720, 2}, {1280, 720, 3}, {1280, 720, 4}, {1920, 1080, 2}, {1920, 1080, 4}};
+    }
 
     /** Mode pnj_ui : seulement les interfaces de PNJ, a trois resolutions, toutes capturees. */
     static void pnjMode() {
@@ -425,6 +432,6 @@ final class DevUiFrames {
                 REPORT.add("  " + NAMES.get(i) + " : cadre " + f[2] + "x" + f[3] + " en (" + f[0] + "," + f[1] + ") barre " + f[4] + (same ? "" : "   <-- ECART"));
             }
         }
-        if (step == 7 && (cfg == 0 || pnjOnly)) DevShowcase.shot(mc, (pnjOnly ? NAMES.get(i) + "_" + mc.getWindow().getWidth() + "x" + mc.getWindow().getHeight() : "frame_" + NAMES.get(i))); // capture asynchrone : un tick de recul pour voir le bon ecran
+        if (step == 7 && (cfg == 0 || pnjOnly || overflowMode)) DevShowcase.shot(mc, (overflowMode ? NAMES.get(i) + "_" + mc.getWindow().getWidth() + "x" + mc.getWindow().getHeight() + "_g" + mc.options.guiScale().get() : pnjOnly ? NAMES.get(i) + "_" + mc.getWindow().getWidth() + "x" + mc.getWindow().getHeight() : "frame_" + NAMES.get(i))); // capture asynchrone : un tick de recul pour voir le bon ecran
     }
 }

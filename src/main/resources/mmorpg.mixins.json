@@ -28,6 +28,7 @@
     "CharacterSlotHighlightMixin",
     "AeloriaShaderMixin",
     "MmoScreenMouseMixin",
+    "TooltipScaleMixin",
     "DevNoBlurMixin",
     "ParticleLimiterMixin",
     "NoTutorialToastMixin"
