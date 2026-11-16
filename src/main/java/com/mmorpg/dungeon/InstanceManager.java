@@ -344,6 +344,7 @@ public final class InstanceManager {
         for (Slot s : InstanceData.get(server).slots) {
             if (s.x != k[0] || s.z != k[1] || s.owner.isEmpty()) continue;
             p.stopRiding();
+            com.mmorpg.server.LoadingShield.grant(p);
             p.teleportTo(level, s.x + 0.5, s.y, s.z + Theme.HALL_Z - 6 + 0.5, Set.<Relative>of(), 0F, 4F, true);
             s.lastBusy = server.getTickCount();
             InstanceData.get(server).dirty();
@@ -357,6 +358,7 @@ public final class InstanceManager {
         if (level == null) return;
         p.stopRiding();
         com.mmorpg.zone.ZoneManager.forgetAnnouncements(p.getUUID());           // nouvelle partie : l'annonce d'entree se rejoue une fois
+        com.mmorpg.server.LoadingShield.grant(p);
         p.teleportTo(level, slot.x + 0.5, slot.y, slot.z + Theme.HALL_Z - 6 + 0.5, Set.<Relative>of(), 0F, 4F, true);
         level.sendParticles(ParticleTypes.REVERSE_PORTAL, p.getX(), p.getY() + 1, p.getZ(), 50, 0.4, 0.9, 0.4, 0.1);
         slot.lastBusy = level.getServer().getTickCount();

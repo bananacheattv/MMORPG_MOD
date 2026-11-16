@@ -575,6 +575,7 @@ public final class MineManager {
         }
         ZoneManager.forgetAnnouncements(p.getUUID());               // l'annonce de la mine (titre et ambiance) se rejoue a l'arrivee
         PORTAL_COOLDOWN.put(p.getUUID(), (long) p.level().getServer().getTickCount());
+        com.mmorpg.server.LoadingShield.grant(p);
         p.teleportTo(level, at[0], at[1], at[2], Set.of(), 0F, 6F, true);
         p.resetFallDistance();
         level.sendParticles(ParticleTypes.END_ROD, at[0], at[1] + 1, at[2], 30, 0.6, 0.9, 0.6, 0.05);

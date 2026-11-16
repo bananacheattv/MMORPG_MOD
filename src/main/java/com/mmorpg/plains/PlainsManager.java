@@ -401,6 +401,7 @@ public final class PlainsManager {
         }
         ZoneManager.forgetAnnouncements(p.getUUID());
         COOLDOWN.put(p.getUUID(), (long) server.getTickCount());
+        com.mmorpg.server.LoadingShield.grant(p);
         p.teleportTo(level, x, y, z, Set.of(), 0F, 4F, true);
         p.resetFallDistance();
         level.sendParticles(ParticleTypes.HAPPY_VILLAGER, x, y + 1, z, 24, 0.6, 0.9, 0.6, 0.05);
