@@ -47,8 +47,22 @@ final class DevSafeSpawnChecks {
         orc.tickCount = 10 - (orc.getId() & 7) + (orc.getId() & 7);   // cycle de verification
         for (int i = 0; i < 16 && orc.getTarget() != null; i++) { orc.tickCount++; orc.aiStep(); }
         check(orc.getTarget() == null, "aggro cleared when the target is in the safe zone");
+        // bouclier de chargement : meme loin de toute zone sure, invincible et ignore des monstres jusqu'a sa levee
+        float ahp = attacker.getHealth();
+        LoadingShield.grant(attacker);
+        check(LoadingShield.active(attacker) && SafeSpawn.safe(attacker), "loading shield makes the player safe anywhere");
+        attacker.hurtServer(level, level.damageSources().generic(), 5F);
+        check(attacker.getHealth() == ahp, "damage cancelled during loading");
+        orc.setPos(sp[0] + 198, sp[1], sp[2]);
+        check(!orc.canAttack(attacker), "monster cannot target a loading player");
+        check(!com.mmorpg.combat.RpgCombat.isEnemy(orc, attacker), "loading player is not an enemy");
+        LoadingShield.clear(attacker);
+        check(!LoadingShield.active(attacker) && !SafeSpawn.safe(attacker), "shield removed");
+        LoadingShield.grant(attacker);
+        LoadingShield.clearAll();
+        check(!LoadingShield.active(attacker), "clearAll");
         orc.discard();
         mob.discard();
-        com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] SAFE SPAWN PASS: mine arrival point, damage taken and dealt cancelled, outside untouched");
+        com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] SAFE SPAWN PASS: mine arrival point, loading shield, damage taken and dealt cancelled, outside untouched");
     }
 }

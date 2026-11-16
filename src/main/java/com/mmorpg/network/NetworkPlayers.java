@@ -55,7 +55,7 @@ public final class NetworkPlayers {
             PORTAL_GRACE.put(p.getUUID(), (long) p.level().getServer().getTickCount() + 100);
             MMORPG.LOGGER.info("[Aeloria voyage] Arrivée {} sur {} : {}", p.getUUID(), NetworkConfig.current.role, destination);
             final String arrival = destination;
-            if (!arrival.isEmpty()) ARRIVALS.put(p.getUUID(), arrival);
+            if (!arrival.isEmpty()) { ARRIVALS.put(p.getUUID(), arrival); com.mmorpg.server.LoadingShield.grant(p); }   // changement de serveur : invincible jusqu'a la fin du chargement
             Scheduler.later(p.level(), 5, () -> { if (!p.isRemoved()) arrive(p, arrival); });
             return true;
         } catch (Exception e) {

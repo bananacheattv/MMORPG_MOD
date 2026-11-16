@@ -60,6 +60,7 @@ public final class FeatureCatalog {
         CATEGORIES.put("Monde", List.of(
                 new Entry("mines", "Mines", "Étages miniers."),
                 new Entry("plaines", "Plaines", "Zone des plaines."),
+                new Entry("mobs_plaines_mines", "Mobs plaines/mines", "Monstres dans les plaines et les mines (désactivé par défaut : aucun mob, les existants sont retirés)."),
                 new Entry("cinematique", "Cinématique", "Intro du hub."),
                 new Entry("anticheat", "Anticheat", "Limites de débit et détections."),
                 new Entry("drop_objets", "Interdire le drop", "Empêche de jeter des objets (admins exemptés).")));

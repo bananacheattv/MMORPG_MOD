@@ -24,6 +24,7 @@ public final class SafeSpawn {
     private static final int HALL_HALF_X = 13, HALL_Z_MAX = 26;
 
     public static boolean safe(Entity e) {
+        if (LoadingShield.active(e)) return true;                      // chargement en cours : invincible
         if (!(e.level() instanceof ServerLevel level)) return false;
         var server = level.getServer();
         if (!level.dimension().equals(InstanceManager.DIM)) return false;
