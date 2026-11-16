@@ -121,6 +121,9 @@ for r in tab['Événements']:
 needed = {r for q in out for r in q['requires']}
 for q in out:                     # une quete exigee par une autre doit pouvoir etre terminee pour de bon : pas de repetition
     if q['id'] in needed: q['repeat'] = ''
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import collect_fix
+print(len(collect_fix.apply(out)), 'quetes de recolte/livraison reelles')
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 json.dump(out, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
 import collections

@@ -17,6 +17,9 @@ public final class DevWorldNpcChecks {
     @SubscribeEvent public static void started(net.neoforged.neoforge.event.server.ServerStartedEvent event) {
         if (!Boolean.getBoolean("mmorpg.checkWorldNpcs")) return;
         var server = event.getServer();
+        var early = new ArrayList<String>();
+        deliveries(server, early);
+        MMORPG.LOGGER.info("[WORLD NPC CHECKS] livraisons {}", early.isEmpty() ? "PASS" : "FAIL " + early);
         var data = com.mmorpg.hub.SpawnData.get(server);
         var spawn = server.getLevel(SpawnBuilder.DIM);
         boolean spawnOk = spawn != null && data.exists();
@@ -72,8 +75,36 @@ public final class DevWorldNpcChecks {
             var at = BlockPos.of(entry.getLongOr("pos", 0));
             MMORPG.LOGGER.info("[WORLD NPC CHECKS] {} | {} | {} @ {}", e.region(), e.name(), e.quest(), at);
         }
+        deliveries(server, fails);
         int total = 0;
         for (var l : server.getAllLevels()) for (var en : l.getAllEntities()) if (en instanceof NpcEntity n && WorldNpcs.GROUP.equals(n.group())) total++;
         MMORPG.LOGGER.info("[WORLD NPC CHECKS] {} : {} spawn, {} monde ouvert dans l'annuaire, {} entites chargees", fails.isEmpty() ? "PASS" : "FAIL " + fails.subList(0, Math.min(10, fails.size())), spawnN, worldN, total);
+    }
+    /** Quetes de recolte / livraison : chaque objet demande existe, la quete se valide avec les objets en main et les consomme. */
+    private static void deliveries(net.minecraft.server.MinecraftServer server, List<String> fails) {
+        var ow = server.overworld();
+        var p = net.neoforged.neoforge.common.util.FakePlayerFactory.get(ow, new com.mojang.authlib.GameProfile(UUID.randomUUID(), "DeliveryChecks"));
+        var d = RpgPlayers.get(p);
+        int n = 0;
+        for (var e : com.mmorpg.config.ConfigManager.quests().entrySet()) {
+            var q = e.getValue();
+            if (q.lore == null) continue;
+            for (var o : q.objectives) {
+                if (!o.type.equals("collect")) continue;
+                n++;
+                var item = com.mmorpg.crafting.ForgeRecipes.resolveItem(o.target);
+                if (item == null || item == net.minecraft.world.item.Items.AIR) { fails.add("objet inconnu " + e.getKey() + " " + o.target); continue; }
+                if (!q.lore.objective.contains(String.valueOf(o.count))) fails.add("texte sans quantite " + e.getKey());
+                p.getInventory().clearContent();
+                d.activeQuests.clear();
+                d.activeQuests.put(e.getKey(), new int[]{0});
+                if (QuestManager.completable(p, d, e.getKey())) fails.add("completable sans objets " + e.getKey());
+                p.getInventory().add(new net.minecraft.world.item.ItemStack(item, o.count));
+                if (!QuestManager.completable(p, d, e.getKey())) fails.add("non completable avec les objets " + e.getKey());
+            }
+        }
+        p.getInventory().clearContent();
+        d.activeQuests.clear();
+        MMORPG.LOGGER.info("[WORLD NPC CHECKS] livraisons : {} quetes de recolte verifiees", n);
     }
 }
