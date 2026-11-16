@@ -40,6 +40,13 @@ const CONFIG = {
     discord: 'https://discord.gg/aeloria-mmorpg',
   },
 
+  // Comptes Aéloria + boutique de crédits (back-end : dossier backend/ du dépôt, voir site/README.md).
+  // url vide : pages Compte et Boutique masquées. '/' : même domaine via le proxy Netlify (recommandé).
+  // Adresse complète (ex. 'https://api.aeloria.fr') : l’ajouter aussi à connect-src dans compte.html et boutique.html.
+  api: {
+    url: '',
+  },
+
   // Réseaux affichés dans le pied de page (Discord est déjà présent). Ex. :
   // { label: 'YouTube', url: 'https://youtube.com/@aeloria' }
   socials: [],
@@ -81,6 +88,9 @@ const CONFIG = {
 
   legal: {
     host: 'Netlify, Inc., San Francisco, Californie, États-Unis (netlify.com).',
+    // Vendeur affiché dans les conditions de vente de la boutique (nom, adresse, n° d’entreprise s’il y a lieu).
+    // Obligatoire avant d’accepter de vrais paiements.
+    seller: '',
   },
 };
 
@@ -485,8 +495,15 @@ function initParallax() {
 /* =========================================================================
    Démarrage
    ========================================================================= */
+/** Liens Compte / Boutique : visibles seulement quand le back-end est configuré. */
+function initAccountLinks() {
+  if (!CONFIG.api.url) return;
+  $$('[data-requires-api]').forEach((el) => { el.hidden = false; });
+}
+
 function init() {
   applyConfig();
+  initAccountLinks();
   initNavigation();
   initServerStatus();
   initDownloadLinks();
