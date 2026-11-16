@@ -125,7 +125,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import collect_fix
 print(len(collect_fix.apply(out)), 'quetes de recolte/livraison reelles')
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
-json.dump(out, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+import fmt_json
+fmt_json.write_quests(out, OUT)   # JSON indente, une propriete par ligne, cles ordonnees (voir fmt_json.py)
 import collections
 print(len(out), 'quetes', os.path.getsize(OUT) // 1024, 'Ko')
 print(collections.Counter((q['kind'], 'verifie' if q['objs'] else 'narratif') for q in out))
