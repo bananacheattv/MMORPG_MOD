@@ -125,6 +125,7 @@ public final class RpgCombat {
                 if (com.mmorpg.server.PartyManager.sameParty(ap, p)) return false;
                 return ConfigManager.general().skillsHitPlayers && p.level() instanceof net.minecraft.server.level.ServerLevel psl && psl.isPvpAllowed();
             }
+            if (attacker instanceof net.minecraft.world.entity.Mob && com.mmorpg.server.SafeSpawn.safe(p)) return false;   // zone sure : les monstres ignorent le joueur
             return true;
         }
         if (target instanceof OwnableEntity own && own.getOwner() != null) {
@@ -319,6 +320,8 @@ public final class RpgCombat {
         if (target instanceof ServerPlayer tp) {
             damage = incomingModifiers(tp, damage);damage=ShieldGuard.absorb(tp,source,damage,h.max());
         }
+        if (playerAttacker != null && !(target instanceof ServerPlayer)) damage *= com.mmorpg.dungeon.DungeonBalance.dealt(playerAttacker);
+        if (target instanceof ServerPlayer dp && !(attacker instanceof ServerPlayer) && attacker instanceof LivingEntity && !environmental) damage *= com.mmorpg.dungeon.DungeonBalance.taken(dp);
         if(playerAttacker!=null)damage*=com.mmorpg.competition.PvpEquipment.outgoing(playerAttacker,target instanceof ServerPlayer);
         if(target instanceof ServerPlayer pv&&attacker instanceof LivingEntity)damage*=com.mmorpg.competition.PvpEquipment.incoming(pv,playerAttacker!=null);
         damage = Math.max(0, damage);

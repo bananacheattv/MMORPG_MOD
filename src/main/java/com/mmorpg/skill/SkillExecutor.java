@@ -346,9 +346,25 @@ public final class SkillExecutor {
                 sound(p, SoundEvents.ARROW_SHOOT, 1f, 0.6f);
             }
             case "saut_arriere" -> {
-                Vec3 back = p.getLookAngle().multiply(1, 0, 1).normalize().scale(-1.3);
-                p.setDeltaMovement(back.x, 0.55, back.z);
-                p.needsSync = true;
+                Vec3 back = p.getLookAngle().multiply(1, 0, 1).normalize().scale(-0.7);
+                // Le client gere seul le mouvement du joueur : une vitesse posee cote serveur n'arrive pas toujours.
+                // On deplace donc le joueur par petites etapes (arc) avec controle des collisions.
+                final double[] arc = {0.45, 0.35, 0.22, 0.08, -0.08, -0.22, -0.35, -0.45};
+                for (int i = 0; i < arc.length; i++) {
+                    final double dy = arc[i];
+                    Scheduler.later(level, i, () -> {
+                        if (!p.isAlive() || p.level() != level) return;
+                        net.minecraft.world.phys.AABB moved = p.getBoundingBox().move(back.x, dy, back.z);
+                        double ny = p.getY() + dy, nx = p.getX() + back.x, nz = p.getZ() + back.z;
+                        if (!level.noCollision(p, moved)) {
+                            moved = p.getBoundingBox().move(0, dy, 0);
+                            if (!level.noCollision(p, moved)) { if (dy < 0) { p.fallDistance = 0; } return; }
+                            nx = p.getX(); nz = p.getZ();
+                        }
+                        p.teleportTo(nx, ny, nz);
+                        p.fallDistance = 0;
+                    });
+                }
                 com.mmorpg.anticheat.AntiCheat.grace(p, 40);
                 Fx.attach(level, FxKind.TRAIL, p, 1, 0xD8F0FF, 12);
                 Fx.spawn(level, FxKind.RING, pos, s.radius, 0xD8F0FF, 12);

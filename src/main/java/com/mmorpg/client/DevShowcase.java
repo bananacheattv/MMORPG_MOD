@@ -626,7 +626,7 @@ public final class DevShowcase {
                 if(tick==15+i*20) mc.gui.setScreen(new com.mmorpg.client.screen.CosmeticsScreen(list.get(i)));
                 if(tick==25+i*20) shot(mc,"cosmetique_3d_"+list.get(i).id);
             }
-            if(tick==225) stop(mc);
+            if(tick==35+list.size()*20) stop(mc);
             return;
         }
         if (MODE.equals("modeles_importes")) {

@@ -247,6 +247,7 @@ public final class HubManager {
         p.stopRiding();
         Vec3 at = com.mmorpg.config.ConfigManager.spawn().manualBuild ? spawn.arrival()
                 : HubLayout.center(spawn.origin(), new int[]{HubMarket.CX + 31, 0, 0});
+        com.mmorpg.server.LoadingShield.grant(p);
         p.teleportTo(level, at.x, at.y, at.z, Set.of(), spawn.yaw(), spawn.pitch(), true);
         p.resetFallDistance();
         if (com.mmorpg.config.ConfigManager.spawn().manualBuild && isOperator(p) && p.isCreative()) {
@@ -263,6 +264,7 @@ public final class HubManager {
         if (CinematicManager.isLocked(p)) return true;
         if (ClassTrial.active(p)) ClassTrial.end(p, false, null);
         p.stopRiding();
+        com.mmorpg.server.LoadingShield.grant(p);
         p.teleportTo(level, 0.5, 84, 0.5, Set.of(), 0F, 0F, true);
         p.resetFallDistance();
         p.sendOverlayMessage(Component.literal("Monde ouvert d'Aeloria").withColor(0x60C8FF));

@@ -73,6 +73,7 @@ public final class LoreQuests {
                 JsonObject o = e.getAsJsonObject();
                 m.put(o.get("id").getAsString(), convert(o));
             }
+            WorldNpcs.assign(m);
         } catch (Exception ex) {
             throw new IllegalStateException("Quetes du lore illisibles : " + ex, ex);
         }

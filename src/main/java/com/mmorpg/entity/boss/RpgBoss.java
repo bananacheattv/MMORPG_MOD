@@ -75,9 +75,9 @@ public abstract class RpgBoss extends RpgMonster {
     private static final byte EVENT_CLIP = 80;
     private final BossFury.State fury=new BossFury.State();
     /** Base de la puissance offensive du boss (surchargee par les gardiens de guilde, deja tres puissants). */
-    protected double baseDamage(){return 1.5;}
+    protected double baseDamage(){return 1.25;}
     /** Base de la robustesse du boss : les degats recus sont divises par ce facteur. */
-    protected double baseToughness(){return 1.8;}
+    protected double baseToughness(){return 1.5;}
     public double damageMultiplier(){return BossFury.damageMultiplier(this,fury,phase,baseDamage());}
     public double toughness(){return BossFury.toughness(fury,baseToughness())*(exposed()?0.5:1.0);}
     @Override public void die(DamageSource source){if(level() instanceof ServerLevel sl)BossFury.discardAdds(sl,fury);super.die(source);}
@@ -350,12 +350,12 @@ public abstract class RpgBoss extends RpgMonster {
         if (target != null && target.isAlive() && !busy() && this.tickCount >= immobileEnd && this.tickCount % 5 == 0) {
             double pd = preferredDistance(), d = distanceTo(target);
             if (pd <= 0) {
-                if (d > 2.5) this.getNavigation().moveTo(target, 1.3 + 0.1 * Math.min(4, phase));      // poursuite constante, de plus en plus rapide
+                if (d > 2.5) this.getNavigation().moveTo(target, 1.1 + 0.05 * Math.min(4, phase));      // poursuite constante, de plus en plus rapide
             } else if (d > pd + 3 || !this.hasLineOfSight(target)) {
-                this.getNavigation().moveTo(target, 1.1);
+                this.getNavigation().moveTo(target, 1.0);
             } else if (d < pd - 4) {
                 Vec3 away = DefaultRandomPos.getPosAway(this, 10, 4, target.position());
-                if (away != null && inBase(away, 1.5)) this.getNavigation().moveTo(away.x, away.y, away.z, 1.2);
+                if (away != null && inBase(away, 1.5)) this.getNavigation().moveTo(away.x, away.y, away.z, 1.1);
             } else {
                 this.getNavigation().stop();
                 this.getLookControl().setLookAt(target, 30F, 30F);

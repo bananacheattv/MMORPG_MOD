@@ -72,7 +72,7 @@ public final class ThreatGoal extends Goal {
 
     private boolean valid(Player p) {
         if (p == null || !p.isAlive() || p.isRemoved() || p.level() != mob.level()
-                || p.isCreative() || p.isSpectator()) return false;
+                || p.isCreative() || p.isSpectator() || com.mmorpg.server.SafeSpawn.safe(p)) return false;
         double range = Math.max(16, mob.getAttributeValue(Attributes.FOLLOW_RANGE));
         if (mob.distanceToSqr(p) > range * range) return false;
         // Respecter la base des boss meme lorsqu'une provocation est active.

@@ -211,7 +211,7 @@ public final class RpgPlayers {
             double maxMana = d.stats.get(Stat.MAX_MANA);
             // One discrete pulse every five seconds, independent of food and the old base regen stat.
             if (player.tickCount % 100 == 0) d.hp = (float) Math.min(maxHp, d.hp + maxHp * 0.01*com.mmorpg.combat.MobDebuffs.healingMultiplier(player));
-            d.mana = (float) Math.min(maxMana, d.mana + d.stats.get(Stat.MANA_REGEN) / 20.0);
+            d.mana = (float) Math.min(maxMana, d.mana + d.stats.get(Stat.MANA_REGEN) * (com.mmorpg.dungeon.DungeonBalance.inDungeon(player.level()) ? com.mmorpg.dungeon.DungeonBalance.manaRegen(d.playerClass) : 1.0) / 20.0);
             syncVanillaHealth(player);
         }
         // pieces d'or ramassees -> porte-monnaie ; suivi des objectifs de collecte
@@ -620,7 +620,7 @@ public final class RpgPlayers {
     public static void onDeath(ServerPlayer player, String cause) {
         PlayerData d = get(player);
         d.hp = 0;
-        com.mmorpg.server.PortalOrigin.markDeath(player);
+        if (com.mmorpg.dungeon.InstanceManager.noteDeath(player)) com.mmorpg.server.PortalOrigin.clearDeath(player); else com.mmorpg.server.PortalOrigin.markDeath(player);
         int mr = com.mmorpg.mine.MineManager.regionOf(player), pr = com.mmorpg.plains.PlainsManager.regionOf(player);
         if (mr >= 0) DEATH_ZONE.put(player.getUUID(), new int[]{0, mr});
         else if (pr >= 0) DEATH_ZONE.put(player.getUUID(), new int[]{1, pr});

@@ -121,6 +121,7 @@ public final class ServerEvents {
         if (event.getEntity() instanceof ServerPlayer sp) {
             RpgPlayers.onRespawn(sp);
             // mort en zone d'aventure : retour devant le portail d'entree, sinon repli sur le spawn
+            if (com.mmorpg.dungeon.InstanceManager.respawnInside(sp)) return;          // mort en donjon : retour au depart, instance conservee
             boolean back = !event.isEndConquered() && com.mmorpg.server.PortalOrigin.afterDeath(sp);
             if (sp.level().dimension().equals(com.mmorpg.dungeon.InstanceManager.DIM)) {
                 com.mmorpg.dungeon.InstanceManager.forgetReturn(sp);
