@@ -32,6 +32,7 @@ import java.util.Map;
  * d'amortissement, temps reel) et accompagnes de sons.
  */
 public class ClassMasterScreen extends MmoScreen {
+    @Override protected boolean hasNav() { return false; }
     private static final PlayerClass[] CLASSES = {PlayerClass.GUERRIER, PlayerClass.MAGE, PlayerClass.ARCHER, PlayerClass.TANK};
     private static final String[] RATINGS = {"Attaque", "Défense", "Magie", "Mobilité", "Difficulté"};
     private static final int[] LEVELS = {1, 25, 50, 75, 100};
