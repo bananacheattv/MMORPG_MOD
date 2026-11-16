@@ -31,6 +31,7 @@ enforce-whitelist=true      # seulement si l'accès est limité ; sinon false
 max-players=40              # à ajuster après mesure (non mesuré)
 motd=Aeloria                # le nom affiché dans la liste des serveurs
 view-distance=12   # plafonné à 12 par le mod (-Dmmorpg.viewDistance=N pour changer) ; 32 rendait le chargement très lent
+pause-when-empty-seconds=0   # sinon le serveur vide se met en pause et le pré-chargement attend un joueur
 simulation-distance=8   # plafonné à 8 par le mod (-Dmmorpg.simulationDistance=N)
 ```
 
@@ -152,3 +153,8 @@ Statistiques, classement, or en circulation, historique d'un joueur : voir les r
 
 Le réseau multi-serveurs (rôles `HUB`/`MAIN`/`MINES`/`PLAINS`/`DUNGEONS`, `config/mmorpg/network.json`, profils partagés, transferts Velocity) est décrit dans `RESEAU_AELORIA.md`. La base MariaDB (§10) y est facultative : elle reflète profils et banque (le profil partagé fait foi en réseau), journalise les actions et stocke les données partagées (guildes, hôtel des ventes, groupes, registres de coordination) dans la table `shared_docs` (option `syncShared` de `database.json`, vrai par défaut). Au premier accès, les anciens fichiers (`guilds.json`, `coordination/*.json`, `parties.json`) et l'hôtel des ventes du monde sont importés, puis les fichiers sont renommés en `.migre`. En réseau, une base injoignable refuse l'opération au lieu de diverger.
 
+
+
+## Pré-chargement de la carte du spawn
+
+Au démarrage (après environ 1 minute), le serveur charge puis relâche en arrière-plan 1000×1000 blocs autour du spawn de l'Overworld (`-Dmmorpg.preloadRadius=N` en chunks, 32 par défaut, 0 pour désactiver) ; ils sont ensuite sur disque et se rechargent vite. Journal : « Carte du spawn pré-chargée ».
