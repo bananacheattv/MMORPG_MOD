@@ -73,7 +73,6 @@ public final class HubMarket {
         stall(c, CX - 12, -13, 0, 1, 2);
         stall(c, CX - 12, 13, 0, -1, 3);
         gate(c, CX + 24, -18, -1, 0, true);
-        gate(c, CX + 24, 19, -1, 0, false);
         plainsGate(c, CX - 24, -18);
         farm(c, CX - 29, 17);
         plantings(c);
@@ -378,7 +377,6 @@ public final class HubMarket {
         HubBuilder.text(c, CX + 22, 12, 25, "FORGE", "#FFB070", 3.4F);
         HubBuilder.text(c, CX + 25, 11, 0, "TÉLÉPORTEUR", "#9FD8FF", 3F);
         HubBuilder.text(c, CX + 24, 12, -18, "MINES D'AELORIA", "#FFAA50", 4F);
-        HubBuilder.text(c, CX + 24, 12, 19, "DONJONS", "#C090FF", 4F);
         HubBuilder.text(c, CX - 24, 12, -18, "PLAINES D'AELORIA", "#8CE68C", 4F);
         HubBuilder.text(c, CX - 24, 10.2, -18, "Farm en plein air · niveaux 1 à 98", "#F0E8D8", 1.8F);
         HubBuilder.text(c, CX - 29, 7, 17, "JARDINS D'AELORIA", "#8CE68C", 3.4F);
