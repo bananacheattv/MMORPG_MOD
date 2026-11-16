@@ -45,7 +45,27 @@ public enum Cosmetic {
     CAPE_ROYALE("cape_royale", "Cape Royale", Category.DOS, -1, 0xFFFFC050, "Une cape royale animée."),
     CARQUOIS_SYLVESTRE("carquois_sylvestre", "Carquois Sylvestre", Category.DOS, -1, 0xFF90C060, "Un carquois sylvestre en trois dimensions."),
     EPAULIERES_GIVRE("epaulieres_givre", "Épaulières de Givre", Category.EPAULES, -1, 0xFF90D8FF, "Deux épaulières aux cristaux animés."),
-    MANTEAU_CELESTE("manteau_celeste", "Manteau Céleste", Category.DOS, -1, 0xFFE8D8FF, "Un manteau céleste en trois dimensions.");
+    MANTEAU_CELESTE("manteau_celeste", "Manteau Céleste", Category.DOS, -1, 0xFFE8D8FF, "Un manteau céleste en trois dimensions."),
+    COURONNE_SOLAIRE("couronne_solaire", "Couronne Solaire", Category.COIFFE, -1, 0xFFFFC040, "Une couronne d'or aux rayons de soleil pulsants."),
+    CASQUE_VALKYRIE("casque_valkyrie", "Casque de Valkyrie", Category.COIFFE, -1, 0xFFD8E4F4, "Un casque d'acier orné de deux ailes qui battent."),
+    TRICORNE_CORSAIRE("tricorne_corsaire", "Tricorne de Corsaire", Category.COIFFE, -1, 0xFFC02030, "Un tricorne noir à tête de mort et plume rouge."),
+    COURONNE_LAURIERS("couronne_lauriers", "Couronne de Lauriers", Category.COIFFE, -1, 0xFF70C040, "Des lauriers dorés, couronne des champions."),
+    CHAPEAU_SORCIERE("chapeau_sorciere", "Chapeau de Sorcière", Category.COIFFE, -1, 0xFF8040C8, "Un chapeau pointu et ses étoiles flottantes."),
+    KABUTO_SAMOURAI("kabuto_samourai", "Kabuto du Samouraï", Category.COIFFE, -1, 0xFFC83030, "Un casque écarlate au croissant doré."),
+    DIADEME_LUNE("diademe_lune", "Diadème de Lune", Category.COIFFE, -1, 0xFFA0C8FF, "Un diadème d'argent, croissant et étoiles en orbite."),
+    MASQUE_VENITIEN("masque_venitien", "Masque Vénitien", Category.VISAGE, -1, 0xFFF4EEE4, "Un masque de porcelaine et d'or, plume au vent."),
+    MASQUE_ONI("masque_oni", "Masque d'Oni", Category.VISAGE, -1, 0xFFD82A2A, "Un masque de démon aux cornes et aux crocs."),
+    MASQUE_DOCTEUR_PESTE("masque_docteur_peste", "Masque du Docteur de la Peste", Category.VISAGE, -1, 0xFFCDB48A, "Un long bec de cuir et des lunettes ambrées."),
+    LUNETTES_STEAMPUNK("lunettes_steampunk", "Lunettes Steampunk", Category.VISAGE, -1, 0xFF58E0E8, "Lunettes de laiton, engrenage et monocle relevable."),
+    EPAULIERES_PHENIX("epaulieres_phenix", "Épaulières du Phénix", Category.EPAULES, -1, 0xFFFF6A20, "Des épaulières écarlates couronnées de flammes."),
+    EPAULIERES_CHEVALIER_OR("epaulieres_chevalier_or", "Épaulières du Chevalier d'Or", Category.EPAULES, -1, 0xFFE8B838, "De lourdes épaulières dorées serties de saphirs."),
+    HIBOU_EPAULE("hibou_epaule", "Hibou d'Épaule", Category.EPAULES, -1, 0xFF9A6C40, "Un hibou qui tourne la tête et cligne des yeux."),
+    AILES_PHENIX("ailes_phenix", "Ailes de Phénix", Category.DOS, -1, 0xFFFF7A20, "Des ailes de plumes de feu et une queue ardente."),
+    AILES_LIBELLULE("ailes_libellule", "Ailes de Libellule", Category.DOS, -1, 0xFF9AF0FF, "Quatre ailes translucides qui vibrent vite."),
+    CAPE_VAMPIRE("cape_vampire", "Cape de Vampire", Category.DOS, -1, 0xFFB01830, "Une cape sombre au haut col et doublure pourpre."),
+    SAC_AVENTURIER("sac_aventurier", "Sac d'Aventurier", Category.DOS, -1, 0xFF8A5A30, "Sac, couchage, casserole et lanterne vacillante."),
+    BOUCLIER_CROISE("bouclier_croise", "Bouclier du Croisé", Category.DOS, -1, 0xFF2850B8, "Bouclier bleu et épée dans le dos."),
+    REACTEUR_VAPEUR("reacteur_vapeur", "Réacteur à Vapeur", Category.DOS, -1, 0xFFD8A840, "Réservoirs de cuivre, cadran, engrenage et vapeur.");
 
     public enum Category {
         AURA("Auras"), AILES("Ailes"), HALO("Halos"), TRAINEE("Traînées"),

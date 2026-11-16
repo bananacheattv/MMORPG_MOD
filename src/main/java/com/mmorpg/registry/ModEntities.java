@@ -138,7 +138,7 @@ public final class ModEntities {
         IMPORTED.values().forEach(type -> event.put(type.get(), RpgMonster.createAttributes()
                 .add(net.minecraft.world.entity.ai.attributes.Attributes.FLYING_SPEED, 0.45).build()));
         event.put(CRYPT_ZOMBIE.get(), RpgMonster.createAttributes().build());
-        event.put(VENOM_SPIDER.get(), RpgMonster.createAttributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED, 0.32).build());
+        event.put(VENOM_SPIDER.get(), RpgMonster.createAttributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED, 0.2).build());
         event.put(BANDIT.get(), RpgMonster.createAttributes().build());
         event.put(GOBLIN.get(), RpgMonster.createAttributes().build());
         event.put(DARK_WOLF.get(), RpgMonster.createAttributes().build());

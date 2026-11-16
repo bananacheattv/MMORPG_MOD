@@ -68,7 +68,7 @@ public abstract class SmartMonster extends RpgMonster {
         this.goalSelector.addGoal(1, new HoldGoal());
         this.goalSelector.addGoal(2, new KiteGoal());
         this.goalSelector.addGoal(2, new CircleGoal());
-        this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 1.15, false));
+        this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 1.0, false));
         this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.85));
         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 10.0F));
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
@@ -262,7 +262,7 @@ public abstract class SmartMonster extends RpgMonster {
             if (d > max || !sees) {
                 if (--repath <= 0) {
                     repath = 10;
-                    m.getNavigation().moveTo(t, 1.1);
+                    m.getNavigation().moveTo(t, 1.0);
                 }
                 return;
             }
@@ -270,7 +270,7 @@ public abstract class SmartMonster extends RpgMonster {
                 if (--repath <= 0 || m.getNavigation().isDone()) {
                     repath = 12;
                     Vec3 away = DefaultRandomPos.getPosAway(m, 10, 4, t.position());
-                    if (away != null) m.getNavigation().moveTo(away.x, away.y, away.z, 1.25);
+                    if (away != null) m.getNavigation().moveTo(away.x, away.y, away.z, 1.1);
                 }
                 return;
             }

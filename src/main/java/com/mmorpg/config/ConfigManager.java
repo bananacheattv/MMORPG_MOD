@@ -191,6 +191,10 @@ public final class ConfigManager {
                     if (e.getValue().spawn.distanceLevel) existing.spawn = e.getValue().spawn;
                     existing.spawnVersion = DefaultMobs.SPAWN_VERSION;
                 }
+                if (existing != null && existing.speedVersion < DefaultMobs.SPEED_VERSION) {                // vitesses ramenees sous le sprint du joueur
+                    existing.speed = Math.min(existing.speed, e.getValue().speed);
+                    existing.speedVersion = DefaultMobs.SPEED_VERSION;
+                }
             }
             for (MobConfig cfg : result.values()) {
                 sanitize(cfg);
