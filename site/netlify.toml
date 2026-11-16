@@ -22,3 +22,11 @@
   for = "/assets/img/*"
   [headers.values]
     Cache-Control = "public, max-age=604800"
+
+# Comptes + boutique (back-end : dossier backend/) — à activer avec CONFIG.api.url = '/' dans script.js.
+# Le site et l'API partagent alors le même domaine : connect-src 'self' suffit, sans toucher aux CSP.
+# [[redirects]]
+#   from = "/api/*"
+#   to = "https://api.aeloria.fr/api/:splat"
+#   status = 200
+#   force = true

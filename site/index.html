@@ -116,11 +116,16 @@
           <li><a class="site-nav__link" href="#reglement">Règlement</a></li>
           <li><a class="site-nav__link" href="#staff">Staff</a></li>
           <li><a class="site-nav__link" href="#faq">FAQ</a></li>
+          <li data-requires-api hidden><a class="site-nav__link" href="boutique.html">Boutique</a></li>
         </ul>
         <div class="site-nav__actions">
-          <a class="button button--ghost button--small" href="https://discord.gg/aeloria-mmorpg" data-config-href="links.discord" target="_blank" rel="noopener">
+          <a class="button button--ghost button--small button--account" href="compte.html" data-requires-api hidden>
+            <svg class="icon" aria-hidden="true"><use href="#icon-user"/></svg>
+            <span class="button__label">Mon compte</span>
+          </a>
+          <a class="button button--ghost button--small button--discord" href="https://discord.gg/aeloria-mmorpg" data-config-href="links.discord" target="_blank" rel="noopener">
             <svg class="icon" aria-hidden="true"><use href="#icon-discord"/></svg>
-            Discord<span class="visually-hidden"> (nouvel onglet)</span>
+            <span class="button__label">Discord</span><span class="visually-hidden"> (nouvel onglet)</span>
           </a>
           <a class="button button--primary button--small" href="https://github.com/bananacheattv/gfrpg-launcher/releases/latest" data-config-href="launcher.url" data-action="download" target="_blank" rel="noopener">
             <svg class="icon" aria-hidden="true"><use href="#icon-play"/></svg>
@@ -776,6 +781,8 @@
         <ul class="site-footer__list">
           <li><a class="site-footer__link" href="#reglement">Règlement</a></li>
           <li><a class="site-footer__link" href="#faq">FAQ</a></li>
+          <li data-requires-api hidden><a class="site-footer__link" href="compte.html">Mon compte</a></li>
+          <li data-requires-api hidden><a class="site-footer__link" href="boutique.html">Boutique de crédits</a></li>
           <li><button class="site-footer__link site-footer__link--button" type="button" data-dialog-open="mentions">Mentions légales</button></li>
         </ul>
       </div>
