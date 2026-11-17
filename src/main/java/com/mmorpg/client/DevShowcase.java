@@ -353,6 +353,17 @@ public final class DevShowcase {
             if(frame==440){var data=new CompoundTag();data.putInt("tier",4);data.put("table",com.mmorpg.server.AdventureLoot.preview("lucky_neant"));mc.gui.setScreen(new com.mmorpg.client.screen.LuckyBlockScreen(data));}
             if(frame==465)shot(mc,"lucky_small");if(frame==480)stop(mc);return;
         }
+        if(MODE.equals("guilde_hall")){
+            if(mc.player==null||mc.level==null)return;tick++;if(tick<90)return;int frame=tick-90;
+            if(frame==0){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(2);mc.resizeGui();}
+            String[] places={"menu","keeper","keeper","hall"};boolean[] has={true,false,true,true};String[] names={"menu_resume","keeper_creation","keeper_guilde","hall_conseil"};
+            for(int i=0;i<4;i++){
+                if(frame==10+i*30){var guild=new com.mmorpg.guild.GuildStore.Guild();guild.name="Les Veilleurs d’Aeloria";guild.level=4;guild.gold=25000;var self=new java.util.UUID(0,1);guild.members.put(self,new com.mmorpg.guild.GuildStore.Member(self,"Aeloria","CHEF"));
+                    var data=new CompoundTag();data.putString("self",self.toString());data.putString("place",places[i]);if(has[i])data.putString("guild",new com.google.gson.Gson().toJson(guild));mc.gui.setScreen(new com.mmorpg.client.screen.GuildScreen(data));}
+                if(frame==30+i*30)shot(mc,names[i]);
+            }
+            if(frame==140)stop(mc);return;
+        }
         if(MODE.equals("social_ui")){
             if(mc.gui.screen()==null)return;tick++; if(tick<70)return; int frame=tick-70;
             if(frame==30){mc.getWindow().setWindowed(1280,720);mc.options.guiScale().set(3);mc.resizeGui();mc.gui.setScreen(new com.mmorpg.client.screen.AeloriaTitleScreen());}

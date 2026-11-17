@@ -15,7 +15,11 @@ public final class DevSocialChecks {
     public static void run(ServerPlayer p)throws Exception{
         var original=NetworkConfig.current;var dir=Files.createTempDirectory("aeloria-guild-checks-");var cfg=new NetworkConfig();cfg.enabled=true;cfg.role=NetworkConfig.Role.MAIN;cfg.sharedDirectory=dir.resolve("players").toString();NetworkConfig.current=cfg;
         var server=p.level().getServer();var member=net.neoforged.neoforge.common.util.FakePlayerFactory.get(server.overworld(),new com.mojang.authlib.GameProfile(UUID.randomUUID(),"GuildMember"));long oldGold=RpgPlayers.get(p).gold;
+        GuildService.devBypass=false;
         try{
+            // Anti-contournement : hors hall et hors Élyra, aucune action de guilde (création comprise).
+            GuildService.action(p,packet("create","name","Hors Hall"));check(GuildStore.access(server,false,s->GuildStore.of(s,p.getUUID()))==null&&GuildStore.access(server,false,s->s.guilds.stream().noneMatch(x->x.name.equals("Hors Hall"))),"create refused outside hall/keeper");
+            GuildService.devBypass=true;
             check(NetworkPlayers.login(p),"guild test profile acquired");check(NetworkPlayers.login(member),"member profile acquired");RpgPlayers.get(p).gold=25000;
             GuildService.action(p,packet("create","name","Racines du Test"));var guild=GuildStore.access(server,false,s->GuildStore.of(s,p.getUUID()));check(guild!=null&&guild.level==1,"new guild starts at one");UUID id=guild.id;
             var deposit=packet("deposit");deposit.putLong("amount",20000);GuildService.action(p,deposit);check(RpgPlayers.get(p).gold==5000,"deposit debits personal wallet");long banked=GuildStore.access(server,false,s->GuildStore.byId(s,id).gold);check(banked>=20000&&banked<=20000+GuildStore.access(server,false,s->GuildStore.byId(s,id).quests.stream().mapToLong(q->q.rewardGold).sum()),"deposit credits shared bank once (plus any guild quest reward)");GuildService.reconcile(p);check(GuildStore.access(server,false,s->GuildStore.byId(s,id).gold)==banked,"reconciliation never duplicates deposit");
@@ -63,6 +67,6 @@ public final class DevSocialChecks {
             var raid=CompetitionWorld.raid(new net.minecraft.core.BlockPos(500,100,4000),0);var fire=CompetitionWorld.arena(CompetitionWorld.center(0),ArenaRules.Kind.FEU);check(raid.blocks.size()>4000&&fire.blocks.size()>15000,"real decorated arena and trial geometry generated");
             for(var type:com.mmorpg.registry.ModEntities.GUILD_GUARDIANS){var boss=type.get().create(p.level(),net.minecraft.world.entity.EntitySpawnReason.COMMAND);check(boss!=null&&boss.getBbHeight()>=5,"giant guardian registered with large hitbox");boss.initialize();check(boss.rpgData().boss&&boss.rpgData().maxHp>=3500,"guardian RPG combat stats initialized");}
             com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] GUILDS_ARENAS PASS: creation, ranks, invites, treasury, crash recovery, corruption refusal, XP/boss/gold upgrades, buffs, brackets, crystal timing, kills, win and ten guardians");
-        }finally{NetworkPlayers.logout(p);NetworkPlayers.logout(member);RpgPlayers.get(p).gold=oldGold;NetworkConfig.current=original;}
+        }finally{GuildService.devBypass=false;NetworkPlayers.logout(p);NetworkPlayers.logout(member);RpgPlayers.get(p).gold=oldGold;NetworkConfig.current=original;}
     }
 }

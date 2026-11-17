@@ -24,11 +24,28 @@ public final class GuildService {
     private static GuildStore.Guild member(GuildStore.State s,ServerPlayer p){var g=GuildStore.of(s,com.mmorpg.character.CharKey.of(p));require(g!=null,"Tu n’as pas de guilde.");return g;}
     private static void officer(GuildStore.Guild g,UUID id){require(!g.members.get(id).rank.equals("MEMBRE"),"Réservé au chef et aux officiers.");}
     private static void chief(GuildStore.Guild g,UUID id){require(g.members.get(id).rank.equals("CHEF"),"Réservé au chef de guilde.");}
+    /** Interrupteur de test : autorise les actions de guilde hors du hall (vérifications serveur, outils de dev). */
+    public static boolean devBypass;
+    private static boolean bypass(){return devBypass||Boolean.getBoolean("mmorpg.guildAnywhere");}
+    /** Lieu du joueur : "hall" (hall de sa guilde), "keeper" (près d'Élyra, au hub) ou "menu" (ailleurs : lecture seule). */
+    public static String place(ServerPlayer p){
+        if(p.level().dimension().equals(GuildHall.DIM))return "hall";
+        for(var e:p.level().getEntitiesOfClass(com.mmorpg.entity.hub.HubGuideEntity.class,p.getBoundingBox().inflate(10),n->n.guide()==3&&!n.isRemoved()))return "keeper";
+        return "menu";
+    }
+    private static final Set<String> KEEPER_ACTIONS=Set.of("create","accept","decline","hall");
+    /** Anti-contournement : toutes les options de guilde se font dans le hall (création, invitations et entrée du hall auprès d'Élyra). */
+    private static boolean allowed(ServerPlayer p,String action){
+        if(bypass()||action.equals("raidLeave")||action.equals("open"))return true;
+        String place=place(p);
+        if(KEEPER_ACTIONS.contains(action))return place.equals("keeper");
+        return place.equals("hall");
+    }
     public static void open(ServerPlayer p){open(p,"");}
     public static void open(ServerPlayer p,String status){open(p,status,-1);}
     public static void open(ServerPlayer p,String status,int tab){
         try{var t=GuildStore.access(p.level().getServer(),false,s->{var data=new CompoundTag();data.putString("status",status);var g=GuildStore.of(s,com.mmorpg.character.CharKey.of(p));
-            data.putString("self",com.mmorpg.character.CharKey.of(p).toString());data.putLong("wallet",RpgPlayers.get(p).gold);if(tab>=0)data.putInt("tab",tab);if(g!=null){GuildExtras.roll(g);data.putInt("vaultCount",GuildExtras.vaultCount(g));}
+            data.putString("place",bypass()?"hall":place(p));data.putString("self",com.mmorpg.character.CharKey.of(p).toString());data.putLong("wallet",RpgPlayers.get(p).gold);if(tab>=0)data.putInt("tab",tab);if(g!=null){GuildExtras.roll(g);data.putInt("vaultCount",GuildExtras.vaultCount(g));}
             data.putString("guild",g==null?"":publicJson(g));
             var invites=new ListTag();for(var x:s.guilds)if(x.invites.getOrDefault(com.mmorpg.character.CharKey.of(p),0L)>System.currentTimeMillis()){var v=new CompoundTag();v.putString("id",x.id.toString());v.putString("name",x.name);invites.add(v);}data.put("invites",invites);
             var players=new ListTag();for(var player:online(p.level().getServer())){var v=new CompoundTag();v.putString("id",player.id.toString());v.putString("name",player.name);players.add(v);}data.put("online",players);return data;});
@@ -40,6 +57,7 @@ public final class GuildService {
     public static void action(ServerPlayer p,CompoundTag data){
         try{
             String action=data.getStringOr("action","");if(!action.equals("raidLeave")&&!com.mmorpg.server.FeatureFlags.allow(p,"guildes"))return;if(action.equals("open")){reconcile(p);open(p);return;}
+            if(!allowed(p,action)){p.sendSystemMessage(Component.literal(KEEPER_ACTIONS.contains(action)?"Rends-toi auprès d’Élyra, la gardienne des guildes, au hub.":"Rendez-vous au hall de guilde : toutes les options de guilde s’y trouvent."));return;}
             require(!com.mmorpg.hub.ClassTrial.active(p),"Termine d’abord ton essai de classe.");
             require(!NetworkPlayers.inTransit(p),"Changement de serveur en cours.");
             if(action.equals("deposit")||action.equals("withdraw")){transfer(p,data.getLongOr("amount",0),action.equals("withdraw"));open(p,"Transaction enregistrée.");return;}
@@ -122,7 +140,7 @@ public final class GuildService {
             if(g!=null&&GREETED.add(com.mmorpg.character.CharKey.of(p))){if(!g.motd.isEmpty())p.sendSystemMessage(Component.literal("["+g.name+"] Message du jour : "+g.motd).withColor(0xF2D26B));for(var pin:g.pins)p.sendSystemMessage(Component.literal("["+g.name+"] Annonce — "+pin).withColor(0xD5B0FF));}
             for(var invitation:s.guilds){long expires=invitation.invites.getOrDefault(com.mmorpg.character.CharKey.of(p),0L);if(expires>System.currentTimeMillis()){
                 String key=invitation.id+":"+expires;pending.add(key);
-                if(seen.add(key))p.sendSystemMessage(Component.literal("Invitation de guilde : "+invitation.name+". Ouvre /guilde pour accepter ou refuser. Cette invitation est distincte de ton groupe.").withColor(0xD5B0FF));
+                if(seen.add(key))p.sendSystemMessage(Component.literal("Invitation de guilde : "+invitation.name+". Rends-toi auprès d’Élyra, la gardienne des guildes (hub), pour accepter ou refuser. Cette invitation est distincte de ton groupe.").withColor(0xD5B0FF));
             }}seen.retainAll(pending);
             long[] buffs=new long[GuildBuffs.Kind.values().length];if(g!=null)for(var kind:GuildBuffs.Kind.values()){long until=g.buffs.getOrDefault(kind.name(),0L);if(until>System.currentTimeMillis())buffs[kind.ordinal()]=until;}return new Membership(g==null?0:g.level,buffs);});var d=RpgPlayers.get(p);if(d.guildLevel!=membership.level||!Arrays.equals(d.guildBuffs,membership.buffs)){d.guildLevel=membership.level;d.guildBuffs=membership.buffs;RpgPlayers.recomputeAndSync(p);}}catch(Exception e){MMORPG.LOGGER.warn("Guild buffs refresh unavailable: {}",e.getMessage());}}
     public static void bossCleared(net.minecraft.server.MinecraftServer server,UUID guild,int tier){GuildStore.access(server,true,s->{var g=GuildStore.byId(s,guild);require(g!=null&&tier>=0&&tier<g.level,"Palier de guilde modifié.");g.bosses|=1<<tier;g.bossCooldowns.put(tier,System.currentTimeMillis()+6*60*60*1000L);g.log(Yggdrasil.ALL[tier].name()+" vaincu !");return null;});}

@@ -20,7 +20,7 @@ public final class GuildHall {
     public static BlockPos center(GuildStore.Guild g){return new BlockPos(500+g.hallIndex*128,100,500);}
     public static DyeColor color(String key){return GuildCrest.dye(key);}
     /** Stations du hall (décalage par rapport au centre, y = 0) : banque, coffre, quêtes, boutique. */
-    private static final int[][] STATIONS={{-10,-3},{-10,3},{10,-3},{10,3}};
+    private static final int[][] STATIONS={{-10,-3},{-10,3},{10,-3},{10,3},{0,-8}};
     public static void enter(ServerPlayer p){
         if(com.mmorpg.competition.ArenaManager.active(p)||com.mmorpg.competition.GuildRaids.of(p.getUUID())!=null||com.mmorpg.dungeon.InstanceManager.containsPlayer(p))throw new IllegalArgumentException("Termine ton activité avant de rejoindre le hall.");
         if(com.mmorpg.competition.CompetitionTravel.route(p,"guild-hall"))return;
@@ -56,8 +56,8 @@ public final class GuildHall {
         return j;
     }
     private static void stations(com.mmorpg.competition.CompetitionWorld.Job j,BlockPos c){
-        Block[] blocks={Blocks.GOLD_BLOCK,Blocks.BARREL,Blocks.LECTERN,Blocks.EMERALD_BLOCK};
-        for(int i=0;i<4;i++){int x=STATIONS[i][0],z=STATIONS[i][1];j.add(c.getX()+x,99,c.getZ()+z,Blocks.SEA_LANTERN);j.add(c.getX()+x,100,c.getZ()+z,blocks[i]);}
+        Block[] blocks={Blocks.GOLD_BLOCK,Blocks.BARREL,Blocks.LECTERN,Blocks.EMERALD_BLOCK,Blocks.LECTERN};
+        for(int i=0;i<5;i++){int x=STATIONS[i][0],z=STATIONS[i][1];j.add(c.getX()+x,99,c.getZ()+z,Blocks.SEA_LANTERN);j.add(c.getX()+x,100,c.getZ()+z,blocks[i]);}
     }
     /** Salle des trophées : un piédestal par trophée du catalogue, doré une fois débloqué. */
     private static void annex(com.mmorpg.competition.CompetitionWorld.Job j,GuildStore.Guild g,BlockPos c,int r){
@@ -79,8 +79,8 @@ public final class GuildHall {
         text(level,c.offset(0,7,-16),guild.name+" · "+guild.bannerPattern,tag,.8f);
         String board=(guild.motd.isEmpty()?"Aucun message du jour":guild.motd);for(var pin:guild.pins)board+="\n— "+pin;
         text(level,c.offset(0,5,-9),"Message du jour\n"+board,tag,.3f);
-        String[] names={"Banque de guilde","Coffre de guilde","Quêtes de guilde","Boutique de guilde"};
-        for(int i=0;i<4;i++)text(level,c.offset(STATIONS[i][0],2,STATIONS[i][1]),names[i]+"\n(clic droit)",tag,.35f);
+        String[] names={"Banque de guilde","Coffre de guilde","Quêtes de guilde","Boutique de guilde","Conseil de guilde\nMembres · Rangs · Identité · Améliorations"};
+        for(int i=0;i<5;i++)text(level,c.offset(STATIONS[i][0],2,STATIONS[i][1]),names[i]+"\n(clic droit)",tag,.35f);
         int hr=18+guild.hallLevel*3;text(level,c.offset(0,5,hr-1),"Salle des trophées",tag,.45f);
         var all=GuildExtras.catalog();for(int i=0;i<all.size();i++){var t=all.get(i);boolean earned=guild.trophies.contains(t.id());
             text(level,c.offset(-9+2*(i%10),3,hr+(i<10?4:10)),earned?t.label():"???\n"+t.hint(),tag,.2f);}
@@ -96,7 +96,7 @@ public final class GuildHall {
             BUILDS.remove(id);var finished=GuildStore.access(e.getServer(),false,state->GuildStore.byId(state,id));if(finished!=null)labels(level,finished);for(var visitor:new HashMap<>(VISITORS).entrySet())if(visitor.getValue().equals(id)){
                 var p=e.getServer().getPlayerList().getPlayer(visitor.getKey());VISITORS.remove(visitor.getKey());if(p==null)continue;
                 var g=GuildStore.access(e.getServer(),false,s->GuildStore.of(s,com.mmorpg.character.CharKey.of(p)));if(g==null||!g.id.equals(id))continue;var c=center(g);
-                p.teleportTo(level,c.getX()+.5,100,c.getZ()+5.5,Set.of(),180,0,true);p.sendSystemMessage(Component.literal("Hall de "+g.name+" · /guilde pour les améliorations · /reseau spawn pour sortir"));
+                p.teleportTo(level,c.getX()+.5,100,c.getZ()+5.5,Set.of(),180,0,true);p.sendSystemMessage(Component.literal("Hall de "+g.name+" · clic droit sur les pupitres pour gérer la guilde · /reseau spawn pour sortir"));
             }
         }}
         if(e.getServer().getTickCount()%40==0)for(var p:new ArrayList<>(level.players())){
@@ -108,8 +108,8 @@ public final class GuildHall {
         if(!(e.getEntity() instanceof ServerPlayer p)||!p.level().dimension().equals(DIM)||e.getHand()!=net.minecraft.world.InteractionHand.MAIN_HAND)return;
         try{var g=GuildStore.access(p.level().getServer(),false,s->GuildStore.of(s,com.mmorpg.character.CharKey.of(p)));if(g==null||g.hallIndex<0)return;var c=center(g);
             if(e.getPos().getY()!=c.getY())return;int dx=e.getPos().getX()-c.getX(),dz=e.getPos().getZ()-c.getZ();
-            for(int i=0;i<4;i++)if(dx==STATIONS[i][0]&&dz==STATIONS[i][1]){e.setCanceled(true);
-                if(i==1){var t=new net.minecraft.nbt.CompoundTag();t.putString("action","vault");GuildService.action(p,t);}else GuildService.open(p,"",new int[]{2,0,4,3}[i]);return;}
+            for(int i=0;i<5;i++)if(dx==STATIONS[i][0]&&dz==STATIONS[i][1]){e.setCanceled(true);
+                if(i==1){var t=new net.minecraft.nbt.CompoundTag();t.putString("action","vault");GuildService.action(p,t);}else GuildService.open(p,"",new int[]{2,0,4,3,0}[i]);return;}
         }catch(Exception ex){p.sendSystemMessage(Component.literal("Hall indisponible : "+ex.getMessage()));}
     }
     @SubscribeEvent public static void logout(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent e){if(e.getEntity() instanceof ServerPlayer p)GuildService.left(p);}

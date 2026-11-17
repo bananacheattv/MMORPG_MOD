@@ -12,6 +12,9 @@ import java.util.*;
 
 public final class GuildScreen extends MmoScreen {
     @Override protected MenuScreen.Tab navActive() { return MenuScreen.Tab.GUILDE; }
+    /** Barre d'onglets du menu : seulement pour le résumé en lecture seule ; dans le hall et chez Élyra l'écran est une interface de lieu. */
+    @Override protected boolean hasNav() { return "menu".equals(place()) && super.hasNav(); }
+    private String place(){return data==null?"hall":data.getStringOr("place","hall");}
 
     @Override protected String backdrop() { return "guild_hall_header"; }
 
@@ -31,7 +34,10 @@ public final class GuildScreen extends MmoScreen {
     @Override protected void renderContent(GuiGraphicsExtractor g,int mx,int my,float a){
         Ui.frame(g,left,top,pw,ph,Ui.GOLD,false);g.centeredText(font,Component.literal(guild==null?"GUILDES":guild.name+" · Niveau "+guild.level+" / 10"),left+pw/2,top+8,Ui.GOLD);
         for(var f:List.of(name,amount,motto,confirmation,notice)){f.visible=false;f.active=false;}
-        if(guild==null)noGuild(g);else{
+        String place=place();
+        if(place.equals("menu"))summary(g,false);
+        else if(place.equals("keeper")&&guild!=null)summary(g,true);
+        else if(guild==null)noGuild(g);else{
             String[] tabs={"Guilde","Membres","Banque","Boutique","Quêtes","Arbre","Trophées","Buffs","Journal","Identité"};int w=(pw-24)/10;for(int i=0;i<tabs.length;i++){int n=i;button(g,left+12+i*w,top+27,w-2,17,tabs[i],true,tab==i?Ui.GOLD:Ui.MUTED,()->{tab=n;page=0;});}
             switch(tab){case 0->home(g);case 1->members(g);case 2->bank(g);case 3->shop(g);case 4->quests(g);case 5->tree(g);case 6->trophies(g);case 7->buffs(g);case 9->identity(g);default->history(g);}
         }
@@ -41,6 +47,13 @@ public final class GuildScreen extends MmoScreen {
         button(g,left+pw-102,top+ph-23,90,17,"Fermer",true,Ui.MUTED,this::onClose);
     }
     private void visible(EditBox f){f.visible=true;f.active=true;}
+    /** Résumé en lecture seule : les options de guilde se font dans le hall. */
+    private void summary(GuiGraphicsExtractor g,boolean keeper){
+        if(guild==null){text(g,"Tu n’as pas de guilde.",left+12,top+50,Ui.TEXT);Ui.wrap(g,"Va voir Élyra, la gardienne des guildes, au hub : elle fonde les guildes et reçoit les invitations.",left+12,top+70,pw-24,Ui.MUTED);return;}
+        var me=guild.members.get(self);text(g,"Rang : "+(me==null?"—":me.rank)+" · "+guild.members.size()+" / 50 membres",left+12,top+50,Ui.TEXT);
+        text(g,"Banque : "+guild.gold+" or · XP "+guild.xp+" / "+Yggdrasil.xpRequired(guild.level),left+12,top+66,Ui.TEXT);
+        Ui.wrap(g,keeper?"Toutes les options de guilde (membres, rangs, banque, quêtes, boss, améliorations) se font dans ton hall.":"Rendez-vous au hall de guilde : membres, rangs, banque, quêtes, boss et améliorations s’y gèrent. Élyra, au hub, t’y conduit.",left+12,top+92,pw-24,Ui.GOLD);
+        if(keeper)button(g,left+12,top+140,pw-24,20,"Rejoindre le hall de guilde",true,Ui.GREEN,()->{send("hall");onClose();});}
     private void noGuild(GuiGraphicsExtractor g){text(g,"Crée une guilde ou accepte une invitation.",left+12,top+43,Ui.TEXT);visible(name);button(g,left+12,top+90,pw-24,18,"Fonder ma guilde",!name.getValue().isBlank(),Ui.GREEN,()->send("create",t->t.putString("name",name.getValue())));
         var invites=data.getListOrEmpty("invites");int rows=Math.max(1,(ph-162)/23);for(int i=0;i<rows&&i+page*rows<invites.size();i++){var invite=invites.getCompoundOrEmpty(i+page*rows);int y=top+118+i*23;String id=invite.getStringOr("id","");text(g,invite.getStringOr("name",""),left+12,y+4,Ui.TEXT);button(g,left+pw-148,y,65,18,"Accepter",true,Ui.GREEN,()->send("accept",t->t.putString("target",id)));button(g,left+pw-78,y,65,18,"Refuser",true,Ui.RED,()->send("decline",t->t.putString("target",id)));}}
     private void home(GuiGraphicsExtractor g){text(g,guild.members.size()+" / 50 membres · Banque : "+guild.gold+" or",left+12,top+53,Ui.TEXT);text(g,"XP de guilde : "+guild.xp+" / "+Yggdrasil.xpRequired(guild.level),left+12,top+70,Ui.TEXT);
