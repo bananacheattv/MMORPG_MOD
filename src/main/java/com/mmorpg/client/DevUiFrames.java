@@ -99,6 +99,26 @@ final class DevUiFrames {
             t.put("flags", flags);
             return new AdminFeaturesScreen(t).preview(0);
         });
+        add("hunt_zone", () -> {
+            var t = new CompoundTag();
+            t.putBoolean("selection", true);
+            t.putInt("w", 120);
+            t.putInt("d", 80);
+            var mobs = new net.minecraft.nbt.ListTag();
+            for (String k : new String[]{"gobelin", "mousseux", "sanglier_ronce", "archer_sylvestre", "loup_sombre", "crapaud_venimeux", "limace_acide", "osselet", "araignee_os", "garde_funeraire"}) mobs.add(net.minecraft.nbt.StringTag.valueOf(k));
+            t.put("mobs", mobs);
+            var zs = new net.minecraft.nbt.ListTag();
+            var z = new CompoundTag();
+            z.putString("id", "prairies");
+            z.putString("nom", "Prairies d'Aeloria");
+            z.putInt("min", 1);
+            z.putInt("max", 18);
+            z.putBoolean("actif", true);
+            z.putInt("mobs", 5);
+            zs.add(z);
+            t.put("zones", zs);
+            return new HuntZoneScreen(t).preview();
+        });
         add("jobs", JobsScreen::new);
         add("achievements", AchievementsScreen::new);
         add("skills", SkillsScreen::new);

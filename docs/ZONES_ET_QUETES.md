@@ -23,7 +23,7 @@ Créé au premier démarrage. Rechargement à chaud : `/zone chasse recharger`.
 - Les quêtes « tuer X » fonctionnent partout ; le guidage (boussole) pointe vers la zone qui contient le monstre voulu.
 
 ### En jeu (opérateurs)
-Baguette de zone (2 coins), puis :
+Baguette de zone : 2 coins (clic droit sur 2 blocs), puis **clic droit dans le vide = menu** (créer, TP, activer, supprimer, sans commande). Ou en commande :
 `/zone chasse creer <id> <niveauMin> <niveauMax> <monstres…>`, `liste`, `supprimer <id>`, `monstres <id> a,b,c`,
 `niveaux <id> min max`, `max <id> n`, `sure <id> rayon`, `recolte <id> true|false`, `actif <id> true|false`, `nom <id> …`, `tp <id>`.
 

@@ -46,6 +46,8 @@ public class ZoneWandItem extends RpgMaterialItem {
         if (!level.isClientSide() && player instanceof ServerPlayer sp && allowed(sp) && sp.isShiftKeyDown()) {
             ZoneManager.clearSelection(sp);
             sp.sendOverlayMessage(Component.literal("Sélection effacée.").withColor(0xA0A0A0));
+        } else if (!level.isClientSide() && player instanceof ServerPlayer sp && allowed(sp)) {
+            com.mmorpg.zone.HuntTool.open(sp);
         }
         return InteractionResult.SUCCESS;
     }
@@ -55,6 +57,7 @@ public class ZoneWandItem extends RpgMaterialItem {
         super.appendHoverText(stack, context, display, out, flag);
         out.accept(Component.literal("Outil d'administration (opérateurs)").withColor(0xFF8060));
         out.accept(Component.literal("Clic droit sur un bloc : coin A, puis coin B").withColor(0x80C0FF));
+        out.accept(Component.literal("Clic droit dans le vide : menu des zones de chasse").withColor(0x80E080));
         out.accept(Component.literal("/zone creer <nom> : valide la zone").withColor(0xA0A0A0));
         out.accept(Component.literal("/portail zone <destination> : la zone devient un portail").withColor(0xA0A0A0));
         out.accept(Component.literal("Accroupi + clic : efface la sélection").withColor(0xA0A0A0));
