@@ -52,3 +52,6 @@ Baguette de zone (2 coins), puis :
 ## À placer par vous
 Minerais (blocs `minerai_*`), champs de cultures, et vos zones de chasse (JSON ci-dessus). L'ancien PNJ « Maître des mines » déjà posé affiche seulement un message : à supprimer.
 Données joueur `minesUnlocked`/`plainsUnlocked` : conservées, inutilisées.
+
+## Mobs hors donjons
+Aucun mob ne apparaît tout seul hors donjons (ni vanilla, ni mobs du mod) : ils viennent uniquement des zones de chasse posées à la main (`/zone chasse creer <id> <niveauMin> <niveauMax> <monstres>` avec la baguette de zone, `/zone chasse liste|supprimer|recharger`, fichier `config/mmorpg/zones_chasse.json`). Les donjons restent inchangés.
