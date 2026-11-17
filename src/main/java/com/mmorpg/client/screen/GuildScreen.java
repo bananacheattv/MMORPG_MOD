@@ -42,6 +42,7 @@ public final class GuildScreen extends MmoScreen {
             switch(tab){case 0->home(g);case 1->members(g);case 2->bank(g);case 3->shop(g);case 4->quests(g);case 5->tree(g);case 6->trophies(g);case 7->buffs(g);case 9->identity(g);default->history(g);}
         }
         text(g,data.getStringOr("status",""),left+12,top+ph-38,Ui.GOLD);
+        if(place.equals("menu"))return;
         button(g,left+12,top+ph-23,90,17,"Actualiser",true,Ui.GOLD,()->send("open"));
         if(guild!=null&&tab==5)button(g,left+pw/2-65,top+ph-23,130,17,"Quitter l’épreuve",true,Ui.MUTED,()->send("raidLeave"));
         button(g,left+pw-102,top+ph-23,90,17,"Fermer",true,Ui.MUTED,this::onClose);
