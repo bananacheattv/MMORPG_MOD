@@ -21,6 +21,8 @@ public record S2COpenScreen(int screen, CompoundTag extra) implements CustomPack
     public static final int LUCKY_RESULT = 8;
     public static final int LOOT_EDITOR = 9;
     public static final int CRATE = 10;
+    /** Resultat d'ouverture d'une caisse (reste dans l'interface de la caisse). */
+    public static final int CRATE_RESULT = 44;
     /** Dialogue d'un Maitre de classe / de l'epreuve. */
     public static final int CLASS_MASTER = 11;
     /** Lancement de la cinematique d'arrivee (definition JSON et origine du hub). */

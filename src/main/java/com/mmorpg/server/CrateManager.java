@@ -53,38 +53,38 @@ public final class CrateManager {
     public static void open(ServerPlayer p, BlockPos pos) {
         if(!FeatureFlags.allow(p,"coffres"))return;
         CrateBlockEntity be = crate(p, pos);
-        if (be == null || !(be.getBlockState().getBlock() instanceof CrateBlock block)) return;
+        if (be == null || !(be.getBlockState().getBlock() instanceof CrateBlock block)) { fail(p, pos); return; }
         CrateTier tier = block.tier;
         ServerLevel level = (ServerLevel) p.level();
         long now = level.getGameTime();
-        if (be.spinning(now)) {
-            p.sendOverlayMessage(Component.literal("La caisse est déjà en cours d’ouverture…").withColor(0xFFC060));
-            return;
-        }
         ItemStack key = findKey(p, tier);
         if (key.isEmpty()) {
             p.sendOverlayMessage(Component.literal("Il vous faut une " + tier.keyLabel + ".").withColor(0xFF6060));
             level.playSound(null, pos, SoundEvents.CHEST_LOCKED, SoundSource.BLOCKS, 0.8f, 1f);
+            fail(p, pos);
             return;
         }
         if (!p.hasInfiniteMaterials()) key.shrink(1);
         AdventureLoot.Loot loot = AdventureLoot.roll(p, tier.table());
-        AdventureLoot.give(p, loot);                       // verse tout de suite, annonce a la fin de la roue
-        // roue : objets de la table au hasard (selon leur poids), le gain a l'index RESULT_AT
-        List<String> reel = new ArrayList<>();
-        List<LootTables.Entry> entries = ConfigManager.loot().table(tier.table());
-        for (int i = 0; i < REEL; i++) {
-            String id = i == RESULT_AT ? loot.item() : entries.isEmpty() ? "mmorpg:piece_or" : weighted(p, entries);
-            reel.add(id);
-        }
-        String what = loot.gold() > 0 ? loot.gold() + " pièces d’or" : loot.count() + " × " + loot.category();
-        be.start(reel, RESULT_AT, now, p.getUUID(), what, what);
+        AdventureLoot.give(p, loot);                       // verse tout de suite : rien ne se perd si l'ecran est ferme
+        CompoundTag res = new CompoundTag();
+        res.putLong("pos", pos.asLong());
+        res.put("loot", loot.tag());
+        res.putInt("keys", countKeys(p, tier));
+        Net.toPlayer(p, new S2COpenScreen(S2COpenScreen.CRATE_RESULT, res));
         BlockState state = be.getBlockState();
         level.setBlockAndUpdate(pos, state.setValue(CrateBlock.OPEN, true));
-        level.scheduleTick(pos, state.getBlock(), CrateBlockEntity.SPIN_TICKS);
+        level.scheduleTick(pos, state.getBlock(), 60);
         level.playSound(null, pos, SoundEvents.CHEST_OPEN, SoundSource.BLOCKS, 1f, 0.8f);
         level.playSound(null, pos, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 0.6f, 1.6f);
         level.sendParticles(ParticleTypes.END_ROD, pos.getX() + .5, pos.getY() + 1.6, pos.getZ() + .5, 20, .4, .3, .4, .03);
+    }
+
+    private static void fail(ServerPlayer p, BlockPos pos) {
+        CompoundTag res = new CompoundTag();
+        res.putLong("pos", pos.asLong());
+        res.putString("error", "1");
+        Net.toPlayer(p, new S2COpenScreen(S2COpenScreen.CRATE_RESULT, res));
     }
 
     private static String weighted(ServerPlayer p, List<LootTables.Entry> entries) {
@@ -99,20 +99,9 @@ public final class CrateManager {
         return "mmorpg:piece_or";
     }
 
-    /** Tick programme : fin de la roue (annonce + effets), puis fermeture du couvercle. */
+    /** Tick programme : refermeture du couvercle. */
     public static void tick(ServerLevel level, BlockPos pos, BlockState state, CrateTier tier) {
-        if (!(level.getBlockEntity(pos) instanceof CrateBlockEntity be)) return;
-        long elapsed = level.getGameTime() - be.startTick;
-        if (elapsed < CrateBlockEntity.SPIN_TICKS + CrateBlockEntity.SHOW_TICKS - 2) {
-            if (be.opener != null && level.getServer().getPlayerList().getPlayer(be.opener) instanceof ServerPlayer p && !be.announce.isEmpty()) {
-                p.sendSystemMessage(Component.literal("✦ " + tier.label + " : " + be.announce).withColor(tier.color));
-            }
-            be.announce = "";
-            level.playSound(null, pos, com.mmorpg.registry.ModSounds.CHIME.get(), SoundSource.BLOCKS, 1f, 1f);
-            level.sendParticles(ParticleTypes.TOTEM_OF_UNDYING, pos.getX() + .5, pos.getY() + 2.2, pos.getZ() + .5, 40, .4, .4, .4, .3);
-            level.sendParticles(ParticleTypes.FIREWORK, pos.getX() + .5, pos.getY() + 2.2, pos.getZ() + .5, 20, .3, .3, .3, .1);
-            level.scheduleTick(pos, state.getBlock(), CrateBlockEntity.SHOW_TICKS);
-        } else if (state.getValue(CrateBlock.OPEN)) {
+        if (state.getValue(CrateBlock.OPEN)) {
             level.setBlockAndUpdate(pos, state.setValue(CrateBlock.OPEN, false));
             level.playSound(null, pos, SoundEvents.CHEST_CLOSE, SoundSource.BLOCKS, 0.8f, 0.8f);
         }
