@@ -24,6 +24,13 @@ public class GeneralConfig {
     public boolean customSpawning = true;
     public int spawnIntervalTicks = 80;
     public int maxCustomMobsNearPlayer = 8;
+    /** Taille, centre et lieux sans apparition naturelle de mobs dans l'Overworld de ce serveur. */
+    public OpenWorldSettings openWorld = new OpenWorldSettings();
+
+    public OpenWorldSettings openWorld() {
+        if (openWorld == null) openWorld = new OpenWorldSettings();
+        return openWorld;
+    }
     public double goldDropChance = 0.65;
     public double upgradeStoneDropChance = 0.03;
     /** Chance qu'un monstre (niveau 10 et plus) lache un trefle d'amelioration. */

@@ -41,6 +41,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
@@ -742,7 +743,10 @@ public final class AeloriaImport {
                             if (st != null) {
                                 pos.set(s.x() + x, s.y() + y, s.z() + z);
                                 if (mode == Mode.PASTE) {
-                                    chunk.setBlockState(pos, st, 0);
+                                    // A schematic paste is not an interactive placement. In particular,
+                                    // pumpkin onPlace searches unloaded neighbour chunks for golems and
+                                    // can fail at a sector boundary (or consume decorative blocks).
+                                    chunk.setBlockState(pos, st, Block.UPDATE_SKIP_ON_PLACE);
                                     placed++;
                                 } else if (chunk.getBlockState(pos) != st) {
                                     mismatch("bloc " + pos.getX() + " " + pos.getY() + " " + pos.getZ() + " : " + chunk.getBlockState(pos) + " au lieu de " + st);

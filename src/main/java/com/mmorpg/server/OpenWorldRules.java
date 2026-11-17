@@ -14,11 +14,8 @@ import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 public final class OpenWorldRules {
     private OpenWorldRules() { }
 
-    /** Rayon sans aucun de nos mobs autour du spawn. */
-    public static final int SAFE_RADIUS = 200;
-
     public static boolean nearSpawn(double x, double z) {
-        return x * x + z * z <= (double) SAFE_RADIUS * SAFE_RADIUS;
+        return com.mmorpg.config.ConfigManager.general().openWorld().isSafe(x, z);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

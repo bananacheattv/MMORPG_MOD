@@ -1,0 +1,2081 @@
+{
+  "samples": [
+    {
+      "x": 0,
+      "y": 83,
+      "z": 0,
+      "state": "minecraft:gold_block",
+      "name": "Aéloria — Place des Horizons"
+    },
+    {
+      "x": -27,
+      "y": 83,
+      "z": -23,
+      "state": "minecraft:spruce_planks",
+      "name": "Taverne"
+    },
+    {
+      "x": -10,
+      "y": 83,
+      "z": -29,
+      "state": "minecraft:spruce_planks",
+      "name": "Atelier"
+    },
+    {
+      "x": 12,
+      "y": 83,
+      "z": -29,
+      "state": "minecraft:spruce_planks",
+      "name": "Maison des cartes"
+    },
+    {
+      "x": 29,
+      "y": 83,
+      "z": -16,
+      "state": "minecraft:spruce_planks",
+      "name": "Écuries"
+    },
+    {
+      "x": 29,
+      "y": 83,
+      "z": 6,
+      "state": "minecraft:spruce_planks",
+      "name": "Maison"
+    },
+    {
+      "x": 25,
+      "y": 83,
+      "z": 27,
+      "state": "minecraft:spruce_planks",
+      "name": "Bibliothèque"
+    },
+    {
+      "x": 5,
+      "y": 83,
+      "z": 29,
+      "state": "minecraft:spruce_planks",
+      "name": "Forge"
+    },
+    {
+      "x": -16,
+      "y": 83,
+      "z": 27,
+      "state": "minecraft:spruce_planks",
+      "name": "Réserve"
+    },
+    {
+      "x": -29,
+      "y": 83,
+      "z": 10,
+      "state": "minecraft:spruce_planks",
+      "name": "Maison"
+    },
+    {
+      "x": -29,
+      "y": 83,
+      "z": -7,
+      "state": "minecraft:spruce_planks",
+      "name": "Vigie"
+    },
+    {
+      "x": -230,
+      "y": 83,
+      "z": 45,
+      "state": "minecraft:mossy_stone_bricks",
+      "name": "Clairbois"
+    },
+    {
+      "x": -257,
+      "y": 83,
+      "z": 22,
+      "state": "minecraft:spruce_planks",
+      "name": "Taverne"
+    },
+    {
+      "x": -240,
+      "y": 83,
+      "z": 16,
+      "state": "minecraft:spruce_planks",
+      "name": "Atelier"
+    },
+    {
+      "x": -218,
+      "y": 83,
+      "z": 16,
+      "state": "minecraft:spruce_planks",
+      "name": "Maison des cartes"
+    },
+    {
+      "x": -201,
+      "y": 83,
+      "z": 29,
+      "state": "minecraft:spruce_planks",
+      "name": "Écuries"
+    },
+    {
+      "x": -201,
+      "y": 83,
+      "z": 51,
+      "state": "minecraft:spruce_planks",
+      "name": "Maison"
+    },
+    {
+      "x": -205,
+      "y": 83,
+      "z": 72,
+      "state": "minecraft:spruce_planks",
+      "name": "Bibliothèque"
+    },
+    {
+      "x": -225,
+      "y": 83,
+      "z": 74,
+      "state": "minecraft:spruce_planks",
+      "name": "Forge"
+    },
+    {
+      "x": -246,
+      "y": 83,
+      "z": 72,
+      "state": "minecraft:spruce_planks",
+      "name": "Réserve"
+    },
+    {
+      "x": -259,
+      "y": 83,
+      "z": 55,
+      "state": "minecraft:spruce_planks",
+      "name": "Maison"
+    },
+    {
+      "x": -259,
+      "y": 83,
+      "z": 38,
+      "state": "minecraft:spruce_planks",
+      "name": "Vigie"
+    },
+    {
+      "x": -245,
+      "y": 65,
+      "z": 220,
+      "state": "minecraft:mossy_stone_bricks",
+      "name": "Brumevert"
+    },
+    {
+      "x": -265,
+      "y": 65,
+      "z": 203,
+      "state": "minecraft:spruce_planks",
+      "name": "Taverne"
+    },
+    {
+      "x": -244,
+      "y": 65,
+      "z": 197,
+      "state": "minecraft:dark_oak_planks",
+      "name": "Atelier"
+    },
+    {
+      "x": -225,
+      "y": 65,
+      "z": 204,
+      "state": "minecraft:spruce_planks",
+      "name": "Maison des cartes"
+    },
+    {
+      "x": -222,
+      "y": 65,
+      "z": 228,
+      "state": "minecraft:spruce_planks",
+      "name": "Écuries"
+    },
+    {
+      "x": -242,
+      "y": 65,
+      "z": 243,
+      "state": "minecraft:spruce_planks",
+      "name": "Maison"
+    },
+    {
+      "x": -264,
+      "y": 65,
+      "z": 237,
+      "state": "minecraft:spruce_planks",
+      "name": "Bibliothèque"
+    },
+    {
+      "x": 70,
+      "y": 82,
+      "z": 245,
+      "state": "minecraft:cobbled_deepslate",
+      "name": "Veillepierre"
+    },
+    {
+      "x": 43,
+      "y": 82,
+      "z": 222,
+      "state": "minecraft:dark_oak_planks",
+      "name": "Taverne"
+    },
+    {
+      "x": 60,
+      "y": 82,
+      "z": 216,
+      "state": "minecraft:dark_oak_planks",
+      "name": "Atelier"
+    },
+    {
+      "x": 82,
+      "y": 82,
+      "z": 216,
+      "state": "minecraft:dark_oak_planks",
+      "name": "Maison des cartes"
+    },
+    {
+      "x": 99,
+      "y": 82,
+      "z": 229,
+      "state": "minecraft:dark_oak_planks",
+      "name": "Écuries"
+    },
+    {
+      "x": 99,
+      "y": 82,
+      "z": 251,
+      "state": "minecraft:dark_oak_planks",
+      "name": "Maison"
+    },
+    {
+      "x": 95,
+      "y": 82,
+      "z": 272,
+      "state": "minecraft:dark_oak_planks",
+      "name": "Bibliothèque"
+    },
+    {
+      "x": 75,
+      "y": 82,
+      "z": 274,
+      "state": "minecraft:dark_oak_planks",
+      "name": "Forge"
+    },
+    {
+      "x": 54,
+      "y": 82,
+      "z": 272,
+      "state": "minecraft:dark_oak_planks",
+      "name": "Réserve"
+    },
+    {
+      "x": 41,
+      "y": 82,
+      "z": 255,
+      "state": "minecraft:dark_oak_planks",
+      "name": "Maison"
+    },
+    {
+      "x": 41,
+      "y": 82,
+      "z": 238,
+      "state": "minecraft:dark_oak_planks",
+      "name": "Vigie"
+    },
+    {
+      "x": -200,
+      "y": 112,
+      "z": -185,
+      "state": "minecraft:stone_bricks",
+      "name": "Boréalis"
+    },
+    {
+      "x": -227,
+      "y": 112,
+      "z": -208,
+      "state": "minecraft:spruce_planks",
+      "name": "Taverne"
+    },
+    {
+      "x": -210,
+      "y": 112,
+      "z": -214,
+      "state": "minecraft:spruce_planks",
+      "name": "Atelier"
+    },
+    {
+      "x": -188,
+      "y": 112,
+      "z": -214,
+      "state": "minecraft:spruce_planks",
+      "name": "Maison des cartes"
+    },
+    {
+      "x": -171,
+      "y": 112,
+      "z": -201,
+      "state": "minecraft:spruce_planks",
+      "name": "Écuries"
+    },
+    {
+      "x": -171,
+      "y": 112,
+      "z": -179,
+      "state": "minecraft:spruce_planks",
+      "name": "Maison"
+    },
+    {
+      "x": -175,
+      "y": 112,
+      "z": -158,
+      "state": "minecraft:spruce_planks",
+      "name": "Bibliothèque"
+    },
+    {
+      "x": -195,
+      "y": 112,
+      "z": -156,
+      "state": "minecraft:spruce_planks",
+      "name": "Forge"
+    },
+    {
+      "x": -216,
+      "y": 112,
+      "z": -158,
+      "state": "minecraft:spruce_planks",
+      "name": "Réserve"
+    },
+    {
+      "x": -229,
+      "y": 112,
+      "z": -175,
+      "state": "minecraft:spruce_planks",
+      "name": "Maison"
+    },
+    {
+      "x": -229,
+      "y": 112,
+      "z": -192,
+      "state": "minecraft:spruce_planks",
+      "name": "Vigie"
+    },
+    {
+      "x": 210,
+      "y": 92,
+      "z": -175,
+      "state": "minecraft:red_sandstone",
+      "name": "Sahr-Éclat"
+    },
+    {
+      "x": 183,
+      "y": 92,
+      "z": -198,
+      "state": "minecraft:smooth_sandstone",
+      "name": "Taverne"
+    },
+    {
+      "x": 200,
+      "y": 92,
+      "z": -204,
+      "state": "minecraft:smooth_sandstone",
+      "name": "Atelier"
+    },
+    {
+      "x": 222,
+      "y": 92,
+      "z": -204,
+      "state": "minecraft:smooth_sandstone",
+      "name": "Maison des cartes"
+    },
+    {
+      "x": 239,
+      "y": 92,
+      "z": -191,
+      "state": "minecraft:smooth_sandstone",
+      "name": "Écuries"
+    },
+    {
+      "x": 239,
+      "y": 92,
+      "z": -169,
+      "state": "minecraft:smooth_sandstone",
+      "name": "Maison"
+    },
+    {
+      "x": 235,
+      "y": 92,
+      "z": -148,
+      "state": "minecraft:smooth_sandstone",
+      "name": "Bibliothèque"
+    },
+    {
+      "x": 215,
+      "y": 92,
+      "z": -146,
+      "state": "minecraft:smooth_sandstone",
+      "name": "Forge"
+    },
+    {
+      "x": 194,
+      "y": 92,
+      "z": -148,
+      "state": "minecraft:smooth_sandstone",
+      "name": "Réserve"
+    },
+    {
+      "x": 181,
+      "y": 92,
+      "z": -165,
+      "state": "minecraft:dirt",
+      "name": "Maison"
+    },
+    {
+      "x": 181,
+      "y": 92,
+      "z": -182,
+      "state": "minecraft:smooth_sandstone",
+      "name": "Vigie"
+    },
+    {
+      "x": 260,
+      "y": 108,
+      "z": 145,
+      "state": "minecraft:polished_deepslate",
+      "name": "Astréon"
+    },
+    {
+      "x": 233,
+      "y": 108,
+      "z": 122,
+      "state": "minecraft:polished_blackstone",
+      "name": "Taverne"
+    },
+    {
+      "x": 250,
+      "y": 108,
+      "z": 116,
+      "state": "minecraft:polished_blackstone",
+      "name": "Atelier"
+    },
+    {
+      "x": 272,
+      "y": 108,
+      "z": 116,
+      "state": "minecraft:polished_blackstone",
+      "name": "Maison des cartes"
+    },
+    {
+      "x": 289,
+      "y": 108,
+      "z": 129,
+      "state": "minecraft:polished_blackstone",
+      "name": "Écuries"
+    },
+    {
+      "x": 289,
+      "y": 108,
+      "z": 151,
+      "state": "minecraft:polished_blackstone",
+      "name": "Maison"
+    },
+    {
+      "x": 285,
+      "y": 108,
+      "z": 172,
+      "state": "minecraft:polished_blackstone",
+      "name": "Bibliothèque"
+    },
+    {
+      "x": 265,
+      "y": 108,
+      "z": 174,
+      "state": "minecraft:polished_blackstone",
+      "name": "Forge"
+    },
+    {
+      "x": 244,
+      "y": 108,
+      "z": 172,
+      "state": "minecraft:polished_blackstone",
+      "name": "Réserve"
+    },
+    {
+      "x": 231,
+      "y": 108,
+      "z": 155,
+      "state": "minecraft:polished_blackstone",
+      "name": "Maison"
+    },
+    {
+      "x": 231,
+      "y": 108,
+      "z": 138,
+      "state": "minecraft:polished_blackstone",
+      "name": "Vigie"
+    },
+    {
+      "x": -315,
+      "y": 86,
+      "z": -5,
+      "state": "minecraft:mossy_stone_bricks",
+      "name": "Arbre-sanctuaire de Sylveronce"
+    },
+    {
+      "x": 55,
+      "y": 91,
+      "z": 305,
+      "state": "minecraft:stone_bricks",
+      "name": "Abbaye des Veilleurs et crypte funéraire"
+    },
+    {
+      "x": -235,
+      "y": 148,
+      "z": -270,
+      "state": "minecraft:blue_ice",
+      "name": "Citadelle du Souffle boréal"
+    },
+    {
+      "x": 300,
+      "y": 105,
+      "z": -19,
+      "state": "minecraft:sandstone_stairs[facing=north]",
+      "name": "Temple du Soleil brisé"
+    },
+    {
+      "x": 280,
+      "y": 124,
+      "z": 323,
+      "state": "minecraft:polished_blackstone_brick_stairs[facing=north]",
+      "name": "Observatoire des Constellations"
+    },
+    {
+      "x": 265,
+      "y": 183,
+      "z": -310,
+      "state": "minecraft:air",
+      "name": "Caldeira du Brasier ancien"
+    },
+    {
+      "x": -130,
+      "y": 82,
+      "z": 130,
+      "state": "minecraft:mossy_stone_bricks",
+      "name": "Cercle des druides"
+    },
+    {
+      "x": -340,
+      "y": 68,
+      "z": 155,
+      "state": "minecraft:mossy_stone_bricks",
+      "name": "Tour des Roseaux"
+    },
+    {
+      "x": -165,
+      "y": 61,
+      "z": 325,
+      "state": "minecraft:spruce_planks",
+      "name": "Refuge"
+    },
+    {
+      "x": -165,
+      "y": 61,
+      "z": 325,
+      "state": "minecraft:spruce_planks",
+      "name": "Moulin des Brumes"
+    },
+    {
+      "x": -35,
+      "y": 80,
+      "z": 320,
+      "state": "minecraft:cobbled_deepslate",
+      "name": "Ossuaire des Errants"
+    },
+    {
+      "x": 155,
+      "y": 76,
+      "z": 330,
+      "state": "minecraft:cobbled_deepslate",
+      "name": "Chapelle effondrée"
+    },
+    {
+      "x": 110,
+      "y": 88,
+      "z": 155,
+      "state": "minecraft:dark_oak_planks",
+      "name": "Refuge"
+    },
+    {
+      "x": 110,
+      "y": 88,
+      "z": 155,
+      "state": "minecraft:dark_oak_planks",
+      "name": "Camp des Veilleurs"
+    },
+    {
+      "x": -105,
+      "y": 108,
+      "z": -320,
+      "state": "minecraft:stone_bricks",
+      "name": "Phare du Glacier"
+    },
+    {
+      "x": -315,
+      "y": 105,
+      "z": -150,
+      "state": "minecraft:stone_bricks",
+      "name": "Entrée des mines boréales"
+    },
+    {
+      "x": -80,
+      "y": 94,
+      "z": -160,
+      "state": "minecraft:spruce_planks",
+      "name": "Refuge"
+    },
+    {
+      "x": -80,
+      "y": 94,
+      "z": -160,
+      "state": "minecraft:spruce_planks",
+      "name": "Refuge des cols"
+    },
+    {
+      "x": 115,
+      "y": 83,
+      "z": -310,
+      "state": "minecraft:red_sandstone",
+      "name": "Caravane de l’Oasis"
+    },
+    {
+      "x": 345,
+      "y": 89,
+      "z": -190,
+      "state": "minecraft:red_sandstone",
+      "name": "Tour du Vent de cuivre"
+    },
+    {
+      "x": 140,
+      "y": 83,
+      "z": -95,
+      "state": "minecraft:smooth_sandstone",
+      "name": "Refuge"
+    },
+    {
+      "x": 140,
+      "y": 83,
+      "z": -95,
+      "state": "minecraft:smooth_sandstone",
+      "name": "Porte des Dunes"
+    },
+    {
+      "x": 330,
+      "y": 79,
+      "z": 65,
+      "state": "minecraft:polished_deepslate",
+      "name": "Éclat du Zénith"
+    },
+    {
+      "x": 160,
+      "y": 95,
+      "z": 200,
+      "state": "minecraft:polished_deepslate",
+      "name": "Ruines de la Veille astrale"
+    },
+    {
+      "x": 345,
+      "y": 98,
+      "z": 350,
+      "state": "minecraft:polished_blackstone",
+      "name": "Refuge"
+    },
+    {
+      "x": 345,
+      "y": 98,
+      "z": 350,
+      "state": "minecraft:polished_blackstone",
+      "name": "Dernier fanal"
+    },
+    {
+      "x": -115,
+      "y": 76,
+      "z": 20,
+      "state": "minecraft:stone_bricks",
+      "name": "Pont des pèlerins"
+    },
+    {
+      "x": -160,
+      "y": 79,
+      "z": 160,
+      "state": "minecraft:stone_bricks",
+      "name": "Pont des pèlerins"
+    },
+    {
+      "x": -176,
+      "y": 77,
+      "z": 58,
+      "state": "minecraft:water[level=0]",
+      "name": "Jardins de Sylveronce"
+    },
+    {
+      "x": -289,
+      "y": 81,
+      "z": 64,
+      "state": "minecraft:water[level=0]",
+      "name": "Jardins de Sylveronce"
+    },
+    {
+      "x": 118,
+      "y": 93,
+      "z": 252,
+      "state": "minecraft:water[level=0]",
+      "name": "Jardins de Val"
+    },
+    {
+      "x": -148,
+      "y": 120,
+      "z": -213,
+      "state": "minecraft:water[level=0]",
+      "name": "Jardins de Hauts"
+    },
+    {
+      "x": 166,
+      "y": 93,
+      "z": -170,
+      "state": "minecraft:water[level=0]",
+      "name": "Jardins de Dunes"
+    },
+    {
+      "x": 309,
+      "y": 97,
+      "z": 135,
+      "state": "minecraft:water[level=0]",
+      "name": "Jardins de Éclats"
+    },
+    {
+      "x": -322,
+      "y": 72,
+      "z": 130,
+      "state": "minecraft:cobblestone",
+      "name": "Galerie des Racines"
+    },
+    {
+      "x": -105,
+      "y": 109,
+      "z": -280,
+      "state": "minecraft:cobblestone",
+      "name": "Mine du Givre"
+    },
+    {
+      "x": 140,
+      "y": 81,
+      "z": -315,
+      "state": "minecraft:cobblestone",
+      "name": "Fonderie des Cendres"
+    },
+    {
+      "x": 342,
+      "y": 99,
+      "z": 210,
+      "state": "minecraft:cobblestone",
+      "name": "Géode des Échos"
+    }
+  ],
+  "biomes": [
+    {
+      "x": -300,
+      "y": 90,
+      "z": 80,
+      "biome": "minecraft:forest"
+    },
+    {
+      "x": -245,
+      "y": 90,
+      "z": 240,
+      "biome": "minecraft:swamp"
+    },
+    {
+      "x": 55,
+      "y": 90,
+      "z": 320,
+      "biome": "minecraft:dark_forest"
+    },
+    {
+      "x": -235,
+      "y": 90,
+      "z": -300,
+      "biome": "minecraft:frozen_peaks"
+    },
+    {
+      "x": 300,
+      "y": 90,
+      "z": -55,
+      "biome": "minecraft:desert"
+    },
+    {
+      "x": 280,
+      "y": 90,
+      "z": 285,
+      "biome": "minecraft:end_highlands"
+    },
+    {
+      "x": 0,
+      "y": 90,
+      "z": 0,
+      "biome": "minecraft:plains"
+    }
+  ],
+  "signs": [
+    {
+      "x": -24,
+      "y": 84,
+      "z": -15,
+      "lines": [
+        "Taverne",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -7,
+      "y": 84,
+      "z": -19,
+      "lines": [
+        "Atelier",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 15,
+      "y": 84,
+      "z": -21,
+      "lines": [
+        "Maison des cartes",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 19,
+      "y": 84,
+      "z": -13,
+      "lines": [
+        "Écuries",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 21,
+      "y": 84,
+      "z": 9,
+      "lines": [
+        "Maison",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 22,
+      "y": 84,
+      "z": 17,
+      "lines": [
+        "Bibliothèque",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 2,
+      "y": 84,
+      "z": 21,
+      "lines": [
+        "Forge",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -19,
+      "y": 84,
+      "z": 17,
+      "lines": [
+        "Réserve",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -21,
+      "y": 84,
+      "z": 7,
+      "lines": [
+        "Maison",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -19,
+      "y": 84,
+      "z": -10,
+      "lines": [
+        "Vigie",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 0,
+      "y": 84,
+      "z": -43,
+      "lines": [
+        "Aéloria — Place des Horizons",
+        "Village protégé",
+        "Les Cinq Horizons",
+        "Aéloria"
+      ]
+    },
+    {
+      "x": 0,
+      "y": 84,
+      "z": 43,
+      "lines": [
+        "Aéloria — Place des Horizons",
+        "Village protégé",
+        "Les Cinq Horizons",
+        "Aéloria"
+      ]
+    },
+    {
+      "x": -254,
+      "y": 84,
+      "z": 30,
+      "lines": [
+        "Taverne",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -237,
+      "y": 84,
+      "z": 26,
+      "lines": [
+        "Atelier",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -215,
+      "y": 84,
+      "z": 24,
+      "lines": [
+        "Maison des cartes",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -211,
+      "y": 84,
+      "z": 32,
+      "lines": [
+        "Écuries",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -209,
+      "y": 84,
+      "z": 54,
+      "lines": [
+        "Maison",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -208,
+      "y": 84,
+      "z": 62,
+      "lines": [
+        "Bibliothèque",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -228,
+      "y": 84,
+      "z": 66,
+      "lines": [
+        "Forge",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -249,
+      "y": 84,
+      "z": 62,
+      "lines": [
+        "Réserve",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -251,
+      "y": 84,
+      "z": 52,
+      "lines": [
+        "Maison",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -249,
+      "y": 84,
+      "z": 35,
+      "lines": [
+        "Vigie",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -230,
+      "y": 84,
+      "z": 7,
+      "lines": [
+        "Clairbois",
+        "Village protégé",
+        "Les Cinq Horizons",
+        "Aéloria"
+      ]
+    },
+    {
+      "x": -230,
+      "y": 84,
+      "z": 83,
+      "lines": [
+        "Clairbois",
+        "Village protégé",
+        "Les Cinq Horizons",
+        "Aéloria"
+      ]
+    },
+    {
+      "x": -262,
+      "y": 66,
+      "z": 211,
+      "lines": [
+        "Taverne",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -241,
+      "y": 66,
+      "z": 207,
+      "lines": [
+        "Atelier",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -233,
+      "y": 66,
+      "z": 207,
+      "lines": [
+        "Maison des cartes",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -232,
+      "y": 66,
+      "z": 231,
+      "lines": [
+        "Écuries",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -245,
+      "y": 66,
+      "z": 235,
+      "lines": [
+        "Maison",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -267,
+      "y": 66,
+      "z": 227,
+      "lines": [
+        "Bibliothèque",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -245,
+      "y": 66,
+      "z": 190,
+      "lines": [
+        "Brumevert",
+        "Village protégé",
+        "Les Cinq Horizons",
+        "Aéloria"
+      ]
+    },
+    {
+      "x": -245,
+      "y": 66,
+      "z": 250,
+      "lines": [
+        "Brumevert",
+        "Village protégé",
+        "Les Cinq Horizons",
+        "Aéloria"
+      ]
+    },
+    {
+      "x": 46,
+      "y": 83,
+      "z": 230,
+      "lines": [
+        "Taverne",
+        "Val",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 63,
+      "y": 83,
+      "z": 226,
+      "lines": [
+        "Atelier",
+        "Val",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 85,
+      "y": 83,
+      "z": 224,
+      "lines": [
+        "Maison des cartes",
+        "Val",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 89,
+      "y": 83,
+      "z": 232,
+      "lines": [
+        "Écuries",
+        "Val",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 91,
+      "y": 83,
+      "z": 254,
+      "lines": [
+        "Maison",
+        "Val",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 92,
+      "y": 83,
+      "z": 262,
+      "lines": [
+        "Bibliothèque",
+        "Val",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 72,
+      "y": 83,
+      "z": 266,
+      "lines": [
+        "Forge",
+        "Val",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 51,
+      "y": 83,
+      "z": 262,
+      "lines": [
+        "Réserve",
+        "Val",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 49,
+      "y": 83,
+      "z": 252,
+      "lines": [
+        "Maison",
+        "Val",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 51,
+      "y": 83,
+      "z": 235,
+      "lines": [
+        "Vigie",
+        "Val",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 70,
+      "y": 83,
+      "z": 209,
+      "lines": [
+        "Veillepierre",
+        "Village protégé",
+        "Les Cinq Horizons",
+        "Aéloria"
+      ]
+    },
+    {
+      "x": 70,
+      "y": 83,
+      "z": 281,
+      "lines": [
+        "Veillepierre",
+        "Village protégé",
+        "Les Cinq Horizons",
+        "Aéloria"
+      ]
+    },
+    {
+      "x": -224,
+      "y": 113,
+      "z": -200,
+      "lines": [
+        "Taverne",
+        "Hauts",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -207,
+      "y": 113,
+      "z": -204,
+      "lines": [
+        "Atelier",
+        "Hauts",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -185,
+      "y": 113,
+      "z": -206,
+      "lines": [
+        "Maison des cartes",
+        "Hauts",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -181,
+      "y": 113,
+      "z": -198,
+      "lines": [
+        "Écuries",
+        "Hauts",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -179,
+      "y": 113,
+      "z": -176,
+      "lines": [
+        "Maison",
+        "Hauts",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -178,
+      "y": 113,
+      "z": -168,
+      "lines": [
+        "Bibliothèque",
+        "Hauts",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -198,
+      "y": 113,
+      "z": -164,
+      "lines": [
+        "Forge",
+        "Hauts",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -219,
+      "y": 113,
+      "z": -168,
+      "lines": [
+        "Réserve",
+        "Hauts",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -221,
+      "y": 113,
+      "z": -178,
+      "lines": [
+        "Maison",
+        "Hauts",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -219,
+      "y": 113,
+      "z": -195,
+      "lines": [
+        "Vigie",
+        "Hauts",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -200,
+      "y": 113,
+      "z": -222,
+      "lines": [
+        "Boréalis",
+        "Village protégé",
+        "Les Cinq Horizons",
+        "Aéloria"
+      ]
+    },
+    {
+      "x": -200,
+      "y": 113,
+      "z": -148,
+      "lines": [
+        "Boréalis",
+        "Village protégé",
+        "Les Cinq Horizons",
+        "Aéloria"
+      ]
+    },
+    {
+      "x": 186,
+      "y": 93,
+      "z": -190,
+      "lines": [
+        "Taverne",
+        "Dunes",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 203,
+      "y": 93,
+      "z": -194,
+      "lines": [
+        "Atelier",
+        "Dunes",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 225,
+      "y": 93,
+      "z": -196,
+      "lines": [
+        "Maison des cartes",
+        "Dunes",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 229,
+      "y": 93,
+      "z": -188,
+      "lines": [
+        "Écuries",
+        "Dunes",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 231,
+      "y": 93,
+      "z": -166,
+      "lines": [
+        "Maison",
+        "Dunes",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 232,
+      "y": 93,
+      "z": -158,
+      "lines": [
+        "Bibliothèque",
+        "Dunes",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 212,
+      "y": 93,
+      "z": -154,
+      "lines": [
+        "Forge",
+        "Dunes",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 191,
+      "y": 93,
+      "z": -158,
+      "lines": [
+        "Réserve",
+        "Dunes",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 189,
+      "y": 93,
+      "z": -168,
+      "lines": [
+        "Maison",
+        "Dunes",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 191,
+      "y": 93,
+      "z": -185,
+      "lines": [
+        "Vigie",
+        "Dunes",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 210,
+      "y": 93,
+      "z": -215,
+      "lines": [
+        "Sahr-Éclat",
+        "Village protégé",
+        "Les Cinq Horizons",
+        "Aéloria"
+      ]
+    },
+    {
+      "x": 210,
+      "y": 93,
+      "z": -135,
+      "lines": [
+        "Sahr-Éclat",
+        "Village protégé",
+        "Les Cinq Horizons",
+        "Aéloria"
+      ]
+    },
+    {
+      "x": 236,
+      "y": 109,
+      "z": 130,
+      "lines": [
+        "Taverne",
+        "Éclats",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 253,
+      "y": 109,
+      "z": 126,
+      "lines": [
+        "Atelier",
+        "Éclats",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 275,
+      "y": 109,
+      "z": 124,
+      "lines": [
+        "Maison des cartes",
+        "Éclats",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 279,
+      "y": 109,
+      "z": 132,
+      "lines": [
+        "Écuries",
+        "Éclats",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 281,
+      "y": 109,
+      "z": 154,
+      "lines": [
+        "Maison",
+        "Éclats",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 282,
+      "y": 109,
+      "z": 162,
+      "lines": [
+        "Bibliothèque",
+        "Éclats",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 262,
+      "y": 109,
+      "z": 166,
+      "lines": [
+        "Forge",
+        "Éclats",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 241,
+      "y": 109,
+      "z": 162,
+      "lines": [
+        "Réserve",
+        "Éclats",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 239,
+      "y": 109,
+      "z": 152,
+      "lines": [
+        "Maison",
+        "Éclats",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 241,
+      "y": 109,
+      "z": 135,
+      "lines": [
+        "Vigie",
+        "Éclats",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 260,
+      "y": 109,
+      "z": 110,
+      "lines": [
+        "Astréon",
+        "Village protégé",
+        "Les Cinq Horizons",
+        "Aéloria"
+      ]
+    },
+    {
+      "x": 260,
+      "y": 109,
+      "z": 180,
+      "lines": [
+        "Astréon",
+        "Village protégé",
+        "Les Cinq Horizons",
+        "Aéloria"
+      ]
+    },
+    {
+      "x": -315,
+      "y": 87,
+      "z": -29,
+      "lines": [
+        "Sanctuaire de Sylveronce",
+        "Le Cœur des Racines",
+        "Chemin des anciens",
+        ""
+      ]
+    },
+    {
+      "x": 49,
+      "y": 93,
+      "z": 303,
+      "lines": [
+        "Abbaye des Veilleurs",
+        "Le silence a une mémoire",
+        "Crypte sous la nef",
+        ""
+      ]
+    },
+    {
+      "x": -242,
+      "y": 149,
+      "z": -269,
+      "lines": [
+        "Citadelle de Boréalis",
+        "Gardienne du Glacier",
+        "La lumière veille",
+        ""
+      ]
+    },
+    {
+      "x": 293,
+      "y": 106,
+      "z": -19,
+      "lines": [
+        "Temple du Soleil brisé",
+        "Les Dunes d’Ignis",
+        "Le brasier se souvient",
+        ""
+      ]
+    },
+    {
+      "x": 273,
+      "y": 125,
+      "z": 323,
+      "lines": [
+        "Observatoire d’Astréon",
+        "Au-delà des Cinq Horizons",
+        "Passerelles stellaires",
+        ""
+      ]
+    },
+    {
+      "x": -135,
+      "y": 83,
+      "z": 140,
+      "lines": [
+        "Cercle des druides",
+        "Route des Horizons",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -345,
+      "y": 69,
+      "z": 165,
+      "lines": [
+        "Tour des Roseaux",
+        "Route des Horizons",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -168,
+      "y": 62,
+      "z": 317,
+      "lines": [
+        "Refuge",
+        "Sylveronce",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -170,
+      "y": 62,
+      "z": 335,
+      "lines": [
+        "Moulin des Brumes",
+        "Route des Horizons",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -40,
+      "y": 81,
+      "z": 330,
+      "lines": [
+        "Ossuaire des Errants",
+        "Route des Horizons",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 150,
+      "y": 77,
+      "z": 340,
+      "lines": [
+        "Chapelle effondrée",
+        "Route des Horizons",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 107,
+      "y": 89,
+      "z": 145,
+      "lines": [
+        "Refuge",
+        "Val",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 105,
+      "y": 89,
+      "z": 165,
+      "lines": [
+        "Camp des Veilleurs",
+        "Route des Horizons",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -110,
+      "y": 109,
+      "z": -310,
+      "lines": [
+        "Phare du Glacier",
+        "Route des Horizons",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -320,
+      "y": 106,
+      "z": -140,
+      "lines": [
+        "Entrée des mines boréales",
+        "Route des Horizons",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -83,
+      "y": 95,
+      "z": -168,
+      "lines": [
+        "Refuge",
+        "Hauts",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": -85,
+      "y": 95,
+      "z": -150,
+      "lines": [
+        "Refuge des cols",
+        "Route des Horizons",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 110,
+      "y": 84,
+      "z": -300,
+      "lines": [
+        "Caravane de l’Oasis",
+        "Route des Horizons",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 340,
+      "y": 90,
+      "z": -180,
+      "lines": [
+        "Tour du Vent de cuivre",
+        "Route des Horizons",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 137,
+      "y": 84,
+      "z": -105,
+      "lines": [
+        "Refuge",
+        "Dunes",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 135,
+      "y": 84,
+      "z": -85,
+      "lines": [
+        "Porte des Dunes",
+        "Route des Horizons",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 325,
+      "y": 80,
+      "z": 75,
+      "lines": [
+        "Éclat du Zénith",
+        "Route des Horizons",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 155,
+      "y": 96,
+      "z": 210,
+      "lines": [
+        "Ruines de la Veille astrale",
+        "Route des Horizons",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 342,
+      "y": 99,
+      "z": 342,
+      "lines": [
+        "Refuge",
+        "Éclats",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 340,
+      "y": 99,
+      "z": 360,
+      "lines": [
+        "Dernier fanal",
+        "Route des Horizons",
+        "Aéloria",
+        ""
+      ]
+    },
+    {
+      "x": 4,
+      "y": 84,
+      "z": 7,
+      "lines": [
+        "Les Cinq Horizons",
+        "Bienvenue en Aéloria",
+        "Choisis ta route",
+        "Explore les cinq régions"
+      ]
+    },
+    {
+      "x": -318,
+      "y": 73,
+      "z": 128,
+      "lines": [
+        "Galerie des Racines",
+        "Galerie accessible",
+        "Veines anciennes",
+        ""
+      ]
+    },
+    {
+      "x": -101,
+      "y": 110,
+      "z": -282,
+      "lines": [
+        "Mine du Givre",
+        "Galerie accessible",
+        "Veines anciennes",
+        ""
+      ]
+    },
+    {
+      "x": 144,
+      "y": 82,
+      "z": -317,
+      "lines": [
+        "Fonderie des Cendres",
+        "Galerie accessible",
+        "Veines anciennes",
+        ""
+      ]
+    },
+    {
+      "x": 346,
+      "y": 100,
+      "z": 208,
+      "lines": [
+        "Géode des Échos",
+        "Galerie accessible",
+        "Veines anciennes",
+        ""
+      ]
+    }
+  ],
+  "safeAreas": [
+    {
+      "name": "Aéloria — Place des Horizons",
+      "x": 0,
+      "z": 0,
+      "radius": 56
+    },
+    {
+      "name": "Clairbois",
+      "x": -230,
+      "z": 45,
+      "radius": 51
+    },
+    {
+      "name": "Brumevert",
+      "x": -245,
+      "z": 220,
+      "radius": 43
+    },
+    {
+      "name": "Veillepierre",
+      "x": 70,
+      "z": 245,
+      "radius": 49
+    },
+    {
+      "name": "Boréalis",
+      "x": -200,
+      "z": -185,
+      "radius": 50
+    },
+    {
+      "name": "Sahr-Éclat",
+      "x": 210,
+      "z": -175,
+      "radius": 53
+    },
+    {
+      "name": "Astréon",
+      "x": 260,
+      "z": 145,
+      "radius": 48
+    }
+  ]
+}
