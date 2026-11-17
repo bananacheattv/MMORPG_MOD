@@ -203,6 +203,15 @@ final class DevUiFrames {
             data.put("table", com.mmorpg.server.AdventureLoot.preview(com.mmorpg.block.crate.CrateTier.EPIQUE.table()));
             return new CrateScreen(data);
         });
+        add("crate_result", () -> {
+            var data = new CompoundTag();
+            data.putInt("tier", 4);
+            data.putInt("keys", 2);
+            data.put("table", com.mmorpg.server.AdventureLoot.preview(com.mmorpg.block.crate.CrateTier.EPIQUE.table()));
+            var screen = new CrateScreen(data);
+            screen.previewResult();
+            return screen;
+        });
         add("arena", () -> {
             var data = new CompoundTag();
             data.putInt("bracket", 2);
