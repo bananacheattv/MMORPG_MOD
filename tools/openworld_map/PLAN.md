@@ -7,7 +7,7 @@ Le mod a six familles : Forêt ancienne, Marais, Cryptes, Terres gelées, Déser
 ## Contraintes et livraison
 
 - Coordonnées X/Z : -400 à 399, arrivée au centre 0.5 / 84 / 0.5.
-- Monde indépendant ; ne jamais écraser la map actuellement installée.
+- Construction dans un monde indépendant. Instruction du 17 novembre : installer sur Openworld puis supprimer l'ancienne carte, sans la conserver.
 - Terrain naturel sculpté, transitions organiques, itinéraires praticables, rivières, falaises, grottes et cinq silhouettes monumentales.
 - Villages avec maisons différentes, intérieurs, marchés, puits, jardins, quais et éclairage.
 - Export Sponge v3, DataVersion 5023 vérifiée dans le projet ; 100 secteurs de 80×80, CSV compatible avec l'importeur natif existant.

@@ -52,7 +52,7 @@ public final class DevOpenworldMapChecks {
                 check(world.getBlockEntity(pos) instanceof SignBlockEntity, "sign entity at " + pos);
                 var sign = (SignBlockEntity) world.getBlockEntity(pos);
                 var lines = sample.getAsJsonArray("lines");
-                for (int i = 0; i < lines.size(); i++) check(sign.getFrontText().getMessage(i, false).getString().equals(lines.get(i).getAsString()), "sign text at " + pos + " line " + i);
+                for (int i = 0; i < lines.size(); i++) check(sign.getText(net.minecraft.world.level.block.entity.SignTextSlot.FRONT).getMessages(false).get(i).getString().equals(lines.get(i).getAsString()), "sign text at " + pos + " line " + i);
                 signs++;
             }
             String result = "PASS: saved map reload, safe arrival, 800 border, " + samples + " landmarks/buildings, " + biomes + " biomes, " + signs + " French signs\n";

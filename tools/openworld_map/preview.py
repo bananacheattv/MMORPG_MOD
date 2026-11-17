@@ -9,7 +9,8 @@ def colors(palette,jar):
     overrides={'water':(40,101,143),'lava':(244,102,22),'grass_block':(102,143,60),'dirt_path':(153,127,76),
         'oak_leaves':(70,113,43),'birch_leaves':(100,139,57),'spruce_leaves':(48,86,71),'mangrove_leaves':(86,115,43),
         'dark_oak_leaves':(65,96,41),'flowering_azalea_leaves':(122,131,89),'red_sand':(178,99,53),'snow':(227,237,242)}
-    aliases={'chain':'iron_chain','lantern':'lantern','end_rod':'end_rod','ice':'ice','short_grass':'short_grass','snow_block':'snow'}
+    aliases={'chain':'iron_chain','lantern':'lantern','end_rod':'end_rod','ice':'ice','short_grass':'short_grass','snow_block':'snow',
+             'smooth_sandstone':'sandstone_top','smooth_quartz':'quartz_block_side','waxed_copper_block':'copper_block','waxed_cut_copper':'cut_copper'}
     for name in palette:
         name=name.split(':')[-1].split('[')[0]
         if name in overrides:out.append(overrides[name]);continue
