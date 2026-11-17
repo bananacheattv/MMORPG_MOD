@@ -19,6 +19,8 @@ import java.util.List;
 public class QuestDef {
     /** Revision des quetes par defaut (DefaultQuests.REVISION) dont cette quete provient ; une revision plus ancienne est remplacee au chargement. */
     public int revision = 0;
+    /** Vrai : quete modifiee a la main (editeur en jeu ou quests.json) ; elle n'est jamais remplacee par une nouvelle revision des quetes par defaut. */
+    public boolean custom = false;
     public String name = "Quête";
     public String description = "";
     public int minLevel = 1;

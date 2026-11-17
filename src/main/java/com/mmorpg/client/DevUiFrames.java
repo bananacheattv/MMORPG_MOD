@@ -203,6 +203,15 @@ final class DevUiFrames {
             data.put("table", com.mmorpg.server.AdventureLoot.preview(com.mmorpg.block.crate.CrateTier.EPIQUE.table()));
             return new CrateScreen(data);
         });
+        add("crate_result", () -> {
+            var data = new CompoundTag();
+            data.putInt("tier", 4);
+            data.putInt("keys", 2);
+            data.put("table", com.mmorpg.server.AdventureLoot.preview(com.mmorpg.block.crate.CrateTier.EPIQUE.table()));
+            var screen = new CrateScreen(data);
+            screen.previewResult();
+            return screen;
+        });
         add("arena", () -> {
             var data = new CompoundTag();
             data.putInt("bracket", 2);
@@ -344,20 +353,6 @@ final class DevUiFrames {
             }
             d.put("list", l);
             return new TeleporterScreen(d);
-        });
-        add("pnj_mine_master", () -> {
-            var d = new CompoundTag();
-            d.putInt("playerLevel", 25);
-            var l = new net.minecraft.nbt.ListTag();
-            for (int i = 0; i < 4; i++) {
-                var e = new CompoundTag();
-                e.putString("name", "Mine " + (i + 1));
-                e.putInt("level", 5 + i * 10);
-                e.putBoolean("locked", i > 1);
-                l.add(e);
-            }
-            d.put("sectors", l);
-            return new MineMasterScreen(d);
         });
         add("pnj_pvp_store", () -> new PvpStoreScreen(new CompoundTag()));
         add("pnj_bank", () -> {

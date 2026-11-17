@@ -217,11 +217,11 @@ public final class ConfigManager {
             // Quetes par defaut : ajout des manquantes ; remplacement unique de celles issues d'une revision plus ancienne (ordre, donneurs, prerequis).
             com.mmorpg.quest.DefaultQuests.create().forEach((id, def) -> {
                 var current = qres.get(id);
-                if (current == null || current.revision < com.mmorpg.quest.DefaultQuests.REVISION) qres.put(id, def);
+                if (current == null || !current.custom && current.revision < com.mmorpg.quest.DefaultQuests.REVISION) qres.put(id, def);
             });
             // Ancienne campagne (revision < 5) remplacee par le plan de quetes du lore.
             var loreDefaults = com.mmorpg.quest.DefaultQuests.create();
-            qres.keySet().removeIf(id -> qres.get(id).revision < com.mmorpg.quest.DefaultQuests.REVISION
+            qres.keySet().removeIf(id -> !qres.get(id).custom && qres.get(id).revision < com.mmorpg.quest.DefaultQuests.REVISION
                     && (com.mmorpg.quest.DefaultQuests.LEGACY_IDS.contains(id) || qres.get(id).lore != null && !loreDefaults.containsKey(id)));
             for (com.mmorpg.quest.QuestDef d : qres.values()) {
                 if (d.objectives == null) d.objectives = new java.util.ArrayList<>();

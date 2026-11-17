@@ -11,8 +11,8 @@ import net.minecraft.network.chat.Component;
 
 /** Choix de la destination de l'outil portail. */
 public final class PortalToolScreen extends MmoScreen {
-    private static final String[] KINDS = {"hub", "spawn", "mine", "plaines", "donjon", "openworld"};
-    private static final String[] KIND_LABELS = {"Hub", "Spawn", "Mines", "Plaines", "Donjon", "Monde ouvert"};
+    private static final String[] KINDS = {"hub", "spawn", "donjon", "openworld"};
+    private static final String[] KIND_LABELS = {"Hub", "Spawn", "Donjon", "Monde ouvert"};
     private static final String[] DIFFS = {"Normal", "Héroïque", "Mythique"};
     private int kind, region = -1, diff;
     private String dungeon = "";
@@ -21,17 +21,17 @@ public final class PortalToolScreen extends MmoScreen {
 
     @Override protected int designHeight() { return 250; }
 
-    private static int rc0(int k) { return k == 2 || k == 3 ? 0 : -1; }
-    private int regionCount() { return kind == 2 ? com.mmorpg.mine.MineLayout.SECTORS : kind == 3 ? com.mmorpg.plains.PlainsLayout.REGIONS : 0; }
+    private static int rc0(int k) { return -1; }
+    private int regionCount() { return 0; }
 
     @Override
     protected void renderContent(GuiGraphicsExtractor g, int mx, int my, float a) {
         Ui.frame(g, left, top, pw, ph, Ui.GOLD, false);
         g.centeredText(font, Component.literal("OUTIL PORTAIL · DESTINATION"), left + pw / 2, top + 9, Ui.GOLD);
-        int y = top + 28, w = (pw - 24 - 5 * 4) / 6;
+        int y = top + 28, w = (pw - 24 - 3 * 4) / 4;
         for (int i = 0; i < KINDS.length; i++) {
             final int k = i;
-            button(g, left + 12 + i * (w + 4), y, w, 18, KIND_LABELS[i], kind != i, Ui.GOLD, () -> { kind = k; region = rc0(k); dungeon = k == 4 ? DungeonType.values()[0].id : ""; });
+            button(g, left + 12 + i * (w + 4), y, w, 18, KIND_LABELS[i], kind != i, Ui.GOLD, () -> { kind = k; region = rc0(k); dungeon = k == 2 ? DungeonType.values()[0].id : ""; });
         }
         y += 28;
         int rc = regionCount();
@@ -40,7 +40,7 @@ public final class PortalToolScreen extends MmoScreen {
             y += 12;
             int rw = (pw - 24 - rc * 3) / rc;
             for (int i = 0; i < rc; i++) { final int r = i; button(g, left + 12 + i * (rw + 3), y, rw, 16, String.valueOf(i + 1), region != i, Ui.GOLD, () -> region = r); }
-        } else if (kind == 4) {
+        } else if (kind == 2) {
             g.text(font, "Donjon", left + 12, y, Ui.TEXT, false);
             y += 12;
             int cw = (pw - 24 - 4) / 2;

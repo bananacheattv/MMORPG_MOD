@@ -55,8 +55,6 @@ public final class AdventurePortals {
     }
     public static String label(Portal portal) {
         return switch (portal.kind()) {
-            case "mine" -> portal.region() < 0 ? "Mines : choix de la région" : com.mmorpg.mine.MineLayout.STYLES.get(portal.region()).name();
-            case "plaines" -> portal.region() < 0 ? "Plaines : choix de la région" : com.mmorpg.plains.PlainsLayout.STYLES.get(portal.region()).name();
             case "donjon" -> DungeonType.byId(portal.dungeon()).label + " · " + new String[]{"normal", "héroïque", "mythique"}[portal.difficulty()] + " · niv. " + com.mmorpg.dungeon.DungeonMaster.requiredLevel(DungeonType.byId(portal.dungeon()), portal.difficulty());
             case "openworld" -> "Monde ouvert d'Aeloria";
             case "donjons" -> "Donjons : choix du donjon";
@@ -67,8 +65,6 @@ public final class AdventurePortals {
     }
     public static boolean valid(Portal p) {
         return switch (p.kind()) {
-            case "mine" -> p.region() >= -1 && p.region() < com.mmorpg.mine.MineLayout.SECTORS;
-            case "plaines" -> p.region() >= -1 && p.region() < com.mmorpg.plains.PlainsLayout.REGIONS;
             case "donjon" -> DungeonType.byId(p.dungeon()) != null && p.difficulty() >= 0 && p.difficulty() <= 2;
             case "hub", "spawn", "donjons", "openworld" -> true;
             default -> false;
@@ -76,7 +72,7 @@ public final class AdventurePortals {
     }
     private static BlockState frame(Portal p, int x, int y) {
         if (Math.abs(x) == hw(p) && y == top(p) - 1) return com.mmorpg.registry.DecorBlocks.get(switch (p.kind()) {
-            case "mine" -> "cristal_ambre"; case "plaines", "openworld" -> "cristal_azur"; default -> "cristal_arcane";
+            case "openworld" -> "cristal_azur"; default -> "cristal_arcane";
         }).defaultBlockState();
         return com.mmorpg.registry.DecorBlocks.get(y == top(p) ? "marbre_dore" : "marbre_poli").defaultBlockState();
     }
@@ -186,8 +182,6 @@ public final class AdventurePortals {
         if (com.mmorpg.hub.ClassTrial.active(p) || com.mmorpg.hub.CinematicManager.isLocked(p)) return false;
         if (RpgPlayers.get(p).pvpUntilTick > p.level().getServer().getTickCount()) return false;
         return switch (portal.kind()) {
-            case "mine" -> portal.region() < 0 || (portal.region() < RpgPlayers.get(p).minesUnlocked && RpgPlayers.get(p).level >= com.mmorpg.mine.MineLayout.STYLES.get(portal.region()).minLevel());
-            case "plaines" -> portal.region() < 0 || (portal.region() < RpgPlayers.get(p).plainsUnlocked && RpgPlayers.get(p).level >= com.mmorpg.plains.PlainsLayout.STYLES.get(portal.region()).minLevel());
             case "donjons" -> true;
             case "donjon" -> RpgPlayers.get(p).level >= com.mmorpg.dungeon.DungeonMaster.requiredLevel(DungeonType.byId(portal.dungeon()), portal.difficulty());
             default -> false;
@@ -203,8 +197,6 @@ public final class AdventurePortals {
             case "hub" -> com.mmorpg.hub.HubManager.goToHub(p);
             case "spawn" -> { if (!PortalOrigin.exit(p)) com.mmorpg.hub.HubManager.goToSpawn(p); }
             case "openworld" -> com.mmorpg.hub.HubManager.goToOpenWorld(p);
-            case "mine" -> { if (portal.region() < 0) com.mmorpg.mine.MineManager.open(p, null); else com.mmorpg.mine.MineManager.startTransition(p, portal.region()); }
-            case "plaines" -> { if (portal.region() < 0) com.mmorpg.plains.PlainsManager.open(p); else com.mmorpg.plains.PlainsManager.enterChosen(p, portal.region()); }
             case "donjons" -> com.mmorpg.dungeon.DungeonMaster.open(p,null);
             case "donjon" -> com.mmorpg.dungeon.InstanceManager.enterPool(p, com.mmorpg.dungeon.InstanceManager.pool(DungeonType.byId(portal.dungeon()), portal.difficulty()));
         }
@@ -232,7 +224,7 @@ public final class AdventurePortals {
                 if (HEALED.add(portal.id())) heal(p.level(), portal);
                 if (!frame(portal).entrySet().stream().allMatch(e -> p.level().getBlockState(e.getKey()).equals(e.getValue()))) continue;
                 if (portal.block() && portal.max().isEmpty() && p.level().getBlockState(portal.pos()).isAir()) continue;
-                int color = portal.kind().equals("mine") ? 0xFFB040 : portal.kind().equals("plaines") ? 0x50E0A0 : portal.kind().equals("openworld") ? 0x60C8FF : 0xB070FF;
+                int color = portal.kind().equals("openworld") ? 0x60C8FF : 0xB070FF;
                 p.level().sendParticles(p, new DustParticleOptions(color, 1.3f), false, false, portal.pos().getX() + .5, portal.pos().getY() + (portal.block() ? 1.2 : top(portal) / 2.0), portal.pos().getZ() + .5, portal.kind().equals("openworld") ? 30 : 12, portal.block() ? .5 : portal.widthX() ? hw(portal) - .8 : .1, portal.block() ? .5 : top(portal) / 2.7, portal.block() ? .5 : portal.widthX() ? .1 : hw(portal) - .8, 0);
                 if (portal.max().isPresent()) { var box = passage(portal); p.level().sendParticles(p, new DustParticleOptions(color, 1.3f), false, false, box.getCenter().x, box.getCenter().y, box.getCenter().z, 16, box.getXsize() / 2, box.getYsize() / 2, box.getZsize() / 2, 0); }
                 if (p.distanceToSqr(portal.pos().getX() + .5, portal.pos().getY(), portal.pos().getZ() + .5) < 36 && server.getTickCount() % 40 == 0) p.sendOverlayMessage(Component.literal(label(portal)).withColor(color));
@@ -282,10 +274,6 @@ public final class AdventurePortals {
         parent.then(Commands.literal("hub").executes(c -> create(c.getSource(), pre + "hub", -1, "", 0, block)));
         parent.then(Commands.literal("spawn").executes(c -> create(c.getSource(), pre + "spawn", -1, "", 0, block)));
         parent.then(Commands.literal("openworld").executes(c -> create(c.getSource(), pre + "openworld", -1, "", 0, block)));
-        parent.then(Commands.literal("mine")
-                .then(Commands.argument("region", IntegerArgumentType.integer(1, com.mmorpg.mine.MineLayout.SECTORS)).executes(c -> create(c.getSource(), pre + "mine", IntegerArgumentType.getInteger(c, "region") - 1, "", 0, block))));
-        parent.then(Commands.literal("plaines")
-                .then(Commands.argument("region", IntegerArgumentType.integer(1, com.mmorpg.plains.PlainsLayout.REGIONS)).executes(c -> create(c.getSource(), pre + "plaines", IntegerArgumentType.getInteger(c, "region") - 1, "", 0, block))));
         var dungeon = Commands.argument("type", StringArgumentType.word())
                 .suggests((c, b) -> SharedSuggestionProvider.suggest(Arrays.stream(DungeonType.values()).map(t -> t.id), b))
                 .executes(c -> create(c.getSource(), pre + "donjon", -1, StringArgumentType.getString(c, "type"), 0, block));

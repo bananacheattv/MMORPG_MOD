@@ -8,7 +8,7 @@ import java.util.function.IntFunction;
 /** Quetes par defaut : une campagne qui suit la progression des niveaux 1 a 100, plus des quetes journalieres. */
 public final class DefaultQuests {
     /** Incremente quand les quetes par defaut changent : les quetes d'un quests.json plus ancien sont alors remplacees une fois. */
-    public static final int REVISION = 11;
+    public static final int REVISION = 12;
 
     private DefaultQuests() {
     }
@@ -86,13 +86,13 @@ public final class DefaultQuests {
                 "Voilà la forge ! Chaque recette montre les matériaux, l'or et le niveau requis.", 40, 5), "ForgeScreen", "Ouvrir la Forge Arcanique");
         act(tq(m, "forge", "pioche", "Votre première pioche", "Fabriquez une pioche du débutant à la forge.",
                 "Dans la forge, onglet Outils : fabrique ta Pioche du débutant avec les matériaux que je t'ai donnés.",
-                "Belle pioche ! Elle servira à extraire la Verdite dans les mines.", 60, 0), "craft:pioche_debutant", "Fabriquer la pioche du débutant", 1);
+                "Belle pioche ! Elle servira à extraire la Verdite sur les gisements.", 60, 0), "craft:pioche_debutant", "Fabriquer la pioche du débutant", 1);
         act(tq(m, "pioche", "houe", "Votre première houe", "Fabriquez une houe du débutant à la forge.",
                 "Maintenant la houe du débutant, pour labourer la terre et cultiver tes premières graines.",
                 "Parfait ! Tu pourras bientôt cultiver. Voici quelques graines de Lueur.", 60, 0, "graine_lueur", 4), "craft:houe_debutant", "Fabriquer la houe du débutant", 1);
-        open(tq(m, "houe", "mines", "Le Maître des mines", "Le Maître des mines vous mène aux galeries, riches en minerais.",
-                "Les mines d'Aeloria regorgent de minerais ! Parle au Maître des mines : il t'y emmènera.",
-                "Les mines sont dangereuses mais précieuses. Prends garde aux monstres !", 60, 0), "MineMasterScreen", "Parler au Maître des mines");
+        open(tq(m, "houe", "mines", "Le marchand de minerais", "Le marchand de minerais rachète vos lingots et vend le nécessaire.",
+                "Le monde d'Aeloria regorge de minerais ! Passe voir le marchand de minerais du spawn avant de partir à la pioche.",
+                "Les gisements sont dangereux mais précieux. Prends garde aux monstres !", 60, 0), "ShopScreen", "Parler au marchand de minerais");
         act(tq(m, "mines", "minage", "Premiers coups de pioche", "Minez dix blocs de minerai avec votre pioche.",
                 "À la pioche, mine 10 minerais de Verdite. Chaque minerai fait aussi progresser ton métier de Mineur !",
                 "Bravo, mineur ! Voici de quoi forger ta première arme.", 150, 20, "@mat_arme", 1), "job:mineur", "Miner des minerais", 10);
@@ -117,8 +117,8 @@ public final class DefaultQuests {
         open(tq(m, "personnage", "competences", "Les compétences", "Chaque classe possède des compétences à débloquer et à améliorer.",
                 "Ouvre l'onglet Compétences. Place-les dans ta barre pour les lancer en combat !",
                 "Les compétences montent de rang avec tes points. Choisis bien !", 100, 10), "SkillsScreen", "Ouvrir l'onglet Compétences");
-        obj(tq(m, "competences", "combat", "Baptême du feu", "Éliminez trois gobelins dans les plaines.",
-                "Va dans les plaines et élimine 3 gobelins avec ton arme. Garde des potions sous la main !",
+        obj(tq(m, "competences", "combat", "Baptême du feu", "Éliminez trois gobelins dans les zones de chasse.",
+                "Pars en zone de chasse et élimine 3 gobelins avec ton arme. Garde des potions sous la main !",
                 "Bien joué ! Le butin des monstres sert à forger de meilleurs équipements.", 200, 20, "potion_soin_mineure", 2), "kill", "gobelin", 3);
         open(tq(m, "combat", "bestiaire", "Le bestiaire", "Le bestiaire recense les monstres rencontrés et leur butin.",
                 "Chaque monstre vaincu s'ajoute au Bestiaire, avec son butin. Ouvre-le pour voir ce que tu as déjà croisé !",

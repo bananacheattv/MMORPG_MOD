@@ -3,7 +3,6 @@ package com.mmorpg.server;
 import com.mmorpg.MMORPG;
 import com.mmorpg.dungeon.InstanceManager;
 import com.mmorpg.item.RpgEquipment;
-import com.mmorpg.mine.MineManager;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
@@ -43,7 +42,7 @@ public final class SessionLoot {
 
     private static Kind kindOf(ServerPlayer p) {
         if (!p.level().dimension().equals(InstanceManager.DIM)) return Kind.NONE;
-        return MineManager.inMine(p) ? Kind.MINE : Kind.DUNGEON;
+        return Kind.DUNGEON;
     }
 
     private static boolean counts(Kind kind, ItemStack stack) {

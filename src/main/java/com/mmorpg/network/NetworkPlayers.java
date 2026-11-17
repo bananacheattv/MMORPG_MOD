@@ -350,8 +350,7 @@ public final class NetworkPlayers {
     /** Automatic portals must not interpret the backend's old saved position as a fresh entry. */
     public static boolean portalBlocked(ServerPlayer p) {
         return isArriving(p) || inTransit(p)
-                || PORTAL_GRACE.getOrDefault(p.getUUID(), 0L) > p.level().getServer().getTickCount()
-                || com.mmorpg.mine.MineManager.transitioning(p) || com.mmorpg.plains.PlainsManager.transitioning(p);
+                || PORTAL_GRACE.getOrDefault(p.getUUID(), 0L) > p.level().getServer().getTickCount();
     }
     public static boolean isArriving(ServerPlayer p) { return ARRIVALS.containsKey(p.getUUID()); }
 
@@ -369,13 +368,6 @@ public final class NetworkPlayers {
                 DungeonTravel.arriveHome(p);
             } else if (((destination.startsWith("arena:")||destination.startsWith("arena-match:"))||(destination.startsWith("guild-raid")||destination.equals("guild-hall"))||destination.startsWith("admin-test:")) && NetworkConfig.hosts(NetworkConfig.Role.DUNGEONS)) {
                 com.mmorpg.competition.CompetitionTravel.arrive(p,destination);
-            } else if (destination.startsWith("mine:") && NetworkConfig.hosts(NetworkConfig.Role.MINES)) {
-                int region = Integer.parseInt(destination.substring(5));
-                com.mmorpg.server.PortalAccess.grant(p,"mine");
-                if (region >= 0 && region < com.mmorpg.mine.MineLayout.SECTORS && region < RpgPlayers.get(p).minesUnlocked) com.mmorpg.mine.MineManager.startTransition(p, region);
-            } else if (destination.startsWith("plains:") && NetworkConfig.hosts(NetworkConfig.Role.PLAINS)) {
-                com.mmorpg.server.PortalAccess.grant(p,"plaines");
-                com.mmorpg.plains.PlainsManager.enterChosen(p, Integer.parseInt(destination.substring(7)));
             } else if (destination.startsWith("dungeon:") && NetworkConfig.hosts(NetworkConfig.Role.DUNGEONS)) {
                 String pool = destination.substring(8);
                 if (!com.mmorpg.dungeon.InstanceManager.validPool(pool) || !com.mmorpg.dungeon.InstanceManager.enterArriving(p, pool)) {

@@ -58,9 +58,8 @@ public final class FeatureCatalog {
                 new Entry("luckyblocks", "Blocs chanceux", "Blocs à butin."),
                 new Entry("coffres", "Coffres", "Coffres à butin.")));
         CATEGORIES.put("Monde", List.of(
-                new Entry("mines", "Mines", "Étages miniers."),
-                new Entry("plaines", "Plaines", "Zone des plaines."),
-                new Entry("mobs_plaines_mines", "Mobs plaines/mines", "Monstres dans les plaines et les mines (désactivé par défaut : aucun mob, les existants sont retirés)."),
+                new Entry("mines", "Minage", "Minage des minerais du mod."),
+                new Entry("plaines", "Récolte", "Récolte des cultures en zone de chasse."),
                 new Entry("cinematique", "Cinématique", "Intro du hub."),
                 new Entry("anticheat", "Anticheat", "Limites de débit et détections."),
                 new Entry("drop_objets", "Interdire le drop", "Empêche de jeter des objets (admins exemptés).")));

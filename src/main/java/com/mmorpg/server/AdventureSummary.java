@@ -32,8 +32,6 @@ public final class AdventureSummary {
         }
     }
     private static String location(ServerPlayer p) {
-        if(com.mmorpg.mine.MineManager.regionOf(p)>=0)return "mine";
-        if(com.mmorpg.plains.PlainsManager.regionOf(p)>=0)return "plaines";
         if(com.mmorpg.dungeon.InstanceManager.containsPlayer(p))return "donjon";
         return "";
     }

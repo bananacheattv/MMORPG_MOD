@@ -35,7 +35,7 @@ public final class PortalTool {
         if (!allowed(p)) return;
         var c = new Config(t.getStringOr("kind", "hub"), t.getIntOr("region", -1), t.getStringOr("dungeon", ""), t.getIntOr("difficulty", 0));
         var probe = new Portal(UUID.randomUUID(), p.level().dimension(), BlockPos.ZERO, true, c.kind, c.region, c.dungeon, c.difficulty, true);
-        boolean menu = c.kind.equals("donjons") || ((c.kind.equals("mine") || c.kind.equals("plaines")) && c.region < 0);
+        boolean menu = c.kind.equals("donjons");
         if (menu) { p.sendSystemMessage(Component.literal("Niveau obligatoire : choisissez une région ou un donjon précis.").withColor(0xFF8080)); return; }
         if (!AdventurePortals.valid(probe)) { p.sendSystemMessage(Component.literal("Destination invalide.").withColor(0xFF8080)); return; }
         CONFIG.put(p.getUUID(), c);

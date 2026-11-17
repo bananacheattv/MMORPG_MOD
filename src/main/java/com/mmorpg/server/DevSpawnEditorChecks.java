@@ -65,8 +65,6 @@ public final class DevSpawnEditorChecks {
               check(inv1>inv0&&RpgPlayers.get(p).gold>gold0,"plains loot and gold go straight to the killer");p.teleportTo((net.minecraft.server.level.ServerLevel)oldLv,oldPos.x,oldPos.y,oldPos.z,java.util.Set.of(),0,0,true);}}
             p.getFoodData().setFoodLevel(4);ServerEvents.onPlayerTick(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(p));
             check(p.getFoodData().getFoodLevel()==20,"hunger restored in every world");
-            int kept=0;for(int i=0;i<10000;i++)if(com.mmorpg.mine.MineDensity.keep(new BlockPos(i,100,22000)))kept++;
-            check(kept>1800&&kept<2200,"stable one-fifth ore density");
             check(com.mmorpg.item.RpgBowItem.rpgPowerForTime(0)==0&&com.mmorpg.item.RpgBowItem.rpgPowerForTime(9)<1&&com.mmorpg.item.RpgBowItem.rpgPowerForTime(10)==1,"bows reach full power at 10 ticks");
             var spawnLevel=server.getLevel(com.mmorpg.hub.SpawnBuilder.DIM);
             check(spawnLevel!=null,"spawn dimension available");
