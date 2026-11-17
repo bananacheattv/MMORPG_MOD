@@ -260,6 +260,7 @@ public final class QolClient {
         LIVE.clear();
         Map<String, Poi> known = known();
         for (Entity e : mc.level.entitiesForRendering()) {
+            if (e instanceof com.mmorpg.entity.MascotEntity) continue;   // mascotte mobile : jamais de marqueur (sinon une traînée de points)
             if (e instanceof NpcEntity npc) {
                 String kind = switch (npc.role()) {
                     case QUETES -> "quest";
@@ -273,7 +274,7 @@ public final class QolClient {
                 if (kind == null) continue;
                 BlockPos p = npc.blockPosition();
                 Poi poi = new Poi(kind, npc.displayName(), p.getX(), p.getY(), p.getZ());
-                known.put(kind + ":" + p.getX() / 4 + ":" + p.getZ() / 4, poi);
+                known.put(kind + ":" + npc.getUUID(), poi);   // une entrée par PNJ, mise à jour sur place
             } else if (e instanceof com.mmorpg.entity.boss.RpgBoss b && b.isAlive()) {
                 BlockPos p = b.blockPosition();
                 LIVE.add(new Poi("boss", b.getName().getString(), p.getX(), p.getY(), p.getZ()));
