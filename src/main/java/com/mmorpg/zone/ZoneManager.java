@@ -192,8 +192,6 @@ public final class ZoneManager {
     private static String trackOf(ServerPlayer p, ZoneData.Zone z) {
         String t = musicOf(z);
         if (!t.isEmpty()) return t;
-        if (com.mmorpg.mine.MineManager.regionOf(p) >= 0) return "mines";
-        if (com.mmorpg.plains.PlainsManager.regionOf(p) >= 0) return "plaines";
         return "";
     }
 

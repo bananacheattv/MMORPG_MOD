@@ -17,8 +17,8 @@ public final class VanillaMobDrops {
     public static void drops(LivingDropsEvent event) {
         if(event.getEntity() instanceof Player)return;
         event.getDrops().removeIf(e->BuiltInRegistries.ITEM.getKey(e.getItem().getItem()).getNamespace().equals("minecraft"));
-        // Plaines et mines : aucun objet au sol, le butin va directement au tueur (or dans la bourse, le reste dans l'inventaire/les sacs).
-        if(event.getEntity().level() instanceof net.minecraft.server.level.ServerLevel zl&&(com.mmorpg.plains.PlainsManager.inPlains(event.getEntity())||com.mmorpg.mine.MineManager.inMine(event.getEntity()))){
+        // Zones de chasse : aucun objet au sol, le butin va directement au tueur (or dans la bourse, le reste dans l'inventaire/les sacs).
+        if(event.getEntity().level() instanceof net.minecraft.server.level.ServerLevel zl&&com.mmorpg.zone.HuntZones.inZone(event.getEntity())){
             net.minecraft.server.level.ServerPlayer killer = event.getSource().getEntity() instanceof net.minecraft.server.level.ServerPlayer k ? k
                     : event.getEntity().getLastHurtByPlayer() instanceof net.minecraft.server.level.ServerPlayer k ? k : null;
             var left=new java.util.ArrayList<net.minecraft.world.entity.item.ItemEntity>();

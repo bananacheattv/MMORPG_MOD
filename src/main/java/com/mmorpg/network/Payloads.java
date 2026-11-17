@@ -188,18 +188,6 @@ public final class Payloads {
     }
 
     /** Choix du joueur chez le Maitre des donjons : donjon et difficulte (0 normal, 1 heroique, 2 mythique). */
-    /** Choix d'un etage dans le menu des mines (-1 pour le PNJ si le menu vient de la commande /mine). */
-    public record MineEnter(int npc, int sector) implements CustomPacketPayload {
-        public static final Type<MineEnter> TYPE = new Type<>(MMORPG.id("mine_enter"));
-        public static final StreamCodec<ByteBuf, MineEnter> CODEC = StreamCodec.composite(
-                ByteBufCodecs.VAR_INT, MineEnter::npc, ByteBufCodecs.VAR_INT, MineEnter::sector, MineEnter::new);
-
-        @Override
-        public Type<? extends CustomPacketPayload> type() {
-            return TYPE;
-        }
-    }
-
     public record DungeonEnter(int npc, String dungeon, int difficulty) implements CustomPacketPayload {
         public static final Type<DungeonEnter> TYPE = new Type<>(MMORPG.id("dungeon_enter"));
         public static final StreamCodec<ByteBuf, DungeonEnter> CODEC = StreamCodec.composite(

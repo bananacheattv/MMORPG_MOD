@@ -338,20 +338,6 @@ final class DevUiFrames {
             d.put("list", l);
             return new TeleporterScreen(d);
         });
-        add("pnj_mine_master", () -> {
-            var d = new CompoundTag();
-            d.putInt("playerLevel", 25);
-            var l = new net.minecraft.nbt.ListTag();
-            for (int i = 0; i < 4; i++) {
-                var e = new CompoundTag();
-                e.putString("name", "Mine " + (i + 1));
-                e.putInt("level", 5 + i * 10);
-                e.putBoolean("locked", i > 1);
-                l.add(e);
-            }
-            d.put("sectors", l);
-            return new MineMasterScreen(d);
-        });
         add("pnj_pvp_store", () -> new PvpStoreScreen(new CompoundTag()));
         add("pnj_bank", () -> {
             var d = new CompoundTag();

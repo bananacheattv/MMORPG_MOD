@@ -73,7 +73,6 @@ public class SpawnConfig {
         c.npcs.add(new Npc("graines", "MARCHAND", "Marchand de graines", 1, "marche:graines", 12, 13, 180F));
         c.npcs.add(new Npc("armurerie", "MARCHAND", "Armurier", 0, "marche:armurerie", -12, -13, 0F));
         c.npcs.add(new Npc("minerais", "MARCHAND", "Marchand de minerais", 2, "marche:minerais", -12, 13, 180F));
-        c.npcs.add(new Npc("mines", "MINES", "Maître des mines", 1, "marche:mines", 23, -18, 90F));
         c.npcs.add(new Npc("donjons", "DONJON", "Maître des donjons", 3, "donjon:*", 23, 19, 90F));
         c.npcs.add(new Npc("ferme", "MARCHAND", "Fermière d'Aeloria", 2, "marche:ferme", -29, 23, 180F));
         c.stations.add(new Station("banque", "banque_aeloria", 0, -25, "south"));

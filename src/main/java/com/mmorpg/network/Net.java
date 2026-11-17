@@ -36,9 +36,6 @@ public final class Net {
         srv(r, Payloads.DungeonEnter.TYPE, Payloads.DungeonEnter.CODEC, (packet, ctx) -> {
             if (ctx.player() instanceof ServerPlayer p) com.mmorpg.dungeon.DungeonMaster.enter(p, packet);
         });
-        srv(r, Payloads.MineEnter.TYPE, Payloads.MineEnter.CODEC, (packet, ctx) -> {
-            if (ctx.player() instanceof ServerPlayer p) com.mmorpg.mine.MineManager.enter(p, packet);
-        });
         r.playToClient(Payloads.MobInfo.TYPE, Payloads.MobInfo.CODEC);
         r.playToClient(Payloads.PartySync.TYPE, Payloads.PartySync.CODEC);
 

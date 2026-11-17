@@ -49,7 +49,7 @@ public final class QuestEditor {
                     var previous=ConfigManager.quests().get(id);
                     String expected=data.getStringOr("expected","");
                     require(expected.equals(previous==null?"":JSON.toJson(previous)),"Cette quête a été modifiée. Rechargez-la avant d’enregistrer.");
-                    ConfigManager.saveQuest(id,q);
+                    q.custom=true;ConfigManager.saveQuest(id,q);
                     for(var online:p.level().getServer().getPlayerList().getPlayers()) RpgPlayers.get(online).dirty=true;
                     status="Quête enregistrée : "+q.name;
                 }

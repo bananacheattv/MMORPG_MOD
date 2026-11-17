@@ -42,7 +42,7 @@ public final class GroupTravel {
         } catch(Exception e){p.sendSystemMessage(Component.literal("Départ annulé : "+e.getMessage()));}
         return true;
     }
-    private static NetworkConfig.Role role(Trip t){return switch(t.kind){case "mine"->NetworkConfig.Role.MINES;case "plaines"->NetworkConfig.Role.PLAINS;default->NetworkConfig.Role.DUNGEONS;};}
+    private static NetworkConfig.Role role(Trip t){return switch(t.kind){default->NetworkConfig.Role.DUNGEONS;};}
     private static void validate(ServerPlayer p,Trip t){
         var party=PartyManager.partyOf(p);
         if(party==null||!party.leader.equals(t.leader)||!party.members.contains(p.getUUID()))throw new IllegalArgumentException("Le groupe a changé.");
@@ -51,17 +51,13 @@ public final class GroupTravel {
                 ||com.mmorpg.competition.ArenaManager.queued(p.getUUID())||com.mmorpg.competition.ArenaManager.session(p.getUUID())!=null||com.mmorpg.competition.GuildRaids.of(p.getUUID())!=null
                 ||NetworkPlayers.inTransit(p)||com.mmorpg.dungeon.InstanceManager.containsPlayer(p)||d.pvpUntilTick>p.level().getServer().getTickCount())throw new IllegalArgumentException(p.getName().getString()+" n’est pas disponible.");
         int required;
-        if(t.kind.equals("mine")){int k=Integer.parseInt(t.value);if(k<0||k>=com.mmorpg.mine.MineLayout.SECTORS||k>=d.minesUnlocked)throw new IllegalArgumentException(p.getName().getString()+" n’a pas débloqué cette mine.");required=com.mmorpg.mine.MineLayout.STYLES.get(k).minLevel();}
-        else if(t.kind.equals("plaines")){int k=Integer.parseInt(t.value);if(k<0||k>=com.mmorpg.plains.PlainsLayout.REGIONS||k>=d.plainsUnlocked)throw new IllegalArgumentException(p.getName().getString()+" n’a pas débloqué cette plaine.");required=com.mmorpg.plains.PlainsLayout.STYLES.get(k).minLevel();}
-        else required=com.mmorpg.dungeon.DungeonMaster.requiredLevel(com.mmorpg.dungeon.InstanceManager.typeOf(t.value),com.mmorpg.dungeon.InstanceManager.difficultyOf(t.value));
+        required=com.mmorpg.dungeon.DungeonMaster.requiredLevel(com.mmorpg.dungeon.InstanceManager.typeOf(t.value),com.mmorpg.dungeon.InstanceManager.difficultyOf(t.value));
         if(d.level<required)throw new IllegalArgumentException(p.getName().getString()+" doit être niveau "+required+".");
         if(NetworkConfig.current.enabled&&!NetworkPlayers.canTransfer(p,role(t)))throw new IllegalArgumentException(p.getName().getString()+" ne peut pas voyager.");
     }
     private static void dispatch(ServerPlayer p,Trip t){
         individual=true;
         try{PortalAccess.grant(p,t.kind);switch(t.kind){
-            case "mine"->com.mmorpg.mine.MineManager.startTransition(p,Integer.parseInt(t.value));
-            case "plaines"->com.mmorpg.plains.PlainsManager.enterChosen(p,Integer.parseInt(t.value));
             default->com.mmorpg.dungeon.InstanceManager.enterPool(p,t.value);
         }}finally{individual=false;}
     }

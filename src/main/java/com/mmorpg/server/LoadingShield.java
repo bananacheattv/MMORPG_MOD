@@ -45,8 +45,7 @@ public final class LoadingShield {
 
     /** Ecran de chargement du mod ou transfert en cours : l'horloge de marge ne demarre pas. */
     private static boolean busy(ServerPlayer p) {
-        return com.mmorpg.network.NetworkPlayers.isArriving(p) || com.mmorpg.network.NetworkPlayers.inTransit(p)
-                || com.mmorpg.mine.MineManager.transitioning(p) || com.mmorpg.plains.PlainsManager.transitioning(p);
+        return com.mmorpg.network.NetworkPlayers.isArriving(p) || com.mmorpg.network.NetworkPlayers.inTransit(p);
     }
 
     private static boolean chunksReady(ServerPlayer p) {
