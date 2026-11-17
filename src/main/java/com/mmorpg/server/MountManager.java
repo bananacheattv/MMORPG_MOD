@@ -40,8 +40,7 @@ public final class MountManager {
     private static boolean playable(ServerPlayer p) { return p.isAlive() && !p.isSpectator() && RpgPlayers.get(p).playerClass.isPlayable(); }
     /** Les donjons (et leurs antres de boss) partagent leur dimension avec les mines et les plaines, ou les montures restent permises. */
     public static boolean inDungeon(ServerPlayer p) {
-        return p.level().dimension().equals(com.mmorpg.dungeon.InstanceManager.DIM)
-                && com.mmorpg.mine.MineManager.regionOf(p) < 0 && com.mmorpg.plains.PlainsManager.regionOf(p) < 0;
+        return p.level().dimension().equals(com.mmorpg.dungeon.InstanceManager.DIM);
     }
     /** Les montures ne s'achetent plus : elles s'obtiennent dans les caisses et les Lucky Blocks (sceaux de monture). */
     public static boolean unlock(ServerPlayer p, String id) {

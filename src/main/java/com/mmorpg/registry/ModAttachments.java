@@ -12,8 +12,6 @@ import java.util.function.Supplier;
 
 public final class ModAttachments {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENTS = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, MMORPG.MODID);
-    public static final Supplier<AttachmentType<Integer>> MINE_DENSITY = ATTACHMENTS.register("mine_density",
-            () -> AttachmentType.builder(() -> 0).serialize(com.mojang.serialization.Codec.INT.fieldOf("version")).build());
 
     public static final Supplier<AttachmentType<String>> STAND_LOOK=ATTACHMENTS.register("stand_appearance",()->AttachmentType.builder(()->"").serialize(com.mojang.serialization.Codec.STRING.fieldOf("appearance")).sync(net.minecraft.network.codec.ByteBufCodecs.STRING_UTF8).build());
 

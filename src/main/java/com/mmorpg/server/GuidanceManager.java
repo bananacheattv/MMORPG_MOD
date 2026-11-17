@@ -98,14 +98,9 @@ public final class GuidanceManager {
         return wanted.contains(key)||wanted.contains("*")&&(md!=null&&md.initialized()||m instanceof net.minecraft.world.entity.monster.Monster)||wanted.contains("boss")&&md!=null&&md.boss;
     }
     private static Target region(ServerPlayer p,QuestDef q,Set<String> wanted){
-        int plains=com.mmorpg.plains.PlainsManager.regionOf(p),mine=com.mmorpg.mine.MineManager.regionOf(p);
-        for(var s:com.mmorpg.plains.PlainsLayout.STYLES)if((wanted.contains("*")||s.mobs().stream().anyMatch(wanted::contains))){
-            if(plains==s.index()){var l=com.mmorpg.plains.PlainsLayout.get(plains);return new Target("quest",q.name,"Chercher les cibles dans "+s.name(),dim(p),new Vec3(l.x0()+150,l.height(150,110)+1,com.mmorpg.plains.PlainsLayout.Z0+110));}
-            var portal=portal(p,"plaines",s.index());if(portal!=null)return new Target("quest",q.name,"Portail · "+s.name(),dim(p),Vec3.atCenterOf(portal.pos()));
-        }
-        for(var s:com.mmorpg.mine.MineLayout.STYLES)if((wanted.contains("*")||s.mobs().stream().anyMatch(wanted::contains))){
-            if(mine==s.index()){var l=com.mmorpg.mine.MineLayout.get(mine);return new Target("quest",q.name,"Chercher les cibles dans "+s.name(),dim(p),new Vec3(l.x0()+180,l.floor(180,180)+1,com.mmorpg.mine.MineLayout.Z0+180));}
-            var portal=portal(p,"mine",s.index());if(portal!=null)return new Target("quest",q.name,"Portail · "+s.name(),dim(p),Vec3.atCenterOf(portal.pos()));
+        for(var z:com.mmorpg.zone.HuntZones.forMobs(wanted)){
+            var c=z.center();boolean inside=z.contains(p.level(),p.getX(),p.getY(),p.getZ());
+            if(z.dimension.equals(dim(p)))return new Target("quest",q.name,(inside?"Chercher les cibles dans ":"Zone de chasse · ")+z.title(),dim(p),new Vec3(c.x,inside?p.getY():c.y,c.z));
         }
         for(var type:com.mmorpg.world.DungeonBuilder.DungeonType.values()){
             var key=com.mmorpg.registry.ModItems.get(type.bossKey);String boss=key instanceof com.mmorpg.item.SummonKeyItem k?k.bossKey():"";
@@ -118,16 +113,14 @@ public final class GuidanceManager {
         }
         return null;
     }
-    private static com.mmorpg.world.AdventurePortalData.Portal portal(ServerPlayer p,String kind,int region){return com.mmorpg.world.AdventurePortalData.get(p.level().getServer()).all().stream().filter(a->a.dimension().equals(p.level().dimension())&&a.kind().equals(kind)&&(!(kind.equals("mine")||kind.equals("plaines"))||a.region()<0||a.region()==region)).min(Comparator.comparingDouble(a->p.position().distanceToSqr(Vec3.atCenterOf(a.pos())))).orElse(null);}
+    private static com.mmorpg.world.AdventurePortalData.Portal portal(ServerPlayer p,String kind,int region){return com.mmorpg.world.AdventurePortalData.get(p.level().getServer()).all().stream().filter(a->a.dimension().equals(p.level().dimension())&&a.kind().equals(kind)).min(Comparator.comparingDouble(a->p.position().distanceToSqr(Vec3.atCenterOf(a.pos())))).orElse(null);}
     private static Target route(ServerPlayer p,Target target){
         if(target.dimension.equals(dim(p))&&target.backend.equals(NetworkConfig.current.role.name()))return target;
-        String kind=target.backend.equals("PLAINS")?"plaines":target.backend.equals("MINES")?"mine":target.backend.equals("HUB")?"hub":target.backend.equals("MAIN")?"spawn":"";
-        if(!kind.isEmpty()&&target.pos!=null){int region=kind.equals("plaines")?com.mmorpg.plains.PlainsLayout.regionAt(target.pos.x,target.pos.z):kind.equals("mine")?com.mmorpg.mine.MineLayout.regionAt(target.pos.x,target.pos.z):-1;var portal=portal(p,kind,region);if(portal!=null)return new Target(target.kind,target.title,"Portail vers l’objectif",dim(p),Vec3.atCenterOf(portal.pos()));}
+        String kind=target.backend.equals("HUB")?"hub":target.backend.equals("MAIN")?"spawn":"";
+        if(!kind.isEmpty()&&target.pos!=null){var portal=portal(p,kind,-1);if(portal!=null)return new Target(target.kind,target.title,"Portail vers l’objectif",dim(p),Vec3.atCenterOf(portal.pos()));}
         var back=returnPortal(p,target.title);return back!=null?back:new Target(target.kind,target.title,"Autre monde · "+target.label,target.dimension,null);
     }
     private static Target returnPortal(ServerPlayer p,String title){
-        int r=com.mmorpg.plains.PlainsManager.regionOf(p);if(r>=0){var l=com.mmorpg.plains.PlainsLayout.get(r);return new Target("quest",title,"Portail de retour au spawn",dim(p),new Vec3(l.x0()+com.mmorpg.plains.PlainsLayout.PLAZA_X+.5,com.mmorpg.plains.PlainsLayout.BASE+1,com.mmorpg.plains.PlainsLayout.Z0+com.mmorpg.plains.PlainsBuilder.ARCH_Z+1));}
-        r=com.mmorpg.mine.MineManager.regionOf(p);if(r>=0){var l=com.mmorpg.mine.MineLayout.get(r);return new Target("quest",title,"Portail de retour au spawn",dim(p),new Vec3(l.x0()+com.mmorpg.mine.MineLayout.PLAZA_X+.5,l.floor(com.mmorpg.mine.MineLayout.PLAZA_X,com.mmorpg.mine.MineLayout.PLAZA_Z)+1,com.mmorpg.mine.MineLayout.Z0+com.mmorpg.mine.MineLayout.PLAZA_Z-11));}
         var hub=HubData.get(p.level().getServer());if(hub.exists()&&p.level().dimension().equals(hub.dimension()))return new Target("quest",title,"Portail du spawn",dim(p),Vec3.atCenterOf(hub.originAt(p.getX()).offset(HubPortals.HUB_GATE_X,0,0)));
         var passer=scan(p,"passer",()->p.level().getEntitiesOfClass(com.mmorpg.entity.NpcEntity.class,p.getBoundingBox().inflate(160),n->n.role()==com.mmorpg.entity.NpcEntity.Role.SORTIE).stream().min(Comparator.comparingDouble(p::distanceToSqr)));if(passer.isPresent())return new Target("quest",title,"Passeur · Retour au spawn",dim(p),passer.get().position());
         if(NetworkConfig.current.role==NetworkConfig.Role.MAIN)return null;

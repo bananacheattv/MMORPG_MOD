@@ -57,11 +57,9 @@ public final class ServerEvents {
     public static void onCommands(RegisterCommandsEvent event) {
         RpgCommands.register(event.getDispatcher());
         RpgCommands.registerHub(event.getDispatcher());
-        com.mmorpg.mine.MineManager.register(event.getDispatcher());
-        com.mmorpg.plains.PlainsManager.register(event.getDispatcher());
         com.mmorpg.zone.ZoneCommands.register(event.getDispatcher());
+        com.mmorpg.zone.HuntCommands.register(event.getDispatcher());
         RpgCommands.registerSetDonjon(event.getDispatcher());
-        RpgCommands.registerSetMine(event.getDispatcher());
         PlayerCommands.register(event.getDispatcher());
     }
 

@@ -619,7 +619,6 @@ public final class InstanceManager {
             return;
         }
         if (com.mmorpg.network.NetworkPlayers.isArriving(p)) return;
-        if (com.mmorpg.mine.MineManager.inMine(p)) return;            // les mines sont partagees : on y reste a la reconnexion
         MinecraftServer server = p.level().getServer();
         String mine = ownerKey(p);
         for (Slot s : InstanceData.get(server).slots) {

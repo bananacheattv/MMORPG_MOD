@@ -110,7 +110,6 @@ public final class ClientPayloadHandlers {
             case S2COpenScreen.QUEST_GIVER -> mc.gui.setScreen(new com.mmorpg.client.screen.QuestGiverScreen(payload.extra()));
             case S2COpenScreen.SHOP -> mc.gui.setScreen(new com.mmorpg.client.screen.ShopScreen(payload.extra()));
             case S2COpenScreen.DUNGEON_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.DungeonMasterScreen(payload.extra()));
-            case S2COpenScreen.MINE_MASTER -> mc.gui.setScreen(new com.mmorpg.client.screen.MineMasterScreen(payload.extra()));
             case S2COpenScreen.SPAWN_EDITOR -> mc.gui.setScreen(new com.mmorpg.client.screen.SpawnEditorScreen(payload.extra()));
             case S2COpenScreen.PREMIUM_STORE -> mc.gui.setScreen(new com.mmorpg.client.screen.PremiumStoreScreen(payload.extra()));
             case S2COpenScreen.FRIENDS -> mc.gui.setScreen(new com.mmorpg.client.screen.FriendsScreen(payload.extra()));
@@ -144,6 +143,9 @@ public final class ClientPayloadHandlers {
             }
             case S2COpenScreen.CINEMATIC -> com.mmorpg.client.cinematic.CinematicClient.start(payload.extra());
             case S2COpenScreen.CRATE -> mc.gui.setScreen(new com.mmorpg.client.screen.CrateScreen(payload.extra()));
+            case S2COpenScreen.CRATE_RESULT -> {
+                if (mc.gui.screen() instanceof com.mmorpg.client.screen.CrateScreen screen) screen.result(payload.extra());
+            }
             case S2COpenScreen.LUCKY_BLOCK -> mc.gui.setScreen(new com.mmorpg.client.screen.LuckyBlockScreen(payload.extra()));
             case S2COpenScreen.LUCKY_RESULT -> {
                 if (mc.gui.screen() instanceof com.mmorpg.client.screen.LuckyBlockScreen screen) screen.result(payload.extra());

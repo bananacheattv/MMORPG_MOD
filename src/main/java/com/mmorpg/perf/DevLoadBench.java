@@ -59,7 +59,7 @@ public final class DevLoadBench {
         int far = a.length > 2 ? Integer.parseInt(a[2]) : 0;
         if (setupAt < 0) {
             // la premiere fois, le monde construit ses mines et ses plaines (des minutes) : on attend la fin pour ne mesurer que le jeu
-            idle = com.mmorpg.mine.MineManager.building() || com.mmorpg.plains.PlainsManager.building() ? 0 : idle + 1;
+            idle = idle + 1;
             if (idle >= 200) {
                 setupAt = tick;
                 setup(server, players, mobs, far);

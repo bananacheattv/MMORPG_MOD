@@ -34,15 +34,12 @@ public final class DevBetaChecks {
             p.getInventory().clearContent();RpgPlayers.giveStarterTools(p);check(!p.getInventory().contains(new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.get("graine_lueur"))),"starter has no glow seeds");
             check(NetworkPlayers.login(p),"arrival fixture login");check(NetworkPlayers.portalBlocked(p),"saved backend position cannot trigger return portal on login");NetworkPlayers.logout(p);
             restoreTolerant(p);
-            for(int region=0;region<com.mmorpg.mine.MineLayout.SECTORS;region++)com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] Mine entry {} {}",region,java.util.Arrays.toString(com.mmorpg.mine.MineManager.spawnPoint(region)));
-            for(var destination:List.of("mine:0","plains:0","dungeon:crypte_gobeline:0")){
+            for(var destination:List.of("dungeon:crypte_gobeline:0")){
                 cfg.role=NetworkConfig.Role.MAIN;check(NetworkPlayers.login(p),"travel source acquires session");RpgPlayers.get(p).playerClass=com.mmorpg.rpg.PlayerClass.GUERRIER;RpgPlayers.get(p).level=100;
                 var role=destination.startsWith("mine")?NetworkConfig.Role.MINES:destination.startsWith("plains")?NetworkConfig.Role.PLAINS:NetworkConfig.Role.DUNGEONS;
                 check(NetworkPlayers.route(p,role,destination)&&NetworkPlayers.inTransit(p),"source prepares proxy transfer");NetworkPlayers.logout(p);cfg.role=role;
                 check(NetworkPlayers.login(p)&&NetworkPlayers.isArriving(p),"destination restores travel instruction before login recovery");
                 var arrival=NetworkPlayers.class.getDeclaredMethod("arrive",ServerPlayer.class,String.class);arrival.setAccessible(true);arrival.invoke(null,p,destination);
-                if(role==NetworkConfig.Role.MINES)check(com.mmorpg.mine.MineManager.transitioning(p),"mine arrival starts construction/loading without spawn routing");
-                if(role==NetworkConfig.Role.PLAINS)check(com.mmorpg.plains.PlainsManager.transitioning(p),"plain arrival starts construction/loading without spawn routing");
                 check(!NetworkPlayers.inTransit(p),"destination does not bounce to another backend");NetworkPlayers.logout(p);com.mmorpg.dungeon.BossReveal.release(p);
             }
             cfg.role=NetworkConfig.Role.MAIN;RpgPlayers.get(p).level=10;
