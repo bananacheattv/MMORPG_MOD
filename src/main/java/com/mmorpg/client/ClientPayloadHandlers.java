@@ -143,6 +143,9 @@ public final class ClientPayloadHandlers {
             }
             case S2COpenScreen.CINEMATIC -> com.mmorpg.client.cinematic.CinematicClient.start(payload.extra());
             case S2COpenScreen.CRATE -> mc.gui.setScreen(new com.mmorpg.client.screen.CrateScreen(payload.extra()));
+            case S2COpenScreen.CRATE_RESULT -> {
+                if (mc.gui.screen() instanceof com.mmorpg.client.screen.CrateScreen screen) screen.result(payload.extra());
+            }
             case S2COpenScreen.LUCKY_BLOCK -> mc.gui.setScreen(new com.mmorpg.client.screen.LuckyBlockScreen(payload.extra()));
             case S2COpenScreen.LUCKY_RESULT -> {
                 if (mc.gui.screen() instanceof com.mmorpg.client.screen.LuckyBlockScreen screen) screen.result(payload.extra());
