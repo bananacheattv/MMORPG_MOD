@@ -9,7 +9,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 
-/** Monde ouvert (Overworld importe, spawn 0 84 0) : plus de mobs vanilla, et aucun de nos mobs pres du spawn. */
+/** Hors donjons : aucun spawn automatique (vanilla ou serveur) ; les mobs viennent des zones de chasse (/zone chasse). */
 @EventBusSubscriber(modid = MMORPG.MODID)
 public final class OpenWorldRules {
     private OpenWorldRules() { }
@@ -21,14 +21,12 @@ public final class OpenWorldRules {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onSpawn(FinalizeSpawnEvent e) {
         Mob mob = e.getEntity();
-        if (!mob.level().dimension().equals(Level.OVERWORLD)) return;
+        if (mob.level().dimension().equals(com.mmorpg.dungeon.InstanceManager.DIM)) return;   // donjons : inchanges
         EntitySpawnReason r = e.getSpawnType();
-        if (r == EntitySpawnReason.COMMAND || r == EntitySpawnReason.SPAWN_ITEM_USE) return;
-        if (mob instanceof com.mmorpg.entity.RpgMob) {
-            if (nearSpawn(mob.getX(), mob.getZ())) e.setSpawnCancelled(true);
-        } else if (r == EntitySpawnReason.NATURAL || r == EntitySpawnReason.CHUNK_GENERATION || r == EntitySpawnReason.PATROL
-                || r == EntitySpawnReason.REINFORCEMENT || r == EntitySpawnReason.JOCKEY) {
-            e.setSpawnCancelled(true);
+        if (r == EntitySpawnReason.NATURAL || r == EntitySpawnReason.CHUNK_GENERATION || r == EntitySpawnReason.PATROL
+                || r == EntitySpawnReason.REINFORCEMENT || r == EntitySpawnReason.JOCKEY || r == EntitySpawnReason.SPAWNER
+                || r == EntitySpawnReason.TRIAL_SPAWNER) {
+            e.setSpawnCancelled(true);   // plus aucun spawn automatique : seules les zones de chasse posees a la main (/zone chasse) font apparaitre des mobs
         }
     }
 }

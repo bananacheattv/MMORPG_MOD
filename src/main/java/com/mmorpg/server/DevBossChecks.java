@@ -205,4 +205,28 @@ public final class DevBossChecks {
         check(near <= cfg.minLevel + 2 && far >= cfg.maxLevel - 2 && far > near, "level grows with distance: " + near + " -> " + far);
         MMORPG.LOGGER.info("[CODEX CHECKS] MOB BIOMES PASS: biomes per zone, level {} near spawn -> {} at the edge", near, far);
     }
+
+    /** Hors donjons plus aucun spawn automatique (vanilla ou nos mobs) ; COMMAND (zones de chasse) et donjons passent. */
+    private static boolean cancelled(Mob mob, ServerLevel level, net.minecraft.world.DifficultyInstance diff, net.minecraft.world.entity.EntitySpawnReason reason) {
+        var ev = new net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent(mob, level, mob.getX(), mob.getY(), mob.getZ(), diff, reason, null, null);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(ev);
+        return ev.isSpawnCancelled();
+    }
+
+    static void manualSpawnsOnly(ServerLevel level) {
+        var pos = level.getRespawnData().pos();
+        var diff = level.getCurrentDifficultyAt(pos);
+        var gob = com.mmorpg.registry.ModEntities.SPAWNABLE.get("gobelin").get().create(level, net.minecraft.world.entity.EntitySpawnReason.NATURAL);
+        var zombie = net.minecraft.world.entity.EntityTypes.COW.create(level, net.minecraft.world.entity.EntitySpawnReason.NATURAL);
+        check(cancelled((Mob) gob, level, diff, net.minecraft.world.entity.EntitySpawnReason.NATURAL), "natural RPG mob spawn cancelled in the open world");
+        check(cancelled(zombie, level, diff, net.minecraft.world.entity.EntitySpawnReason.NATURAL), "natural vanilla spawn cancelled in the open world");
+        var gob2 = com.mmorpg.registry.ModEntities.SPAWNABLE.get("gobelin").get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        check(!cancelled((Mob) gob2, level, diff, net.minecraft.world.entity.EntitySpawnReason.COMMAND), "hunt zone / command spawn still allowed");
+        var dim = level.getServer().getLevel(com.mmorpg.dungeon.InstanceManager.DIM);
+        if (dim != null) {
+            var gob3 = com.mmorpg.registry.ModEntities.SPAWNABLE.get("gobelin").get().create(dim, net.minecraft.world.entity.EntitySpawnReason.NATURAL);
+            check(!cancelled((Mob) gob3, dim, dim.getCurrentDifficultyAt(pos), net.minecraft.world.entity.EntitySpawnReason.NATURAL), "dungeon dimension unchanged");
+        }
+        MMORPG.LOGGER.info("[CODEX CHECKS] MANUAL SPAWNS PASS");
+    }
 }

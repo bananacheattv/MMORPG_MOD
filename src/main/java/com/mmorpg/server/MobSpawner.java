@@ -45,7 +45,7 @@ public final class MobSpawner {
 
     public static void tick(ServerLevel level) {
         if(!FeatureFlags.enabled(level.getServer(),"apparition_mobs"))return;
-        if(level.dimension().equals(com.mmorpg.competition.CompetitionWorld.DIM))return;
+        if(!level.dimension().equals(com.mmorpg.dungeon.InstanceManager.DIM))return;   // spawn automatique : donjons seulement ; ailleurs, zones de chasse manuelles
         GeneralConfig g = ConfigManager.general();
         if (!g.customSpawning || level.getDifficulty() == Difficulty.PEACEFUL) return;
         if (level.getGameTime() % Math.max(20, g.spawnIntervalTicks) != 0) return;
