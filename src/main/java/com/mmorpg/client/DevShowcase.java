@@ -129,7 +129,7 @@ public final class DevShowcase {
             return;
         }
         if(MODE.equals("perf")){DevPerfBench.phase(mc);return;}
-        if(MODE.equals("ui_frames")){DevUiFrames.tick(mc);return;}if(MODE.equals("pnj_ui")){if(!pnjInit){pnjInit=true;DevUiFrames.pnjMode();}DevUiFrames.tick(mc);return;}
+        if(MODE.equals("ui_frames")){DevUiFrames.tick(mc);return;}if(MODE.equals("debordements")){if(!pnjInit){pnjInit=true;DevUiFrames.overflowMode();}DevUiFrames.tick(mc);return;}if(MODE.equals("pnj_ui")){if(!pnjInit){pnjInit=true;DevUiFrames.pnjMode();}DevUiFrames.tick(mc);return;}
         if(MODE.equals("outils_retires")){DevToolsRemoved.tick(mc);return;}
         if(MODE.equals("pvp_polish")){DevPvpVisual.tick(mc);return;}
         if(MODE.equals("trade")){DevTradeVisual.tick(mc);return;}
@@ -4327,7 +4327,7 @@ public final class DevShowcase {
         }
         if (t >= 62 && t < 140 && mc.gui.screen() instanceof com.mmorpg.client.screen.CharacterSelectScreen) mc.gui.setScreen(null);
         if (t == 140) shot(mc, "pnj_pose");
-        if (t == 150) stop(mc);
+        if (t == 160) stop(mc);
     }
 
     private static void mascotPhase(Minecraft mc, String me) {
@@ -4349,9 +4349,19 @@ public final class DevShowcase {
             e.setYBodyRot(mc.player.getYRot() + 180);
             e.yBodyRotO = e.yBodyRot;
             mc.level.addEntity(e);
-            com.mmorpg.client.MascotDialogClient.say("Mascotte", "Salut, voyageur ! Je suis la Mascotte, ton guide. Rends-toi à la forge du spawn pour fabriquer ta première pioche.");
+            com.mmorpg.client.MascotDialogClient.say("Mascotte", "Salut, voyageur ! Je suis la Mascotte, ton guide. Rends-toi à la forge du spawn pour fabriquer ta première pioche. Ensuite, passe à la mine pour récolter du minerai de fer et de cuivre, puis reviens me voir. Je t'expliquerai comment améliorer ton équipement, rejoindre un groupe et affronter ton premier donjon. N'oublie pas de regarder ton journal de quêtes : chaque mission te donne de l'expérience et des pièces.");
+            ClientData.DATA.playerClass = com.mmorpg.rpg.PlayerClass.GUERRIER;
+            ClientData.DATA.skillBar[0] = com.mmorpg.skill.Skills.FRAPPE_PUISSANTE.id;
+            ClientData.DATA.skillRanks.put(com.mmorpg.skill.Skills.FRAPPE_PUISSANTE.id, 1);
         }
-        if (t == 140) shot(mc, "mascotte");
+        if (MODE.equals("mascotte") && t == 100) { FreeCursorScreen.force = true; mc.gui.setScreen(new FreeCursorScreen()); }
+        if (MODE.equals("mascotte") && t == 110) { realMove(mc, 158, 180); }
+        if (t == 118) shot(mc, "mascotte_tooltip");
+        if (t == 122) { var r = com.mmorpg.client.hud.HudLayout.DIALOGUE.rect(mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight()); realMove(mc, r[0] + 20, r[1] + 20); }
+        if (t == 130) shot(mc, "mascotte_page1");
+        if (t == 136) { MascotDialogClient.turn(1); }
+        if (t == 146) shot(mc, "mascotte_page2");
+        if (t == 150) { FreeCursorScreen.force = false; shot(mc, "mascotte"); }
         if (t == 150) stop(mc);
     }
 
