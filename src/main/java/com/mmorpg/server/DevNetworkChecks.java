@@ -61,7 +61,7 @@ public final class DevNetworkChecks {
         try {
             DevAdminPlayerChecks.run(p);
             purgeCheck(server);
-            DevBossChecks.biomeSpawns(p.level());
+            DevBossChecks.biomeSpawns(p.level());DevBossChecks.manualSpawnsOnly(p.level());
             DevPortalChecks.origin(p);
             DevSkillChecks.run(p);
             UUID id = UUID.randomUUID();

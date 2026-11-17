@@ -1,0 +1,52 @@
+{
+  "openWorld": {
+    "centerX": 0,
+    "centerZ": 0,
+    "mapRadius": 400,
+    "safeRadius": 58,
+    "safeAreas": [
+      {
+        "name": "Aéloria — Place des Horizons",
+        "x": 0,
+        "z": 0,
+        "radius": 56
+      },
+      {
+        "name": "Clairbois",
+        "x": -230,
+        "z": 45,
+        "radius": 51
+      },
+      {
+        "name": "Brumevert",
+        "x": -245,
+        "z": 220,
+        "radius": 43
+      },
+      {
+        "name": "Veillepierre",
+        "x": 70,
+        "z": 245,
+        "radius": 49
+      },
+      {
+        "name": "Boréalis",
+        "x": -200,
+        "z": -185,
+        "radius": 50
+      },
+      {
+        "name": "Sahr-Éclat",
+        "x": 210,
+        "z": -175,
+        "radius": 53
+      },
+      {
+        "name": "Astréon",
+        "x": 260,
+        "z": 145,
+        "radius": 48
+      }
+    ]
+  }
+}

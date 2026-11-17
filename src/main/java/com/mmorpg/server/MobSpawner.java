@@ -45,7 +45,7 @@ public final class MobSpawner {
 
     public static void tick(ServerLevel level) {
         if(!FeatureFlags.enabled(level.getServer(),"apparition_mobs"))return;
-        if(level.dimension().equals(com.mmorpg.competition.CompetitionWorld.DIM))return;
+        if(!level.dimension().equals(com.mmorpg.dungeon.InstanceManager.DIM))return;   // spawn automatique : donjons seulement ; ailleurs, zones de chasse manuelles
         GeneralConfig g = ConfigManager.general();
         if (!g.customSpawning || level.getDifficulty() == Difficulty.PEACEFUL) return;
         if (level.getGameTime() % Math.max(20, g.spawnIntervalTicks) != 0) return;
@@ -66,7 +66,7 @@ public final class MobSpawner {
         int x = (int) (player.getX() + Math.cos(angle) * dist);
         int z = (int) (player.getZ() + Math.sin(angle) * dist);
         if (!level.hasChunkAt(new BlockPos(x, player.getBlockY(), z))) return;
-        if (level.dimension() == net.minecraft.world.level.Level.OVERWORLD && OpenWorldRules.nearSpawn(x, z)) return;   // 200 blocs autour du spawn sans mobs
+        if (level.dimension() == net.minecraft.world.level.Level.OVERWORLD && OpenWorldRules.nearSpawn(x, z)) return;
         BlockPos pos = findGround(level, x, player.getBlockY(), z);
         if (pos == null) return;
         Holder<Biome> biome = level.getBiome(pos);
@@ -101,7 +101,9 @@ public final class MobSpawner {
         int group = chosen.cfg.spawn.minGroup + random.nextInt(Math.max(1, chosen.cfg.spawn.maxGroup - chosen.cfg.spawn.minGroup + 1));
         for (int i = 0; i < group; i++) {
             BlockPos p = i == 0 ? pos : findGround(level, pos.getX() + random.nextInt(5) - 2, pos.getY(), pos.getZ() + random.nextInt(5) - 2);
-            if (p == null) continue;
+            if (p == null || !level.getWorldBorder().isWithinBounds(p)) continue;
+            // Each group member can be offset across a village boundary: check the final position too.
+            if (level.dimension() == net.minecraft.world.level.Level.OVERWORLD && OpenWorldRules.nearSpawn(p.getX(), p.getZ())) continue;
             Mob mob = chosen.type.create(level, EntitySpawnReason.NATURAL);
             if (mob == null) continue;
             mob.snapTo(p.getX() + 0.5, p.getY(), p.getZ() + 0.5, random.nextFloat() * 360, 0);
@@ -117,12 +119,9 @@ public final class MobSpawner {
         }
     }
 
-    /** Rayon de la carte d'Aeloria importee (centre 0, 0) : niveau minimum au centre, maximum au bord. */
-    public static final double MAP_RADIUS = 2500;
-
     /** Niveau d'un monstre selon sa distance au centre de la carte, dans sa fourchette [minLevel, maxLevel], a quelques niveaux pres. */
     public static int distanceLevel(MobConfig cfg, double x, double z, net.minecraft.util.RandomSource random) {
-        double t = Math.min(1.0, Math.sqrt(x * x + z * z) / MAP_RADIUS);
+        double t = ConfigManager.general().openWorld().distanceRatio(x, z);
         int span = cfg.maxLevel - cfg.minLevel;
         int lvl = cfg.minLevel + (int) Math.round(span * t) + random.nextInt(3) - 1;
         return Math.max(cfg.minLevel, Math.min(cfg.maxLevel, lvl));
