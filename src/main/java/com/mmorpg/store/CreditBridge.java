@@ -39,6 +39,7 @@ public final class CreditBridge {
     var json=JsonParser.parseString(new String(body,StandardCharsets.UTF_8)).getAsJsonObject();long timestamp=json.get("timestamp").getAsLong();
     if(Math.abs(System.currentTimeMillis()/1000-timestamp)>300){status=401;throw new IllegalArgumentException("Signature expirée");}
     extra=work.run(json);status=200;message=String.valueOf(extra.getOrDefault("message","OK"));
+   }catch(java.util.concurrent.TimeoutException|java.util.concurrent.ExecutionException ex){status=503;message="Serveur occupé, réessaie plus tard";
    }catch(Exception ex){message=status==400?"Requête refusée : "+(ex.getCause()==null?ex.getMessage():ex.getCause().getMessage()):ex.getMessage();}
    var reply=new LinkedHashMap<String,Object>();reply.put("ok",status==200);reply.put("message",message==null?"Erreur":message);
    if(status==200)extra.forEach((k,v)->{if(!k.equals("message"))reply.put(k,v);});

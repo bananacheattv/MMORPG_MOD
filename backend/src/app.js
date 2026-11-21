@@ -17,9 +17,10 @@ function createApp(cfg, { fetchImpl = fetch, now = Date.now, log = console } = {
 
   // ---------- utilitaires ----------
   function rateLimit(req, bucket, max, windowMs) {
-    const forwarded = cfg.trustProxy ? String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() : '';
+    const forwarded = cfg.trustProxy ? String(req.headers['x-forwarded-for'] || '').split(',').pop().trim() : '';
     const key = `${bucket}:${forwarded || req.socket.remoteAddress}`;
     const t = now();
+    if (limits.size > 5000) for (const [k, v] of limits) if (v.reset <= t) limits.delete(k);
     const entry = limits.get(key);
     if (!entry || entry.reset <= t) {
       limits.set(key, { count: 1, reset: t + windowMs });
@@ -320,24 +321,30 @@ function createApp(cfg, { fetchImpl = fetch, now = Date.now, log = console } = {
       if (st.recentOrders.get(account.id, now() - 3600000).n >= 10) throw new HttpError(429, 'Trop de commandes en une heure.');
       const orderId = security.randomId('cmd_', 15);
       st.insertOrder.run(orderId, account.id, account.mc_uuid, pack.id, pack.credits, pack.price, cfg.shop.currency, cfg.stripe.live ? 1 : 0, now());
-      const session = await createCheckoutSession(cfg.stripe, fetchImpl, {
-        mode: 'payment',
-        locale: 'fr',
-        client_reference_id: orderId,
-        customer_email: account.email,
-        success_url: `${cfg.siteUrl}/boutique.html?commande=${orderId}`,
-        cancel_url: `${cfg.siteUrl}/boutique.html?annule=1`,
-        metadata: { order: orderId, player: account.mc_uuid },
-        payment_intent_data: { metadata: { order: orderId } },
-        line_items: [{
-          quantity: 1,
-          price_data: {
-            currency: cfg.shop.currency,
-            unit_amount: pack.price,
-            product_data: { name: `${pack.name} : ${pack.credits} crédits Aéloria`, description: `Pour ${account.mc_name}` },
-          },
-        }],
+      let session;
+      try {
+        session = await createCheckoutSession(cfg.stripe, fetchImpl, {
+          mode: 'payment',
+          locale: 'fr',
+          client_reference_id: orderId,
+          customer_email: account.email,
+          success_url: `${cfg.siteUrl}/boutique.html?commande=${orderId}`,
+          cancel_url: `${cfg.siteUrl}/boutique.html?annule=1`,
+          metadata: { order: orderId, player: account.mc_uuid },
+          payment_intent_data: { metadata: { order: orderId } },
+          line_items: [{
+            quantity: 1,
+            price_data: {
+              currency: cfg.shop.currency,
+              unit_amount: pack.price,
+              product_data: { name: `${pack.name} : ${pack.credits} crédits Aéloria`, description: `Pour ${account.mc_name}` },
+            },
+          }],
       }, orderId);
+      } catch (error) {
+        st.markStatus.run('failed', 'Stripe indisponible', orderId, 'pending');
+        throw error;
+      }
       st.setOrderSession.run(session.id, orderId);
       return { url: session.url, order: orderId };
     },
