@@ -26,7 +26,7 @@ public final class DevPortalChecks {
         }
         for (Portal old : java.util.List.copyOf(data.all())) if (old.dimension().equals(level.dimension()) && old.pos().getX()>=42 && old.pos().getX()<=54 && old.pos().getZ()>=42 && old.pos().getZ()<=54) data.remove(old.id());
         // retour devant le portail apres sortie ou mort
-        Portal back = portal(p, true, "mine", 2, "", 0);
+        Portal back = portal(p, true, "donjons", -1, "", 0);
         check(AdventurePortals.place(p, back), "origin portal placed");
         p.setPos(48.5, 100, 48.9);
         PortalOrigin.capture(p, back);
@@ -65,7 +65,7 @@ public final class DevPortalChecks {
         for (int x = 45; x <= 51; x++) for (int z = 45; z <= 51; z++) for (int y = 99; y <= 105; y++) {
             BlockPos at = new BlockPos(x, y, z); original.put(at, level.getBlockState(at));
         }
-        Portal mine = portal(p, true, "mine", -1, "", 0);
+        Portal mine = portal(p, true, "hub", -1, "", 0);
         check(AdventurePortals.place(p, mine), "place menu arch");
         check(data.find(mine.id()).equals(mine), "persistent registration");
         check(!level.getBlockState(mine.at(-2, 0)).isAir() && level.getBlockState(mine.at(0, 1)).isAir(), "solid frame with walkable opening");
@@ -89,12 +89,12 @@ public final class DevPortalChecks {
         p.setPos(48.5, 100, 50.5); AdventurePortals.visit(p, null);
         p.setPos(48.5, 100, 48.5);
         check(AdventurePortals.visit(p, mine), "stepping out re-arms portal");
-        check(!AdventurePortals.place(p, portal(p, false, "plaines", 0, "", 0)), "overlap refused");
+        check(!AdventurePortals.place(p, portal(p, false, "spawn", -1, "", 0)), "overlap refused");
         check(AdventurePortals.undo(p), "undo placement");
         check(data.find(mine.id()) == null, "undo removes activation record");
         original.forEach((at, state) -> check(level.getBlockState(at).equals(state), "original terrain restored " + at));
 
-        Portal plains = portal(p, false, "plaines", 0, "", 0);
+        Portal plains = portal(p, false, "spawn", -1, "", 0);
         check(AdventurePortals.place(p, plains), "Z arch placement");
         check(AdventurePortals.passage(plains).contains(48.5, 101, 48.5), "Z arch passage");
         check(AdventurePortals.remove(p, plains), "remove arch");
@@ -116,10 +116,9 @@ public final class DevPortalChecks {
 
         var rpg = RpgPlayers.get(p);
         var saved = rpg.save();
-        rpg.level = 1; rpg.minesUnlocked = 1; rpg.plainsUnlocked = 1;
+        rpg.level = 1;
         check(AdventurePortals.allowed(p, mine), "menu available with a class");
-        check(!AdventurePortals.allowed(p, portal(p, true, "mine", 1, "", 0)), "locked mine refused");
-        check(!AdventurePortals.allowed(p, portal(p, true, "plaines", 1, "", 0)), "locked plain refused");
+        check(!AdventurePortals.valid(portal(p, true, "mine", 1, "", 0)) && !AdventurePortals.allowed(p, portal(p, true, "plaines", 1, "", 0)), "removed mine/plain kinds refused");
         Portal dungeon = portal(p, true, "donjon", -1, "crypte_gobeline", 2);
         check(!AdventurePortals.allowed(p, dungeon), "dungeon level and difficulty respected");
         rpg.level = 100;
@@ -133,13 +132,13 @@ public final class DevPortalChecks {
         var commands = level.getServer().getCommands().getDispatcher();
         var source = level.getServer().createCommandSourceStack().withLevel(level).withEntity(p).withPosition(p.position()).withSuppressedOutput();
         boolean menuRefused = false;
-        try { commands.execute("portail mine", source); } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) { menuRefused = true; }
-        check(menuRefused, "menu portal without level refused");
-        check(commands.execute("portail mine 1", source) == 1, "operator placement command");
+        try { commands.execute("portail donjon", source); } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) { menuRefused = true; }
+        check(menuRefused, "dungeon portal without type refused");
+        check(commands.execute("portail hub", source) == 1, "operator placement command");
         String undoCommand = net.neoforged.fml.ModList.get().isLoaded("worldedit") ? "undoportail" : "undo";
         check(commands.execute(undoCommand, source) == 1 && data.all().size() == baseline, "bare /undo alias executes");
         check(AdventurePortals.place(p, mine), "first placement for multi undo");
-        Portal second = new Portal(UUID.randomUUID(), level.dimension(), new BlockPos(48, 100, 52), true, "plaines", -1, "", 0);
+        Portal second = new Portal(UUID.randomUUID(), level.dimension(), new BlockPos(48, 100, 52), true, "spawn", -1, "", 0);
         check(AdventurePortals.place(p, second), "second placement for multi undo");
         check(commands.execute(undoCommand + " 2", source) == 2 && data.all().size() == baseline, "/undo count traverses alias arguments");
         check(commands.execute("portail donjon crypte_gobeline heroique", source) == 1, "dungeon difficulty command");
@@ -156,7 +155,7 @@ public final class DevPortalChecks {
         check(commands.execute("portail zone hub", source) == 0, "zone portal needs a selection");
         var sel = com.mmorpg.zone.ZoneManager.selection(p); sel.dimension = level.dimension();
         com.mmorpg.zone.ZoneManager.pick(p, new BlockPos(50, 100, 46)); com.mmorpg.zone.ZoneManager.pick(p, new BlockPos(46, 101, 50));
-        check(commands.execute("portail zone mine 2", source) == 1, "zone portal command");
+        check(commands.execute("portail zone spawn", source) == 1, "zone portal command");
         Portal zone = data.all().stream().filter(g -> g.max().isPresent()).findFirst().orElseThrow();
         check(zone.pos().equals(new BlockPos(46, 100, 46)) && zone.max().get().equals(new BlockPos(50, 101, 50)) && AdventurePortals.passage(zone).contains(48.5, 100.5, 48.5), "zone corners normalised, inside passage");
         check(Portal.CODEC.encodeStart(NbtOps.INSTANCE, zone).result().flatMap(t -> Portal.CODEC.parse(NbtOps.INSTANCE, t).result()).orElseThrow().equals(zone), "zone portal persisted");

@@ -54,6 +54,7 @@ public final class DevBossChecks {
             d.load(old);
         }
         try {
+            LoadingShield.clear(p);                                        // bouclier de chargement laisse par les controles de teleportation precedents
             attacks(p);
             mobs(p);
         } finally {
@@ -121,7 +122,7 @@ public final class DevBossChecks {
                     totalHits += boss.hitsLanded - hits;
                     report.append(m.id()).append('=').append(boss.hitsLanded - hits).append(' ');
                 }
-                check(totalHits >= 3, def.key() + " attacks land hits: " + totalHits);
+                check(totalHits >= 3, def.key() + " attacks land hits: " + totalHits + " (" + report + ") safe=" + SafeSpawn.safe(p) + " at " + p.level().dimension().identifier() + " " + p.blockPosition());
                 report.append("| ");
             } finally {
                 Scheduler.endTest();

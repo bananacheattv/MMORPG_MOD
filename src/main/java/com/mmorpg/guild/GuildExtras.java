@@ -272,8 +272,14 @@ public final class GuildExtras {
         held.setCount(left.getCount());
     }
 
+    /** Cases occupees du coffre : le coffre ouvert en memoire fait foi (ses changements ne sont ecrits qu'au tick suivant). */
     public static int vaultCount(GuildStore.Guild g) {
         int n = 0;
+        var live = OPEN.get(g.id);
+        if (live != null) {
+            for (int i = 0; i < live.getContainerSize(); i++) if (!live.getItem(i).isEmpty()) n++;
+            return n;
+        }
         for (var s : g.vault) if (s != null && !s.isEmpty()) n++;
         return n;
     }

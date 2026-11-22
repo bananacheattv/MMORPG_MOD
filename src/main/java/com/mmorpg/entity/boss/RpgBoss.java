@@ -370,7 +370,10 @@ public abstract class RpgBoss extends RpgMonster {
         }
         float frac = hpFraction();
         int newPhase = frac > 0.75f ? 1 : frac > 0.5f ? 2 : frac > 0.25f ? 3 : 4;
-        if (newPhase != phase) {
+        MobData saved = this.getExistingDataOrNull(ModAttachments.MOB);
+        if (saved != null && saved.phase > phase) phase = Math.min(4, saved.phase);   // phase sauvegardee (rechargement) : ni annonce ni renforts rejoues
+        // les phases ne reculent jamais : un soin (drain de la liche, mobs soigneurs) ne rejoue pas annonce, renforts ni noyau expose
+        if (newPhase > phase) {
             phase = newPhase;
             MobData d = this.getExistingDataOrNull(ModAttachments.MOB);
             if (d != null) {

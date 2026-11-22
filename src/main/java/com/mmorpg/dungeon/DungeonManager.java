@@ -91,7 +91,10 @@ public final class DungeonManager {
             ArenaEvents.forgetKey(group);
             closeGate(level, t);
             for (int k = 0; k * 3 + 2 < t.pads().size() && k * 2 < t.states().size(); k++) {
-                level.setBlock(new BlockPos(t.pads().get(k * 3), t.pads().get(k * 3 + 1), t.pads().get(k * 3 + 2)), TrialManager.state(t.states().get(k * 2)), 3);
+                BlockPos pad = new BlockPos(t.pads().get(k * 3), t.pads().get(k * 3 + 1), t.pads().get(k * 3 + 2));
+                level.setBlock(pad, TrialManager.state(t.states().get(k * 2)), 3);
+                // la lumiere posee au-dessus d'une dalle allumee (TrialManager.light) part avec elle
+                if (level.getBlockState(pad.above()).is(net.minecraft.world.level.block.Blocks.LIGHT)) level.setBlock(pad.above(), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
             }
             data.markUndone(t.id());
             n++;

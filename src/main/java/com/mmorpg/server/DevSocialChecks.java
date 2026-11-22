@@ -66,6 +66,10 @@ public final class DevSocialChecks {
             com.mmorpg.competition.DevArenaChecks.run(p);
             var raid=CompetitionWorld.raid(new net.minecraft.core.BlockPos(500,100,4000),0);var fire=CompetitionWorld.arena(CompetitionWorld.center(0),ArenaRules.Kind.FEU);check(raid.blocks.size()>4000&&fire.blocks.size()>15000,"real decorated arena and trial geometry generated");
             for(var type:com.mmorpg.registry.ModEntities.GUILD_GUARDIANS){var boss=type.get().create(p.level(),net.minecraft.world.entity.EntitySpawnReason.COMMAND);check(boss!=null&&boss.getBbHeight()>=5,"giant guardian registered with large hitbox");boss.initialize();check(boss.rpgData().boss&&boss.rpgData().maxHp>=3500,"guardian RPG combat stats initialized");}
+            // dissolution : refusee tant que le coffre de guilde contient des objets (ils seraient perdus)
+            GuildStore.access(server,true,s->{var g=GuildStore.byId(s,id);g.gold=0;g.vault=new ArrayList<>(java.util.Collections.nCopies(27,""));g.vault.set(4,"{\"id\":\"minecraft:diamond\",\"count\":3}");return null;});
+            var disband=packet("disband","confirm","Racines du Test");GuildService.action(p,disband);check(GuildStore.access(server,false,s->GuildStore.byId(s,id))!=null,"disband refused while the guild vault holds items");
+            GuildStore.access(server,true,s->{GuildStore.byId(s,id).vault.set(4,"");return null;});GuildService.action(p,disband);check(GuildStore.access(server,false,s->GuildStore.byId(s,id))==null,"empty guild disbanded");
             com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] GUILDS_ARENAS PASS: creation, ranks, invites, treasury, crash recovery, corruption refusal, XP/boss/gold upgrades, buffs, brackets, crystal timing, kills, win and ten guardians");
         }finally{GuildService.devBypass=false;NetworkPlayers.logout(p);NetworkPlayers.logout(member);RpgPlayers.get(p).gold=oldGold;NetworkConfig.current=original;}
     }

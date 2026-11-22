@@ -55,7 +55,8 @@ public final class DevCharacterChecks {
         check(store.slots.get(0).snapshot != null && store.slots.get(0).level == 12 && store.slots.get(1).name.equals("Elara"), "fiche : personnage 0 range, personnage 1 resume");
         // guildes separees : le personnage 1 fonde sa guilde, le 0 n'en a pas
         n.gold = 100;
-        GuildService.action(p, packet("create", 0, "name", "Cendres de Test"));
+        GuildService.devBypass = true;                                 // creation hors de la gardienne Elyra (le controle porte sur les personnages)
+        try { GuildService.action(p, packet("create", 0, "name", "Cendres de Test")); } finally { GuildService.devBypass = false; }
         var g1 = GuildStore.access(server, false, s -> GuildStore.of(s, CharKey.of(p)));
         check(g1 != null && g1.members.containsKey(CharKey.key(account, 1)) && !g1.members.containsKey(account), "guilde du personnage 1");
         // retour au personnage 0

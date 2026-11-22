@@ -582,6 +582,7 @@ public final class TrialManager {
         SIMON.remove(id);
         ORDER.remove(id);
         HITS.remove(id);
+        SEEN.removeIf(k -> k.length() == 36 + id.length() && k.endsWith(id));      // consigne reaffichee a la prochaine expedition
     }
 
     /** Enigme d'ordre : la sequence est gravee dans le couloir d'entree, les dalles gardent leur lumiere tant que l'ordre est bon. */

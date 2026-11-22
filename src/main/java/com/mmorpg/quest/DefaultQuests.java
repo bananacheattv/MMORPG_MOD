@@ -206,9 +206,13 @@ public final class DefaultQuests {
         return java.util.Set.copyOf(ids);
     }
 
-    /** Identifiants des quetes du tutoriel, dans l'ordre. */
+    /** Identifiants des quetes du tutoriel, dans l'ordre (calcules une fois : la Mascotte les consulte a chaque tick). */
     public static java.util.List<String> tutorialIds() {
-        return java.util.List.copyOf(tutorial().keySet());
+        return TutorialIds.IDS;
+    }
+
+    private static final class TutorialIds {
+        static final java.util.List<String> IDS = java.util.List.copyOf(tutorial().keySet());
     }
 
     public static Map<String, QuestDef> create() {

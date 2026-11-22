@@ -151,10 +151,31 @@ public final class ServerEvents {
     /** Interdit de jeter des objets (sauf admins) ; interrupteur « drop_objets » (actif = drop interdit). */
     @net.neoforged.bus.api.SubscribeEvent
     public static void onTossForbidden(net.neoforged.neoforge.event.entity.item.ItemTossEvent event) {
-        if (!(event.getPlayer() instanceof net.minecraft.server.level.ServerPlayer p)) return;
+        if (event.isCanceled() || !(event.getPlayer() instanceof net.minecraft.server.level.ServerPlayer p)) return;
         if (com.mmorpg.admin.PlayerAdmin.allowed(p)) return;
         if (!FeatureFlags.enabled(p.level().getServer(), "drop_objets")) return;
-        event.setCanceled(true);
-        p.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Il est interdit de jeter des objets.").withColor(0xFF8080));
+        if (refuseToss(p, event)) p.sendOverlayMessage(net.minecraft.network.chat.Component.literal("Il est interdit de jeter des objets.").withColor(0xFF8080));
+    }
+
+    /**
+     * Refuse un lancer sans detruire l'objet : NeoForge l'a deja retire de l'inventaire, annuler seul le ferait disparaitre (touche Q,
+     * glisser hors de l'inventaire, objet rendu inventaire plein). L'objet revient dans l'inventaire ; ce qui n'y tient pas tombe au sol.
+     * @return vrai si tout est revenu (lancer annule)
+     */
+    public static boolean refuseToss(net.minecraft.server.level.ServerPlayer p, net.neoforged.neoforge.event.entity.item.ItemTossEvent event) {
+        var stack = event.getEntity().getItem().copy();
+        var inv = p.getInventory();
+        if (inv.getSelectedItem().isEmpty()) {
+            inv.setItem(inv.getSelectedSlot(), stack);
+            stack = net.minecraft.world.item.ItemStack.EMPTY;
+        } else {
+            inv.add(stack);
+        }
+        if (stack.isEmpty()) {
+            event.setCanceled(true);
+            return true;
+        }
+        event.getEntity().setItem(stack);
+        return false;
     }
 }

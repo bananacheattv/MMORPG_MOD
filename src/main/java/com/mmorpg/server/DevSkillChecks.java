@@ -15,6 +15,12 @@ public final class DevSkillChecks {
         if (!yes) throw new AssertionError("skills: " + message);
     }
 
+    private static boolean forcedReady(ServerLevel level) {
+        for (int cx = -2; cx <= 1; cx++) for (int cz = -2; cz <= 1; cz++)
+            if (!level.isPositionEntityTicking(new net.minecraft.core.BlockPos(cx * 16, 64, cz * 16))) return false;
+        return true;
+    }
+
     public static void run(ServerPlayer p) {
         ServerLevel level = p.level();
         var d = RpgPlayers.get(p);
@@ -35,7 +41,17 @@ public final class DevSkillChecks {
             p.setXRot(0); p.setYRot(0);
             for (int cx = -2; cx <= 1; cx++) for (int cz = -2; cz <= 1; cz++) level.setChunkForced(cx, cz, true);
             for (int cx = -2; cx <= 1; cx++) for (int cz = -2; cz <= 1; cz++) level.getChunk(cx, cz);
-            p.setPos(0.5, level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, 0, 0) + 1, 0.5);
+            // la promotion des troncons forces (entites visibles et actives) passe par la file de taches du serveur : on la vide,
+            // sinon une invocation dans un troncon tout juste charge reste invisible jusqu'au tick suivant (echec aleatoire de la chimere)
+            long until = System.nanoTime() + 2_000_000_000L;
+            while (!forcedReady(level) && System.nanoTime() < until) if (!level.getChunkSource().pollTask()) Thread.onSpinWait();
+            // couloir plat : le relief du monde de test (arbres, pentes) arretait l'esquive apres un bloc
+            int floor = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, 0, 0);
+            for (int x = -2; x <= 2; x++) for (int z = -9; z <= 3; z++) {
+                level.setBlockAndUpdate(new net.minecraft.core.BlockPos(x, floor - 1, z), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+                for (int dy = 0; dy <= 3; dy++) level.setBlockAndUpdate(new net.minecraft.core.BlockPos(x, floor + dy, z), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+            }
+            p.setPos(0.5, floor, 0.5);
             Scheduler.beginTest();
             Vec3 start = p.position();
             check(SkillExecutor.cast(p, Skills.get("esquive")), "esquive cast");

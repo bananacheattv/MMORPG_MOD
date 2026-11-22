@@ -56,13 +56,22 @@ public final class DevSpawnEditorChecks {
               for(int cx=-1;cx<=1;cx++)for(int cz=-1;cz<=1;cz++)pl.setChunkForced((pat.getX()>>4)+cx,(pat.getZ()>>4)+cz,true);
               pl.getChunkSource().tick(()->true,true);pl.getChunkAt(pat);
               var box=new net.minecraft.world.phys.AABB(40130,80,40080,40170,110,40120);
-              var oldLv=p.level();var oldPos=p.position();p.teleportTo(pl,pat.getX(),pat.getY(),pat.getZ(),java.util.Set.of(),0,0,true);
+              // les plaines codees en dur n'existent plus : le butin direct vaut pour les zones de chasse declarees (zones_chasse.json)
+              var hunt=new com.mmorpg.zone.HuntZones.Zone();hunt.id="controle_butin_direct";hunt.dimension=pl.dimension().identifier().toString();
+              hunt.x1=40130;hunt.y1=80;hunt.z1=40080;hunt.x2=40169;hunt.y2=109;hunt.z2=40119;
+              try{com.mmorpg.zone.HuntZones.put(hunt);}catch(java.io.IOException e){throw new AssertionError("hunt zone saved",e);}
+              var oldLv=p.level();var oldPos=p.position();
+              try{
+              p.teleportTo(pl,pat.getX(),pat.getY(),pat.getZ(),java.util.Set.of(),0,0,true);
+              LoadingShield.clear(p);          // bouclier d'un controle de donjon precedent : le faux client ne signale jamais la fin du chargement
               int inv0=0;for(int i=0;i<36;i++)inv0+=p.getInventory().getItem(i).getCount();long gold0=RpgPlayers.get(p).gold;
-              for(int i=0;i<40;i++){var gob=MobSpawner.spawnForCommand(pl,"gobelin",pat,5);if(gob instanceof net.minecraft.world.entity.LivingEntity le)com.mmorpg.combat.RpgCombat.dealDamage(p,le,1e7,false,false);}
+              int spawned=0,killed=0;for(int i=0;i<40;i++){var gob=MobSpawner.spawnForCommand(pl,"gobelin",pat,5);if(gob instanceof net.minecraft.world.entity.LivingEntity le){spawned++;com.mmorpg.combat.RpgCombat.dealDamage(p,le,1e7,false,false);if(!le.isAlive())killed++;}}
               int inv1=0;for(int i=0;i<36;i++)inv1+=p.getInventory().getItem(i).getCount();
               
-              check(pl.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,box).isEmpty(),"plains mobs leave no item on the ground");
-              check(inv1>inv0&&RpgPlayers.get(p).gold>gold0,"plains loot and gold go straight to the killer");p.teleportTo((net.minecraft.server.level.ServerLevel)oldLv,oldPos.x,oldPos.y,oldPos.z,java.util.Set.of(),0,0,true);}}
+              check(pl.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,box).isEmpty(),"hunt zone mobs leave no item on the ground");
+              check(inv1>inv0&&RpgPlayers.get(p).gold>gold0,"hunt zone loot and gold go straight to the killer (spawned "+spawned+", killed "+killed+", items "+inv0+"->"+inv1+", gold "+gold0+"->"+RpgPlayers.get(p).gold+", in zone "+com.mmorpg.zone.HuntZones.at(pl,pat.getX()+.5,pat.getY(),pat.getZ()+.5).isPresent()+")");
+              }finally{try{com.mmorpg.zone.HuntZones.remove(hunt.id);}catch(java.io.IOException e){throw new AssertionError("hunt zone removed",e);}}
+              p.teleportTo((net.minecraft.server.level.ServerLevel)oldLv,oldPos.x,oldPos.y,oldPos.z,java.util.Set.of(),0,0,true);}}
             p.getFoodData().setFoodLevel(4);ServerEvents.onPlayerTick(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(p));
             check(p.getFoodData().getFoodLevel()==20,"hunger restored in every world");
             check(com.mmorpg.item.RpgBowItem.rpgPowerForTime(0)==0&&com.mmorpg.item.RpgBowItem.rpgPowerForTime(9)<1&&com.mmorpg.item.RpgBowItem.rpgPowerForTime(10)==1,"bows reach full power at 10 ticks");

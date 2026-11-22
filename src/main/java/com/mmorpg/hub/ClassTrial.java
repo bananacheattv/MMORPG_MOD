@@ -342,8 +342,9 @@ public final class ClassTrial {
 
     @SubscribeEvent
     public static void onToss(ItemTossEvent event) {
-        if (event.getPlayer() instanceof ServerPlayer p && data(p).inTrial) {
-            event.setCanceled(true);
+        if (!event.isCanceled() && event.getPlayer() instanceof ServerPlayer p && data(p).inTrial) {
+            // l'objet revient dans l'inventaire de l'essai (annuler seul le detruirait) ; inventaire plein : il ne sort pas de l'essai
+            if (!com.mmorpg.server.ServerEvents.refuseToss(p, event)) event.setCanceled(true);
             p.sendOverlayMessage(Component.literal("Les objets de l'essai ne peuvent pas être jetés.").withColor(0xFF8080));
         }
     }

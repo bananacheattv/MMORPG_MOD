@@ -327,7 +327,9 @@ public final class QuestManager {
             for (int i = 0; i < inv.getContainerSize() && !has; i++) has = inv.getItem(i).is(it);
             if (!has) toGive.add(new net.minecraft.world.item.ItemStack(it, ir.count));
         }
-        if (!toGive.isEmpty() && p.getInventory().getFreeSlot() < 0) {
+        int free = 0;
+        for (int i = 0; i < 36; i++) if (p.getInventory().getItem(i).isEmpty()) free++;
+        if (free < toGive.size()) {                                       // une case par outil remis
             p.sendOverlayMessage(Component.literal("Inventaire plein : libère une place pour recevoir l'outil de la quête.").withColor(0xFF5050));
             return false;
         }

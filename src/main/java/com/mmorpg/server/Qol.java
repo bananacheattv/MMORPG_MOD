@@ -57,13 +57,16 @@ public final class Qol {
         p.containerMenu.broadcastChanges();
     }
 
+    /** Coffres seulement (comme le bouton du client) ; les cases verrouillees ou speciales (sacs equipes, capacite fermee) ne bougent pas. */
     public static void sortContainer(ServerPlayer p) {
-        if (p.containerMenu == p.inventoryMenu) return;
+        if (!(p.containerMenu instanceof net.minecraft.world.inventory.ChestMenu)) return;
         List<Slot> slots = new ArrayList<>();
-        for (Slot s : p.containerMenu.slots) if (!(s.container instanceof Inventory)) slots.add(s);
+        for (Slot s : p.containerMenu.slots)
+            if (!(s.container instanceof Inventory) && s.isActive() && s.mayPickup(p) && s.getMaxStackSize() >= 64) slots.add(s);
         List<ItemStack> stacks = new ArrayList<>();
         for (Slot s : slots) stacks.add(s.getItem());
         List<ItemStack> sorted = sorted(stacks, slots.size());
+        for (int i = 0; i < slots.size(); i++) if (!sorted.get(i).isEmpty() && !slots.get(i).mayPlace(sorted.get(i))) return;   // une case refuserait l'objet : rien ne bouge
         for (int i = 0; i < slots.size(); i++) slots.get(i).set(sorted.get(i));
         p.containerMenu.broadcastChanges();
     }
