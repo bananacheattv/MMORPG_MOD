@@ -1,84 +1,84 @@
 {
  "regions": {
   "Valdhéris et les Contreforts": [
-   120,
+   0,
    0
   ],
   "Bois de Murmurelle": [
-   -129,
-   118
+   -230,
+   45
   ],
   "Marais de Fangeterre": [
-   20,
-   -229
+   -245,
+   220
   ],
   "Mines de Creuse-Braise": [
-   173,
-   226
+   -315,
+   -150
   ],
   "Marches du Rempart": [
-   -335,
-   -59
+   -80,
+   -160
   ],
   "Plaines de Cendrelune": [
-   333,
-   -212
+   140,
+   -95
   ],
   "Ruines de Haute-Cadette": [
-   -116,
-   435
+   110,
+   155
   ],
   "Désert de Verre": [
-   -233,
-   -448
+   210,
+   -175
   ],
   "Vallée de Refuge-Bas": [
-   526,
-   192
+   260,
+   145
   ],
   "Terres du Fort de la Brisure": [
-   -568,
-   235
+   345,
+   -190
   ],
   "Pics d'Hivernoir": [
-   283,
-   -607
+   -200,
+   -185
   ],
   "Forêt Pétrifiée": [
-   218,
-   691
+   -315,
+   -5
   ],
   "Abysses de Sombrelac": [
-   -675,
-   -390
+   -105,
+   -320
   ],
   "Faille des Murmures": [
-   815,
-   -181
+   330,
+   65
   ],
   "Marches Renégates": [
-   -510,
-   729
+   -165,
+   325
   ],
   "Lisières du Cratère": [
-   -123,
-   -937
+   265,
+   -310
   ],
   "Forge de Malvorn": [
-   766,
-   643
+   140,
+   -315
   ],
   "Nécropole d'Aelis": [
-   -1054,
-   46
+   55,
+   305
   ],
   "Entre-Monde": [
-   785,
-   -785
+   280,
+   323
   ],
   "Cœur de la Brisure": [
-   -51,
-   1164
+   300,
+   -19
   ]
  },
  "npcs": [
@@ -420,8 +420,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Ferraille Gobeline : butin des Gobelins des forêts et plaines.",
    "dim": "openworld",
    "region": "Valdhéris et les Contreforts",
-   "dx": 8,
-   "dz": 0
+   "dx": -12,
+   "dz": -1
   },
   {
    "id": "world_001",
@@ -431,8 +431,8 @@
    "dialogue": "Un survivant cherche à rejoindre les siens.",
    "dim": "openworld",
    "region": "Valdhéris et les Contreforts",
-   "dx": -17,
-   "dz": 16
+   "dx": 11,
+   "dz": 3
   },
   {
    "id": "world_002",
@@ -442,8 +442,8 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Écorce Ancienne : butin des monstres de forêt et de plaines.",
    "dim": "openworld",
    "region": "Valdhéris et les Contreforts",
-   "dx": 3,
-   "dz": -29
+   "dx": 12,
+   "dz": -17
   },
   {
    "id": "world_003",
@@ -453,8 +453,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Valdhéris et les Contreforts",
-   "dx": 21,
-   "dz": 27
+   "dx": 4,
+   "dz": 18
   },
   {
    "id": "world_004",
@@ -464,8 +464,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Valdhéris et les Contreforts",
-   "dx": -37,
-   "dz": -7
+   "dx": -19,
+   "dz": -21
   },
   {
    "id": "world_005",
@@ -475,8 +475,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Valdhéris et les Contreforts",
-   "dx": 35,
-   "dz": -22
+   "dx": 22,
+   "dz": 16
   },
   {
    "id": "world_006",
@@ -486,8 +486,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Valdhéris et les Contreforts",
-   "dx": -12,
-   "dz": 43
+   "dx": -19,
+   "dz": 16
   },
   {
    "id": "world_007",
@@ -497,8 +497,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Valdhéris et les Contreforts",
-   "dx": -22,
-   "dz": -42
+   "dx": 29,
+   "dz": -5
   },
   {
    "id": "world_008",
@@ -508,8 +508,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Croc de Loup Sombre : butin des Loups Sombres, la nuit.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": 8,
-   "dz": 0
+   "dx": 10,
+   "dz": -8
   },
   {
    "id": "world_009",
@@ -519,8 +519,8 @@
    "dialogue": "Un survivant cherche à rejoindre les siens.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": -17,
-   "dz": 16
+   "dx": -19,
+   "dz": 12
   },
   {
    "id": "world_010",
@@ -530,8 +530,8 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Racine de Lueur : se cultive avec une graine de Lueur plantée à la houe, métier Fermier.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": 3,
-   "dz": -29
+   "dx": 27,
+   "dz": -5
   },
   {
    "id": "world_011",
@@ -541,8 +541,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": 21,
-   "dz": 27
+   "dx": -16,
+   "dz": -4
   },
   {
    "id": "world_012",
@@ -552,8 +552,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": -37,
-   "dz": -7
+   "dx": 0,
+   "dz": 6
   },
   {
    "id": "world_013",
@@ -563,8 +563,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": 35,
-   "dz": -22
+   "dx": 19,
+   "dz": 16
   },
   {
    "id": "world_014",
@@ -574,8 +574,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": -12,
-   "dz": 43
+   "dx": 2,
+   "dz": -28
   },
   {
    "id": "world_015",
@@ -585,8 +585,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": -22,
-   "dz": -42
+   "dx": -19,
+   "dz": -20
   },
   {
    "id": "world_016",
@@ -596,8 +596,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": 47,
-   "dz": 17
+   "dx": -4,
+   "dz": 27
   },
   {
    "id": "world_017",
@@ -607,8 +607,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": -49,
-   "dz": 20
+   "dx": 115,
+   "dz": 106
   },
   {
    "id": "world_018",
@@ -618,8 +618,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": 23,
-   "dz": -50
+   "dx": 123,
+   "dz": 77
   },
   {
    "id": "world_019",
@@ -629,8 +629,8 @@
    "dialogue": "Le chronomètre démarre à l'acceptation.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": 17,
-   "dz": 55
+   "dx": 92,
+   "dz": 63
   },
   {
    "id": "world_020",
@@ -640,8 +640,8 @@
    "dialogue": "Le chronomètre démarre à l'acceptation.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": -52,
-   "dz": -30
+   "dx": 77,
+   "dz": 101
   },
   {
    "id": "world_021",
@@ -651,8 +651,8 @@
    "dialogue": "Le chronomètre démarre à l'acceptation.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": 61,
-   "dz": -13
+   "dx": 94,
+   "dz": 97
   },
   {
    "id": "world_022",
@@ -662,8 +662,8 @@
    "dialogue": "Le chronomètre démarre à l'acceptation.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": -37,
-   "dz": 53
+   "dx": 139,
+   "dz": -21
   },
   {
    "id": "world_023",
@@ -673,8 +673,8 @@
    "dialogue": "Le chronomètre démarre à l'acceptation.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": -9,
-   "dz": -66
+   "dx": 114,
+   "dz": -31
   },
   {
    "id": "world_024",
@@ -684,8 +684,8 @@
    "dialogue": "Le chronomètre démarre à l'acceptation.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": 52,
-   "dz": 44
+   "dx": 97,
+   "dz": -26
   },
   {
    "id": "world_025",
@@ -695,8 +695,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Mucus Acide : butin des monstres des marais.",
    "dim": "openworld",
    "region": "Marais de Fangeterre",
-   "dx": 8,
-   "dz": 0
+   "dx": 14,
+   "dz": -1
   },
   {
    "id": "world_026",
@@ -706,8 +706,8 @@
    "dialogue": "Un survivant cherche à rejoindre les siens.",
    "dim": "openworld",
    "region": "Marais de Fangeterre",
-   "dx": -17,
-   "dz": 16
+   "dx": -12,
+   "dz": -20
   },
   {
    "id": "world_027",
@@ -717,8 +717,8 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Goujon des marais : se pêche à la canne dans les marais, métier Pêcheur.",
    "dim": "openworld",
    "region": "Marais de Fangeterre",
-   "dx": 3,
-   "dz": -29
+   "dx": 18,
+   "dz": 19
   },
   {
    "id": "world_028",
@@ -728,8 +728,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Marais de Fangeterre",
-   "dx": 21,
-   "dz": 27
+   "dx": -3,
+   "dz": -5
   },
   {
    "id": "world_029",
@@ -739,8 +739,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Marais de Fangeterre",
-   "dx": -37,
-   "dz": -7
+   "dx": -17,
+   "dz": 5
   },
   {
    "id": "world_030",
@@ -750,8 +750,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Marais de Fangeterre",
-   "dx": 35,
-   "dz": -22
+   "dx": -8,
+   "dz": 28
   },
   {
    "id": "world_031",
@@ -761,8 +761,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Marais de Fangeterre",
-   "dx": -12,
-   "dz": 43
+   "dx": -112,
+   "dz": -67
   },
   {
    "id": "world_032",
@@ -772,8 +772,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Marais de Fangeterre",
-   "dx": -22,
-   "dz": -42
+   "dx": -86,
+   "dz": -52
   },
   {
    "id": "world_033",
@@ -783,8 +783,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Marais de Fangeterre",
-   "dx": 47,
-   "dz": 17
+   "dx": -67,
+   "dz": -61
   },
   {
    "id": "world_034",
@@ -794,8 +794,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Marais de Fangeterre",
-   "dx": -49,
-   "dz": 20
+   "dx": -112,
+   "dz": -50
   },
   {
    "id": "world_035",
@@ -805,8 +805,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Marais de Fangeterre",
-   "dx": 23,
-   "dz": -50
+   "dx": -85,
+   "dz": -82
   },
   {
    "id": "world_036",
@@ -816,8 +816,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Poussière d'Âme : butin des morts-vivants.",
    "dim": "openworld",
    "region": "Mines de Creuse-Braise",
-   "dx": 8,
-   "dz": 0
+   "dx": 7,
+   "dz": -8
   },
   {
    "id": "world_037",
@@ -827,8 +827,8 @@
    "dialogue": "Un survivant cherche à rejoindre les siens.",
    "dim": "openworld",
    "region": "Mines de Creuse-Braise",
-   "dx": -17,
-   "dz": 16
+   "dx": -9,
+   "dz": -4
   },
   {
    "id": "world_038",
@@ -838,8 +838,8 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Lingot de Verdite : s'obtient en minant les veines de Verdite des Mines d'Aeloria, métier Mineur.",
    "dim": "openworld",
    "region": "Mines de Creuse-Braise",
-   "dx": 3,
-   "dz": -29
+   "dx": -8,
+   "dz": 16
   },
   {
    "id": "world_039",
@@ -849,8 +849,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Mines de Creuse-Braise",
-   "dx": 21,
-   "dz": 27
+   "dx": 8,
+   "dz": -28
   },
   {
    "id": "world_040",
@@ -860,8 +860,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Mines de Creuse-Braise",
-   "dx": -37,
-   "dz": -7
+   "dx": 9,
+   "dz": 28
   },
   {
    "id": "world_041",
@@ -871,8 +871,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Mines de Creuse-Braise",
-   "dx": 35,
-   "dz": -22
+   "dx": -24,
+   "dz": -12
   },
   {
    "id": "world_042",
@@ -882,8 +882,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Mines de Creuse-Braise",
-   "dx": -12,
-   "dz": 43
+   "dx": 29,
+   "dz": 7
   },
   {
    "id": "world_043",
@@ -893,8 +893,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Mines de Creuse-Braise",
-   "dx": -22,
-   "dz": -42
+   "dx": -28,
+   "dz": 5
   },
   {
    "id": "world_044",
@@ -904,8 +904,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Acier Orc : butin des Orcs Guerriers.",
    "dim": "openworld",
    "region": "Marches du Rempart",
-   "dx": 8,
-   "dz": 0
+   "dx": -5,
+   "dz": -38
   },
   {
    "id": "world_045",
@@ -915,8 +915,8 @@
    "dialogue": "Un survivant cherche à rejoindre les siens.",
    "dim": "openworld",
    "region": "Marches du Rempart",
-   "dx": -17,
-   "dz": 16
+   "dx": -12,
+   "dz": 2
   },
   {
    "id": "world_046",
@@ -926,8 +926,8 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Sang d'Orc : butin des Orcs Guerriers.",
    "dim": "openworld",
    "region": "Marches du Rempart",
-   "dx": 3,
-   "dz": -29
+   "dx": 39,
+   "dz": -19
   },
   {
    "id": "world_047",
@@ -937,8 +937,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Marches du Rempart",
-   "dx": 21,
-   "dz": 27
+   "dx": -23,
+   "dz": -23
   },
   {
    "id": "world_048",
@@ -948,8 +948,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Marches du Rempart",
-   "dx": -37,
-   "dz": -7
+   "dx": -4,
+   "dz": -14
   },
   {
    "id": "world_049",
@@ -959,8 +959,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Marches du Rempart",
-   "dx": 35,
-   "dz": -22
+   "dx": -30,
+   "dz": 29
   },
   {
    "id": "world_050",
@@ -970,8 +970,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Marches du Rempart",
-   "dx": -12,
-   "dz": 43
+   "dx": 37,
+   "dz": 23
   },
   {
    "id": "world_051",
@@ -981,8 +981,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Marches du Rempart",
-   "dx": -22,
-   "dz": -42
+   "dx": 28,
+   "dz": 4
   },
   {
    "id": "world_052",
@@ -992,8 +992,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Marches du Rempart",
-   "dx": 47,
-   "dz": 17
+   "dx": -39,
+   "dz": 13
   },
   {
    "id": "world_053",
@@ -1003,8 +1003,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Marches du Rempart",
-   "dx": -49,
-   "dz": 20
+   "dx": 14,
+   "dz": -42
   },
   {
    "id": "world_054",
@@ -1014,8 +1014,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Marches du Rempart",
-   "dx": 23,
-   "dz": -50
+   "dx": 12,
+   "dz": 18
   },
   {
    "id": "world_055",
@@ -1025,8 +1025,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Carapace de Cuivre : butin des monstres du désert.",
    "dim": "openworld",
    "region": "Plaines de Cendrelune",
-   "dx": 8,
-   "dz": 0
+   "dx": -16,
+   "dz": -20
   },
   {
    "id": "world_056",
@@ -1036,8 +1036,8 @@
    "dialogue": "Un survivant cherche à rejoindre les siens.",
    "dim": "openworld",
    "region": "Plaines de Cendrelune",
-   "dx": -17,
-   "dz": 16
+   "dx": 37,
+   "dz": 0
   },
   {
    "id": "world_057",
@@ -1047,8 +1047,8 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Crin Cendré : butin des Hyènes cendrées du désert et de la savane.",
    "dim": "openworld",
    "region": "Plaines de Cendrelune",
-   "dx": 3,
-   "dz": -29
+   "dx": -27,
+   "dz": 11
   },
   {
    "id": "world_058",
@@ -1058,8 +1058,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Plaines de Cendrelune",
-   "dx": 21,
-   "dz": 27
+   "dx": 2,
+   "dz": -17
   },
   {
    "id": "world_059",
@@ -1069,8 +1069,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Plaines de Cendrelune",
-   "dx": -37,
-   "dz": -7
+   "dx": 17,
+   "dz": -8
   },
   {
    "id": "world_060",
@@ -1080,8 +1080,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Plaines de Cendrelune",
-   "dx": 35,
-   "dz": -22
+   "dx": 19,
+   "dz": -32
   },
   {
    "id": "world_061",
@@ -1091,8 +1091,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Plaines de Cendrelune",
-   "dx": -12,
-   "dz": 43
+   "dx": -32,
+   "dz": -18
   },
   {
    "id": "world_062",
@@ -1102,8 +1102,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Plaines de Cendrelune",
-   "dx": -22,
-   "dz": -42
+   "dx": -26,
+   "dz": 34
   },
   {
    "id": "world_063",
@@ -1113,8 +1113,8 @@
    "dialogue": "Le chronomètre démarre à l'acceptation.",
    "dim": "openworld",
    "region": "Plaines de Cendrelune",
-   "dx": 47,
-   "dz": 17
+   "dx": 2,
+   "dz": 30
   },
   {
    "id": "world_064",
@@ -1124,8 +1124,8 @@
    "dialogue": "Le chronomètre démarre à l'acceptation.",
    "dim": "openworld",
    "region": "Plaines de Cendrelune",
-   "dx": -49,
-   "dz": 20
+   "dx": 0,
+   "dz": -44
   },
   {
    "id": "world_065",
@@ -1135,8 +1135,8 @@
    "dialogue": "Le chronomètre démarre à l'acceptation.",
    "dim": "openworld",
    "region": "Plaines de Cendrelune",
-   "dx": 23,
-   "dz": -50
+   "dx": 25,
+   "dz": 21
   },
   {
    "id": "world_066",
@@ -1146,8 +1146,8 @@
    "dialogue": "Le chronomètre démarre à l'acceptation.",
    "dim": "openworld",
    "region": "Plaines de Cendrelune",
-   "dx": 17,
-   "dz": 55
+   "dx": 18,
+   "dz": 41
   },
   {
    "id": "world_067",
@@ -1157,8 +1157,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Fragment d'Ossuaire : butin des monstres des cryptes.",
    "dim": "openworld",
    "region": "Ruines de Haute-Cadette",
-   "dx": 8,
-   "dz": 0
+   "dx": -27,
+   "dz": -2
   },
   {
    "id": "world_068",
@@ -1169,7 +1169,7 @@
    "dim": "openworld",
    "region": "Ruines de Haute-Cadette",
    "dx": -17,
-   "dz": 16
+   "dz": 11
   },
   {
    "id": "world_069",
@@ -1180,7 +1180,7 @@
    "dim": "openworld",
    "region": "Ruines de Haute-Cadette",
    "dx": 3,
-   "dz": -29
+   "dz": 13
   },
   {
    "id": "world_070",
@@ -1190,8 +1190,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Ruines de Haute-Cadette",
-   "dx": 21,
-   "dz": 27
+   "dx": 25,
+   "dz": -2
   },
   {
    "id": "world_071",
@@ -1201,8 +1201,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Ruines de Haute-Cadette",
-   "dx": -37,
-   "dz": -7
+   "dx": 0,
+   "dz": -17
   },
   {
    "id": "world_072",
@@ -1212,8 +1212,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Ruines de Haute-Cadette",
-   "dx": 35,
-   "dz": -22
+   "dx": 16,
+   "dz": -21
   },
   {
    "id": "world_073",
@@ -1223,8 +1223,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Ruines de Haute-Cadette",
-   "dx": -12,
-   "dz": 43
+   "dx": 52,
+   "dz": 57
   },
   {
    "id": "world_074",
@@ -1234,8 +1234,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Ruines de Haute-Cadette",
-   "dx": -22,
-   "dz": -42
+   "dx": 70,
+   "dz": 58
   },
   {
    "id": "world_075",
@@ -1245,7 +1245,7 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Ruines de Haute-Cadette",
-   "dx": 47,
+   "dx": 57,
    "dz": 17
   },
   {
@@ -1256,8 +1256,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Ruines de Haute-Cadette",
-   "dx": -49,
-   "dz": 20
+   "dx": 21,
+   "dz": 41
   },
   {
    "id": "world_077",
@@ -1267,8 +1267,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Ruines de Haute-Cadette",
-   "dx": 23,
-   "dz": -50
+   "dx": 35,
+   "dz": 57
   },
   {
    "id": "world_078",
@@ -1278,8 +1278,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Bandelette Ancienne : butin des monstres du désert.",
    "dim": "openworld",
    "region": "Désert de Verre",
-   "dx": 8,
-   "dz": 0
+   "dx": 4,
+   "dz": 11
   },
   {
    "id": "world_079",
@@ -1289,8 +1289,8 @@
    "dialogue": "Un survivant cherche à rejoindre les siens.",
    "dim": "openworld",
    "region": "Désert de Verre",
-   "dx": -17,
-   "dz": 16
+   "dx": -12,
+   "dz": -2
   },
   {
    "id": "world_080",
@@ -1300,8 +1300,8 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Dard de Scorpion : butin des Scorpions de cuivre du désert.",
    "dim": "openworld",
    "region": "Désert de Verre",
-   "dx": 3,
-   "dz": -29
+   "dx": 15,
+   "dz": -19
   },
   {
    "id": "world_081",
@@ -1311,8 +1311,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Désert de Verre",
-   "dx": 21,
-   "dz": 27
+   "dx": 28,
+   "dz": -4
   },
   {
    "id": "world_082",
@@ -1322,8 +1322,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Désert de Verre",
-   "dx": -37,
-   "dz": -7
+   "dx": -19,
+   "dz": -18
   },
   {
    "id": "world_083",
@@ -1333,8 +1333,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Désert de Verre",
-   "dx": 35,
-   "dz": -22
+   "dx": 1,
+   "dz": -27
   },
   {
    "id": "world_084",
@@ -1344,8 +1344,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Désert de Verre",
-   "dx": -12,
-   "dz": 43
+   "dx": -4,
+   "dz": 28
   },
   {
    "id": "world_085",
@@ -1355,8 +1355,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Désert de Verre",
-   "dx": -22,
-   "dz": -42
+   "dx": 23,
+   "dz": 15
   },
   {
    "id": "world_086",
@@ -1366,8 +1366,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Blé d'Argent : se cultive avec une graine d'Argent, Fermier niveau 18.",
    "dim": "openworld",
    "region": "Vallée de Refuge-Bas",
-   "dx": 8,
-   "dz": 0
+   "dx": -4,
+   "dz": 25
   },
   {
    "id": "world_087",
@@ -1377,8 +1377,8 @@
    "dialogue": "Un survivant cherche à rejoindre les siens.",
    "dim": "openworld",
    "region": "Vallée de Refuge-Bas",
-   "dx": -17,
-   "dz": 16
+   "dx": 14,
+   "dz": 21
   },
   {
    "id": "world_088",
@@ -1388,8 +1388,8 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Baie Ambrée : se cultive avec une graine Ambrée, Fermier niveau 38.",
    "dim": "openworld",
    "region": "Vallée de Refuge-Bas",
-   "dx": 3,
-   "dz": -29
+   "dx": 12,
+   "dz": 2
   },
   {
    "id": "world_089",
@@ -1399,8 +1399,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Vallée de Refuge-Bas",
-   "dx": 21,
-   "dz": 27
+   "dx": 27,
+   "dz": -5
   },
   {
    "id": "world_090",
@@ -1410,8 +1410,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Vallée de Refuge-Bas",
-   "dx": -37,
-   "dz": -7
+   "dx": 1,
+   "dz": -29
   },
   {
    "id": "world_091",
@@ -1421,8 +1421,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Vallée de Refuge-Bas",
-   "dx": 35,
-   "dz": -22
+   "dx": -4,
+   "dz": -5
   },
   {
    "id": "world_092",
@@ -1432,8 +1432,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Vallée de Refuge-Bas",
-   "dx": -12,
-   "dz": 43
+   "dx": -19,
+   "dz": 4
   },
   {
    "id": "world_093",
@@ -1443,8 +1443,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Vallée de Refuge-Bas",
-   "dx": -22,
-   "dz": -42
+   "dx": 30,
+   "dz": 15
   },
   {
    "id": "world_094",
@@ -1454,8 +1454,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Vallée de Refuge-Bas",
-   "dx": 47,
-   "dz": 17
+   "dx": -27,
+   "dz": 20
   },
   {
    "id": "world_095",
@@ -1465,8 +1465,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Vallée de Refuge-Bas",
-   "dx": -49,
-   "dz": 20
+   "dx": -19,
+   "dz": -21
   },
   {
    "id": "world_096",
@@ -1476,8 +1476,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Vallée de Refuge-Bas",
-   "dx": 23,
-   "dz": -50
+   "dx": 24,
+   "dz": -27
   },
   {
    "id": "world_097",
@@ -1487,8 +1487,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Acier Orc : butin des Orcs Guerriers.",
    "dim": "openworld",
    "region": "Terres du Fort de la Brisure",
-   "dx": 8,
-   "dz": 0
+   "dx": 21,
+   "dz": 11
   },
   {
    "id": "world_098",
@@ -1498,8 +1498,8 @@
    "dialogue": "Un survivant cherche à rejoindre les siens.",
    "dim": "openworld",
    "region": "Terres du Fort de la Brisure",
-   "dx": -17,
-   "dz": 16
+   "dx": 14,
+   "dz": -16
   },
   {
    "id": "world_099",
@@ -1509,8 +1509,8 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Lingot de Ambrasite : s'obtient en minant les veines d'Ambrasite des Mines d'Aeloria.",
    "dim": "openworld",
    "region": "Terres du Fort de la Brisure",
-   "dx": 3,
-   "dz": -29
+   "dx": -21,
+   "dz": 13
   },
   {
    "id": "world_100",
@@ -1520,8 +1520,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Terres du Fort de la Brisure",
-   "dx": 21,
-   "dz": 27
+   "dx": 0,
+   "dz": 11
   },
   {
    "id": "world_101",
@@ -1531,8 +1531,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Terres du Fort de la Brisure",
-   "dx": -37,
-   "dz": -7
+   "dx": -6,
+   "dz": -27
   },
   {
    "id": "world_102",
@@ -1542,8 +1542,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Terres du Fort de la Brisure",
-   "dx": 35,
-   "dz": -22
+   "dx": -14,
+   "dz": -5
   },
   {
    "id": "world_103",
@@ -1553,8 +1553,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Terres du Fort de la Brisure",
-   "dx": -12,
-   "dz": 43
+   "dx": -6,
+   "dz": 27
   },
   {
    "id": "world_104",
@@ -1564,8 +1564,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Terres du Fort de la Brisure",
-   "dx": -22,
-   "dz": -42
+   "dx": 11,
+   "dz": 27
   },
   {
    "id": "world_105",
@@ -1575,8 +1575,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Carapace Givrée : butin des bêtes des terres gelées.",
    "dim": "openworld",
    "region": "Pics d'Hivernoir",
-   "dx": 8,
-   "dz": 0
+   "dx": -31,
+   "dz": 24
   },
   {
    "id": "world_106",
@@ -1586,8 +1586,8 @@
    "dialogue": "Un survivant cherche à rejoindre les siens.",
    "dim": "openworld",
    "region": "Pics d'Hivernoir",
-   "dx": -17,
-   "dz": 16
+   "dx": 15,
+   "dz": -1
   },
   {
    "id": "world_107",
@@ -1597,8 +1597,8 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Fourrure Polaire : butin des bêtes des terres gelées.",
    "dim": "openworld",
    "region": "Pics d'Hivernoir",
-   "dx": 3,
-   "dz": -29
+   "dx": -3,
+   "dz": -7
   },
   {
    "id": "world_108",
@@ -1608,8 +1608,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Pics d'Hivernoir",
-   "dx": 21,
-   "dz": 27
+   "dx": 27,
+   "dz": 15
   },
   {
    "id": "world_109",
@@ -1619,8 +1619,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Pics d'Hivernoir",
-   "dx": -37,
-   "dz": -7
+   "dx": 5,
+   "dz": 19
   },
   {
    "id": "world_110",
@@ -1630,8 +1630,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Pics d'Hivernoir",
-   "dx": 35,
-   "dz": -22
+   "dx": 42,
+   "dz": -8
   },
   {
    "id": "world_111",
@@ -1641,8 +1641,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Pics d'Hivernoir",
-   "dx": -12,
-   "dz": 43
+   "dx": 0,
+   "dz": 39
   },
   {
    "id": "world_112",
@@ -1652,8 +1652,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Pics d'Hivernoir",
-   "dx": -22,
-   "dz": -42
+   "dx": -1,
+   "dz": -38
   },
   {
    "id": "world_113",
@@ -1663,8 +1663,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Pics d'Hivernoir",
-   "dx": 47,
-   "dz": 17
+   "dx": 26,
+   "dz": -29
   },
   {
    "id": "world_114",
@@ -1674,8 +1674,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Pics d'Hivernoir",
-   "dx": -49,
-   "dz": 20
+   "dx": -19,
+   "dz": -17
   },
   {
    "id": "world_115",
@@ -1685,8 +1685,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Pics d'Hivernoir",
-   "dx": 23,
-   "dz": -50
+   "dx": -16,
+   "dz": 4
   },
   {
    "id": "world_116",
@@ -1696,8 +1696,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Sève Lumineuse : butin des monstres de forêt.",
    "dim": "openworld",
    "region": "Forêt Pétrifiée",
-   "dx": 8,
-   "dz": 0
+   "dx": 17,
+   "dz": 20
   },
   {
    "id": "world_117",
@@ -1707,8 +1707,8 @@
    "dialogue": "Un survivant cherche à rejoindre les siens.",
    "dim": "openworld",
    "region": "Forêt Pétrifiée",
-   "dx": -17,
-   "dz": 16
+   "dx": -3,
+   "dz": -29
   },
   {
    "id": "world_118",
@@ -1718,8 +1718,8 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Défense de Ronce : butin des Sangliers ronce des forêts.",
    "dim": "openworld",
    "region": "Forêt Pétrifiée",
-   "dx": 3,
-   "dz": -29
+   "dx": -12,
+   "dz": 13
   },
   {
    "id": "world_119",
@@ -1729,8 +1729,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Forêt Pétrifiée",
-   "dx": 21,
-   "dz": 27
+   "dx": 22,
+   "dz": -18
   },
   {
    "id": "world_120",
@@ -1740,8 +1740,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Forêt Pétrifiée",
-   "dx": -37,
-   "dz": -7
+   "dx": 18,
+   "dz": 3
   },
   {
    "id": "world_121",
@@ -1751,8 +1751,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Forêt Pétrifiée",
-   "dx": 35,
-   "dz": -22
+   "dx": -27,
+   "dz": -12
   },
   {
    "id": "world_122",
@@ -1762,8 +1762,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Forêt Pétrifiée",
-   "dx": -12,
-   "dz": 43
+   "dx": -29,
+   "dz": 5
   },
   {
    "id": "world_123",
@@ -1773,8 +1773,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Forêt Pétrifiée",
-   "dx": -22,
-   "dz": -42
+   "dx": 3,
+   "dz": 29
   },
   {
    "id": "world_124",
@@ -1784,8 +1784,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Anchois des abysses : se pêche dans les abysses.",
    "dim": "openworld",
    "region": "Abysses de Sombrelac",
-   "dx": 8,
-   "dz": 0
+   "dx": -31,
+   "dz": 18
   },
   {
    "id": "world_125",
@@ -1795,8 +1795,8 @@
    "dialogue": "Un survivant cherche à rejoindre les siens.",
    "dim": "openworld",
    "region": "Abysses de Sombrelac",
-   "dx": -17,
-   "dz": 16
+   "dx": -35,
+   "dz": -17
   },
   {
    "id": "world_126",
@@ -1806,8 +1806,8 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Poisson-lanterne : se pêche en mer et dans les abysses, la nuit.",
    "dim": "openworld",
    "region": "Abysses de Sombrelac",
-   "dx": 3,
-   "dz": -29
+   "dx": 30,
+   "dz": 14
   },
   {
    "id": "world_127",
@@ -1817,8 +1817,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Abysses de Sombrelac",
-   "dx": 21,
-   "dz": 27
+   "dx": -7,
+   "dz": -32
   },
   {
    "id": "world_128",
@@ -1828,8 +1828,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Abysses de Sombrelac",
-   "dx": -37,
-   "dz": -7
+   "dx": 26,
+   "dz": 34
   },
   {
    "id": "world_129",
@@ -1839,8 +1839,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Abysses de Sombrelac",
-   "dx": 35,
-   "dz": -22
+   "dx": -20,
+   "dz": -2
   },
   {
    "id": "world_130",
@@ -1850,8 +1850,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Abysses de Sombrelac",
-   "dx": -12,
-   "dz": 43
+   "dx": 28,
+   "dz": -4
   },
   {
    "id": "world_131",
@@ -1861,8 +1861,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Abysses de Sombrelac",
-   "dx": -22,
-   "dz": -42
+   "dx": -43,
+   "dz": 3
   },
   {
    "id": "world_132",
@@ -1872,8 +1872,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Abysses de Sombrelac",
-   "dx": 47,
-   "dz": 17
+   "dx": -23,
+   "dz": -38
   },
   {
    "id": "world_133",
@@ -1883,8 +1883,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Abysses de Sombrelac",
-   "dx": -49,
-   "dz": 20
+   "dx": 44,
+   "dz": 3
   },
   {
    "id": "world_134",
@@ -1894,8 +1894,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Abysses de Sombrelac",
-   "dx": 23,
-   "dz": -50
+   "dx": 8,
+   "dz": -40
   },
   {
    "id": "world_135",
@@ -1905,8 +1905,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Poussière d'Étoile : butin des créatures du vide, îles du large, océans profonds, End.",
    "dim": "openworld",
    "region": "Faille des Murmures",
-   "dx": 8,
-   "dz": 0
+   "dx": 7,
+   "dz": 21
   },
   {
    "id": "world_136",
@@ -1916,8 +1916,8 @@
    "dialogue": "Un survivant cherche à rejoindre les siens.",
    "dim": "openworld",
    "region": "Faille des Murmures",
-   "dx": -17,
-   "dz": 16
+   "dx": -13,
+   "dz": -3
   },
   {
    "id": "world_137",
@@ -1927,8 +1927,8 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Éclat Astral : butin des créatures du vide, îles du large, océans profonds, End.",
    "dim": "openworld",
    "region": "Faille des Murmures",
-   "dx": 3,
-   "dz": -29
+   "dx": 10,
+   "dz": -19
   },
   {
    "id": "world_138",
@@ -1938,8 +1938,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Faille des Murmures",
-   "dx": 21,
-   "dz": 27
+   "dx": -4,
+   "dz": -28
   },
   {
    "id": "world_139",
@@ -1949,8 +1949,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Faille des Murmures",
-   "dx": -37,
-   "dz": -7
+   "dx": -23,
+   "dz": -17
   },
   {
    "id": "world_140",
@@ -1960,8 +1960,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Faille des Murmures",
-   "dx": 35,
-   "dz": -22
+   "dx": 24,
+   "dz": 7
   },
   {
    "id": "world_141",
@@ -1971,8 +1971,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Faille des Murmures",
-   "dx": -12,
-   "dz": 43
+   "dx": -10,
+   "dz": 17
   },
   {
    "id": "world_142",
@@ -1982,8 +1982,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Faille des Murmures",
-   "dx": -22,
-   "dz": -42
+   "dx": 28,
+   "dz": -9
   },
   {
    "id": "world_143",
@@ -1993,8 +1993,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Éclat Astral : butin des créatures du vide, îles du large, océans profonds, End.",
    "dim": "openworld",
    "region": "Marches Renégates",
-   "dx": 8,
-   "dz": 0
+   "dx": 4,
+   "dz": 37
   },
   {
    "id": "world_144",
@@ -2004,8 +2004,8 @@
    "dialogue": "Un survivant cherche à rejoindre les siens.",
    "dim": "openworld",
    "region": "Marches Renégates",
-   "dx": -17,
-   "dz": 16
+   "dx": 29,
+   "dz": 23
   },
   {
    "id": "world_145",
@@ -2015,8 +2015,8 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Poussière d'Étoile : butin des créatures du vide, îles du large, océans profonds, End.",
    "dim": "openworld",
    "region": "Marches Renégates",
-   "dx": 3,
-   "dz": -29
+   "dx": -27,
+   "dz": 10
   },
   {
    "id": "world_146",
@@ -2026,8 +2026,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Marches Renégates",
-   "dx": 21,
-   "dz": 27
+   "dx": 25,
+   "dz": -29
   },
   {
    "id": "world_147",
@@ -2037,8 +2037,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Marches Renégates",
-   "dx": -37,
-   "dz": -7
+   "dx": 5,
+   "dz": 16
   },
   {
    "id": "world_148",
@@ -2048,8 +2048,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Marches Renégates",
-   "dx": 35,
-   "dz": -22
+   "dx": -36,
+   "dz": -12
   },
   {
    "id": "world_149",
@@ -2059,8 +2059,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Marches Renégates",
-   "dx": -12,
-   "dz": 43
+   "dx": 9,
+   "dz": -42
   },
   {
    "id": "world_150",
@@ -2070,8 +2070,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Marches Renégates",
-   "dx": -22,
-   "dz": -42
+   "dx": 40,
+   "dz": -4
   },
   {
    "id": "world_151",
@@ -2081,8 +2081,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Marches Renégates",
-   "dx": 47,
-   "dz": 17
+   "dx": -12,
+   "dz": 40
   },
   {
    "id": "world_152",
@@ -2092,8 +2092,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Marches Renégates",
-   "dx": -49,
-   "dz": 20
+   "dx": 39,
+   "dz": -20
   },
   {
    "id": "world_153",
@@ -2103,8 +2103,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Marches Renégates",
-   "dx": 23,
-   "dz": -50
+   "dx": 17,
+   "dz": -7
   },
   {
    "id": "world_154",
@@ -2114,8 +2114,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Griffe du Vide : butin des Rôdeurs du vide.",
    "dim": "openworld",
    "region": "Lisières du Cratère",
-   "dx": 8,
-   "dz": 0
+   "dx": 83,
+   "dz": -51
   },
   {
    "id": "world_155",
@@ -2125,8 +2125,8 @@
    "dialogue": "Un survivant cherche à rejoindre les siens.",
    "dim": "openworld",
    "region": "Lisières du Cratère",
-   "dx": -17,
-   "dz": 16
+   "dx": 93,
+   "dz": -31
   },
   {
    "id": "world_156",
@@ -2136,8 +2136,8 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Poudre d'Aile Astrale : butin des Mites astrales du vide.",
    "dim": "openworld",
    "region": "Lisières du Cratère",
-   "dx": 3,
-   "dz": -29
+   "dx": 9,
+   "dz": 97
   },
   {
    "id": "world_157",
@@ -2147,8 +2147,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Lisières du Cratère",
-   "dx": 21,
-   "dz": 27
+   "dx": -89,
+   "dz": -40
   },
   {
    "id": "world_158",
@@ -2158,8 +2158,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Lisières du Cratère",
-   "dx": -37,
-   "dz": -7
+   "dx": -94,
+   "dz": 26
   },
   {
    "id": "world_159",
@@ -2169,8 +2169,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Lisières du Cratère",
-   "dx": 35,
-   "dz": -22
+   "dx": 47,
+   "dz": 87
   },
   {
    "id": "world_160",
@@ -2180,8 +2180,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Lisières du Cratère",
-   "dx": -12,
-   "dz": 43
+   "dx": 7,
+   "dz": 23
   },
   {
    "id": "world_161",
@@ -2191,8 +2191,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Lisières du Cratère",
-   "dx": -22,
-   "dz": -42
+   "dx": -94,
+   "dz": -24
   },
   {
    "id": "world_162",
@@ -2202,8 +2202,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Lingot de Glacium : s'obtient en minant les veines de Glacium des Mines d'Aeloria.",
    "dim": "openworld",
    "region": "Forge de Malvorn",
-   "dx": 8,
-   "dz": 0
+   "dx": -38,
+   "dz": -24
   },
   {
    "id": "world_163",
@@ -2213,8 +2213,8 @@
    "dialogue": "Un survivant cherche à rejoindre les siens.",
    "dim": "openworld",
    "region": "Forge de Malvorn",
-   "dx": -17,
-   "dz": 16
+   "dx": -31,
+   "dz": 24
   },
   {
    "id": "world_164",
@@ -2224,8 +2224,8 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Lingot de Néantite : s'obtient en minant les veines de Néantite des Mines d'Aeloria.",
    "dim": "openworld",
    "region": "Forge de Malvorn",
-   "dx": 3,
-   "dz": -29
+   "dx": 16,
+   "dz": 14
   },
   {
    "id": "world_165",
@@ -2235,8 +2235,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Forge de Malvorn",
-   "dx": 21,
-   "dz": 27
+   "dx": -26,
+   "dz": 4
   },
   {
    "id": "world_166",
@@ -2246,8 +2246,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Forge de Malvorn",
-   "dx": -37,
-   "dz": -7
+   "dx": 0,
+   "dz": -15
   },
   {
    "id": "world_167",
@@ -2257,8 +2257,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Forge de Malvorn",
-   "dx": 35,
-   "dz": -22
+   "dx": -7,
+   "dz": 9
   },
   {
    "id": "world_168",
@@ -2268,8 +2268,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Forge de Malvorn",
-   "dx": -12,
-   "dz": 43
+   "dx": 9,
+   "dz": 30
   },
   {
    "id": "world_169",
@@ -2279,8 +2279,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Forge de Malvorn",
-   "dx": -22,
-   "dz": -42
+   "dx": -23,
+   "dz": -16
   },
   {
    "id": "world_170",
@@ -2290,8 +2290,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Forge de Malvorn",
-   "dx": 47,
-   "dz": 17
+   "dx": 0,
+   "dz": -39
   },
   {
    "id": "world_171",
@@ -2301,8 +2301,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Forge de Malvorn",
-   "dx": -49,
-   "dz": 20
+   "dx": -22,
+   "dz": -33
   },
   {
    "id": "world_172",
@@ -2312,8 +2312,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Forge de Malvorn",
-   "dx": 23,
-   "dz": -50
+   "dx": -15,
+   "dz": 41
   },
   {
    "id": "world_173",
@@ -2323,8 +2323,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Pupille du Chaos : butin des Yeux du chaos du vide.",
    "dim": "openworld",
    "region": "Nécropole d'Aelis",
-   "dx": 8,
-   "dz": 0
+   "dx": 28,
+   "dz": 25
   },
   {
    "id": "world_174",
@@ -2334,8 +2334,8 @@
    "dialogue": "Un survivant cherche à rejoindre les siens.",
    "dim": "openworld",
    "region": "Nécropole d'Aelis",
-   "dx": -17,
-   "dz": 16
+   "dx": -30,
+   "dz": -11
   },
   {
    "id": "world_175",
@@ -2345,8 +2345,8 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Griffe du Vide : butin des Rôdeurs du vide.",
    "dim": "openworld",
    "region": "Nécropole d'Aelis",
-   "dx": 3,
-   "dz": -29
+   "dx": -31,
+   "dz": 26
   },
   {
    "id": "world_176",
@@ -2356,8 +2356,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Nécropole d'Aelis",
-   "dx": 21,
-   "dz": 27
+   "dx": -35,
+   "dz": 5
   },
   {
    "id": "world_177",
@@ -2367,8 +2367,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Nécropole d'Aelis",
-   "dx": -37,
-   "dz": -7
+   "dx": 25,
+   "dz": -11
   },
   {
    "id": "world_178",
@@ -2378,8 +2378,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Nécropole d'Aelis",
-   "dx": 35,
-   "dz": -22
+   "dx": 5,
+   "dz": -2
   },
   {
    "id": "world_179",
@@ -2389,8 +2389,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Nécropole d'Aelis",
-   "dx": -12,
-   "dz": 43
+   "dx": 41,
+   "dz": -6
   },
   {
    "id": "world_180",
@@ -2400,8 +2400,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Nécropole d'Aelis",
-   "dx": -22,
-   "dz": -42
+   "dx": -29,
+   "dz": -30
   },
   {
    "id": "world_181",
@@ -2411,8 +2411,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Éclat Fracturé : butin des êtres du vide.",
    "dim": "openworld",
    "region": "Entre-Monde",
-   "dx": 8,
-   "dz": 0
+   "dx": -21,
+   "dz": -4
   },
   {
    "id": "world_182",
@@ -2422,8 +2422,8 @@
    "dialogue": "Un survivant cherche à rejoindre les siens.",
    "dim": "openworld",
    "region": "Entre-Monde",
-   "dx": -17,
-   "dz": 16
+   "dx": -34,
+   "dz": 25
   },
   {
    "id": "world_183",
@@ -2433,8 +2433,8 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Pupille du Chaos : butin des Yeux du chaos du vide.",
    "dim": "openworld",
    "region": "Entre-Monde",
-   "dx": 3,
-   "dz": -29
+   "dx": 29,
+   "dz": -9
   },
   {
    "id": "world_184",
@@ -2444,8 +2444,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Entre-Monde",
-   "dx": 21,
-   "dz": 27
+   "dx": 19,
+   "dz": 37
   },
   {
    "id": "world_185",
@@ -2455,8 +2455,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Entre-Monde",
-   "dx": -37,
-   "dz": -7
+   "dx": -14,
+   "dz": 17
   },
   {
    "id": "world_186",
@@ -2466,8 +2466,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Entre-Monde",
-   "dx": 35,
-   "dz": -22
+   "dx": 2,
+   "dz": 38
   },
   {
    "id": "world_187",
@@ -2477,8 +2477,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Entre-Monde",
-   "dx": -12,
-   "dz": 43
+   "dx": -3,
+   "dz": 4
   },
   {
    "id": "world_188",
@@ -2488,8 +2488,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Entre-Monde",
-   "dx": -22,
-   "dz": -42
+   "dx": -43,
+   "dz": 1
   },
   {
    "id": "world_189",
@@ -2499,8 +2499,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Entre-Monde",
-   "dx": 47,
-   "dz": 17
+   "dx": 7,
+   "dz": 22
   },
   {
    "id": "world_190",
@@ -2510,8 +2510,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Entre-Monde",
-   "dx": -49,
-   "dz": 20
+   "dx": -36,
+   "dz": -20
   },
   {
    "id": "world_191",
@@ -2521,8 +2521,8 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Entre-Monde",
-   "dx": 23,
-   "dz": -50
+   "dx": 31,
+   "dz": 13
   },
   {
    "id": "world_192",
@@ -2532,8 +2532,8 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Éclat Fracturé : butin des êtres du vide.",
    "dim": "openworld",
    "region": "Cœur de la Brisure",
-   "dx": 8,
-   "dz": 0
+   "dx": -24,
+   "dz": 17
   },
   {
    "id": "world_193",
@@ -2543,8 +2543,8 @@
    "dialogue": "Un survivant cherche à rejoindre les siens.",
    "dim": "openworld",
    "region": "Cœur de la Brisure",
-   "dx": -17,
-   "dz": 16
+   "dx": 33,
+   "dz": 24
   },
   {
    "id": "world_194",
@@ -2554,8 +2554,8 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Orchidée du Néant : se cultive avec une graine du Néant, Fermier niveau 75.",
    "dim": "openworld",
    "region": "Cœur de la Brisure",
-   "dx": 3,
-   "dz": -29
+   "dx": -22,
+   "dz": 33
   },
   {
    "id": "world_195",
@@ -2565,8 +2565,8 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Cœur de la Brisure",
-   "dx": 21,
-   "dz": 27
+   "dx": -37,
+   "dz": -20
   },
   {
    "id": "world_196",
@@ -2576,8 +2576,8 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Cœur de la Brisure",
-   "dx": -37,
-   "dz": -7
+   "dx": 15,
+   "dz": 35
   },
   {
    "id": "world_197",
@@ -2587,8 +2587,8 @@
    "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
    "dim": "openworld",
    "region": "Cœur de la Brisure",
-   "dx": 35,
-   "dz": -22
+   "dx": -6,
+   "dz": 5
   },
   {
    "id": "world_198",
@@ -2598,8 +2598,8 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Cœur de la Brisure",
-   "dx": -12,
-   "dz": 43
+   "dx": 13,
+   "dz": 1
   },
   {
    "id": "world_199",
@@ -2609,8 +2609,8 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Cœur de la Brisure",
-   "dx": -22,
-   "dz": -42
+   "dx": -2,
+   "dz": 32
   }
  ]
 }

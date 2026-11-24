@@ -41,6 +41,10 @@ public final class DevWorldNpcChecks {
             }
             var e = list.get(i[0]++); var a = WorldNpcs.anchor(e.region());
             visit(fake, ow, a[0] + e.dx(), a[1] + e.dz(), 0);
+            { int ix = a[0] + e.dx(), iz = a[1] + e.dz(); var en = com.mmorpg.world.NpcDirectory.get(server).entry(e.uuid().toString());
+              if (en == null || BlockPos.of(en.getLongOr("pos", 0)).distSqr(new BlockPos(ix, BlockPos.of(en.getLongOr("pos", 0)).getY(), iz)) > 2) {
+                int hy = ow.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, ix, iz); var bp = new BlockPos(ix, hy, iz);
+                MMORPG.LOGGER.info("[WORLD NPC CHECKS] DIAG {} {} {} h={} dessous={} ici={} dessus={} flu={}{} chunk={}", e.id(), ix, iz, hy, ow.getBlockState(bp.below()), ow.getBlockState(bp), ow.getBlockState(bp.above()), ow.getFluidState(bp).isEmpty(), ow.getFluidState(bp.below()).isEmpty(), ow.hasChunkAt(bp)); } }
             Scheduler.later(ow, 2, step[0]);
         };
         Scheduler.later(ow, 20, step[0]);
@@ -64,6 +68,7 @@ public final class DevWorldNpcChecks {
         var quests = com.mmorpg.config.ConfigManager.quests();
         int spawnN = 0, worldN = 0;
         var names = new HashSet<String>();
+        var placedPositions = new ArrayList<BlockPos>();
         for (var e : WorldNpcs.entries()) {
             if (e.dim().equals("spawn") && !spawnChecked) continue;
             var entry = directory.entry(e.uuid().toString());
@@ -73,12 +78,20 @@ public final class DevWorldNpcChecks {
             if (!names.add(e.name())) fails.add("nom en double " + e.name());
             if (e.dim().equals("spawn")) spawnN++; else worldN++;
             var at = BlockPos.of(entry.getLongOr("pos", 0));
+            if (e.dim().equals("openworld")) {
+                { var a = WorldNpcs.anchor(e.region()); int ix = a[0] + e.dx(), iz = a[1] + e.dz(); if (Math.abs(ix - at.getX()) > 1 || Math.abs(iz - at.getZ()) > 1) MMORPG.LOGGER.info("[WORLD NPC CHECKS] DEVIATION {} {} {} -> {} {}", e.id(), ix, iz, at.getX(), at.getZ()); }
+                var ow = server.overworld();
+                if (Math.abs(at.getX()) > 399 || Math.abs(at.getZ()) > 399) fails.add("hors carte " + e.name() + " " + at);
+                else if (!ow.getFluidState(at).isEmpty() || !ow.getFluidState(at.below()).isEmpty() || !ow.getBlockState(at.below()).isSolidRender() || !ow.getBlockState(at).getCollisionShape(ow, at).isEmpty() || !ow.getBlockState(at.above()).getCollisionShape(ow, at.above()).isEmpty()) fails.add("sol invalide " + e.name() + " " + at);
+                for (var o : placedPositions) if (Math.hypot(o.getX() - at.getX(), o.getZ() - at.getZ()) < 12) fails.add("trop proche " + e.name() + " " + at + " / " + o);
+                placedPositions.add(at);
+            }
             MMORPG.LOGGER.info("[WORLD NPC CHECKS] {} | {} | {} @ {}", e.region(), e.name(), e.quest(), at);
         }
         deliveries(server, fails);
         int total = 0;
         for (var l : server.getAllLevels()) for (var en : l.getAllEntities()) if (en instanceof NpcEntity n && WorldNpcs.GROUP.equals(n.group())) total++;
-        MMORPG.LOGGER.info("[WORLD NPC CHECKS] {} : {} spawn, {} monde ouvert dans l'annuaire, {} entites chargees", fails.isEmpty() ? "PASS" : "FAIL " + fails.subList(0, Math.min(10, fails.size())), spawnN, worldN, total);
+        MMORPG.LOGGER.info("[WORLD NPC CHECKS] {} : {} spawn, {} monde ouvert dans l'annuaire, {} entites chargees", fails.isEmpty() ? "PASS" : "FAIL " + fails, spawnN, worldN, total);
     }
     /** Quetes de recolte / livraison : chaque objet demande existe, la quete se valide avec les objets en main et les consomme. */
     private static void deliveries(net.minecraft.server.MinecraftServer server, List<String> fails) {

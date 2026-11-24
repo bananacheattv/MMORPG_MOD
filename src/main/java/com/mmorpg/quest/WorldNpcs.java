@@ -58,6 +58,21 @@ public final class WorldNpcs {
         return p;
     }
 
+    /** Migration : un PNJ du monde ouvert pose a l'ancien emplacement (carte precedente) est retire pour etre repose au bon endroit. */
+    private static void retire(ServerLevel l, com.mmorpg.world.NpcDirectory directory, UUID id, int x, int z) {
+        var live = l.getEntity(id);
+        if (live != null && (live.getX() - x) * (live.getX() - x) + (live.getZ() - z) * (live.getZ() - z) > 12100) {
+            live.discard();
+            directory.remove(id.toString());
+            return;
+        }
+        var entry = directory.entry(id.toString());
+        if (entry != null && live == null) {
+            var at = BlockPos.of(entry.getLongOr("pos", 0));
+            if ((at.getX() - x) * (long) (at.getX() - x) + (at.getZ() - z) * (long) (at.getZ() - z) > 12100) directory.remove(id.toString());
+        }
+    }
+
     /** Pose les PNJ manquants autour du joueur ; renvoie le nombre pose. */
     public static int install(ServerPlayer player) {
         var l = player.level();
@@ -83,9 +98,11 @@ public final class WorldNpcs {
             int z = spawn ? cz + e.dz() : anchor(e.region())[1] + e.dz();
             double dx = player.getX() - x, dz = player.getZ() - z;
             if (dx * dx + dz * dz > RANGE * RANGE) continue;
+            if (!spawn) retire(l, directory, e.uuid(), x, z);
             if (l.getEntity(e.uuid()) != null || directory.entry(e.uuid().toString()) != null) continue;
+            if (!l.hasChunkAt(new BlockPos(x, 64, z))) continue;   // sol pas encore charge : attendre, ne pas poser a cote
             BlockPos at = null;
-            for (int r = 0; r <= (spawn ? 12 : 96) && at == null; r += 4)
+            for (int r = 0; r <= (spawn ? 12 : 8) && at == null; r += 4)
                 for (int a = 0; a < (r == 0 ? 1 : 12) && at == null; a++)
                     at = ground(l, x + (int) Math.round(Math.cos(a * Math.PI / 6) * r), z + (int) Math.round(Math.sin(a * Math.PI / 6) * r), baseY, !spawn);
             if (at == null || !l.getEntitiesOfClass(NpcEntity.class, new net.minecraft.world.phys.AABB(at).inflate(2.5)).isEmpty()) continue;
@@ -100,6 +117,18 @@ public final class WorldNpcs {
             if (l.addFreshEntity(n)) placed++;
         }
         return placed;
+    }
+
+    /** Un ancien PNJ du monde ouvert (carte precedente) qui se recharge a son ancien emplacement est refuse : le PNJ du bon endroit le remplace. */
+    @SubscribeEvent
+    public static void joined(net.neoforged.neoforge.event.entity.EntityJoinLevelEvent e) {
+        if (e.getLevel().isClientSide() || !(e.getEntity() instanceof NpcEntity n) || !GROUP.equals(n.group())) return;
+        for (var en : entries()) {
+            if (!en.dim().equals("openworld") || !en.uuid().equals(n.getUUID())) continue;
+            int x = anchor(en.region())[0] + en.dx(), z = anchor(en.region())[1] + en.dz();
+            if ((n.getX() - x) * (n.getX() - x) + (n.getZ() - z) * (n.getZ() - z) > 12100) e.setCanceled(true);
+            return;
+        }
     }
 
     @SubscribeEvent
