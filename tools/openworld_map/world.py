@@ -213,18 +213,23 @@ class World:
     def fill_terrain(self):
         print('Terrain et biomes...',flush=True)
         n=noise(9,SEED+10); slope=np.hypot(*np.gradient(self.height.astype(float)))
+        # Surface blocks use a dithered region map: the biome edges become a 20-block mottled mix
+        # instead of a ruler-straight line (snow touching grass at the spawn).
+        cs=[(-220,90),(65,285),(-205,-225),(235,-205),(285,160)]
+        dist=np.stack([(self.x-cx)**2+(self.z-cz)**2+32000*noise(24+i,SEED+40+i) for i,(cx,cz) in enumerate(cs)])
+        rj=np.argmin(dist,axis=0).astype(np.uint8)
         topnames=['grass_block','coarse_dirt','snow_block','red_sand','end_stone']
-        tops=np.array([self.block(x) for x in topnames],np.uint16)[self.region_map]
-        tops[(self.region_map==0)&self.swamp]=self.block('mud')
-        tops[(self.region_map==1)&(n>.22)]=self.block('podzol')
-        tops[(self.region_map==1)&(n<-.3)]=self.block('gravel')
-        tops[(self.region_map==4)&(n>.2)]=self.block('purple_terracotta')
-        tops[(self.region_map==4)&(n<-.3)]=self.block('blackstone')
-        tops[(self.region_map==2)&(slope>2.5)]=self.block('stone')
-        tops[(self.region_map==3)&(slope>1.8)]=self.block('red_sandstone')
-        tops[(self.region_map==0)&(slope>2.4)]=self.block('andesite')
-        tops[(self.height<64)&(self.region_map!=2)]=self.block('gravel')
-        tops[(self.height<64)&(self.region_map==0)&~self.swamp]=self.block('sand')
+        tops=np.array([self.block(x) for x in topnames],np.uint16)[rj]
+        tops[(rj==0)&self.swamp]=self.block('mud')
+        tops[(rj==1)&(n>.22)]=self.block('podzol')
+        tops[(rj==1)&(n<-.3)]=self.block('gravel')
+        tops[(rj==4)&(n>.2)]=self.block('purple_terracotta')
+        tops[(rj==4)&(n<-.3)]=self.block('blackstone')
+        tops[(rj==2)&(slope>2.5)]=self.block('stone')
+        tops[(rj==3)&(slope>1.8)]=self.block('red_sandstone')
+        tops[(rj==0)&(slope>2.4)]=self.block('andesite')
+        tops[(self.height<64)&(rj!=2)]=self.block('gravel')
+        tops[(self.height<64)&(rj==0)&~self.swamp]=self.block('sand')
         stone=self.block('stone'); deep=self.block('deepslate');dirt=self.block('dirt')
         for y in range(YMIN,YMAX+1):
             target=self.a[y-YMIN];solid=y<=self.height

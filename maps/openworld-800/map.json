@@ -206,9 +206,9 @@
     "minecraft:dandelion",
     "minecraft:short_grass",
     "minecraft:red_mushroom",
-    "minecraft:brown_mushroom",
     "minecraft:azure_bluet",
     "minecraft:poppy",
+    "minecraft:brown_mushroom",
     "minecraft:oxeye_daisy",
     "minecraft:lily_pad",
     "minecraft:oak_log[axis=x]"
@@ -2751,6 +2751,6 @@
     "cristal naturel": 140,
     "arbre mort": 156,
     "rocher": 532,
-    "plante": 19461
+    "plante": 19341
   }
 }
