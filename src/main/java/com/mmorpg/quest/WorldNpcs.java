@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * PNJ donneurs de quetes du spawn (30) et du monde ouvert (200), un PNJ par quete, decrits dans
+ * PNJ donneurs de quetes du spawn (30, un par quete) et du monde ouvert (72, chacun porte plusieurs quetes), decrits dans
  * {@code data/mmorpg/lore/world_npcs.json} (produit par {@code tools/quetes/build_world_npcs.py}). Les PNJ sont poses a la demande
  * (joueur a moins de 64 blocs, sol charge), une seule fois : l'identifiant fixe evite tout doublon au redemarrage.
  */
@@ -58,6 +58,26 @@ public final class WorldNpcs {
         return p;
     }
 
+    private static java.lang.ref.WeakReference<net.minecraft.server.MinecraftServer> purged;
+
+    /** Une fois par demarrage : retire les PNJ de quetes d'une ancienne disposition (annuaire et entites chargees). */
+    private static void purgeStale(ServerLevel l, com.mmorpg.world.NpcDirectory directory) {
+        var server = l.getServer();
+        if (purged != null && purged.get() == server) return;
+        purged = new java.lang.ref.WeakReference<>(server);
+        var valid = WorldNpcData.valid();
+        for (var t : directory.snapshot()) {
+            if (!(t instanceof net.minecraft.nbt.CompoundTag n) || !GROUP.equals(n.getStringOr("group", ""))) continue;
+            String id = n.getStringOr("id", "");
+            try {
+                var uuid = UUID.fromString(id);
+                if (valid.contains(uuid)) continue;
+                for (var level : server.getAllLevels()) { var old = level.getEntity(uuid); if (old != null) old.discard(); }
+            } catch (IllegalArgumentException ignored) { }
+            directory.remove(id);
+        }
+    }
+
     /** Migration : un PNJ du monde ouvert pose a l'ancien emplacement (carte precedente) est retire pour etre repose au bon endroit. */
     private static void retire(ServerLevel l, com.mmorpg.world.NpcDirectory directory, UUID id, int x, int z) {
         var live = l.getEntity(id);
@@ -91,6 +111,7 @@ public final class WorldNpcs {
             cz = city.getZ();
             baseY = (int) Math.round(data.arrival().y);
         }
+        purgeStale(l, directory);
         int placed = 0;
         for (var e : entries()) {
             if (spawn != e.dim().equals("spawn")) continue;
@@ -123,6 +144,7 @@ public final class WorldNpcs {
     @SubscribeEvent
     public static void joined(net.neoforged.neoforge.event.entity.EntityJoinLevelEvent e) {
         if (e.getLevel().isClientSide() || !(e.getEntity() instanceof NpcEntity n) || !GROUP.equals(n.group())) return;
+        if (!WorldNpcData.valid().contains(n.getUUID())) { e.setCanceled(true); return; }
         for (var en : entries()) {
             if (!en.dim().equals("openworld") || !en.uuid().equals(n.getUUID())) continue;
             int x = anchor(en.region())[0] + en.dx(), z = anchor(en.region())[1] + en.dz();

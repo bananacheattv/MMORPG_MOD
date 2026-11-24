@@ -421,29 +421,12 @@
    "dim": "openworld",
    "region": "Valdhéris et les Contreforts",
    "dx": -12,
-   "dz": -1
-  },
-  {
-   "id": "world_001",
-   "name": "Brunehilde · Guide",
-   "skin": 8,
-   "quest": "qs_099",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Valdhéris et les Contreforts",
-   "dx": 11,
-   "dz": 3
-  },
-  {
-   "id": "world_002",
-   "name": "Dagmar · Messager",
-   "skin": 4,
-   "quest": "qs_102",
-   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Écorce Ancienne : butin des monstres de forêt et de plaines.",
-   "dim": "openworld",
-   "region": "Valdhéris et les Contreforts",
-   "dx": 12,
-   "dz": -17
+   "dz": -1,
+   "quests": [
+    "qs_098",
+    "qs_099",
+    "qs_102"
+   ]
   },
   {
    "id": "world_003",
@@ -453,30 +436,13 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Valdhéris et les Contreforts",
-   "dx": 4,
-   "dz": 18
-  },
-  {
-   "id": "world_004",
-   "name": "Jorun · Traqueur",
-   "skin": 18,
-   "quest": "qs_097",
-   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
-   "dim": "openworld",
-   "region": "Valdhéris et les Contreforts",
-   "dx": -19,
-   "dz": -21
-  },
-  {
-   "id": "world_005",
-   "name": "Héloïse · Libérateur",
-   "skin": 1,
-   "quest": "qs_100",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Valdhéris et les Contreforts",
-   "dx": 22,
-   "dz": 16
+   "dx": 16,
+   "dz": 11,
+   "quests": [
+    "qs_481",
+    "qs_097",
+    "qs_100"
+   ]
   },
   {
    "id": "world_006",
@@ -486,19 +452,12 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Valdhéris et les Contreforts",
-   "dx": -19,
-   "dz": 16
-  },
-  {
-   "id": "world_007",
-   "name": "Honorine · Éclaireur",
-   "skin": 16,
-   "quest": "qs_103",
-   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
-   "dim": "openworld",
-   "region": "Valdhéris et les Contreforts",
-   "dx": 29,
-   "dz": -5
+   "dx": 12,
+   "dz": -17,
+   "quests": [
+    "qs_101",
+    "qs_103"
+   ]
   },
   {
    "id": "world_008",
@@ -509,18 +468,11 @@
    "dim": "openworld",
    "region": "Bois de Murmurelle",
    "dx": 10,
-   "dz": -8
-  },
-  {
-   "id": "world_009",
-   "name": "Lorcan · Guide",
-   "skin": 0,
-   "quest": "qs_106",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Bois de Murmurelle",
-   "dx": -19,
-   "dz": 12
+   "dz": -8,
+   "quests": [
+    "qs_105",
+    "qs_106"
+   ]
   },
   {
    "id": "world_010",
@@ -530,19 +482,12 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Racine de Lueur : se cultive avec une graine de Lueur plantée à la houe, métier Fermier.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": 27,
-   "dz": -5
-  },
-  {
-   "id": "world_011",
-   "name": "Jeanne · Éclaireur",
-   "skin": 7,
-   "quest": "qs_482",
-   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
-   "dim": "openworld",
-   "region": "Bois de Murmurelle",
-   "dx": -16,
-   "dz": -4
+   "dx": -19,
+   "dz": 12,
+   "quests": [
+    "qs_109",
+    "qs_482"
+   ]
   },
   {
    "id": "world_012",
@@ -552,19 +497,12 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": 0,
-   "dz": 6
-  },
-  {
-   "id": "world_013",
-   "name": "Faustine · Veilleur",
-   "skin": 7,
-   "quest": "qs_422",
-   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
-   "dim": "openworld",
-   "region": "Bois de Murmurelle",
-   "dx": 19,
-   "dz": 16
+   "dx": -19,
+   "dz": -20,
+   "quests": [
+    "qs_421",
+    "qs_422"
+   ]
   },
   {
    "id": "world_014",
@@ -574,19 +512,12 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": 2,
-   "dz": -28
-  },
-  {
-   "id": "world_015",
-   "name": "Zacharie · Libérateur",
-   "skin": 0,
-   "quest": "qs_107",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Bois de Murmurelle",
-   "dx": -19,
-   "dz": -20
+   "dx": 115,
+   "dz": 106,
+   "quests": [
+    "qs_104",
+    "qs_107"
+   ]
   },
   {
    "id": "world_016",
@@ -596,19 +527,12 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": -4,
-   "dz": 27
-  },
-  {
-   "id": "world_017",
-   "name": "Solène · Éclaireur",
-   "skin": 14,
-   "quest": "qs_110",
-   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
-   "dim": "openworld",
-   "region": "Bois de Murmurelle",
-   "dx": 115,
-   "dz": 106
+   "dx": 123,
+   "dz": 77,
+   "quests": [
+    "qs_108",
+    "qs_110"
+   ]
   },
   {
    "id": "world_018",
@@ -618,19 +542,12 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": 123,
-   "dz": 77
-  },
-  {
-   "id": "world_019",
-   "name": "Gareth · Maître d’épreuve",
-   "skin": 8,
-   "quest": "qs_361",
-   "dialogue": "Le chronomètre démarre à l'acceptation.",
-   "dim": "openworld",
-   "region": "Bois de Murmurelle",
    "dx": 92,
-   "dz": 63
+   "dz": 63,
+   "quests": [
+    "qs_423",
+    "qs_361"
+   ]
   },
   {
    "id": "world_020",
@@ -640,19 +557,12 @@
    "dialogue": "Le chronomètre démarre à l'acceptation.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": 77,
-   "dz": 101
-  },
-  {
-   "id": "world_021",
-   "name": "Océane · Maître d’épreuve",
-   "skin": 7,
-   "quest": "qs_363",
-   "dialogue": "Le chronomètre démarre à l'acceptation.",
-   "dim": "openworld",
-   "region": "Bois de Murmurelle",
-   "dx": 94,
-   "dz": 97
+   "dx": 139,
+   "dz": -21,
+   "quests": [
+    "qs_362",
+    "qs_363"
+   ]
   },
   {
    "id": "world_022",
@@ -662,19 +572,12 @@
    "dialogue": "Le chronomètre démarre à l'acceptation.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": 139,
-   "dz": -21
-  },
-  {
-   "id": "world_023",
-   "name": "Isaure · Maître d’épreuve",
-   "skin": 4,
-   "quest": "qs_365",
-   "dialogue": "Le chronomètre démarre à l'acceptation.",
-   "dim": "openworld",
-   "region": "Bois de Murmurelle",
    "dx": 114,
-   "dz": -31
+   "dz": -31,
+   "quests": [
+    "qs_364",
+    "qs_365"
+   ]
   },
   {
    "id": "world_024",
@@ -684,8 +587,11 @@
    "dialogue": "Le chronomètre démarre à l'acceptation.",
    "dim": "openworld",
    "region": "Bois de Murmurelle",
-   "dx": 97,
-   "dz": -26
+   "dx": 108,
+   "dz": 4,
+   "quests": [
+    "qs_366"
+   ]
   },
   {
    "id": "world_025",
@@ -696,18 +602,11 @@
    "dim": "openworld",
    "region": "Marais de Fangeterre",
    "dx": 14,
-   "dz": -1
-  },
-  {
-   "id": "world_026",
-   "name": "Perrin · Guide",
-   "skin": 3,
-   "quest": "qs_113",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Marais de Fangeterre",
-   "dx": -12,
-   "dz": -20
+   "dz": -1,
+   "quests": [
+    "qs_112",
+    "qs_113"
+   ]
   },
   {
    "id": "world_027",
@@ -717,19 +616,12 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Goujon des marais : se pêche à la canne dans les marais, métier Pêcheur.",
    "dim": "openworld",
    "region": "Marais de Fangeterre",
-   "dx": 18,
-   "dz": 19
-  },
-  {
-   "id": "world_028",
-   "name": "Blanche · Éclaireur",
-   "skin": 14,
-   "quest": "qs_483",
-   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
-   "dim": "openworld",
-   "region": "Marais de Fangeterre",
-   "dx": -3,
-   "dz": -5
+   "dx": -12,
+   "dz": -20,
+   "quests": [
+    "qs_116",
+    "qs_483"
+   ]
   },
   {
    "id": "world_029",
@@ -739,19 +631,12 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Marais de Fangeterre",
-   "dx": -17,
-   "dz": 5
-  },
-  {
-   "id": "world_030",
-   "name": "Ambroise · Libérateur",
-   "skin": 4,
-   "quest": "qs_114",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Marais de Fangeterre",
    "dx": -8,
-   "dz": 28
+   "dz": 28,
+   "quests": [
+    "qs_111",
+    "qs_114"
+   ]
   },
   {
    "id": "world_031",
@@ -762,18 +647,11 @@
    "dim": "openworld",
    "region": "Marais de Fangeterre",
    "dx": -112,
-   "dz": -67
-  },
-  {
-   "id": "world_032",
-   "name": "Éloi · Éclaireur",
-   "skin": 3,
-   "quest": "qs_117",
-   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
-   "dim": "openworld",
-   "region": "Marais de Fangeterre",
-   "dx": -86,
-   "dz": -52
+   "dz": -67,
+   "quests": [
+    "qs_115",
+    "qs_117"
+   ]
   },
   {
    "id": "world_033",
@@ -783,19 +661,12 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Marais de Fangeterre",
-   "dx": -67,
-   "dz": -61
-  },
-  {
-   "id": "world_034",
-   "name": "Nestor · Veilleur",
-   "skin": 7,
-   "quest": "qs_425",
-   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
-   "dim": "openworld",
-   "region": "Marais de Fangeterre",
-   "dx": -112,
-   "dz": -50
+   "dx": -86,
+   "dz": -52,
+   "quests": [
+    "qs_424",
+    "qs_425"
+   ]
   },
   {
    "id": "world_035",
@@ -806,7 +677,10 @@
    "dim": "openworld",
    "region": "Marais de Fangeterre",
    "dx": -85,
-   "dz": -82
+   "dz": -82,
+   "quests": [
+    "qs_426"
+   ]
   },
   {
    "id": "world_036",
@@ -817,29 +691,12 @@
    "dim": "openworld",
    "region": "Mines de Creuse-Braise",
    "dx": 7,
-   "dz": -8
-  },
-  {
-   "id": "world_037",
-   "name": "Léandre · Guide",
-   "skin": 5,
-   "quest": "qs_120",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Mines de Creuse-Braise",
-   "dx": -9,
-   "dz": -4
-  },
-  {
-   "id": "world_038",
-   "name": "Wendel · Messager",
-   "skin": 8,
-   "quest": "qs_123",
-   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Lingot de Verdite : s'obtient en minant les veines de Verdite des Mines d'Aeloria, métier Mineur.",
-   "dim": "openworld",
-   "region": "Mines de Creuse-Braise",
-   "dx": -8,
-   "dz": 16
+   "dz": -8,
+   "quests": [
+    "qs_119",
+    "qs_120",
+    "qs_123"
+   ]
   },
   {
    "id": "world_039",
@@ -849,30 +706,13 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Mines de Creuse-Braise",
-   "dx": 8,
-   "dz": -28
-  },
-  {
-   "id": "world_040",
-   "name": "Valène · Traqueur",
-   "skin": 4,
-   "quest": "qs_118",
-   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
-   "dim": "openworld",
-   "region": "Mines de Creuse-Braise",
-   "dx": 9,
-   "dz": 28
-  },
-  {
-   "id": "world_041",
-   "name": "Béatrice · Libérateur",
-   "skin": 3,
-   "quest": "qs_121",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Mines de Creuse-Braise",
-   "dx": -24,
-   "dz": -12
+   "dx": -8,
+   "dz": 16,
+   "quests": [
+    "qs_484",
+    "qs_118",
+    "qs_121"
+   ]
   },
   {
    "id": "world_042",
@@ -882,19 +722,12 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Mines de Creuse-Braise",
-   "dx": 29,
-   "dz": 7
-  },
-  {
-   "id": "world_043",
-   "name": "Héloïse · Éclaireur",
-   "skin": 1,
-   "quest": "qs_124",
-   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
-   "dim": "openworld",
-   "region": "Mines de Creuse-Braise",
-   "dx": -28,
-   "dz": 5
+   "dx": -24,
+   "dz": -12,
+   "quests": [
+    "qs_122",
+    "qs_124"
+   ]
   },
   {
    "id": "world_044",
@@ -904,41 +737,14 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Acier Orc : butin des Orcs Guerriers.",
    "dim": "openworld",
    "region": "Marches du Rempart",
-   "dx": -5,
-   "dz": -38
-  },
-  {
-   "id": "world_045",
-   "name": "Lucien · Guide",
-   "skin": 7,
-   "quest": "qs_127",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Marches du Rempart",
-   "dx": -12,
-   "dz": 2
-  },
-  {
-   "id": "world_046",
-   "name": "Nicodème · Messager",
-   "skin": 17,
-   "quest": "qs_130",
-   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Sang d'Orc : butin des Orcs Guerriers.",
-   "dim": "openworld",
-   "region": "Marches du Rempart",
-   "dx": 39,
-   "dz": -19
-  },
-  {
-   "id": "world_047",
-   "name": "Tobias · Éclaireur",
-   "skin": 7,
-   "quest": "qs_485",
-   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
-   "dim": "openworld",
-   "region": "Marches du Rempart",
-   "dx": -23,
-   "dz": -23
+   "dx": 28,
+   "dz": 3,
+   "quests": [
+    "qs_126",
+    "qs_127",
+    "qs_130",
+    "qs_485"
+   ]
   },
   {
    "id": "world_048",
@@ -948,41 +754,14 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Marches du Rempart",
-   "dx": -4,
-   "dz": -14
-  },
-  {
-   "id": "world_049",
-   "name": "Urbain · Traqueur",
-   "skin": 18,
-   "quest": "qs_125",
-   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
-   "dim": "openworld",
-   "region": "Marches du Rempart",
-   "dx": -30,
-   "dz": 29
-  },
-  {
-   "id": "world_050",
-   "name": "Valène · Libérateur",
-   "skin": 3,
-   "quest": "qs_128",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Marches du Rempart",
-   "dx": 37,
-   "dz": 23
-  },
-  {
-   "id": "world_051",
-   "name": "Iseult · Érudit",
-   "skin": 5,
-   "quest": "qs_129",
-   "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
-   "dim": "openworld",
-   "region": "Marches du Rempart",
-   "dx": 28,
-   "dz": 4
+   "dx": -14,
+   "dz": -12,
+   "quests": [
+    "qs_427",
+    "qs_125",
+    "qs_128",
+    "qs_129"
+   ]
   },
   {
    "id": "world_052",
@@ -992,30 +771,13 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Marches du Rempart",
-   "dx": -39,
-   "dz": 13
-  },
-  {
-   "id": "world_053",
-   "name": "Cassiane · Veilleur",
-   "skin": 18,
-   "quest": "qs_428",
-   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
-   "dim": "openworld",
-   "region": "Marches du Rempart",
-   "dx": 14,
-   "dz": -42
-  },
-  {
-   "id": "world_054",
-   "name": "Sévrin · Arbitre",
-   "skin": 18,
-   "quest": "qs_429",
-   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
-   "dim": "openworld",
-   "region": "Marches du Rempart",
-   "dx": 12,
-   "dz": 18
+   "dx": 5,
+   "dz": 20,
+   "quests": [
+    "qs_131",
+    "qs_428",
+    "qs_429"
+   ]
   },
   {
    "id": "world_055",
@@ -1025,41 +787,14 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Carapace de Cuivre : butin des monstres du désert.",
    "dim": "openworld",
    "region": "Plaines de Cendrelune",
-   "dx": -16,
-   "dz": -20
-  },
-  {
-   "id": "world_056",
-   "name": "Solène · Guide",
-   "skin": 14,
-   "quest": "qs_134",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Plaines de Cendrelune",
-   "dx": 37,
-   "dz": 0
-  },
-  {
-   "id": "world_057",
-   "name": "Blanche · Messager",
-   "skin": 4,
-   "quest": "qs_137",
-   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Crin Cendré : butin des Hyènes cendrées du désert et de la savane.",
-   "dim": "openworld",
-   "region": "Plaines de Cendrelune",
-   "dx": -27,
-   "dz": 11
-  },
-  {
-   "id": "world_058",
-   "name": "Dagmar · Éclaireur",
-   "skin": 2,
-   "quest": "qs_486",
-   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
-   "dim": "openworld",
-   "region": "Plaines de Cendrelune",
-   "dx": 2,
-   "dz": -17
+   "dx": -6,
+   "dz": -14,
+   "quests": [
+    "qs_133",
+    "qs_134",
+    "qs_137",
+    "qs_486"
+   ]
   },
   {
    "id": "world_059",
@@ -1069,41 +804,14 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Plaines de Cendrelune",
-   "dx": 17,
-   "dz": -8
-  },
-  {
-   "id": "world_060",
-   "name": "Jolan · Libérateur",
-   "skin": 1,
-   "quest": "qs_135",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Plaines de Cendrelune",
-   "dx": 19,
-   "dz": -32
-  },
-  {
-   "id": "world_061",
-   "name": "Rémi · Érudit",
-   "skin": 2,
-   "quest": "qs_136",
-   "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
-   "dim": "openworld",
-   "region": "Plaines de Cendrelune",
-   "dx": -32,
-   "dz": -18
-  },
-  {
-   "id": "world_062",
-   "name": "Prosper · Éclaireur",
-   "skin": 6,
-   "quest": "qs_138",
-   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
-   "dim": "openworld",
-   "region": "Plaines de Cendrelune",
-   "dx": -26,
-   "dz": 34
+   "dx": 24,
+   "dz": 13,
+   "quests": [
+    "qs_132",
+    "qs_135",
+    "qs_136",
+    "qs_138"
+   ]
   },
   {
    "id": "world_063",
@@ -1113,41 +821,14 @@
    "dialogue": "Le chronomètre démarre à l'acceptation.",
    "dim": "openworld",
    "region": "Plaines de Cendrelune",
-   "dx": 2,
-   "dz": 30
-  },
-  {
-   "id": "world_064",
-   "name": "Cassiane · Maître d’épreuve",
-   "skin": 5,
-   "quest": "qs_368",
-   "dialogue": "Le chronomètre démarre à l'acceptation.",
-   "dim": "openworld",
-   "region": "Plaines de Cendrelune",
-   "dx": 0,
-   "dz": -44
-  },
-  {
-   "id": "world_065",
-   "name": "Wilfrid · Maître d’épreuve",
-   "skin": 6,
-   "quest": "qs_369",
-   "dialogue": "Le chronomètre démarre à l'acceptation.",
-   "dim": "openworld",
-   "region": "Plaines de Cendrelune",
-   "dx": 25,
-   "dz": 21
-  },
-  {
-   "id": "world_066",
-   "name": "Vladimir · Maître d’épreuve",
-   "skin": 14,
-   "quest": "qs_370",
-   "dialogue": "Le chronomètre démarre à l'acceptation.",
-   "dim": "openworld",
-   "region": "Plaines de Cendrelune",
-   "dx": 18,
-   "dz": 41
+   "dx": -28,
+   "dz": 2,
+   "quests": [
+    "qs_367",
+    "qs_368",
+    "qs_369",
+    "qs_370"
+   ]
   },
   {
    "id": "world_067",
@@ -1157,19 +838,12 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Fragment d'Ossuaire : butin des monstres des cryptes.",
    "dim": "openworld",
    "region": "Ruines de Haute-Cadette",
-   "dx": -27,
-   "dz": -2
-  },
-  {
-   "id": "world_068",
-   "name": "Urbain · Guide",
-   "skin": 14,
-   "quest": "qs_141",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Ruines de Haute-Cadette",
-   "dx": -17,
-   "dz": 11
+   "dx": 19,
+   "dz": -5,
+   "quests": [
+    "qs_140",
+    "qs_141"
+   ]
   },
   {
    "id": "world_069",
@@ -1179,19 +853,12 @@
    "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Poussière d'Âme : butin des morts-vivants.",
    "dim": "openworld",
    "region": "Ruines de Haute-Cadette",
-   "dx": 3,
-   "dz": 13
-  },
-  {
-   "id": "world_070",
-   "name": "Fenna · Éclaireur",
-   "skin": 2,
-   "quest": "qs_487",
-   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
-   "dim": "openworld",
-   "region": "Ruines de Haute-Cadette",
-   "dx": 25,
-   "dz": -2
+   "dx": -21,
+   "dz": -8,
+   "quests": [
+    "qs_144",
+    "qs_487"
+   ]
   },
   {
    "id": "world_071",
@@ -1201,19 +868,12 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Ruines de Haute-Cadette",
-   "dx": 0,
-   "dz": -17
-  },
-  {
-   "id": "world_072",
-   "name": "Bastien · Libérateur",
-   "skin": 17,
-   "quest": "qs_142",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Ruines de Haute-Cadette",
-   "dx": 16,
-   "dz": -21
+   "dx": 4,
+   "dz": -28,
+   "quests": [
+    "qs_139",
+    "qs_142"
+   ]
   },
   {
    "id": "world_073",
@@ -1223,19 +883,12 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Ruines de Haute-Cadette",
-   "dx": 52,
-   "dz": 57
-  },
-  {
-   "id": "world_074",
-   "name": "Tanguy · Éclaireur",
-   "skin": 18,
-   "quest": "qs_145",
-   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
-   "dim": "openworld",
-   "region": "Ruines de Haute-Cadette",
-   "dx": 70,
-   "dz": 58
+   "dx": 23,
+   "dz": 42,
+   "quests": [
+    "qs_143",
+    "qs_145"
+   ]
   },
   {
    "id": "world_075",
@@ -1245,19 +898,12 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Ruines de Haute-Cadette",
-   "dx": 57,
-   "dz": 17
-  },
-  {
-   "id": "world_076",
-   "name": "Corvin · Veilleur",
-   "skin": 7,
-   "quest": "qs_431",
-   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
-   "dim": "openworld",
-   "region": "Ruines de Haute-Cadette",
-   "dx": 21,
-   "dz": 41
+   "dx": 63,
+   "dz": 54,
+   "quests": [
+    "qs_430",
+    "qs_431"
+   ]
   },
   {
    "id": "world_077",
@@ -1267,8 +913,11 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Ruines de Haute-Cadette",
-   "dx": 35,
-   "dz": 57
+   "dx": 40,
+   "dz": 67,
+   "quests": [
+    "qs_432"
+   ]
   },
   {
    "id": "world_078",
@@ -1278,30 +927,13 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Bandelette Ancienne : butin des monstres du désert.",
    "dim": "openworld",
    "region": "Désert de Verre",
-   "dx": 4,
-   "dz": 11
-  },
-  {
-   "id": "world_079",
-   "name": "Tanguy · Guide",
-   "skin": 8,
-   "quest": "qs_148",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Désert de Verre",
-   "dx": -12,
-   "dz": -2
-  },
-  {
-   "id": "world_080",
-   "name": "Zacharie · Messager",
-   "skin": 16,
-   "quest": "qs_151",
-   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Dard de Scorpion : butin des Scorpions de cuivre du désert.",
-   "dim": "openworld",
-   "region": "Désert de Verre",
-   "dx": 15,
-   "dz": -19
+   "dx": 5,
+   "dz": -17,
+   "quests": [
+    "qs_147",
+    "qs_148",
+    "qs_151"
+   ]
   },
   {
    "id": "world_081",
@@ -1311,30 +943,13 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Désert de Verre",
-   "dx": 28,
-   "dz": -4
-  },
-  {
-   "id": "world_082",
-   "name": "Dagmar · Traqueur",
-   "skin": 1,
-   "quest": "qs_146",
-   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
-   "dim": "openworld",
-   "region": "Désert de Verre",
-   "dx": -19,
-   "dz": -18
-  },
-  {
-   "id": "world_083",
-   "name": "Léandre · Libérateur",
-   "skin": 18,
-   "quest": "qs_149",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Désert de Verre",
-   "dx": 1,
-   "dz": -27
+   "dx": -2,
+   "dz": 14,
+   "quests": [
+    "qs_488",
+    "qs_146",
+    "qs_149"
+   ]
   },
   {
    "id": "world_084",
@@ -1344,19 +959,12 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Désert de Verre",
-   "dx": -4,
-   "dz": 28
-  },
-  {
-   "id": "world_085",
-   "name": "Gwenaëlle · Éclaireur",
-   "skin": 3,
-   "quest": "qs_152",
-   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
-   "dim": "openworld",
-   "region": "Désert de Verre",
-   "dx": 23,
-   "dz": 15
+   "dx": 29,
+   "dz": -3,
+   "quests": [
+    "qs_150",
+    "qs_152"
+   ]
   },
   {
    "id": "world_086",
@@ -1366,41 +974,14 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Blé d'Argent : se cultive avec une graine d'Argent, Fermier niveau 18.",
    "dim": "openworld",
    "region": "Vallée de Refuge-Bas",
-   "dx": -4,
-   "dz": 25
-  },
-  {
-   "id": "world_087",
-   "name": "Honorine · Guide",
-   "skin": 2,
-   "quest": "qs_155",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Vallée de Refuge-Bas",
    "dx": 14,
-   "dz": 21
-  },
-  {
-   "id": "world_088",
-   "name": "Klervi · Messager",
-   "skin": 18,
-   "quest": "qs_158",
-   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Baie Ambrée : se cultive avec une graine Ambrée, Fermier niveau 38.",
-   "dim": "openworld",
-   "region": "Vallée de Refuge-Bas",
-   "dx": 12,
-   "dz": 2
-  },
-  {
-   "id": "world_089",
-   "name": "Brunehilde · Éclaireur",
-   "skin": 5,
-   "quest": "qs_489",
-   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
-   "dim": "openworld",
-   "region": "Vallée de Refuge-Bas",
-   "dx": 27,
-   "dz": -5
+   "dz": 4,
+   "quests": [
+    "qs_154",
+    "qs_155",
+    "qs_158",
+    "qs_489"
+   ]
   },
   {
    "id": "world_090",
@@ -1410,41 +991,14 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Vallée de Refuge-Bas",
-   "dx": 1,
-   "dz": -29
-  },
-  {
-   "id": "world_091",
-   "name": "Florian · Traqueur",
-   "skin": 7,
-   "quest": "qs_153",
-   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
-   "dim": "openworld",
-   "region": "Vallée de Refuge-Bas",
-   "dx": -4,
-   "dz": -5
-  },
-  {
-   "id": "world_092",
-   "name": "Wendel · Libérateur",
-   "skin": 16,
-   "quest": "qs_156",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Vallée de Refuge-Bas",
-   "dx": -19,
-   "dz": 4
-  },
-  {
-   "id": "world_093",
-   "name": "Urbain · Érudit",
-   "skin": 17,
-   "quest": "qs_157",
-   "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
-   "dim": "openworld",
-   "region": "Vallée de Refuge-Bas",
-   "dx": 30,
-   "dz": 15
+   "dx": -7,
+   "dz": 28,
+   "quests": [
+    "qs_433",
+    "qs_153",
+    "qs_156",
+    "qs_157"
+   ]
   },
   {
    "id": "world_094",
@@ -1454,30 +1008,13 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Vallée de Refuge-Bas",
-   "dx": -27,
-   "dz": 20
-  },
-  {
-   "id": "world_095",
-   "name": "Nolwenn · Veilleur",
-   "skin": 8,
-   "quest": "qs_434",
-   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
-   "dim": "openworld",
-   "region": "Vallée de Refuge-Bas",
-   "dx": -19,
-   "dz": -21
-  },
-  {
-   "id": "world_096",
-   "name": "Célestin · Arbitre",
-   "skin": 4,
-   "quest": "qs_435",
-   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
-   "dim": "openworld",
-   "region": "Vallée de Refuge-Bas",
-   "dx": 24,
-   "dz": -27
+   "dx": -16,
+   "dz": 2,
+   "quests": [
+    "qs_159",
+    "qs_434",
+    "qs_435"
+   ]
   },
   {
    "id": "world_097",
@@ -1487,30 +1024,13 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Acier Orc : butin des Orcs Guerriers.",
    "dim": "openworld",
    "region": "Terres du Fort de la Brisure",
-   "dx": 21,
-   "dz": 11
-  },
-  {
-   "id": "world_098",
-   "name": "Corvin · Guide",
-   "skin": 3,
-   "quest": "qs_162",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Terres du Fort de la Brisure",
-   "dx": 14,
-   "dz": -16
-  },
-  {
-   "id": "world_099",
-   "name": "Silvain · Messager",
-   "skin": 17,
-   "quest": "qs_165",
-   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Lingot de Ambrasite : s'obtient en minant les veines d'Ambrasite des Mines d'Aeloria.",
-   "dim": "openworld",
-   "region": "Terres du Fort de la Brisure",
-   "dx": -21,
-   "dz": 13
+   "dx": -16,
+   "dz": 17,
+   "quests": [
+    "qs_161",
+    "qs_162",
+    "qs_165"
+   ]
   },
   {
    "id": "world_100",
@@ -1520,30 +1040,13 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Terres du Fort de la Brisure",
-   "dx": 0,
-   "dz": 11
-  },
-  {
-   "id": "world_101",
-   "name": "Philémon · Traqueur",
-   "skin": 7,
-   "quest": "qs_160",
-   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
-   "dim": "openworld",
-   "region": "Terres du Fort de la Brisure",
-   "dx": -6,
-   "dz": -27
-  },
-  {
-   "id": "world_102",
-   "name": "Mélisande · Libérateur",
-   "skin": 15,
-   "quest": "qs_163",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Terres du Fort de la Brisure",
-   "dx": -14,
-   "dz": -5
+   "dx": 18,
+   "dz": -23,
+   "quests": [
+    "qs_490",
+    "qs_160",
+    "qs_163"
+   ]
   },
   {
    "id": "world_103",
@@ -1553,19 +1056,12 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Terres du Fort de la Brisure",
-   "dx": -6,
-   "dz": 27
-  },
-  {
-   "id": "world_104",
-   "name": "Bastien · Éclaireur",
-   "skin": 8,
-   "quest": "qs_166",
-   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
-   "dim": "openworld",
-   "region": "Terres du Fort de la Brisure",
-   "dx": 11,
-   "dz": 27
+   "dx": 21,
+   "dz": 4,
+   "quests": [
+    "qs_164",
+    "qs_166"
+   ]
   },
   {
    "id": "world_105",
@@ -1575,41 +1071,14 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Carapace Givrée : butin des bêtes des terres gelées.",
    "dim": "openworld",
    "region": "Pics d'Hivernoir",
-   "dx": -31,
-   "dz": 24
-  },
-  {
-   "id": "world_106",
-   "name": "Thibault · Guide",
-   "skin": 15,
-   "quest": "qs_169",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Pics d'Hivernoir",
-   "dx": 15,
-   "dz": -1
-  },
-  {
-   "id": "world_107",
-   "name": "Ignace · Messager",
-   "skin": 3,
-   "quest": "qs_172",
-   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Fourrure Polaire : butin des bêtes des terres gelées.",
-   "dim": "openworld",
-   "region": "Pics d'Hivernoir",
-   "dx": -3,
-   "dz": -7
-  },
-  {
-   "id": "world_108",
-   "name": "Yvain · Éclaireur",
-   "skin": 18,
-   "quest": "qs_491",
-   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
-   "dim": "openworld",
-   "region": "Pics d'Hivernoir",
-   "dx": 27,
-   "dz": 15
+   "dx": 10,
+   "dz": 16,
+   "quests": [
+    "qs_168",
+    "qs_169",
+    "qs_172",
+    "qs_491"
+   ]
   },
   {
    "id": "world_109",
@@ -1619,41 +1088,14 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Pics d'Hivernoir",
-   "dx": 5,
-   "dz": 19
-  },
-  {
-   "id": "world_110",
-   "name": "Kélia · Traqueur",
-   "skin": 2,
-   "quest": "qs_167",
-   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
-   "dim": "openworld",
-   "region": "Pics d'Hivernoir",
-   "dx": 42,
-   "dz": -8
-  },
-  {
-   "id": "world_111",
-   "name": "Klervi · Libérateur",
-   "skin": 3,
-   "quest": "qs_170",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Pics d'Hivernoir",
-   "dx": 0,
-   "dz": 39
-  },
-  {
-   "id": "world_112",
-   "name": "Lazare · Érudit",
-   "skin": 7,
-   "quest": "qs_171",
-   "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
-   "dim": "openworld",
-   "region": "Pics d'Hivernoir",
-   "dx": -1,
-   "dz": -38
+   "dx": -6,
+   "dz": -16,
+   "quests": [
+    "qs_436",
+    "qs_167",
+    "qs_170",
+    "qs_171"
+   ]
   },
   {
    "id": "world_113",
@@ -1663,30 +1105,13 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Pics d'Hivernoir",
-   "dx": 26,
-   "dz": -29
-  },
-  {
-   "id": "world_114",
-   "name": "Jeanne · Veilleur",
-   "skin": 2,
-   "quest": "qs_437",
-   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
-   "dim": "openworld",
-   "region": "Pics d'Hivernoir",
-   "dx": -19,
-   "dz": -17
-  },
-  {
-   "id": "world_115",
-   "name": "Jolan · Arbitre",
-   "skin": 17,
-   "quest": "qs_438",
-   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
-   "dim": "openworld",
-   "region": "Pics d'Hivernoir",
-   "dx": -16,
-   "dz": 4
+   "dx": -18,
+   "dz": 15,
+   "quests": [
+    "qs_173",
+    "qs_437",
+    "qs_438"
+   ]
   },
   {
    "id": "world_116",
@@ -1696,30 +1121,13 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Sève Lumineuse : butin des monstres de forêt.",
    "dim": "openworld",
    "region": "Forêt Pétrifiée",
-   "dx": 17,
-   "dz": 20
-  },
-  {
-   "id": "world_117",
-   "name": "Nolwenn · Guide",
-   "skin": 3,
-   "quest": "qs_176",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Forêt Pétrifiée",
-   "dx": -3,
-   "dz": -29
-  },
-  {
-   "id": "world_118",
-   "name": "Jorun · Messager",
-   "skin": 5,
-   "quest": "qs_179",
-   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Défense de Ronce : butin des Sangliers ronce des forêts.",
-   "dim": "openworld",
-   "region": "Forêt Pétrifiée",
-   "dx": -12,
-   "dz": 13
+   "dx": 19,
+   "dz": 23,
+   "quests": [
+    "qs_175",
+    "qs_176",
+    "qs_179"
+   ]
   },
   {
    "id": "world_119",
@@ -1729,30 +1137,13 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Forêt Pétrifiée",
-   "dx": 22,
-   "dz": -18
-  },
-  {
-   "id": "world_120",
-   "name": "Cassiane · Traqueur",
-   "skin": 5,
-   "quest": "qs_174",
-   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
-   "dim": "openworld",
-   "region": "Forêt Pétrifiée",
-   "dx": 18,
-   "dz": 3
-  },
-  {
-   "id": "world_121",
-   "name": "Célestin · Libérateur",
-   "skin": 14,
-   "quest": "qs_177",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Forêt Pétrifiée",
-   "dx": -27,
-   "dz": -12
+   "dx": -12,
+   "dz": 27,
+   "quests": [
+    "qs_492",
+    "qs_174",
+    "qs_177"
+   ]
   },
   {
    "id": "world_122",
@@ -1762,19 +1153,12 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Forêt Pétrifiée",
-   "dx": -29,
-   "dz": 5
-  },
-  {
-   "id": "world_123",
-   "name": "Ivo · Éclaireur",
-   "skin": 8,
-   "quest": "qs_180",
-   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
-   "dim": "openworld",
-   "region": "Forêt Pétrifiée",
-   "dx": 3,
-   "dz": 29
+   "dx": 26,
+   "dz": -5,
+   "quests": [
+    "qs_178",
+    "qs_180"
+   ]
   },
   {
    "id": "world_124",
@@ -1784,41 +1168,14 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Anchois des abysses : se pêche dans les abysses.",
    "dim": "openworld",
    "region": "Abysses de Sombrelac",
-   "dx": -31,
-   "dz": 18
-  },
-  {
-   "id": "world_125",
-   "name": "Rosalie · Guide",
-   "skin": 2,
-   "quest": "qs_183",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Abysses de Sombrelac",
-   "dx": -35,
-   "dz": -17
-  },
-  {
-   "id": "world_126",
-   "name": "Yseult · Messager",
-   "skin": 14,
-   "quest": "qs_186",
-   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Poisson-lanterne : se pêche en mer et dans les abysses, la nuit.",
-   "dim": "openworld",
-   "region": "Abysses de Sombrelac",
-   "dx": 30,
-   "dz": 14
-  },
-  {
-   "id": "world_127",
-   "name": "Béatrice · Éclaireur",
-   "skin": 5,
-   "quest": "qs_493",
-   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
-   "dim": "openworld",
-   "region": "Abysses de Sombrelac",
-   "dx": -7,
-   "dz": -32
+   "dx": -21,
+   "dz": -7,
+   "quests": [
+    "qs_182",
+    "qs_183",
+    "qs_186",
+    "qs_493"
+   ]
   },
   {
    "id": "world_128",
@@ -1828,41 +1185,14 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Abysses de Sombrelac",
-   "dx": 26,
-   "dz": 34
-  },
-  {
-   "id": "world_129",
-   "name": "Roxane · Traqueur",
-   "skin": 16,
-   "quest": "qs_181",
-   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
-   "dim": "openworld",
-   "region": "Abysses de Sombrelac",
-   "dx": -20,
-   "dz": -2
-  },
-  {
-   "id": "world_130",
-   "name": "Yvain · Libérateur",
-   "skin": 0,
-   "quest": "qs_184",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Abysses de Sombrelac",
-   "dx": 28,
-   "dz": -4
-  },
-  {
-   "id": "world_131",
-   "name": "Viviane · Érudit",
-   "skin": 6,
-   "quest": "qs_185",
-   "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
-   "dim": "openworld",
-   "region": "Abysses de Sombrelac",
-   "dx": -43,
-   "dz": 3
+   "dx": 15,
+   "dz": -7,
+   "quests": [
+    "qs_439",
+    "qs_181",
+    "qs_184",
+    "qs_185"
+   ]
   },
   {
    "id": "world_132",
@@ -1872,30 +1202,13 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Abysses de Sombrelac",
-   "dx": -23,
-   "dz": -38
-  },
-  {
-   "id": "world_133",
-   "name": "Edmée · Veilleur",
-   "skin": 1,
-   "quest": "qs_440",
-   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
-   "dim": "openworld",
-   "region": "Abysses de Sombrelac",
-   "dx": 44,
-   "dz": 3
-  },
-  {
-   "id": "world_134",
-   "name": "Tanguy · Arbitre",
-   "skin": 7,
-   "quest": "qs_441",
-   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
-   "dim": "openworld",
-   "region": "Abysses de Sombrelac",
-   "dx": 8,
-   "dz": -40
+   "dx": 24,
+   "dz": 18,
+   "quests": [
+    "qs_187",
+    "qs_440",
+    "qs_441"
+   ]
   },
   {
    "id": "world_135",
@@ -1905,30 +1218,13 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Poussière d'Étoile : butin des créatures du vide, îles du large, océans profonds, End.",
    "dim": "openworld",
    "region": "Faille des Murmures",
-   "dx": 7,
-   "dz": 21
-  },
-  {
-   "id": "world_136",
-   "name": "Ulrich · Guide",
-   "skin": 8,
-   "quest": "qs_190",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Faille des Murmures",
-   "dx": -13,
-   "dz": -3
-  },
-  {
-   "id": "world_137",
-   "name": "Garance · Messager",
-   "skin": 0,
-   "quest": "qs_193",
-   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Éclat Astral : butin des créatures du vide, îles du large, océans profonds, End.",
-   "dim": "openworld",
-   "region": "Faille des Murmures",
    "dx": 10,
-   "dz": -19
+   "dz": -22,
+   "quests": [
+    "qs_189",
+    "qs_190",
+    "qs_193"
+   ]
   },
   {
    "id": "world_138",
@@ -1938,30 +1234,13 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Faille des Murmures",
-   "dx": -4,
-   "dz": -28
-  },
-  {
-   "id": "world_139",
-   "name": "Morgane · Traqueur",
-   "skin": 15,
-   "quest": "qs_188",
-   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
-   "dim": "openworld",
-   "region": "Faille des Murmures",
-   "dx": -23,
-   "dz": -17
-  },
-  {
-   "id": "world_140",
-   "name": "Alaric · Libérateur",
-   "skin": 14,
-   "quest": "qs_191",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Faille des Murmures",
-   "dx": 24,
-   "dz": 7
+   "dx": -17,
+   "dz": -18,
+   "quests": [
+    "qs_494",
+    "qs_188",
+    "qs_191"
+   ]
   },
   {
    "id": "world_141",
@@ -1971,19 +1250,12 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Faille des Murmures",
-   "dx": -10,
-   "dz": 17
-  },
-  {
-   "id": "world_142",
-   "name": "Florian · Éclaireur",
-   "skin": 16,
-   "quest": "qs_194",
-   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
-   "dim": "openworld",
-   "region": "Faille des Murmures",
-   "dx": 28,
-   "dz": -9
+   "dx": -12,
+   "dz": 14,
+   "quests": [
+    "qs_192",
+    "qs_194"
+   ]
   },
   {
    "id": "world_143",
@@ -1993,41 +1265,14 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Éclat Astral : butin des créatures du vide, îles du large, océans profonds, End.",
    "dim": "openworld",
    "region": "Marches Renégates",
-   "dx": 4,
-   "dz": 37
-  },
-  {
-   "id": "world_144",
-   "name": "Morgane · Guide",
-   "skin": 3,
-   "quest": "qs_197",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Marches Renégates",
-   "dx": 29,
-   "dz": 23
-  },
-  {
-   "id": "world_145",
-   "name": "Éloi · Messager",
-   "skin": 1,
-   "quest": "qs_200",
-   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Poussière d'Étoile : butin des créatures du vide, îles du large, océans profonds, End.",
-   "dim": "openworld",
-   "region": "Marches Renégates",
-   "dx": -27,
-   "dz": 10
-  },
-  {
-   "id": "world_146",
-   "name": "Elwen · Éclaireur",
-   "skin": 15,
-   "quest": "qs_495",
-   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
-   "dim": "openworld",
-   "region": "Marches Renégates",
-   "dx": 25,
-   "dz": -29
+   "dx": 18,
+   "dz": 17,
+   "quests": [
+    "qs_196",
+    "qs_197",
+    "qs_200",
+    "qs_495"
+   ]
   },
   {
    "id": "world_147",
@@ -2037,41 +1282,14 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Marches Renégates",
-   "dx": 5,
-   "dz": 16
-  },
-  {
-   "id": "world_148",
-   "name": "Zacharie · Traqueur",
-   "skin": 8,
-   "quest": "qs_195",
-   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
-   "dim": "openworld",
-   "region": "Marches Renégates",
-   "dx": -36,
-   "dz": -12
-  },
-  {
-   "id": "world_149",
-   "name": "Silvain · Libérateur",
-   "skin": 6,
-   "quest": "qs_198",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Marches Renégates",
-   "dx": 9,
-   "dz": -42
-  },
-  {
-   "id": "world_150",
-   "name": "Jolan · Érudit",
-   "skin": 1,
-   "quest": "qs_199",
-   "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
-   "dim": "openworld",
-   "region": "Marches Renégates",
-   "dx": 40,
-   "dz": -4
+   "dx": 1,
+   "dz": -28,
+   "quests": [
+    "qs_442",
+    "qs_195",
+    "qs_198",
+    "qs_199"
+   ]
   },
   {
    "id": "world_151",
@@ -2081,30 +1299,13 @@
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
    "region": "Marches Renégates",
-   "dx": -12,
-   "dz": 40
-  },
-  {
-   "id": "world_152",
-   "name": "Éloi · Veilleur",
-   "skin": 4,
-   "quest": "qs_443",
-   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
-   "dim": "openworld",
-   "region": "Marches Renégates",
-   "dx": 39,
-   "dz": -20
-  },
-  {
-   "id": "world_153",
-   "name": "Gaspard · Arbitre",
-   "skin": 3,
-   "quest": "qs_444",
-   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
-   "dim": "openworld",
-   "region": "Marches Renégates",
-   "dx": 17,
-   "dz": -7
+   "dx": -18,
+   "dz": -3,
+   "quests": [
+    "qs_201",
+    "qs_443",
+    "qs_444"
+   ]
   },
   {
    "id": "world_154",
@@ -2114,30 +1315,13 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Griffe du Vide : butin des Rôdeurs du vide.",
    "dim": "openworld",
    "region": "Lisières du Cratère",
-   "dx": 83,
-   "dz": -51
-  },
-  {
-   "id": "world_155",
-   "name": "Alaric · Guide",
-   "skin": 17,
-   "quest": "qs_204",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Lisières du Cratère",
-   "dx": 93,
-   "dz": -31
-  },
-  {
-   "id": "world_156",
-   "name": "Osric · Messager",
-   "skin": 8,
-   "quest": "qs_207",
-   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Poudre d'Aile Astrale : butin des Mites astrales du vide.",
-   "dim": "openworld",
-   "region": "Lisières du Cratère",
-   "dx": 9,
-   "dz": 97
+   "dx": 80,
+   "dz": -49,
+   "quests": [
+    "qs_203",
+    "qs_204",
+    "qs_207"
+   ]
   },
   {
    "id": "world_157",
@@ -2147,30 +1331,13 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Lisières du Cratère",
-   "dx": -89,
-   "dz": -40
-  },
-  {
-   "id": "world_158",
-   "name": "Klervi · Traqueur",
-   "skin": 15,
-   "quest": "qs_202",
-   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
-   "dim": "openworld",
-   "region": "Lisières du Cratère",
-   "dx": -94,
-   "dz": 26
-  },
-  {
-   "id": "world_159",
-   "name": "Florian · Libérateur",
-   "skin": 18,
-   "quest": "qs_205",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Lisières du Cratère",
-   "dx": 47,
-   "dz": 87
+   "dx": -63,
+   "dz": 75,
+   "quests": [
+    "qs_496",
+    "qs_202",
+    "qs_205"
+   ]
   },
   {
    "id": "world_160",
@@ -2180,19 +1347,12 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Lisières du Cratère",
-   "dx": 7,
-   "dz": 23
-  },
-  {
-   "id": "world_161",
-   "name": "Wendel · Éclaireur",
-   "skin": 7,
-   "quest": "qs_208",
-   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
-   "dim": "openworld",
-   "region": "Lisières du Cratère",
-   "dx": -94,
-   "dz": -24
+   "dx": 20,
+   "dz": 97,
+   "quests": [
+    "qs_206",
+    "qs_208"
+   ]
   },
   {
    "id": "world_162",
@@ -2202,41 +1362,14 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Lingot de Glacium : s'obtient en minant les veines de Glacium des Mines d'Aeloria.",
    "dim": "openworld",
    "region": "Forge de Malvorn",
-   "dx": -38,
-   "dz": -24
-  },
-  {
-   "id": "world_163",
-   "name": "Gareth · Guide",
-   "skin": 4,
-   "quest": "qs_211",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Forge de Malvorn",
-   "dx": -31,
-   "dz": 24
-  },
-  {
-   "id": "world_164",
-   "name": "Anselme · Messager",
-   "skin": 3,
-   "quest": "qs_214",
-   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Lingot de Néantite : s'obtient en minant les veines de Néantite des Mines d'Aeloria.",
-   "dim": "openworld",
-   "region": "Forge de Malvorn",
-   "dx": 16,
-   "dz": 14
-  },
-  {
-   "id": "world_165",
-   "name": "Lorcan · Éclaireur",
-   "skin": 3,
-   "quest": "qs_497",
-   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
-   "dim": "openworld",
-   "region": "Forge de Malvorn",
-   "dx": -26,
-   "dz": 4
+   "dx": 2,
+   "dz": -25,
+   "quests": [
+    "qs_210",
+    "qs_211",
+    "qs_214",
+    "qs_497"
+   ]
   },
   {
    "id": "world_166",
@@ -2246,41 +1379,14 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Forge de Malvorn",
-   "dx": 0,
-   "dz": -15
-  },
-  {
-   "id": "world_167",
-   "name": "Rémi · Libérateur",
-   "skin": 2,
-   "quest": "qs_212",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Forge de Malvorn",
-   "dx": -7,
-   "dz": 9
-  },
-  {
-   "id": "world_168",
-   "name": "Océane · Érudit",
-   "skin": 17,
-   "quest": "qs_213",
-   "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
-   "dim": "openworld",
-   "region": "Forge de Malvorn",
-   "dx": 9,
-   "dz": 30
-  },
-  {
-   "id": "world_169",
-   "name": "Léandre · Éclaireur",
-   "skin": 2,
-   "quest": "qs_215",
-   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
-   "dim": "openworld",
-   "region": "Forge de Malvorn",
-   "dx": -23,
-   "dz": -16
+   "dx": -5,
+   "dz": 21,
+   "quests": [
+    "qs_209",
+    "qs_212",
+    "qs_213",
+    "qs_215"
+   ]
   },
   {
    "id": "world_170",
@@ -2290,30 +1396,13 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Forge de Malvorn",
-   "dx": 0,
-   "dz": -39
-  },
-  {
-   "id": "world_171",
-   "name": "Lazare · Veilleur",
-   "skin": 7,
-   "quest": "qs_446",
-   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
-   "dim": "openworld",
-   "region": "Forge de Malvorn",
-   "dx": -22,
-   "dz": -33
-  },
-  {
-   "id": "world_172",
-   "name": "Honorine · Arbitre",
-   "skin": 8,
-   "quest": "qs_447",
-   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
-   "dim": "openworld",
-   "region": "Forge de Malvorn",
-   "dx": -15,
-   "dz": 41
+   "dx": 23,
+   "dz": 19,
+   "quests": [
+    "qs_445",
+    "qs_446",
+    "qs_447"
+   ]
   },
   {
    "id": "world_173",
@@ -2323,30 +1412,13 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Pupille du Chaos : butin des Yeux du chaos du vide.",
    "dim": "openworld",
    "region": "Nécropole d'Aelis",
-   "dx": 28,
-   "dz": 25
-  },
-  {
-   "id": "world_174",
-   "name": "Viviane · Guide",
-   "skin": 6,
-   "quest": "qs_218",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Nécropole d'Aelis",
-   "dx": -30,
-   "dz": -11
-  },
-  {
-   "id": "world_175",
-   "name": "Aldric · Messager",
-   "skin": 14,
-   "quest": "qs_221",
-   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Griffe du Vide : butin des Rôdeurs du vide.",
-   "dim": "openworld",
-   "region": "Nécropole d'Aelis",
-   "dx": -31,
-   "dz": 26
+   "dx": -4,
+   "dz": -22,
+   "quests": [
+    "qs_217",
+    "qs_218",
+    "qs_221"
+   ]
   },
   {
    "id": "world_176",
@@ -2356,30 +1428,13 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Nécropole d'Aelis",
-   "dx": -35,
-   "dz": 5
-  },
-  {
-   "id": "world_177",
-   "name": "Garance · Traqueur",
-   "skin": 1,
-   "quest": "qs_216",
-   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
-   "dim": "openworld",
-   "region": "Nécropole d'Aelis",
-   "dx": 25,
-   "dz": -11
-  },
-  {
-   "id": "world_178",
-   "name": "Cassiane · Libérateur",
-   "skin": 7,
-   "quest": "qs_219",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Nécropole d'Aelis",
-   "dx": 5,
-   "dz": -2
+   "dx": 22,
+   "dz": -12,
+   "quests": [
+    "qs_498",
+    "qs_216",
+    "qs_219"
+   ]
   },
   {
    "id": "world_179",
@@ -2389,19 +1444,12 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Nécropole d'Aelis",
-   "dx": 41,
-   "dz": -6
-  },
-  {
-   "id": "world_180",
-   "name": "Morgane · Éclaireur",
-   "skin": 15,
-   "quest": "qs_222",
-   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
-   "dim": "openworld",
-   "region": "Nécropole d'Aelis",
-   "dx": -29,
-   "dz": -30
+   "dx": -21,
+   "dz": 17,
+   "quests": [
+    "qs_220",
+    "qs_222"
+   ]
   },
   {
    "id": "world_181",
@@ -2411,41 +1459,14 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Éclat Fracturé : butin des êtres du vide.",
    "dim": "openworld",
    "region": "Entre-Monde",
-   "dx": -21,
-   "dz": -4
-  },
-  {
-   "id": "world_182",
-   "name": "Nicodème · Guide",
-   "skin": 5,
-   "quest": "qs_225",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Entre-Monde",
-   "dx": -34,
-   "dz": 25
-  },
-  {
-   "id": "world_183",
-   "name": "Ivo · Messager",
-   "skin": 6,
-   "quest": "qs_228",
-   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Pupille du Chaos : butin des Yeux du chaos du vide.",
-   "dim": "openworld",
-   "region": "Entre-Monde",
-   "dx": 29,
-   "dz": -9
-  },
-  {
-   "id": "world_184",
-   "name": "Ursule · Éclaireur",
-   "skin": 18,
-   "quest": "qs_499",
-   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
-   "dim": "openworld",
-   "region": "Entre-Monde",
-   "dx": 19,
-   "dz": 37
+   "dx": 7,
+   "dz": 26,
+   "quests": [
+    "qs_224",
+    "qs_225",
+    "qs_228",
+    "qs_499"
+   ]
   },
   {
    "id": "world_185",
@@ -2455,41 +1476,14 @@
    "dialogue": "Une bête plus grosse que les autres terrorise la région.",
    "dim": "openworld",
    "region": "Entre-Monde",
-   "dx": -14,
-   "dz": 17
-  },
-  {
-   "id": "world_186",
-   "name": "Wilfrid · Libérateur",
-   "skin": 5,
-   "quest": "qs_226",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Entre-Monde",
-   "dx": 2,
-   "dz": 38
-  },
-  {
-   "id": "world_187",
-   "name": "Faustine · Érudit",
-   "skin": 1,
-   "quest": "qs_227",
-   "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
-   "dim": "openworld",
-   "region": "Entre-Monde",
-   "dx": -3,
-   "dz": 4
-  },
-  {
-   "id": "world_188",
-   "name": "Klervi · Éclaireur",
-   "skin": 2,
-   "quest": "qs_229",
-   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
-   "dim": "openworld",
-   "region": "Entre-Monde",
-   "dx": -43,
-   "dz": 1
+   "dx": -18,
+   "dz": -4,
+   "quests": [
+    "qs_223",
+    "qs_226",
+    "qs_227",
+    "qs_229"
+   ]
   },
   {
    "id": "world_189",
@@ -2499,30 +1493,13 @@
    "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
    "dim": "openworld",
    "region": "Entre-Monde",
-   "dx": 7,
-   "dz": 22
-  },
-  {
-   "id": "world_190",
-   "name": "Gaspard · Veilleur",
-   "skin": 5,
-   "quest": "qs_449",
-   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
-   "dim": "openworld",
-   "region": "Entre-Monde",
-   "dx": -36,
-   "dz": -20
-  },
-  {
-   "id": "world_191",
-   "name": "Romane · Arbitre",
-   "skin": 16,
-   "quest": "qs_450",
-   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
-   "dim": "openworld",
-   "region": "Entre-Monde",
-   "dx": 31,
-   "dz": 13
+   "dx": 9,
+   "dz": -1,
+   "quests": [
+    "qs_448",
+    "qs_449",
+    "qs_450"
+   ]
   },
   {
    "id": "world_192",
@@ -2532,30 +1509,13 @@
    "dialogue": "Le journal d'un Cadet raconte les jours qui ont suivi la Brisure. Rapporte-moi 5 Éclat Fracturé : butin des êtres du vide.",
    "dim": "openworld",
    "region": "Cœur de la Brisure",
-   "dx": -24,
-   "dz": 17
-  },
-  {
-   "id": "world_193",
-   "name": "Wendel · Guide",
-   "skin": 4,
-   "quest": "qs_232",
-   "dialogue": "Un survivant cherche à rejoindre les siens.",
-   "dim": "openworld",
-   "region": "Cœur de la Brisure",
-   "dx": 33,
-   "dz": 24
-  },
-  {
-   "id": "world_194",
-   "name": "Kélia · Messager",
-   "skin": 14,
-   "quest": "qs_235",
-   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Orchidée du Néant : se cultive avec une graine du Néant, Fermier niveau 75.",
-   "dim": "openworld",
-   "region": "Cœur de la Brisure",
-   "dx": -22,
-   "dz": 33
+   "dx": 13,
+   "dz": 26,
+   "quests": [
+    "qs_231",
+    "qs_232",
+    "qs_235"
+   ]
   },
   {
    "id": "world_195",
@@ -2565,30 +1525,13 @@
    "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
    "dim": "openworld",
    "region": "Cœur de la Brisure",
-   "dx": -37,
-   "dz": -20
-  },
-  {
-   "id": "world_196",
-   "name": "Tobias · Traqueur",
-   "skin": 15,
-   "quest": "qs_230",
-   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
-   "dim": "openworld",
-   "region": "Cœur de la Brisure",
-   "dx": 15,
-   "dz": 35
-  },
-  {
-   "id": "world_197",
-   "name": "Vladimir · Libérateur",
-   "skin": 0,
-   "quest": "qs_233",
-   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
-   "dim": "openworld",
-   "region": "Cœur de la Brisure",
-   "dx": -6,
-   "dz": 5
+   "dx": -11,
+   "dz": 2,
+   "quests": [
+    "qs_500",
+    "qs_230",
+    "qs_233"
+   ]
   },
   {
    "id": "world_198",
@@ -2598,8 +1541,1157 @@
    "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
    "dim": "openworld",
    "region": "Cœur de la Brisure",
-   "dx": 13,
-   "dz": 1
+   "dx": 21,
+   "dz": 1,
+   "quests": [
+    "qs_234",
+    "qs_236"
+   ]
+  }
+ ],
+ "retired": [
+  {
+   "id": "world_001",
+   "name": "Brunehilde · Guide",
+   "skin": 8,
+   "quest": "qs_099",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Valdhéris et les Contreforts"
+  },
+  {
+   "id": "world_002",
+   "name": "Dagmar · Messager",
+   "skin": 4,
+   "quest": "qs_102",
+   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Écorce Ancienne : butin des monstres de forêt et de plaines.",
+   "dim": "openworld",
+   "region": "Valdhéris et les Contreforts"
+  },
+  {
+   "id": "world_004",
+   "name": "Jorun · Traqueur",
+   "skin": 18,
+   "quest": "qs_097",
+   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
+   "dim": "openworld",
+   "region": "Valdhéris et les Contreforts"
+  },
+  {
+   "id": "world_005",
+   "name": "Héloïse · Libérateur",
+   "skin": 1,
+   "quest": "qs_100",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Valdhéris et les Contreforts"
+  },
+  {
+   "id": "world_007",
+   "name": "Honorine · Éclaireur",
+   "skin": 16,
+   "quest": "qs_103",
+   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
+   "dim": "openworld",
+   "region": "Valdhéris et les Contreforts"
+  },
+  {
+   "id": "world_009",
+   "name": "Lorcan · Guide",
+   "skin": 0,
+   "quest": "qs_106",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Bois de Murmurelle"
+  },
+  {
+   "id": "world_011",
+   "name": "Jeanne · Éclaireur",
+   "skin": 7,
+   "quest": "qs_482",
+   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
+   "dim": "openworld",
+   "region": "Bois de Murmurelle"
+  },
+  {
+   "id": "world_013",
+   "name": "Faustine · Veilleur",
+   "skin": 7,
+   "quest": "qs_422",
+   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
+   "dim": "openworld",
+   "region": "Bois de Murmurelle"
+  },
+  {
+   "id": "world_015",
+   "name": "Zacharie · Libérateur",
+   "skin": 0,
+   "quest": "qs_107",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Bois de Murmurelle"
+  },
+  {
+   "id": "world_017",
+   "name": "Solène · Éclaireur",
+   "skin": 14,
+   "quest": "qs_110",
+   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
+   "dim": "openworld",
+   "region": "Bois de Murmurelle"
+  },
+  {
+   "id": "world_019",
+   "name": "Gareth · Maître d’épreuve",
+   "skin": 8,
+   "quest": "qs_361",
+   "dialogue": "Le chronomètre démarre à l'acceptation.",
+   "dim": "openworld",
+   "region": "Bois de Murmurelle"
+  },
+  {
+   "id": "world_021",
+   "name": "Océane · Maître d’épreuve",
+   "skin": 7,
+   "quest": "qs_363",
+   "dialogue": "Le chronomètre démarre à l'acceptation.",
+   "dim": "openworld",
+   "region": "Bois de Murmurelle"
+  },
+  {
+   "id": "world_023",
+   "name": "Isaure · Maître d’épreuve",
+   "skin": 4,
+   "quest": "qs_365",
+   "dialogue": "Le chronomètre démarre à l'acceptation.",
+   "dim": "openworld",
+   "region": "Bois de Murmurelle"
+  },
+  {
+   "id": "world_026",
+   "name": "Perrin · Guide",
+   "skin": 3,
+   "quest": "qs_113",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Marais de Fangeterre"
+  },
+  {
+   "id": "world_028",
+   "name": "Blanche · Éclaireur",
+   "skin": 14,
+   "quest": "qs_483",
+   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
+   "dim": "openworld",
+   "region": "Marais de Fangeterre"
+  },
+  {
+   "id": "world_030",
+   "name": "Ambroise · Libérateur",
+   "skin": 4,
+   "quest": "qs_114",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Marais de Fangeterre"
+  },
+  {
+   "id": "world_032",
+   "name": "Éloi · Éclaireur",
+   "skin": 3,
+   "quest": "qs_117",
+   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
+   "dim": "openworld",
+   "region": "Marais de Fangeterre"
+  },
+  {
+   "id": "world_034",
+   "name": "Nestor · Veilleur",
+   "skin": 7,
+   "quest": "qs_425",
+   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
+   "dim": "openworld",
+   "region": "Marais de Fangeterre"
+  },
+  {
+   "id": "world_037",
+   "name": "Léandre · Guide",
+   "skin": 5,
+   "quest": "qs_120",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Mines de Creuse-Braise"
+  },
+  {
+   "id": "world_038",
+   "name": "Wendel · Messager",
+   "skin": 8,
+   "quest": "qs_123",
+   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Lingot de Verdite : s'obtient en minant les veines de Verdite des Mines d'Aeloria, métier Mineur.",
+   "dim": "openworld",
+   "region": "Mines de Creuse-Braise"
+  },
+  {
+   "id": "world_040",
+   "name": "Valène · Traqueur",
+   "skin": 4,
+   "quest": "qs_118",
+   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
+   "dim": "openworld",
+   "region": "Mines de Creuse-Braise"
+  },
+  {
+   "id": "world_041",
+   "name": "Béatrice · Libérateur",
+   "skin": 3,
+   "quest": "qs_121",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Mines de Creuse-Braise"
+  },
+  {
+   "id": "world_043",
+   "name": "Héloïse · Éclaireur",
+   "skin": 1,
+   "quest": "qs_124",
+   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
+   "dim": "openworld",
+   "region": "Mines de Creuse-Braise"
+  },
+  {
+   "id": "world_045",
+   "name": "Lucien · Guide",
+   "skin": 7,
+   "quest": "qs_127",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Marches du Rempart"
+  },
+  {
+   "id": "world_046",
+   "name": "Nicodème · Messager",
+   "skin": 17,
+   "quest": "qs_130",
+   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Sang d'Orc : butin des Orcs Guerriers.",
+   "dim": "openworld",
+   "region": "Marches du Rempart"
+  },
+  {
+   "id": "world_047",
+   "name": "Tobias · Éclaireur",
+   "skin": 7,
+   "quest": "qs_485",
+   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
+   "dim": "openworld",
+   "region": "Marches du Rempart"
+  },
+  {
+   "id": "world_049",
+   "name": "Urbain · Traqueur",
+   "skin": 18,
+   "quest": "qs_125",
+   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
+   "dim": "openworld",
+   "region": "Marches du Rempart"
+  },
+  {
+   "id": "world_050",
+   "name": "Valène · Libérateur",
+   "skin": 3,
+   "quest": "qs_128",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Marches du Rempart"
+  },
+  {
+   "id": "world_051",
+   "name": "Iseult · Érudit",
+   "skin": 5,
+   "quest": "qs_129",
+   "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
+   "dim": "openworld",
+   "region": "Marches du Rempart"
+  },
+  {
+   "id": "world_053",
+   "name": "Cassiane · Veilleur",
+   "skin": 18,
+   "quest": "qs_428",
+   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
+   "dim": "openworld",
+   "region": "Marches du Rempart"
+  },
+  {
+   "id": "world_054",
+   "name": "Sévrin · Arbitre",
+   "skin": 18,
+   "quest": "qs_429",
+   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
+   "dim": "openworld",
+   "region": "Marches du Rempart"
+  },
+  {
+   "id": "world_056",
+   "name": "Solène · Guide",
+   "skin": 14,
+   "quest": "qs_134",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Plaines de Cendrelune"
+  },
+  {
+   "id": "world_057",
+   "name": "Blanche · Messager",
+   "skin": 4,
+   "quest": "qs_137",
+   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Crin Cendré : butin des Hyènes cendrées du désert et de la savane.",
+   "dim": "openworld",
+   "region": "Plaines de Cendrelune"
+  },
+  {
+   "id": "world_058",
+   "name": "Dagmar · Éclaireur",
+   "skin": 2,
+   "quest": "qs_486",
+   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
+   "dim": "openworld",
+   "region": "Plaines de Cendrelune"
+  },
+  {
+   "id": "world_060",
+   "name": "Jolan · Libérateur",
+   "skin": 1,
+   "quest": "qs_135",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Plaines de Cendrelune"
+  },
+  {
+   "id": "world_061",
+   "name": "Rémi · Érudit",
+   "skin": 2,
+   "quest": "qs_136",
+   "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
+   "dim": "openworld",
+   "region": "Plaines de Cendrelune"
+  },
+  {
+   "id": "world_062",
+   "name": "Prosper · Éclaireur",
+   "skin": 6,
+   "quest": "qs_138",
+   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
+   "dim": "openworld",
+   "region": "Plaines de Cendrelune"
+  },
+  {
+   "id": "world_064",
+   "name": "Cassiane · Maître d’épreuve",
+   "skin": 5,
+   "quest": "qs_368",
+   "dialogue": "Le chronomètre démarre à l'acceptation.",
+   "dim": "openworld",
+   "region": "Plaines de Cendrelune"
+  },
+  {
+   "id": "world_065",
+   "name": "Wilfrid · Maître d’épreuve",
+   "skin": 6,
+   "quest": "qs_369",
+   "dialogue": "Le chronomètre démarre à l'acceptation.",
+   "dim": "openworld",
+   "region": "Plaines de Cendrelune"
+  },
+  {
+   "id": "world_066",
+   "name": "Vladimir · Maître d’épreuve",
+   "skin": 14,
+   "quest": "qs_370",
+   "dialogue": "Le chronomètre démarre à l'acceptation.",
+   "dim": "openworld",
+   "region": "Plaines de Cendrelune"
+  },
+  {
+   "id": "world_068",
+   "name": "Urbain · Guide",
+   "skin": 14,
+   "quest": "qs_141",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Ruines de Haute-Cadette"
+  },
+  {
+   "id": "world_070",
+   "name": "Fenna · Éclaireur",
+   "skin": 2,
+   "quest": "qs_487",
+   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
+   "dim": "openworld",
+   "region": "Ruines de Haute-Cadette"
+  },
+  {
+   "id": "world_072",
+   "name": "Bastien · Libérateur",
+   "skin": 17,
+   "quest": "qs_142",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Ruines de Haute-Cadette"
+  },
+  {
+   "id": "world_074",
+   "name": "Tanguy · Éclaireur",
+   "skin": 18,
+   "quest": "qs_145",
+   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
+   "dim": "openworld",
+   "region": "Ruines de Haute-Cadette"
+  },
+  {
+   "id": "world_076",
+   "name": "Corvin · Veilleur",
+   "skin": 7,
+   "quest": "qs_431",
+   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
+   "dim": "openworld",
+   "region": "Ruines de Haute-Cadette"
+  },
+  {
+   "id": "world_079",
+   "name": "Tanguy · Guide",
+   "skin": 8,
+   "quest": "qs_148",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Désert de Verre"
+  },
+  {
+   "id": "world_080",
+   "name": "Zacharie · Messager",
+   "skin": 16,
+   "quest": "qs_151",
+   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Dard de Scorpion : butin des Scorpions de cuivre du désert.",
+   "dim": "openworld",
+   "region": "Désert de Verre"
+  },
+  {
+   "id": "world_082",
+   "name": "Dagmar · Traqueur",
+   "skin": 1,
+   "quest": "qs_146",
+   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
+   "dim": "openworld",
+   "region": "Désert de Verre"
+  },
+  {
+   "id": "world_083",
+   "name": "Léandre · Libérateur",
+   "skin": 18,
+   "quest": "qs_149",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Désert de Verre"
+  },
+  {
+   "id": "world_085",
+   "name": "Gwenaëlle · Éclaireur",
+   "skin": 3,
+   "quest": "qs_152",
+   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
+   "dim": "openworld",
+   "region": "Désert de Verre"
+  },
+  {
+   "id": "world_087",
+   "name": "Honorine · Guide",
+   "skin": 2,
+   "quest": "qs_155",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Vallée de Refuge-Bas"
+  },
+  {
+   "id": "world_088",
+   "name": "Klervi · Messager",
+   "skin": 18,
+   "quest": "qs_158",
+   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Baie Ambrée : se cultive avec une graine Ambrée, Fermier niveau 38.",
+   "dim": "openworld",
+   "region": "Vallée de Refuge-Bas"
+  },
+  {
+   "id": "world_089",
+   "name": "Brunehilde · Éclaireur",
+   "skin": 5,
+   "quest": "qs_489",
+   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
+   "dim": "openworld",
+   "region": "Vallée de Refuge-Bas"
+  },
+  {
+   "id": "world_091",
+   "name": "Florian · Traqueur",
+   "skin": 7,
+   "quest": "qs_153",
+   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
+   "dim": "openworld",
+   "region": "Vallée de Refuge-Bas"
+  },
+  {
+   "id": "world_092",
+   "name": "Wendel · Libérateur",
+   "skin": 16,
+   "quest": "qs_156",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Vallée de Refuge-Bas"
+  },
+  {
+   "id": "world_093",
+   "name": "Urbain · Érudit",
+   "skin": 17,
+   "quest": "qs_157",
+   "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
+   "dim": "openworld",
+   "region": "Vallée de Refuge-Bas"
+  },
+  {
+   "id": "world_095",
+   "name": "Nolwenn · Veilleur",
+   "skin": 8,
+   "quest": "qs_434",
+   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
+   "dim": "openworld",
+   "region": "Vallée de Refuge-Bas"
+  },
+  {
+   "id": "world_096",
+   "name": "Célestin · Arbitre",
+   "skin": 4,
+   "quest": "qs_435",
+   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
+   "dim": "openworld",
+   "region": "Vallée de Refuge-Bas"
+  },
+  {
+   "id": "world_098",
+   "name": "Corvin · Guide",
+   "skin": 3,
+   "quest": "qs_162",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Terres du Fort de la Brisure"
+  },
+  {
+   "id": "world_099",
+   "name": "Silvain · Messager",
+   "skin": 17,
+   "quest": "qs_165",
+   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Lingot de Ambrasite : s'obtient en minant les veines d'Ambrasite des Mines d'Aeloria.",
+   "dim": "openworld",
+   "region": "Terres du Fort de la Brisure"
+  },
+  {
+   "id": "world_101",
+   "name": "Philémon · Traqueur",
+   "skin": 7,
+   "quest": "qs_160",
+   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
+   "dim": "openworld",
+   "region": "Terres du Fort de la Brisure"
+  },
+  {
+   "id": "world_102",
+   "name": "Mélisande · Libérateur",
+   "skin": 15,
+   "quest": "qs_163",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Terres du Fort de la Brisure"
+  },
+  {
+   "id": "world_104",
+   "name": "Bastien · Éclaireur",
+   "skin": 8,
+   "quest": "qs_166",
+   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
+   "dim": "openworld",
+   "region": "Terres du Fort de la Brisure"
+  },
+  {
+   "id": "world_106",
+   "name": "Thibault · Guide",
+   "skin": 15,
+   "quest": "qs_169",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Pics d'Hivernoir"
+  },
+  {
+   "id": "world_107",
+   "name": "Ignace · Messager",
+   "skin": 3,
+   "quest": "qs_172",
+   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Fourrure Polaire : butin des bêtes des terres gelées.",
+   "dim": "openworld",
+   "region": "Pics d'Hivernoir"
+  },
+  {
+   "id": "world_108",
+   "name": "Yvain · Éclaireur",
+   "skin": 18,
+   "quest": "qs_491",
+   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
+   "dim": "openworld",
+   "region": "Pics d'Hivernoir"
+  },
+  {
+   "id": "world_110",
+   "name": "Kélia · Traqueur",
+   "skin": 2,
+   "quest": "qs_167",
+   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
+   "dim": "openworld",
+   "region": "Pics d'Hivernoir"
+  },
+  {
+   "id": "world_111",
+   "name": "Klervi · Libérateur",
+   "skin": 3,
+   "quest": "qs_170",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Pics d'Hivernoir"
+  },
+  {
+   "id": "world_112",
+   "name": "Lazare · Érudit",
+   "skin": 7,
+   "quest": "qs_171",
+   "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
+   "dim": "openworld",
+   "region": "Pics d'Hivernoir"
+  },
+  {
+   "id": "world_114",
+   "name": "Jeanne · Veilleur",
+   "skin": 2,
+   "quest": "qs_437",
+   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
+   "dim": "openworld",
+   "region": "Pics d'Hivernoir"
+  },
+  {
+   "id": "world_115",
+   "name": "Jolan · Arbitre",
+   "skin": 17,
+   "quest": "qs_438",
+   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
+   "dim": "openworld",
+   "region": "Pics d'Hivernoir"
+  },
+  {
+   "id": "world_117",
+   "name": "Nolwenn · Guide",
+   "skin": 3,
+   "quest": "qs_176",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Forêt Pétrifiée"
+  },
+  {
+   "id": "world_118",
+   "name": "Jorun · Messager",
+   "skin": 5,
+   "quest": "qs_179",
+   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Défense de Ronce : butin des Sangliers ronce des forêts.",
+   "dim": "openworld",
+   "region": "Forêt Pétrifiée"
+  },
+  {
+   "id": "world_120",
+   "name": "Cassiane · Traqueur",
+   "skin": 5,
+   "quest": "qs_174",
+   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
+   "dim": "openworld",
+   "region": "Forêt Pétrifiée"
+  },
+  {
+   "id": "world_121",
+   "name": "Célestin · Libérateur",
+   "skin": 14,
+   "quest": "qs_177",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Forêt Pétrifiée"
+  },
+  {
+   "id": "world_123",
+   "name": "Ivo · Éclaireur",
+   "skin": 8,
+   "quest": "qs_180",
+   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
+   "dim": "openworld",
+   "region": "Forêt Pétrifiée"
+  },
+  {
+   "id": "world_125",
+   "name": "Rosalie · Guide",
+   "skin": 2,
+   "quest": "qs_183",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Abysses de Sombrelac"
+  },
+  {
+   "id": "world_126",
+   "name": "Yseult · Messager",
+   "skin": 14,
+   "quest": "qs_186",
+   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Poisson-lanterne : se pêche en mer et dans les abysses, la nuit.",
+   "dim": "openworld",
+   "region": "Abysses de Sombrelac"
+  },
+  {
+   "id": "world_127",
+   "name": "Béatrice · Éclaireur",
+   "skin": 5,
+   "quest": "qs_493",
+   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
+   "dim": "openworld",
+   "region": "Abysses de Sombrelac"
+  },
+  {
+   "id": "world_129",
+   "name": "Roxane · Traqueur",
+   "skin": 16,
+   "quest": "qs_181",
+   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
+   "dim": "openworld",
+   "region": "Abysses de Sombrelac"
+  },
+  {
+   "id": "world_130",
+   "name": "Yvain · Libérateur",
+   "skin": 0,
+   "quest": "qs_184",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Abysses de Sombrelac"
+  },
+  {
+   "id": "world_131",
+   "name": "Viviane · Érudit",
+   "skin": 6,
+   "quest": "qs_185",
+   "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
+   "dim": "openworld",
+   "region": "Abysses de Sombrelac"
+  },
+  {
+   "id": "world_133",
+   "name": "Edmée · Veilleur",
+   "skin": 1,
+   "quest": "qs_440",
+   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
+   "dim": "openworld",
+   "region": "Abysses de Sombrelac"
+  },
+  {
+   "id": "world_134",
+   "name": "Tanguy · Arbitre",
+   "skin": 7,
+   "quest": "qs_441",
+   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
+   "dim": "openworld",
+   "region": "Abysses de Sombrelac"
+  },
+  {
+   "id": "world_136",
+   "name": "Ulrich · Guide",
+   "skin": 8,
+   "quest": "qs_190",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Faille des Murmures"
+  },
+  {
+   "id": "world_137",
+   "name": "Garance · Messager",
+   "skin": 0,
+   "quest": "qs_193",
+   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Éclat Astral : butin des créatures du vide, îles du large, océans profonds, End.",
+   "dim": "openworld",
+   "region": "Faille des Murmures"
+  },
+  {
+   "id": "world_139",
+   "name": "Morgane · Traqueur",
+   "skin": 15,
+   "quest": "qs_188",
+   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
+   "dim": "openworld",
+   "region": "Faille des Murmures"
+  },
+  {
+   "id": "world_140",
+   "name": "Alaric · Libérateur",
+   "skin": 14,
+   "quest": "qs_191",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Faille des Murmures"
+  },
+  {
+   "id": "world_142",
+   "name": "Florian · Éclaireur",
+   "skin": 16,
+   "quest": "qs_194",
+   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
+   "dim": "openworld",
+   "region": "Faille des Murmures"
+  },
+  {
+   "id": "world_144",
+   "name": "Morgane · Guide",
+   "skin": 3,
+   "quest": "qs_197",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Marches Renégates"
+  },
+  {
+   "id": "world_145",
+   "name": "Éloi · Messager",
+   "skin": 1,
+   "quest": "qs_200",
+   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Poussière d'Étoile : butin des créatures du vide, îles du large, océans profonds, End.",
+   "dim": "openworld",
+   "region": "Marches Renégates"
+  },
+  {
+   "id": "world_146",
+   "name": "Elwen · Éclaireur",
+   "skin": 15,
+   "quest": "qs_495",
+   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
+   "dim": "openworld",
+   "region": "Marches Renégates"
+  },
+  {
+   "id": "world_148",
+   "name": "Zacharie · Traqueur",
+   "skin": 8,
+   "quest": "qs_195",
+   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
+   "dim": "openworld",
+   "region": "Marches Renégates"
+  },
+  {
+   "id": "world_149",
+   "name": "Silvain · Libérateur",
+   "skin": 6,
+   "quest": "qs_198",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Marches Renégates"
+  },
+  {
+   "id": "world_150",
+   "name": "Jolan · Érudit",
+   "skin": 1,
+   "quest": "qs_199",
+   "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
+   "dim": "openworld",
+   "region": "Marches Renégates"
+  },
+  {
+   "id": "world_152",
+   "name": "Éloi · Veilleur",
+   "skin": 4,
+   "quest": "qs_443",
+   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
+   "dim": "openworld",
+   "region": "Marches Renégates"
+  },
+  {
+   "id": "world_153",
+   "name": "Gaspard · Arbitre",
+   "skin": 3,
+   "quest": "qs_444",
+   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
+   "dim": "openworld",
+   "region": "Marches Renégates"
+  },
+  {
+   "id": "world_155",
+   "name": "Alaric · Guide",
+   "skin": 17,
+   "quest": "qs_204",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Lisières du Cratère"
+  },
+  {
+   "id": "world_156",
+   "name": "Osric · Messager",
+   "skin": 8,
+   "quest": "qs_207",
+   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Poudre d'Aile Astrale : butin des Mites astrales du vide.",
+   "dim": "openworld",
+   "region": "Lisières du Cratère"
+  },
+  {
+   "id": "world_158",
+   "name": "Klervi · Traqueur",
+   "skin": 15,
+   "quest": "qs_202",
+   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
+   "dim": "openworld",
+   "region": "Lisières du Cratère"
+  },
+  {
+   "id": "world_159",
+   "name": "Florian · Libérateur",
+   "skin": 18,
+   "quest": "qs_205",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Lisières du Cratère"
+  },
+  {
+   "id": "world_161",
+   "name": "Wendel · Éclaireur",
+   "skin": 7,
+   "quest": "qs_208",
+   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
+   "dim": "openworld",
+   "region": "Lisières du Cratère"
+  },
+  {
+   "id": "world_163",
+   "name": "Gareth · Guide",
+   "skin": 4,
+   "quest": "qs_211",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Forge de Malvorn"
+  },
+  {
+   "id": "world_164",
+   "name": "Anselme · Messager",
+   "skin": 3,
+   "quest": "qs_214",
+   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Lingot de Néantite : s'obtient en minant les veines de Néantite des Mines d'Aeloria.",
+   "dim": "openworld",
+   "region": "Forge de Malvorn"
+  },
+  {
+   "id": "world_165",
+   "name": "Lorcan · Éclaireur",
+   "skin": 3,
+   "quest": "qs_497",
+   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
+   "dim": "openworld",
+   "region": "Forge de Malvorn"
+  },
+  {
+   "id": "world_167",
+   "name": "Rémi · Libérateur",
+   "skin": 2,
+   "quest": "qs_212",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Forge de Malvorn"
+  },
+  {
+   "id": "world_168",
+   "name": "Océane · Érudit",
+   "skin": 17,
+   "quest": "qs_213",
+   "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
+   "dim": "openworld",
+   "region": "Forge de Malvorn"
+  },
+  {
+   "id": "world_169",
+   "name": "Léandre · Éclaireur",
+   "skin": 2,
+   "quest": "qs_215",
+   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
+   "dim": "openworld",
+   "region": "Forge de Malvorn"
+  },
+  {
+   "id": "world_171",
+   "name": "Lazare · Veilleur",
+   "skin": 7,
+   "quest": "qs_446",
+   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
+   "dim": "openworld",
+   "region": "Forge de Malvorn"
+  },
+  {
+   "id": "world_172",
+   "name": "Honorine · Arbitre",
+   "skin": 8,
+   "quest": "qs_447",
+   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
+   "dim": "openworld",
+   "region": "Forge de Malvorn"
+  },
+  {
+   "id": "world_174",
+   "name": "Viviane · Guide",
+   "skin": 6,
+   "quest": "qs_218",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Nécropole d'Aelis"
+  },
+  {
+   "id": "world_175",
+   "name": "Aldric · Messager",
+   "skin": 14,
+   "quest": "qs_221",
+   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Griffe du Vide : butin des Rôdeurs du vide.",
+   "dim": "openworld",
+   "region": "Nécropole d'Aelis"
+  },
+  {
+   "id": "world_177",
+   "name": "Garance · Traqueur",
+   "skin": 1,
+   "quest": "qs_216",
+   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
+   "dim": "openworld",
+   "region": "Nécropole d'Aelis"
+  },
+  {
+   "id": "world_178",
+   "name": "Cassiane · Libérateur",
+   "skin": 7,
+   "quest": "qs_219",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Nécropole d'Aelis"
+  },
+  {
+   "id": "world_180",
+   "name": "Morgane · Éclaireur",
+   "skin": 15,
+   "quest": "qs_222",
+   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
+   "dim": "openworld",
+   "region": "Nécropole d'Aelis"
+  },
+  {
+   "id": "world_182",
+   "name": "Nicodème · Guide",
+   "skin": 5,
+   "quest": "qs_225",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Entre-Monde"
+  },
+  {
+   "id": "world_183",
+   "name": "Ivo · Messager",
+   "skin": 6,
+   "quest": "qs_228",
+   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Pupille du Chaos : butin des Yeux du chaos du vide.",
+   "dim": "openworld",
+   "region": "Entre-Monde"
+  },
+  {
+   "id": "world_184",
+   "name": "Ursule · Éclaireur",
+   "skin": 18,
+   "quest": "qs_499",
+   "dialogue": "Sélian cartographie tout Aeloria, une région à la fois.",
+   "dim": "openworld",
+   "region": "Entre-Monde"
+  },
+  {
+   "id": "world_186",
+   "name": "Wilfrid · Libérateur",
+   "skin": 5,
+   "quest": "qs_226",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Entre-Monde"
+  },
+  {
+   "id": "world_187",
+   "name": "Faustine · Érudit",
+   "skin": 1,
+   "quest": "qs_227",
+   "dialogue": "Les Ancéliens aimaient cacher leurs trésors derrière des énigmes à leur taille.",
+   "dim": "openworld",
+   "region": "Entre-Monde"
+  },
+  {
+   "id": "world_188",
+   "name": "Klervi · Éclaireur",
+   "skin": 2,
+   "quest": "qs_229",
+   "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
+   "dim": "openworld",
+   "region": "Entre-Monde"
+  },
+  {
+   "id": "world_190",
+   "name": "Gaspard · Veilleur",
+   "skin": 5,
+   "quest": "qs_449",
+   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
+   "dim": "openworld",
+   "region": "Entre-Monde"
+  },
+  {
+   "id": "world_191",
+   "name": "Romane · Arbitre",
+   "skin": 16,
+   "quest": "qs_450",
+   "dialogue": "Histoire à choix. Chaque fin a ses conséquences.",
+   "dim": "openworld",
+   "region": "Entre-Monde"
+  },
+  {
+   "id": "world_193",
+   "name": "Wendel · Guide",
+   "skin": 4,
+   "quest": "qs_232",
+   "dialogue": "Un survivant cherche à rejoindre les siens.",
+   "dim": "openworld",
+   "region": "Cœur de la Brisure"
+  },
+  {
+   "id": "world_194",
+   "name": "Kélia · Messager",
+   "skin": 14,
+   "quest": "qs_235",
+   "dialogue": "Le camp avancé manque de tout. Rapporte-moi 10 Orchidée du Néant : se cultive avec une graine du Néant, Fermier niveau 75.",
+   "dim": "openworld",
+   "region": "Cœur de la Brisure"
+  },
+  {
+   "id": "world_196",
+   "name": "Tobias · Traqueur",
+   "skin": 15,
+   "quest": "qs_230",
+   "dialogue": "Une bête plus grosse que les autres terrorise la région.",
+   "dim": "openworld",
+   "region": "Cœur de la Brisure"
+  },
+  {
+   "id": "world_197",
+   "name": "Vladimir · Libérateur",
+   "skin": 0,
+   "quest": "qs_233",
+   "dialogue": "Les cages sont trop petites pour un géant, pas pour un Petit-Pas.",
+   "dim": "openworld",
+   "region": "Cœur de la Brisure"
   },
   {
    "id": "world_199",
@@ -2608,9 +2700,7 @@
    "quest": "qs_236",
    "dialogue": "Une rumeur parle d'une grotte que même les géants ont oubliée.",
    "dim": "openworld",
-   "region": "Cœur de la Brisure",
-   "dx": -2,
-   "dz": 32
+   "region": "Cœur de la Brisure"
   }
  ]
 }

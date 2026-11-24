@@ -86,26 +86,26 @@ def nearest_ok(x,z):
                 if 0<=a<800 and 0<=b<800 and ok[a,b]: return a,b
     return None
 SITES={ # region -> [(site name, cx,cz, count)]
-"Valdhéris et les Contreforts":[("Aéloria",0,0,8)],
-"Bois de Murmurelle":[("Clairbois",-230,45,9),("Cercle des druides",-130,130,5),("Pont des pèlerins",-115,20,3)],
-"Marais de Fangeterre":[("Brumevert",-245,220,6),("Tour des Roseaux",-340,155,5)],
-"Mines de Creuse-Braise":[("Entrée des mines boréales",-315,-150,8)],
-"Marches du Rempart":[("Refuge des cols",-80,-160,11)],
-"Plaines de Cendrelune":[("Porte des Dunes",140,-95,12)],
-"Ruines de Haute-Cadette":[("Camp des Veilleurs",110,155,6),("Ruines de la Veille astrale",160,200,5)],
-"Désert de Verre":[("Sahr-Éclat",210,-175,8)],
-"Vallée de Refuge-Bas":[("Astréon",260,145,11)],
-"Terres du Fort de la Brisure":[("Tour du Vent de cuivre",345,-190,8)],
-"Pics d'Hivernoir":[("Boréalis",-200,-185,11)],
-"Forêt Pétrifiée":[("Arbre-sanctuaire de Sylveronce",-315,-5,8)],
-"Abysses de Sombrelac":[("Phare du Glacier",-105,-320,11)],
-"Faille des Murmures":[("Éclat du Zénith",330,65,8)],
-"Marches Renégates":[("Moulin des Brumes",-165,325,11)],
-"Lisières du Cratère":[("Caldeira du Brasier ancien",265,-310,8)],
-"Forge de Malvorn":[("Fonderie des Cendres",140,-315,11)],
-"Nécropole d'Aelis":[("Abbaye des Veilleurs",55,305,8)],
-"Entre-Monde":[("Observatoire des Constellations",280,323,11)],
-"Cœur de la Brisure":[("Temple du Soleil brisé",300,-19,8)],
+"Valdhéris et les Contreforts":[("Aéloria",0,0,3)],
+"Bois de Murmurelle":[("Clairbois",-230,45,3),("Cercle des druides",-130,130,3),("Pont des pèlerins",-115,20,3)],
+"Marais de Fangeterre":[("Brumevert",-245,220,3),("Tour des Roseaux",-340,155,3)],
+"Mines de Creuse-Braise":[("Entrée des mines boréales",-315,-150,3)],
+"Marches du Rempart":[("Refuge des cols",-80,-160,3)],
+"Plaines de Cendrelune":[("Porte des Dunes",140,-95,3)],
+"Ruines de Haute-Cadette":[("Camp des Veilleurs",110,155,3),("Ruines de la Veille astrale",160,200,3)],
+"Désert de Verre":[("Sahr-Éclat",210,-175,3)],
+"Vallée de Refuge-Bas":[("Astréon",260,145,3)],
+"Terres du Fort de la Brisure":[("Tour du Vent de cuivre",345,-190,3)],
+"Pics d'Hivernoir":[("Boréalis",-200,-185,3)],
+"Forêt Pétrifiée":[("Arbre-sanctuaire de Sylveronce",-315,-5,3)],
+"Abysses de Sombrelac":[("Phare du Glacier",-105,-320,3)],
+"Faille des Murmures":[("Éclat du Zénith",330,65,3)],
+"Marches Renégates":[("Moulin des Brumes",-165,325,3)],
+"Lisières du Cratère":[("Caldeira du Brasier ancien",265,-310,3)],
+"Forge de Malvorn":[("Fonderie des Cendres",140,-315,3)],
+"Nécropole d'Aelis":[("Abbaye des Veilleurs",55,305,3)],
+"Entre-Monde":[("Observatoire des Constellations",280,323,3)],
+"Cœur de la Brisure":[("Temple du Soleil brisé",300,-19,3)],
 }
 random.seed(161126)
 MAIN=comp(nearest_ok(0,0))&ok
@@ -116,7 +116,7 @@ for reg,sites in SITES.items():
     res[reg]=[]
     for name,cx,cz,n in sites:
         cc=MAIN
-        for D in (16,14,12):
+        for D in (26,22,18,16):
             pts=[]
             for R in (30,45,60,80,100,130):
                 cand=[(a,b) for a,b in zip(*np.nonzero(cc)) if 5<=math.hypot(b-OX-cx,a-OX-cz)<=R]
@@ -136,17 +136,29 @@ for reg,sites in SITES.items():
         for x,z in pts:
             placed.append((x,z,reg,name)); res[reg].append((x,z,int(H[z+OX,x+OX])))
 
-# --- ecriture dans world_npcs.json
+# --- ecriture dans world_npcs.json : 3 PNJ par lieu, chacun porte plusieurs quetes (ordre de niveau conserve)
 f=ROOT/"src/main/resources/data/mmorpg/lore/world_npcs.json"
 d=json.load(open(f,encoding="utf-8"))
-anchors={}
-for reg,sites in SITES.items(): anchors[reg]=[sites[0][1],sites[0][2]]
-d["regions"]=anchors
-nxt={r:0 for r in res}
+lore={q["id"]:q for q in json.load(open(ROOT/"src/main/resources/data/mmorpg/lore/lore_quests.json",encoding="utf-8"))}
+# reserve complete : un PNJ par quete (reprend les PNJ regroupes d'une execution precedente)
+pool=[]
 for n in d["npcs"]:
     if n["dim"]!="openworld": continue
-    r=n["region"]; x,z,_=res[r][nxt[r]]; nxt[r]+=1
-    n["dx"]=int(x-anchors[r][0]); n["dz"]=int(z-anchors[r][1])
-assert all(nxt[r]==len(res[r]) for r in res)
-json.dump(d,open(f,"w",encoding="utf-8"),ensure_ascii=False,indent=1)
-print("ecrit",f)
+    n=dict(n); n.pop("quests",None); pool.append(n)
+for n in d.get("retired",[]): pool.append(dict(n))
+by_region=collections.defaultdict(list)
+for n in pool: by_region[n["region"]].append(n)
+anchors={reg:[sites[0][1],sites[0][2]] for reg,sites in SITES.items()}
+out=[n for n in d["npcs"] if n["dim"]!="openworld"]; retired=[]
+for reg,lst in by_region.items():
+    lst.sort(key=lambda n:(lore[n["quest"]]["level"],n["quest"]))
+    pts=res[reg]; m=len(pts); k,r=divmod(len(lst),m); i=0
+    for g,(x,z,_) in enumerate(pts):
+        size=k+(1 if g<r else 0); grp=lst[i:i+size]; i+=size
+        rep=dict(grp[0]); rep["quests"]=[n["quest"] for n in grp]
+        rep["dx"]=int(x-anchors[reg][0]); rep["dz"]=int(z-anchors[reg][1])
+        out.append(rep)
+        for n in grp[1:]:
+            c=dict(n); c.pop("dx",None); c.pop("dz",None); retired.append(c)
+json.dump({"regions":anchors,"npcs":out,"retired":retired},open(f,"w",encoding="utf-8"),ensure_ascii=False,indent=1)
+print("ecrit",f,len([n for n in out if n["dim"]=="openworld"]),"PNJ,",len(retired),"regroupes")

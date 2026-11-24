@@ -73,8 +73,10 @@ public final class DevWorldNpcChecks {
             if (e.dim().equals("spawn") && !spawnChecked) continue;
             var entry = directory.entry(e.uuid().toString());
             if (entry == null) { fails.add("absent " + e.name() + " (" + e.region() + ")"); continue; }
-            var q = quests.get(e.quest());
-            if (q == null || !e.uuid().toString().equals(q.npc)) fails.add("quete non liee " + e.quest());
+            for (var qid : e.quests()) {
+                var q = quests.get(qid);
+                if (q == null || !e.uuid().toString().equals(q.npc)) fails.add("quete non liee " + qid);
+            }
             if (!names.add(e.name())) fails.add("nom en double " + e.name());
             if (e.dim().equals("spawn")) spawnN++; else worldN++;
             var at = BlockPos.of(entry.getLongOr("pos", 0));
