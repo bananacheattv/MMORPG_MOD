@@ -1,5 +1,6 @@
 """Reproducible natural set dressing, explorable mine mouths and field systems."""
-import math, random
+import math, random, json
+from pathlib import Path
 import numpy as np
 from world import SEED, REGIONS
 from architecture import crystal, farm, sign, lamp
@@ -143,7 +144,9 @@ def wilderness(w):
         x=rng.randint(-360,-130);z=rng.randint(130,330);ix=x+400;iz=z+400
         if w.reserved[iz,ix] or not w.swamp[iz,ix]:continue
         if w.get(x,62,z)=='minecraft:water[level=0]':w.put(x,63,z,'lily_pad')
-        elif w.ground(x,z) in [62,63] and w.get(x,64,z)=='minecraft:air':w.box(x,64,z,x,rng.randint(65,67),z,'sugar_cane')
+        elif w.ground(x,z) in [62,63] and w.get(x,w.ground(x,z)+1,z)=='minecraft:air' and w.get(x,w.ground(x,z),z) in ('minecraft:mud','minecraft:dirt','minecraft:coarse_dirt','minecraft:sand','minecraft:podzol','minecraft:grass_block') \
+                and any(w.get(x+dx,w.ground(x,z),z+dz)=='minecraft:water[level=0]' for dx,dz in ((1,0),(-1,0),(0,1),(0,-1))):
+            g=w.ground(x,z);w.box(x,g+1,z,x,g+rng.randint(2,4),z,'sugar_cane')
     # Fallen logs and fern clusters give clearings a less uniform surface.
     for _ in range(70):
         x=rng.randint(-355,-55);z=rng.randint(-60,320);ix=x+400;iz=z+400
@@ -161,4 +164,11 @@ def polish(w):
     mine(w,342,210,4,'Géode des Échos',dx=-1,dz=0)
     # Reserve the caldera and its lava channels before vegetation.
     w.reserve(265,-310,78)
+    # Quest NPCs (world_npcs.json) stay in clear ground: no tree or boulder may grow on their spot.
+    npcs=Path(__file__).resolve().parents[2]/'src/main/resources/data/mmorpg/lore/world_npcs.json'
+    if npcs.exists():
+        d=json.loads(npcs.read_text(encoding='utf-8'))
+        for n in d['npcs']:
+            if n.get('dim')=='openworld':
+                ax,az=d['regions'][n['region']];w.reserve(ax+n['dx'],az+n['dz'],4)
     wilderness(w)

@@ -694,15 +694,15 @@
       "name": "Dernier fanal"
     },
     {
-      "x": -115,
-      "y": 76,
-      "z": 20,
+      "x": -129,
+      "y": 88,
+      "z": -25,
       "state": "minecraft:stone_bricks",
       "name": "Pont des pèlerins"
     },
     {
-      "x": -160,
-      "y": 79,
+      "x": -180,
+      "y": 75,
       "z": 160,
       "state": "minecraft:stone_bricks",
       "name": "Pont des pèlerins"

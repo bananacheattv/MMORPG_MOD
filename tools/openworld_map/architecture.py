@@ -37,9 +37,31 @@ def lamp(w,x,y,z,rid=0):
     stone=['mossy_stone_bricks','deepslate_bricks','stone_bricks','cut_sandstone','polished_blackstone_bricks'][rid]
     w.put(x,y,z,stone);w.box(x,y+1,z,x,y+3,z,'iron_chain[axis=y]');w.put(x,y+4,z,'lantern')
 
+def level_site(w,b,y,hw,hl,margin=2,skirt=4):
+    """Terrain under and around a building: flat at its foundation (y-1) over the footprint + margin, then a
+    smooth skirt back to the natural ground, so no house is buried in a slope or hangs above it."""
+    seen=set()
+    for dz in range(-hl-margin-skirt-2,hl+margin+skirt+3):
+        for dx in range(-hw-margin-skirt-2,hw+margin+skirt+3):
+            cx,_,cz=b.at(dx,0,dz)
+            if (cx,cz) in seen or not -399<=cx<=398 or not -399<=cz<=398:continue
+            seen.add((cx,cz))
+            ox=max(0,abs(dx)-hw-margin);oz=max(0,abs(dz)-hl-margin);d=math.hypot(ox,oz)
+            if d>=skirt or (d>0 and w.roads[cz+400,cx+400]):continue
+            k=d/skirt;k=k*k*(3-2*k)
+            g=w.ground(cx,cz);target=int(round((y-1)*(1-k)+g*k))
+            if g==target:continue
+            top=w.get(cx,g,cz)
+            if 'air' in top or 'water' in top or 'leaves' in top:top='minecraft:grass_block'
+            if g>target:w.box(cx,target+1,cz,cx,g+6,cz,'air')
+            else:w.box(cx,g+1,cz,cx,target,cz,'dirt')
+            w.put(cx,target,cz,top)
+            w.height[cz+400,cx+400]=target
+
 def house(w,x,y,z,rid,index,rot=0,role='Maison'):
     t=THEMES[rid];b=Local(w,x,y,z,rot)
     hw=4+(index%3);hl=5+(index%2)*2;stories=2 if index%4==0 else 1;h=5*stories
+    level_site(w,b,y,hw,hl)
     b.box(-hw,0,-hl,hw,0,hl,t['base']);b.box(-hw,1,-hl,hw,h,hl,t['wall'])
     b.box(-hw+1,1,-hl+1,hw-1,h-1,hl-1,'air');b.box(-hw+1,0,-hl+1,hw-1,0,hl-1,t['floor'])
     for xx in [-hw,hw]:
@@ -370,15 +392,24 @@ def secondary_sites(w):
             house(w,x,y,z,rid,i,0,'Refuge')
         sign(w,x-5,y+1,z+10,[name,'Route des Horizons','Aéloria',''],0)
         w.poi(name,'halte d’exploration',x,z,y+1,REGIONS[rid])
-    # Bridges over the woodland gorge, with stone arches and parapets.
-    for cx,cz,length in [(-115,20,45),(-160,160,35)]:
+    # Stone arch bridges, centred on the real river (the route crossings are wooden bridges built by finish_roads).
+    for cz,length in [(-25,45),(160,35)]:
+        cx=w.river_x(cz)
         yy=max(w.ground(cx-length//2,cz),w.ground(cx+length//2,cz),72)
         for dx in range(-length//2,length//2+1):
             top=yy+round(3*math.cos(dx/(length/2)*math.pi/2))
             w.box(cx+dx,top,cz-3,cx+dx,top,cz+3,'stone_bricks')
+            if abs(dx)>=length//2-2:
+                # Abutments: the deck ends rest on solid ground whatever the bank height.
+                for dz in range(-3,4):
+                    g=w.ground(cx+dx,cz+dz)
+                    if g<top:w.box(cx+dx,g,cz+dz,cx+dx,top-1,cz+dz,'stone_bricks')
             if dx%6==0:
-                for dz in [-3,3]:w.box(cx+dx,w.ground(cx+dx,cz+dz),cz+dz,cx+dx,top,cz+dz,'mossy_stone_bricks')
+                for dz in [-3,3]:
+                    g=w.ground(cx+dx,cz+dz)
+                    if g<top:w.box(cx+dx,g,cz+dz,cx+dx,top,cz+dz,'mossy_stone_bricks')
             for dz in [-3,3]:w.put(cx+dx,top+1,cz+dz,'stone_brick_wall')
+            if dx%8==0:w.reserve(cx+dx,cz,7)
         w.poi('Pont des pèlerins','pont',cx,cz,yy+4,REGIONS[0])
 
 def build_all(w):

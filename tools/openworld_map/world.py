@@ -75,6 +75,8 @@ class World:
             if r:self.sphere(*p,r,r,r,block)
             else:self.put(*p,block)
 
+    def river_x(self,z):return int(round(-115-40*math.sin((z+60)/95)-max(0,z-50)*.32))
+
     def ground(self,x,z):return int(self.height[max(0,min(799,int(z)+400)),max(0,min(799,int(x)+400))])
     def region(self,x,z):return int(self.region_map[int(z)+400,int(x)+400])
 
@@ -160,14 +162,28 @@ class World:
         samples.append(pts[-1]); coords=np.rint(samples).astype(int)
         heights=np.array([self.ground(x,z) for x,z in coords],float)
         heights=np.convolve(np.pad(heights,(6,6),mode='edge'),np.ones(13)/13,mode='valid')
+        # Water is read BEFORE any cell is modified: otherwise each sample dries the cells ahead of it
+        # and the road ends up damming the river instead of crossing it on a bridge.
+        wl=np.array([self.water[max(0,min(799,z+400-5)):max(0,min(799,z+400+5))+1,max(0,min(799,x+400-5)):max(0,min(799,x+400+5))+1].max() for x,z in coords])
+        wet=np.array([self.water[max(0,min(799,z+400)),max(0,min(799,x+400))]>-200 for x,z in coords])
+        wetd=np.convolve(wet.astype(int),np.ones(11,int),mode='same')>0
+        i=0
+        while i<len(wetd):
+            if not wetd[i]:i+=1;continue
+            j=i
+            while j+1<len(wetd) and wetd[j+1]:j+=1
+            a,b=max(0,i-6),min(len(heights)-1,j+6)
+            for k in range(i,j+1):
+                heights[k]=heights[a]+(heights[b]-heights[a])*(k-a)/max(1,b-a)
+                if wl[k]>-200:heights[k]=max(heights[k],wl[k]+3)
+            i=j+1
         for _ in range(3):
             for i in range(1,len(heights)):heights[i]=np.clip(heights[i],heights[i-1]-.48,heights[i-1]+.48)
             for i in range(len(heights)-2,-1,-1):heights[i]=np.clip(heights[i],heights[i+1]-.48,heights[i+1]+.48)
         route=[]
-        for (x,z),y in zip(coords,np.rint(heights).astype(int)):
+        for n_i,((x,z),y) in enumerate(zip(coords,np.rint(heights).astype(int))):
             if not -390<x<390 or not -390<z<390:continue
-            wet=self.water[z+400,x+400]>-200
-            y=max(y,int(self.water[z+400,x+400])+3) if wet else y
+            wet=bool(wetd[n_i])
             for dz in range(-width//2-2,width//2+3):
                 for dx in range(-width//2-2,width//2+3):
                     if not -400<=x+dx<400 or not -400<=z+dz<400:continue
@@ -177,8 +193,8 @@ class World:
                     self.reserved[iz,ix]=True
                     if d<=width/2:
                         self.roads[iz,ix]=True
-                        if not wet:self.height[iz,ix]=y;self.water[iz,ix]=-300
-                    elif not wet:
+                        if not wet and self.water[iz,ix]<=-200:self.height[iz,ix]=y
+                    elif not wet and self.water[iz,ix]<=-200:
                         k=(width/2+2-d)/2; self.height[iz,ix]=round(self.height[iz,ix]*(1-k)+y*k)
             route.append((int(x),int(y),int(z),bool(wet)))
         self.routes.append((route,width,main))
@@ -236,9 +252,19 @@ class World:
                 b=['dirt_path','cobbled_deepslate','stone_bricks','smooth_sandstone','polished_blackstone_bricks'][rid]
                 if wet:b='dark_oak_planks'
                 self.disk(x,y,z,width/2,b)
-                if wet and i%7==0:
-                    self.box(x-2,self.ground(x-2,z),z,x-2,y-1,z,'stripped_dark_oak_log')
-                    self.box(x+2,self.ground(x+2,z),z,x+2,y-1,z,'stripped_dark_oak_log')
+                if wet:
+                    # Tangent of the route, to put piles and railings on both sides of the deck.
+                    p0=route[max(0,i-2)];p1=route[min(len(route)-1,i+2)]
+                    tx,tz=p1[0]-p0[0],p1[2]-p0[2];nrm=math.hypot(tx,tz) or 1
+                    nx,nz=-tz/nrm,tx/nrm;off=width/2-.5
+                    for sgn in (-1,1):
+                        qx,qz=round(x+sgn*nx*off),round(z+sgn*nz*off)
+                        self.put(qx,y+1,qz,'dark_oak_fence')
+                        if i%7==0:
+                            for yy in range(y-1,max(YMIN,self.ground(qx,qz)-1),-1):
+                                if self.get(qx,yy,qz) in ('minecraft:air','minecraft:water[level=0]'):self.put(qx,yy,qz,'stripped_dark_oak_log')
+                                else:break
+                            if i%14==0:self.put(qx,y+2,qz,'lantern')
                 if i%47==0 and i>15 and i<len(route)-15:
                     self.box(x+width//2+1,y+1,z,x+width//2+1,y+3,z,'cobblestone_wall')
                     self.put(x+width//2+1,y+4,z,'lantern')
