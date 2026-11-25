@@ -179,7 +179,16 @@ public final class GuildExtras {
     private static final class Vault extends SimpleContainer {
         final UUID guild; final net.minecraft.core.RegistryAccess registries; boolean ready, dirty; String lastOpener = "?";
         Vault(UUID guild, net.minecraft.core.RegistryAccess registries) { super(27); this.guild = guild; this.registries = registries; }
+        /** SimpleContainer ne suit pas ses spectateurs (liste toujours vide) : sans ce suivi, le coffre ouvert etait libere au tick
+         *  suivant et ce qu'un officier retirait ensuite n'etait jamais enregistre, l'objet reapparaissant a la reouverture (duplication). */
+        final List<net.minecraft.world.entity.ContainerUser> viewers = new ArrayList<>();
         @Override public void setChanged() { super.setChanged(); if (ready) dirty = true; }
+        @Override public void startOpen(net.minecraft.world.entity.ContainerUser user) { if (!viewers.contains(user)) viewers.add(user); }
+        @Override public void stopOpen(net.minecraft.world.entity.ContainerUser user) { viewers.remove(user); }
+        @Override public List<net.minecraft.world.entity.ContainerUser> getEntitiesWithContainerOpen() {
+            viewers.removeIf(u -> u.getLivingEntity().isRemoved() || !(u.getLivingEntity() instanceof net.minecraft.world.entity.player.Player pl) || !(pl.containerMenu instanceof ChestMenu m) || m.getContainer() != this);
+            return List.copyOf(viewers);
+        }
     }
 
     private static com.mojang.serialization.DynamicOps<com.google.gson.JsonElement> ops(net.minecraft.core.RegistryAccess r) {
@@ -257,13 +266,34 @@ public final class GuildExtras {
         GuildService.require(officer, "Seuls le chef et les officiers ouvrent le coffre. Les membres déposent l’objet en main.");
         var v = vault(p, g);
         v.lastOpener = com.mmorpg.character.CharKey.name(p);
-        p.openMenu(new SimpleMenuProvider((id, inv, pl) -> new ChestMenu(net.minecraft.world.inventory.MenuType.GENERIC_9x3, id, inv, v, 3), Component.literal("Coffre de " + g.name)));
+        p.openMenu(new SimpleMenuProvider((id, inv, pl) -> restrict(new ChestMenu(net.minecraft.world.inventory.MenuType.GENERIC_9x3, id, inv, v, 3)), Component.literal("Coffre de " + g.name)));
+    }
+
+    /** Tests serveur : le menu du coffre tel qu'un officier l'ouvre (sans exiger le hall). */
+    public static ChestMenu devVaultMenu(ServerPlayer p, GuildStore.Guild g) {
+        var v = vault(p, g);
+        return restrict(new ChestMenu(net.minecraft.world.inventory.MenuType.GENERIC_9x3, 0, p.getInventory(), v, 3));
+    }
+
+    /** Les objets reserves aux caisses (familiers, montures, cosmetiques) ne s'echangent pas : le coffre partage les refuse aussi. */
+    private static ChestMenu restrict(ChestMenu menu) {
+        var c = menu.getContainer();
+        for (int i = 0; i < c.getContainerSize(); i++) {
+            var old = menu.slots.get(i);
+            var slot = new net.minecraft.world.inventory.Slot(c, old.getContainerSlot(), old.x, old.y) {
+                @Override public boolean mayPlace(ItemStack stack) { return !com.mmorpg.server.CrateOnly.is(stack.getItem()); }
+            };
+            slot.index = old.index;
+            menu.slots.set(i, slot);
+        }
+        return menu;
     }
 
     public static void depositHand(ServerPlayer p, GuildStore.Guild g) {
         GuildService.require(p.level().dimension().equals(GuildHall.DIM), "Le coffre de guilde se trouve dans le hall de guilde.");
         var held = p.getMainHandItem();
         GuildService.require(!held.isEmpty(), "Tiens l’objet à déposer en main.");
+        GuildService.require(!com.mmorpg.server.CrateOnly.is(held.getItem()), "Cet objet ne peut pas être déposé dans le coffre de guilde.");
         var v = vault(p, g);
         v.lastOpener = com.mmorpg.character.CharKey.name(p);
         var copy = held.copy();

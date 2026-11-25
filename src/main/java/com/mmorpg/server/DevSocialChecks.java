@@ -17,6 +17,11 @@ public final class DevSocialChecks {
         var server=p.level().getServer();var member=net.neoforged.neoforge.common.util.FakePlayerFactory.get(server.overworld(),new com.mojang.authlib.GameProfile(UUID.randomUUID(),"GuildMember"));long oldGold=RpgPlayers.get(p).gold;
         GuildService.devBypass=false;
         try{
+            // positions de bloc envoyees par un client : jamais de chargement ni de generation de troncon lointain
+            {var far=new net.minecraft.core.BlockPos(1_000_016,64,1_000_016);
+                com.mmorpg.economy.Bank.action(p,far,0,1,0);com.mmorpg.economy.Auction.action(p,far,0,0,"",0);com.mmorpg.economy.Mail.action(p,far,0,0,"");
+                LuckyBlockManager.roll(p,far);ForgeManager.craft(p,far,"",1);com.mmorpg.mine.Compression.compress(p,far,1,"");
+                check(!p.level().hasChunk(far.getX()>>4,far.getZ()>>4),"client block positions never load far chunks");}
             // Anti-contournement : hors hall et hors Élyra, aucune action de guilde (création comprise).
             GuildService.action(p,packet("create","name","Hors Hall"));check(GuildStore.access(server,false,s->GuildStore.of(s,p.getUUID()))==null&&GuildStore.access(server,false,s->s.guilds.stream().noneMatch(x->x.name.equals("Hors Hall"))),"create refused outside hall/keeper");
             GuildService.devBypass=true;
@@ -68,6 +73,15 @@ public final class DevSocialChecks {
             for(var type:com.mmorpg.registry.ModEntities.GUILD_GUARDIANS){var boss=type.get().create(p.level(),net.minecraft.world.entity.EntitySpawnReason.COMMAND);check(boss!=null&&boss.getBbHeight()>=5,"giant guardian registered with large hitbox");boss.initialize();check(boss.rpgData().boss&&boss.rpgData().maxHp>=3500,"guardian RPG combat stats initialized");}
             // dissolution : refusee tant que le coffre de guilde contient des objets (ils seraient perdus)
             GuildStore.access(server,true,s->{var g=GuildStore.byId(s,id);g.gold=0;g.vault=new ArrayList<>(java.util.Collections.nCopies(27,""));g.vault.set(4,"{\"id\":\"minecraft:diamond\",\"count\":3}");return null;});
+            // coffre ouvert : il reste suivi d'un tick a l'autre, un retrait est enregistre (avant : libere au tick suivant -> objet duplique)
+            {var g=GuildStore.access(server,false,s->GuildStore.byId(s,id));var menu=GuildExtras.devVaultMenu(p,g);
+                check(menu.getContainer().getItem(4).getCount()==3,"vault menu shows stored items");
+                check(!menu.getSlot(0).mayPlace(new net.minecraft.world.item.ItemStack(com.mmorpg.registry.ModItems.COFFRE_COSMETIQUE.get())),"crate-only items refused by the guild vault");
+                var oldMenu=p.containerMenu;p.containerMenu=menu;
+                GuildExtras.tick(server);menu.getContainer().setItem(4,net.minecraft.world.item.ItemStack.EMPTY);GuildExtras.tick(server);
+                menu.removed(p);p.containerMenu=oldMenu;GuildExtras.tick(server);
+                check(GuildStore.access(server,false,s->GuildStore.byId(s,id).vault.get(4).isEmpty()),"item taken from an open vault is saved (no duplication)");
+                GuildStore.access(server,true,s->{GuildStore.byId(s,id).vault.set(4,"{\"id\":\"minecraft:diamond\",\"count\":3}");return null;});}
             var disband=packet("disband","confirm","Racines du Test");GuildService.action(p,disband);check(GuildStore.access(server,false,s->GuildStore.byId(s,id))!=null,"disband refused while the guild vault holds items");
             GuildStore.access(server,true,s->{GuildStore.byId(s,id).vault.set(4,"");return null;});GuildService.action(p,disband);check(GuildStore.access(server,false,s->GuildStore.byId(s,id))==null,"empty guild disbanded");
             com.mmorpg.MMORPG.LOGGER.info("[CODEX CHECKS] GUILDS_ARENAS PASS: creation, ranks, invites, treasury, crash recovery, corruption refusal, XP/boss/gold upgrades, buffs, brackets, crystal timing, kills, win and ten guardians");

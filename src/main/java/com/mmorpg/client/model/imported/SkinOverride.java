@@ -126,6 +126,7 @@ public final class SkinOverride {
                 byte[] bytes = null;
                 for (int redirect = 0; redirect < 6; redirect++) {
                     if (!"https".equals(uri.getScheme()) && !"http".equals(uri.getScheme())) throw new IllegalArgumentException("Lien HTTP(S) requis");
+                    if (!publicHost(uri.getHost())) throw new IllegalArgumentException("Adresse locale ou privée refusée");
                     var connection = (HttpURLConnection) uri.toURL().openConnection(mc.getProxy());
                     connection.setConnectTimeout(8_000);
                     connection.setReadTimeout(15_000);
@@ -152,5 +153,21 @@ public final class SkinOverride {
         }).thenCompose(file -> new SkinTextureDownloader(mc.getProxy(), mc.getTextureManager(), mc)
                 .downloadAndRegisterSkin(MMORPG.id("skin_url/" + file.getFileName().toString().replace(".png", "")), file, location.url, true))
                 .thenApply(texture -> PlayerSkin.insecure(texture, null, null, location.model));
+    }
+
+    /** Un skin par lien ne doit jamais faire viser au client son reseau local (routeur, NAS, services sur 127.0.0.1...). */
+    static boolean publicHost(String host) {
+        if (host == null || host.isEmpty()) return false;
+        try {
+            for (var a : java.net.InetAddress.getAllByName(host)) {
+                if (a.isLoopbackAddress() || a.isAnyLocalAddress() || a.isLinkLocalAddress() || a.isSiteLocalAddress() || a.isMulticastAddress()) return false;
+                byte[] b = a.getAddress();
+                if (b.length == 16 && (b[0] & 0xFE) == 0xFC) return false;                                    // IPv6 ULA fc00::/7
+                if (b.length == 4 && ((b[0] & 0xFF) == 100 && (b[1] & 0xC0) == 64 || (b[0] & 0xFF) == 0)) return false;   // CGNAT 100.64/10, 0/8
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

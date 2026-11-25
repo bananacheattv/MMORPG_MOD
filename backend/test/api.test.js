@@ -257,3 +257,38 @@ test('configuration : paiements réels refusés sans accord explicite', () => {
   assert.throws(() => loadConfig({ ...ENV, AELORIA_CREDIT_SECRET: 'court' }), /32 caractères/);
   assert.throws(() => verifyStripeSignature(Buffer.from('{}'), 't=1,v1=00', WHSEC), /expirée/);
 });
+
+test('webhook : un traitement en échec n’est pas marqué comme reçu (Stripe peut le renvoyer)', async () => {
+  const t = await start();
+  try {
+    const { token } = await registerAndLink(t);
+    const checkout = await t.call('POST', '/api/shop/checkout', { token, body: { pack: 'aventurier', waiver: true } });
+    const object = { id: t.world.sessions[0].id, client_reference_id: checkout.json.order, payment_status: 'paid', amount_total: 999, currency: 'eur', payment_intent: 'pi_retry' };
+    const event = stripeEvent('evt_retry', 'checkout.session.completed', object);
+    const real = t.app.store.st.markPaid;
+    t.app.store.st.markPaid = { run() { throw new Error('base occupée'); } };
+    assert.equal((await t.call('POST', '/api/stripe/webhook', { raw: event.raw, headers: event.headers })).status, 500);
+    t.app.store.st.markPaid = real;
+    const again = await t.call('POST', '/api/stripe/webhook', { raw: event.raw, headers: event.headers });
+    assert.equal(again.status, 200);
+    assert.notEqual(again.json.duplicate, true);
+    await new Promise((r) => setTimeout(r, 50));
+    assert.equal(t.world.ledger.get(PLAYER_UUID), 1200);
+  } finally {
+    await t.stop();
+  }
+});
+
+test('connexion : essais limités par identifiant même depuis plusieurs adresses', async () => {
+  const t = await start({ ...ENV, TRUST_PROXY: 'oui' });
+  try {
+    await registerAndLink(t);
+    let last;
+    for (let i = 0; i < 21; i++) {
+      last = await t.call('POST', '/api/auth/login', { body: { login: 'Aventurier', password: 'mauvais-mot-de-passe' }, headers: { 'X-Forwarded-For': `203.0.113.${i}` } });
+    }
+    assert.equal(last.status, 429);
+  } finally {
+    await t.stop();
+  }
+});

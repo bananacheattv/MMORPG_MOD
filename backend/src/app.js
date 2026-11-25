@@ -16,9 +16,9 @@ function createApp(cfg, { fetchImpl = fetch, now = Date.now, log = console } = {
   const limits = new Map();
 
   // ---------- utilitaires ----------
-  function rateLimit(req, bucket, max, windowMs) {
+  function rateLimit(req, bucket, max, windowMs, subject) {
     const forwarded = cfg.trustProxy ? String(req.headers['x-forwarded-for'] || '').split(',').pop().trim() : '';
-    const key = `${bucket}:${forwarded || req.socket.remoteAddress}`;
+    const key = `${bucket}:${subject ?? (forwarded || req.socket.remoteAddress)}`;
     const t = now();
     if (limits.size > 5000) for (const [k, v] of limits) if (v.reset <= t) limits.delete(k);
     const entry = limits.get(key);
@@ -160,13 +160,30 @@ function createApp(cfg, { fetchImpl = fetch, now = Date.now, log = console } = {
     const raw = await readBody(req, 262144);
     const event = verifyStripeSignature(raw, req.headers['stripe-signature'], cfg.stripe.webhookSecret, Math.floor(now() / 1000));
     if (event.livemode && !cfg.stripe.live) throw new HttpError(400, 'Événement LIVE refusé en mode test.');
-    if (!st.insertEvent.run(event.id, now()).changes) return { received: true, duplicate: true };
+    if (typeof event.id !== 'string' || typeof event.type !== 'string') throw new HttpError(400, 'Événement Stripe invalide.');
+    // L'événement n'est marqué comme traité que si son traitement réussit : sinon Stripe le renvoie et la commande
+    // payée n'est pas perdue (avant : une erreur après l'enregistrement de l'id faisait ignorer tous les renvois).
+    store.db.exec('BEGIN IMMEDIATE');
+    let result;
+    try {
+      result = processStripeEvent(event);
+      store.db.exec('COMMIT');
+    } catch (error) {
+      store.db.exec('ROLLBACK');
+      throw error;
+    }
+    if (result.deliver) setImmediate(() => deliverDue());
+    return result.reply;
+  }
+
+  function processStripeEvent(event) {
+    if (!st.insertEvent.run(event.id, now()).changes) return { reply: { received: true, duplicate: true } };
     const object = event.data?.object || {};
     if (event.type.startsWith('checkout.session.')) {
       const order = st.orderById.get(String(object.client_reference_id || object.metadata?.order || ''));
       if (!order || order.stripe_session !== object.id) {
         log.warn(`[boutique] session Stripe inconnue ignorée : ${object.id}`);
-        return { received: true };
+        return { reply: { received: true } };
       }
       const paid = event.type === 'checkout.session.async_payment_succeeded'
         || (event.type === 'checkout.session.completed' && object.payment_status === 'paid');
@@ -174,10 +191,10 @@ function createApp(cfg, { fetchImpl = fetch, now = Date.now, log = console } = {
         if (object.amount_total !== order.amount || String(object.currency).toLowerCase() !== order.currency) {
           st.markStatus.run('failed', 'Montant payé différent du pack', order.id, 'pending');
           log.error(`[boutique] ${order.id} : montant incohérent (${object.amount_total} ${object.currency})`);
-          return { received: true };
+          return { reply: { received: true } };
         }
         st.markPaid.run(now(), object.payment_intent ? String(object.payment_intent) : null, now(), order.id);
-        setImmediate(() => deliverDue());
+        return { reply: { received: true }, deliver: true };
       } else if (event.type === 'checkout.session.expired') {
         st.markStatus.run('expired', null, order.id, 'pending');
       } else if (event.type === 'checkout.session.async_payment_failed') {
@@ -187,7 +204,7 @@ function createApp(cfg, { fetchImpl = fetch, now = Date.now, log = console } = {
       // Les crédits déjà livrés ne sont pas retirés automatiquement : l'admin décide en jeu.
       if (st.markRefunded.run(String(object.payment_intent)).changes) log.warn(`[boutique] remboursement Stripe : ${object.payment_intent}`);
     }
-    return { received: true };
+    return { reply: { received: true } };
   }
 
   // ---------- routes ----------
@@ -224,6 +241,8 @@ function createApp(cfg, { fetchImpl = fetch, now = Date.now, log = console } = {
       rateLimit(req, 'login', 10, 900000);
       const body = await readJson(req);
       const login = text(body.login, 254);
+      // Limite aussi par identifiant visé : un essai de mots de passe réparti sur plusieurs adresses IP reste freiné.
+      if (login) rateLimit(req, 'login-account', 20, 900000, login.toLowerCase());
       const password = typeof body.password === 'string' ? body.password.slice(0, 128) : '';
       const account = login && st.accountByLogin.get(login, login.toLowerCase());
       const valid = account ? await security.verifyPassword(password, account.password) : await security.burnPasswordCheck(password);

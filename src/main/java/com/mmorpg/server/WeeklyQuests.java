@@ -166,7 +166,7 @@ public final class WeeklyQuests {
     }
 
     private static boolean near(ServerPlayer p, BlockPos pos) {
-        return p.isAlive() && !p.isSpectator() && p.level().getBlockState(pos).is(ModBlocks.QUETES_HEBDO.get())
+        return p.isAlive() && !p.isSpectator() && com.mmorpg.security.Reach.within(p, pos, 144) && p.level().getBlockState(pos).is(ModBlocks.QUETES_HEBDO.get())
                 && p.distanceToSqr(Vec3.atCenterOf(pos)) < 144;
     }
 

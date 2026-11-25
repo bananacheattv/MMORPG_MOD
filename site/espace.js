@@ -299,6 +299,8 @@ function initShopPage() {
     }
     try {
       const { url } = await portal.api('/shop/checkout', { method: 'POST', body: { pack: selected.id, waiver: true } });
+      // Seule une page de paiement Stripe est acceptée : une réponse altérée ne peut pas rediriger ailleurs.
+      if (!/^https:\/\/checkout\.stripe\.com\//.test(String(url))) throw new Error('Lien de paiement inattendu.');
       window.location.assign(url);
     } catch (error) {
       errorText.textContent = error.message;

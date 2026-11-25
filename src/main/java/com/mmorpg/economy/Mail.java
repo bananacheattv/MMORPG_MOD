@@ -39,7 +39,7 @@ public final class Mail {
     private static final UUID SYSTEM = new UUID(0, 0);
 
     private static boolean near(ServerPlayer p, BlockPos pos) {
-        return p.level().getBlockState(pos).is(ModBlocks.BOITE_AUX_LETTRES.get()) && p.distanceToSqr(Vec3.atCenterOf(pos)) < 100;
+        return com.mmorpg.security.Reach.within(p, pos, 100) && p.level().getBlockState(pos).is(ModBlocks.BOITE_AUX_LETTRES.get());
     }
 
     private static Tag encode(MinecraftServer server, ItemStack stack) {

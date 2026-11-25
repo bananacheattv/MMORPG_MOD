@@ -42,7 +42,7 @@ public final class Auction {
     public static final int ACT_BROWSE = 0, ACT_BUY = 1, ACT_SELL = 2, ACT_CANCEL = 3, ACT_CLAIM = 4;
 
     private static boolean near(ServerPlayer p, BlockPos pos) {
-        return p.level().getBlockState(pos).is(ModBlocks.HDV.get()) && p.distanceToSqr(Vec3.atCenterOf(pos)) < 100;
+        return com.mmorpg.security.Reach.within(p, pos, 100) && p.level().getBlockState(pos).is(ModBlocks.HDV.get());
     }
 
     private static Tag encode(MinecraftServer server, ItemStack stack) {

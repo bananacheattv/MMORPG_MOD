@@ -28,7 +28,7 @@ public final class Bank {
     public static final int ACT_DEPOSIT = 0, ACT_WITHDRAW = 1, ACT_OPEN_PAGE = 2;
 
     private static boolean near(ServerPlayer p, BlockPos pos) {
-        return p.level().getBlockState(pos).is(com.mmorpg.registry.ModBlocks.BANQUE.get()) && p.distanceToSqr(Vec3.atCenterOf(pos)) < 100;
+        return com.mmorpg.security.Reach.within(p, pos, 100) && p.level().getBlockState(pos).is(com.mmorpg.registry.ModBlocks.BANQUE.get());
     }
 
     public static void open(ServerPlayer p, BlockPos pos) {

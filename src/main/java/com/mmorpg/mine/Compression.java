@@ -41,7 +41,7 @@ public final class Compression {
     }
 
     public static void compress(ServerPlayer player, BlockPos pos, int times, String oreId) {
-        if (!player.level().getBlockState(pos).is(ModBlocks.PRESSE_COMPRESSION.get()) || player.distanceToSqr(Vec3.atCenterOf(pos)) >= 64) return;
+        if (!com.mmorpg.security.Reach.within(player, pos, 64) || !player.level().getBlockState(pos).is(ModBlocks.PRESSE_COMPRESSION.get())) return;
         MineBlocks.Ore ore = ore(oreId);
         if (ore == null) return;
         PlayerData d = RpgPlayers.get(player);

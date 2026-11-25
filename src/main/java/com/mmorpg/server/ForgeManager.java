@@ -27,7 +27,7 @@ public final class ForgeManager {
     }
 
     private static boolean nearForge(ServerPlayer player, BlockPos pos) {
-        return player.level().getBlockState(pos).is(ModBlocks.FORGE_ARCANIQUE.get()) && player.distanceToSqr(Vec3.atCenterOf(pos)) < 64;
+        return com.mmorpg.security.Reach.within(player, pos, 64) && player.level().getBlockState(pos).is(ModBlocks.FORGE_ARCANIQUE.get());
     }
 
     public static int count(Inventory inv, Item item) {

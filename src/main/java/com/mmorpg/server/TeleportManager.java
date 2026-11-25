@@ -120,7 +120,7 @@ public final class TeleportManager {
 
     public static void configure(ServerPlayer player, BlockPos pos, String name, int category, int minLevel) {
         ServerLevel level = player.level();
-        if (!(level.getBlockState(pos).getBlock() instanceof TeleporterBlock) || player.distanceToSqr(Vec3.atCenterOf(pos)) > 100) return;
+        if (!com.mmorpg.security.Reach.within(player, pos, 100.0001) || !(level.getBlockState(pos).getBlock() instanceof TeleporterBlock)) return;
         WaypointData data = WaypointData.get(level.getServer());
         WaypointData.Waypoint w = data.at(level.dimension(), pos);
         if (w == null || !canEdit(player, w)) return;
